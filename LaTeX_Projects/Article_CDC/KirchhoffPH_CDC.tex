@@ -12,6 +12,8 @@
 \usepackage{subfig}
 \usepackage{diffcoeff}
 \usepackage{mathrsfs}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,calc}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{remark}{Remark}
@@ -55,6 +57,15 @@
 	\thispagestyle{empty}
 	\pagestyle{empty}
 
+\tikzset{
+	block/.style = {draw, fill=white, rectangle, minimum height=3em, minimum width=3em},
+	tmp/.style  = {coordinate}, 
+	sum/.style= {draw, fill=white, circle, node distance=1cm},
+	input/.style = {coordinate},
+	output/.style= {coordinate},
+	pinstyle/.style = {pin edge={to-,thin,black}
+	}
+}
 
 % make the title area
 \maketitle
@@ -230,7 +241,7 @@ In this section the structure preserving discretization procedure is detailed. T
 \begin{enumerate}
 \item put the system in weak form;
 \item second perform integrations by parts to get the boundary control of choice;
-\item select the finite element spaces to achieve a finite dimensional system
+\item select the finite element spaces to achieve a finite dimensional system.
 \end{enumerate}
 
 
@@ -343,18 +354,14 @@ m_{nn} = \sum_{i = 1}^{N_{m_{nn}}} \phi_{m_{nn}}^i(s) \; m_{nn}^i.
 \end{equation}
 It is now possible to construct the following matrices
 \begin{equation}
-\begin{gathered}
-\left.\begin{aligned}
-\bm{G}_{w}(i,j) &= \int_{\Gamma_{C} \cup \Gamma_{S} } {\phi}_{w}^i \, {\phi}_{\widetilde{q}_n}^j \d{s}, \\
-\bm{B}_{\widetilde{q}_n}(i,j) &= \int_{\Gamma_{\widetilde{q}_n}} {\phi}_{w}^i \, {\phi}_{\widetilde{q}_n}^j \d{s},  \\
-\end{aligned} \; \right\} \quad  \in \mathbb{R}^{N_w \times N_{q_n}}, \\
-\left. \begin{aligned}
-\bm{G}_{\omega_n}(i,j) &= \int_{\Gamma_{C}} \diffp{\phi_w^i}{n} \, \phi_{m_{nn}}^j \d{s}, \\
-\bm{B}_{m_{nn}}(i,j) &= \int_{\Gamma_{m_{nn}}} \diffp{\phi_w^i}{n} \, \phi_{m_{nn}}^j \d{s}, \\
-\end{aligned} \; \right\} \quad \in \mathbb{R}^{N_w \times N_{m_{nn}}},
-\end{gathered}
+\begin{aligned}
+\bm{G}_{w}(i,j) &= \int_{\Gamma_{C} \cup \Gamma_{S} } {\phi}_{w}^i \, {\phi}_{\widetilde{q}_n}^j \d{s}, \quad  \in \mathbb{R}^{N_w \times N_{q_n}},\\
+\bm{B}_{\widetilde{q}_n}(i,j) &= \int_{\Gamma_{\widetilde{q}_n}} {\phi}_{w}^i \, {\phi}_{\widetilde{q}_n}^j \d{s}, \quad  \in \mathbb{R}^{N_w \times N_{q_n}}, \\
+\bm{G}_{\omega_n}(i,j) &= \int_{\Gamma_{C}} \diffp{\phi_w^i}{n} \, \phi_{m_{nn}}^j \d{s}, \quad \in \mathbb{R}^{N_w \times N_{m_{nn}}}, \\
+\bm{B}_{m_{nn}}(i,j) &= \int_{\Gamma_{m_{nn}}} \diffp{\phi_w^i}{n} \, \phi_{m_{nn}}^j \d{s}, \quad \in \mathbb{R}^{N_w \times N_{m_{nn}}},\\
+\end{aligned} 
 \end{equation}
-where $\Gamma_{C},\Gamma_{S}$ are subsets of the boundary where clamped and simply supported boundary conditions apply and $\Gamma_{\widetilde{q}_n},\Gamma_{m_{nn}}$ are subset Consequently, the input matrix reads
+where $\Gamma_{C},\Gamma_{S}$ are subsets of the boundary where clamped and simply supported boundary conditions apply and $\Gamma_{\widetilde{q}_n},\Gamma_{m_{nn}}$ are subsets where inhomogeneous Neumann conditions hold. Consequently, the input matrix reads
 The final port-Hamiltonian descriptor system (pHDAEs), as defined in \cite{beattie2018linear}, is written as
 \begin{equation}
 \begin{bmatrix}
@@ -400,12 +407,96 @@ since $\mathscr{H} \subset \mathcal{D}(J)$.
 \begin{remark}
 	It has to be appointed that the space $H^{\text{div Div}}(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}})$ was never addressed in the mathematical literature. For this reason the only way to deal with this problem numerically is to use $H^{2}(\Omega)$ conforming finite elements. 
 \end{remark}
-The Firedrake library \cite{firedrake} was used to implement the numerical analysis as it provides functionalities to automate the generalized mappings for $H^2$ conforming finite elements (like the Hermite, Bell or Argyris finite elements). \\ 
-All the variables, i.e. the velocity $e_w$ and the momenta tensor $\mathbb{V}_\kappa$ as well as the corresponding test functions, are discretized by the same finite element space, the Bell finite element \cite{Bell}, denoted by $H_r^2(\mathbb{P}_5, \Omega)$. For this element the field is computed using quintic polynomials whose degrees of freedom are the values of the function, its gradient and its Hessian at the vertex of each triangular element. In the following mixed boundary conditions will be considered. To deal with those Lagrange multipliers have to be introduced (the reader can refer to \cite{BrugnoliMin}, section 4.3 for an explanation). The multipliers are therefore discretized by using second degree Lagrange polynomials defined over the boundary $H_r^1(\mathbb{P}_2, \partial\Omega)$. 
+The Firedrake library \cite{firedrake} was used to implement the numerical analysis as it provides functionalities to automate the generalized mappings for $H^2$ conforming finite elements (like the Hermite, Bell or Argyris finite elements). All the variables, i.e. the velocity $e_w$ and the momenta tensor $\bm{E}_\kappa$ as well as the corresponding test functions, are discretized by the same finite element space, the Bell finite element \cite{Bell}, denoted by $H_r^2(\mathbb{P}_5, \Omega)$. The multipliers are therefore discretized by using second degree Lagrange polynomials defined over the boundary and denoted with $H_r^1(\mathbb{P}_2, \partial\Omega)$. 
 
 
 \section{Interconnection with a finite dimensional pH system}
-In this section the interconnection of an infinite and finite port system is explained in 
+In this section the interconnection of an infinite and finite port system is explained in both the infinite and finite dimensional setting.
+
+\subsection{General Ideas for the infinite dimensional setting}
+Consider an infinite dimensional pH system ( or distributed pH system, dpH) and a finite dimensional pH system denoted by equations 
+
+\noindent
+\begin{minipage}{.5\linewidth}
+	\begin{equation}
+	\text{pH} \left\{ 
+	\begin{aligned}
+	\dot{\bm{x}}_2 = \bm{J} \diffp{H_2}{\bm{x}_2} + \bm{B} \bm{u}_2 \\
+	\bm{y}_{2} = \bm{C} \diffp{H_2}{\bm{x}_2} + \bm{D} \bm{u}_2 \\
+	\end{aligned},
+	\right. 
+	\end{equation}
+\end{minipage} %
+\begin{minipage}{.45\linewidth}
+	\begin{equation}
+	\text{dpH} \left\{ 
+	\begin{aligned}
+	\diffp{x_1}{t} = \mathcal{J} \diffd{H_1}{x_1} \\
+	u_{\partial, 1} = \mathcal{B} \diffd{H_1}{x_1} \\
+	y_{\partial, 1} = \mathcal{C} \diffd{H_1}{x_1} \\
+	\end{aligned},
+	\right.
+	\end{equation} 
+\end{minipage}
+
+where $\bm{x} \in \mathbb{R}^n, \bm{u}, \bm{y} \in \mathbb{R}^m$ $x_1 \in \mathscr{X}$ and $u_{\partial, 1}  \in \mathscr{U}, \, y_{\partial, 1} \in  \mathscr{Y} = \mathscr{U}^\prime$ belong to some Hilbert spaces (the prime denotes the dual of a space)  and  $\mathcal{B}: \mathscr{X} \rightarrow \mathscr{U}, \; \mathcal{C}: \mathscr{X} \rightarrow \mathscr{Y}$ are boundary operators. The duality pairings for the boundary ports are then denoted by
+\[
+\left\langle u_{\partial, 1}, \; y_{\partial, 1} \right\rangle_{\mathscr{U} \times \mathscr{Y}}  \qquad
+\left\langle \bm{u}_{2}, \; \bm{y}_{2} \right\rangle_{\mathbb{R}^m}
+\]
+
+Given a compact interconnection operator $\mathcal{I}: \mathscr{Y} \rightarrow \mathbb{R}^m$ consider the following power preserving interconnection
+\begin{equation}
+	\bm{u}_2 = \mathcal{I} \, y_{\partial, 1}  \qquad u_{\partial, 1} = - \mathcal{I}^* \, \bm{y}_2
+\end{equation}
+
+\paragraph{Example 1: Rigid rod welded to the plate}
+A rigid rod can be written undergoing small displacements about the $z$ axis and small rotation about the $x$ axis is a port-Hamiltonian system with structure
+\begin{equation}
+\begin{aligned} \dot{\bm{x}}_{\text{rod}} =
+\displaystyle \diff{}{t}
+\begin{pmatrix}
+p_w \\ p_\theta \\
+\end{pmatrix} & = \begin{pmatrix}
+F_z \\ T_x \\
+\end{pmatrix} = \bm{u}_{\text{rod}}\vspace{1mm} \\
+ \bm{y}_{\text{rod}} &= \begin{pmatrix}
+ v_G \\ \theta_{G} \\
+ \end{pmatrix} = \displaystyle \diffp{H_{\text{rod}}}{\bm{x}_{\text{rod}}}
+\end{aligned}, 
+\end{equation}
+with $p_w, p_\theta$ the linear and angular momentum about the center of mass, $v_G, \theta_{G}$ the linear and angular velocity about the center of mass $G$ and $F_z, T_x$ the force along $z$ and the torque along $x$. The Hamiltonian reads $H_{\text{rod}}  = \frac{1}{2} \left( \frac{p_w^2}{M_G} + \frac{p_\theta^2}{J_G}\right)$, with $M, J_G$ the mass and rotary inertia about the $x$ axis. The rod is welded to a rectangular thin plate of sides $L_x, L_y$ on side $x = L_x$. The boundary variables for the plate involved in the interconnection are 
+\[u_{\partial, \text{pl}} = w_t\vert_{x = L_x}  \qquad  y_{\partial, \text{pl}} = \widetilde{q}_n\vert_{x = L_x}
+\]
+The space $\mathscr{Y}$ is the space of square integrable functions on with support $\partial\Omega_{\text{int}} = \left\{ (x,y) \vert \; x=L_x, 0 \le y \le L_y  \right\}$ compact interconnection operator then reads
+\begin{equation}
+	\mathcal{I} \widetilde{q}_n\vert_{x = L_x} \begin{pmatrix}
+	\int_{y = 0}^{y = L_y} \widetilde{q} \d{y} \\
+	\int_{y = 0}^{y = L_y} \widetilde{q} \left( y - L_y/2 \right) \d{y} \\
+	\end{pmatrix} 
+\end{equation}
+
+
+
+\begin{tikzpicture}[auto, node distance=2cm,>=latex']
+
+\node [input, name=input] {};
+\node [sum, right of=input] (sum) {};
+\node [block, right of=sum] (controller) {Controller};
+\node [block, right of=controller, pin={[pinstyle]above:D},
+node distance=3cm] (system) {System};
+
+\draw [->] (controller) -- node[name=u] {$u$} (system);
+\node [output, right of=system] (output) {};
+\node [block, below of=u] (measurements) {Measurements};
+
+\draw [draw,->] (input) -- node {$r$} (sum);
+\draw [->] (sum) -- node {$e$} (controller);
+\draw [->] (system) -- node [name=y] {$y$}(output);
+\draw [->] (y) |- (measurements);
+\draw [->] (measurements) -| node[pos=0.99] {$-$} 
+node [near end] {$y_m$} (sum);
+\end{tikzpicture}
 
 
 % An example of a floating figure using the graphicx package.
