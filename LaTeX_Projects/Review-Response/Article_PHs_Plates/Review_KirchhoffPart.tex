@@ -1,0 +1,515 @@
+%% LyX 2.1.5 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage{color}
+\usepackage{tcolorbox}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\usepackage[unicode=true,pdfusetitle,
+ bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
+ breaklinks=false,pdfborder={0 0 0},backref=false,colorlinks=true]
+ {hyperref}
+\hypersetup{allcolors=red}
+
+\def\onedot{$\mathsurround0pt\ldotp$}
+\def\cddot{% two dots stacked vertically
+	\mathbin{\vcenter{\baselineskip.67ex
+			\hbox{\onedot}\hbox{\onedot}}%
+}}
+
+\makeatletter \renewcommand\d[1]{\ensuremath{%
+		\;\mathrm{d}#1\@ifnextchar\d{\!}{}}}
+\makeatother
+
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+%===================================
+%% --  Page margins
+\usepackage{geometry}
+\geometry{verbose,twoside,a4paper,
+    % Main margins 
+top=3cm,
+bottom=3cm,
+inner=2.5cm,outer=2.5cm,
+    % Split of top margins
+headheight=2.2cm,headsep=0.5cm,
+    % Split of bottom margin
+footskip=0.5cm,
+    % Split of outer margin
+marginparsep=0.5cm,
+marginparwidth=12.5pt % width of icon \faNewspaperO at 11pt
+}
+% Width of icon is computed with
+% \newlength{\myl} \settowidth{\myl}{\faNewspaperO} Width of icon \faNewspaperO is \the\myl.
+%===================================
+
+%===================================
+%% -- Header
+%\renewcommand{\thepage}{\roman{page}}% Roman numerals for page counter
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+% Custom fancy style (can be modified on the fly within the document as well)
+\fancyhf{} %Clear Everything.
+  % Current page number on the exterior
+\fancyhead[R]{Brugnoli {\it et al.},   APM-D-18-02038, \thepage}
+  % Chapter name on the interior of even pages
+\fancyhead[L]{\nouppercase{\leftmark}}
+% Redefinition of the plain style
+% (This page style is used for the first page of Chapter, table of contents,
+% etc...)
+\fancypagestyle{plain}{
+       \fancyhf{} %Clear Everything.
+       \renewcommand{\headrule}{\hrule height 2pt \vspace{1mm}\hrule height 1pt}
+       \fancyhead[R]{\thepage}
+}
+%===================================
+
+%===================================
+%% -- tcolorbox to quote
+%\usepackage[most]{tcolorbox}
+\tcbuselibrary{most}
+\tcbuselibrary{breakable} % breakable boxes
+%\definecolor{background}{HTML}{F9F5E9}
+%\definecolor{linecolor}{HTML}{E0D7BC}
+\colorlet{background}{lightgray!80!white}
+\colorlet{linecolor}{black}
+
+\newtcolorbox{quotebox}[2][]{%
+leftupper=2em,
+colback=background,
+colframe=background,
+%fonttitle=\bfseries,
+coltitle=black,
+breakable,
+enhanced,
+attach boxed title to top right,
+boxed title style={empty},
+sharp corners,
+borderline north={0.5pt}{0pt}{linecolor},
+borderline north={0.5pt}{1.5pt}{linecolor},
+borderline south={0.5pt}{0pt}{linecolor},
+borderline south={0.5pt}{1.5pt}{linecolor},
+title=#2,#1}
+
+\tcbset{colback=white,
+%colframe=green!50!black,
+%fonttitle=\bfseries,
+coltitle=white,
+breakable,enhanced jigsaw,%breakable box
+%sharp corners,
+}
+%===================================
+
+%===================================
+%-- 'Remark' and TODO' command
+\usepackage{fontawesome}
+\usepackage{tcolorbox}
+   % enable macro
+\newcommand{\remark}[1]{%
+\begin{tcolorbox}[title=,colframe=white,colback=lightgray!50!white,fontupper=\sffamily\small]
+\faComment~#1
+\end{tcolorbox}}
+   % disable macro
+\renewcommand{\remark}[1]{}
+   % enable macro
+\newcounter{todocounter}
+\newcommand{\todo}[1]{\stepcounter{todocounter}\textbf{\textcolor{red}{(TODO \arabic{todocounter} -- #1)}}}
+   % disable macro
+%\renewcommand{\todo}[1]{\stepcounter{todocounter} \textbf{ \textcolor{red}{(\arabic{todocounter})} }}
+%===================================
+
+%===================================
+%%-- Misc.
+\usepackage{lipsum}
+% Write 'et al.'
+% Use \etal (no trailing space) or \etal{} (trailing space)
+\newcommand{\etal}{\emph{et al.}}
+  % Line numbering
+\usepackage{lineno}
+\modulolinenumbers[5]
+  % For option 'stretch fill image'
+\tcbuselibrary{skins}
+%===================================
+
+%===================================
+%% -- Color for review
+   % background color
+\colorlet{colorRevBG1}{blue!60!black} % dark blue
+\colorlet{colorRevBG2}{red!60!black} % dark red
+\colorlet{colorRevBG3}{green!40!black} % dark green
+  % front color
+\colorlet{colorRev1}{blue!80!black} % dark blue
+\colorlet{colorRev2}{red!80!black} % dark red
+\colorlet{colorRev3}{green!50!black} % dark green
+% Macro to enter revisions
+% Usage: \revision[No.]{text}
+%\usepackage{ifthen}
+\usepackage{xstring}
+\newcommand{\revision}[2]{%
+\IfStrEqCase{#1}{{1}{\textcolor{colorRev1}{#2}}
+    {2}{\textcolor{colorRev2}{#2}}
+    {3}{\textcolor{colorRev3}{#2}}}
+    [\PackageError{rev}{Unknown reviewer: #1}{Choose available.}]%
+}
+
+%===================================
+
+\makeatother
+
+\makeatother
+
+\begin{document}
+\thispagestyle{plain}
+
+\noindent {\Large{} APM-D-18-02038
+}{\Large \par}
+
+\noindent \begin{flushleft}
+{\Large{}Port-Hamiltonian formulation and Symplectic discretization of Plate models \\	\vspace{2mm}\large\textit{Part II : Kirchhoff model for thin plates
+}}
+\par\end{flushleft}{\Large \par}
+
+\noindent \begin{flushleft}
+Andrea Brugnoli, Daniel Alazard, Val\'erie Pommier-Budinger, Denis Matignon
+\par\end{flushleft}
+
+\noindent \begin{flushleft}
+\today
+\par\end{flushleft}
+
+\begin{center}
+\textbf{\Large{}Response to reviewers}
+\par\end{center}{\Large \par}
+
+We gratefully acknowledge each reviewer for his/her most constructive comments. The quality of the paper has benefited from yours suggestions. Our responses are provided in this document.
+
+Revised passages have been highlighted in the PDF version of the manuscript, with a different color for \textcolor{colorRev1}{Reviewer \#1} and \textcolor{colorRev2}{Reviewer \#2}.
+
+\tableofcontents{}
+
+\clearpage{}
+
+
+\section{Summary of revisions}
+
+The manuscript has been revised to account for the comments of the two reviewers. The revisions are highlighted in \revision{1}{blue for reviewer \#1} and in \revision{2}{red for reviewer \#2}. A summary of the revisions
+is given below.
+
+\begin{tcolorbox}[title=Summary of revisions (Reviewer No. 1), colframe=colorRevBG1]
+Here we refer to the sections of the unrevised paper.
+\begin{itemize}
+\item (Section~2) The Euler-Lagrange formulation has been removed. The classical model has been directly recalled.
+\item (Section~3.2)  The Stokes-Dirac structure for the Kirchhoff plate has been derived using results presented in the introduction of part I of these companion papers. 
+\item (Section~4.3) The final part has been removed. A new section has been added to describe the numerical results. In this sections the numerical difficulties related to this formulation are better discussed.
+\item (Conclusion) The conclusion has been rewritten to detail the novelty of the formulation. The issues related to the additional complexities of this model have been discussed in a clearer way.
+\end{itemize}
+\end{tcolorbox}
+
+
+\begin{tcolorbox}[title=Summary of revisions (Reviewer No. 2),colframe=colorRevBG2]
+Here the sections we refer to are the ones for the unrevised paper.
+\begin{itemize}
+\item (Section~4.3) The numerical procedure has been detailed with an implementation suited for the Firedrake library. 
+\item A new section (section 5) was added to illustrate numerical results. To demonstrate the consistency and validity of the approach the computation of the eigenvalues and eigenvectors using different different boundary control has been carried out. Temporal simulations demonstrate the possibility to add distributed forces in a straightforward manner and handle easily generic boundary conditions. Symplectic integration schemes allow to preserve the energy at the discrete level.
+\end{itemize}
+\end{tcolorbox}
+ 
+We have also made the following minor modifications:
+\begin{itemize}
+\item the vertical velocity variable (before denoted with $v$) is now denoted with $w_t$ to avoid confusion with the test functions of the weak formulation;
+\item the shear stress is now denoted with the lower case $\bm{q}$, together with the corresponding boundary value $q_n$ to insist on the vectorial nature of this variable (figure 2 has been modified consequently);
+\item the notations for the vector valued and tensor valued function space has been slightly modified; for the example the space $L^2(\Omega, \mathbb{R}_{\text{sym}}^{2\times2})$ (before denoted with notation $[L^2_{\text{sym}}(\Omega)]^{2\times2}$) is the space of square integrable symmetric tensor valued functions on the open connected set $\Omega$;
+\item when using the tensorial formulation the boundary variables are obtained by contraction of tensors against the dyadic product of normal and tangential tensors;
+\item the subsection "Weak form for the vectorial formulation" has been removed as it is a useless repetition of the same procedure for the tensorial formulation.
+\end{itemize}
+\clearpage{}
+
+
+\section[Document format]{Format of the present document}
+
+\subsubsection*{Format of response}
+
+An answer is formatted as follows. The reviewer is first quoted with
+a gray box that also indicates the position of the quote in the original
+review. The comment is then answered in the subsequent paragraph(s).
+A description of the revisions and their positions is then given in a box.
+The color of the box for each reviewer matches the text color used in the revised manuscript (in all cases but one when the revision is made for reviewer  \#2 but answer also a question by reviewer \#1), given below.
+\begin{itemize}
+	\item \textcolor{colorRev1}{Reviewer \#1} 
+	\item \textcolor{colorRev2}{Reviewer \#2}
+\end{itemize}
+
+\begin{quotebox}{Reviewer No.$i\in\left\{1{,}2{,}3\right\} $ -- Position of the quote}
+	"Direct quote of a comment provided by the reviewer No.$i$."
+\end{quotebox}
+
+Answer to the comment for reviewer No. 1.
+
+\begin{tcolorbox}[title=Revision page -- (Reviewer No. $1$),colframe=colorRevBG1]
+	Descriptions of the corresponding revisions in the manuscript.
+\end{tcolorbox}
+
+Answer to the comment for reviewer No. 2.
+\begin{tcolorbox}[title=Revision page -- (Reviewer No. $2$),colframe=colorRevBG2]
+	Descriptions of the corresponding revisions in the manuscript.
+\end{tcolorbox}
+
+
+\subsubsection*{Remark on the use of references}
+
+In our responses, we refer to two families of bibliographic entries:
+\begin{itemize}
+\item The ones that are contained in the revised manuscript, which are referred
+to using the numerical style of the \emph{Journal}, e.g. [1].
+\item References\emph{ specific to this document} and not necessarily contained
+in the manuscript. To avoid confusion, these references are quoted
+using an author-year citation style, e.g. \cite{LIM20075396}.
+\end{itemize}
+\clearpage{}
+
+
+\section{Reply to reviewer \#1}
+We thank the reviewer for these detailed and constructive comments. We have addressed each one
+below. In the revised manuscript, the corresponding revisions are \textcolor{colorRev1}{highlighted in blue}.
+
+
+\begin{quotebox}{Reviewer No.1 -- Paragraphs 2}
+However the paper should be improved in the following aspects. I find it necessary, to
+add the definition of the Stokes-Dirac structure at the end of the section 3; it would be a
+natural to present it as the extension of the operator defined in equation (54). The proof
+would not be necessary as it would be very similar to that of the section 2 in vector form.
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision page 15 (Reviewer No. 1),colframe=colorRevBG1]
+As discussed in the reply for part I, the introduction has been rewritten including a suitable definition of Stokes-Dirac structure for the models. The tensorial formulation is now completed with its associated Stokes-Dirac structure.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Paragraphs 3}
+Having read now the two companion paper I would also suggest that in the first one (as
+indicated in the review) include the precise definition of Dirac and Stokes-Dirac structure
+as extension of Hamiltonian operators and that the second paper refers to it.
+\end{quotebox}
+\begin{tcolorbox}[title=Revision in part I pages 4 to 6 (Reviewer No. 1),colframe=colorRevBG1]
+This suggestion was followed in part I. Now part II refers to the first one for the preliminary results.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment 1 and 2}
+page 1, line 48: mispelled: first \\
+page 2
+\begin{itemize}
+\item line 20: mispelled: through
+\item lines 44-47: the sentence The reader can refer to [17] ...as PH Bernoulli
+beams. It is not clear why it is written here; I think that it should rather be
+inserted at the end of the section as reference to the use of this model for
+simualtion and control purposes.	
+\end{itemize}
+\end{quotebox}
+\begin{tcolorbox}[title=Revision page 4 (Reviewer No. 1 -- Comment 1 and 2),colframe=colorRevBG1]
+The remark concerning the sentence "\textit{The reader can refer to [17] ...as PH Bernoulli
+	beams}" has been followed. It is now reported as a remark at the end of the section.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment 3}
+	page 5: line 37-38: the rigidity is defined in two ways as a constant and as a position
+	depend coefficient: give the properties of this coefficient and give a justification of
+	your choice !
+\end{quotebox}
+The mechanical parameters (the Young and Poisson modulus) may be inhomogeneous in the general case. The PH Hamiltonian formulation easily allow to treat the inhomogeneous case. In order to relate the Krchhoff plate formulation used for PH model and the well known classical bilaplacian problem constant coefficients have to be assumed.
+\begin{tcolorbox}[title=Revision page 5 (Reviewer No. 1 -- Comment 3),colframe=colorRevBG1]
+ The explanation now consider a generic definition for the bending rigidity matrix to be used in the paper. The relation with the bilaplacian problem is stated for the homogeneous case.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment 4}
+page 6
+	\begin{itemize}
+		\item line 43: the sentence The spatial derivatives of the acceleration have been
+		neglected. is cryptic ! That means that equation (19) does not stems from
+		Hamilton's principle ?
+		\item line 50: please precise: in the sentence: In the sequel it is assumed that the
+		load density p = 0.
+	\end{itemize}
+\end{quotebox}
+\begin{tcolorbox}[title=Revision page 5 (Reviewer No. 1 -- Comment 4),colframe=colorRevBG1]
+The Euler-Lagrange formulation has been removed to simplify the explanation. No load density is considered. The discussion on how to add distributed load in given in section 3.1.2.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment 5}
+page 7 :
+\begin{itemize}
+\item line 7-8 it is written: Since the Kirchhoff plate represents the 2D extension of
+the Euler-Bernoulli beam, it is natural to select as energy variables \dots Maybe
+it would be better not to argue with "common sense in Mechanics" and be
+more clearly justify the choice of the energy variables from the expression of
+the kinetic and the potential energy in page 6, lines 18-22.
+\item  lines 23-24: it is written: The port-Hamiltonian system and the formally
+skew-adjoint operator relating energy and co-energy variables are found ...
+How do you find it ? there is nowhere written the equations of motion or a
+reference to it ?
+\end{itemize}
+\end{quotebox}
+The last three equations of the systems stems from Schwarz (or Clairaut) theorem for the vertical displacement function: for a smooth function the higher order mixed partial derivatives commute.
+\begin{tcolorbox}[title=Revision pages 6-7 (Reviewer No. 1 -- Comment 5),colframe=colorRevBG1]
+The choice of the energy variables is now justified by the expression of the energy. System (24) is now followed by an explanation on how to obtain each line. 
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment 6}
+ page 9:
+	\begin{itemize}
+		\item line 8: it is written It is well known that variables $v$ and $\frac{\partial v}{\partial s}$ are kinematically related. Actually what is used below is the fact that they are differentially
+		dependent (with respect to derivation along s the curvilinear abcsissa of the
+		boundary domain) and this is immediately seen. So what is actually achieved
+		is to express the energy balance equation with respect to independent variables.
+		\item line 33: it is written The space of boundary conditions but the authors mean
+		The space of boundary variables as it is written line 43
+	\end{itemize}
+\end{quotebox}
+-\begin{tcolorbox}[title=Revision pages 8-9 (Reviewer No. 1 -- Comment 6),colframe=colorRevBG1]
+Appropriate corrections have been performed.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment 7}
+	page 12
+	\begin{itemize}
+		\item   line 31: I guess that the authors mean In fact instead of Indeed ?
+		\item  lines 40-41: the sentence .. will correspond to the mixed derivatives of the
+		vertical displacement instead of its double, is not very clear. Rather write
+		(differing by 1/2 from the definition page ...)	
+	\end{itemize}
+\end{quotebox}
+\begin{tcolorbox}[title=Revision page 12 (Reviewer No. 1 -- Comment 7),colframe=colorRevBG1]
+Appropriate corrections have been performed.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment 8}
+	page 13
+	\begin{itemize}
+		\item   line 5: it is written: The port-Hamiltonian system \dots what Hamiltonian system do you mean ? give a precise reference to the equation you	mean.	
+		\item  line 49: it is written We try to identify $A^∗$ .. rather write We shall	compute / identify ..	
+	\end{itemize}
+\end{quotebox}
+\begin{tcolorbox}[title=Revision page 13 (Reviewer No. 1 -- Comment 8),colframe=colorRevBG1]
+Appropriate corrections have been carried out.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment 9}
+	page 14
+	\begin{itemize}
+		\item   lines 4-6: I would reverse the 2 sentences; first: A classical result is the
+		fact that the adjoint of the vector divergence is div$^∗$ = grad and give a
+		reference there. and then. This may be generalized to the adjoint of the
+		tensor divergence ..
+		\item line 33: it is written Again the boundary values, whereas it should be boundary port variables
+	\end{itemize}
+\end{quotebox}
+\begin{tcolorbox}[title=Revision page 14 (Reviewer No. 1 -- Comment 9),colframe=colorRevBG1]
+Appropriate corrections have been performed.
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.1 -- Comment 10}
+	page 15: lines 28-34: these lines describing the discretization method are too vague. I
+	suggest to write preciely which of the equations are then integrated by parts.
+	and write the choices of input variables to which this corresponds.
+\end{quotebox}
+\begin{tcolorbox}[title=Revision page 16 (Reviewer No. 1 -- Comment 10),colframe=colorRevBG1]
+	The discretization procedure is now detailed step by step in the introductory part, together with the lines to be integrated by parts
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment 11}
+	page 20: 
+	\begin{itemize}
+\item line 10, you write: shares the same properties, but it is not clear which
+properties ? Rather state share the Port Hamiltonian structure.
+\item line 13: it is written Furthermore, this method is easily implementable by standard finite element libraries. This is not justified; which libraries ? why ? I doubt that standard libraries encompass the Port Hamiltonian systems N!
+\item the paragraph starting line 16 is very poorly written, although the subject
+should be mentioned. Please recall where $\phi_1$ is defined and to which physical
+variable it corresponds and do the same with the remaining variables; give references to the choices of discretization basis that you mention. The sentence These elements are however difficult \dots level. is not understandable. Rather give references where it is used and why they are difficult to implement. What are the less regular elements, five examples, references and eventually references to standar/open FEM packages ?
+\item  lines 35 and following. The conclusion has been too hastily written and is
+quite weak. The results should be summarized precisely in 1 paragraph.
+Concerning the open questions, they should be formulated in such a way to
+give a precise idea on the path to follow. The statement: First of all the
+functional spaces in which the variables live needs to be specified precisely. is
+weak. I'd rather stated that the presented formulation should be completed
+with amore precise analysis of the well-posedness of the system in the input-output sense, generalizing to a second-order operator the results of Kurula and Zwart in the UT Memorandum 1994 The duality between the gradient
+and divergence operators on bounded Lipschitz domains (see also the reference [9] about the trace operators and Port Hamiltonian systems) for 2-D systems. 
+\item The statement Then it would be of great interest to interconnect \dots is also not
+precise enough ! State for instance that the results presented in this paper enables
+the interconnection in the sense of Dirac structures and their composition on
+Hilbert spaces Mikael Kurula et al., J. . Math. Anal. Appl. 372 (2010) 402-422,
+that the structure preserving discretization enables to adapt easily commercial
+software etc \dots
+	\end{itemize}
+\end{quotebox}
+These comments were really useful to improve the explanation about numerical problems related to this model. The domain of the operator $J$ for the Kirchhoff plate is 
+\[
+\mathcal{D}(J) = H^{2}(\Omega) \times  H^{\text{div Div}}(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}}) \,+ \text{boundary conditions}
+\]
+First of all the the space $H^{\text{div Div}}(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}})$ was never addressed in the mathematical literature. A theoretical analysis of this space is needed. This represents a problematic on its own. Then it must be added that the $H^2$ conforming finite elements (like the Hermite, Bell or Argyris finite elements) do not satisfy the proper equivalence properties to give a simple relationship between the reference basis and nodal basis on a general cell. Reference [29] was added as it presents in the introduction a precise discussion upon this problematic topic. Many finite element lbrary are construct on this equivalence paradigm between the reference element of a mesh and a generic cell. Here we quote 29 "any  code  based  on  the  reference  element  paradigm  operates  under  the  assumption that finite elements satisfy a certain kind of
+equivalence". The problem is that $H^2$ elements "do not satisfy the proper equivalence properties to give a simple relationship between the reference basis and nodal basis on a general cell"  In this reference this problem is address and a new methodology is developed to transform finite element from a reference cell to a generic one in the mesh. There exist isolated case for which this mapping is given for a specific cases (see the introduction of [29]) but they do not represent the rule. As our purposes is to make the PH modelling paradigm as usable as possible we decide to use the Firedrake library (in which the new methodology presented in [29] is implemented) to perform the numerical analysis in section 5. 
+\begin{tcolorbox}[title=Revision pages 19-20 (Reviewer No. 1 -- Comment 11),colframe=colorRevBG1]
+The paragraph starting at line 16 has been removed. Section 5 deals in detail with the numerical implementation ad there we make the needed comments upon the additional difficulties of using $H^2$ elements. Reference [29] has been added. Therein the reader can find an exhausting explaining on the problem of transforming the basis function from a reference element to a generic cell.  \\
+For what concern the conclusion, the main results were summarize in the first paragraph. The second paragraph cites [33] for the extension of the results therein to the second order differential case. The third one, citing [5] discussed the possibility of interconnecting this system to model complex systems.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment 11}
+References:
+	\begin{itemize}
+\item please cite as much as possible journal papers and chapters from books in-
+stead of conference papers
+\item please write Hamiltonian with capital H in the titles of the papers: this is
+achieved by writing {H}amiltonian in the bib file!
+\item for the Port Hamiltonian formulation on jet bundles of the Mindlin plate
+rather cite Schöberl M., Schlacher K. (2017) Variational Principles for Different Representations of Lagrangian and Hamiltonian Systems. In: Irschik H., Belyaev A., Krommer M. (eds) Dynamics and Control of Advanced
+Structures and Machines. Springer, First Online 12 November 2016 DOI https://doi.org/10.1007/978-3-319-43080-5\_7
+	\end{itemize}
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision pages 26 to 29 (Reviewer No. 1 -- Concluding remarks on References ),colframe=colorRevBG1]
+The references were carefully revised to correct the lower case mistake. When possible conference papers have been replaced by journals. For the jet bundle theory the request remark has been satisfied.
+\end{tcolorbox}
+\clearpage{}
+
+\section{Reply to reviewer \#2}
+We thank the reviewer for these constructive comments. We have addressed each one
+below. In the revised manuscript, the corresponding revisions are \textcolor{colorRev2}{highlighted in red}.
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 1}
+	The verification and validation through numerical examples must be provided. Otherwise, the benefits for developing these new formulations are not clear.
+\end{quotebox}
+It is clear that a new model should be supported by numerical evidence of its consistency. The proposed formulation is rather complex but a versatile library as Firedrake (that dispose of $H^2$ conforming elements) allow to handle this formulation. This allowed us to add a new section that deals with the numerical aspects of the proposed formulation.
+\begin{tcolorbox}[title=Revision pages 18 to 24 (Reviewer No. 2 -- Comment 1),colframe=colorRevBG2]
+	In section 5 we reported the computed the eigenvalues and eigenvectors by using polynomials on a sufficiently fine mesh. We used Bell Polynomials for both the two proposed weak form for many different boundary conditions. The results are accurately computed by the formulations involving Hessians, while the results deteriorate when using the double divergence formulation. This is probably due to the choice of non optimal elements for the double divergence operators. The computed eigenvectors associated with the vertical displacement are then plotted and they look perfectly coherent with the given boundary conditions. \\
+	We added temporal simulations with different boundary conditions. Since the proposed method is structure preserving we are able to conserve the energy at the discrete level (once all the external solicitations are set to zero) using symplectic time integration. The inclusion of non homogeneous boundary conditions or external distributed forces is easily performed. 
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 2}
+	Based on the first comment, this reviewer suggests to restructure the paper, put all the theories in part I, and put all the additional numerical studies in part II. It can be in this form: part I: theory, part II: modelling.
+\end{quotebox}
+We are sorry to answer that it would not be possible to satisfy this request, as it collides strongly with the recommendations made by reviewer one. A numerical part was added to both papers in the form of a final section, containing all the numerical studied for each model in a separate way.
+
+\begin{quotebox}{Reviewer No.2 -- Comment 3}
+	There are many questions regard to the proposed partitioned finite element method which is constructed based on the proposed weak form. The computational accuracy and efficiency? The properties of stiffness matrix? 
+\end{quotebox}
+In order to perform a convergence such an analysis using conforming finite elements (i.e. the finite discretization space is included in the Hilbert space for which the problem is defined) we would need $H^{\text{div Div}}(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}}$ conforming finite elements to discretized the momenta tensor, which are not available in any finite element library, as this space was never analyzed in the literature. Other insights about this point We cannot speak of computational efficiency without such a rigorous analysis, which anyway is not the focus of this paper. The problem will for sure interest numerical mathematicians working with the Finite element method. Other insights about this question are reported in the answer to comment 11 by \textcolor{colorRev1}{reviewer \#1}. \\
+For what concern the second question and other insights we invite reviewer two to refer to the answer in the response to part I.
+\begin{tcolorbox}[title=Revision pages 20-21 (Reviewer No. 2 -- Comment 3),colframe=colorRevBG2]
+	The computational size of the matrices us has been reported, to give a clear idea of the matrices obtained with the finite element discretization.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 4}
+	In comparison with existing Hamiltonian system for elasticity, does the proposed port-Hamiltonian system pocess advantage on finding analytical solution?
+\end{quotebox}
+No, the proposed model does not provide any advantages in finding analytical solution. We invite the reviewer to he refer to the corresponding answer in part I.
+
+\begin{tcolorbox}[title=Revision page 29 (Reviewer No. 2 -- Concluding remarks ),colframe=colorRevBG2]
+	The suggested references \cite{Yao2011,LIM20075396} deal with analysis conducted in the static case. However, the port-Hamiltonian framework, deals with dynamical system and not with structural problem. This would represent a degenerate case for which the skew-symmetric  structure of the operator is lost as no kinetic energy is present. Therefore these two reference were not added. Nevertheless, we found necessary to add reference [33], as in this reference the free vibration problem is addressed.
+\end{tcolorbox}
+\clearpage{}
+
+
+\bibliographystyle{alpha}
+\bibliography{biblio_Kirchhoff_Response}
+\end{document}

@@ -1,0 +1,556 @@
+%% LyX 2.1.5 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage{color}
+\usepackage{tcolorbox}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\usepackage[unicode=true,pdfusetitle,
+ bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
+ breaklinks=false,pdfborder={0 0 0},backref=false,colorlinks=true]
+ {hyperref}
+\hypersetup{allcolors=red}
+
+\def\onedot{$\mathsurround0pt\ldotp$}
+\def\cddot{% two dots stacked vertically
+	\mathbin{\vcenter{\baselineskip.67ex
+			\hbox{\onedot}\hbox{\onedot}}%
+}}
+
+\makeatletter \renewcommand\d[1]{\ensuremath{%
+		\;\mathrm{d}#1\@ifnextchar\d{\!}{}}}
+\makeatother
+
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+%===================================
+%% --  Page margins
+\usepackage{geometry}
+\geometry{verbose,twoside,a4paper,
+    % Main margins 
+top=3cm,
+bottom=3cm,
+inner=2.5cm,outer=2.5cm,
+    % Split of top margins
+headheight=2.2cm,headsep=0.5cm,
+    % Split of bottom margin
+footskip=0.5cm,
+    % Split of outer margin
+marginparsep=0.5cm,
+marginparwidth=12.5pt % width of icon \faNewspaperO at 11pt
+}
+% Width of icon is computed with
+% \newlength{\myl} \settowidth{\myl}{\faNewspaperO} Width of icon \faNewspaperO is \the\myl.
+%===================================
+
+%===================================
+%% -- Header
+%\renewcommand{\thepage}{\roman{page}}% Roman numerals for page counter
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+% Custom fancy style (can be modified on the fly within the document as well)
+\fancyhf{} %Clear Everything.
+  % Current page number on the exterior
+\fancyhead[R]{Brugnoli {\it et al.},  APM-D-18-02037, \thepage}
+  % Chapter name on the interior of even pages
+\fancyhead[L]{\nouppercase{\leftmark}}
+% Redefinition of the plain style
+% (This page style is used for the first page of Chapter, table of contents,
+% etc...)
+\fancypagestyle{plain}{
+       \fancyhf{} %Clear Everything.
+       \renewcommand{\headrule}{\hrule height 2pt \vspace{1mm}\hrule height 1pt}
+       \fancyhead[R]{\thepage}
+}
+%===================================
+
+%===================================
+%% -- tcolorbox to quote
+%\usepackage[most]{tcolorbox}
+\tcbuselibrary{most}
+\tcbuselibrary{breakable} % breakable boxes
+%\definecolor{background}{HTML}{F9F5E9}
+%\definecolor{linecolor}{HTML}{E0D7BC}
+\colorlet{background}{lightgray!80!white}
+\colorlet{linecolor}{black}
+
+\newtcolorbox{quotebox}[2][]{%
+leftupper=2em,
+colback=background,
+colframe=background,
+%fonttitle=\bfseries,
+coltitle=black,
+breakable,
+enhanced,
+attach boxed title to top right,
+boxed title style={empty},
+sharp corners,
+borderline north={0.5pt}{0pt}{linecolor},
+borderline north={0.5pt}{1.5pt}{linecolor},
+borderline south={0.5pt}{0pt}{linecolor},
+borderline south={0.5pt}{1.5pt}{linecolor},
+title=#2,#1}
+
+\tcbset{colback=white,
+%colframe=green!50!black,
+%fonttitle=\bfseries,
+coltitle=white,
+breakable,enhanced jigsaw,%breakable box
+%sharp corners,
+}
+%===================================
+
+%===================================
+%-- 'Remark' and TODO' command
+\usepackage{fontawesome}
+\usepackage{tcolorbox}
+   % enable macro
+\newcommand{\remark}[1]{%
+\begin{tcolorbox}[title=,colframe=white,colback=lightgray!50!white,fontupper=\sffamily\small]
+\faComment~#1
+\end{tcolorbox}}
+   % disable macro
+\renewcommand{\remark}[1]{}
+   % enable macro
+\newcounter{todocounter}
+\newcommand{\todo}[1]{\stepcounter{todocounter}\textbf{\textcolor{red}{(TODO \arabic{todocounter} -- #1)}}}
+   % disable macro
+%\renewcommand{\todo}[1]{\stepcounter{todocounter} \textbf{ \textcolor{red}{(\arabic{todocounter})} }}
+%===================================
+
+%===================================
+%%-- Misc.
+\usepackage{lipsum}
+% Write 'et al.'
+% Use \etal (no trailing space) or \etal{} (trailing space)
+\newcommand{\etal}{\emph{et al.}}
+  % Line numbering
+\usepackage{lineno}
+\modulolinenumbers[5]
+  % For option 'stretch fill image'
+\tcbuselibrary{skins}
+%===================================
+
+%===================================
+%% -- Color for review
+   % background color
+\colorlet{colorRevBG1}{blue!60!black} % dark blue
+\colorlet{colorRevBG2}{red!60!black} % dark red
+\colorlet{colorRevBG3}{green!40!black} % dark green
+  % front color
+\colorlet{colorRev1}{blue!80!black} % dark blue
+\colorlet{colorRev2}{red!80!black} % dark red
+\colorlet{colorRev3}{green!50!black} % dark green
+% Macro to enter revisions
+% Usage: \revision[No.]{text}
+%\usepackage{ifthen}
+\usepackage{xstring}
+\newcommand{\revision}[2]{%
+\IfStrEqCase{#1}{{1}{\textcolor{colorRev1}{#2}}
+    {2}{\textcolor{colorRev2}{#2}}
+    {3}{\textcolor{colorRev3}{#2}}}
+    [\PackageError{rev}{Unknown reviewer: #1}{Choose available.}]%
+}
+
+%===================================
+
+\makeatother
+
+\makeatother
+
+\begin{document}
+\thispagestyle{plain}
+
+\noindent {\Large{} APM-D-18-02037
+}{\Large \par}
+
+\noindent \begin{flushleft}
+{\Large{}Port-Hamiltonian formulation and Symplectic discretization of Plate models \\	\vspace{2mm}\large\textit{Part I : Mindlin model for thick plates}}
+\par\end{flushleft}{\Large \par}
+
+\noindent \begin{flushleft}
+Andrea Brugnoli, Daniel Alazard, Val\'erie Pommier-Budinger, Denis Matignon
+\par\end{flushleft}
+
+\noindent \begin{flushleft}
+\today
+\par\end{flushleft}
+
+\begin{center}
+\textbf{\Large{}Response to reviewers}
+\par\end{center}{\Large \par}
+
+We gratefully acknowledge each reviewer for his/her most constructive comments. The quality of the paper has benefited from yours suggestions. Our responses are provided in this document.
+
+Revised passages have been highlighted in the PDF version of the manuscript, with a different color for \textcolor{colorRev1}{Reviewer \#1} and \textcolor{colorRev2}{Reviewer \#2}.
+
+\tableofcontents{}
+
+\clearpage{}
+
+
+\section{Summary of revisions}
+
+The manuscript has been revised to account for the comments of the two reviewers. The revisions are highlighted in \revision{1}{blue for reviewer \#1} and in \revision{2}{red for reviewer \#2}. A summary of the revisions
+is given below.
+
+\begin{tcolorbox}[title=Summary of revisions (Reviewer No. 1), colframe=colorRevBG1]
+Here the sections we refer to here are the ones for the unrevised paper.
+\begin{itemize}
+\item (Section~1) This section has been rewritten to illustrate the theory in a more coherent and logical way. The definition of Dirac structure precedes that of a port-Hamiltonian system and their interconnection is expressed explicitly. For infinite dimensional systems the Stokes-Dirac structure definition precedes the Timoshenko beam example, so that is underlying geometry to this model appears more evidently.  
+\item (Section~2)  This section has been restructured to present the model directly in tensorial form, without recalling the Euler-Lagrange minimization problem, which is not the focus of paper. 
+\item (Section~3.1) The vectorial formulation part has been completely removed from the manuscript to facilitate the explanation and avoid repeating already published results. The Stokes-Dirac structure definition presented in section~1 also applies for the tensorial model.
+\item (Section~4.1) The redundant and tedious weak form for the vectorial formulation has been eliminated to focus only on the tensorial part. 
+\item (Conclusion) The conclusion has been rewritten to insist on the novelties presented in this paper. Reference have been added to the control part. 
+\end{itemize}
+\end{tcolorbox}
+
+
+\begin{tcolorbox}[title=Summary of revisions (Reviewer No. 2),colframe=colorRevBG2]
+Here the sections we refer to are the ones for the unrevised paper.
+\begin{itemize}
+\item (Section~4.3) The numerical procedure has been detailed with an implementation suited for the Fenics library. 
+\item A new section (Section 5) was added to illustrate numerical results. To demonstrate the consistency and validity of the approach the computation of the eigenvalues and eigenvectors using different polynomial elements has been carried out. Temporal simulations demonstrate the possibility to add distributed forces in a straightforward manner and handle easily generic boundary conditions. Symplectic integration schemes allow to preserve the energy at the discrete level.
+\end{itemize}
+\end{tcolorbox}
+ 
+We have also made the following minor modifications:
+\begin{itemize}
+\item the deflection of the cross section $\bm{\theta}$  has components  $\theta_x, \theta_y$ to uniform the notation;
+\item the vertical velocity variable (before denoted with $v$) is now denoted with $w_t$ to avoid confusion with the test functions of the weak formulation;
+\item the energy and coenergy variables associated with the shear stress and deformation are now denoted with the subscript $\gamma$, instead of $\epsilon_s$, to avoid appending to many subscript to a symbol;
+\item the shear stress is now denoted with the lower case $\bm{q}$, together with the corresponding boundary value $q_n$ to insist on the vectorial nature of this variable (figure 2 has been modified consequently);
+\item figure 3 has been modified to consider boundary conditions involving all the variables;
+\item the notations for the vector valued and tensor valued function space has been slightly modified; for the example the space $L^2(\Omega, \mathbb{R}_{\text{sym}}^{2\times2})$ (before denoted with notation $[L^2_{\text{sym}}(\Omega)]^{2\times2}$) is the space of square integrable symmetric tensor valued functions on the open connected set $\Omega$;
+\item since only the tensorial formalism is now used the boundary variables are obtained by contraction of ternsors against the dyadic product of normal and tangential tensors.
+\end{itemize}
+\clearpage{}
+
+
+\section[Document format]{Format of the present document}
+
+
+\subsubsection*{Format of response}
+
+An answer is formatted as follows. The reviewer is first quoted with
+a gray box that also indicates the position of the quote in the original
+review. The comment is then answered in the subsequent paragraph(s).
+A description of the revisions and their positions is then given in a box.
+The color of the box for each reviewer matches the text color used in the revised manuscript, given below.
+\begin{itemize}
+	\item \textcolor{colorRev1}{Reviewer \#1} 
+	\item \textcolor{colorRev2}{Reviewer \#2}
+\end{itemize}
+
+\begin{quotebox}{Reviewer No.$i\in\left\{1{,}2{,}3\right\} $ -- Position of the quote}
+"Direct quote of a comment provided by the reviewer No.$i$."
+\end{quotebox}
+
+Answer to the comment for reviewer No. 1.
+
+\begin{tcolorbox}[title=Revision page -- (Reviewer No. $1$),colframe=colorRevBG1]
+ Descriptions of the corresponding revisions in the manuscript.
+\end{tcolorbox}
+
+Answer to the comment for reviewer No. 2.
+\begin{tcolorbox}[title=Revision  page -- (Reviewer No. $2$),colframe=colorRevBG2]
+	Descriptions of the corresponding revisions in the manuscript.
+\end{tcolorbox}
+
+
+\subsubsection*{Remark on the use of references}
+
+In our responses, we refer to two families of bibliographic entries:
+\begin{itemize}
+\item The ones that are contained in the revised manuscript, which are referred
+to using the numerical style of the \emph{Journal}, e.g. [1].
+\item References\emph{ specific to this document} and not necessarily contained
+in the manuscript. To avoid confusion, these references are quoted
+using an author-year citation style, e.g. \cite{LIM20075396}.
+\end{itemize}
+\clearpage{}
+
+
+\section{Reply to reviewer \#1}
+We thank the reviewer for these detailed and constructive comments. We have addressed each one
+below. In the revised manuscript, the corresponding revisions are \textcolor{colorRev1}{highlighted in blue}.
+
+
+\begin{quotebox}{Reviewer No.1 -- Paragraphs 5}
+In the section 1. Recall on port-Hamiltonian systems, the definition of PHS on Dirac structures as well as
+the definition of Stokes-Dirac structure (in subsection 1.2. Infinite-dimensional PHs) are missing in order to
+understand the following sections !
+\end{quotebox}
+In the PH literature the Stokes-Dirac structure definition has been mainly addressed to one dimensional system, using  either the PDEs or differential form technical language. There is a general lack of reference upon the 2-D or 3-D cases, which are known to be more difficult. Reference [25] is one of the few publications that addresses the general case. The definition herein is given for system of PDEs ruled by skew symmetric differential operators and encompasses many system (like the Harry-Dym one for which $J = \partial{}/{\partial x^3}$). 
+\begin{tcolorbox}[title=Revision pages 3 to 6 (Reviewer No. 1),colframe=colorRevBG1]
+In the revised document the definition of Dirac structure is now in section 1.1. The definition is inspired by the one given in reference [24] of the revised document. For the Stokes-Dirac structure we took as reference the paper [25].  The results in this paper are extended to the case where intrinsic operators(div, Div, grad, Grad) are included inside the global differential operator, once the proper scalar product needed for the bilinear form is established.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Paragraphs 6}
+In the section 2. Mindlin theory for thick plates , the presentation may be quite improved (see the detailed
+remarks). It is not clear why the EL formulation is recalled ? I think that the all the geometry, stress
+and strain variables could be directly introduced without giving the Euler-Lagrange formulation. If however
+the authors like to recall the Euler-Lagrange formulation, then there should be some reference given about
+its relation with the Port Hamiltonian formulation (for instance the order of the Euler-Lagrange system is
+different from the Port Hamiltonian one) which is maybe not so easy.
+\end{quotebox}
+\begin{tcolorbox}[title=Revision pages 8 to 10 (Reviewer No. 1),colframe=colorRevBG1]
+The stress and strain variables have been defined directly in the tensorial formalism so to avoid confusion between the 2 notations. The classical model has been recalled citing [28] without making use of  the Euler-Lagrange formulation.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Paragraphs 7}
+In the same spirit, why is the vectorial formulation presented ? I think that the reference [16] could be
+mentioned but then all variables of the model presented and directly expressed in the tensorial formulation !
+That would simplify the paper and the understanding. This remark applies to the section 3. PH formulation
+of the Mindlin plate as well as to the section 4. Discretization of the Mindlin plate using a Partitioned Finite
+Element Method (PFEM) which is extremely well-written and intersting but I do not think that the section
+4.1. Weak Form for the vectorial formulation is really nececessary.
+\end{quotebox}
+This remark is really useful to lighten and simplify the explanation. It was initially considered to present the two formulation to imitate the illustration in Kirchhoff paper. This is of no use since the results for the vectorial formulation are already well explain in [16].
+\begin{tcolorbox}[title=Revision pages 10 to 15 (Reviewer No. 1)(Reviewer No. 1),colframe=colorRevBG1]
+The vectorial formalism is no more used in the paper. The results stated in reference [16] are no more recalled. Section 3 directly uses of the tensorial formulation. The Stokes-Dirac structure directly employs the tensorial model. Since the vectorial formulation is no more present section 4.1 is no more present.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Paragraphs 8}
+The section Conclusion and Perspectives should also be improved. The paragraph of lines 51 to 55 should
+be developed and enriched with more details on the result: coordinate free representation, of Hamiltonian
+operator nd boundary port variables for the definition of the Stokes-Dirac structure. The advantages of the
+PFEM method should be detailed: natural derivation of the boundary port variables in the discretized system
+and possibility of having mixed boundary conditions, the possibility to use classical FEM software \dots I am not
+convinced by the open questions formulation. If I understand well the first paragraph adresses the questions
+of convergence but more interestingly, of the interconnection of the plate and the choice of appropriate basis
+for the discretization. The second paragraph could rather state that this work paves the way for a practical
+design and implementation of control laws based on methods developed for PHS, like IDA-PBC etc
+giving references.
+\end{quotebox}
+The functional space involved in this model is a mixed space  that comprises the space $H^{\text{Div}}(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}})$ with is discretized by the Arnold Winther. A proper finite element analysis needs such a space but it is not included in Fenics and all the other standard libraries. In the conclusion we address this point to aware the numerical mathematicians that there is still much to be done.
+\begin{tcolorbox}[title=Revision pages 26 - 27 (Reviewer No. 1),colframe=colorRevBG1]
+The first paragraph of the conclusion now resumes the principal advantages of this model and the corresponding discretization method. The second one addresses the problem of analyze in an input-output sense the well-posedness of the problem (analogously to what was done for the wave equation in [33]) and the necessity to perform an accurate convergence analysis. The third paragraph discusses the possible control applications (citations [34], [35], [36] have been included) arising from the IDA-PBC methodology. We found necessary to remark that this tool is normally used in one-dimensional system as the 2D case remains not well understood. Furthermore we discuss the possibility of using standard methodology (LQR, $H^\infty$) on the finite dimensional PH system. 
+\end{tcolorbox}
+
+
+
+\begin{quotebox}{Reviewer No.1 -- Comment 1 and 2}
+page 3: line 42, I would suggest: 1. Reminder on port-Hamiltonian systems \\
+page 4:
+\begin{itemize}
+\item line 27: I would suggest: this vector is called co-energy variables
+\item line 37: I suggest: given by the skew-symmetric matrix $S(x)$
+\item line 41: [9] complete with the chapter number or page !	
+\end{itemize}
+\end{quotebox}
+\begin{tcolorbox}[title=Revision page 3 (Reviewer No. 1 -- Comment 1 and 2),colframe=colorRevBG1]
+The first suggestion has been adopted. For the other 3 issues the sections have been modified to illustrate things more coherently. In particular, for what concerns reference [9], cited in the unrevised version, the reference is no more cited in the revised version. To illustrate the concept of Dirac-Structure we consider reference [24].
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment 3}
+	page 5:
+	\begin{itemize}
+	\item lines 21-31: this paragraph should end with some relation with the definition of Dirac structures
+	or be removed. Maybe the authors would have liked to define Port Hamiltonian systems ?
+	\item line 35-36: again from the text before, it does not appear clearly the relation between Dirac
+	structures and Port Hamiltonian systems. Maybe the defintion of a Port Hamiltonian system
+	should be presented before ? the name distributed port-Hamiltonian systems is given: it should
+	be defined or there should be a precise reference to it.
+	\item line 51: please give name to the variables : linear, angular momentum etc ..
+	\end{itemize}
+\end{quotebox}
+\begin{tcolorbox}[title=Revision page 4 (Reviewer No. 1 -- Comment 3),colframe=colorRevBG1]
+	Now the relation between PH systems and Dirac structure is clearly stated by choosing the proper port variables for the storage and boundary behavior.
+	The variables have been named appropriately.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment 4}
+	page 6:
+	\begin{itemize}
+		\item line 14: please give names to the variables: velocity etc ..
+		\item line 32: the equation (14) mixes two things: the Hamiltonian system equivalent to the equation
+		(10) and the Hamiltonian operator J: what is the interconnection structure: is it not a defined
+		by a Dirac structure ?
+	\end{itemize}
+\end{quotebox}
+\begin{tcolorbox}[title=Revision pages 7-8 (Reviewer No. 1 -- Comment 4),colframe=colorRevBG1]
+	The variables have been named appropriately. The word interconnection structure has been replaced by self-adjoint differential operator. The Stokes Dirac structure is then presented, making it possible to understand that $J$ plays the role of an interconnection between fluxes and efforts.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment 5}
+ page 7: line 47, give a name to $\sigma$: stress field
+\end{quotebox}
+\begin{tcolorbox}[title=Revision page 9 (Reviewer No. 1 -- Comment 5),colframe=colorRevBG1]
+The stress tensor has been properly defined by integration of the strain tensor.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment 6}
+	page 8:
+	\begin{itemize}
+		\item line 3: the constant $E$ is not defined.
+		\item lines 17-18: It seems that the correction factor k could simply be integrated into $E$, as all
+		coefficients of the matrices $D_b$ and $D_s$ are proportional to $E$.
+		\item line 34: the Euler Lagrange is derived below: maybe a subsection 2.2 is convenient here ?	
+	\end{itemize}
+\end{quotebox}
+The correction factor $k$ cannot be included into $E$ has it does not affect the bending part. This coefficient is introduced to reduce the stiffness with respect to the shear deformations and  therefore in integrated only in the shear stresses $\bm{q}$ (analogously to with is done in [16]).
+\begin{tcolorbox}[title=Revision pages 8 to 10 (Reviewer No. 1 -- Comment 6),colframe=colorRevBG1]
+	The Young modulus $E$ is now defined. The section 2 now does not contain subsections.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment 7}
+	page 9:
+	\begin{itemize}
+		\item  line 32: I suggest the Title: Reminder on the PH vectorial formulation of the Mindlin plate [16]
+		\item lines 34-35: I prefer: in the sequel, the Mindlin plate model written as a the port-Hamiltonian
+		system.
+		\item lines 35-38: this sentence does not provide useful information.
+		\item lines 38-42: the energy variables in (32) and the Hamiltonian functional in (33) should be related
+		to the model presented in section 2.		
+	\end{itemize}
+\end{quotebox}
+\begin{tcolorbox}[title=Revision page 10 (Reviewer No. 1 -- Comment 7),colframe=colorRevBG1]
+	The section under analysis is no more present
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment 8}
+	page 10:
+	\begin{itemize}
+		\item  line 31-33: it is written: The port-Hamiltonian system and the skew-adjoint operator relating
+		energies and co-energies are found to be This should be commented a little more. Indeed the
+		Port Hamiltonian System (35) is quite different from the Euler-Lagrange system: firstly it is
+		defined with respect to a differential Hamiltonian operator (whereas the Hamiltonian system
+		obtained by the Legendre transformation of Euler-Lagrange system would lead to a symplectic
+		Hamiltonian system with constant skew-symmetric matrix) and secondly the order of the Port
+		Hamiltonian system is 8 which is strictly greater than the order of the Euler-Lagrange system
+		which is 6 ! This is worth a little explanation, either by referring to an explanation in [16] (if
+		there is any) or to an analogous example, the vibrating string as exposed in [7, chapter 4] or
+		maybe another reference ?
+		\item  line 47: it is written The boundary variables are found by evaluating the time derivative of the
+		Hamiltonian . Is it not true that the boundary port variables are defined from the Hamiltonian
+		operator and the Stokes-Dirac structure derived from it ? At that point it would be more precise
+		to write: We shall establish the total energy balance in terms of ...
+		\item line 59: maybe it would be good to specify that the vectors $\bm{n}$ and $\bm{s}$ are unit vectors (normal
+		and tangent to the boundary and in the plane $(x, y)$) ?	
+	\end{itemize}
+\end{quotebox}
+The first remark is really interesting and useful. Port Hamiltonian systems defined with respect to a skew-symmetric differential operator  are fundamentally different from Hamiltonian system obtained by Legendre transformation of Euler-Lagrange equation. The latter approach is used in reference [1] and [17]. 
+\begin{tcolorbox}[title=Revision pages 13 to 15 (Reviewer No. 1 -- Comment 8),colframe=colorRevBG1]
+The section has been rewritten to state clearly how the application of the Green theorem to the energy rate provides the boundary variables needed to define the Stokes-Dirac structure. Remark 3 is introduced after the definition of the Stokes-Dirac structure to distinguish the approach used in the equivalent jet bundle formulation of the Mindlin plate, in which 6 variables figure in the problem and the Hamiltonian operator is algebraic.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment 9}
+	page 11:
+	\begin{itemize}
+		\item   line 28: why is the reference [25] cited ? I have checked and the Midlin plate is not treated there.
+		\item line 49: it is written If instead the differential operator is of order two ... As it is not the case,
+		the sentence is superfluous !
+	\end{itemize}
+\end{quotebox}
+The reference [25] was cited inappropriately in the unrevised version. This reference is anyway important in the introduction as in the revised version it is used in order to define the Stokes-Dirac structure and the associated mathematical theorems and definitions.
+\begin{tcolorbox}[title=Revision page 14 (Reviewer No. 1 -- Comment 9),colframe=colorRevBG1]
+The subsection under examination and the sentence "\textit{If instead the differential operator is of order two}", clearly superfluous, have been removed.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment 10}
+	page 15:  lines 57-61: the remark 2 would be very appropriate as an introduction of the section 3 !
+
+\end{quotebox}
+\begin{tcolorbox}[title=Revision page 10 (Reviewer No. 1 -- Comment 10),colframe=colorRevBG1]
+This remark was moved to the introduction of section 3 
+\end{tcolorbox}
+
+\clearpage{}
+
+\section{Reply to reviewer \#2}
+We thank the reviewer for these constructive comments. We have addressed each one
+below. In the revised manuscript, the corresponding revisions are \textcolor{colorRev2}{highlighted in red}.
+
+\begin{quotebox}{Reviewer No.2 -- Comment 1}
+The verification and validation through numerical examples must be provided. Otherwise, the benefits for developing these new formulations are not clear.
+\end{quotebox}
+It is clear that a new model should be supported by numerical evidence of its consistency. The proposed formulation is rather complex but a versatile library as Fenics allow to easily handled a mixed function space composed by scalar, vectorial and tensorial variables. This allowed us to add a new section that deals with the numerical aspects of the proposed formulation.
+\begin{tcolorbox}[title=Revision pages 17 to 25 (Reviewer No. 2 -- Comment 1),colframe=colorRevBG2]
+In section 5 we reported the computed the eigenvalues and eigenvectors by means of first and second order Lagrange polynomials on a sufficiently fine mesh. By using Lagrange Polynomials of first and second order the eigenvalues for different boundary conditions are exactly reproduced in the thick case. In the thin case the results deteriorate. This is probably linked to a shear locking phenomenon because of the appearance of the thickness with different exponents in the mass matrix. The results are anyway convincing since second order polynomials are able to alleviate this problem, like in classical Finite element formulations. The computed eigenvectors associated with the vertical displacement are then plotted and they look perfectly coherent with the given boundary conditions. \\
+We added temporal simulations with different boundary conditions. Since the proposed method is structure preserving we are able to conserve the energy at the discrete level (once all the external solicitations are set to zero) using symplectic time integration. The inclusion of non homogeneous boundary conditions or external distributed forces is easily performed. 
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 2}
+Based on the first comment, this reviewer suggests to restructure the paper, put all the theories in part I, and put all the additional numerical studies in part II. It can be in this form: part I: theory, part II: modelling.
+\end{quotebox}
+We are sorry to answer that it would not be possible to satisfy this request, as it collides strongly with the recommendations made by reviewer one. A numerical part was added to both papers in the form of a final section, containing all the numerical studied for each model in a separate way.
+
+\begin{quotebox}{Reviewer No.2 -- Comment 3}
+There are many questions regard to the proposed partitioned finite element method which is constructed based on the proposed weak form. The computational accuracy and efficiency? The properties of stiffness matrix? 
+\end{quotebox}
+When using a Finite Element method the computational accuracy and efficiency is normally measured by the order (or rate) of convergence (see e.g. the paper by Arnold \cite{ArnoldElasDyn} on the mixed element method for the elastodynamics problem). This quantity is deduced once the error is estimated with respect to a finite element approximation, by using appropriate norms related to the Hilbert spaces under consideration. In order to perform such an analysis using conforming finite elements (i.e. the finite discretization space is included in the Hilbert space for which the problem is defined) we would need Arnold Winther finite elements to discretized the momenta tensor, which are not available in any standard finite element library. We cannot speak of computational efficiency without such a rigorous analysis, which anyway is not the focus of this paper. The problem will for sure interest numerical mathematicians working with the Finite element method. \\
+For what concern the second question consider a mechanical system discretized by means of a finite element method:
+\[
+M \ddot{q} + K q = 0,
+\]
+where $K$ is the mass matrix and $K$ is the stiffness. If we apply the Legendre transformation $p = M q$ this system may be rewritten as 
+\[
+\frac{d}{dt}\begin{pmatrix}
+q \\ p \\
+\end{pmatrix} = 
+\begin{bmatrix}
+0 & I \\
+-I & 0 \\
+\end{bmatrix}
+\begin{pmatrix}
+\frac{\partial H}{\partial q} \\ \frac{\partial H}{\partial p} \\
+\end{pmatrix}
+= 
+\begin{bmatrix}
+ 0 & I \\
+-I & 0 \\
+\end{bmatrix}
+\begin{bmatrix}
+K & 0 \\
+0 & M^{-1} \\
+\end{bmatrix}
+\begin{pmatrix}
+q \\ p \\
+\end{pmatrix},
+\]
+where $H = \frac{1}{2} \left(p^T M^{-1} p + q^T K q\right)$ is the Hamiltonian. In this case the role of the classical stiffness matrix is easily identified. In the proposed discretization method the formally skew-symmetric operator (that plays a role similar  to the stiffness bilinear form which include derivatives of the different variables), once discretized, reduce to an skew-symmetric matrix. The relation between the two is really difficult to tell, since the two formulation use different variables to describe the model. To understand this let us consider the bilinear form for the Mindlin plate that gives rise to the stiffness matrix after discretization
+\[
+\begin{aligned}
+a(v_w, \bm{v}_\theta, w, \bm{\theta} ) = &+\frac{E h^3}{12 (1- \nu^2)}\int_\Omega \left[(1- \nu) \text{Grad}(\bm{v}_{\theta})\cddot \text{Grad}(\bm\theta) + \nu \, \text{div}(\bm{v}_{\theta}) \text{div}(\bm\theta) \right] \d\Omega \\
+&+ \frac{E h k}{2 (1 + \nu)}\int_\Omega (\text{grad}(v_w) -\bm{v}_\theta) (\text{grad}(w) -\bm\theta) \d\Omega
+\end{aligned}
+\]
+where $v_{w}, \bm{v}_{\theta}$ are the test functions and $E, \nu, k, h, w, \bm\theta$ have the same meaning as in this paper. How this bilinear form is related with the two bilinear form provided by th PFEM method
+\[
+\begin{aligned}
+j_{\text{div}}(v, e): =  &+\displaystyle \int_{\Omega} v_w \mathrm{div}(\bm{e}_{\epsilon_s})  \d\Omega \vspace{2mm}\\
+&+ \displaystyle \int_{\Omega} \bm{v}_{\theta} \cdot (\mathrm{Div}(\mathbb{E}_{\kappa}) + \bm{e}_{\epsilon_s}) \;  \d\Omega \vspace{2mm} \\
+&- \displaystyle\int_{\Omega} \mathrm{Div}(\mathbb{V}_{\kappa}) \cdot \bm{e}_\theta \;  \d\Omega  \vspace{2mm} \\
+&- \displaystyle\int_{\Omega} \left\{ \mathrm{div}(\bm{v}_{\epsilon_s}) e_w + \bm{v}_{\epsilon_s} \cdot \bm{e}_{\theta} \right\} \, \d\Omega. 
+\end{aligned},
+\qquad 
+\begin{aligned}
+j_{\text{grad}}(v, e): =  - &\displaystyle\int_{\Omega} \mathrm{grad}(v_w)  \cdot \bm{e}_{\epsilon_s}  \d\Omega \,   \vspace{2mm}\\
+- &\displaystyle\int_{\Omega} \left\{ \mathrm{Grad}(\bm{v}_{\theta}) \cddot \mathbb{E}_{\kappa} - \bm{v}_{\theta} \cdot \bm{e}_{\epsilon_s}\right\}  \d\Omega \,  \vspace{2mm} \\
++&\displaystyle\int_{\Omega} \mathbb{V}_{\kappa} \cddot \mathrm{Grad}(\bm{e}_\theta)  \d\Omega \, \vspace{2mm} \\ +&\displaystyle\int_{\Omega} \bm{v}_{\epsilon_s} \cdot (\mathrm{grad}({e}_{w}) - \bm{e}_{\theta})  \d\Omega.
+\end{aligned}.
+\]
+The relation between these forms is not that evident. This issues is related to comment 8 by reviewer~\#1 and additional information can be found in the corresponding answer. \\
+ The discretized matrix $J$ will anyway be sparse, as the stiffness matrix in standard finite element method. 
+ 
+ \begin{tcolorbox}[title=Revision pages 20 to 25 (Reviewer No. 2 -- Comment 3),colframe=colorRevBG2]
+The computational size of the matrices using different discretization spaces has been reported, to give a clear idea of the matrices obtained with the finite element discretization. Different polynomials spaces has been used, but the overall size of the system is the same when 5 Lagrange polynomials of order 2 or 10 Lagrange polynomials of order 1 are used for each side. This allow for a fair comparison of the 2 polynomial families and to state clearly the advantages of using 2 order polynomials to alleviate the shear locking phenomenon. \\
+ \end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 4}
+In comparison with existing Hamiltonian system for elasticity, does the proposed port-Hamiltonian system pocess advantage on finding analytical solution?
+\end{quotebox}
+No, the proposed model does not provide any advantages in finding analytical solution. \\
+The references \cite{LIM20075396,LIM2009131, Yao2011} provide analytical solutions in rectangular domains with uniform boundary conditions on each side. These assumptions are rarely met in real case applications. The focus of this paper is not the search for analytical solutions  but to provide the control community with new models capable of being included in complex systems in a modular way. The PH formalism looks really promising under this point of view but for the moment plate models were not treated and no discretization procedure were available. The proposed discretized method allows to treat the Mindlin model with not given causality (i.e. not a priory known boundary conditions) making it possible to incorporate this model as a module within a larger global system. The plate model discussed in this paper could be connected with other discretized distributed systems (beams or reservoirs containing fluid) or finite dimensional systems (rigid bodies, punctual masses, springs ecc). This is really interesting for many application, for example the preliminary analysis of complex spacecraft. In such applications the solar panels are interconnected in a complex manner and the PH formulation that we present allows to treat these interconnections, considering each plate as a separated component.
+
+\begin{tcolorbox}[title=Revision page 1 (Reviewer No. 2 -- Concluding remarks ),colframe=colorRevBG2]
+	The suggested references \cite{LIM20075396,LIM2009131, Yao2011} deal with the Kirchhoff plate model and therefore are not particularly useful to improve the quality of this manuscript. None of those was cited. Nevertheless, we found necessary to add reference [1], i. e. the book Symplectic Elasticity. This book is an important reference for the use of symplectic spaces in continuum mechanics and was therefore cited in the introduction.
+\end{tcolorbox}
+\clearpage{}
+
+\bibliographystyle{alpha}
+\bibliography{biblio_Mindlin_Response}
+\end{document}
