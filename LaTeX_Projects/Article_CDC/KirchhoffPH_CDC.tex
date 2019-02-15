@@ -52,20 +52,10 @@
 
 \begin{document}
 
-	
-	\maketitle
-	\thispagestyle{empty}
-	\pagestyle{empty}
 
-\tikzset{
-	block/.style = {draw, fill=white, rectangle, minimum height=3em, minimum width=3em},
-	tmp/.style  = {coordinate}, 
-	sum/.style= {draw, fill=white, circle, node distance=1cm},
-	input/.style = {coordinate},
-	output/.style= {coordinate},
-	pinstyle/.style = {pin edge={to-,thin,black}
-	}
-}
+\maketitle
+\thispagestyle{empty}
+\pagestyle{empty}
 
 % make the title area
 \maketitle
@@ -73,8 +63,8 @@
 % As a general rule, do not put math, special symbols or citations
 % in the abstract
 \begin{abstract}
-The Kirchhoff plate model is here detailed by using a tensorial port-Hamiltonian (pH) formulation. A structure-preserving discretization of this model is then achieved by using the partitioned finite element (PFEM). This methodology easily accounts for the boundary variables and the finite dimensional system can be interconnected to the surrounding environments in an simple and structured manner. The algebraic constraints to be considered are deduced by the boundary conditions, that may be homogeneous or defined by an interconnection with another dynamical system. \\
-The versatility of the proposed approach is presented by means of numerical simulations. A first illustration considers a rectangular plate clamped on one side and interconnected to a rod rigidly attached to the opposite side. A second example exploits the collocated output feature of pH systems to perform damping injection in a plate undergoing an external forcing. A stability proof is obtained effortlessly as the Hamiltonian is a Lyapunov function. 
+	The Kirchhoff plate model is here detailed by using a tensorial port-Hamiltonian (pH) formulation. A structure-preserving discretization of this model is then achieved by using the partitioned finite element (PFEM). This methodology easily accounts for the boundary variables and the finite dimensional system can be interconnected to the surrounding environments in an simple and structured manner. The algebraic constraints to be considered are deduced by the boundary conditions, that may be homogeneous or defined by an interconnection with another dynamical system. \\
+	The versatility of the proposed approach is presented by means of numerical simulations. A first illustration considers a rectangular plate clamped on one side and interconnected to a rod rigidly attached to the opposite side. A second example exploits the collocated output feature of pH systems to perform damping injection in a plate undergoing an external forcing. A stability proof is obtained effortlessly as the Hamiltonian is a Lyapunov function. 
 \end{abstract}
 
 % no keywords
@@ -101,7 +91,7 @@ The first attempt to perform a structure-preserving discretization dates back to
 
 In this paper the Kirchhoff plate model is presented in a pH fashion. The tensorial calculus is employed in order to clearly identify the skew-symmetric nature of the differential operator. The PFEM methodology is then used to obtain a finite dimensional system. Depending on the application the weak form may contain forces and momenta or linear and angular velocities as control inputs. Numerical applications are then carried out using the Firedrake platform \cite{firedrake}. First an interconnection along the boundary is then presented to model an cantilever plate welded to a rigid bar. A control application by damping injection follows. The plate is interconnected along part of the boundary with a dissipative system. The Hamiltonian for the interconnected system is a Lyapunov function, therefore the system will tend to the equilibrium point, i.e. the undeformed configuration. \\
 
-	In section \ref{sec:KirchhPH} the Kirchhoff Plate model in strong form as a port-Hamiltonian system is described. In section \ref{sec:WF} BLABLA 
+In section \ref{sec:KirchhPH} the Kirchhoff Plate model in strong form as a port-Hamiltonian system is described. In section \ref{sec:WF} BLABLA 
 
 \section{pH formulation of the Kirchoff plate}
 \label{sec:KirchhPH}
@@ -121,7 +111,7 @@ For a vector field $\bm{v}: \mathbb{R}^d \rightarrow \mathbb{R}^d$ the symmetric
 \end{equation*}
 The Hessian operator of $u$ is then computed as follows
 \begin{equation*}
-\mathrm{Hess}(\bm{u}) = \mathrm{Grad}(\mathrm{grad}(u)),
+\mathrm{Hess}(u) = \mathrm{Grad}(\mathrm{grad}(u)),
 \end{equation*}
 For a tensor field $\bm{U}: \mathbb{R}^d \rightarrow \mathbb{R}^{d \times d}$, with elements $u_{ij}$, the divergence is a vector defined column-wise as
 \begin{equation*}
@@ -131,7 +121,7 @@ The double divergence of a tensor field $\bm{U}$ is then a scalar field defined 
 \begin{equation*}
 \mathrm{div}(\mathrm{Div}(\bm U)):= \sum_{i, j = 1}^d \partial_{x_i} \partial_{x_j} u_{ij} .
 \end{equation*}
-Furthermore, $\mathbb{S}$ denotes the space of symmetric $d \times d$ matrices. The geometrical dimension of interest in this paper is $d=2$. In the following vectors (tensor) fields and numerical vectors (matrices) will be denote by a lower (upper) case bold letter. It will be clear by the context which mathematical objects is considered.
+The geometrical dimension of interest in this paper is $d=2$. In the following vectors (tensor) fields and numerical vectors (matrices) will be denote by a lower (upper) case bold letter. It will be clear by the context which mathematical objects is considered. Furthermore, $\mathbb{S}$ denotes the space of symmetric $d \times d$ tensors (matrices).
 \subsection{Kirchhoff Model for Thin Plates}
 \label{subsec:classMin}
 The Kirchhoff Model is a generalization to the 2D case of the Euler-Bernoulli beam model and accounts for the shear deformation. Given an open and connected set $\Omega \in \mathbb{R}^2$, the classical equations for this model (\cite{timoshenko1959theory}) are 
@@ -239,9 +229,9 @@ where $m_{ns} :=  \bm{E}_{\kappa} \cddot (\bm{s} \otimes{\bm{n}})$ is the torsio
 \label{sec:SP_discr}
 In this section the structure preserving discretization procedure is detailed. Three steps are needed: 
 \begin{enumerate}
-\item put the system in weak form;
-\item second perform integrations by parts to get the boundary control of choice;
-\item select the finite element spaces to achieve a finite dimensional system.
+	\item put the system in weak form;
+	\item second perform integrations by parts to get the boundary control of choice;
+	\item select the finite element spaces to achieve a finite dimensional system.
 \end{enumerate}
 
 
@@ -364,9 +354,10 @@ It is now possible to construct the following matrices
 where $\Gamma_{C},\Gamma_{S}$ are subsets of the boundary where clamped and simply supported boundary conditions apply and $\Gamma_{\widetilde{q}_n},\Gamma_{m_{nn}}$ are subsets where inhomogeneous Neumann conditions hold. Consequently, the input matrix reads
 The final port-Hamiltonian descriptor system (pHDAEs), as defined in \cite{beattie2018linear}, is written as
 \begin{equation}
+\label{eq:discr_pl}
 \begin{bmatrix}
-\bm{M} & 0 \\
-0      & 0 \\
+\bm{M} & \bm{0} \\
+\bm{0} & \bm{0} \\
 \end{bmatrix} \frac{\d}{\d t}
 \begin{pmatrix}
 \bm{e}\\
@@ -374,18 +365,18 @@ The final port-Hamiltonian descriptor system (pHDAEs), as defined in \cite{beatt
 \end{pmatrix}
 = \begin{bmatrix}
 \bm{J}_d & \bm{G}_D\\
--\bm{G}_D^T & 0 \\
+-\bm{G}_D^T & \bm{0} \\
 \end{bmatrix}
 \begin{pmatrix}
 \bm{e}\\
 \bm{\lambda}_D \\
 \end{pmatrix} + \begin{bmatrix}
 \bm{B}_N\\
-0 \\
+\bm{0} \\
 \end{bmatrix}
 \bm{f}_N,
 \end{equation}
-where $\bm{e} = (\bm{e}_w, \, \bm{e}_\kappa), \;  \bm{\lambda}_D = (\bm{\lambda}_{\widetilde{q}_n}, \, \bm{\lambda}_{m_{nn}}), \; \bm{f}_N = (\widetilde{\bm{q}}_n, \, \bm{m}_{nn})$ are the concatenation of the co-energy variables, Lagrange multipliers and boundary forces and momenta at the borders and 
+where $\bm{e} = (\bm{e}_w; \, \bm{e}_\kappa), \;  \bm{\lambda}_D = (\bm{\lambda}_{\widetilde{q}_n}; \, \bm{\lambda}_{m_{nn}}), \; \bm{f}_N = (\widetilde{\bm{q}}_n; \, \bm{m}_{nn})$ are the concatenation of the co-energy variables, Lagrange multipliers and boundary forces and momenta at the borders and 
 \[\bm{G}_D = \begin{bmatrix}
 \bm{G}_{w} & \bm{G}_{\omega_n} \\
 \bm{0} & \bm{0}  \\
@@ -410,10 +401,10 @@ since $\mathscr{H} \subset \mathcal{D}(J)$.
 The Firedrake library \cite{firedrake} was used to implement the numerical analysis as it provides functionalities to automate the generalized mappings for $H^2$ conforming finite elements (like the Hermite, Bell or Argyris finite elements). All the variables, i.e. the velocity $e_w$ and the momenta tensor $\bm{E}_\kappa$ as well as the corresponding test functions, are discretized by the same finite element space, the Bell finite element \cite{Bell}, denoted by $H_r^2(\mathbb{P}_5, \Omega)$. The multipliers are therefore discretized by using second degree Lagrange polynomials defined over the boundary and denoted with $H_r^1(\mathbb{P}_2, \partial\Omega)$. 
 
 
-\section{Interconnection with a finite dimensional pH system}
+\section{Interconnection with a finite dimensional conservative pH system}
 In this section the interconnection of an infinite and finite port system is explained in both the infinite and finite dimensional setting.
 
-\subsection{General Ideas for the infinite dimensional setting}
+\subsection{Infinite dimensional setting}
 Consider an infinite dimensional pH system ( or distributed pH system, dpH) and a finite dimensional pH system denoted by equations 
 
 \noindent
@@ -422,7 +413,7 @@ Consider an infinite dimensional pH system ( or distributed pH system, dpH) and 
 	\text{pH} \left\{ 
 	\begin{aligned}
 	\dot{\bm{x}}_2 = \bm{J} \diffp{H_2}{\bm{x}_2} + \bm{B} \bm{u}_2 \\
-	\bm{y}_{2} = \bm{C} \diffp{H_2}{\bm{x}_2} + \bm{D} \bm{u}_2 \\
+	\bm{y}_{2} = \bm{B}^T \diffp{H_2}{\bm{x}_2} + \bm{D} \bm{u}_2 \\
 	\end{aligned},
 	\right. 
 	\end{equation}
@@ -441,62 +432,86 @@ Consider an infinite dimensional pH system ( or distributed pH system, dpH) and 
 
 where $\bm{x} \in \mathbb{R}^n, \bm{u}, \bm{y} \in \mathbb{R}^m$ $x_1 \in \mathscr{X}$ and $u_{\partial, 1}  \in \mathscr{U}, \, y_{\partial, 1} \in  \mathscr{Y} = \mathscr{U}^\prime$ belong to some Hilbert spaces (the prime denotes the dual of a space)  and  $\mathcal{B}: \mathscr{X} \rightarrow \mathscr{U}, \; \mathcal{C}: \mathscr{X} \rightarrow \mathscr{Y}$ are boundary operators. The duality pairings for the boundary ports are then denoted by
 \[
-\left\langle u_{\partial, 1}, \; y_{\partial, 1} \right\rangle_{\mathscr{U} \times \mathscr{Y}}  \qquad
-\left\langle \bm{u}_{2}, \; \bm{y}_{2} \right\rangle_{\mathbb{R}^m}
+\left\langle u_{\partial, 1}, \; y_{\partial, 1} \right\rangle_{\mathscr{U} \times \mathscr{Y}},  \qquad
+\left\langle \bm{u}_{2}, \; \bm{y}_{2} \right\rangle_{\mathbb{R}^m}.
 \]
 
 Given a compact interconnection operator $\mathcal{I}: \mathscr{Y} \rightarrow \mathbb{R}^m$ consider the following power preserving interconnection
 \begin{equation}
-	\bm{u}_2 = \mathcal{I} \, y_{\partial, 1}  \qquad u_{\partial, 1} = - \mathcal{I}^* \, \bm{y}_2
+\label{eq:int_inf}
+\bm{u}_2 = \mathcal{I} \, y_{\partial, 1},  \qquad u_{\partial, 1} = - \mathcal{I}^* \, \bm{y}_2,
 \end{equation}
-
-\paragraph{Example 1: Rigid rod welded to the plate}
-A rigid rod can be written undergoing small displacements about the $z$ axis and small rotation about the $x$ axis is a port-Hamiltonian system with structure
+where $\mathcal{I}^*$ denotes the adjoint operator of $\mathcal{I}$. As an illustration, a rigid rod welded to the plate is considered. A rigid rod can be written undergoing small displacements about the $z$ axis and small rotation about the $x$ axis can be written as port-Hamiltonian in co-energy variables system with structure
 \begin{equation}
-\begin{aligned} \dot{\bm{x}}_{\text{rod}} =
+\begin{aligned}
+\begin{bmatrix}
+M_G & 0 \\
+0   & J_G \\
+\end{bmatrix} 
 \displaystyle \diff{}{t}
 \begin{pmatrix}
-p_w \\ p_\theta \\
+v_G \\ \theta_G \\
 \end{pmatrix} & = \begin{pmatrix}
 F_z \\ T_x \\
-\end{pmatrix} = \bm{u}_{\text{rod}}\vspace{1mm} \\
- \bm{y}_{\text{rod}} &= \begin{pmatrix}
- v_G \\ \theta_{G} \\
- \end{pmatrix} = \displaystyle \diffp{H_{\text{rod}}}{\bm{x}_{\text{rod}}}
-\end{aligned}, 
+\end{pmatrix} = \bm{u}_{\text{rod}}\vspace{1mm}, \\
+\bm{y}_{\text{rod}} &= \begin{pmatrix}
+v_G \\ \theta_{G} \\
+\end{pmatrix}
+\end{aligned}
 \end{equation}
-with $p_w, p_\theta$ the linear and angular momentum about the center of mass, $v_G, \theta_{G}$ the linear and angular velocity about the center of mass $G$ and $F_z, T_x$ the force along $z$ and the torque along $x$. The Hamiltonian reads $H_{\text{rod}}  = \frac{1}{2} \left( \frac{p_w^2}{M_G} + \frac{p_\theta^2}{J_G}\right)$, with $M, J_G$ the mass and rotary inertia about the $x$ axis. The rod is welded to a rectangular thin plate of sides $L_x, L_y$ on side $x = L_x$. The boundary variables for the plate involved in the interconnection are 
-\[u_{\partial, \text{pl}} = w_t\vert_{x = L_x}  \qquad  y_{\partial, \text{pl}} = \widetilde{q}_n\vert_{x = L_x}
+with $v_G, \, \theta_{G}$ the linear and angular velocity about $G$, the center of mass, $M, J_G$ the mass and rotary inertia about the $x$ axis and $F_z, T_x$ the force along $z$ and the torque along $x$. The Hamiltonian reads $H_{\text{rod}}  = \frac{1}{2} \left(M_G v_G^2 + J_G \theta_{G}^2 \right)$. The rod is welded to a rectangular thin plate of sides $L_x, L_y$ on side $x = L_x$. The boundary variables for the plate involved in the interconnection are 
+\[u_{\partial, \text{pl}} = w_t(x = L_x, y),  \qquad  y_{\partial, \text{pl}} = \widetilde{q}_n(x = L_x, y).
 \]
-The space $\mathscr{Y}$ is the space of square integrable functions on with support $\partial\Omega_{\text{int}} = \left\{ (x,y) \vert \; x=L_x, 0 \le y \le L_y  \right\}$ compact interconnection operator then reads
+The space $\mathscr{Y}$ is the space of square-integrable functions on with support $\Gamma_{\text{int}} = \left\{ (x,y) \vert \; x=L_x, 0 \le y \le L_y  \right\}$. The compact interconnection operator then reads
 \begin{equation}
-	\mathcal{I} \widetilde{q}_n\vert_{x = L_x} \begin{pmatrix}
-	\int_{y = 0}^{y = L_y} \widetilde{q} \d{y} \\
-	\int_{y = 0}^{y = L_y} \widetilde{q} \left( y - L_y/2 \right) \d{y} \\
-	\end{pmatrix} 
+\mathcal{I} y_{\partial, \text{pl}} = - \int_{\Gamma_{\text{int}}} \begin{pmatrix}
+y_{\partial, \text{pl}} \\
+y_{\partial, \text{pl}} \left( y - L_y/2 \right) \\
+\end{pmatrix} \d{s}
 \end{equation}
+The adjoint operator is then obtained considering that $\bm{u}_{\text{rod}} = \mathcal{I} y_{\partial, \text{pl}}$ and that the inner product of $\mathbb{R}^m$ is easily converted to an inner product on the space $L^2(\Gamma_{\text{int}})$ (square-integrable functions on $\Gamma_{\text{int}}$)
+\[
+\left\langle \mathcal{I} y_{\partial, \text{pl}}, \; \bm{y}_{\text{rod}} \right\rangle_{\mathbb{R}^m} = \left\langle \mathcal{I}^* \bm{y}_{\text{rod}} , \; y_{\partial, \text{pl}} \right\rangle_{L^2(\partial\Omega_{\text{int}})},
+\]
+\[
+\mathcal{I}^* \bm{y}_{\text{rod}} = - \left[ v_G + \theta_{G} \left( y - L_y/2 \right) \right].
+\]
+The interconnection \eqref{eq:int_inf} will assure that the rigid rod is welded in a power preserving manner.
+\subsection{Finite dimensional setting}
+Consider a rectangular plate of side $L_x, L_y$, clamped at $x=0$ and welded to a rigid rod on $x=L_x$. The discretized system \ref{eq:discr_pl} is now modified to take into account the presence of an inhomogeneous Dirichlet boundary condition, i.e the input needed for the interconnection. It reads
+\begin{equation}
+\begin{aligned}
+\begin{bmatrix}
+\bm{M}_{\text{pl}} & \bm{0} \\
+\bm{0} & \bm{0} \\
+\end{bmatrix} \frac{\d}{\d t}
+\begin{pmatrix}
+\bm{e}_{\text{pl}}\\
+\bm{\lambda}_D \\
+\end{pmatrix}
+&= \begin{bmatrix}
+\bm{J}_d & \bm{G}_D \\
+-\bm{G}_D^T & \bm{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+\bm{e}_{\text{pl}}\\
+\bm{\lambda}_D \\
+\end{pmatrix} + \begin{bmatrix}
+\bm{0} \\
+\bm{B} \\
+\end{bmatrix} \bm{u}_{\text{pl}}, \\
+\bm{y}_{\text{pl}} &= \begin{bmatrix}
+\bm{0} & \bm{B} \\
+\end{bmatrix} \begin{pmatrix}
+\bm{e}_{\text{pl}}\\
+\bm{\lambda}_D \\
+\end{pmatrix}.
+\end{aligned} 
+\end{equation}
+Here the Lagrange multipliers and associated matrices $\bm{\lambda}_D =  (\bm\lambda_{\Gamma_{C}}; \; \bm\lambda_{\Gamma_{\text{int}}} ), \; \bm{G}_D = [\bm{G}_{\Gamma_{C}}, \; \bm{G}_{\Gamma_{\text{int}}}]$ are split between the homogeneous and non-homogeneous Dirichlet boundary conditions. The rigid rod is written
 
 
-
-\begin{tikzpicture}[auto, node distance=2cm,>=latex']
-
-\node [input, name=input] {};
-\node [sum, right of=input] (sum) {};
-\node [block, right of=sum] (controller) {Controller};
-\node [block, right of=controller, pin={[pinstyle]above:D},
-node distance=3cm] (system) {System};
-
-\draw [->] (controller) -- node[name=u] {$u$} (system);
-\node [output, right of=system] (output) {};
-\node [block, below of=u] (measurements) {Measurements};
-
-\draw [draw,->] (input) -- node {$r$} (sum);
-\draw [->] (sum) -- node {$e$} (controller);
-\draw [->] (system) -- node [name=y] {$y$}(output);
-\draw [->] (y) |- (measurements);
-\draw [->] (measurements) -| node[pos=0.99] {$-$} 
-node [near end] {$y_m$} (sum);
-\end{tikzpicture}
+where $\bm{e}_{\text{rod}} = (v_G\; \theta_{G}), \; \bm{M}_{\text{rod}} = \mathrm{diag}(M_G, \, J_G)$
 
 
 % An example of a floating figure using the graphicx package.
@@ -617,7 +632,7 @@ The conclusion goes here.
 \section*{Acknowledgment}
 
 
-The authors would like to thank...
+The authors would like to thank Michel Sala\"n, Xavier Vaisseur and Ghislain Haine from ISAE-SUPAERO for their insightful observations and comments.
 
 
 
@@ -625,8 +640,8 @@ The authors would like to thank...
 \bibliography{biblio_CDCKirchhoff}
 
 
-
-% that's all folks
+	
+	% that's all folks
 \end{document}
 
 
