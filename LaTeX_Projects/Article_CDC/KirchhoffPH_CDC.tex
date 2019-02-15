@@ -323,7 +323,7 @@ where $A(i,j)$ indicates the entry in the matrix corresponding to the $i \, {\te
 \begin{equation}
 \alpha_w = \rho h e_w, \qquad \bm{A}_{\kappa} = \bm{D}^{-1} \bm{E}_{\kappa}.
 \end{equation}
-The symmetric bilinear form on the left side of \eqref{eq:WF_Neum} is discretized as $\bm{M} = \text{diag}[\bm{M}_w,\, \bm{M}_\kappa]$ with
+The symmetric bilinear form on the left side of \eqref{eq:WF_Neum} is discretized as $\bm{M}_{\text{pl}} = \text{diag}[\bm{M}_w,\, \bm{M}_\kappa]$ with
 \begin{equation}
 \begin{aligned}
 &\bm{M}_w(i,j) = \int_{\Omega} \rho h \, \bm{\phi}_w^i \, \bm{\phi}_w^j \d\Omega \; \in \mathbb{R}^{N_w \times N_w}, \\
@@ -356,11 +356,11 @@ The final port-Hamiltonian descriptor system (pHDAEs), as defined in \cite{beatt
 \begin{equation}
 \label{eq:discr_pl}
 \begin{bmatrix}
-\bm{M} & \bm{0} \\
+\bm{M}_{\text{pl}} & \bm{0} \\
 \bm{0} & \bm{0} \\
 \end{bmatrix} \frac{\d}{\d t}
 \begin{pmatrix}
-\bm{e}\\
+\bm{e}_{\text{pl}}\\
 \bm{\lambda}_D \\
 \end{pmatrix}
 = \begin{bmatrix}
@@ -368,7 +368,7 @@ The final port-Hamiltonian descriptor system (pHDAEs), as defined in \cite{beatt
 -\bm{G}_D^T & \bm{0} \\
 \end{bmatrix}
 \begin{pmatrix}
-\bm{e}\\
+\bm{e}_{\text{pl}}\\
 \bm{\lambda}_D \\
 \end{pmatrix} + \begin{bmatrix}
 \bm{B}_N\\
@@ -376,7 +376,7 @@ The final port-Hamiltonian descriptor system (pHDAEs), as defined in \cite{beatt
 \end{bmatrix}
 \bm{f}_N,
 \end{equation}
-where $\bm{e} = (\bm{e}_w; \, \bm{e}_\kappa), \;  \bm{\lambda}_D = (\bm{\lambda}_{\widetilde{q}_n}; \, \bm{\lambda}_{m_{nn}}), \; \bm{f}_N = (\widetilde{\bm{q}}_n; \, \bm{m}_{nn})$ are the concatenation of the co-energy variables, Lagrange multipliers and boundary forces and momenta at the borders and 
+where $\bm{e}_{\text{pl}} = (\bm{e}_w; \, \bm{e}_\kappa), \;  \bm{\lambda}_D = (\bm{\lambda}_{\widetilde{q}_n}; \, \bm{\lambda}_{m_{nn}}), \; \bm{f}_N = (\widetilde{\bm{q}}_n; \, \bm{m}_{nn})$ are column-wise the concatenation of the co-energy variables, Lagrange multipliers and boundary forces and momenta at the borders and 
 \[\bm{G}_D = \begin{bmatrix}
 \bm{G}_{w} & \bm{G}_{\omega_n} \\
 \bm{0} & \bm{0}  \\
@@ -436,12 +436,12 @@ where $\bm{x} \in \mathbb{R}^n, \bm{u}, \bm{y} \in \mathbb{R}^m$ $x_1 \in \maths
 \left\langle \bm{u}_{2}, \; \bm{y}_{2} \right\rangle_{\mathbb{R}^m}.
 \]
 
-Given a compact interconnection operator $\mathcal{I}: \mathscr{Y} \rightarrow \mathbb{R}^m$ consider the following power preserving interconnection
+Given a compact interconnection operator $\mathcal{W}: \mathscr{Y} \rightarrow \mathbb{R}^m$ consider the following power preserving interconnection
 \begin{equation}
 \label{eq:int_inf}
-\bm{u}_2 = \mathcal{I} \, y_{\partial, 1},  \qquad u_{\partial, 1} = - \mathcal{I}^* \, \bm{y}_2,
+\bm{u}_2 = -\mathcal{W} \, y_{\partial, 1},  \qquad u_{\partial, 1} = \mathcal{W}^* \, \bm{y}_2,
 \end{equation}
-where $\mathcal{I}^*$ denotes the adjoint operator of $\mathcal{I}$. As an illustration, a rigid rod welded to the plate is considered. A rigid rod can be written undergoing small displacements about the $z$ axis and small rotation about the $x$ axis can be written as port-Hamiltonian in co-energy variables system with structure
+where $\mathcal{W}^*$ denotes the adjoint of $\mathcal{W}$. As an illustration, a rigid rod welded to the plate is considered. A rigid rod can be written undergoing small displacements about the $z$ axis and small rotation about the $x$ axis can be written as port-Hamiltonian in co-energy variables system with structure
 \begin{equation}
 \begin{aligned}
 \begin{bmatrix}
@@ -464,17 +464,17 @@ with $v_G, \, \theta_{G}$ the linear and angular velocity about $G$, the center 
 \]
 The space $\mathscr{Y}$ is the space of square-integrable functions on with support $\Gamma_{\text{int}} = \left\{ (x,y) \vert \; x=L_x, 0 \le y \le L_y  \right\}$. The compact interconnection operator then reads
 \begin{equation}
-\mathcal{I} y_{\partial, \text{pl}} = - \int_{\Gamma_{\text{int}}} \begin{pmatrix}
+\mathcal{W} y_{\partial, \text{pl}} = \int_{\Gamma_{\text{int}}} \begin{pmatrix}
 y_{\partial, \text{pl}} \\
 y_{\partial, \text{pl}} \left( y - L_y/2 \right) \\
 \end{pmatrix} \d{s}
 \end{equation}
-The adjoint operator is then obtained considering that $\bm{u}_{\text{rod}} = \mathcal{I} y_{\partial, \text{pl}}$ and that the inner product of $\mathbb{R}^m$ is easily converted to an inner product on the space $L^2(\Gamma_{\text{int}})$ (square-integrable functions on $\Gamma_{\text{int}}$)
+The adjoint operator is then obtained considering that $\bm{u}_{\text{rod}} = \mathcal{W} y_{\partial, \text{pl}}$ and that the inner product of $\mathbb{R}^m$ is easily converted to an inner product on the space $L^2(\Gamma_{\text{int}})$ (square-integrable functions on $\Gamma_{\text{int}}$)
 \[
-\left\langle \mathcal{I} y_{\partial, \text{pl}}, \; \bm{y}_{\text{rod}} \right\rangle_{\mathbb{R}^m} = \left\langle \mathcal{I}^* \bm{y}_{\text{rod}} , \; y_{\partial, \text{pl}} \right\rangle_{L^2(\partial\Omega_{\text{int}})},
+\left\langle \mathcal{W} y_{\partial, \text{pl}}, \; \bm{y}_{\text{rod}} \right\rangle_{\mathbb{R}^m} = \left\langle \mathcal{W}^* \bm{y}_{\text{rod}} , \; y_{\partial, \text{pl}} \right\rangle_{L^2(\partial\Omega_{\text{int}})},
 \]
 \[
-\mathcal{I}^* \bm{y}_{\text{rod}} = - \left[ v_G + \theta_{G} \left( y - L_y/2 \right) \right].
+\mathcal{W}^* \bm{y}_{\text{rod}} = v_G + \theta_{G} \left( y - L_y/2 \right).
 \]
 The interconnection \eqref{eq:int_inf} will assure that the rigid rod is welded in a power preserving manner.
 \subsection{Finite dimensional setting}
@@ -484,10 +484,10 @@ Consider a rectangular plate of side $L_x, L_y$, clamped at $x=0$ and welded to 
 \begin{bmatrix}
 \bm{M}_{\text{pl}} & \bm{0} \\
 \bm{0} & \bm{0} \\
-\end{bmatrix} \frac{\d}{\d t}
+\end{bmatrix}
 \begin{pmatrix}
-\bm{e}_{\text{pl}}\\
-\bm{\lambda}_D \\
+\dot{\bm{e}}_{\text{pl}}\\
+\dot{\bm{\lambda}}_D \\
 \end{pmatrix}
 &= \begin{bmatrix}
 \bm{J}_d & \bm{G}_D \\
@@ -501,18 +501,57 @@ Consider a rectangular plate of side $L_x, L_y$, clamped at $x=0$ and welded to 
 \bm{B} \\
 \end{bmatrix} \bm{u}_{\text{pl}}, \\
 \bm{y}_{\text{pl}} &= \begin{bmatrix}
-\bm{0} & \bm{B} \\
+\bm{0} & \bm{B}^T \\
 \end{bmatrix} \begin{pmatrix}
 \bm{e}_{\text{pl}}\\
 \bm{\lambda}_D \\
 \end{pmatrix}.
 \end{aligned} 
 \end{equation}
-Here the Lagrange multipliers and associated matrices $\bm{\lambda}_D =  (\bm\lambda_{\Gamma_{C}}; \; \bm\lambda_{\Gamma_{\text{int}}} ), \; \bm{G}_D = [\bm{G}_{\Gamma_{C}}, \; \bm{G}_{\Gamma_{\text{int}}}]$ are split between the homogeneous and non-homogeneous Dirichlet boundary conditions. The rigid rod is written
+Here the Lagrange multipliers and associated matrices $\bm{\lambda}_D =  (\bm\lambda_{\Gamma_{C}}; \; \bm\lambda_{\Gamma_{\text{int}}} ), \; \bm{G}_D = [\bm{G}_{\Gamma_{C}}, \; \bm{G}_{\Gamma_{\text{int}}}], \; \bm{B} = [\bm{0}; \; \bm{I}]$ are split between the homogeneous and non-homogeneous Dirichlet boundary conditions. The rigid rod is written compactly 
+\begin{equation}
+\begin{aligned}
+\bm{M}_{\text{rod}} \dot{\bm{e}}_{\text{rod}} = \bm{u}_{\text{rod}} \\
+\bm{y}_{\text{rod}} = \bm{e}_{\text{rod}}
+\end{aligned}
+\end{equation}
 
+where $\bm{e}_{\text{rod}} = (v_G\; \theta_{G}), \; \bm{M}_{\text{rod}} = \mathrm{diag}(M_G, \, J_G)$. The interconnection matrix if obtained once the operator $\mathcal{W}^*$ is put into weak form
+\[ \bm{W}^T = \left\langle v_w, \; \mathcal{W}^* \bm{\phi}^i_{\mathbb{R}^2} \right\rangle_{L^2(\partial\Omega_{\text{int}})}  = \int_{\Gamma_{\text{int}}} [v_w, \; v_w (y - L_y/2) ]\d{s},
+\]
+where $\bm{\phi}^i_{\mathbb{R}^2}, \, i = 1, 2$ is the canonical basis for $\mathbb{R}^2$. The final system is obtained considering the power preserving interconnection $\bm{u}_{\text{rod}} = - \bm{W} \bm{y}_{\text{pl}}, \; \bm{u}_{\text{pl}} = \bm{W}^T \bm{y}_{\text{rod}}$ is then the augmented system 
+\begin{equation}
+\bm{E}_{\text{aug}} \dot{\bm{x}}_{\text{aug}} = \bm{J}_{\text{aug}}\bm{x}_{\text{aug}}, 
+\end{equation}
+with $\bm{x}_{\text{aug}} = (\bm{e}_{\text{pl}}, \bm{e}_{\text{rod}}, \bm{\lambda}_D)$ and
+\begin{equation}
+\bm{E}_{\text{aug}} = 
+\begin{bmatrix}
+\bm{M}_{\text{pl}} & \bm{0} & \bm{0} \\
+\bm{0} & \bm{M}_{\text{rod}} &\bm{0} \\
+\bm{0} & \bm{0} &\bm{0} \\
+\end{bmatrix},
+\bm{J}_{\text{aug}}=\begin{bmatrix}
+\bm{J}_d & \bm{0} & \bm{G}_D \\
+\bm{0} & \bm{0} & -\bm{B}^T\bm{W}\\
+-\bm{G}_D^T & \bm{B}\bm{W}^T & \bm{0} \\
+\end{bmatrix}.
+\end{equation}
 
-where $\bm{e}_{\text{rod}} = (v_G\; \theta_{G}), \; \bm{M}_{\text{rod}} = \mathrm{diag}(M_G, \, J_G)$
+\subsection{Numerical Simulation}
 
+%\begin{figure*}[!t]
+%\centering
+%\subfloat[Case I]{\includegraphics[width=2.5in]{box}%
+%\label{fig_first_case}}
+%\hfil
+%\subfloat[Case II]{\includegraphics[width=2.5in]{box}%
+%\label{fig_second_case}}
+%\caption{Simulation results for the network.}
+%\label{fig_sim}
+%\end{figure*}
+
+\section{Damping Injection}
 
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
