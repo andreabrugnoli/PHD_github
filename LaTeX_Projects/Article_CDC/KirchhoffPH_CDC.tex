@@ -15,6 +15,8 @@
 \usepackage{tikz}
 \usetikzlibrary{shapes,arrows,positioning,calc}
 
+\usepackage{multirow}
+
 \newtheorem{theorem}{Theorem}
 \newtheorem{remark}{Remark}
 \newtheorem{proposition}{Proposition}
@@ -36,19 +38,20 @@
 
 \title{\LARGE \bf
 	Control by interconnection of the Kirchhoff plate
-	within the Port-Hamiltonian framework*	
+	within the port-Hamiltonian framework*	
 }
 
 
 \author{Andrea Brugnoli$^{1}$ and Daniel Alazard$^{1}$ and Val\'erie Pommier-Budinger$^{1}$ and Denis Matignon$^{1}$% <-this % stops a space
 	\thanks{*This work is supported by the project ANR-16-CE92-0028,
 		entitled {\em Interconnected Infinite-Dimensional systems for Heterogeneous
-			Media}, INFIDHEM, financed by the French National Research Agency (ANR) and the Deutsche Forschungsgemeinschaft (DFG). Further information is available at { {https://websites.isae-supaero.fr/infidhem/the-project} }.}% <-this % stops a space
+			Media}, INFIDHEM, financed by the French National Research Agency (ANR) and the Deutsche Forschungsgemeinschaft (DFG). Further information is available at { {https://websites.isae-supaero.fr/infidhem/the-project}}.}% <-this % stops a space
 	\thanks{$^{1}$Andrea Brugnoli, Daniel Alazard, Val\'erie Pommier-Budinger and Denis Matignon are with ISAE-SUPAERO, Universit\'e de Toulouse, France,
 		10 Avenue Edouard Belin, BP-54032, 31055 Toulouse Cedex 4
 		{\tt\small \{Andrea.Brugnoli, Daniel.Alazard, Valerie.Budinger, Denis.Matignon\}@isae.fr} }
 }
 
+\graphicspath{{./Figures/}, {./Figures/DampingInjection/}, {./Figures/InterconnectionRod/}}
 
 \begin{document}
 
@@ -85,9 +88,9 @@
 
 
 \section{Introduction}
-The port-Hamiltonian (pH) framework has proved to be a powerful framework for modeling and control multi-physics system \cite{bookPHs}. During the last years distributed systems, i.e. systems ruled by partial differential equations (PDEs) have attracted a lot of interest \cite{BookZwart}. The modularity of the pH paradigm is particularly appealing as it provides a structured and coherent way to build complex system. Infinite \cite{ShaftIntInfinite} and finite \cite{CerveraIntFinite} dimensional pH systems can be connected together giving rise to another pH system. In order to simulate and control such systems, a finite dimensional representation of the distributed system has to be found and it is advantageous to use a discretization procedure that preserves the port-Hamiltonian nature. \\
+The port-Hamiltonian (pH) framework has proved to be a powerful framework for modeling and control multi-physics system \cite{bookPHs}. During the last years distributed systems, i.e. systems ruled by partial differential equations (PDEs) have attracted a lot of interest \cite{BookZwart}. The modularity of the pH paradigm is particularly appealing as it provides a structured and coherent way to build complex system. Infinite \cite{ShaftIntInfinite} and finite \cite{CerveraIntFinite} dimensional pH systems can be connected together giving rise to another pH system. \\
 
-The first attempt to perform a structure-preserving discretization dates back to \cite{Golo}, where the authors proposed a mixed finite element spatial discretization for 1D hyperbolic system. Pseudo-spectral methods were studied in \cite{moulla:hal-01625008} .  A 2D finite difference method with staggered grids was used in \cite{Trenchant}. In \cite{WeakForm_Kot} the prototypical example of hyperbolic systems of two conservation laws was discretized by a weak formulation, leading to a Galerkin numerical approximations. All these methods require a specific implementation and cannot be related to standard numerical methods. An extension of the Mixed finite element method to pH system was proposed in \cite{CardosoRibeiro2018}. The main point of this methodology is that the integration by parts to be performed so that the symplectic structure is preserved. Several choice of the boundary control are possible. For this reason this method is referred to as partitioned finite element method (PFEM). If mixed boundary conditions have to be considered the discretized system is an algebraic differential one (pHDAEs), which can be analyzed by referring to \cite{beattie2018linear,vanderSchaft2013}. \\
+In order to simulate and control such systems, a finite dimensional representation of the distributed system has to be found and it is convenient to use a discretization procedure that preserves the port-Hamiltonian nature and uses standard libraires. The first attempt to perform a structure-preserving discretization dates back to \cite{Golo}, where the authors proposed a mixed finite element spatial discretization for 1D hyperbolic system. Pseudo-spectral methods were studied in \cite{moulla:hal-01625008} .In \cite{WeakForm_Kot} the prototypical example of hyperbolic systems of two conservation laws was discretized by a weak formulation, leading to a Galerkin numerical approximations. A drawback of these methods is that they require a specific implementation and cannot be related to standard numerical methods. An extension of the Mixed finite element method to pH system was proposed in \cite{CardosoRibeiro2018}. The main point of this methodology is that the integration by parts to be performed so that the symplectic structure is preserved. Several choice of the boundary control are possible and for this reason this method is referred to as the partitioned finite element method (PFEM). If mixed boundary conditions have to be considered the discretized system is an algebraic differential one (pHDAEs), which can be analyzed by referring to \cite{beattie2018linear,vanderSchaft2013}. \\
 
 In this paper the Kirchhoff plate model is presented in a pH fashion. The tensorial calculus is employed in order to clearly identify the skew-symmetric nature of the differential operator. The PFEM methodology is then used to obtain a finite dimensional system. Depending on the application the weak form may contain forces and momenta or linear and angular velocities as control inputs. Numerical applications are then carried out using the Firedrake platform \cite{firedrake}. First an interconnection along the boundary is then presented to model an cantilever plate welded to a rigid bar. A control application by damping injection follows. The plate is interconnected along part of the boundary with a dissipative system. The Hamiltonian for the interconnected system is a Lyapunov function, therefore the system will tend to the equilibrium point, i.e. the undeformed configuration. \\
 
@@ -161,12 +164,11 @@ In order to rewrite the system as a port-Hamiltonian one, the energy variables h
 The co-energy variables are found by computing the variational derivative of the Hamiltonian
 \begin{equation}
 \begin{aligned}
-e_w &:= \diffd{H}{\alpha_w} = \diffp{w}{t}, \quad &\text{Vertical Velocity}, \\
-\bm{E}_{\kappa} &:= \diffd{H}{\bm{A}_{\kappa}} = \bm{M}, \quad &\text{Momenta tensor}.\\
+e_w &:= \diffd{H}{\alpha_w} = w_t, \quad &\text{Vertical Velocity}, \\
+\bm{E}_{\kappa} &:= \diffd{H}{\bm{A}_{\kappa}} = \bm{M}, \quad &\text{Momenta tensor},\\
 \end{aligned} 
 \end{equation}
-
-The port-Hamiltonian system is expressed as follows 
+where $w_t = \diffp{w}{t}$ for compactness. The port-Hamiltonian system is expressed as follows 
 \begin{equation}
 \begin{cases}
 \displaystyle\diffp{\alpha_w}{t} &= -\mathrm{div}(\mathrm{Div}(\bm{E}_{\kappa})), \vspace{1mm} \\
@@ -307,7 +309,7 @@ e_w &= \sum_{i = 1}^{N_w} \phi_w^i(x,y) \, e_w^i(t), \\
 \bm{E}_\kappa &= \sum_{i = 1}^{N_\kappa} \bm\Phi_\kappa^i(x,y) \, e_\kappa^i(t),\\
 \end{aligned}
 \end{equation}
-The basis function $\phi_w^i, \, \bm\Phi_\kappa^i, $ have to be chosen in a suitable function space $\mathcal{V}^h$ in the domain of operator $\mathcal{J}$, i.e. $\mathcal{V}^h \subset \mathcal{V} \in \mathcal{D}(\mathcal{J})$. The discretized skew-symmetric bilinear form given in \eqref{eq:j_allgrad} then reads
+The basis function $\phi_w^i, \, \bm\Phi_\kappa^i \in \mathbb{S}, $ have to be chosen in a suitable function space $\mathcal{V}^h$ in the domain of operator $\mathcal{J}$, i.e. $\mathcal{V}^h \subset \mathcal{V} \in \mathcal{D}(\mathcal{J})$. The discretized skew-symmetric bilinear form given in \eqref{eq:j_allgrad} then reads
 \begin{equation}
 \bm{J}_d = 
 \begin{bmatrix}
@@ -342,17 +344,16 @@ If inhomogeneous Neumann boundary conditions are then discretized as
 m_{nn} = \sum_{i = 1}^{N_{m_{nn}}} \phi_{m_{nn}}^i(s) \; m_{nn}^i.
 \end{aligned}
 \end{equation}
-It is now possible to construct the following matrices
+It is now possible to construct the following constraints and input matrices
 \begin{equation}
 \begin{aligned}
-\bm{G}_{w}(i,j) &= \int_{\Gamma_{C} \cup \Gamma_{S} } {\phi}_{w}^i \, {\phi}_{\widetilde{q}_n}^j \d{s}, \quad  \in \mathbb{R}^{N_w \times N_{q_n}},\\
-\bm{B}_{\widetilde{q}_n}(i,j) &= \int_{\Gamma_{\widetilde{q}_n}} {\phi}_{w}^i \, {\phi}_{\widetilde{q}_n}^j \d{s}, \quad  \in \mathbb{R}^{N_w \times N_{q_n}}, \\
+\bm{G}_{w}(i,j) &= \int_{\Gamma_{C} \cup \Gamma_{S} } {\phi}_{w}^i \, {\phi}_{\widetilde{q}_n}^j \d{s}, \quad  \in \mathbb{R}^{N_w \times N_{\widetilde{q}_n}},\\
+\bm{B}_{\widetilde{q}_n}(i,j) &= \int_{\Gamma_{\widetilde{q}_n}} {\phi}_{w}^i \, {\phi}_{\widetilde{q}_n}^j \d{s}, \quad  \in \mathbb{R}^{N_w \times N_{\widetilde{q}_n}}, \\
 \bm{G}_{\omega_n}(i,j) &= \int_{\Gamma_{C}} \diffp{\phi_w^i}{n} \, \phi_{m_{nn}}^j \d{s}, \quad \in \mathbb{R}^{N_w \times N_{m_{nn}}}, \\
 \bm{B}_{m_{nn}}(i,j) &= \int_{\Gamma_{m_{nn}}} \diffp{\phi_w^i}{n} \, \phi_{m_{nn}}^j \d{s}, \quad \in \mathbb{R}^{N_w \times N_{m_{nn}}},\\
 \end{aligned} 
 \end{equation}
-where $\Gamma_{C},\Gamma_{S}$ are subsets of the boundary where clamped and simply supported boundary conditions apply and $\Gamma_{\widetilde{q}_n},\Gamma_{m_{nn}}$ are subsets where inhomogeneous Neumann conditions hold. Consequently, the input matrix reads
-The final port-Hamiltonian descriptor system (pHDAEs), as defined in \cite{beattie2018linear}, is written as
+where $\Gamma_{C},\Gamma_{S}$ are subsets of the boundary where clamped and simply supported boundary conditions apply and $\Gamma_{\widetilde{q}_n},\Gamma_{m_{nn}}$ are subsets where inhomogeneous Neumann conditions hold. The final port-Hamiltonian descriptor system (pHDAEs), as defined in \cite{beattie2018linear}, is written as
 \begin{equation}
 \label{eq:discr_pl}
 \begin{bmatrix}
@@ -376,7 +377,7 @@ The final port-Hamiltonian descriptor system (pHDAEs), as defined in \cite{beatt
 \end{bmatrix}
 \bm{f}_N,
 \end{equation}
-where $\bm{e}_{\text{pl}} = (\bm{e}_w; \, \bm{e}_\kappa), \;  \bm{\lambda}_D = (\bm{\lambda}_{\widetilde{q}_n}; \, \bm{\lambda}_{m_{nn}}), \; \bm{f}_N = (\widetilde{\bm{q}}_n; \, \bm{m}_{nn})$ are column-wise the concatenation of the co-energy variables, Lagrange multipliers and boundary forces and momenta at the borders and 
+where $\bm{e}_{\text{pl}} = (\bm{e}_w; \, \bm{e}_\kappa), \;  \bm{\lambda}_D = (\bm{\lambda}_{\widetilde{q}_n}; \, \bm{\lambda}_{m_{nn}}), \; \bm{f}_N = (\widetilde{\bm{q}}_n; \, \bm{m}_{nn})$ are column-wise (denoted by $;$) concatenation of the co-energy variables, Lagrange multipliers and boundary forces and momenta at the borders and 
 \[\bm{G}_D = \begin{bmatrix}
 \bm{G}_{w} & \bm{G}_{\omega_n} \\
 \bm{0} & \bm{0}  \\
@@ -402,7 +403,8 @@ The Firedrake library \cite{firedrake} was used to implement the numerical analy
 
 
 \section{Interconnection with a finite dimensional conservative pH system}
-In this section the interconnection of an infinite and finite port system is explained in both the infinite and finite dimensional setting.
+In this section the interconnection of an infinite and finite port system is explained in both the infinite and finite dimensional setting. This paradigm, here illustrated by means of an example, provides an easy way to construct arbitrarily complex system given its basic components. 
+Infinite and finite dimensional can be coupled together, making it possible to construct models for complex applications. 
 
 \subsection{Infinite dimensional setting}
 Consider an infinite dimensional pH system ( or distributed pH system, dpH) and a finite dimensional pH system denoted by equations 
@@ -456,7 +458,7 @@ F_z \\ T_x \\
 \end{pmatrix} = \bm{u}_{\text{rod}}\vspace{1mm}, \\
 \bm{y}_{\text{rod}} &= \begin{pmatrix}
 v_G \\ \theta_{G} \\
-\end{pmatrix}
+\end{pmatrix},
 \end{aligned}
 \end{equation}
 with $v_G, \, \theta_{G}$ the linear and angular velocity about $G$, the center of mass, $M, J_G$ the mass and rotary inertia about the $x$ axis and $F_z, T_x$ the force along $z$ and the torque along $x$. The Hamiltonian reads $H_{\text{rod}}  = \frac{1}{2} \left(M_G v_G^2 + J_G \theta_{G}^2 \right)$. The rod is welded to a rectangular thin plate of sides $L_x, L_y$ on side $x = L_x$. The boundary variables for the plate involved in the interconnection are 
@@ -467,7 +469,7 @@ The space $\mathscr{Y}$ is the space of square-integrable functions on with supp
 \mathcal{W} y_{\partial, \text{pl}} = \int_{\Gamma_{\text{int}}} \begin{pmatrix}
 y_{\partial, \text{pl}} \\
 y_{\partial, \text{pl}} \left( y - L_y/2 \right) \\
-\end{pmatrix} \d{s}
+\end{pmatrix} \d{s}.
 \end{equation}
 The adjoint operator is then obtained considering that $\bm{u}_{\text{rod}} = \mathcal{W} y_{\partial, \text{pl}}$ and that the inner product of $\mathbb{R}^m$ is easily converted to an inner product on the space $L^2(\Gamma_{\text{int}})$ (square-integrable functions on $\Gamma_{\text{int}}$)
 \[
@@ -511,45 +513,111 @@ Consider a rectangular plate of side $L_x, L_y$, clamped at $x=0$ and welded to 
 Here the Lagrange multipliers and associated matrices $\bm{\lambda}_D =  (\bm\lambda_{\Gamma_{C}}; \; \bm\lambda_{\Gamma_{\text{int}}} ), \; \bm{G}_D = [\bm{G}_{\Gamma_{C}}, \; \bm{G}_{\Gamma_{\text{int}}}], \; \bm{B} = [\bm{0}; \; \bm{I}]$ are split between the homogeneous and non-homogeneous Dirichlet boundary conditions. The rigid rod is written compactly 
 \begin{equation}
 \begin{aligned}
-\bm{M}_{\text{rod}} \dot{\bm{e}}_{\text{rod}} = \bm{u}_{\text{rod}} \\
-\bm{y}_{\text{rod}} = \bm{e}_{\text{rod}}
+\bm{M}_{\text{rod}} \dot{\bm{e}}_{\text{rod}} = \bm{u}_{\text{rod}}, \\
+\bm{y}_{\text{rod}} = \bm{e}_{\text{rod}},
 \end{aligned}
 \end{equation}
 
 where $\bm{e}_{\text{rod}} = (v_G\; \theta_{G}), \; \bm{M}_{\text{rod}} = \mathrm{diag}(M_G, \, J_G)$. The interconnection matrix if obtained once the operator $\mathcal{W}^*$ is put into weak form
-\[ \bm{W}^T = \left\langle v_w, \; \mathcal{W}^* \bm{\phi}^i_{\mathbb{R}^2} \right\rangle_{L^2(\partial\Omega_{\text{int}})}  = \int_{\Gamma_{\text{int}}} [v_w, \; v_w (y - L_y/2) ]\d{s},
-\]
-where $\bm{\phi}^i_{\mathbb{R}^2}, \, i = 1, 2$ is the canonical basis for $\mathbb{R}^2$. The final system is obtained considering the power preserving interconnection $\bm{u}_{\text{rod}} = - \bm{W} \bm{y}_{\text{pl}}, \; \bm{u}_{\text{pl}} = \bm{W}^T \bm{y}_{\text{rod}}$ is then the augmented system 
+\begin{align*}
+\bm{W}^T(i,j) &= \left\langle \bm{\phi}^i_{\widetilde{q}_n}, \; \mathcal{W}^* \bm{\phi}^j_{\mathbb{R}^2} \right\rangle_{L^2(\Gamma_{\text{int}})} \\
+&= \int_{\Gamma_{\text{int}}} [\bm{\phi}^i_{\widetilde{q}_n}, \; \bm{\phi}^i_{\widetilde{q}_n} (y - L_y/2) ]\d{s},
+\end{align*}
+
+where $\bm{\phi}^j_{\mathbb{R}^2},  \; \forall j = 1,2$ is the canonical basis for $\mathbb{R}^2$. The final system is obtained considering the power preserving interconnection $\bm{u}_{\text{rod}} = - \bm{W} \bm{y}_{\text{pl}}, \; \bm{u}_{\text{pl}} = \bm{W}^T \bm{y}_{\text{rod}}$ is then the augmented system 
 \begin{equation}
 \bm{E}_{\text{aug}} \dot{\bm{x}}_{\text{aug}} = \bm{J}_{\text{aug}}\bm{x}_{\text{aug}}, 
 \end{equation}
 with $\bm{x}_{\text{aug}} = (\bm{e}_{\text{pl}}, \bm{e}_{\text{rod}}, \bm{\lambda}_D)$ and
 \begin{equation}
+\label{eq:aug_Int}
 \bm{E}_{\text{aug}} = 
 \begin{bmatrix}
 \bm{M}_{\text{pl}} & \bm{0} & \bm{0} \\
 \bm{0} & \bm{M}_{\text{rod}} &\bm{0} \\
 \bm{0} & \bm{0} &\bm{0} \\
-\end{bmatrix},
+\end{bmatrix}, \;
 \bm{J}_{\text{aug}}=\begin{bmatrix}
 \bm{J}_d & \bm{0} & \bm{G}_D \\
-\bm{0} & \bm{0} & -\bm{B}^T\bm{W}\\
--\bm{G}_D^T & \bm{B}\bm{W}^T & \bm{0} \\
-\end{bmatrix}.
+\bm{0} & \bm{0} & \bm{G}_{\text{rod}}\\
+-\bm{G}_D^T & -\bm{G}_{\text{rod}}^T & \bm{0} \\
+\end{bmatrix},
 \end{equation}
-
+with $\bm{G}_{\text{rod}} = -\bm{B}^T\bm{W}$. Distributed forces are easily accounted for. 
+ 
 \subsection{Numerical Simulation}
+To validate the approach numerical simulations considering system \eqref{eq:aug_Int} were carried out. A final time equal to $t_{\text{end}} = 10 [ms]$ is taken. A vertical distributed force given by expression
+\[
+\bm{f}_w = \begin{cases}
+10^5 \left[( y + 10 \left\{ y - L_y/2 \right)^2 \right\} [Pa], \quad \forall \, t < 0.2 \, t_{\text{end}}, \\
+0, \quad \forall \, t \ge 0.2 \, t_{\text{end}}.
+\end{cases}
+\]
+acts on the plate.
 
-%\begin{figure*}[!t]
-%\centering
-%\subfloat[Case I]{\includegraphics[width=2.5in]{box}%
-%\label{fig_first_case}}
-%\hfil
-%\subfloat[Case II]{\includegraphics[width=2.5in]{box}%
-%\label{fig_second_case}}
-%\caption{Simulation results for the network.}
-%\label{fig_sim}
-%\end{figure*}
+\begin{figure*}[t]
+	\centering
+	\subfloat[$t=0.25 \; t_{\text{end}}$]{\includegraphics[width=0.25\linewidth]{SnapNoRod_t25_cropped.eps}%
+		\label{fig:NoRod_1}}
+	\hfil
+	\subfloat[$t=0.5 \; t_{\text{end}}$]{\includegraphics[width=0.25\linewidth]{SnapNoRod_t50_cropped.eps}%
+		\label{fig:NoRod_2}}
+	\subfloat[$t=0.75 \; t_{\text{end}}$]{\includegraphics[width=0.25\linewidth]{SnapNoRod_t75_cropped.eps}%
+		\label{fig:NoRod_3}}
+	\hfil
+	\subfloat[$t= t_{\text{end}}$]{\includegraphics[width=0.25\linewidth]{SnapNoRod_t100_cropped.eps}%
+		\label{fig:NoRod_4}}
+	\caption{Snapshots without rod ($t_{\text{end}} = 10 \,[ms]$).}
+	\label{fig:IntNoRod}
+\end{figure*}
+
+\begin{figure*}[t]
+	\centering
+	\subfloat[$t=0.25 \; t_{\text{end}}$]{\includegraphics[width=0.25\linewidth]{SnapRod_t25_cropped.eps}%
+		\label{fig:Rod_1}}
+	\hfil
+	\subfloat[$t=0.5 \; t_{\text{end}}$]{\includegraphics[width=0.25\linewidth]{SnapRod_t50_cropped.eps}%
+		\label{fig:Rod_2}}
+	\subfloat[$t=0.75 \; t_{\text{end}}$]{\includegraphics[width=0.25\linewidth]{SnapRod_t75_cropped.eps}%
+		\label{fig:Rod_3}}
+	\hfil
+	\subfloat[$t= t_{\text{end}}$]{\includegraphics[width=0.25\linewidth]{SnapRod_t100_cropped.eps}%
+		\label{fig:Rod_4}}
+	\caption{Snapshots with rod ($t_{\text{end}} = 10 \,[ms]$).}
+	\label{fig:IntRod}
+\end{figure*}
+
+\begin{table}[t]
+	\centering
+	\begin{tabular}{|c|c|}
+		\hline 
+		\multicolumn{2}{|c|}{Plate} \\ 
+		\multicolumn{2}{|c|}{Parameters} \\ 
+		\hline 
+		$E [GPa]$ & 70 \\ 
+		$\nu$& 0.35 \\ 
+		$h/L$& 0.05 \\ 
+		$L [m]$& 1 \\ 
+		\hline 
+	\end{tabular} 
+	\begin{tabular}{|c|c|}
+		\hline 
+		\multicolumn{2}{|c|}{Simulation} \\ 
+		\multicolumn{2}{|c|}{Settings} \\ 
+		\hline 
+		$\Delta t [ms]$ & $0.001$ \\ 
+		Integrator & St\"ormer-Verlet \\ 
+		N$^\circ$ Elements & 4 \\
+		FE space & Bell ($\bm{e}_{\text{pl}}$) $\times$ CG$^2$ ($\bm{\lambda}$)\\
+		\hline 
+	\end{tabular} 
+	\captionsetup{width=0.95\linewidth}
+	\vspace{1mm}
+	\captionof{table}{Simulations settings and parameters}
+	\label{tab:par}
+\end{table}
+
+
 
 \section{Damping Injection}
 
@@ -671,7 +739,7 @@ The conclusion goes here.
 \section*{Acknowledgment}
 
 
-The authors would like to thank Michel Sala\"n, Xavier Vaisseur and Ghislain Haine from ISAE-SUPAERO for their insightful observations and comments.
+The authors would like to thank Michel Salau\"n, Xavier Vaisseur and Ghislain Haine from ISAE-SUPAERO for their insightful observations and comments.
 
 
 
