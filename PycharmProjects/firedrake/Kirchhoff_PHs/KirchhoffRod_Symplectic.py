@@ -1,5 +1,3 @@
-# Mindlin plate written with the port Hamiltonian approach
-
 from firedrake import *
 import numpy as np
 
@@ -13,16 +11,18 @@ import matplotlib.pyplot as plt
 import matplotlib
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from matplotlib import cm
-from AnimateSurfFiredrake import animate2D
+from AnimateIntFiredrake import animateInt2D
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as animation
+
+from symplectic_integrators import StormerVerletGrad
 
 matplotlib.rcParams['text.usetex'] = True
 
 
 E = 7e10
 nu = 0.35
-h = 0.001 # 0.01
+h = 0.05 # 0.01
 rho = 2700  # kg/m^3
 D = E * h ** 3 / (1 - nu ** 2) / 12.
 
@@ -30,9 +30,16 @@ L = 1
 l_x = L
 l_y = L
 
-z_imp = 100
-
 n = 4 #int(input("N element on each side: "))
+
+m_rod = 50
+Jxx_rod = 1. / 12 * m_rod * L ** 2
+
+k_sp1 = 10
+k_sp2 = 10
+
+r_sp1 = 0
+r_sp2 = 0
 
 # Plate bending stiffness :math:`D=\dfrac{Eh^3}{12(1-\nu^2)}` and shear stiffness :math:`F = \kappa Gh`
 # with a shear correction factor :math:`\kappa = 5/6` for a homogeneous plate
@@ -107,8 +114,10 @@ elif name_FEq == 'Argyris' or name_FEq == 'Bell':
 Vp = FunctionSpace(mesh, name_FEp, deg_p)
 Vq = VectorFunctionSpace(mesh, name_FEq, deg_q, dim=3)
 
+
 n_Vp = Vp.dim()
 n_Vq = Vq.dim()
+
 
 
 v_p = TestFunction(Vp)
@@ -133,7 +142,7 @@ dx = Measure('dx')
 ds = Measure('ds')
 m_p = dot(v_p, al_p) * dx
 m_q = inner(v_q, al_q) * dx
-# m = m_p + m_q
+m = m_p + m_q
 
 j_divDiv = -v_p * tensor_divDiv_vec(e_q) * dx
 j_divDivIP = tensor_divDiv_vec(v_q) * e_p * dx
@@ -158,11 +167,11 @@ petsc_m_p = Mp.M.handle
 petsc_j_q = Jq.M.handle
 petsc_m_q = Mq.M.handle
 
-D_p = np.array(petsc_j_p.convert("dense").getDenseArray())
-M_p = np.array(petsc_m_p.convert("dense").getDenseArray())
+Dp_pl = np.array(petsc_j_p.convert("dense").getDenseArray())
+Mp_pl = np.array(petsc_m_p.convert("dense").getDenseArray())
 
-D_q = np.array(petsc_j_q.convert("dense").getDenseArray())
-M_q = np.array(petsc_m_q.convert("dense").getDenseArray())
+Dq_pl = np.array(petsc_j_q.convert("dense").getDenseArray())
+Mq_pl = np.array(petsc_m_q.convert("dense").getDenseArray())
 
 # Dirichlet Boundary Conditions and related constraints
 # The boundary edges in this mesh are numbered as follows:
@@ -179,61 +188,86 @@ V_qn = FunctionSpace(mesh, 'Lagrange', 2)
 V_Mnn = FunctionSpace(mesh, 'Lagrange', 2)
 
 Vu = V_qn * V_Mnn
+
 q_n, M_nn = TrialFunction(Vu)
 
-v_omn = dot(grad(v_p), n)
+v_wt, v_omn = TestFunction(Vu)
 
-b_bd = v_p * q_n * ds(2) + v_omn * M_nn * ds(2)
-# b_bd = v_p * q_n * ds(2) + v_omn * M_nn * ds(2) \
-#         + v_p * q_n * ds(3) + v_omn * M_nn * ds(3) + v_p * q_n * ds(4) + v_omn * M_nn * ds(4)
-b_mul = v_p * q_n * ds(1) + v_omn * M_nn * ds(1)
+v_omn = dot(grad(v_p), n)
+g = v_p * q_n * ds(1) + v_omn * M_nn * ds(1) + v_p * q_n * ds(2)
 
 # Assemble the stiffness matrix and the mass matrix.
-B = assemble(b_bd,  mat_type='aij')
-petsc_b = B.M.handle
+petsc_g = assemble(g, mat_type='aij').M.handle
 
-Bbd_pl = np.array(petsc_b.convert("dense").getDenseArray())
+# print(B_u.array().shape)
+G_pl = np.array(petsc_g.convert("dense").getDenseArray())
 
-bd_dofs_ctrl = np.where(Bbd_pl.any(axis=0))[0]
-Bbd_pl = Bbd_pl[:, bd_dofs_ctrl]
+bd_dofs = np.where(G_pl.any(axis=0))[0]# np.where(~np.all(B_in == 0, axis=0) == True) #
 
-n_ctrl = len(bd_dofs_ctrl)
+G_pl = G_pl[:, bd_dofs]
+n_bd = len(bd_dofs)
 
-Z = np.eye(n_ctrl) * z_imp
+# Splitting of matrices
 
-R_p = Bbd_pl @ Z @ Bbd_pl.T
+# Force applied at the right boundary
+x, y = SpatialCoordinate(mesh)
+g = Constant(10)
+A = Constant(10**6)
+f_w = project(A*(y/10 + (y-l_y/2)**2), Vp) # project(A*sin(2*pi/l_y*y), Vp) #
+# f_w = Expression("1000000*sin(2*pi*x[0])", degree=4)
+b_p = v_p * f_w * dx             # v_p * f_w * ds(3) - v_p * f_w * ds(4)
+#                                # -v_p * rho * h * g * dx #
 
-G = assemble(b_mul,  mat_type='aij')
-petsc_g = G.M.handle
-G_p = np.array(petsc_g.convert("dense").getDenseArray())
-
-bd_dofs_mul = np.where(G_p.any(axis=0))[0]
-G_p = G_p[:, bd_dofs_mul]
-
-n_mul = len(bd_dofs_mul)
+Bp_pl = assemble(b_p, mat_type='aij').vector().get_local()
 
 # Final Assemble
-Mp_sp = csc_matrix(M_p)
 
+np_rod = 2
+Mp_rod = np.diag([m_rod, Jxx_rod])
+Mq_rod = np.diag([1./k_sp1, 1./k_sp2])
+
+Dp_rod = np.array([[1, l_y/2], [1, -l_y/2]])
+Dq_rod = - Dp_rod.T
+
+r_v = r_sp1 + r_sp2
+r_th = l_y**2/4*(r_sp1 - r_sp2)
+r_vth = l_y/2*(r_sp1 - r_sp2)
+R_rod = np.array([[r_v, r_vth], [r_vth, r_th]])
+
+
+G_rodT = np.zeros((n_bd, 2))
+
+
+G_rodT[:, 0] = assemble(- v_wt * ds(2)).vector().get_local()[bd_dofs]
+G_rodT[:, 1] = assemble(- v_wt * (y - l_y/2) * ds(2)).vector().get_local()[bd_dofs]
+
+G_rod = G_rodT.T
+
+M_p = la.block_diag(Mp_pl, Mp_rod)
+M_q = Mq_pl
+D_p = np.concatenate((Dp_pl, np.zeros((n_Vq, 2))), axis = 1)
+D_q = np.concatenate((Dq_pl, np.zeros((2, n_Vq))), axis = 0)
+
+Mp_sp = csc_matrix(M_p)
 invMp = inv_sp(Mp_sp)
 invM_pl = invMp.toarray()
-
+G_p = np.concatenate((G_pl, G_rod), axis = 0)
 S_p = G_p @ la.inv(G_p.T @ invMp @ G_p) @ G_p.T @ invMp
 
-n_tot = n_Vp + n_Vq
-Id_p = np.eye(n_Vp)
+np_tot = n_Vp + np_rod
+Id_p = np.eye(np_tot)
 P_p = Id_p - S_p
+
+R_p = np.zeros((np_tot, np_tot))
+F_p = np.zeros((np_tot, )); F_p[:n_Vp] = Bp_pl
+
+solverSym = StormerVerletGrad(M_p, M_q, D_p, D_q, R_p, P_p, F_p)
 
 t_0 = 0
 dt = 1e-6
-
-t_f = 1e-3
+t_f = 0.01
 n_ev = 100
 
-n_t = int(t_f / dt)
-
-
-x, y = SpatialCoordinate(mesh)
 Aw = 0.001
 # init_p = Aw*(1 - cos(2*pi/l_x*x) )
 init_p = Expression('A*( pow(x[0], 2))', \
@@ -242,12 +276,11 @@ init_q = Expression(('0', '0', '0'), degree=4, lx=l_x, ly=l_y)
 
 e_pw_0 = Function(Vp)
 e_pw_0.assign(project(init_p, Vp))
-ep_0 = e_pw_0.vector().get_local() #
-eq_0 = np.zeros((n_Vq))
+ep_pl0 = e_pw_0.vector().get_local() #
+eq_pl0 = np.zeros((n_Vq))
 
-from symplectic_integrators import StormerVerletGrad
-
-solverSym = StormerVerletGrad(M_p, M_q, D_p, D_q, R_p, P_p)
+ep_0 = np.zeros((np_tot,))
+eq_0 = np.zeros((n_Vq,))
 
 sol = solverSym.compute_sol(ep_0, eq_0, t_f, t_0 = t_0, dt = dt, n_ev = n_ev)
 
@@ -255,22 +288,41 @@ t_ev = sol.t_ev
 ep_sol = sol.ep_sol
 eq_sol = sol.eq_sol
 
-n_ev = len(t_ev)
+dt_vec = np.diff(t_ev)
 
-n_sol = len(t_ev)
-w0 = np.zeros((n_Vp,))
-w = np.zeros(ep_sol.shape)
-w[:, 0] = w0
-w_old = w[:, 0]
+ep_pl = sol.ep_sol[:n_Vp, :]
+ep_rod = sol.ep_sol[n_Vp: np_tot, :]
 
-dt_ev = np.diff(t_ev)
+eq_pl = sol.eq_sol
+
+w0_pl = np.zeros((n_Vp,))
+w_pl = np.zeros(ep_pl.shape)
+w_pl[:, 0] = w0_pl
+w_pl_old = w_pl[:, 0]
+
+
 for i in range(1, n_ev):
-    w[:, i] = w_old + 0.5 * (ep_sol[:, i - 1] + ep_sol[:, i]) * dt_ev[i-1]
-    w_old = w[:, i]
+    w_pl[:, i] = w_pl_old + 0.5 * (ep_pl[:, i - 1] + ep_pl[:, i]) * dt_vec[i-1]
+    w_pl_old = w_pl[:, i]
 
-w_mm = w * 1000000
+y_rod = np.array([0, 1])*l_y
+x_rod = np.array([1, 1])*l_x
 
-wmm_CGvec = []
+v_rod = np.zeros((len(x_rod), n_ev))
+w_rod = np.zeros((len(x_rod), n_ev))
+w_rod_old = w_rod[:, 0]
+
+for i in range(n_ev):
+
+    v_rod[:, i] = x_rod * ep_rod[0, i] + (y_rod - l_y / 2) * ep_rod[1, i]
+    if i >= 1:
+        w_rod[:, i] = w_rod_old + 0.5 * (v_rod[:, i - 1] + v_rod[:, i]) * dt_vec[i-1]
+        w_rod_old = w_rod[:, i]
+
+w_pl_mm = w_pl * 1000
+w_rod_mm = w_rod * 1000
+
+wmm_pl_CGvec = []
 w_fun = Function(Vp)
 Vp_CG = FunctionSpace(mesh, 'Lagrange', 3)
 n_VpCG = Vp_CG.dim()
@@ -279,68 +331,66 @@ print(n_Vp, n_VpCG)
 maxZvec = np.zeros(n_ev)
 minZvec = np.zeros(n_ev)
 for i in range(n_ev):
-    w_fun.vector()[:] = w_mm[:, i]
-    wmm_CG = project(w_fun, Vp_CG)
-    wmm_CGvec.append(wmm_CG)
+    w_fun.vector()[:] = w_pl_mm[:, i]
+    wmm_pl_CG = project(w_fun, Vp_CG)
+    wmm_pl_CGvec.append(wmm_pl_CG)
 
-    maxZvec[i] = max(wmm_CG.vector())
-    minZvec[i] = min(wmm_CG.vector())
+    maxZvec[i] = max(wmm_pl_CG.vector())
+    minZvec[i] = min(wmm_pl_CG.vector())
 
 maxZ = max(maxZvec)
 minZ = min(minZvec)
 
-print(maxZ)
-print(minZ)
 
-# if matplotlib.is_interactive():
-#     plt.ioff()
-# plt.close('all')
-
-fntsize = 16
-H_vec = np.zeros((n_ev,))
+Hpl_vec = np.zeros((n_ev,))
+Hrod_vec = np.zeros((n_ev,))
 
 for i in range(n_ev):
-    H_vec[i] = 0.5 * (np.transpose(ep_sol[:, i]) @ M_p @ ep_sol[:, i] + np.transpose(eq_sol[:, i]) @ M_q @ eq_sol[:, i])
+    Hpl_vec[i] = 0.5 * (ep_pl[:, i].T @ Mp_pl @ ep_pl[:, i] +  eq_pl[:, i].T @ Mq_pl @ eq_pl[:, i])
+    Hrod_vec[i] = 0.5 * (ep_rod[:, i].T @ Mp_rod @ ep_rod[:, i])
 
-matplotlib.rcParams['text.usetex'] = True
-fig, ax = plt.subplots()
-ax.yaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
-plt.plot(t_ev, H_vec, 'b-', label='Hamiltonian Plate (J)')
-plt.xlabel(r'{Time} (s)', fontsize=fntsize)
-plt.ylabel(r'{Hamiltonian} (J)', fontsize=fntsize)
-# plt.title(r"Hamiltonian trend",
-#           fontsize=fntsize)
-# plt.legend(loc='upper left')
+fntsize = 16
 
-path_out = "/home/a.brugnoli/PycharmProjects/firedrake/Kirchhoff_PHs/Simulations/DampingInjection/"
-# plt.savefig(path_out + "Hamiltonian.eps", format="eps")
+fig = plt.figure()
+plt.plot(t_ev, Hpl_vec, 'b-', label='Hamiltonian Plate (J)')
+plt.plot(t_ev, Hrod_vec, 'r-', label='Hamiltonian Rod (J)')
+plt.plot(t_ev, Hpl_vec + Hrod_vec, 'g-', label='Total Energy (J)')
+plt.xlabel(r'{Time} (s)', fontsize = fntsize)
+# plt.ylabel(r'{Hamiltonian} (J)', fontsize = fntsize)
+plt.title(r"Hamiltonian trend",
+          fontsize = fntsize)
+plt.legend(loc='upper left')
 
+path_out = "/home/a.brugnoli/Plots_Videos/Kirchhoff_plots/Simulations/Article_CDC/InterconnectionRod/"
 
-anim = animate2D(minZ, maxZ, wmm_CGvec, t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \
-                         zlabel = '$w [\mu m]$', title = 'Vertical Displacement')
+# plt.savefig(path_out + "HamiltonianRod.eps", format="eps")
 
+anim = animateInt2D(minZ, maxZ, wmm_pl_CGvec, x_rod, y_rod, w_rod_mm, \
+             t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \
+                         zlabel = '$w [mm]$', z2label = '$w [mm]$ Rod', title = 'Vertical Displacement')
 
-# rallenty = 10
-# Writer = animation.writers['ffmpeg']
-# writer = Writer(fps=int(n_ev/(t_f*rallenty)), metadata=dict(artist='Me'), bitrate=1800)
-# anim.save(path_out + 'Kirchh_Damped.mp4', writer=writer)
+rallenty = 10
+fps = 20
+Writer = animation.writers['ffmpeg']
+writer = Writer(fps= fps, metadata=dict(artist='Me'), bitrate=1800)
+
+# anim.save(path_out + 'Kirchh_Rod.mp4', writer=writer)
 
 plt.show()
-#
-#
-# plot_solutions = True
-# if plot_solutions:
+
+# save_solutions = True
+# if save_solutions:
 #
 #
 #     matplotlib.rcParams['text.usetex'] = True
 #
-#     n_fig = 50
+#     n_fig = 4
 #     tol = 1e-6
 #
 #     for i in range(n_fig):
 #         index = int(n_ev/n_fig*(i+1)-1)
 #         w_fun = Function(Vp)
-#         w_fun.vector()[:] = w_mm[:, index]
+#         w_fun.vector()[:] = w_pl_mm[:, index]
 #
 #         Vp_CG = FunctionSpace(mesh, 'Lagrange', 3)
 #         wmm_wCG = project(w_fun, Vp_CG)
@@ -353,10 +403,15 @@ plt.show()
 #         ax = fig.add_subplot(111, projection="3d")
 #         ax.collections.clear()
 #
-#         surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False, 'vmin': minZ, 'vmax': maxZ}
+#         surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False} #, 'vmin': minZ, 'vmax': maxZ}
 #         # lab = 'Time =' + '{0:.2e}'.format(t_ev[index])
-#         surf = ax.plot_trisurf(triangulation, Z, **surf_opts)
-#         fig.colorbar(surf)
+#         tri_surf = ax.plot_trisurf(triangulation, Z, **surf_opts)
+#         tri_line = ax.plot(x_rod, y_rod, w_rod_mm[:, index], linewidth = 5, label='Rod $w[mm]$', color='black')
+#
+#         tri_surf._facecolors2d = tri_surf._facecolors3d
+#         tri_surf._edgecolors2d = tri_surf._edgecolors3d
+#         ax.legend(handles=[tri_line[0]])
+#         # fig.colorbar(surf)
 #
 #         ax.set_xbound(-tol, l_x + tol)
 #         ax.set_xlabel('$x [m]$', fontsize=fntsize)
@@ -367,9 +422,11 @@ plt.show()
 #         ax.w_zaxis.set_major_locator(LinearLocator(10))
 #         ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
 #
-#         ax.set_zlabel('$w [\mu m]$', fontsize=fntsize)
-#         ax.set_title('Vertical displacement ' +'$(t=$' + '{0:.2e}'.format(t_ev[index]) + '$s)$', fontsize=fntsize)
+#         ax.set_zlabel('$w [mm]$' +'$(t=$' + '{0:.4f}'.format(t_ev[index]) + '$s)$', fontsize=fntsize)
+#         ax.set_title('Vertical displacement', fontsize=fntsize)
 #
 #         ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
 #
-#         plt.savefig(path_out + "Snapshot_t_" + str(index + 1) + ".eps", format="eps")
+#         plt.savefig(path_out + "SnapRod_t" + str(index + 1) + ".eps", format="eps")
+#
+#         plt.close()

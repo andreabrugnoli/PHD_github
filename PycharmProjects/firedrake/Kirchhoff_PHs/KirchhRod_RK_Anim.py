@@ -255,12 +255,12 @@ Rsys = P @ Rint
 Fsys = P @ Bf_int
 
 t0 = 0.0
-t_fin = 0.01
-n_t = 100
+t_fin = 1
+n_t = 500
 t_span = [t0, t_fin]
 
 def sys(t,y):
-    if t< 0.2 * t_fin:
+    if t< 0.2 * t_fin/100:
         bool_f = 1
     else: bool_f = 0
     dydt = invMint @ ( (Jsys - Rsys) @ y + Fsys *bool_f)
@@ -345,7 +345,7 @@ for i in range(n_ev):
 
 fntsize = 16
 
-fig = plt.figure(0)
+fig = plt.figure()
 plt.plot(t_ev, Hpl_vec, 'b-', label='Hamiltonian Plate (J)')
 plt.plot(t_ev, Hrod_vec, 'r-', label='Hamiltonian Rod (J)')
 plt.plot(t_ev, Hpl_vec + Hrod_vec, 'g-', label='Total Energy (J)')
@@ -355,7 +355,7 @@ plt.title(r"Hamiltonian trend",
           fontsize = fntsize)
 plt.legend(loc='upper left')
 
-path_out = "/home/a.brugnoli/PycharmProjects/firedrake/Kirchhoff_PHs/Simulations/InterconnectionRod/"
+path_out = "/home/a.brugnoli/Plots_Videos/Kirchhoff_plots/Simulations/Article_CDC/InterconnectionRod/"
 
 # plt.savefig(path_out + "HamiltonianRod.eps", format="eps")
 
@@ -371,7 +371,7 @@ writer = Writer(fps= fps, metadata=dict(artist='Me'), bitrate=1800)
 # anim.save(path_out + 'Kirchh_Rod.mp4', writer=writer)
 
 plt.show()
-#
+
 # save_solutions = True
 # if save_solutions:
 #
@@ -421,6 +421,6 @@ plt.show()
 #
 #         ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
 #
-#         plt.savefig(path_out + "Snap_Rod_t_" + str(index + 1) + ".eps", format="eps")
+#         plt.savefig(path_out + "SnapRod_t" + str(index + 1) + ".eps", format="eps")
 #
 #         plt.close()

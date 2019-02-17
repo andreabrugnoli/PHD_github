@@ -267,10 +267,10 @@ fig = plt.figure(0)
 plt.plot(t_ev, Hpl_vec, 'b-', label='Hamiltonian Plate (J)')
 plt.xlabel(r'{Time} (s)', fontsize = fntsize)
 plt.ylabel(r'{Hamiltonian} (J)', fontsize = fntsize)
-# plt.title(r"Hamiltonian trend", fontsize=fntsize)
+plt.title(r"Hamiltonian trend", fontsize=fntsize)
 # plt.legend(loc='upper left')
 
-path_out = "/home/a.brugnoli/PycharmProjects/firedrake/Kirchhoff_PHs/Simulations/InterconnectionRod/"
+path_out = "/home/a.brugnoli/Plots_Videos/Kirchhoff_plots/Simulations/Article_CDC/InterconnectionRod/"
 
 # plt.savefig(path_out + "HamiltonianNoRod.eps", format="eps")
 
@@ -286,7 +286,7 @@ writer = Writer(fps= fps, metadata=dict(artist='Me'), bitrate=1800)
 # anim.save(path_out + 'Kirchh_NoRod.mp4', writer=writer)
 #
 plt.show()
-#
+
 # save_solutions = True
 # if save_solutions:
 #
@@ -331,4 +331,4 @@ plt.show()
 #
 #         ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
 #
-#         plt.savefig(path_out + "Snap_NoRod_t_" + str(index + 1) + ".eps", format="eps")
+#         plt.savefig(path_out + "SnapNoRod_t" + str(index + 1) + ".eps", format="eps")
