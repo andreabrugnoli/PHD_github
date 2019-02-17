@@ -363,7 +363,7 @@ where $\Gamma_{C},\Gamma_{S}$ are subsets of the boundary where clamped and simp
 \bm{0} & \bm{0}  \\
 \end{bmatrix},
 \]
-the final port-Hamiltonian descriptor system (pHDAEs), as defined in \cite{beattie2018linear}, is written as
+ where the subscript $N, D$ refer to Neumann and Dirichlet boundary conditions, the final port-Hamiltonian descriptor system (pHDAEs), as defined in \cite{beattie2018linear}, is written as
 \begin{equation}
 \begin{aligned}
 \label{eq:discr_pl}
@@ -396,7 +396,10 @@ the final port-Hamiltonian descriptor system (pHDAEs), as defined in \cite{beatt
 \end{aligned}
 \end{equation}
 where $\bm{e}_{\text{pl}} = (\bm{e}_w; \, \bm{e}_\kappa), \;  \bm{\lambda}_D = (\bm{\lambda}_{\widetilde{q}_n}; \, \bm{\lambda}_{m_{nn}})$ are column-wise (denoted by $;$) concatenation of the co-energy variables, Lagrange multipliers. The input $\bm{u} = (\widetilde{\bm{q}}_n; \, \bm{m}_{nn})$ are the known Neumann conditions (boundary forces and momenta) at the boundary. 
-The subscript $N, D$ refer to Neumann and Dirichlet boundary conditions.
+ The Hamiltonian is symply computed as
+\begin{equation}
+H_{\text{pl}} = \frac{1}{2} \bm{e}_{\text{pl}}^T \, \bm{M}_{\text{pl}} \, \bm{e}_{\text{pl}}.
+\end{equation}
 
 \paragraph{Finite Element Choice}
 \label{par:FE}
@@ -423,8 +426,8 @@ Consider an infinite dimensional pH system ( or distributed pH system, dpH) and 
 	\begin{equation}
 	\text{pH} \left\{ 
 	\begin{aligned}
-	\dot{\bm{x}}_2 = \bm{J} \diffp{H_2}{\bm{x}_2} + \bm{B} \bm{u}_2 \\
-	\bm{y}_{2} = \bm{B}^T \diffp{H_2}{\bm{x}_2} + \bm{D} \bm{u}_2 \\
+	\diff{\bm{x}_2}{t} &= \bm{J} \diffp{H_2}{\bm{x}_2} + \bm{B} \bm{u}_2 \\
+	\bm{y}_{2} &= \bm{B}^T \diffp{H_2}{\bm{x}_2} + \bm{D} \bm{u}_2 \\
 	\end{aligned},
 	\right. 
 	\end{equation}
@@ -433,9 +436,9 @@ Consider an infinite dimensional pH system ( or distributed pH system, dpH) and 
 	\begin{equation}
 	\text{dpH} \left\{ 
 	\begin{aligned}
-	\diffp{x_1}{t} = \mathcal{J} \diffd{H_1}{x_1} \\
-	u_{\partial, 1} = \mathcal{B} \diffd{H_1}{x_1} \\
-	y_{\partial, 1} = \mathcal{C} \diffd{H_1}{x_1} \\
+	\diffp{x_1}{t} &= \mathcal{J} \diffd{H_1}{x_1} \\
+	u_{\partial, 1}  &= \mathcal{B} \diffd{H_1}{x_1} \\
+	y_{\partial, 1} &= \mathcal{C} \diffd{H_1}{x_1} \\
 	\end{aligned},
 	\right.
 	\end{equation} 
@@ -494,10 +497,10 @@ Consider a rectangular plate of side $L_x, L_y$, clamped at $x=0$ and welded to 
 \begin{bmatrix}
 \bm{M}_{\text{pl}} & \bm{0} \\
 \bm{0} & \bm{0} \\
-\end{bmatrix}
+\end{bmatrix}\frac{\d}{\d t}
 \begin{pmatrix}
-\dot{\bm{e}}_{\text{pl}}\\
-\dot{\bm{\lambda}}_D \\
+\bm{e}_{\text{pl}}\\
+\bm{\lambda}_D \\
 \end{pmatrix}
 &= \begin{bmatrix}
 \bm{J}_d & \bm{G}_D \\
@@ -521,7 +524,7 @@ Consider a rectangular plate of side $L_x, L_y$, clamped at $x=0$ and welded to 
 Here the Lagrange multipliers and associated matrices $\bm{\lambda}_D =  (\bm\lambda_{\Gamma_{C}}; \; \bm\lambda_{\Gamma_{\text{int}}} ), \; \bm{G}_D = [\bm{G}_{\Gamma_{C}}, \; \bm{G}_{\Gamma_{\text{int}}}], \; \bm{B} = [\bm{0}; \; \bm{I}]$ are split between the homogeneous and non-homogeneous Dirichlet boundary conditions. The rigid rod is written compactly 
 \begin{equation}
 \begin{aligned}
-\bm{M}_{\text{rod}} \dot{\bm{e}}_{\text{rod}} = \bm{u}_{\text{rod}}, \\
+\bm{M}_{\text{rod}} \diff{\bm{e}_{\text{rod}}}{t} = \bm{u}_{\text{rod}}, \\
 \bm{y}_{\text{rod}} = \bm{e}_{\text{rod}},
 \end{aligned}
 \end{equation}
@@ -534,7 +537,7 @@ where $\bm{e}_{\text{rod}} = (v_G\; \theta_{G}), \; \bm{M}_{\text{rod}} = \mathr
 
 where $\bm{\phi}^j_{\mathbb{R}^2},  \; \forall j = 1,2$ is the canonical basis for $\mathbb{R}^2$. The final system is obtained considering the power preserving interconnection $\bm{u}_{\text{rod}} = - \bm{W} \bm{y}_{\text{pl}}, \; \bm{u}_{\text{pl}} = \bm{W}^T \bm{y}_{\text{rod}}$ is then the augmented system 
 \begin{equation}
-\bm{E}_{\text{aug}} \dot{\bm{x}}_{\text{aug}} = \bm{J}_{\text{aug}}\bm{x}_{\text{aug}}, 
+\bm{E}_{\text{aug}} \diff{\bm{x}_{\text{aug}}}{t} = \bm{J}_{\text{aug}}\bm{x}_{\text{aug}}, 
 \end{equation}
 with $\bm{x}_{\text{aug}} = (\bm{e}_{\text{pl}}, \bm{e}_{\text{rod}}, \bm{\lambda}_D)$ and
 \begin{equation}
@@ -554,7 +557,7 @@ with $\bm{x}_{\text{aug}} = (\bm{e}_{\text{pl}}, \bm{e}_{\text{rod}}, \bm{\lambd
 with $\bm{G}_{\text{rod}} = -\bm{B}^T\bm{W}$. Distributed forces are easily accounted for. 
  
 \subsection{Numerical Simulation}
-To validate the approach numerical simulations considering system \eqref{eq:aug_Int} were carried out. A final time equal to $t_{\text{end}} = 10 [ms]$ is taken. A vertical distributed force given by expression
+To validate the approach numerical simulations on system \eqref{eq:aug_Int} are carried out. A  plate clamped in $x=0$ is considered, i.e. $\Gamma_C = \{(x,y) \vert x = 0\}$. A final time equal to $t_{\text{end}} = 10 [ms]$ is taken and a vertical distributed force given by expression
 \[
 \bm{f}_w = \begin{cases}
 10^5 \left[ y + 10 \left( y - L_y/2 \right)^2 \right] [Pa], \quad &\forall \, t < 0.2 \, t_{\text{end}}, \\
@@ -562,8 +565,10 @@ To validate the approach numerical simulations considering system \eqref{eq:aug_
 \end{cases}
 \]
 acts on the plate. The rigid rod has mass $M = 50 \, [kg]$ and length $L_{\text{rod}} = 1 [m]$. The plate parameters and settings for the discretization (a uniform grid is taken) ar provided in table \ref{tab:par}. The constraints are eliminated considering the projection matrix
-\[ \bm{P}_{\lambda} = \bm{I} - \bm{G} \left(\bm{G}^T \bm{M}^{-1} \bm{G} \right) \bm{G}^T \bm{M}^{-1}
-\]
+\begin{equation} \label{eq:proj}
+\bm{P}_{\lambda} = \bm{I} - \bm{G} \left(\bm{G}^T \bm{M}^{-1} \bm{G} \right)^{-1} \bm{G}^T \bm{M}^{-1}
+\end{equation}
+ 
 with $\bm{M} = \text{diag}(\bm{M}_{\text{pl}}, \, \bm{M}_{\text{rod}}), \; \bm{G} = [\bm{G}_D; \; \bm{G}_{\text{rod}}]$.
 
 \begin{figure}[t]
@@ -643,7 +648,85 @@ Snapshots of simulations without and with the rigid rod are reported in figures 
 
 
 \section{Damping Injection}
-The damping injection technique allows to asymptotically stabilize and infinite dimensional system. It relies on the La~Salle invariance principle (\cite{bookPHs}  chapter 6, proposition 6.2). Starting from system \eqref{eq:discr_pl}
+The damping injection technique allows to asymptotically stabilize and infinite dimensional system. It relies on the La~Salle invariance principle (\cite{bookPHs}  chapter 6, proposition 6.2). Starting from system \eqref{eq:discr_pl}, consider a cantilever plate and the following static control law
+\begin{equation}
+\bm{u} = -\bm{K} \bm{y}.
+\end{equation}
+System \eqref{eq:discr_pl} now reads
+\begin{equation}
+\begin{bmatrix}
+\bm{M}_{\text{pl}} & \bm{0} \\
+\bm{0} & \bm{0} \\
+\end{bmatrix}\frac{\d}{\d t}
+\begin{pmatrix}
+\bm{e}_{\text{pl}}\\
+\bm{\lambda}_D \\
+\end{pmatrix}
+= \begin{bmatrix}
+\bm{J}_d - \bm{R} & \bm{G}_D \\
+-\bm{G}_D^T & \bm{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+\bm{e}_{\text{pl}}\\
+\bm{\lambda}_D \\
+\end{pmatrix}.
+\end{equation}
+The matrix $\bm{R} = \bm{B}_N \bm{Z} \bm{B}_N^T \succcurlyeq 0$ is a semi-positive definitive matrix because of the input-output collocated feature of pH system. The energy rate reads (\cite{beattie2018linear} theorem 13)
+\[\dot{H} _{\text{pl}} = - \bm{e}_{\text{pl}}^T \; \bm{R} \; \bm{e}_{\text{pl}} \le 0 \]
+
+
+Videos are accessible at \url{https://github.com/brugnoss/Goodies_pH_plates}
+\begin{figure}[t]
+	\centering
+	\subfloat[$t=0.06 \; t_{\text{end}}$]{\includegraphics[width=0.5\linewidth]{Snapshot_t_60_cropped.eps}%
+		\label{fig:Damp_1}}
+	\subfloat[$t=0.16 \; t_{\text{end}}$]{\includegraphics[width=0.5\linewidth]{Snapshot_t_160_cropped.eps}%
+		\label{fig:Damp_2}}
+	\hfil
+	\subfloat[$t=0.26 \; t_{\text{end}}$]{\includegraphics[width=0.5\linewidth]{Snapshot_t_260_cropped.eps}%
+		\label{fig:Damp_3}}
+	\subfloat[$t=0.48 \, t_{\text{end}}$]{\includegraphics[width=0.5\linewidth]{Snapshot_t_480_cropped.eps}%
+		\label{fig:Damp_4}}
+	\caption{Snapshots of a  ($t_{\text{end}} = 10 \,[ms]$).}
+	\label{fig:SnapDamp}
+	\hfil
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.8\linewidth]{HamiltonianDamped_cropped.eps}
+\caption{Hamiltonian trend for }
+\label{fig:HamDamped}
+\end{figure}
+
+\section{Conclusion}
+The conclusion goes here.
+
+%\addtolength{\textheight}{-12cm}   % This command serves to balance the column lengths
+% on the last page of the document manually. It shortens
+% the textheight of the last page by a suitable amount.
+% This command does not take effect until the next page
+% so it should come on the page before the last. Make
+% sure that you do not shorten the textheight too much.
+
+
+
+
+
+% conference papers do not normally have an appendix
+
+
+% use section* for acknowledgment
+\section*{Acknowledgment}
+
+
+The authors would like to thank Michel Salau\"n, Xavier Vaisseur and Ghislain Haine from ISAE-SUPAERO for their insightful observations and comments.
+
+
+
+\bibliographystyle{IEEEtran}
+\bibliography{biblio_CDCKirchhoff}
+
 
 
 % An example of a floating figure using the graphicx package.
@@ -739,38 +822,6 @@ The damping injection technique allows to asymptotically stabilize and infinite 
 % Note that, LaTeX2e, unlike IEEE journals/conferences, places
 % footnotes above bottom floats. This can be corrected via the
 % \fnbelowfloat command of the stfloats package.
-
-
-
-
-\section{Conclusion}
-The conclusion goes here.
-
-\addtolength{\textheight}{-12cm}   % This command serves to balance the column lengths
-% on the last page of the document manually. It shortens
-% the textheight of the last page by a suitable amount.
-% This command does not take effect until the next page
-% so it should come on the page before the last. Make
-% sure that you do not shorten the textheight too much.
-
-
-
-
-
-% conference papers do not normally have an appendix
-
-
-% use section* for acknowledgment
-\section*{Acknowledgment}
-
-
-The authors would like to thank Michel Salau\"n, Xavier Vaisseur and Ghislain Haine from ISAE-SUPAERO for their insightful observations and comments.
-
-
-
-\bibliographystyle{IEEEtran}
-\bibliography{biblio_CDCKirchhoff}
-
 
 	
 	% that's all folks
