@@ -18,15 +18,11 @@ def animate2D(x, y, sol1, sol2, t, xlabel = None, ylabel = None,  zlabel = None,
     def update_plot(frame_number, sol1, sol2, plot):
         ax.collections.clear()
         lab = 'Time =' + '{0:.2e}'.format(t[frame_number])
-        plot = ax.plot_trisurf(x, y, sol1[:, frame_number], \
-                                  label=lab, cmap=cm.winter, linewidth=0, antialiased=False)
+        plot = ax.plot_trisurf(x, y, sol1[:, frame_number], label=lab, **surf_opts1)
         plot._facecolors2d = plot._facecolors3d
         plot._edgecolors2d = plot._edgecolors3d
 
-        ax.plot_trisurf(x + x.max(), y, sol2[:, frame_number], \
-                        cmap=cm.inferno, linewidth=0, antialiased=False)
-
-
+        ax.plot_trisurf(x + x.max(), y, sol2[:, frame_number], **surf_opts2)
         ax.legend()
 
     ax.set_xlim(min(x) - tol, max(2 * x) + tol)
@@ -51,13 +47,12 @@ def animate2D(x, y, sol1, sol2, t, xlabel = None, ylabel = None,  zlabel = None,
 
     lab = 'Time =' + '{0:.2e}'.format(t[0])
 
-    plot = ax.plot_trisurf(x, y, sol1[:, 0], label = lab, cmap=cm.winter,\
-                            linewidth=0, antialiased=False)
+    surf_opts1 = {'cmap': cm.winter, 'linewidth': 0, 'antialiased': False, 'vmin': minSol, 'vmax': maxSol}
+    plot = ax.plot_trisurf(x, y, sol1[:, 0], label = lab, **surf_opts1)
+    surf_opts2 = {'cmap': cm.inferno, 'linewidth': 0, 'antialiased': False, 'vmin': minSol, 'vmax': maxSol}
 
+    ax.plot_trisurf(x + x.max(), y, sol2[:, 0], **surf_opts2)
 
-    ax.plot_trisurf(x + x.max(), y, sol2[:, 0], \
-                    cmap=cm.inferno, linewidth=0, antialiased=False)
-
-    anim =  animation.FuncAnimation(fig, update_plot, frames=len(t), interval = 10, fargs=(sol1, sol2, plot))
-
+    anim = animation.FuncAnimation(fig, update_plot, frames=len(t),\
+                                    interval = 10, fargs=(sol1, sol2, plot))
     return anim

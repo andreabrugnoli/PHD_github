@@ -18,7 +18,7 @@ def animate2D(x, y, sol2D, t, xlabel = None, ylabel = None,  zlabel = None, titl
         ax.collections.clear()
         lab = 'Time =' + '{0:.2e}'.format(t[frame_number])
         plot = ax.plot_trisurf(x, y, sol2D[:, frame_number], \
-                                  label=lab, cmap=cm.jet, linewidth=0, antialiased=False)
+                                  label=lab, **surf_opts)
         plot._facecolors2d = plot._facecolors3d
         plot._edgecolors2d = plot._edgecolors3d
 
@@ -45,8 +45,8 @@ def animate2D(x, y, sol2D, t, xlabel = None, ylabel = None,  zlabel = None, titl
     ax.set_title(title, fontsize=fntsize)
 
     lab = 'Time =' + '{0:.2e}'.format(t[0])
-    plot = ax.plot_trisurf(x, y, sol2D[:, 0], label = lab, cmap=cm.jet,\
-                            linewidth=0, antialiased=False)
+    surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False, 'vmin': minSol, 'vmax': maxSol}
+    plot = ax.plot_trisurf(x, y, sol2D[:, 0], label = lab, **surf_opts)
 
     anim =  animation.FuncAnimation(fig, update_plot, frames=len(t), interval = 10, fargs=(sol2D, plot))
 

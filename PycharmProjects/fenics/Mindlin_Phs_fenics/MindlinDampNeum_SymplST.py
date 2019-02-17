@@ -325,9 +325,9 @@ e_p0_fun.assign(interpolate(init_p, Vp))
 ep_0 = e_p0_fun.vector().get_local() #
 eq_0 = np.zeros((n_Vq))
 
-import Stormer_Verlet_Grad
+import symplectic_integrators
 
-solverSym = Stormer_Verlet_Grad.StormerVerletGrad(M_p, M_q, D_p, D_q, R_p, P_p)
+solverSym = symplectic_integrators.StormerVerletGrad(M_p, M_q, D_p, D_q, R_p, P_p)
 
 sol = solverSym.compute_sol(ep_0, eq_0, t_f, t_0 = t_0, dt = dt, n_ev = n_ev)
 
@@ -408,7 +408,7 @@ plt.show()
 #
 #     ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
 #     ax.w_zaxis.set_major_locator(LinearLocator(10))
-#     ax.w_zaxis.set_major_formatter(FormatStrFormatter('%3.2f' ))
+#     ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g' ))
 #
 #     ax.plot_trisurf(x, y, w_mm[:,index], cmap=cm.jet, linewidth=0, antialiased=False)
 #     # plt.savefig(path_out + "Sim2_t_" + str(index+1) + ".eps", format="eps")

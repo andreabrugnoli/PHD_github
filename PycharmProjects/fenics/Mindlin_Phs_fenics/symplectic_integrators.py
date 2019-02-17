@@ -46,7 +46,7 @@ class StormerVerletGrad( object ):
         ep_old = ep0
         eq_old = eq0
 
-        t_stop = 0.2 * t_f
+        t_stop = 0.25 * t_f
 
         k = 1
         for i in range(1, n_t + 1):
