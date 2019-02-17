@@ -1200,8 +1200,8 @@ In this analysis we consider a square plate, subject either to a non null shear 
 	\centering
 	\begin{tabular}{|c|c|}
 		\hline 
-		\multicolumn{2}{|c|}{Plate} \\ 
-		\multicolumn{2}{|c|}{Parameters} \\ 
+		\multicolumn{2}{|c|}{Plate Parameters} \\ 
+		%\multicolumn{2}{|c|}{Parameters} \\ 
 		\hline 
 		$E [GPa]$ & 70 \\ 
 		$\nu$& 0.35 \\ 
@@ -1212,10 +1212,10 @@ In this analysis we consider a square plate, subject either to a non null shear 
 	\end{tabular} 
 	\begin{tabular}{|c|c|}
 		\hline 
-		\multicolumn{2}{|c|}{Simulation Parameters} \\  
+		\multicolumn{2}{|c|}{Simulation Settings} \\  
 		\hline 
 		$\Delta t$ & $0.001\; [ms]$ \\ 
-		$t_{\text{end}}$ & $1\; [ms]$ \\ 
+		$t_{\text{end}}$ & $10\; [ms]$ \\ 
 		Integrator & St\"ormer-Verlet \\ 
 		N$^\circ$ Elements & 10 \\
 		FE space & $H_{r = L/10}^1(\mathbb{P}_2)\text{ for }\bm{e} \times H_{r = L/10}^1(\mathbb{P}_2, \partial\Omega)\text{ for }\bm{\lambda}$ \\
@@ -1230,11 +1230,11 @@ In this analysis we consider a square plate, subject either to a non null shear 
 	\centering
 	\subfloat[][Simulation $n^\circ 1$]{%
 		\label{fig:sim1-H}%
-		\includegraphics[width=0.47\columnwidth]{Revision_Min/Sim1_Hamiltonian_cropped.eps}}%
+		\includegraphics[width=0.47\columnwidth]{Revision_Min/Sim1Hamiltonian_cropped.eps}}%
 	\hspace{8pt}%
 	\subfloat[][Simulation $n^\circ 2$]{%
 		\label{fig:sim2-H}%
-		\includegraphics[width=0.45\columnwidth]{Revision_Min/Sim2_Hamiltonian_cropped.eps}} \\
+		\includegraphics[width=0.45\columnwidth]{Revision_Min/Sim2Hamiltonian_cropped.eps}} \\
 	\caption[Hamiltonian]{Hamiltonian trend for the two simulations}
 	\label{fig:Hamiltonian}
 \end{figure}
@@ -1245,8 +1245,9 @@ where $g = 10 [m/s^2]$ is the gravity acceleration. This solicitation, that appl
 For this simulation the set of BC reads:
 \begin{equation*} \text{Simulation $n^\circ \, 1$} \;
 \begin{cases}
-w_t = 0, \, \omega_n = \omega_s= 0,  \quad &\text{for } x=0, \\
-q_n = 0, \, M_{nn} = M_{ns}= 0, \quad &\text{for } y=0, \; y=1 \text{ and } x=1\\
+w_t = 0, \, \omega_n = \omega_s= 0, \quad &\text{for } x=0 \text{ and } x=1,\\
+q_n = 0, \, M_{nn} = M_{ns}= 0, \quad &\text{for } y=0,\\
+q_n = 0, \, M_{nn} = M_{ns}= 0, \quad &\text{for } y=1,\\
 \end{cases}
 \end{equation*}
 Since the solicitation admits a potential the Hamiltonian does not represent the total energy, that now includes the potential energy
@@ -1256,38 +1257,39 @@ E_p = \int_{\Omega} \rho h g w \d{\Omega},
 where $w$ is the vertical displacement. For the second simulation the following  boundary conditions, corresponding to the case $CFCF$ are considered
 \begin{equation*} \text{Simulation $n^\circ \, 2$} \;
 	\begin{cases}
-	w_t = 0, \, \omega_n = \omega_s= 0, \quad &\text{for } x=0 \text{ and } x=1,\\
-    q_n = +f(x, t), \, M_{nn} = M_{ns}= 0, \quad &\text{for } y=0,\\
+	w_t = 0, \, \omega_n = \omega_s= 0, \quad &\text{for } x=0,\\
+	q_n = 0, \, M_{nn} = M_{ns}= 0, \quad &\text{for } x=1,\\
+	q_n = +f(x, t), \, M_{nn} = M_{ns}= 0, \quad &\text{for } y=0,\\
 	q_n = -f(x, t), \, M_{nn} = M_{ns}= 0, \quad &\text{for } y=1,\\
 	\end{cases}
 \end{equation*}
 where 
 \begin{equation*}
 f(x, t) = \begin{cases}
-10^6 \,\sin \left( \frac{2 \pi}{L} x \right) \; [Pa \cdot m], \; &\forall t< 0.25 \, t_{\text{end}}, \\
+10^5 \,\sin \left( \frac{\pi}{L} x \right) \; [Pa \cdot m], \; &\forall t< 0.25 \, t_{\text{end}}, \\
 0, \; &\forall t\geq 0.25 \, t_{\text{fin}}, \\
 \end{cases}
 \end{equation*} 
 where $t_{\text{end}}$ is defined in table \ref{tab:par}
-In this case inhomogeneous boundary conditions are considered. Snapshots of the vertical displacement are reported in figure \ref{fig:sim1}, \ref{fig:sim2}. This field is obtained from the velocity field $e_w = \diffp{w}{t}$ by applying the trapezoidal rule integration. For both simulations the output is consistent with the imposed BC and with the physical intuition of the observed phenomenon. The symplectic integration has been used to demonstrate numerically the conservation of total energy. The Hamiltonian for both simulation is reported in figure \ref{fig:Hamiltonian}. For the first one the total energy $E_p$ is the conserved quantity and it stays constant equal to zero as expected. For the second simulation the Hamiltonian is conserved quantity once the excitation is set back to zero. The symplectic integrator is a fixed-step integrator and it is not well adapted if the dynamics accelerates consistently during the simulation because of external solicitations. Standard variable step integrators like the Runge-Kutta ones can be used in this case.
+In this case inhomogeneous boundary conditions are considered. Snapshots of the vertical displacement are reported in figure \ref{fig:sim1}, \ref{fig:sim2}. This field is obtained from the velocity field $e_w = \diffp{w}{t}$ by applying the trapezoidal rule integration. For both simulations the output is consistent with the imposed BC and with the physical intuition of the observed phenomenon. The symplectic integration has been used to demonstrate numerically the conservation of total energy. The Hamiltonian for both simulation is reported in figure \ref{fig:Hamiltonian}. For the first one the total energy $E_p$ is the conserved quantity and it stays constant equal to zero as expected. For the second simulation the Hamiltonian is conserved quantity once the excitation is set back to zero. The conservation of energy is also evident from figure \ref{fig:sim2}. The boundary conditions are such that the energy increases monotonically as long as the excitation is present.  The deformation attained at the final time of the excitation  repeats itself symmetrically with respect to axis $y = L/2$ with period given by $0.5 t_{\text{end}}$.
 } 
 
 \begin{figure}[t]%
 	\centering
 	\subfloat[][$w(t = 0.25 \, t_{\text{fin}})$]{%
 		\label{fig:sim1-a}%
-		\includegraphics[width=0.45\columnwidth]{Revision_Min/Sim1_t_25_cropped.eps}}%
+		\includegraphics[width=0.45\columnwidth]{Revision_Min/Sim1t25_cropped.eps}}%
 	\hspace{8pt}%
 	\subfloat[][$w(t = 0.50 \, t_{\text{fin}})$]{%
 		\label{fig:sim1-b}%
-		\includegraphics[width=0.45\columnwidth]{Revision_Min/Sim1_t_50_cropped.eps}} \\
+		\includegraphics[width=0.45\columnwidth]{Revision_Min/Sim1t50_cropped.eps}} \\
 	\subfloat[][$w(t = 0.75 \, t_{\text{fin}})$]{%
 		\label{fig:sim1-c}%
-		\includegraphics[width=0.45\columnwidth]{Revision_Min/Sim1_t_75_cropped.eps}}%
+		\includegraphics[width=0.45\columnwidth]{Revision_Min/Sim1t75_cropped.eps}}%
 	\hspace{8pt}%
 	\subfloat[][$w(t = t_{\text{fin}})$]{%
 		\label{fig:sim1-d}%
-		\includegraphics[width=0.45\columnwidth]{Revision_Min/Sim1_t_100_cropped.eps}}%
+		\includegraphics[width=0.45\columnwidth]{Revision_Min/Sim1t100_cropped.eps}}%
 	\caption[Snapshots of the displacement field]{Snapshots for Simulation $n^\circ 1$.}%
 	\label{fig:sim1}%
 \end{figure}
@@ -1295,18 +1297,18 @@ In this case inhomogeneous boundary conditions are considered. Snapshots of the 
 	\centering
 	\subfloat[][$w(t = 0.25 \, t_{\text{fin}})$]{%
 		\label{fig:sim2-a}%
-		\includegraphics[width=0.45\columnwidth]{Revision_Min/Sim2_t_25_cropped.eps}}%
+		\includegraphics[width=0.45\columnwidth]{Revision_Min/Sim2t25_cropped.eps}}%
 	\hspace{8pt}%
 	\subfloat[][$w(t = 0.50 \, t_{\text{fin}})$]{%
 		\label{fig:sim2-b}%
-		\includegraphics[width=0.45\columnwidth]{Revision_Min/Sim2_t_50_cropped.eps}} \\
+		\includegraphics[width=0.45\columnwidth]{Revision_Min/Sim2t50_cropped.eps}} \\
 	\subfloat[][$w(t = 0.75 \, t_{\text{fin}})$]{%
 		\label{fig:sim2-c}%
-		\includegraphics[width=0.45\columnwidth]{Revision_Min/Sim2_t_75_cropped.eps}}%
+		\includegraphics[width=0.45\columnwidth]{Revision_Min/Sim2t75_cropped.eps}}%
 	\hspace{8pt}%
 	\subfloat[][$w(t = t_{\text{fin}})$]{%
 		\label{fig:sim2-d}%
-		\includegraphics[width=0.45\columnwidth]{Revision_Min/Sim2_t_100_cropped.eps}}%
+		\includegraphics[width=0.45\columnwidth]{Revision_Min/Sim2t100_cropped.eps}}%
 	\caption[Snapshots of the displacement field]{Snapshots for Simulation $n^\circ 2$.}%
 	\label{fig:sim2}%
 \end{figure}
