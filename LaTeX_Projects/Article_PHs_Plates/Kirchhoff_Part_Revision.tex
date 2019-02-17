@@ -34,10 +34,11 @@
 \newtheorem{remark}{Remark}
 \newtheorem{proposition}{Proposition}
 
-
 \newcommand{\revOne}[1]{\textcolor{blue!80!black}{#1}}
 \newcommand{\revTwo}[1]{\textcolor{red!80!black}{#1}}
 
+%\newcommand{\revOne}[1]{\textcolor{black}{#1}}
+%\newcommand{\revTwo}[1]{\textcolor{black}{#1}}
 
 \newcommand{\sqboxs}{1.2ex}% the square size
 \newcommand{\sqboxf}{0.6pt}% the border in \sqboxEmpty
@@ -1313,22 +1314,21 @@ where $\omega_{n}^{L}$ are the eigenvalues computed in \cite{LeissaRect}. The re
 			\multicolumn{2}{|c|}{Plate} \\ 
 			\multicolumn{2}{|c|}{Parameters} \\ 
 			\hline 
-			$E [GPa]$ & 70 \\ 
+			$E$ & $70\; [GPa]$ \\ 
 			$\nu$& 0.35 \\ 
 			$h/L$& 0.05 \\ 
-			$L [m]$& 1 \\ 
+			$L$& $1\; [m]$ \\ 
 			\hline 
 		\end{tabular} 
 		\begin{tabular}{|c|c|}
 			\hline 
 			\multicolumn{2}{|c|}{Simulation Parameters} \\  
 			\hline 
-			$\Delta t [ms]$ & $0.001$ \\ 
-			$t_{\text{fin}} [ms]$& 1 \\ 
+			$\Delta t$ & $0.001\;  [ms]$ \\ 
+			$t_{\text{end}}$& $1 \; [ms]$ \\ 
 			Integrator & St\"ormer-Verlet \\ 
-			N$^\circ$ Samples & 100 \\ 
 			N$^\circ$ Elements & 5 \\
-			FE space & $H_{r = L/5}^2(\mathbb{P}_5, \Omega) \times H_{r = L/5}^1(\mathbb{P}_2, \partial\Omega)$ \\
+			FE space & $H_{r = L/5}^2(\mathbb{P}_5, \Omega) \text{ for }\bm{e} \times H_{r = L/5}^1(\mathbb{P}_2, \partial\Omega)\text{ for }\bm{\lambda}$ \\
 			\hline 
 		\end{tabular} 
 		\captionsetup{width=0.95\linewidth}
@@ -1372,8 +1372,8 @@ where $\omega_{n}^{L}$ are the eigenvalues computed in \cite{LeissaRect}. The re
 	where 
 	\begin{equation}
 	f(x, t) = \begin{cases}
-	10^5 \, x \; [Pa \cdot m], \; &\forall t< 0.2 \, t_{\text{fin}}, \\
-	0, \; &\forall t\geq 0.2 \, t_{\text{fin}}. \\
+	10^5 \, x \; [Pa \cdot m], \; &\forall t< 0.2 \, t_{\text{end}}, \\
+	0, \; &\forall t\geq 0.2 \, t_{\text{end}}. \\
 	\end{cases}
 	\end{equation} 
 	In this case inhomogeneous boundary conditions are considered. Snapshots of the vertical displacement are reported in figure \ref{fig:sim1}, \ref{fig:sim2}. This field is obtained from the velocity field $e_w = \diffp{w}{t}$ by applying the trapezoidal rule integration. For both simulations the output is consistent with the imposed BC and with the physical intuition of the observed phenomenon. The symplectic integration has been used to demonstrate numerically the conservation of total energy. The Hamiltonian for both simulation is reported in figure \ref{fig:Hamiltonian}. For the first one the total energy $E_p$ is the conserved quantity and it stays constant equal to zero as expected. For the second simulation the Hamiltonian is conserved quantity once the excitation is set back to zero. 
@@ -1421,16 +1421,16 @@ where $\omega_{n}^{L}$ are the eigenvalues computed in \cite{LeissaRect}. The re
 
 \section*{Conclusions and Future Perspectives}
 \revOne{
-In this paper the port-Hamiltonian formulation of the Kirchhoff plate was detailed with the equivalent vectorial and a tensorial representation. The tensorial formalism allowed showing the adjointness relation between the double divergence of a symmetric tensor and the Hessian. This result represent a appealing novelty for mathematical working on functional a analysis. Moreover, many features of the PFEM are of interest:
+In this paper the port-Hamiltonian formulation of the Kirchhoff plate was detailed with the equivalent vectorial and a tensorial representation. The tensorial formalism allowed showing the adjointness relation between the double divergence of a symmetric tensor and the Hessian of a scalar field. This result represent a appealing novelty for mathematical working on functional a analysis. Moreover, many features of the PFEM are of interest:
 \begin{itemize}
 	\item its capability of preserving the port-Hamiltonian structure;
 	\item the natural derivation of boundary port variables as inputs;
 	\item the possibility of dealing with mixed boundary conditions inside the framework of  port-Hamiltonian descriptor systems PHDAEs  detailed in \cite{beattie2018linear};
 	\item the easy implementability of the method using standard Finite Element libraries (Firedrake \cite{firedrake} in this case);
 \end{itemize}   
-The computation of eigenvalues with different boundary controls and the numerical simulations demonstrate the validity of the proposed model. \\ \\
-The model presented in this paper should be completed with a precise analysis of the well-posedness, in the input-output sense. It must be appointed that a complication arises in this formulation. The differential operator of the PH model of the Kirchhoff plate requires the momenta to belong to the space $H^{\text{div Div}}(\Omega, \mathbb{R}^{d \times d}_{\text{sym}})$. To the best of our knowledge this space was never analyzed in the mathematical literature and a precise study of its peculiarity is needed. The results obtained in \cite{waveEqZwart} for the wave equation in $\mathbb{R}^d$ could be generalize to the second order differential operator presented in the Kirchhoff plate PH model. Once the theoretical analysis has gained a  sufficient insight a numerical analysis focusing on the convergence should be carried out. \\ \\
-The discretization procedure details in the paper open new scenarios on the interconnection of PH systems. Starting from the results stated in \cite{ShaftIntInfinite} this system may be interconnected over its boundary to other finite or infinite dimensional PH systems, such as rigid bodies or other flexible appendages. This may find useful applications in simulating a multi-body environment for spatial applications, like the attitude motion of a satellite with flexible solar panels (as in \cite{aoues:hal-01738092}). Since no causality is imposed on the boundary ports, the discretization method herein proposed allows the construction of arbitrarily complex connections among the different parts. This feature is particularly appealing for complex applications.
+The computation of eigenvalues with different boundary conditions and the numerical simulations demonstrate the validity of the proposed model. \\ \\
+The model presented in this paper should be completed with a precise analysis of the well-posedness, in the input-output sense. It must be appointed that a complication arises in this formulation. The differential operator of the PH model of the Kirchhoff plate requires the momenta to belong to the space $H^{\text{div Div}}(\Omega, \mathbb{R}^{d \times d}_{\text{sym}})$. To the best of our knowledge this space was never analyzed in the mathematical literature and a precise study of its peculiarities is needed. The results obtained in \cite{waveEqZwart} for the wave equation in $\mathbb{R}^d$ could be generalize to the second order differential operator presented herein. A numerical analysis focusing on the convergence of appropriate finite elements should be carried out. \\ \\
+The discretization procedure details in the paper open new scenarios on the interconnection of PH systems. Starting from the results stated in \cite{ShaftIntInfinite} this system may be interconnected over its boundary to other finite or infinite dimensional PH systems, such as rigid bodies or other flexible appendages. This may find useful applications in simulating a multi-body environment for spatial applications, like the attitude motion of a satellite with flexible solar panels \cite{aoues:hal-01738092}. Since no causality is imposed on the boundary ports, the discretization method herein proposed allows the construction of arbitrarily complex connections among different modules. This feature is particularly appealing for complex applications.
 }
  	
 

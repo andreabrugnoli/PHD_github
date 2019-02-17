@@ -44,6 +44,10 @@
 \newcommand{\RevOne}[1]{\textcolor{blue!80!black}{#1}}
 \newcommand{\RevTwo}[1]{\textcolor{red!80!black}{#1}}
 
+%\newcommand{\RevOne}[1]{\textcolor{black}{#1}}
+%\newcommand{\RevTwo}[1]{\textcolor{black}{#1}}
+
+
 %\usepackage{hyperref}
 
 \DeclareMathOperator*{\argmax}{arg\,max}
@@ -1210,12 +1214,11 @@ In this analysis we consider a square plate, subject either to a non null shear 
 		\hline 
 		\multicolumn{2}{|c|}{Simulation Parameters} \\  
 		\hline 
-		$\Delta t [ms]$ & $0.001$ \\ 
-		$t_{\text{end}} [ms]$& 1 \\ 
+		$\Delta t$ & $0.001\; [ms]$ \\ 
+		$t_{\text{end}}$ & $1\; [ms]$ \\ 
 		Integrator & St\"ormer-Verlet \\ 
-		N$^\circ$ Samples & 100 \\ 
 		N$^\circ$ Elements & 10 \\
-		FE space & $H_{r = L/10}^1(\mathbb{P}_2)$ \\
+		FE space & $H_{r = L/10}^1(\mathbb{P}_2)\text{ for }\bm{e} \times H_{r = L/10}^1(\mathbb{P}_2, \partial\Omega)\text{ for }\bm{\lambda}$ \\
 		\hline 
 	\end{tabular} 
 	\captionsetup{width=0.95\linewidth}
@@ -1261,7 +1264,7 @@ where $w$ is the vertical displacement. For the second simulation the following 
 where 
 \begin{equation*}
 f(x, t) = \begin{cases}
-\sin \left( \frac{2 \pi}{L} x \right) \; [MPa \cdot m], \; &\forall t< 0.25 \, t_{\text{end}}, \\
+10^6 \,\sin \left( \frac{2 \pi}{L} x \right) \; [Pa \cdot m], \; &\forall t< 0.25 \, t_{\text{end}}, \\
 0, \; &\forall t\geq 0.25 \, t_{\text{fin}}, \\
 \end{cases}
 \end{equation*} 
@@ -1319,8 +1322,7 @@ In this paper the port-Hamiltonian formulation of the Mindlin plate was enriched
 	\item the easy implementability of the method using standard Finite Element libraries (Fenics \cite{LoggMardalEtAl2012} in this case);
 	\item a coordinate free representation which makes possible to treat other planar geometries (circular, ellipsoidal, annular etc).
 \end{itemize}  
-\
-The formulation presented in this paper should be completed with a precise analysis of the well-posedness, in the input-output sense (as in \cite{waveEqZwart} for the wave equation in $\mathbb{R}^d$). Furthermore a proper convergence analysis is needed. Using conforming elements requires the Arnold-Winther elements. Unfortunately these are not included inside Fenics (or in any standard library).  \\
+The formulation presented in this paper should be completed with a precise analysis of the well-posedness, in the input-output sense (as in \cite{waveEqZwart} for the wave equation in $\mathbb{R}^d$). Furthermore a proper convergence analysis is needed. Using conforming elements requires the Arnold-Winther elements. Unfortunately these are not included inside Fenics (or in any standard library).  \\ \\
 Another important aspect is the implementation of suitable control laws. The proposed method paves the way to the use of passivity-based approaches and the energy shaping methods. These techniques were already largely studied in the literature \cite{Ortega2002, OrtegaContrInt} for the finite dimensional case. However, the distributed case is mainly limited to one geometrical dimension \cite{MaccContrDist}.}  It would be of great interest, especially for control engineers, to conceive a controller able to respect given performance specifications. The port-Hamiltonian formalism and its powerfulness in modeling complex systems could be linked to standard control methodologies, already well known in the industrial field, like the $LQR$ or $H^\infty$ methodology.   
 
 \section*{Acknowledgments}
