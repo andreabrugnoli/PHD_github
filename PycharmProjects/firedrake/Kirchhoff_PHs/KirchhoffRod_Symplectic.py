@@ -265,7 +265,7 @@ solverSym = StormerVerletGrad(M_p, M_q, D_p, D_q, R_p, P_p, F_p)
 
 t_0 = 0
 dt = 1e-6
-t_f = 0.01
+t_f = 1e-3
 n_ev = 100
 
 Aw = 0.001

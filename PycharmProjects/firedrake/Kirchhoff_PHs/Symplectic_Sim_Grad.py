@@ -1,15 +1,23 @@
-# Mindlin plate written with the port Hamiltonian approach
+# Kirchhoff plate written with the port Hamiltonian approach
 
 from firedrake import *
 import numpy as np
 
 np.set_printoptions(threshold=np.inf)
-from math import floor, sqrt, pi
-import matplotlib.pyplot as plt
 
 from scipy import linalg as la
-from scipy.sparse import csr_matrix
-from scipy.sparse.linalg import spsolve
+from scipy.sparse import csc_matrix
+from scipy.sparse.linalg import inv as inv_sp
+
+import matplotlib.pyplot as plt
+import matplotlib
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+from matplotlib import cm
+from AnimateSurfFiredrake import animate2D
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.animation as animation
+
+matplotlib.rcParams['text.usetex'] = True
 
 
 E = 7e10
@@ -180,30 +188,22 @@ q_n, M_nn = TrialFunction(Vu)
 
 v_omn = dot(grad(v_p), n)
 
-b_vec = []
+g_vec = []
 for key,val in bc_dict.items():
     if val == 'C':
-        b_vec.append( v_p * q_n * ds(key) + v_omn * M_nn * ds(key))
+        g_vec.append( v_p * q_n * ds(key) + v_omn * M_nn * ds(key))
     elif val == 'S':
-        b_vec.append(v_p * q_n * ds(key))
+        g_vec.append(v_p * q_n * ds(key))
 
-b_u = sum(b_vec)
+g = sum(g_vec)
 # Assemble the stiffness matrix and the mass matrix.
 
-B_u = assemble(b_u, mat_type='aij')
-# B_y = assemble(b_y_omn, mat_type='aij')
-
-petsc_b_u = B_u.M.handle
-# petsc_b_y =  B_y.M.handle
-
-# print(B_u.array().shape)
-B_in = np.array(petsc_b_u.convert("dense").getDenseArray())
+petsc_g = assemble(g, mat_type='aij').M.handle
+G_p = np.array(petsc_g.convert("dense").getDenseArray())
 # B_out = np.array(petsc_b_y.convert("dense").getDenseArray())
 
-boundary_dofs = np.where(B_in.any(axis=0))[0]  # np.where(~np.all(B_in == 0, axis=0) == True) #
-B_in = B_in[:, boundary_dofs]
-
-G_ep = B_in.T
+boundary_dofs = np.where(G_p.any(axis=0))[0]  # np.where(~np.all(B_in == 0, axis=0) == True) #
+G_p = G_p[:, boundary_dofs]
 
 # Splitting of matrices
 
@@ -212,133 +212,78 @@ x, y = SpatialCoordinate(mesh)
 g = Constant(10)
 A = Constant(10**5)
 f_w = project(A*x, Vp) # project(1000000*sin(6*pi/l_y*x), Vp) #
-# f_w = Expression("1000000*sin(2*pi*x[0])", degree=4)
-# f_qn = Expression("1000000*sin(2*pi*x[1])", degree= 4) # Constant(1e5) #
-b_p = v_p * f_w * ds(3) + v_p * f_w * ds(4)
-#                                # v_p * f_qn * ds(3) #
-#                                # -v_p * rho * h * g * dx #
+b_p1 = -v_p * rho * h * g * dx #
+b_p2 = v_p * f_w * ds(3) + v_p * f_w * ds(4) + v_p * f_w * ds(2)
 
-B_p = assemble(b_p, mat_type='aij').vector().get_local()
+n_sim = 2
+if n_sim == 1:
+    b_p = b_p1
+else: b_p = b_p2
+F_p = assemble(b_p, mat_type='aij').vector().get_local()
 
 # Final Assemble
-Mp_sp = csr_matrix(M_p)
-Mq_sp = csr_matrix(M_q)
+Mp_sp = csc_matrix(M_p)
 
-G_epT = np.transpose(G_ep)
-G_eq = np.zeros((0, 0))
-G_eqT = np.transpose(G_eq)
+invMp = inv_sp(Mp_sp)
+invM_pl = invMp.toarray()
 
-invMp = la.inv(M_p)
-invMq = la.inv(M_q)
+S_p = G_p @ la.inv(G_p.T @ invMp @ G_p) @ G_p.T @ invMp
 
-if G_ep.size != 0:
-    invGMGT_p = la.inv(G_ep @ invMp @ G_epT)
+Id_p = np.eye(n_Vp)
+P_p = Id_p - S_p
 
-if G_eq.size != 0:
-    invGMGT_q = la.inv(G_eq @ invMq @ G_eqT)
+
+x, y = SpatialCoordinate(mesh)
+Aw = 0.001
+# init_p = Aw*(1 - cos(2*pi/l_x*x) )
+init_p = Expression('A*( pow(x[0], 2))', \
+                    degree=4, lx=l_x, ly=l_y, A = 0.001)
+init_q = Expression(('0', '0', '0'), degree=4, lx=l_x, ly=l_y)
+
+e_pw_0 = Function(Vp)
+e_pw_0.assign(project(init_p, Vp))
+ep_0 = np.zeros((n_Vp)) # e_pw_0.vector().get_local() #
+eq_0 = np.zeros((n_Vq))
+
+from symplectic_integrators import StormerVerletGrad
+
+R_p = np.zeros((n_Vp, n_Vp))
+
+solverSym = StormerVerletGrad(M_p, M_q, D_p, D_q, R_p, P_p, F_p)
+
 
 t_0 = 0
 dt = 1e-6
-fac = 1
-t_base = 0.001
-t_f = t_base *fac
+t_f = 1e-2
 n_ev = 100
-t_ev = np.linspace(t_0, t_f, n_ev)
 
-n_t = int(t_f / dt)
+sol = solverSym.compute_sol(ep_0, eq_0, t_f, t_0 = t_0, dt = dt, n_ev = n_ev)
 
-ep_sol = np.zeros((n_Vp, n_ev))
-eq_sol = np.zeros((n_Vq, n_ev))
+t_ev = sol.t_ev
+ep_sol = sol.ep_sol
+eq_sol = sol.eq_sol
 
-init_p = Expression('sin(2*pi*x[0])*sin(2*pi*(x[0]-lx))*sin(2*pi*x[1])*sin(2*pi*(x[1]-ly))', degree=4,
-                    lx=l_x, ly=l_y)
-init_q = Expression(('0', '0', '0'), degree=4, lx=l_x, ly=l_y)
+n_ev = len(t_ev)
 
-e_pw_in = project(init_p, Vp)
-e_pw_0 = Function(Vp)
-e_pw_0.assign(e_pw_in)
-ep_old = np.zeros((n_Vp))  # e_pw_0.vector().get_local() #
-eq_old = np.zeros((n_Vq))
-
-ep_sol[:, 0] = ep_old
-eq_sol[:, 0] = eq_old
-
-k = 1
-f = 1
-for i in range(1, n_t + 1):
-
-    t = i * dt
-    if t < t_base:
-        f = 1
-    else:
-        f = 0
-
-    # Intergation for p (n+1/2)
-
-    w_De_q = D_q @ eq_old
-
-    if G_ep.size == 0:
-        bp = M_p @ ep_old + 0.5 * dt * (w_De_q + B_p * f)
-    else:
-        lmbda_p = - invGMGT_p @ G_ep @ invMp @ (w_De_q + B_p * f)
-        bp = M_p @ ep_old + 0.5 * dt * (w_De_q + G_epT @ lmbda_p + B_p * f)
-
-    bp_sp = csr_matrix(bp).reshape((n_Vp, 1))
-    ep_new = spsolve(Mp_sp, bp_sp)
-
-    ep_old = ep_new
-    # Integration of q (n+1)
-
-    w_De_p = D_p @ ep_new
-
-    if G_eq.size == 0:
-        bq = M_q @ eq_old + dt * w_De_p
-    else:
-        lmbda_q = - invGMGT_q @ G_eq @ invMq @ w_De_p
-        bq = M_q @ eq_old + dt * (w_De_p + G_eqT @ lmbda_q)
-
-    bq_sp = csr_matrix(bq).reshape((n_Vq, 1))
-    eq_new = spsolve(Mq_sp, bq_sp)
-
-    eq_old = eq_new
-
-    # Intergation for p (n+1)
-
-    w_De_q = D_q @ eq_old
-
-    if G_ep.size == 0:
-        bp = M_p @ ep_old + 0.5 * dt * (w_De_q + B_p * f)
-    else:
-        lmbda_p = - invGMGT_p @ G_ep @ invMp @ (w_De_q + B_p * f)
-        bp = M_p @ ep_old + 0.5 * dt * (w_De_q + G_epT @ lmbda_p + B_p * f)
-
-    bp_sp = csr_matrix(bp).reshape((n_Vp, 1))
-    ep_new = spsolve(Mp_sp, bp_sp)
-
-    ep_old = ep_new
-
-    if t >= t_ev[k]:
-        ep_sol[:, k] = ep_new
-        eq_sol[:, k] = eq_new
-        k = k + 1
-        print('Solution number ' + str(k) + ' computed')
-
+n_sol = len(t_ev)
 w0 = np.zeros((n_Vp,))
 w = np.zeros(ep_sol.shape)
 w[:, 0] = w0
 w_old = w[:, 0]
 
+dt_ev = np.diff(t_ev)
+
 h_Ep = Function(Vp)
 Ep = np.zeros((n_ev,))
-
-Deltat = t_f / (n_ev - 1)
 for i in range(1, n_ev):
-    w[:, i] = w_old + 0.5 * (ep_sol[:, i - 1] + ep_sol[:, i]) * Deltat
+    w[:, i] = w_old + 0.5 * (ep_sol[:, i - 1] + ep_sol[:, i]) * dt_ev[i-1]
     w_old = w[:, i]
     h_Ep.vector()[:] = np.ascontiguousarray(w[:, i], dtype='float')
     Ep[i] = assemble(rho * g * h * h_Ep * dx)
 
-w_mm = w * 1000
+if n_sim ==1:
+    w_mm = w * 1000000
+else: w_mm = w * 1000
 
 wmm_CGvec = []
 w_fun = Function(Vp)
@@ -362,88 +307,88 @@ minZ = min(minZvec)
 print(maxZ)
 print(minZ)
 
-import matplotlib, drawNow
+# if matplotlib.is_interactive():
+#     plt.ioff()
+# plt.close('all')
 
-matplotlib.rcParams['text.usetex'] = True
-matplotlib.interactive(True)
-
-plotter = drawNow.plot3dClass(wmm_CGvec[0], minZ= minZ, maxZ = maxZ,  \
-                         xlabel = '$x[m]$', ylabel = '$y [m]$', \
-                         zlabel = '$w [mm]$', title = 'Vertical Displacement')
-
-for i in range(n_ev):
-    # w_fun.vector()[:] = w_mm[:, i]
-    # wmm_CG = project(w_fun, Vp_CG)
-    plotter.drawNow(wmm_CGvec[i])
-
-if matplotlib.is_interactive():
-    plt.ioff()
-plt.close('all')
-
+fntsize = 16
 H_vec = np.zeros((n_ev,))
-fntsize = 15
 
 for i in range(n_ev):
-    H_vec[i] = 0.5 * (np.transpose(ep_sol[:, i]) @ M_p @ ep_sol[:, i] + np.transpose(eq_sol[:, i]) @ M_q @ eq_sol[:, i])
-#
-# t_ev = np.linspace(t_0, t_f, n_ev)
-# fig = plt.figure(0)
-# plt.plot(t_ev, H_vec, 'b-', label='Hamiltonian (J)')
-# # plt.plot(t_ev, Ep, 'r-', label = 'Potential Energy (J)')
-# # plt.plot(t_ev, H_vec + Ep, 'g-', label = 'Total Energy (J)')
-# plt.xlabel(r'{Time} (s)', fontsize=fntsize)
-# # plt.ylabel(r'{Hamiltonian} (J)',fontsize=fntsize)
-# plt.title(r"Hamiltonian trend",
-#           fontsize=fntsize)
-# plt.legend(loc='upper left')
-# path_out = "/home/a.brugnoli/PycharmProjects/firedrake/Kirchhoff_PHs/Simulations/"
-# plt.gcf().savefig(path_out + "Sim2_Hamiltonian.eps", format="eps")
-# # plt.show()
-#
-# plot_solutions = True
-# if plot_solutions:
-#
-#     from matplotlib.ticker import LinearLocator, FormatStrFormatter
-#     from matplotlib import cm
-#     from mpl_toolkits.mplot3d import Axes3D
-#
-#     matplotlib.rcParams['text.usetex'] = True
-#
-#     n_fig = 4
-#     tol = 1e-6
-#
-#     for i in range(n_fig):
-#         index = int(n_ev/n_fig*(i+1)-1)
-#         w_fun = Function(Vp)
-#         w_fun.vector()[:] = w_mm[:, index]
-#
-#         Vp_CG = FunctionSpace(mesh, 'Lagrange', 3)
-#         wmm_wCG = project(w_fun, Vp_CG)
-#
-#         from firedrake.plot import _two_dimension_triangle_func_val
-#
-#         triangulation, Z = _two_dimension_triangle_func_val(wmm_wCG, 10)
-#         fig = plt.figure(i + 1)
-#
-#         ax = fig.add_subplot(111, projection="3d")
-#
-#         ax.plot_trisurf(triangulation, Z, cmap=cm.jet)
-#
-#         ax.set_xbound(-tol, l_x + tol)
-#         ax.set_xlabel('$x [m]$', fontsize=fntsize)
-#
-#         ax.set_ybound(-tol, l_y + tol)
-#         ax.set_ylabel('$y [m]$', fontsize=fntsize)
-#
-#         ax.w_zaxis.set_major_locator(LinearLocator(10))
-#         ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
-#
-#         ax.set_zlabel('$w [\mu m]$', fontsize=fntsize)
-#         ax.set_title('Vertical displacement', fontsize=fntsize)
-#
-#         ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
-#
-#         plt.gcf().savefig(path_out + "Sim2_t_" + str(index + 1) + ".eps", format="eps")
-#
-#     plt.show()
+    H_vec[i] = 0.5 * (np.transpose(ep_sol[:, i]) @ M_p @ ep_sol[:, i] \
+        + np.transpose(eq_sol[:, i]) @ M_q @ eq_sol[:, i])
 
+fig, ax = plt.subplots()
+ax.yaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
+plt.plot(t_ev, H_vec, 'b-', label='Hamiltonian Plate (J)')
+# plt.plot(t_ev, Ep, 'r-', label = 'Potential Energy (J)')
+# plt.plot(t_ev, H_vec + Ep, 'g-', label = 'Total Energy (J)')
+plt.xlabel(r'{Time} (s)', fontsize=fntsize)
+# plt.ylabel(r'{Hamiltonian} (J)', fontsize=fntsize)
+plt.title(r"Hamiltonian trend",  fontsize=fntsize)
+plt.legend(loc='upper left')
+
+path_out = "/home/a.brugnoli/Plots_Videos/Kirchhoff_plots/Simulations/Article_Kirchh/"
+plt.savefig(path_out + "Sim" +str(n_sim) + "Hamiltonian.eps", format="eps")
+
+if n_sim == 1:
+    unit = "[\mu m]"
+else: unit = "[mm]"
+anim = animate2D(minZ, maxZ, wmm_CGvec, t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \
+                         zlabel = '$w $' + unit, title = 'Vertical Displacement')
+
+
+# rallenty = 10
+# Writer = animation.writers['ffmpeg']
+# writer = Writer(fps=int(n_ev/(t_f*rallenty)), metadata=dict(artist='Me'), bitrate=1800)
+# anim.save(path_out + 'Kirchh_Damped.mp4', writer=writer)
+
+plt.show()
+
+plot_solutions = True
+if plot_solutions:
+
+
+    matplotlib.rcParams['text.usetex'] = True
+
+    n_fig = 4
+    tol = 1e-6
+
+    for i in range(n_fig):
+        index = int(n_ev/n_fig*(i+1)-1)
+        w_fun = Function(Vp)
+        w_fun.vector()[:] = w_mm[:, index]
+
+        Vp_CG = FunctionSpace(mesh, 'Lagrange', 3)
+        wmm_wCG = project(w_fun, Vp_CG)
+
+        from firedrake.plot import _two_dimension_triangle_func_val
+
+        triangulation, Z = _two_dimension_triangle_func_val(wmm_wCG, 10)
+        fig = plt.figure()
+
+        ax = fig.add_subplot(111, projection="3d")
+        ax.collections.clear()
+
+        surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False} #, 'vmin': minZ, 'vmax': maxZ}
+        # lab = 'Time =' + '{0:.2e}'.format(t_ev[index])
+        surf = ax.plot_trisurf(triangulation, Z, **surf_opts)
+        # fig.colorbar(surf)
+
+        ax.set_xbound(-tol, l_x + tol)
+        ax.set_xlabel('$x [m]$', fontsize=fntsize)
+
+        ax.set_ybound(-tol, l_y + tol)
+        ax.set_ylabel('$y [m]$', fontsize=fntsize)
+
+        ax.w_zaxis.set_major_locator(LinearLocator(10))
+        ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
+
+        ax.set_zlabel('$w [mm]$', fontsize=fntsize)
+        ax.set_title('Vertical displacement ', fontsize=fntsize)
+
+        # ax.set_title('Vertical displacement ' +'$(t=$' + '{0:.2e}'.format(t_ev[index]) + '$s)$', fontsize=fntsize)
+
+        ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
+
+        plt.savefig(path_out + "Sim" + str(n_sim) + "t" + str(index + 1) + ".eps", format="eps")

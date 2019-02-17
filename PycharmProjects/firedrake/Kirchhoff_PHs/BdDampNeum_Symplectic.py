@@ -1,4 +1,4 @@
-# Mindlin plate written with the port Hamiltonian approach
+# Kirchhoff plate written with the port Hamiltonian approach
 
 from firedrake import *
 import numpy as np
