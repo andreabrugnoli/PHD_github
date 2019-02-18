@@ -15,6 +15,7 @@
 \usepackage{tikz}
 \usetikzlibrary{shapes,arrows,positioning,calc}
 
+\usepackage[bookmarks=false]{hyperref}
 \usepackage{multirow}
 
 \newtheorem{theorem}{Theorem}
@@ -45,7 +46,7 @@
 \author{Andrea Brugnoli$^{1}$ and Daniel Alazard$^{1}$ and Val\'erie Pommier-Budinger$^{1}$ and Denis Matignon$^{1}$% <-this % stops a space
 	\thanks{*This work is supported by the project ANR-16-CE92-0028,
 		entitled {\em Interconnected Infinite-Dimensional systems for Heterogeneous
-			Media}, INFIDHEM, financed by the French National Research Agency (ANR) and the Deutsche Forschungsgemeinschaft (DFG). Further information is available at { {https://websites.isae-supaero.fr/infidhem/the-project}}.}% <-this % stops a space
+			Media}, INFIDHEM, financed by the French National Research Agency (ANR) and the Deutsche Forschungsgemeinschaft (DFG). Further information is available at { \url{https://websites.isae-supaero.fr/infidhem/the-project}}.}% <-this % stops a space
 	\thanks{$^{1}$Andrea Brugnoli, Daniel Alazard, Val\'erie Pommier-Budinger and Denis Matignon are with ISAE-SUPAERO, Universit\'e de Toulouse, France,
 		10 Avenue Edouard Belin, BP-54032, 31055 Toulouse Cedex 4
 		{\tt\small \{Andrea.Brugnoli, Daniel.Alazard, Valerie.Budinger, Denis.Matignon\}@isae.fr} }
@@ -67,7 +68,7 @@
 % in the abstract
 \begin{abstract}
 	The Kirchhoff plate model is here detailed by using a tensorial port-Hamiltonian (pH) formulation. A structure-preserving discretization of this model is then achieved by using the partitioned finite element (PFEM). This methodology easily accounts for the boundary variables and the finite dimensional system can be interconnected to the surrounding environment in an simple and structured manner. The algebraic constraints to be considered are deduced by the boundary conditions, that may be homogeneous or defined by an interconnection with another dynamical system. \\
-	The versatility of the proposed approach is presented by means of numerical simulations. A first illustration considers a rectangular plate clamped on one side and interconnected to a rigid rod welded to the opposite side. A second example exploits the collocated output feature of pH systems to perform damping injection in a plate undergoing an external forcing. A stability proof is obtained effortlessly as the Hamiltonian is a Lyapunov function. 
+	The versatility of the proposed approach is presented by means of numerical simulations. A first illustration considers a rectangular plate clamped on one side and interconnected to a rigid rod welded to the opposite side. A second example exploits the collocated output feature of pH systems to perform damping injection in a plate undergoing an external forcing. A stability proof is obtained by the application of the La~Salle invariance principle.
 \end{abstract}
 
 % no keywords
@@ -94,12 +95,12 @@ In order to simulate and control such systems, a finite dimensional representati
 
 In this paper the Kirchhoff plate model is presented in a pH fashion. The tensorial calculus is employed in order to clearly identify the skew-symmetric nature of the differential operator. The PFEM methodology is then used to obtain a finite dimensional system. Numerical applications are then carried out using the Firedrake platform \cite{firedrake}. An interconnection along the boundary is presented to model an cantilever plate welded to a rigid bar. This serves just as an example as the methodology may be employed to construct complex systems starting from their basic components. A control application by damping injection follows. The plate is interconnected along part of the boundary with a dissipative system. The Hamiltonian for such an interconnected system is a Lyapunov function, therefore the system will tend to the equilibrium point, i.e. the undeformed configuration. \\
 
-In section \ref{sec:KirchhPH} the Kirchhoff Plate model in strong form as a port-Hamiltonian system is described. In section \ref{sec:WF} BLABLA 
+In section \ref{sec:KirchhPH} the Kirchhoff Plate model in strong form as a port-Hamiltonian system is described. In section \ref{sec:SP_discr} the structure preserving discretization obtained by using PFEM  is detailed. The discretized system and the associated finite elements are given in \ref{subsec:finPHs}. Section \ref{sec:Int} provides a structure way to interconnected a infinite dimensional system with a finite one. The damping injection control methodology is briefly discussed in \ref{sec:Damp}. 
 
 \section{pH formulation of the Kirchoff plate}
 \label{sec:KirchhPH}
 
-In this section the classical formulation of the Kirchhoff plate the tensorial pH formulation are recalled. 
+In this section the classical formulation of the Kirchhoff plate the tensorial pH formulation are described. 
 
 \subsection{Notations}
 First, the differential operators needed for the following are recalled. For a scalar field $u: \mathbb{R}^d \rightarrow \mathbb{R}$ the gradient is defined as 
@@ -223,7 +224,7 @@ where $m_{ns} :=  \bm{E}_{\kappa} \cddot (\bm{s} \otimes{\bm{n}})$ is the torsio
 \label{eq:wtwnws}
 \begin{aligned}
 \text{Vertical velocity}  \quad w_t &:= e_w, \\
-\text{Flexural rotation} \quad \omega_{n} &:=  \diffp{e_w}{n}.
+\text{Angular velocity} \quad \omega_{n} &:=  \diffp{e_w}{n}.
 \end{aligned}
 \end{equation}
 
@@ -409,12 +410,13 @@ The domain of the operator $\mathcal{J}$ in \eqref{eq:PH_sys_Kir_Ten} is $\mathc
 \end{equation}
 since $\mathscr{H} \subset \mathcal{D}(J)$. 
 \begin{remark}
-	It has to be appointed that the space $H^{\text{div Div}}(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}})$ was never addressed in the mathematical literature. For this reason the only way to deal with this problem numerically is to use $H^{2}(\Omega)$ conforming finite elements. 
+	It has to be appointed that the space $H^{\text{div Div}}(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}})$ was never addressed in the mathematical literature. To deal with this problem numerically $H^{2}(\Omega)$ conforming finite elements are used. 
 \end{remark}
-The Firedrake library \cite{firedrake} was used to implement the numerical analysis as it provides functionalities to automate the generalized mappings for $H^2$ conforming finite elements (like the Hermite, Bell or Argyris finite elements). All the variables, i.e. the velocity $e_w$ and the momenta tensor $\bm{E}_\kappa$ as well as the corresponding test functions, are discretized by the same finite element space, the Bell finite element \cite{Bell}, denoted by $H_r^2(\mathbb{P}_5, \Omega)$. The multipliers are therefore discretized by using second degree Lagrange polynomials defined over the boundary and denoted with $H_r^1(\mathbb{P}_2, \partial\Omega)$. 
+The Firedrake library \cite{firedrake} was used to implement the numerical analysis as it provides functionalities to automate the generalized mappings for $H^2$ conforming finite elements (like the Hermite, Bell or Argyris finite elements). All the variables, i.e. the velocity $e_w$ and the momenta tensor $\bm{E}_\kappa$ as well as the corresponding test functions, are discretized by the same finite element space, the Bell finite element \cite{Bell}. The multipliers are therefore discretized by using second degree Lagrange polynomials defined over the boundary.
 
 
 \section{Interconnection with a finite dimensional conservative pH system}
+\label{sec:Int}
 In this section the interconnection of an infinite and finite port system is explained in both the infinite and finite dimensional setting. This paradigm, here illustrated by means of an example, provides an easy way to construct arbitrarily complex system given its basic components. 
 Infinite and finite dimensional can be coupled together, making it possible to construct models for complex applications. 
 
@@ -521,7 +523,7 @@ Consider a rectangular plate of side $L_x, L_y$, clamped at $x=0$ and welded to 
 \end{pmatrix}.
 \end{aligned} 
 \end{equation}
-Here the Lagrange multipliers and associated matrices $\bm{\lambda}_D =  (\bm\lambda_{\Gamma_{C}}; \; \bm\lambda_{\Gamma_{\text{int}}} ), \; \bm{G}_D = [\bm{G}_{\Gamma_{C}}, \; \bm{G}_{\Gamma_{\text{int}}}], \; \bm{B} = [\bm{0}; \; \bm{I}]$ are split between the homogeneous and non-homogeneous Dirichlet boundary conditions. The rigid rod is written compactly 
+Here the Lagrange multipliers and associated matrices $\bm{\lambda}_D =  (\bm\lambda_{\Gamma_{C}}; \; \bm\lambda_{\Gamma_{\text{int}}} ), \; \bm{G}_D = [\bm{G}_{\Gamma_{C}}, \; \bm{G}_{\Gamma_{\text{int}}}], \; \bm{B} = [\bm{0}; \; \bm{I}]$ (where $\bm{I}$ is the identity matrix of appropriate size) are split between the homogeneous and non-homogeneous Dirichlet boundary conditions. The rigid rod is written compactly 
 \begin{equation}
 \begin{aligned}
 \bm{M}_{\text{rod}} \diff{\bm{e}_{\text{rod}}}{t} = \bm{u}_{\text{rod}}, \\
@@ -557,7 +559,7 @@ with $\bm{x}_{\text{aug}} = (\bm{e}_{\text{pl}}, \bm{e}_{\text{rod}}, \bm{\lambd
 with $\bm{G}_{\text{rod}} = -\bm{B}^T\bm{W}$. Distributed forces are easily accounted for. 
  
 \subsection{Numerical Simulation}
-To validate the approach numerical simulations on system \eqref{eq:aug_Int} are carried out. A  plate clamped in $x=0$ is considered, i.e. $\Gamma_C = \{(x,y) \vert x = 0\}$. A final time equal to $t_{\text{end}} = 10 [ms]$ is taken and a vertical distributed force given by expression
+To validate the approach numerical simulations on system \eqref{eq:aug_Int} are carried out. A  plate clamped in $x=0$ is considered, i.e. $\Gamma_C = \{x = 0\}$. A final time equal to $t_{\text{end}} = 10 [ms]$ is taken and a vertical distributed force given by expression
 \[
 \bm{f}_w = \begin{cases}
 10^5 \left[ y + 10 \left( y - L_y/2 \right)^2 \right] [Pa], \quad &\forall \, t < 0.2 \, t_{\text{end}}, \\
@@ -573,10 +575,10 @@ with $\bm{M} = \text{diag}(\bm{M}_{\text{pl}}, \, \bm{M}_{\text{rod}}), \; \bm{G
 
 \begin{figure}[t]
 \centering
-\subfloat[Without rod]{\includegraphics[width=0.5\linewidth]{HamiltonianNoRod_cropped.eps}%
+\subfloat[Without rod]{\includegraphics[width=0.515\linewidth]{HamiltonianNoRod_cropped.eps}%
 \label{fig:H_Norod}}
 \hfil
-\subfloat[With rod]{\includegraphics[width=0.5\linewidth]{HamiltonianRod_cropped.eps}%
+\subfloat[With rod]{\includegraphics[width=0.485\linewidth]{HamiltonianRod_cropped.eps}%
 \label{fig:H_rod}}
 \caption{Simulation results for the network.}
 \label{fig:HamInt}
@@ -586,8 +588,7 @@ with $\bm{M} = \text{diag}(\bm{M}_{\text{pl}}, \, \bm{M}_{\text{rod}}), \; \bm{G
 	\centering
 	\begin{tabular}{|c|c|}
 		\hline 
-		\multicolumn{2}{|c|}{Plate} \\ 
-		\multicolumn{2}{|c|}{Parameters} \\ 
+		\multicolumn{2}{|c|}{Plate Parameters} \\ 
 		\hline 
 		$E$ & $70\; [GPa]$ \\ 
 		$\nu$& 0.35 \\ 
@@ -597,8 +598,7 @@ with $\bm{M} = \text{diag}(\bm{M}_{\text{pl}}, \, \bm{M}_{\text{rod}}), \; \bm{G
 	\end{tabular} 
 	\begin{tabular}{|c|c|}
 		\hline 
-		\multicolumn{2}{|c|}{Simulation} \\ 
-		\multicolumn{2}{|c|}{Settings} \\ 
+		\multicolumn{2}{|c|}{Simulation Settings} \\ 
 		\hline 
 		$\Delta t $ & $0.001 \; [ms]$ \\ 
 		Integrator & St\"ormer-Verlet \\ 
@@ -612,7 +612,7 @@ with $\bm{M} = \text{diag}(\bm{M}_{\text{pl}}, \, \bm{M}_{\text{rod}}), \; \bm{G
 	\label{tab:par}
 \end{table}
 
-Snapshots of simulations without and with the rigid rod are reported in figures \ref{fig:IntNoRod}, \ref{fig:IntRod}. The deformations undergone by the plate are clear affected by the presence of the rod: the maximum deformation as well as the Hamiltonian value, once the excitation is removed, are lower. The interconnected side remains straight along the whole simulation, meaning that the constraints are respected.
+Snapshots of simulations without and with the rigid rod are reported in figures \ref{fig:IntNoRod}, \ref{fig:IntRod}\footnote{\label{note:1}Complete videos are accessible at \url{https://github.com/andreabrugnoli/Goodies_pH_plates}}. The deformations undergone by the plate are clear affected by the presence of the rod: the maximum deformation as well as the Hamiltonian value, once the excitation is removed, are lower. The interconnected side remains straight along the whole simulation, meaning that the constraints are respected.
 
 \begin{figure*}[t]
 	\centering
@@ -648,7 +648,8 @@ Snapshots of simulations without and with the rigid rod are reported in figures 
 
 
 \section{Damping Injection}
-The damping injection technique allows to asymptotically stabilize and infinite dimensional system. It relies on the La~Salle invariance principle (\cite{bookPHs}  chapter 6, proposition 6.2). Starting from system \eqref{eq:discr_pl}, consider a cantilever plate and the following static control law
+\label{sec:Damp}
+Starting from system \eqref{eq:discr_pl}, consider the following static control law
 \begin{equation}
 \bm{u} = -\bm{K} \bm{y}.
 \end{equation}
@@ -672,10 +673,12 @@ System \eqref{eq:discr_pl} now reads
 \end{pmatrix}.
 \end{equation}
 The matrix $\bm{R} = \bm{B}_N \bm{Z} \bm{B}_N^T \succcurlyeq 0$ is a semi-positive definitive matrix because of the input-output collocated feature of pH system. The energy rate reads (\cite{beattie2018linear} theorem 13)
-\[\dot{H} _{\text{pl}} = - \bm{e}_{\text{pl}}^T \; \bm{R} \; \bm{e}_{\text{pl}} \le 0 \]
+\[\dot{H} _{\text{pl}} = - \bm{e}_{\text{pl}}^T \; \bm{R} \; \bm{e}_{\text{pl}} \le 0. \]
+The Hamiltonian energy is therefore a Lyapunov function for the system. The asymptotically stability of configuration $\bm{e}_{\text{pl}} = \bm{0}$ is deduced using the La~Salle invariance principle (\cite{bookPHs}  chapter 6, proposition 6.2). As a numerical illustration a cantilever square plate clamped in $x=0$ with parameters given in \ref{tab:par} is consider. The controller gain matrix is set to $\bm{Z} = 100 \ \bm{I}$. The initial condition, that must be compatible with the constraints, reads
+\[e_w(x,y,0) = x^2, \quad \bm{E}_{\kappa}=0\]
 
+ The control law is activated after 1 second. The Hamiltonian \ref{fig:H_Damped} goes almost to zero in 4 seconds. Snapshot of simulation \ref{fig:SnapDamp} show the decreasing amplitudes of the oscillations\footnote{See footnote \ref{note:1}}, as the plate gradually reaches the undeformed equilibrium state.
 
-Videos are accessible at \url{https://github.com/brugnoss/Goodies_pH_plates}
 \begin{figure}[t]
 	\centering
 	\subfloat[$t=0.06 \; t_{\text{end}}$]{\includegraphics[width=0.5\linewidth]{Snapshot_t_60_cropped.eps}%
@@ -694,13 +697,13 @@ Videos are accessible at \url{https://github.com/brugnoss/Goodies_pH_plates}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.8\linewidth]{HamiltonianDamped_cropped.eps}
-\caption{Hamiltonian trend for }
-\label{fig:HamDamped}
+\includegraphics[width=0.6\linewidth]{HamiltonianDamped_cropped.eps}
+\caption{Hamiltonian trend under damping injection}
+\label{fig:H_Damped}
 \end{figure}
 
 \section{Conclusion}
-The conclusion goes here.
+In this paper the port-Hamiltonian tensorial formulation has been discussed. A structure preserving discretization is obtained by applying a mixed finite element method. The resulting system explicitly contain the boundary variables, so that the interconnection with other finite or infinite dimensional systems can be performed easily. As a coontrol application the damping injection methodology was addressed.
 
 %\addtolength{\textheight}{-12cm}   % This command serves to balance the column lengths
 % on the last page of the document manually. It shortens
