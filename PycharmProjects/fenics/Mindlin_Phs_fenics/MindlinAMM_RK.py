@@ -1,21 +1,26 @@
 # Mindlin plate written with the port Hamiltonian approach
 
+
 from fenics import *
 import numpy as np
-
-np.set_printoptions(threshold=np.inf)
-# import mshr
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 from scipy import linalg as la
 from scipy.sparse import csc_matrix
 from scipy.sparse.linalg import inv as inv_sp
 from scipy import integrate
 
+import matplotlib.pyplot as plt
+import matplotlib
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+from matplotlib import cm
+from AnimateSurf import animate2D
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.animation as animation
 
-n = 3
-deg = 3
+n_sim = 2
+
+n = 10
+deg = 2
 
 E = (7e10)
 nu = (0.35)
@@ -23,8 +28,6 @@ h = (0.1)
 rho = (2700)  # kg/m^3
 k =  0.8601 # 5./6. #
 L = 1
-
-case_study = input("Select the case under study: ")
 
 # Plate bending stiffness :math:`D=\dfrac{Eh^3}{12(1-\nu^2)}` and shear stiffness :math:`F = \kappa Gh`
 # with a shear correction factor :math:`\kappa = 5/6` for a homogeneous plate
@@ -193,7 +196,12 @@ J, M = PETScMatrix(), PETScMatrix()
 J_pl = assemble(j).array()
 M_pl = assemble(m).array()
 
-bc_input = input('Select Boundary Condition:')
+
+if n_sim == 1:
+    bc_input = 'CFFF'
+else: bc_input = 'CFCF'
+
+# bc_input = input('Select Boundary Condition:')
 
 bc_1, bc_3, bc_2, bc_4 = bc_input
 
@@ -238,12 +246,25 @@ n_mul = len(bd_dofs_mul)
 
 # Force applied at the right boundary
 
+
+g = Constant(10)
+force = Expression("A*sin(2*pi/lx*x[0])", degree=4, lx = l_x, A = 10**5)
+# force = Constant(1e6)
+# f_p = v_pw * force * ds(2)
+f_p1 = - v_pw * rho * h * g * dx
+f_p2 = v_pw * force * ds(3) - v_pw * force * ds(4)
+
+if n_sim == 1:
+    f_p = f_p1
+else:
+    f_p = f_p2
+
+F_int = assemble(f_p).get_local()
+
 Mint = M_pl
 Jint = J_pl
 Rint = np.zeros((n_V, n_V))
 Gint = G_pl
-Bf_int = np.concatenate((Bf_pl, Bf_rod), axis=0)
-
 Mint_sp = csc_matrix(Mint)
 invMint = inv_sp(Mint_sp)
 invMint = invMint.toarray()
@@ -256,16 +277,14 @@ P = I - S
 
 Jsys = P @ Jint
 Rsys = P @ Rint
-Fsys = P @ Bf_int
+Fsys = P @ F_int
 
 t0 = 0.0
-fac = 100
-t_base =
-t_fin = 1e-2
+t_fin = 1e-3
 t_span = [t0, t_fin]
 
 def sys(t,y):
-    if t< 0.25 * t_fin:
+    if t < 0.25 * t_fin:
         bool_f = 1
     else: bool_f = 0
     dydt = invMint @ ( (Jsys - Rsys) @ y + Fsys *bool_f)
@@ -277,61 +296,95 @@ init_con = Expression(('sin(2*pi*x[0])*sin(2*pi*(x[0]-lx))*sin(2*pi*x[1])*sin(2*
 
 e_pl0 = Function(V)
 e_pl0.assign(interpolate(init_con, V))
-y0 = np.zeros(n_tot,)
+y0 = np.zeros(n_V,)
 # y0[:n_pl] = e_pl0.vector().get_local()
 
-t_ev = np.linspace(t0,t_fin, num = n_t)
-dt = t_fin/(n_t - 1)
-
-sol = integrate.solve_ivp(sys, t_span, y0, method='RK45', vectorized=False, t_eval = t_ev)
+t_ev = np.linspace(t0,t_fin, num=100)
+sol = integrate.solve_ivp(sys, t_span, y0, method='RK45', vectorized=False, t_eval=t_ev)
 
 n_ev = len(t_ev)
 
-e_pl = sol.y[:n_pl, :]
-e_rod = sol.y[n_pl: n_tot, :]
+e_pl = sol.y
 
-e_pw = e_pl[dofs_Vpw, :]
+e_pw = e_pl[dofs_Vpw, :]  # np.zeros((n_pw,n_t))
 
-w0 = np.zeros((n_pw,))
+w0 = np.zeros((len(dofs_Vpw),))
 w = np.zeros(e_pw.shape)
-w[:,0] = w0
-w_old = w[:,0]
-for i in range(1,n_t):
-    w[:,i] = w_old + 0.5*(e_pw[:,i-1] + e_pw[:,i])*dt
-    w_old  = w[:,i]
+w[:, 0] = w0
+w_old = w[:, 0]
+
+Vw = FunctionSpace(mesh, P_pw)
+h_Ep = Function(Vw)
+Ep = np.zeros((n_ev,))
+
+dt_ev = np.diff(t_ev)
+for i in range(1, n_ev):
+    w[:, i] = w_old + 0.5 * (e_pw[:, i - 1] + e_pw[:, i]) * dt_ev[i-1]
+    w_old = w[:, i]
+    h_Ep.vector()[:] = np.ascontiguousarray(w[:, i], dtype='float')
+    Ep[i] = assemble(rho * g * h * h_Ep * dx)
+
+x = dofVpw_x[:, 0]
+y = dofVpw_x[:, 1]
+
+if n_sim == 1:
+    w_mm = w * 1000000
+else:
+    w_mm = w * 1000
+
+minZ = w_mm.min()
+maxZ = w_mm.max()
 
 
-x = dofVpw_x[:,0]
-y = dofVpw_x[:,1]
+H_vec = np.zeros((n_ev,))
+fntsize = 16
 
-minZ = w.min()
-maxZ = w.max()
+for i in range(n_ev):
+    H_vec[i] = 0.5 * (e_pl[:, i].T @ M_pl @ e_pl[:, i])
 
-import drawNow, matplotlib
-matplotlib.rcParams['text.usetex'] = True
-matplotlib.rcParams['text.latex.unicode'] = True
-matplotlib.interactive(True)
-
-plotter = drawNow.plot3dClass(x, y, minZ= minZ, maxZ = maxZ,  \
-                        xlabel = '$x [m]$', ylabel = '$y [m]$', \
-                        zlabel = '$w[m]$', title = 'Vertical Displacement')
-
-for i in range(n_t):
-    w_t = w[:,i]
-    plotter.drawNow(w_t)
-
-
-H_vec = np.zeros((n_t,))
-
-for i in range(n_t):
-    H_vec[i] = 0.5  * np.transpose(e[:,i]) @ M @ e[:,i]
-
-if matplotlib.is_interactive():
-    plt.ioff()
 fig = plt.figure()
-plt.plot(t_ev, H_vec, 'b-')
-plt.xlabel(r'{time} (s)',fontsize=16)
-plt.ylabel(r'{Hamiltonian} (J)',fontsize=16)
+plt.plot(t_ev, H_vec, 'b-', label='Hamiltonian (J)')
+# plt.plot(t_ev, Ep, 'r-', label = 'Potential Energy (J)')
+# plt.plot(t_ev, H_vec + Ep, 'g-', label = 'Total Energy (J)')
+plt.xlabel(r'{Time} (s)', fontsize=fntsize)
+# plt.ylabel(r'{Hamiltonian} (J)',fontsize=fntsize)
 plt.title(r"Hamiltonian trend",
-          fontsize=16)
+          fontsize=fntsize)
+plt.legend(loc='upper left')
+
+
+path_out = "/home/a.brugnoli/Plots_Videos/Mindlin_plots/Temp_Simulation/Article_Min/"
+plt.savefig(path_out + "Sim" +str(n_sim) + "Hamiltonian.eps", format="eps")
+
+
+anim = animate2D(x, y, w_mm, t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \
+                         zlabel='$w [mm]$', title = 'Vertical Displacement')
+
 plt.show()
+
+
+save_figs = True
+if save_figs:
+    n_fig = 4
+    tol = 1e-6
+    for i in range(n_fig):
+        index = int(n_ev/n_fig*(i+1)-1)
+        fig = plt.figure(i+1)
+        ax = fig.add_subplot(111, projection='3d')
+
+        surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False}  # , 'vmin': minZ, 'vmax': maxZ}
+
+        ax.set_xbound(min(x) - tol, max(x) + tol)
+        ax.set_xlabel('$x [m]$', fontsize=fntsize)
+        ax.set_ybound(min(y) - tol, max(y) + tol)
+        ax.set_ylabel('$y [m]$', fontsize=fntsize)
+        ax.set_zlabel('$w [mm]$', fontsize=fntsize)
+        ax.set_title('Vertical displacement', fontsize=fntsize)
+
+        ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
+        ax.w_zaxis.set_major_locator(LinearLocator(10))
+        ax.w_zaxis.set_major_formatter(FormatStrFormatter('%3.2f' ))
+
+        ax.plot_trisurf(x, y, w_mm[:,index], **surf_opts)
+        plt.savefig(path_out + "Sim" + str(n_sim) + "t" + str(index + 1) + ".eps", format="eps")
+        # plt.show()

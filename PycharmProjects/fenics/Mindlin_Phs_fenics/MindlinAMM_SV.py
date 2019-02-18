@@ -20,7 +20,7 @@ matplotlib.rcParams['text.usetex'] = True
 
 n_sim = 2
 
-n = 10
+n = 5
 deg = 2
 
 E = 7e10
@@ -121,7 +121,7 @@ lower = Lower()
 upper = Upper()
 
 boundaries = MeshFunction("size_t", mesh, mesh.topology().dim() - 1)
-
+boundaries.set_all(0)
 left.mark(boundaries, 1)
 right.mark(boundaries, 2)
 lower.mark(boundaries, 3)
@@ -230,8 +230,9 @@ D_q = J_q.array()
 # bc_input = input('Select Boundary Condition:')
 
 if n_sim == 1:
+    bc_input = 'CFCF'
+else:
     bc_input = 'CFFF'
-else: bc_input = 'CFCF'
 # bc_input = input('Select Boundary Condition:')
 
 bc_1, bc_3, bc_2, bc_4 = bc_input
@@ -259,7 +260,7 @@ for key,val in bc_dict.items():
     if val == 'C':
         g_vec.append( v_pw * q_n * ds(key) + v_omn * M_nn * ds(key) + v_oms * M_ns * ds(key))
     elif val == 'S':
-        g_vec.append(v_p * q_n * ds(key) + v_oms * M_ns * ds(key))
+        g_vec.append(v_pw * q_n * ds(key) + v_oms * M_ns * ds(key))
 
 g = sum(g_vec)
 
@@ -279,7 +280,7 @@ n_mul = len(bd_dofs_mul)
 
 # Force applied at the right boundary
 g = Constant(10)
-force = Expression("A*sin(2*pi/ly*x[1])", degree=4, ly = l_y, A = 10**6)
+force = Expression("A*sin(pi/lx*x[0])", degree=4, lx = l_x, A = 10**5)
 # force = Constant(1e6)
 # f_p = v_pw * force * ds(2)
 f_p1 = - v_pw * rho * h * g * dx
@@ -287,7 +288,8 @@ f_p2 = v_pw * force * ds(3) - v_pw * force * ds(4)
 
 if n_sim == 1:
     f_p = f_p1
-else: f_p = f_p2
+else:
+    f_p = f_p2
 
 F_p = assemble(f_p).get_local()
 
@@ -353,7 +355,9 @@ y = dofVpw_x[:, 1]
 
 if n_sim == 1:
     w_mm = w * 1000000
-else: w_mm = w * 1000
+else:
+    w_mm = w * 1000
+
 minZ = w_mm.min()
 maxZ = w_mm.max()
 
@@ -364,10 +368,10 @@ fntsize = 16
 for i in range(n_ev):
     H_vec[i] = 0.5 * (ep_sol[:, i].T @ M_p @ ep_sol[:, i] + eq_sol[:, i].T @ M_q @ eq_sol[:, i])
 
-fig = plt.figure(0)
+fig = plt.figure()
 plt.plot(t_ev, H_vec, 'b-', label='Hamiltonian (J)')
-plt.plot(t_ev, Ep, 'r-', label = 'Potential Energy (J)')
-plt.plot(t_ev, H_vec + Ep, 'g-', label = 'Total Energy (J)')
+# plt.plot(t_ev, Ep, 'r-', label = 'Potential Energy (J)')
+# plt.plot(t_ev, H_vec + Ep, 'g-', label = 'Total Energy (J)')
 plt.xlabel(r'{Time} (s)', fontsize=fntsize)
 # plt.ylabel(r'{Hamiltonian} (J)',fontsize=fntsize)
 plt.title(r"Hamiltonian trend",
@@ -375,23 +379,29 @@ plt.title(r"Hamiltonian trend",
 plt.legend(loc='upper left')
 
 
-path_out = "/home/a.brugnoli/Plots_Videos/Mindlin_plots/Temp_Simulation/Article_Min/"
-plt.savefig(path_out + "Sim" +str(n_sim) + "Hamiltonian.eps", format="eps")
+path_out = "/home/a.brugnoli/Plots_Videos/Videos/Mindlin_Plate/"
+# plt.savefig(path_out + "Sim" +str(n_sim) + "Hamiltonian.eps", format="eps")
 
 
 anim = animate2D(x, y, w_mm, t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \
                          zlabel='$w [mm]$', title = 'Vertical Displacement')
 
+rallenty = 10
+fps = int(n_ev/(t_f*rallenty))
+Writer = animation.writers['ffmpeg']
+writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
+anim.save(path_out + "Mindlin_SymmetricExcitation.mp4", writer=writer)
+
 plt.show()
 
 
-save_figs = True
+save_figs = False
 if save_figs:
     n_fig = 4
     tol = 1e-6
     for i in range(n_fig):
         index = int(n_ev/n_fig*(i+1)-1)
-        fig = plt.figure(i+1)
+        fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
 
         surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False}  # , 'vmin': minZ, 'vmax': maxZ}

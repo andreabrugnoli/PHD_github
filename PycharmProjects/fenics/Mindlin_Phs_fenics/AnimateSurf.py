@@ -6,6 +6,8 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from mpl_toolkits.mplot3d import Axes3D
 
 matplotlib.rcParams['text.usetex'] = True
+matplotlib.rcParams["legend.loc"] = 'upper right'
+
 
 def animate2D(x, y, sol2D, t, xlabel = None, ylabel = None,  zlabel = None, title = None):
     tol = 1e-4
@@ -42,12 +44,12 @@ def animate2D(x, y, sol2D, t, xlabel = None, ylabel = None,  zlabel = None, titl
     ax.w_zaxis.set_major_locator(LinearLocator(10))
     ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
 
-    ax.set_title(title, fontsize=fntsize)
+    ax.set_title(title, fontsize=fntsize, loc='left')
 
     lab = 'Time =' + '{0:.2e}'.format(t[0])
     surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False, 'vmin': minSol, 'vmax': maxSol}
     plot = ax.plot_trisurf(x, y, sol2D[:, 0], label = lab, **surf_opts)
-
+    fig.colorbar(plot)
     anim =  animation.FuncAnimation(fig, update_plot, frames=len(t), interval = 10, fargs=(sol2D, plot))
 
     return anim
