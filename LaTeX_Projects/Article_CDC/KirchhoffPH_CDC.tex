@@ -67,7 +67,7 @@
 % As a general rule, do not put math, special symbols or citations
 % in the abstract
 \begin{abstract}
-	The Kirchhoff plate model is here detailed by using a tensorial port-Hamiltonian (pH) formulation. A structure-preserving discretization of this model is then achieved by using the partitioned finite element (PFEM). This methodology easily accounts for the boundary variables and the finite-dimensional system can be interconnected to the surrounding environment in a simple and structured manner. The algebraic constraints to be considered are deduced from the boundary conditions, that may be homogeneous or defined by an interconnection with another pH system. \\
+	The Kirchhoff plate model is detailed by using a tensorial port-Hamiltonian (pH) formulation. A structure-preserving discretization of this model is then achieved by using the partitioned finite element (PFEM). This methodology easily accounts for the boundary variables and the finite-dimensional system can be interconnected to the surrounding environment in a simple and structured manner. The algebraic constraints to be considered are deduced from the boundary conditions, that may be homogeneous or defined by an interconnection with another pH system. \\
 	The versatility of the proposed approach is assessed by means of numerical simulations. A first illustration considers a rectangular plate clamped on one side and interconnected to a rigid rod welded to the opposite side. A second example exploits the collocated output feature of pH systems to perform damping injection in a plate undergoing an external forcing. A stability proof is obtained by the application of the LaSalle's invariance principle.
 \end{abstract}
 
@@ -562,7 +562,7 @@ To validate the approach numerical simulations on system \eqref{eq:aug_Int} are 
 \end{cases}
 \end{equation}
 
-acts on the plate. The rigid rod has mass $M = 50 \, [kg]$ and length $L_{\text{rod}} = 1 [m]$. The plate parameters and settings for the discretization (a uniform grid is taken) are provided in table \ref{tab:par}. The constraints are classically eliminated considering the projection matrix
+acts on the plate. The rigid rod has mass $M = 50 \, [kg]$ and length $L_{\text{rod}} = 1 [m]$. The plate parameters and settings for the discretization (a uniform grid is taken) are provided in table \ref{tab:par}. The constraints are eliminated considering the projection matrix \cite{Heiland_red}
 \begin{equation} \label{eq:proj}
 \bm{P}_{\lambda} = \bm{I} - \bm{G} \left(\bm{G}^T \bm{M}^{-1} \bm{G} \right)^{-1} \bm{G}^T \bm{M}^{-1}
 \end{equation}
@@ -571,12 +571,12 @@ with $\bm{M} = \text{diag}(\bm{M}_{\text{pl}}, \, \bm{M}_{\text{rod}}), \; \bm{G
 
 \begin{figure}[t]
 \centering
-\subfloat[Plate only]{\includegraphics[width=0.515\linewidth]{HamiltonianNoRod_cropped.eps}%
-\label{fig:H_Norod}}
-\hfil
 \subfloat[Plate and rod]{\includegraphics[width=0.485\linewidth]{HamiltonianRod_cropped.eps}%
-\label{fig:H_rod}}
-\caption{Hamiltonian trend for the interconnection of a cantilever plate with a rigid rod. For comparison in \ref{fig:H_Norod} the same simulation is performed without including the rod}
+	\label{fig:H_rod}}
+\hfil
+\subfloat[Plate only]{\includegraphics[width=0.515\linewidth]{HamiltonianNoRod_cropped.eps}%
+	\label{fig:H_Norod}}
+\caption{Hamiltonian trend \ref{fig:H_rod} for the interconnection of a cantilever plate with a rigid rod . For comparison in \ref{fig:H_Norod} the same simulation is performed without including the rod}
 \label{fig:HamInt}
 \end{figure}
 
@@ -587,6 +587,7 @@ with $\bm{M} = \text{diag}(\bm{M}_{\text{pl}}, \, \bm{M}_{\text{rod}}), \; \bm{G
 		\multicolumn{2}{|c|}{Plate Parameters} \\ 
 		\hline 
 		$E$ & $70\; [GPa]$ \\ 
+		$\rho$ & $2700\; [kg \cdot m^3]$ \\ 
 		$\nu$& 0.35 \\ 
 		$h/L$& 0.05 \\ 
 		$L_x = L_y$& $1\; [m]$\\ 
@@ -594,11 +595,12 @@ with $\bm{M} = \text{diag}(\bm{M}_{\text{pl}}, \, \bm{M}_{\text{rod}}), \; \bm{G
 	\end{tabular} 
 	\begin{tabular}{|c|c|}
 		\hline 
-		\multicolumn{2}{|c|}{Simulation Settings} \\ 
+		\multicolumn{2}{|c|}{Simulation} \\ 
+		\multicolumn{2}{|c|}{Settings} \\
 		\hline 
-		$\Delta t $ & $0.001 \; [ms]$ \\ 
-		Integrator & St\"ormer-Verlet \\ 
-		N$^\circ$ Elements & 4 \\
+		Integrator & St\"ormer-Verlet \\
+		$\Delta t $ & $0.001 \; [ms]$ \\  
+		N$^\circ$ FE & 4 \\
 		FE space & Bell ($\bm{e}_{\text{pl}}$) $\times$ CG$^2$ ($\bm{\lambda}_D$)\\
 		\hline 
 	\end{tabular} 
@@ -608,7 +610,7 @@ with $\bm{M} = \text{diag}(\bm{M}_{\text{pl}}, \, \bm{M}_{\text{rod}}), \; \bm{G
 	\label{tab:par}
 \end{table}
 
-Snapshots of simulations without and with the rigid rod are reported in figures \ref{fig:IntNoRod}, \ref{fig:IntRod}\footnote{\label{note:1}Complete videos are accessible at \url{https://github.com/andreabrugnoli/Goodies_pH_plates}}. The deformations undergone by the plate are clear affected by the presence of the rod: the maximum deformation as well as the Hamiltonian value, once the excitation is removed, are lower. The interconnected side remains straight along the whole simulation, meaning that the constraints are respected.
+Snapshots of simulations without and with the rigid rod are reported in figures \ref{fig:IntNoRod}, \ref{fig:IntRod}\footnote{\label{note:1}Complete videos are accessible at \url{https://github.com/andreabrugnoli/Goodies_pH_plates}}. The deformations undergone by the plate are clearly affected by the presence of the rod: the maximum deformation as well as the Hamiltonian value, once the excitation is removed, are lower. The interconnected side remains straight during the whole simulation, meaning that the constraints are respected.
 
 \begin{figure*}[ht]
 	\centering
@@ -651,7 +653,7 @@ Snapshots of simulations without and with the rigid rod are reported in figures 
 	\label{fig:H_Damped}
 \end{figure}
 \label{sec:Damp}
-Starting from system \eqref{eq:discr_pl}, consider the following static control law
+In \cite{MacchelliMindlin} the damping injection tecnique was used to stabilize the Mindlin plate subjected to an initial condition. The same application is here considered for the cantilever Kirchoff plate. Starting from system \eqref{eq:discr_pl}, consider the following static control law
 \begin{equation}
 \bm{u} = -\bm{K} \bm{y}.
 \end{equation}
@@ -676,7 +678,7 @@ System \eqref{eq:discr_pl} now reads
 \end{equation}
 The matrix $\bm{R} = \bm{B}_N \bm{Z} \bm{B}_N^T \succcurlyeq 0$ is semi-positive definitive because of the input-output collocated feature of pH system. The energy rate evaluates to (\cite{beattie2018linear} theorem 13)
 \[\dot{H} _{\text{pl}} = - \bm{e}_{\text{pl}}^T \; \bm{R} \; \bm{e}_{\text{pl}} \le 0. \]
-Therefore, the Hamiltonian energy is a Lyapunov function and the asymptotically stability of configuration $\bm{e}_{\text{pl}} = \bm{0}$ is deduced using LaSalle invariance  principle (\cite{bookPHs}  chapter 6, proposition 6.2). As a numerical illustration a cantilever square plate clamped in $x=0$ with parameters given in table~\ref{tab:par} is consider. The controller gain matrix is set to $\bm{Z} = 100 \ \bm{I}$. The initial condition, that must be compatible with the constraints, reads
+Therefore, the Hamiltonian energy is a Lyapunov function and the asymptotic stability of configuration $\bm{e}_{\text{pl}} = \bm{0}$ is deduced using LaSalle' invariance  principle (\cite{bookPHs}  chapter 6, proposition 6.2). As a numerical illustration a cantilever square plate clamped in $x=0$ with parameters given in table~\ref{tab:par} is consider. The controller gain matrix is set to $\bm{Z} = 100 \ \bm{I}$. The initial condition, that must be compatible with the constraints, reads
 \[e_w(x,y,0) = x^2, \quad \bm{E}(x,y,0)_{\kappa}=0\]
 The control law is activated after 1 second. The discrete Hamiltonian, computed using \eqref{eq:H_discr} goes almost to zero in 4 seconds (figure \ref{fig:H_Damped}). Snapshot of simulation, reported in figure~\ref{fig:SnapDamp}, show the decreasing amplitudes of the oscillations\footnote{See footnote \ref{note:1}}, as the plate gradually reaches the undeformed equilibrium state.
 
@@ -711,7 +713,7 @@ In this paper the port-Hamiltonian tensorial formulation has been discussed. A s
 
 
 
-\addtolength{\textheight}{-4.3cm}   % This command serves to balance the column lengths
+\addtolength{\textheight}{-3.2cm}   % This command serves to balance the column lengths
 % on the last page of the document manually. It shortens
 % the textheight of the last page by a suitable amount.
 % This command does not take effect until the next page
