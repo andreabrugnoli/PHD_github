@@ -147,11 +147,11 @@ In part II of this companion paper, the modeling and discretization of thin plat
 Finally, the extension of the PFEM method  to the structure-preserving discretization of the Kirchhoff model  is also a novelty of the paper. It allows simple implementation of numerical schemes compared to the jet theory formalism, while preserving the structure of PHS at the discrete level. \revTwo{The last section is dedicated to numerical studies of this model by using Firedrake \cite{firedrake}.}
 
 \section{Second-order distributed PH systems: Euler-Bernoulli beam}	
-The Euler-Bernoulli beam is the one-dimensional equivalent of the Kirchhoff-Love plate.  This model consists of one PDE, describing the vertical displacement along the beam length
+The Euler-Bernoulli beam is the one-dimensional equivalent of the Kirchhoff-Love plate.  This model consists of one PDE, describing the vertical displacement along the beam length:
 \begin{equation}
 \rho(x) \diffp[2]{w}{t}(x,t) + \displaystyle \diffp[2]{}{x} \left( EI(x) \diffp[2]{w}{x} \right) = 0, \quad x \in (0,L),\, t \ge 0 
 \end{equation}
-where ${w}(x,t)$ is the transverse displacement of the beam. The coefficients $\rho(x), E(x)$ and $I(x)$  are the mass per unit length, Young's modulus of elasticity and the moment of inertia of a cross section. The energy variables are then chosen as follows
+where ${w}(x,t)$ is the transverse displacement of the beam. The coefficients $\rho(x), E(x)$ and $I(x)$  are the mass per unit length, Young's modulus of elasticity and the moment of inertia of a cross section. The energy variables are then chosen as follows:
 \begin{equation}
 \begin{aligned}
 \alpha_{w} &= \rho(x) \diffp{w}{t}(x,t),  &\quad \text{Linear Momentum},\\
@@ -159,7 +159,7 @@ where ${w}(x,t)$ is the transverse displacement of the beam. The coefficients $\
 \end{aligned}
 \end{equation}
 
-Those variables are collected in the vector $\bm{\alpha} = (\alpha_{w}, \, \alpha_{\kappa})^T $, so that the Hamiltonian can be written as a quadratic functional in the energy variables 
+Those variables are collected in the vector $\bm{\alpha} = (\alpha_{w}, \, \alpha_{\kappa})^T $, so that the Hamiltonian can be written as a quadratic functional in the energy variables: 
 \begin{equation}
 H = \frac{1}{2} \int_{0}^{L} \bm{\alpha}^T Q \bm{\alpha} \; \d{x},
 \qquad \text{where} \qquad
@@ -170,14 +170,14 @@ Q =
 \end{bmatrix}.
 \end{equation}
 
-The co-energy variables are found by computing the variational derivative of the Hamiltonian
+The co-energy variables are found by computing the variational derivative of the Hamiltonian:
 \begin{equation}
 \begin{aligned}
 e_{w} &:= \diffd{H}{\alpha_w} = \diffp{w}{t}(x,t) ,  &\quad \text{Vertical velocity}, \\
 e_{\kappa} &:= \diffd{H}{\alpha_{\kappa}} =EI(x) \diffp[2]{w}{x}(x,t),  &\quad \text{Flexural momentum}. \\
 \end{aligned}
 \end{equation}
-Those variables are again collected in vector $\bm{e} = (e_{w}, \, e_{\kappa})^T $, so that the underlying interconnection structure is then found to be
+Those variables are again collected in vector $\bm{e} = (e_{w}, \, e_{\kappa})^T $, so that the underlying interconnection structure is then found to be:
 \begin{equation}
 \label{eq:PH_Timo}
 \diffp{\bm{\alpha}}{t} = J \mathbf{e},  	\qquad \text{where} \qquad
@@ -188,8 +188,7 @@ J =
 \end{bmatrix}.
 \end{equation}
 
-For an infinite-dimensional system, boundary variables have to be defined as well. Those can be found by evaluating the energy rate flow across the boundary. One possible choice among others (see \cite{articleFlavio} for a more exhaustive explanation) for this model is the following 
-
+For an infinite-dimensional system, boundary variables have to be defined as well. Those can be found by evaluating the energy rate flow across the boundary. One possible choice among others (see \cite{articleFlavio} for a more exhaustive explanation) for this model is the following:
 \begin{equation}
 \label{eq:BoundPortEB}
 \bm{f}_{\partial} = 
@@ -207,26 +206,26 @@ e_{\kappa}(L) \\
 \displaystyle \diffp{e_{w}}{x}(L)\\
 \end{pmatrix}.
 \end{equation}
-The power flow is then easily evaluated as
+The power flow is then easily evaluated as:
 \begin{equation}
 \frac{d}{dt} H(t) = \int_{0}^{L} \diffp{\bm{\alpha}}{t} \cdot \bm{e} \, \d{x} = \left\langle \bm{e}_{\partial}, \bm{f}_{\partial} \right\rangle_{{\rm I\!R}^4}.
 \end{equation}
 
 The flow variables can now be defined as $\bm{f} = - \diffp{\bm{\alpha}}{t}$, so that the flow space is given by the tuples
-$(\bm{f},\bm{f}_{\partial}) \in \mathcal{F}$. Equivalently the effort space is given by $(\bm{e},\bm{e}_{\partial}) \in \mathcal{E}$. The bond space is therefore the Cartesian product of the two
+$(\bm{f},\bm{f}_{\partial}) \in \mathcal{F}$. Equivalently the effort space is given by $(\bm{e},\bm{e}_{\partial}) \in \mathcal{E}$. The bond space is therefore the Cartesian product of the two:
 \begin{equation}
 \label{eq:BondEB}
 \mathcal{B} := \left\{(\bm{f},\bm{f}_{\partial},\bm{e},\bm{e}_{\partial}) \in \mathcal{F} \times \mathcal{E} \right\}.
 \end{equation}
 
-The duality pairing between elements of $\mathcal{B}$ is then defined as follows
+The duality pairing between elements of $\mathcal{B}$ is then defined as follows:
 \begin{equation}
 \label{eq:bil_Timo}
 \ll ((\bm{f}^a,\bm{f}_{\partial}^a), (\bm{e}^a,\bm{e}_{\partial}^a)), ((\bm{f}^b,\bm{f}_{\partial}^b), (\bm{e}^b,\bm{e}_{\partial}^b)) \gg := \int_{0}^{L}\left\{ (\bm{f}^{a})^T \bm{e}^b + (\bm{f}^{b})^T \bm{e}^a \right\} \d{x} + (\bm{f}_{\partial}^{a})^T \bm{e}_{\partial}^b + (\bm{f}_{\partial}^{b}) ^T \bm{f}_{\partial}^a.
 \end{equation}
 The Stokes-Dirac structure for the Euler-Bernoulli beam is therefore the following
 \begin{theorem}[From \cite{LeGorrec2005}, Stokes-Dirac structure for the Bernoulli beam]
-	Consider the space of power variables \revOne{$\mathcal{B}$ defined in \eqref{eq:BondEB}} and the bilinear form (+pairing operator) $\ll , \gg$ given by \eqref{eq:bil_Timo}. Define the following linear subspace $\mathcal{D} \subset \mathcal{F} \times \mathcal{E}$
+	Consider the space of power variables \revOne{$\mathcal{B}$ defined in \eqref{eq:BondEB}} and the bilinear form (+pairing operator) $\ll , \gg$ given by \eqref{eq:bil_Timo}. Define the following linear subspace $\mathcal{D} \subset \mathcal{F} \times \mathcal{E}$:
 	\begin{equation}
 	\mathcal{D} =  \left\{(\bm{f},\bm{f}_{\partial},\bm{e},\bm{e}_{\partial}) \in \mathcal{F} \times \mathcal{E} | \; \bm{f} = -J\bm{e} \right\},
 	\end{equation}
@@ -234,7 +233,7 @@ The Stokes-Dirac structure for the Euler-Bernoulli beam is therefore the followi
 \end{theorem}
 \revOne{
 \begin{remark}
-	For what concerns the use of this model for control and simulation purposes, the reader can refer to \cite{stabBeam} for a stability and stabilization proof of the Euler-Bernoulli beam or to \cite{aoues:hal-01738092} for an illustration of rotating spacecraft with flexible appendages model as PH Bernoulli beams.
+	For what concerns the use of this model for control and simulation purposes, the reader can refer to \cite{stabBeam} for a stability and stabilization proof of the Euler-Bernoulli beam or to \cite{aoues:hal-01738092} for an illustration of a rotating spacecraft with flexible appendages model as PH Bernoulli beams.
 \end{remark}
 }
 \section{Kirchhoff-Love theory for thin plates}
@@ -243,10 +242,10 @@ In this section the classical variational approach (Hamilton's principle) to der
 
 \subsection{Model and associated variational formulation}
 \label{sec:VarKir}
-The Kirchhoff-Love plate formulation rests on the hypothesis of small thickness compared to the in plane dimensions. The notations and symbols are borrowed form \cite{FEM_Cook} and \cite{Oslo}. The displacement field and the strains are defined by assuming that fibers orthogonal to the middle plane remain orthogonal (see figure \ref{fig:Kirchh_sketch}). This leads to the following relations for the displacement field 
+The Kirchhoff-Love plate formulation rests on the hypothesis of small thickness compared to the in plane dimensions. The notations and symbols are borrowed form \cite{FEM_Cook} and \cite{Oslo}. The displacement field and the strains are defined by assuming that fibers orthogonal to the middle plane remain orthogonal (see Fig. \ref{fig:Kirchh_sketch}). This leads to the following relations for the displacement field
 \begin{equation}
 u(x,y,z) = -z \diffp{w}{x}, \qquad v(x,y,z) = -z \diffp{w}{y}, \qquad 
-w(x,y,z) = w(x,y).
+w(x,y,z) = w(x,y)
 \end{equation}
 and for the strains
 \begin{equation}
@@ -272,7 +271,7 @@ and for the strains
 2 \diffp{w}{x,y} \\
 \end{pmatrix}. 
 \end{equation}
-The curvature vector is defined as	
+The curvature vector is defined as:
 \begin{equation}
 \label{eq:CurVec}
 \bm{\kappa} = 
@@ -295,7 +294,7 @@ The curvature vector is defined as
 	\label{fig:Kirchh_sketch}
 \end{figure}
 
-The Hooke constitutive law for isotropic material is considered for the constitutive relation
+The Hooke constitutive law for isotropic material is considered for the constitutive relation:
 \begin{equation}
 \bm{\sigma} = 
 \bm{E} \bm{\epsilon} , \qquad \bm{E} :=
@@ -306,7 +305,7 @@ The Hooke constitutive law for isotropic material is considered for the constitu
 0  &  0 & \frac{1-\nu}{2}\\
 \end{bmatrix}.
 \end{equation}
-where $\nu$ the Poisson ratio and $E$ the Young modulus. \revOne{Theses physical parameters may be inhomogeneous, i.e. $\nu = \nu(x, y, z), \, E = E(x, y, z)$. The generalized momenta are found by integrating the stresses along the fiber
+where $\nu$ the Poisson's ratio and $E$ the Young's modulus. \revOne{Theses physical parameters may be inhomogeneous, i.e. $\nu = \nu(x, y, z), \, E = E(x, y, z)$. The generalized momenta are found by integrating the stresses along the fiber:
 \begin{equation*}
 \bm{M} =
 \begin{pmatrix}
@@ -315,21 +314,21 @@ M_{yy} \\
 M_{xy} \\
 \end{pmatrix} = \int_{-\frac{h}{2} }^{\frac{h}{2}} \bm{E} z^2 \d{z} \; \bm{\kappa} 
 \end{equation*}
-where $h$ is the plate thickness and the relation between momenta and curvatures is expressed by the bending rigidity matrix $\bm{D}$
+where $h$ is the plate thickness. The relation between momenta and curvatures is expressed by the bending rigidity matrix $\bm{D}$:
 \begin{equation}
 \label{eq:BenRigVec}
 \bm{M} = \bm{D} \bm{\kappa} \qquad  \qquad  \bm{D} := \int_{-\frac{h}{2} }^{\frac{h}{2}} \bm{E} z^2 \d{z}
 \end{equation}
-Now the classical Kirchhoff-Love model for thin can be recalled \cite{timoshenko1959theory}
+Now the classical Kirchhoff-Love model for thin can be recalled \cite{timoshenko1959theory}:
 \begin{equation}
 \label{eq:KirchhClass}
 \mu \diffp[2]{w}{t}  + \diffp[2]{M_{xx}}{x} + 2 \diffp{M_{xy}}{x,y} + \diffp[2]{M_{yy}}{y}= 0,
 \end{equation}
-where $\mu = \rho h$ is the surface density and $\rho$ the mass density. If the $E, \nu$ coefficients are constant then the ruling EDP becomes
+where $\mu = \rho h$ is the surface density and $\rho$ the mass density. If the $E, \nu$ coefficients are constant then the ruling EDP becomes:
 \begin{equation}
 \mu \diffp[2]{w}{t}  + D \Delta^2 w= p ,
 \end{equation}
-where $\Delta^2 = \diffp[4]{}{x} + 2 \diffp[2,2]{}{x,y} + \diffp[4]{}{y}$ is the bilaplacian and $D = \frac{E h^3}{12 (1 - \nu^2)}$ is the bending rigidity coefficient.
+where $\Delta^2 = \diffp[4]{}{x} + 2 \diffp[2,2]{}{x,y} + \diffp[4]{}{y}$ is the bilaplacian and $D = \frac{E h^3}{12 (1 - \nu^2)}$ is the bending rigidity modulus.
 }
 The kinetic and potential energy density per unit area $\mathcal{K}$ and $\mathcal{U}$, are respectively given by
 
@@ -342,7 +341,7 @@ The total energy density is split into kinetic and potential energy
 \begin{equation}
 \mathcal{H} = \mathcal{K} + \mathcal{U},
 \end{equation}
-and the corresponding total energies given by the following relations
+and the corresponding total energies given by the following relations:
 \begin{equation}
 H = \int_{\Omega} \mathcal{H} \ \d{\Omega}, \qquad K = \int_{\Omega} \mathcal{K} \ \d{\Omega}, \qquad U = \int_{\Omega} \mathcal{U} \ \d{\Omega}.
 \end{equation}
@@ -354,7 +353,7 @@ In this section the port-Hamiltonian formulation of the Kirchhoff plate is prese
 \subsection{PH vectorial formulation of the Kirchhoff plate}
 \label{sec:PH_vec_Kir}
 
-To obtain a port-Hamiltonian system (PHs) the energy variables as well as the underlying Stokes-Dirac structure, associated with the skew-adjoint operator $J$, have to be properly defined. \revOne{Consider the Hamiltonian energy
+To obtain a port-Hamiltonian system (PHs) the energy variables as well as the underlying Stokes-Dirac structure, associated with the skew-adjoint operator $J$, have to be properly defined. \revOne{Consider the Hamiltonian energy:
 \begin{equation}
 \begin{aligned}
 H &=  \int_{\Omega} \frac{1}{2} \left\{ \mu \left(\diffp{w}{t}\right)^2 + \bm{M} \cdot \bm{\kappa} \right\} \d{\Omega} \\
@@ -365,7 +364,7 @@ The energy variables are then selected to be the linear momentum $\mu \diffp{w}{
 \begin{equation}
 \bm{\alpha} := (\mu w_t,\ \kappa_{xx},\ \kappa_{yy},\ \kappa_{xy})^T,
 \end{equation}
-where $w_t = \diffp{w}{t}$. The Hamiltonian density is given by the following expression
+where $w_t = \diffp{w}{t}$. The Hamiltonian density is given by the following expression:
 \begin{equation}
 \label{eq:H_kir}
 \mathcal{H} = \frac{1}{2} \bm{\alpha}^T \begin{bmatrix}
@@ -373,11 +372,11 @@ where $w_t = \diffp{w}{t}$. The Hamiltonian density is given by the following ex
 0 & \bm{D} \\
 \end{bmatrix} \bm{\alpha},  \qquad H = \int_{\Omega} \mathcal{H} \ \d{\Omega}.
 \end{equation}
-So its variational derivative provides as co-energy variables
+So its variational derivative provides as co-energy variables:
 \begin{equation}
 \mathbf{e} := \diffd{H}{\bm{\alpha}} = (w_t,\ M_{xx},\ M_{yy},\ M_{xy})^T,
 \end{equation}
-The port-Hamiltonian system and the formally skew-adjoint operator relating energy and co-energy variables are found to be
+The port-Hamiltonian system and the formally skew-adjoint operator relating energy and co-energy variables are found to be:
 \begin{equation}
 \label{eq:PH_Kirchh}
 \diffp{\bm{\alpha}}{t} = J \mathbf{e} \quad \text{and} \quad J := 
@@ -388,7 +387,7 @@ The port-Hamiltonian system and the formally skew-adjoint operator relating ener
 \diffp{}{x,y} +  \diffp{}{y,x} & 0 & 0 & 0 \\
 \end{bmatrix}.
 \end{equation}
-\revOne{ The first line of the skew-symmetric operator in \eqref{eq:PH_Kirchh} is found by considering the equation \ref{eq:KirchhClass}. The remaining lines express Clairaut’s theorem for the vertical displacement. This theorem states that for smooth function higher order partial derivative commute. To see this consider the second, third and forth line of system \eqref{eq:PH_Kirchh}
+\revOne{ The first line of the skew-symmetric operator in \eqref{eq:PH_Kirchh} is found by considering Eq. \eqref{eq:KirchhClass}. The remaining lines express Clairaut’s theorem for the vertical displacement. This theorem states that for smooth function higher order partial derivative commute. To see this consider the second, third and forth line of system \eqref{eq:PH_Kirchh}
 \[ \diffp{\kappa_{xx}}{t} = \diffp[2]{w_t}{x}, \qquad \diffp{\kappa_{yy}}{t} = \diffp[2]{w_t}{y}, \qquad  \diffp{\kappa_{xy}}{t} = 2 \diffp{w_t}{x,y} 
 \] Then, since $w_t = \diffp{w}{t}, \, \kappa_{xx} = \diffp[2]{w}{x}, \, \kappa_{yy} = \diffp[2]{w}{y}, \, \kappa_{xy} = 2 \diffp{w}{x, y}$ it holds
 \[ \diffp[1,2]{w}{t,x} = \diffp[2,1]{w}{x,t}, \qquad \diffp[1,2]{w}{t,y} = \diffp[2,1]{w}{y,t}, \qquad  \diffp{w}{t,x,y} = \diffp{w}{x,y,t},  
@@ -412,21 +411,7 @@ The boundary variables are obtained by evaluating the time derivative of the Ham
 	\label{fig:plate_ref}
 \end{figure}
 
-In Figure \ref{fig:plate_ref} the notations for the different reference frames are introduced. By applying Green theorem, considering the split mixed derivative ($2 \diffp{}{x,y} = \diffp{}{x,y} +  \diffp{}{y,x}$)
-
-\begin{comment}
-\begin{equation}
-\label{Hdot1}
-\dot{H} = \int_{\partial \Omega} \left\{ n_x \left(e_2 \diffp{e_1}{x} - e_1 \diffp{e_2}{x} + 2 e_4 \diffp{e_1}{y} \right) + n_y \left(e_3 \diffp{e_1}{y} - e_1 \diffp{e_3}{y} - 2 e_1 \diffp{e_4}{x} \right) \right\} \d{s}
-\end{equation}
-Or, equivalently, 
-\begin{equation}
-\label{Hdot2}
-\dot{H} = \int_{\partial \Omega} \left\{ n_x \left(e_2 \diffp{e_1}{x} - e_1 \diffp{e_2}{x} - 2 e_1 \diffp{e_4}{y}\right) + n_y \left(e_3 \diffp{e_1}{y} - e_1 \diffp{e_3}{y} + 2 e_4 \diffp{e_1}{x}\right) \right\} ds
-\end{equation}
-The half-sum of equations \eqref{Hdot1}, \eqref{Hdot2} does restore symmetry
-\end{comment} 
-
+In Fig. \ref{fig:plate_ref} the notations for the different reference frames are introduced. By applying Green theorem, considering the split mixed derivative ($2 \diffp{}{x,y} = \diffp{}{x,y} +  \diffp{}{y,x}$):
 \begin{align}
 \dot{H} = \int_{\partial \Omega}  & \left\{  n_x \left(e_2 \diffp{e_1}{x}  + e_4 \diffp{e_1}{y}  - e_1 \diffp{e_2}{x} - e_1 \diffp{e_4}{y}\right)
 \right. \nonumber \\
@@ -449,7 +434,7 @@ If the physical variables are introduced
 	\label{fig:Cauchy_law}
 \end{figure}
 
-Now the following quantities, represented in figure \ref{fig:Cauchy_law}, are defined 
+Now the following quantities, represented in Fig. \ref{fig:Cauchy_law}, are defined: 
 \begin{equation}
 \label{eq:QnMnnMns}
 \begin{aligned}
@@ -479,21 +464,20 @@ n_x \\
 \end{pmatrix},
 \end{aligned}
 \end{equation}
-where $q_x = - \diffp{M_{xx}}{x} -\diffp{M_{xy}}{y}$ and $\; q_y = - \diffp{M_{yy}}{y} -\diffp{M_{xy}}{x}$. The gradient of the vertical velocity can be projected upon the normal and tangential directions to the boundary
+where $q_x = - \diffp{M_{xx}}{x} -\diffp{M_{xy}}{y}$ and $\; q_y = - \diffp{M_{yy}}{y} -\diffp{M_{xy}}{x}$. The gradient of the vertical velocity can be projected upon the normal and tangential directions to the boundary:
 \begin{equation}
 \label{eq:gr_dec_ns}
 \nabla w_t = \left(\nabla w_t^T \bm{n} \right) \,\bm{n} + \left(\nabla w_t^T \bm{s} \right) \, \bm{s} = \diffp{w_t}{n} \; \bm{n} +   \diffp{w_t}{s} \; \bm{s}.
 \end{equation}
-So the time derivative of the Hamiltonian can be finally written as
+So the time derivative of the Hamiltonian can be finally written as:
 \begin{equation}
 \dot{H} = \int_{\partial \Omega} \left\{ w_t \, q_n + \diffp{w_t}{s} \, M_{ns} + \diffp{w_t}{n} \, M_{nn}\right\} \d{s}.
 \end{equation}
-\revOne{The variables $w_t$ and $\diffp{w_t}{s}$ are not independent as they are differentially related with respect to derivation along $s$, the curvilinear abscissa of the boundary domain (see for instance \cite{timoshenko1959theory})}. Another integration by part is needed to highlight appropriate \revOne{independent} power conjugated variables. Let us suppose that the boundary is a closed and regular curve. Then the integration by parts along a closed boundary leads to
+\revOne{Variables $w_t$ and $\diffp{w_t}{s}$ are not independent as they are differentially related with respect to derivation along $s$, the curvilinear abscissa of the boundary domain (see for instance \cite{timoshenko1959theory})}. Another integration by part is needed to highlight appropriate \revOne{independent} power conjugated variables. Let us suppose that the boundary is a closed and regular curve. Then the integration by parts along a closed boundary leads to:
 \begin{equation}
 \int_{\partial \Omega} \diffp{w_t}{s} \, M_{ns} \ \d{s}= - \int_{\partial \Omega} \diffp{M_{ns}}{s} \, w_t \ \d{s}.
 \end{equation}
-The energy balance can be finally written as
-
+The energy balance can be finally written as:
 \begin{equation}
 \label{eq:energyBal_Kir}
 \dot{H} = \int_{\partial \Omega} \left\{ w_t \, \widetilde{q}_n + \diffp{w_t}{n} \, M_{nn}\right\} \d{s}
@@ -501,18 +485,9 @@ The energy balance can be finally written as
 where $\widetilde{q}_n := q_n - \diffp{M_{ns}}{s}$ is the effective shear force.
 Equation \eqref{eq:energyBal_Kir} is of utmost importance, since it contains the boundary variables that will be present in the Stokes-Dirac structure defining the port-Hamiltonian system.
 
-\begin{comment}
-If the boundary is not regular then the torsional momentum at the corner points might be discontinuous if concentrated forces are present. The conjugated variable to the vertical displacement becomes
-\begin{equation}
-\widetilde{q}_n = q_n - \diffp{M_{ns}}{s} + \sum_{k=1}^{N_{\text{corner}}} M_{ns} \left( \delta(\bm{x} - \bm{x}_k^+) - \delta(\bm{x} - \bm{x}_k^-)\right)
-\end{equation} 
-where the delta distribution has been introduced to retrieve the value of torsional momentum before and after the corner points.
-\end{comment}
-
 \subsubsection{Underlying Stokes-Dirac structure} 
 
-Let $\mathcal{F}$ denote the flow space and let $\mathcal{E}$ denote the effort space. For simplicity we take  $\mathcal{F} \equiv  \mathcal{E} = \mathcal{C}^2(\Omega, \mathbb{R}^4)$, the space of smooth vector-valued functions in $\mathbb{R}^4$. Equation \eqref{eq:energyBal_Kir} allows identifying the boundary terms of the underlying Stokes-Dirac structures. The space of boundary \revOne{variables} is a vector of four components given by
-
+Let $\mathcal{F}$ denote the flow space and let $\mathcal{E}$ denote the effort space. For simplicity we take  $\mathcal{F} \equiv  \mathcal{E} = \mathcal{C}^2(\Omega, \mathbb{R}^4)$, the space of smooth vector-valued functions in $\mathbb{R}^4$. Equation \eqref{eq:energyBal_Kir} allows identifying the boundary terms of the underlying Stokes-Dirac structures. The space of boundary \revOne{variables} is a vector of four components given by:
 \begin{equation*}
 \mathcal{Z} = \{\bm{z} | \, \bm{z} = B_{\partial}(\bm{e}), \forall \, \bm{e} \in \mathcal{E} \},  \qquad \bm{z} = \left( \widetilde{q}_n, w_t, M_{nn}, \diffp{w_t}{n} \right)^T .
 \end{equation*}
@@ -521,8 +496,7 @@ In the case where the differential $J$ operator of order one, the $B_{\partial}$
 \begin{remark}
 This fact was already stated for 1-D systems in \cite{LeGorrec2005}; here it is the extension to the 2-D system with second order differential operator $J$.
 \end{remark}
-This operator reads
-
+This operator reads:
 \begin{multline}
 	B_{\partial}(\bm{e}) = 
 	\begin{bmatrix}
@@ -585,21 +559,21 @@ is a Stokes-Dirac structure with respect to the pairing
 \begin{proof}
 	A regular boundary will be assumed for the proof.
 	\paragraph{\textbf{Step I}} 
-	The first implication is $\mathbb{D} \subseteq \mathbb{D}^T$. This is true if $ \forall \;\bm\omega_\alpha = (\bm{f}_\alpha, \bm{e}_\alpha, \bm{f}_\alpha)$ and $\bm\omega_\beta = (\bm{f}_\beta, \bm{e}_\beta, \bm{z}_\beta) \in \mathbb{D}$ then $\ll \bm\omega_\alpha, \bm\omega_\beta \gg = 0$. The integral over the domain reads
+	The first implication is $\mathbb{D} \subseteq \mathbb{D}^T$. This is true if $ \forall \;\bm\omega_\alpha = (\bm{f}_\alpha, \bm{e}_\alpha, \bm{f}_\alpha)$ and $\bm\omega_\beta = (\bm{f}_\beta, \bm{e}_\beta, \bm{z}_\beta) \in \mathbb{D}$ then $\ll \bm\omega_\alpha, \bm\omega_\beta \gg = 0$. The integral over the domain reads:
 	\begin{align*}
 	&\int_{\Omega}  \left[ \bm{e}_\alpha^T \bm{f}_\beta + \bm{e}_\beta^T \bm{f}_\alpha \right] d\Omega
 	= \int_{\Omega} \left\{ e_1^\alpha \left( \diffp[2]{e_2^\beta}{x} + \diffp[2]{e_3^\beta}{y} + \diffp{e_4^\beta}{x,y} \right) - e_2^\alpha \diffp[2]{e_1^\beta}{x} -e_3^\alpha \diffp[2]{e_1^\beta}{y} \right.\\ 
 	&  - 2 e_4^\alpha \diffp{e_1^\beta}{x,y} + 
 	\left. e_1^\beta \left( \diffp[2]{e_2^\alpha}{x} + \diffp[2]{e_3^\alpha}{y} + \diffp{e_4^\alpha}{x,y} \right) - e_2^\beta \diffp[2]{e_1^\alpha}{x} -e_3^\beta \diffp[2]{e_1^\alpha}{y} - 2 e_4^\beta \diffp{e_1^\alpha}{x,y} \right\} \d{\Omega}. \\
 	\end{align*}
-	Once the Green theorem has been applied,  the relevant quantities expressed by equations~\eqref{eq:QnMnnMns} pop up as follows
+	Once the Green theorem has been applied,  the relevant quantities expressed by equations~\eqref{eq:QnMnnMns} pop up as follows:
 	\begin{multline}
 	\int_{\Omega}  \left[ \bm{e}_\alpha^T \bm{f}_\beta + \bm{e}_\beta^T \bm{f}_\alpha \right] d\Omega = \int_{\partial \Omega}  \left\{ e_1^\alpha \left( \diffp{e_2^\beta}{x} n_x + \diffp{e_3^\beta}{y} n_y +\diffp{e_4^\beta}{y} n_x + \diffp{e_4^\beta}{x} n_y \right) \right. \\
 	\left.   + e_1^\beta \left( \diffp{e_2^\alpha}{x} n_x + \diffp{e_3^\alpha}{y} n_y +\diffp{e_4^\alpha}{y} n_x + \diffp{e_4^\alpha}{x} n_y \right) - e_2^\alpha \diffp{e_1^\beta}{x} n_x - e_2^\beta \diffp{e_1^\alpha}{x} n_x   \right.\\
 	\left. - e_3^\alpha \diffp{e_1^\beta}{y} n_y  - e_3^\beta \diffp{e_1^\alpha}{y} n_y  - e_4^\alpha \left( \diffp{e_1^\beta}{y} n_x + \diffp{e_1^\beta}{x} n_y \right) - e_4^\beta \left( \diffp{e_1^\alpha}{y} n_x + \diffp{e_1^\alpha}{x} n_y \right) \right\} \d{s}. 
 	\end{multline}
 	
-	Moreover only the kinematically independent quantities have to be considered, leading to the final result
+	Moreover only the kinematically independent quantities have to be considered, leading to the final result:
 	\begin{equation}
 	- \int_{\partial \Omega} \left( w_t^\alpha \widetilde{q}_n^\beta + w_t^\beta \widetilde{q}_n^\alpha + \diffp{w_t^\alpha}{n} \, M_{nn}^\beta + \diffp{w_t^\beta}{n} \, M_{nn}^\alpha \right) ds =  - \int_{\partial \Omega}  B_J(\bm{z}_\alpha, \bm{z}_\beta) ds.
 	\end{equation}		
@@ -635,7 +609,7 @@ is a Stokes-Dirac structure with respect to the pairing
 	\mu \diffp[2]{w}{t}  + r \diffp{w}{t}+ \diffp[2]{M_{xx}}{x} + 2 \diffp{M_{xy}}{x,y} + \diffp[2]{M_{yy}}{y} = 0,
 	\end{equation}
 	where $r>0$ is the damping coefficient.
-	If this equation is rewritten using the port-Hamiltonian formalism then we get
+	If this equation is rewritten using the port-Hamiltonian formalism then we get:
 	\begin{equation}
 	\diffp{\bm\alpha}{t} = \left(J - R \right) \bm{e}, \qquad 
 	R := 
@@ -685,8 +659,7 @@ More involved dissipation model can be found in \cite{DissDenis} are reference t
 \subsection{PH tensorial formulation of the Kirchhoff plate}
 \label{sec:PH_ten_Kir}
 
-In section \ref{sec:PH_vec_Kir} the Stokes-Dirac structure of the Kirchhoff plate was found by using a vectorial notation for the curvatures and momenta. \revOne{In fact} these variables are of tensorial nature and in the following the tensorial formulation takes the place of the vectorial one. First let us rewrite the momenta and curvatures as symmetric matrices (corresponding to the choice of a Cartesian frame for the representation of tensors)
-
+In section \ref{sec:PH_vec_Kir} the Stokes-Dirac structure of the Kirchhoff plate was found by using a vectorial notation for the curvatures and momenta. \revOne{In fact} these variables are of tensorial nature and in the following the tensorial formulation takes the place of the vectorial one. First let us rewrite the momenta and curvatures as symmetric matrices (corresponding to the choice of a Cartesian frame for the representation of tensors):
 \begin{equation}
 \mathbb{K} = 
 \begin{bmatrix}
@@ -699,24 +672,24 @@ M_{xx} & M_{xy} \\
 M_{xy} & M_{yy} \\
 \end{bmatrix},
 \end{equation}
-where now, with a slight abuse of notation, $\kappa_{xy}$ \revOne{differs by $1/2$ from the definition given in equation \eqref{eq:CurVec}}, i.e. $\kappa_{xy} =\diffp{w}{x,y}$. All the other quantities stay the same with respect to what stated in section \ref{sec:VarKir}. 	The Hamiltonian energy is written as
+where now, with a slight abuse of notation, $\kappa_{xy}$ \revOne{differs by $1/2$ from the definition given in equation \eqref{eq:CurVec}}, i.e. $\kappa_{xy} =\diffp{w}{x,y}$. All the other quantities stay the same with respect to what stated in section \ref{sec:VarKir}. 	The Hamiltonian energy is written as:
 \begin{equation}
 \label{eq:H_Kir_Ten}
 H = \int_{\Omega} \left\{ \frac{1}{2} \mu \left(\diffp{w}{t} \right)^2 + \frac{1}{2} \mathbb{M} \cddot \mathbb{K}  \right\}  \d{\Omega} ,
 \end{equation}
 where the tensor contraction in Cartesian coordinates is expressed as
 \[\mathbb{M} \cddot \mathbb{K} = \sum_{i,j = 1}^{2} M_{ij} \kappa_{ij} = \Tr(\mathbb{M}^T \mathbb{K}) \]
-For what concerns the choice of the energy variables a scalar and a tensor variable are grouped together
+For what concerns the choice of the energy variables a scalar and a tensor variable are grouped together:
 \begin{equation}
 \alpha_w = \mu \diffp{w}{t} \qquad \mathbb{A}_{\kappa} = \mathbb{K} 	\end{equation}
-The co-energy variables are found by computing the variational derivative of the Hamiltonian
+The co-energy variables are found by computing the variational derivative of the Hamiltonian:
 \begin{equation}
 e_w := \diffd{H}{\alpha_w} = \diffp{w}{t} := w_t,  \qquad  \mathbb{E}_{\kappa} := \diffd{H}{\mathbb{A}_{\kappa}} = \mathbb{M}.
 \end{equation}
 \begin{remark}
 For the variational derivative with respect to a tensor, see Propostion 1 in \cite{BrugnoliMin}.
 \end{remark}
-The port-Hamiltonian system \revOne{\eqref{eq:PH_Kirchh} is now rewritten as}
+The port-Hamiltonian system \revOne{\eqref{eq:PH_Kirchh} is now rewritten as:}
 \begin{equation}
 \label{eq:PH_sys_Kir_Ten_pr}
 \begin{cases}
@@ -726,12 +699,12 @@ The port-Hamiltonian system \revOne{\eqref{eq:PH_Kirchh} is now rewritten as}
 \end{equation}
 
 
-where $\mathrm{div}$ and $\mathrm{Div}$ denote the divergence of a vector and of a tensor respectively. The operator $\mathrm{Grad}$ denotes the symmetric gradient
+where $\mathrm{div}$ and $\mathrm{Div}$ denote the divergence of a vector and of a tensor respectively. The operator $\mathrm{Grad}$ denotes the symmetric gradient:
 \begin{equation}
 \mathrm{Grad}(\bm{a}) =  \frac{1}{2} \left(\nabla \otimes \bm{a} + \left(\nabla \otimes \bm{a}\right)^T \right).
 \end{equation}
 
-The operator $\mathrm{Grad} \circ \mathrm{grad}$ corresponds to the Hessian operator. In Cartesian coordinates it reads
+The operator $\mathrm{Grad} \circ \mathrm{grad}$ corresponds to the Hessian operator. In Cartesian coordinates it reads:
 \begin{equation}
 \mathrm{Grad} \circ \mathrm{grad} = 
 \begin{bmatrix}
@@ -745,14 +718,14 @@ The operator $\mathrm{Grad} \circ \mathrm{grad}$, corresponding to the Hessian o
 \end{theorem}
 
 \begin{proof}
-	Let us consider the Hilbert space of the square integrable symmetric square tensors of size $n \times n$ over an open connected set $\Omega$. This space will be denoted by $\mathscr{H}_1 = L^2(\Omega, \mathbb{R}^{n \times n}_{\text{sym}})$. This space is endowed with the integral of the tensor contraction as scalar product
+	Let us consider the Hilbert space of the square integrable symmetric square tensors of size $n \times n$ over an open connected set $\Omega$. This space will be denoted by $\mathscr{H}_1 = L^2(\Omega, \mathbb{R}^{n \times n}_{\text{sym}})$. This space is endowed with the integral of the tensor contraction as scalar product:
 	\[\left\langle \mathbb{E} , \mathbb{F} \right\rangle_{\mathscr{H}_1} = \int_{\Omega}  \mathbb{E} \cddot \mathbb{F} \; \d{\Omega} = \int_{\Omega} \Tr(\mathbb{E}^T \mathbb{F}) \; \d{\Omega}, \quad \forall  \mathbb{E} , \mathbb{F} \in [L^2_{\text{sym}}(\Omega)]^{n \times n}. \]
 	
-Consider the Hilbert space $\mathscr{H}_2 =L^2(\Omega)$ of scalar square integrable functions, endowed with the inner product
+Consider the Hilbert space $\mathscr{H}_2 =L^2(\Omega)$ of scalar square integrable functions, endowed with the inner product:
 \begin{equation}
 	\left\langle e,f \right\rangle_{\mathscr{H}_2}  \,= \int_{\Omega} e f \, \d{\Omega}.
 \end{equation} 
- Let us consider the double divergence operator defined as 
+ Let us consider the double divergence operator defined as: 
 \[
 \begin{aligned}
 A: \; \mathscr{H}_1& \rightarrow \mathscr{H}_2, \\
@@ -775,13 +748,13 @@ such that \[
 \]
 
 
-The function have to belong to the operator domain, so for instance $f \in \mathcal{C}_0^2(\Omega) \in \mathrm{Domain}(A^*)$ the space of twice differentiable scalar functions with compact support on an open simply connected set $\Omega$ and additionally $\mathbb{E}$ can be chosen in the set $\mathcal{C}_{0}^2(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}}) \in \mathrm{Domain}(A)$, the space of twice differentiable $2 \times 2$ symmetric tensors with compact support on $\Omega$. \revOne{ A classical result is the fact that the adjoint of the vector divergence is $\mathrm{div}^* = -\mathrm{grad}$ as stated in \cite{kurula2012duality}. This may be generalized to the adjoint of the tensor divergence $\mathrm{Div}^* = -\mathrm{Grad}$ (see theorem 4 of \cite{BrugnoliMin}).} Considering that $A$ is the composition of two different operators $A = \mathrm{div} \circ \mathrm{Div}$ and that the adjoint of a composed operator is the adjoint of each operator in reverse order, i.e. $(B \circ C)^* = C^* \circ B^*$, then it can be stated
+The function have to belong to the operator domain, so for instance $f \in \mathcal{C}_0^2(\Omega) \in \mathrm{Domain}(A^*)$ the space of twice differentiable scalar functions with compact support on an open simply connected set $\Omega$ and additionally $\mathbb{E}$ can be chosen in the set $\mathcal{C}_{0}^2(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}}) \in \mathrm{Domain}(A)$, the space of twice differentiable $2 \times 2$ symmetric tensors with compact support on $\Omega$. \revOne{ A classical result is the fact that the adjoint of the vector divergence is $\mathrm{div}^* = -\mathrm{grad}$ as stated in \cite{kurula2012duality}. This may be generalized to the adjoint of the tensor divergence $\mathrm{Div}^* = -\mathrm{Grad}$ (see Theorem 4 of \cite{BrugnoliMin}).} Considering that $A$ is the composition of two different operators $A = \mathrm{div} \circ \mathrm{Div}$ and that the adjoint of a composed operator is the adjoint of each operator in reverse order, i.e. $(B \circ C)^* = C^* \circ B^*$, then it can be stated
 \[
 A^* = (\mathrm{div} \circ \mathrm{Div})^* = \mathrm{Div}^* \circ \mathrm{div}^* = \mathrm{Grad} \circ \mathrm{grad}.
 \]  
 Since only formal adjoints are being looked for, this concludes the proof.
 \end{proof}
-If the variables in system \eqref{eq:PH_sys_Kir_Ten_pr} are grouped together the formally skew-symmetric operator $J$ can be highlighted 
+If the variables in system \eqref{eq:PH_sys_Kir_Ten_pr} are grouped together the formally skew-symmetric operator $J$ can be highlighted:
 \begin{equation}
 \label{eq:PH_sys_Kir_Ten}
 \diffp{}{t}
@@ -802,7 +775,7 @@ where all zeros are intended as nullifying operator from the space of input vari
 \begin{remark}
 The interconnection structure $J$ now resembles that of the Bernoulli beam. The double divergence and the double gradient coincide, in dimension one, with the second derivative.
 \end{remark}
-Again the boundary \revOne{port variables} can be found by evaluating the time derivative of the Hamiltonian
+Again the boundary \revOne{port variables} can be found by evaluating the time derivative of the Hamiltonian:
 \begin{equation}
 \begin{aligned}
 \dot{H}&= \int_{\Omega} \left\{ \diffp{\alpha_w}{t} e_w  + \diffp{\mathbb{A}_{\kappa}}{t} \cddot \mathbb{E}_{\kappa} \right\} \d\Omega, \\
@@ -831,7 +804,7 @@ If a regular boundary is considered the final energy balance is exactly the same
 \begin{equation}
 \dot{H} = \int_{\partial \Omega} \left\{ w_t \, \widetilde{q}_n + \diffp{w_t}{n} \, M_{nn}\right\} \ \d{s},  \qquad \text{where }\widetilde{q}_n := q_n - \diffp{M_{ns}}{s}.
 \end{equation} 
-The tensorial formulation allows highlighting the intrinsic differential operators. Furthermore the symmetric nature of the variables is explicitly expressed by the usage of symmetric tensors. \revOne{Now that the energy balance has been established in terms of the boundary vairables the Stokes-Dirac structure for the Kirchhoff plate in tensorial form can be defined. Consider now the bond space
+The tensorial formulation allows highlighting the intrinsic differential operators. Furthermore the symmetric nature of the variables is explicitly expressed by the usage of symmetric tensors. \revOne{Now that the energy balance has been established in terms of the boundary vairables the Stokes-Dirac structure for the Kirchhoff plate in tensorial form can be defined. Consider now the bond space:
 \begin{equation}
 \label{eq:bondKir}
 \mathcal{B} := \left\{(\bm{f}, \bm{e}, \bm{z}) \in \mathcal{F} \times \mathcal{E} \times \mathcal{Z} \right\},
@@ -839,7 +812,7 @@ The tensorial formulation allows highlighting the intrinsic differential operato
 where $\mathcal{F}=  \mathscr{L}^2(\Omega) :=  L^2(\Omega) \times L^2(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}})$ and $ \mathcal{E} =  \mathscr{H}^2(\Omega) = H^{2}(\Omega) \times H^{\text{div Div}}(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}})$. The space $H^{\text{divDiv}}(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}})$ is such that
 \[
 H^{\text{div Div}}(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}}) = \left\{ \mathbb{A} \in L^2(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}}) \; \vert \; \mathrm{div}(\mathrm{Div}(\mathbb{A})) \in L^2(\Omega) \right\}.
-\] Consider the space of boundary port variables
+\] Consider the space of boundary port variables:
 \begin{equation}
 \begin{gathered}
 \mathcal{Z} := \left\{ \bm{z} \; \vert \; \bm{z} = \begin{pmatrix} \bm{f}_{\partial} \\ \bm{e}_{\partial} \end{pmatrix} \right\}, \qquad \text{with} \quad
@@ -853,7 +826,7 @@ w_t \\ \diffp{w_t}{n} \\
 \end{pmatrix}
 \end{gathered}
 \end{equation}
-The duality pairing between elements of $\mathcal{B}$ is then defined as follows
+The duality pairing between elements of $\mathcal{B}$ is then defined as follows:
 \begin{equation}
 \label{eq:bil_Kir_Ten}
 \left\langle \left\langle (\bm{f}_1, \bm{e}_1, \bm{z}_1), (\bm{f}_2, \bm{e}_2, \bm{z}_2) \right\rangle \right\rangle :=  \left\langle \bm{e}_1, \bm{f}_2 \right\rangle_{\mathscr{L}^2(\Omega)}  +  \left\langle \bm{e}_2,  \bm{f}_1  \right\rangle_{\mathscr{L}^2(\Omega)} + \int_{\partial \Omega} B_J(\bm{z}_1, \bm{z}_2) \d{s} , 
@@ -896,12 +869,12 @@ The fist line of \eqref{eq:PH_sys_Kir_Ten} is multiplied  by $v_w$ (scalar multi
 \int_{\Omega} \mathbb{V}_{\kappa} \cddot \diffp{\mathbb{A}_{\kappa}}{t} \,  \d\Omega &= \int_{\Omega} \mathbb{V}_{\kappa} \cddot  \mathrm{Grad}(\mathrm{grad}(e_w)) \,   \d\Omega.  \label{eq:wf2_kir_ten}
 \end{align}
 
-The right hand side of equation \eqref{eq:wf1_kir_ten} has to be integrated by parts twice
+The right hand side of equation \eqref{eq:wf1_kir_ten} has to be integrated by parts twice:
 \begin{equation}
 \label{eq:line1_wf1_ten}
 \int_{\Omega} - v_w \mathrm{div}(\mathrm{Div}(\mathbb{E}_{\kappa})) \, \d\Omega = \int_{\partial \Omega} \underbrace{- \bm{n} \cdot \mathrm{Div}(\mathbb{E}_{\kappa})}_{q_n} v_w \, \d{s} + \int_{\Omega} \mathrm{grad}(v_w)  \cdot \mathrm{Div}(\mathbb{E}_{\kappa}) \, \d\Omega
 \end{equation}
-Applying again the integration by parts
+Applying again the integration by parts leads to
 \begin{equation}
 \label{eq:line1_wf2_ten}
 \int_{\Omega} \mathrm{grad}(v_w)  \cdot \mathrm{Div}(\mathbb{E}_{\kappa}) \, \d\Omega = \int_{\partial \Omega} \mathrm{grad}(v_w)  \cdot \left( \bm{n} \cdot \mathbb{E}_{\kappa} \right) \, \d{s} -  \int_{\Omega}\mathrm{Grad}(\mathrm{grad}(v_w))  \cddot \mathbb{E}_{\kappa} \, \d\Omega
@@ -915,16 +888,16 @@ The usual additional manipulation is performed on the boundary term containing t
 &= \sum_{\Gamma_{i} \subset \partial \Omega} \left[ M_{ns} v_w \right]_{\partial \Gamma_i} + \int_{\partial \Omega} \left\{ \diffp{v_w}{n} M_{nn}  - v_w \, \diffp{M_{ns}}{s} \right\} \, \d{s}
 \end{aligned}
 \end{equation}
-Combining equations \eqref{eq:line1_wf1_ten}, \eqref{eq:line1_wf2_ten} and \eqref{eq:line1_ipbc_ten} the final expression which make appear the dynamic boundary terms (forces and momenta) is found 
+Combining equations \eqref{eq:line1_wf1_ten}, \eqref{eq:line1_wf2_ten} and \eqref{eq:line1_ipbc_ten} the final expression which make appear the dynamic boundary terms (forces and momenta) is found:
 \begin{equation}
 \int_{\Omega} v_w \diffp{\alpha_w}{t} \, \d\Omega  =  -  \int_{\Omega} \mathrm{Grad}(\mathrm{grad}(v_w))  \cddot \mathbb{E}_{\kappa} \, \d\Omega  +  \int_{\partial \Omega} \left\{ \diffp{v_w}{n} M_{nn}  + v_w \, \widetilde{q}_n \right\}  \, \d{s}  + \sum_{\Gamma_{i} \subset \partial \Omega} \left[ M_{ns} v_w \right]_{\partial \Gamma_i}.
 \end{equation}
-If the boundary is regular the final expression simplifies  
+If the boundary is regular the final expression simplifies:  
 \begin{equation}
 \int_{\Omega} v_w \diffp{\alpha_w}{t}  \, \d\Omega =  -  \int_{\Omega} \mathrm{Grad}(\mathrm{grad}(v_w))  \cddot \mathbb{E}_{\kappa} \, \d\Omega +  \int_{\partial \Omega} \left\{ \diffp{v_w}{n} M_{nn}  + v_w \, \widetilde{q}_n \right\} \, \d{s}. 
 \end{equation}
 
-So the final weak form obtained from system \eqref{eq:PH_sys_Kir_Ten} reads
+So the final weak form obtained from system \eqref{eq:PH_sys_Kir_Ten} reads:
 \begin{equation}
 \label{eq:WF_Kir_Dyn}
 \begin{cases}
@@ -933,7 +906,7 @@ So the final weak form obtained from system \eqref{eq:PH_sys_Kir_Ten} reads
 \end{cases}
 \end{equation}
 
-The control input $\bm{u}_\partial$ and the corresponding conjugate outputs $\bm{y}_\partial$ are 
+The control input $\bm{u}_\partial$ and the corresponding conjugate outputs $\bm{y}_\partial$ are:
 \[\bm{u}_\partial = 
 \begin{pmatrix}
 \widetilde{q}_n \\
@@ -949,7 +922,7 @@ w_t \\
 
 \subsubsection{Boundary control through kinematic variables}
 \label{sec:BC_displ}
-Alternatively, the same procedure can be performed on the second line of the system to make appear the kinematic boundary conditions, i.e. the value of the vertical velocity and its normal derivative along the border. Once the necessary calculations are carried out, the following result is found 
+Alternatively, the same procedure can be performed on the second line of the system to make appear the kinematic boundary conditions, i.e. the value of the vertical velocity and its normal derivative along the border. Once the necessary calculations are carried out, the following result is found: 
 \begin{equation}
 \label{eq:WF_Kir_Kin}
 \begin{cases}
@@ -957,7 +930,7 @@ Alternatively, the same procedure can be performed on the second line of the sys
 \displaystyle\int_{\Omega} \mathbb{V}_{\kappa} \cddot \diffp{\mathbb{A}_{\kappa}}{t}   \d\Omega &= \displaystyle\int_{\Omega} \mathrm{div}(\mathrm{Div}(\mathbb{V}_{\kappa})) \; e_w  d\Omega +  \displaystyle\int_{\partial \Omega} \left\{ {v}_{M_{nn}} \diffp{w_t}{n}  + v_{\widetilde{q}_n} w_t \right\} \  \d{s}. 
 \end{cases}
 \end{equation}
-where $v_{M_{nn}} = \left(\bm{n} \otimes \bm{n} \right) \cddot \mathbb{V}_{\kappa}  \; $ and $ \; v_{\widetilde{q}_n} = - \displaystyle \mathrm{Div}(\mathbb{V}_{\kappa}) \cdot \bm{n} - \diffp{ v_{M_{ns}} }{s}$ with $v_{M_{ns}} = \left(\bm{n} \otimes \bm{s} \right) \cddot \mathbb{E}_{\kappa}$. The control input $\bm{u}_\partial$ and the corresponding conjugate outputs $\bm{y}_\partial$ are 
+where $v_{M_{nn}} = \left(\bm{n} \otimes \bm{n} \right) \cddot \mathbb{V}_{\kappa}  \; $ and $ \; v_{\widetilde{q}_n} = - \displaystyle \mathrm{Div}(\mathbb{V}_{\kappa}) \cdot \bm{n} - \diffp{ v_{M_{ns}} }{s}$ with $v_{M_{ns}} = \left(\bm{n} \otimes \bm{s} \right) \cddot \mathbb{E}_{\kappa}$. The control input $\bm{u}_\partial$ and the corresponding conjugate outputs $\bm{y}_\partial$ are: 
 \[\bm{u}_\partial = 
 \begin{pmatrix}
 w_t \\
@@ -973,7 +946,7 @@ M_{nn} \\
 \subsection{Finite-dimensional port-Hamiltonian system}
 
 \revTwo{
-In this section the formulation \eqref{eq:WF_Kir_Dyn} is used is order to explain the discretization procedure. The same procedure may be performed using the formulation given in \eqref{eq:WF_Kir_Kin} and in \ref{sec:Eigen} both strategies will be used to compute the eigenvalues of a square plate. Test and co-energy variables are discretized using the same basis function (Galerkin Method)
+In this section the formulation \eqref{eq:WF_Kir_Dyn} is used is order to explain the discretization procedure. The same procedure may be performed using the formulation given in \eqref{eq:WF_Kir_Kin} and in Section \ref{sec:Eigen} both strategies will be used to compute the eigenvalues of a square plate. Test and co-energy variables are discretized using the same basis functions (Galerkin Method):
 \begin{equation}
 \begin{aligned}
 v_w &= \sum_{i = 1}^{N_w} \phi_w^i(x,y) \, v_w^i, \\
@@ -984,7 +957,7 @@ e_w &= \sum_{i = 1}^{N_w} \phi_w^i(x,y) \, e_w^i(t), \\
 \mathbb{E}_\kappa &= \sum_{i = 1}^{N_\kappa} \bm\Phi_\kappa^i(x,y) \, e_\kappa^i(t),\\
 \end{aligned}
 \end{equation}
-The basis function $\phi_w^i, \, \bm\Phi_\kappa^i, $ have to be chosen in a suitable function space $\mathcal{V}^h$ in the domain of operator $J$, i.e. $\mathcal{V}^h \subset \mathcal{V} \in \mathcal{D}(J)$. This will be discussed in section \ref{sec:Num}. The discretized skew-symmetric bilinear form on the right side of \eqref{eq:WF_Kir_Dyn} then reads
+The basis functions $\phi_w^i, \, \bm\Phi_\kappa^i, $ have to be chosen in a suitable function space $\mathcal{V}^h$ in the domain of operator $J$, i.e. $\mathcal{V}^h \subset \mathcal{V} \in \mathcal{D}(J)$. This will be discussed in Section \ref{sec:Num}. The discretized skew-symmetric bilinear form on the right side of \eqref{eq:WF_Kir_Dyn} then reads:
 \begin{equation}
 \bm{J}_d = 
 \begin{bmatrix}
@@ -992,15 +965,15 @@ The basis function $\phi_w^i, \, \bm\Phi_\kappa^i, $ have to be chosen in a suit
 \bm{D}_{\mathrm{H}} & 0 \vspace{.3mm}\\
 \end{bmatrix},
 \end{equation}
-where the matrix $\bm{D}_{\mathrm{H}}$ is computed in the following way
+where the matrix $\bm{D}_{\mathrm{H}}$ is computed in the following way:
 \begin{equation}
 \bm{D}_{\mathrm{H}}(i,j) = \int_{\Omega} \bm{\Phi}_{\kappa}^i : \mathrm{Grad}(\mathrm{grad}(\phi_w^j)) \d\Omega, \quad \in \mathbb{R}^{N_\kappa \times N_w},
 \end{equation}
-where the notation $A(i,j)$ indicates the entry in the matrix corresponding to the $i \, {\text{th}}$ row and $j \,{\text{th}}$ column. The energy variables are deduced from the co-energy variables 
+where the notation $A(i,j)$ indicates the entry in the matrix corresponding to the $i \, {\text{th}}$ row and $j \,{\text{th}}$ column. The energy variables are deduced from the co-energy variables: 
 \begin{equation}
 \alpha_w = \mu e_w, \qquad \mathbb{A}_{\kappa} = \mathbb{D}^{-1} \mathbb{E}_{\kappa},
 \end{equation}
-where $\mathbb{D}_{ijkl}$ is the symmetric bending rigidity tensor, the tensorial analogous of  matrix $\bm{D}$ defined in \eqref{eq:BenRigVec}. The symmetric bilinear form on the left side of \eqref{eq:WF_Kir_Dyn} is discretized as 
+where $\mathbb{D}_{ijkl}$ is the symmetric bending rigidity tensor, the tensorial analogous of  matrix $\bm{D}$ defined in \eqref{eq:BenRigVec}. The symmetric bilinear form on the left side of \eqref{eq:WF_Kir_Dyn} becomes: 
 \begin{equation}
 \begin{gathered}
 \bm{M} = \text{diag}[\bm{M}_w,\, \bm{M}_\kappa], \quad \text{with} \\
@@ -1010,28 +983,28 @@ where $\mathbb{D}_{ijkl}$ is the symmetric bending rigidity tensor, the tensoria
 \end{aligned}
 \end{gathered}
 \end{equation}
-The boundary variables are then discretized as
+The boundary variables are then discretized as:
 \begin{equation}
 \begin{aligned}
 \widetilde{q}_n = \sum_{i = 1}^{N_{\widetilde{q}_n}} \phi_{\widetilde{q}_n}^i(s) \; \widetilde{q}_n^i, \qquad
 M_{nn} = \sum_{i = 1}^{N_{M_{nn}}} \phi_{M_{nn}}^i(s) \; M_{nn}^i.
 \end{aligned}
 \end{equation}
-The variables are defined only over the boundary $\partial\Omega$. Consequently, the input matrix reads
+The variables are defined only over the boundary $\partial\Omega$. Consequently, the input matrix reads:
 \begin{equation}
 \bm{B} = \begin{bmatrix}
 \bm{B}_{\widetilde{q}_n} & \bm{B}_{M_{nn}}\\
 0 & 0 \\
 \end{bmatrix} 
 \end{equation}
-where the inner components are computed as
+The inner components are computed as:
 \begin{equation}
 \begin{aligned}
 \bm{B}_{\widetilde{q}_n}(i,j) &= \int_{\partial\Omega} {\phi}_{w}^i \, {\phi}_{q_n}^j \d{s} \quad \in \mathbb{R}^{N_w \times N_{q_n}} , \\
 \bm{B}_{M_{nn}}(i,j) &= \int_{\partial\Omega} \diffp{\phi_w^i}{n} \, \phi_{M_{nn}}^j \d{s} \quad \in \mathbb{R}^{N_w \times N_{M_{nn}}} , \\
 \end{aligned}
 \end{equation}
-The final port-Hamiltonian system, as defined in \cite{beattie2018linear} is written as
+The final port-Hamiltonian system, as defined in \cite{beattie2018linear} is written as:
 \begin{equation}
 \label{eq:PHdiscr_Kir}
 \begin{aligned}
@@ -1039,7 +1012,7 @@ The final port-Hamiltonian system, as defined in \cite{beattie2018linear} is wri
 \bm{y}_{\partial} &= \bm{B}^T \, \bm{e}
 \end{aligned} 
 \end{equation}
-where $\bm{e} = \left(e_w^1, \cdots, e_{\kappa}^{N_{\kappa}}\right)^T$ and $\bm{u}_{\partial} = \left(\widetilde{q}_n^1, \dots, M_{nn}^{N_{M_{nn}}}\right)^T$ are the concatenations of the degrees of freedom for the different variables. The discrete Hamiltonian is then found as
+where $\bm{e} = \left(e_w^1, \cdots, e_{\kappa}^{N_{\kappa}}\right)^T$ and $\bm{u}_{\partial} = \left(\widetilde{q}_n^1, \dots, M_{nn}^{N_{M_{nn}}}\right)^T$ are the concatenations of the degrees of freedom for the different variables. The discrete Hamiltonian is then found as:
 \begin{equation}
 \label{eq:Hd_Kir}
 \begin{aligned}
@@ -1049,7 +1022,7 @@ H_d &= \frac{1}{2} \int_{\Omega} \left\{ \alpha_w e_w + \mathbb{A}_{\kappa} \cdd
 \end{aligned}
 \end{equation}
 }
-Using equations \eqref{eq:PHdiscr_Kir}, \eqref{eq:Hd_Kir} the time derivative of the Hamiltonian is given by the scalar product of the boundary flows
+Using equations \eqref{eq:PHdiscr_Kir}, \eqref{eq:Hd_Kir} the time derivative of the Hamiltonian is given by the scalar product of the boundary flows:
 \begin{equation}
 \dot{H}_d = \bm{y}_{\partial}^T \bm{u}_{\partial}.
 \end{equation}
@@ -1060,20 +1033,20 @@ The above Equation is equivalent to the energy balance of the continuous system,
 \label{sec:Num}
 In this section we illustrate numerically the consistency of the proposed model. For this purpose the computation of the eigenvalues of a square plate and temporal simulations for several boundary conditions are presented. 
 \subsection{Finite Element Choice}
-The domain of the operator $J$ in \eqref{eq:PH_sys_Kir_Ten} is $\mathcal{D}(J) = H^{2}(\Omega) \times  H^{\text{div Div}}(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}}) \,+ $ boundary conditions. For this reason a suitable choice for the functional space is
+The domain of the operator $J$ in \eqref{eq:PH_sys_Kir_Ten} is $\mathcal{D}(J) = H^{2}(\Omega) \times  H^{\text{div Div}}(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}})$ and boundary conditions. For this reason a suitable choice for the functional space is:
 \begin{equation}
 (v_w, \,\mathbb{V}_\kappa) \in H^{2}(\Omega) \times H^{2}(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}}) \equiv \mathscr{H},
 \end{equation}
 since $\mathscr{H} \subset \mathcal{D}(J)$. 
 \begin{remark}
-It has to be appointed that the space $H^{\text{div Div}}(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}})$ was never addressed in the mathematical literature. A theoretical analysis of this space is needed. For this reason the only way to deal with this problem numerically is to use $H^{2}(\Omega)$ conforming finite elements. 
+It has to be appointed that, to the best of authors' knowledge, the space $H^{\text{div Div}}(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}})$ was never addressed in the mathematical literature. For this reason $H^{2}(\Omega)$ conforming finite elements were used to deal with this problem numerically. 
 \end{remark}
-The $H^2$ conforming finite elements (like the Hermite, Bell or Argyris finite elements) do not satisfy the proper equivalence properties to give a simple relationship between the reference basis and nodal basis on a general cell \cite{KirbyFE}. For this reason the Firedrake library \cite{firedrake} was used to implement the numerical analysis as it provides functionalities to automate the generalized mappings for these elements. \\ \\
-Then for the Finite Element choice denote by
+The $H^2$ conforming finite elements (like the Hermite, Bell or Argyris finite elements) do not satisfy the proper equivalence properties to give a simple relationship between the reference basis and nodal basis on a general cell \cite{KirbyFE}. The Firedrake library \cite{firedrake} was used to implement the numerical analysis as it provides functionalities to automate the generalized mappings for these elements. \\ \\
+Then for the Finite Element choice denote
 \[ H_r^k(\mathbb{P}_l, \Omega) = \{ v \in H^k(\Omega)|\; v_{|T} \in \mathbb{P}_l \; \forall T \in \mathbb{T}_r \} 
 \]
 the finite element space which is a subspace of $H^k(\Omega)$, based on the shape function space of piecewise polynomials of degree $l$. The shape function space is defined over the mesh $\mathbb{T}_r = \bigcup_i T_i$, where the cells $T_i$ are triangles. These spaces can be scalar-valued or symmetric matrix valued, depending on the variables to be discretized. The parameter $r$ is the average size of a mesh element.
-All the variables, i.e. the velocity $e_w$ and the momenta tensor $\mathbb{V}_\kappa$ as well as the corresponding test functions, are discretized by the same finite element space, the Bell finite element \cite{Bell}, denoted by $H_r^2(\mathbb{P}_5, \Omega)$. For this element the field is computed using quintic polynomials whose degrees of freedom are the values of the function, its gradient and its Hessian at the vertex of each triangular element. In the following mixed boundary conditions will be considered. To deal with those Lagrange multipliers have to be introduced (the reader can refer to \cite{BrugnoliMin}, section 4.3 for an explanation). The multipliers are therefore discretized by using second degree Lagrange polynomials defined over the boundary $H_r^1(\mathbb{P}_2, \partial\Omega)$. 
+All the variables, i.e. the velocity $e_w$ and the momenta tensor $\mathbb{V}_\kappa$ as well as the corresponding test functions, are discretized by the same finite element space, the Bell finite element \cite{Bell}, denoted by $H_r^2(\mathbb{P}_5, \Omega)$. For this element the field is computed using quintic polynomials whose degrees of freedom are the values of the function, its gradient and its Hessian at the vertex of each triangular element. To deal with mixed boundary conditions Lagrange multipliers have to be introduced (the reader can refer to \cite{BrugnoliMin}, section 4.3 for an explanation). The multipliers are therefore discretized by using second degree Lagrange polynomials defined over the boundary $H_r^1(\mathbb{P}_2, \partial\Omega)$. 
 \subsection{Eigenvalues Computation}
 \label{sec:Eigen}
 The test case for this analysis is a simple square plate of side $L$, a benchmark problem which has been studied in \cite{LeissaRect, LimEigen} for different boundary conditions on each plate side. The possible cases are the following: 
@@ -1086,11 +1059,11 @@ In order to compare our results the computed frequencies $\omega_{n}^h$ in the f
 \begin{equation}
 \widehat{\omega}_{n}^h = 4 L^2 \omega_{n}^h \left(\frac{\rho h}{D} \right)^{1/2},
 \end{equation}
-The only parameters which influence the results are the Poisson modulus $\nu=0.3$, but only for cases containing free sides \cite{LI2016984}. The reported non-dimensional frequencies are independent of the remaining geometrical and physical parameters.  The error is computed as
+The only parameter which influences the results is the Poisson's ration $\nu=0.3$, but only for cases containing free sides \cite{LI2016984}. The reported non-dimensional frequencies are independent of the remaining geometrical and physical parameters.  The error is computed as:
 \begin{equation}
 \varepsilon = \frac{\text{abs}(\widehat{\omega}_{n}^h - \omega_{n}^{DR})}{\omega_{n}^{L}},
 \end{equation}
-where $\omega_{n}^{L}$ are the eigenvalues computed in \cite{LeissaRect}. The results are reported in table \ref{tab:eigNoFree} and \ref{tab:eigFree}, together with the results from Leissa \cite{LeissaRect}. The boundary condition are denoted by string of four letters, one for each side of the square. The results are reported either by using the forces and momenta as control \eqref{eq:WF_Kir_Dyn} (column Hessian in tables \ref{tab:eigNoFree}, \ref{tab:eigFree} ) or the vertical linear and angular velocity \eqref{eq:WF_Kir_Kin} (column divDiv in tables \ref{tab:eigNoFree}, \ref{tab:eigFree}).  The results are obtaining using a regular mesh composed by 5 Bell element on each side. Hence, the state vector has a total dimension of 864. The dimension of the Lagrange multiplier vector depends on the boundary condition upon consideration.  When using $H_r^2(\mathbb{P}_2, \partial\Omega)$ on the considered mesh, this number can vary from 0 depending on the bcs. The results obtained by using \eqref{eq:WF_Kir_Dyn} are in perfect agreement with the reference. This formulation was also used to compute the eigenvectors corresponding to the vertical velocity,for the different cases under examination: CSCS in figure \ref{fig:CSCS} , SSCS in \ref{fig:SSCS}, SSSS in \ref{fig:SSSS}, CSFS in \ref{fig:CSFS}, SSFS in \ref{fig:SSFS} and FSFS \ref{fig:FSFS}. For what concerns the weak formulation \eqref{eq:WF_Kir_Kin} the results deteriorate when a free condition (table \ref{tab:eigFree}) is present. 
+where $\omega_{n}^{L}$ are the eigenvalues computed in \cite{LeissaRect}. The results are computed either by using the forces and momenta as control \eqref{eq:WF_Kir_Dyn} or the vertical linear and angular velocity \eqref{eq:WF_Kir_Kin} (column Hessian and divDiv in Tables \ref{tab:eigNoFree}, \ref{tab:eigFree}).  The results are obtained using a regular mesh composed by 5 Bell element on each side. Hence, the state vector has a total dimension of 864. The dimension of the Lagrange multiplier vector depends on the boundary condition upon consideration.  When using $H_r^2(\mathbb{P}_2, \partial\Omega)$ on the considered mesh, this number can vary from 0 depending on the bcs. The results obtained by using \eqref{eq:WF_Kir_Dyn} are in perfect agreement with the reference. This formulation was also used to compute the eigenvectors corresponding to the vertical velocity,for the different cases under examination (see Figs \ref{fig:CSCS} to \ref{fig:FSFS}). For what concerns the weak formulation \eqref{eq:WF_Kir_Kin} the results deteriorate when a free condition (see Table \ref{tab:eigFree}) is present. 
 }
 
 \begin{table}[t]
@@ -1109,7 +1082,7 @@ where $\omega_{n}^{L}$ are the eigenvalues computed in \cite{LeissaRect}. The re
 		$\widehat{\omega}_{6}$&	129.086&   129.141&	129.110&113.217&113.250&113.237&98.696&	98.709& 98.703\\		
 		\hline 
 	\end{tabular} 	
-	\caption{Eigenvalues obtained with 5 Bell element per side for $\nu=0.3$, considering either the $\mathrm{Grad} \circ \mathrm{grad}$ formulation \eqref{eq:WF_Kir_Dyn}, either the $\mathrm{Div} \circ \mathrm{div}$ formulation \eqref{eq:WF_Kir_Kin}. \\
+	\caption{Eigenvalues obtained with 5 Bell element per side for $\nu=0.3$, considering either the $\mathrm{Grad} \circ \mathrm{grad}$ formulation \eqref{eq:WF_Kir_Dyn}, either the $\mathrm{Div} \circ \mathrm{div}$ formulation \eqref{eq:WF_Kir_Kin}. For comparison reference \cite{LeissaRect} is considered.  \\
 		\sqbox{Blue} reference, \, \sqbox{Green} $\varepsilon<0.1\%$.}
 	\label{tab:eigNoFree}
 \end{table}
@@ -1129,7 +1102,7 @@ where $\omega_{n}^{L}$ are the eigenvalues computed in \cite{LeissaRect}. The re
 		$\widehat{\omega}_{6}$&	90.61&	90.602&	92.960&	90.29&	90.283&	92.436&	70.75&	70.666&	73.550\\	
 		\hline 
 	\end{tabular} 	
-	\caption{Eigenvalues obtained with 5 Bell element per side for $\nu=0.3$, considering either the $\mathrm{Grad} \circ \mathrm{grad}$ formulation \eqref{eq:WF_Kir_Dyn}, either the $\mathrm{Div} \circ \mathrm{div}$ formulation \eqref{eq:WF_Kir_Kin}. \\
+	\caption{Eigenvalues obtained with 5 Bell element per side for $\nu=0.3$, considering either the $\mathrm{Grad} \circ \mathrm{grad}$ formulation \eqref{eq:WF_Kir_Dyn}, either the $\mathrm{Div} \circ \mathrm{div}$ formulation \eqref{eq:WF_Kir_Kin}. For comparison reference \cite{LeissaRect} is considered. \\
 		\sqbox{Blue} reference, \, \sqbox{Green} $\varepsilon<0.1\%$ , \, \sqbox{GreenYellow} $\varepsilon<1\%$, \, 			\sqbox{Yellow} $\varepsilon<5\%$, \, \sqbox{Orange} $\varepsilon<15\%$.}
 	\label{tab:eigFree}
 \end{table}
@@ -1306,15 +1279,14 @@ where $\omega_{n}^{L}$ are the eigenvalues computed in \cite{LeissaRect}. The re
 
 \revTwo{
 	\subsection{Temporal Simulations}
-	In this analysis we consider a square plate, subject either to a non null shear force on the boundaries either to a distributed force over the domain. The physical parameters and simulation setting are reported in table \ref{tab:par}. 
-	\begin{table}[h!]
+	\begin{table}[t]
 		\centering
 		\begin{tabular}{|c|c|}
 			\hline 
-			\multicolumn{2}{|c|}{Plate} \\ 
-			\multicolumn{2}{|c|}{Parameters} \\ 
+			\multicolumn{2}{|c|}{Plate Parameters} \\
 			\hline 
 			$E$ & $70\; [GPa]$ \\ 
+			$\rho$ & $2700\; [kg/m^3]$ \\
 			$\nu$& 0.35 \\ 
 			$h/L$& 0.05 \\ 
 			$L$& $1\; [m]$ \\ 
@@ -1324,9 +1296,9 @@ where $\omega_{n}^{L}$ are the eigenvalues computed in \cite{LeissaRect}. The re
 			\hline 
 			\multicolumn{2}{|c|}{Simulation Parameters} \\  
 			\hline 
+			Integrator & St\"ormer-Verlet \\ 
 			$\Delta t$ & $0.001\;  [ms]$ \\ 
 			$t_{\text{end}}$& $10 \; [ms]$ \\ 
-			Integrator & St\"ormer-Verlet \\ 
 			N$^\circ$ Elements & 5 \\
 			FE space & $H_{r = L/5}^2(\mathbb{P}_5, \Omega) \text{ for }\bm{e} \times H_{r = L/5}^1(\mathbb{P}_2, \partial\Omega)\text{ for }\bm{\lambda}$ \\
 			\hline 
@@ -1348,19 +1320,19 @@ where $\omega_{n}^{L}$ are the eigenvalues computed in \cite{LeissaRect}. The re
 		\caption[Hamiltonian]{Hamiltonian trend for the two simulations}
 		\label{fig:Hamiltonian}
 	\end{figure}
-	The energy variables and Lagrange multipliers are discretized using Bell shape functions (five elements for each side) and second order Lagrange polynomials respectively. The symplectic St\"ormer-Verlet integrator is employed, so that when no solicitation is applied to the system, the Hamiltonian is preserved. Two different simulation with different BC are considered. The initial condition are set to zero for each variables. For the first simulation a plate subject to gravity is considered. 
-	For this simulation the set of BC reads:
+	In this analysis we consider a square plate, subject either to a non null shear force on the boundaries either to a distributed force over the domain. The physical parameters and simulation setting are reported in Table \ref{tab:par}. The energy variables and Lagrange multipliers are discretized using Bell shape functions (regular mesh of five elements for each side) and second order Lagrange polynomials respectively. The symplectic St\"ormer-Verlet integrator is employed, so that when no solicitation is applied to the system, the Hamiltonian is preserved. Two different simulation with different BC are considered. The initial condition are set to zero for each variables. For the first simulation a plate subject to gravity is considered. 
+	For this simulation the following  boundary conditions, corresponding to the case CCCF are considered:
 	\begin{equation} \text{Simulation $n^\circ \, 1$} \;
 	\begin{cases}
 	w_t = 0, \, \diffp{w_t}{n} = 0,  \quad &\text{for } x=0, y=0 \text{ and } y=1 \\
 	\widetilde{q}_n = 0, \, M_{nn}= 0, \quad &\text{for } x=1\\
 	\end{cases}
 	\end{equation}
-	Since the solicitation admits a potential the Hamiltonian does not represent the total energy, that now includes the potential energy
+	Since the solicitation admits a potential the Hamiltonian does not represent the total energy, that now includes the potential energy, whose expression is given by:
 	\begin{equation}
 	E_p = \int_{\Omega} \rho h g w \d{\Omega}, 
 	\end{equation}
-	where $w$ is the vertical displacement and $g = 10 [m/s^2]$ is the gravity acceleration. For the second simulation the following  boundary conditions, corresponding to the case $CFFF$ are considered
+	where $w$ is the vertical displacement field and $g = 10 \, [m/s^2]$ is the gravity acceleration. For the second simulation the following  boundary conditions are considered
 	\begin{equation} \text{Simulation $n^\circ \, 2$} \;
 	\begin{cases}
 	w_t = 0, \, \diffp{w_t}{n} = 0, \quad &\text{for } x=0,\\
@@ -1369,14 +1341,14 @@ where $\omega_{n}^{L}$ are the eigenvalues computed in \cite{LeissaRect}. The re
 	q_n = +f(x, t), \, M_{nn} = M_{ns}= 0, \quad &\text{for } y=1,\\
 	\end{cases}
 	\end{equation}
-	where 
+	where the excitation $f(x, t)$ is computed as
 	\begin{equation}
 	f(x, t) = \begin{cases}
 	10^5 \, x \; [Pa \cdot m], \; &\forall t< 0.25 \, t_{\text{end}}, \\
 	0, \; &\forall t\geq 0.25 \, t_{\text{end}}. \\
 	\end{cases}
 	\end{equation} 
-	In this case inhomogeneous boundary conditions are considered. Snapshots of the vertical displacement are reported in figure \ref{fig:sim1}, \ref{fig:sim2}. This field is obtained from the velocity field $e_w = \diffp{w}{t}$ by applying the trapezoidal rule integration. For both simulations the output is consistent with the imposed BC and with the physical intuition of the observed phenomenon. The symplectic integration has been used to demonstrate numerically the conservation of total energy. The Hamiltonian for both simulation is reported in figure \ref{fig:Hamiltonian}. For the first one the total energy $E_p$ is the conserved quantity and it stays constant equal to zero as expected. For the second simulation the Hamiltonian is conserved quantity once the excitation is set back to zero. 
+	In this case inhomogeneous boundary conditions are considered. Snapshots of the vertical displacement are reported in Figs. \ref{fig:sim1}, \ref{fig:sim2}. This field is obtained from the velocity field $e_w = \diffp{w}{t}$ by applying the trapezoidal rule integration. For both simulations the output is consistent with the imposed BC and with the physical intuition of the observed phenomenon. The symplectic integration has been used to demonstrate numerically the conservation of total energy. The Hamiltonian for both simulation is reported in Fig. \ref{fig:Hamiltonian}. For the first one the total energy $E_p$ is the conserved quantity and it stays constant equal to zero as expected. For the second simulation the Hamiltonian is conserved quantity once the excitation is set back to zero. 
 } 
 
 \begin{figure}[t]%

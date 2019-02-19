@@ -95,7 +95,7 @@ In order to simulate and control such systems, a finite-dimensional representati
 
 In this paper the Kirchhoff plate model is presented in a pH fashion. Another classical model, the Mindlin plate, has already been enriched with a suitable Stokes-Dirac structure in \cite{MacchelliMindlin}. The formalism is here extended by employing  tensorial calculus in order to clearly identify the skew-symmetric nature of the differential operator. PFEM discretization is then used to obtain a finite-dimensional system. Numerical applications are then carried out using the Firedrake platform \cite{firedrake}. An interconnection along the boundary is presented to model a cantilever plate welded to a rigid bar. This serves just as an example as the methodology may be employed to construct complex systems starting from their basic components. A control application by damping injection follows. The plate is interconnected along part of the boundary with a dissipative system. The LaSalle's principle guarantees that the system will tend to the equilibrium point, i.e. the undeformed configuration. \\
 
-In section \ref{sec:KirchhPH} the Kirchhoff Plate model is described in strong form as a port-Hamiltonian system . In section \ref{sec:SP_discr} the structure-preserving discretization obtained by using PFEM  is detailed. The discretized system and the associated finite elements are given in \ref{subsec:finPHs}. Section \ref{sec:Int} provides a structured way to interconnect an infinite-dimensional system with a finite-dimensional one. The damping injection control methodology is briefly discussed in \ref{sec:Damp}. 
+Section \ref{sec:KirchhPH} describes the Kirchhoff Plate model in strong form as a port-Hamiltonian system . In Section \ref{sec:SP_discr} the structure-preserving discretization obtained by using PFEM  is detailed. The discretized system and the associated finite elements are given in \ref{subsec:finPHs}. Section \ref{sec:Int} provides a structured way to interconnect an infinite-dimensional system with a finite-dimensional one. The damping injection control methodology is briefly discussed in Section \ref{sec:Damp}. 
 
 \section{pH formulation of the Kirchoff plate}
 \label{sec:KirchhPH}
@@ -144,7 +144,7 @@ m_{yy} &= D\left(\kappa_{yy} + \nu \kappa_{xx}\right),\\
 m_{xy} &= D(1 - \nu) \kappa_{xy}, \\
 \end{aligned}
 \end{equation*}
-with $\nu$ the Poisson ratio, $D$ the bending modulus. The kinetic and potential energy densities $\mathcal{K}$ and $\mathcal{U}$ read
+with $\nu$ the Poisson's ratio, $D$ the bending modulus. The kinetic and potential energy densities $\mathcal{K}$ and $\mathcal{U}$ read
 \begin{equation}
 \mathcal{K} =  \frac{1}{2}\rho h \left(\diffp{w}{t} \right)^2, \quad
 \mathcal{U} = \frac{1}{2} \bm{M} \cddot \bm{K},
@@ -562,7 +562,7 @@ To validate the approach numerical simulations on system \eqref{eq:aug_Int} are 
 \end{cases}
 \end{equation}
 
-acts on the plate. The rigid rod has mass $M = 50 \, [kg]$ and length $L_{\text{rod}} = 1 [m]$. The plate parameters and settings for the discretization (a uniform grid is taken) are provided in table \ref{tab:par}. The constraints are eliminated considering the projection matrix \cite{Heiland_red}
+acts on the plate. The rigid rod has mass $M = 50 \, [kg]$ and length $L_{\text{rod}} = 1 [m]$. The plate parameters and settings for the discretization (a uniform grid is taken) are provided in Table \ref{tab:par}. The constraints are eliminated considering the projection matrix \cite{Heiland_red}
 \begin{equation} \label{eq:proj}
 \bm{P}_{\lambda} = \bm{I} - \bm{G} \left(\bm{G}^T \bm{M}^{-1} \bm{G} \right)^{-1} \bm{G}^T \bm{M}^{-1}
 \end{equation}
@@ -610,7 +610,7 @@ with $\bm{M} = \text{diag}(\bm{M}_{\text{pl}}, \, \bm{M}_{\text{rod}}), \; \bm{G
 	\label{tab:par}
 \end{table}
 
-Snapshots of simulations without and with the rigid rod are reported in figures \ref{fig:IntNoRod}, \ref{fig:IntRod}\footnote{\label{note:1}Complete videos are accessible at \url{https://github.com/andreabrugnoli/Goodies_pH_plates}}. The deformations undergone by the plate are clearly affected by the presence of the rod: the maximum deformation as well as the Hamiltonian value \ref{fig:HamInt}, once the excitation is removed, are lower. The interconnected side remains straight during the whole simulation, meaning that the constraints are respected.
+Snapshots of simulations without and with the rigid rod are reported in Figs. \ref{fig:IntNoRod}, \ref{fig:IntRod}\footnote{\label{note:1}Complete videos are accessible at \url{https://github.com/andreabrugnoli/Goodies_pH_plates}}. The deformations undergone by the plate are clearly affected by the presence of the rod: the maximum deformation as well as the Hamiltonian value \ref{fig:HamInt}, once the excitation is removed, are lower. The interconnected side remains straight during the whole simulation, meaning that the constraints are respected.
 
 \begin{figure*}[ht]
 	\centering
@@ -678,9 +678,9 @@ System \eqref{eq:discr_pl} now reads
 \end{equation}
 The matrix $\bm{R} = \bm{B}_N \bm{Z} \bm{B}_N^T \succcurlyeq 0$ is semi-positive definitive because of the input-output collocated feature of pH system. The energy rate evaluates to (\cite{beattie2018linear} theorem 13)
 \[\dot{H} _{\text{pl}} = - \bm{e}_{\text{pl}}^T \; \bm{R} \; \bm{e}_{\text{pl}} \le 0. \]
-Therefore, the Hamiltonian energy is a Lyapunov function and the asymptotic stability of configuration $\bm{e}_{\text{pl}} = \bm{0}$ is deduced using LaSalle' invariance  principle (\cite{bookPHs}  chapter 6, proposition 6.2). As a numerical illustration a cantilever square plate clamped in $x=0$ with parameters given in table~\ref{tab:par} is consider. The controller gain matrix is set to $\bm{Z} = 100 \ \bm{I}$. The initial condition, that must be compatible with the constraints, reads
+Therefore, the Hamiltonian energy is a Lyapunov function and the asymptotic stability of configuration $\bm{e}_{\text{pl}} = \bm{0}$ is deduced using LaSalle' invariance  principle (\cite{bookPHs}  chapter 6, proposition 6.2). As a numerical illustration a cantilever square plate clamped in $x=0$ with parameters given in Table~\ref{tab:par} is consider. The controller gain matrix is set to $\bm{Z} = 100 \ \bm{I}$. The initial condition, that must be compatible with the constraints, reads
 \[e_w(x,y,0) = x^2, \quad \bm{E}(x,y,0)_{\kappa}=0\]
-The control law is activated after 1 second. The discrete Hamiltonian, computed using \eqref{eq:H_discr} goes almost to zero in 4 seconds (figure \ref{fig:H_Damped}). Snapshot of simulation, reported in figure~\ref{fig:SnapDamp}, show the decreasing amplitudes of the oscillations\footnote{See footnote \ref{note:1}}, as the plate gradually reaches the undeformed equilibrium state.
+The control law is activated after 1 second. The discrete Hamiltonian, computed using \eqref{eq:H_discr} goes almost to zero in 4 seconds (Fig. \ref{fig:H_Damped}). Snapshot of simulation, reported in Fig.~\ref{fig:SnapDamp}, show the decreasing amplitudes of the oscillations\footnote{See footnote \ref{note:1}}, as the plate gradually reaches the undeformed equilibrium state.
 
 \begin{figure*}[t]
 	\centering
