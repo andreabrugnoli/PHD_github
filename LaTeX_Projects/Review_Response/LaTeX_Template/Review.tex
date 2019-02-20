@@ -1,0 +1,305 @@
+%% LyX 2.1.5 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage{color}
+\usepackage{tcolorbox}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage[unicode=true,pdfusetitle,
+ bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
+ breaklinks=false,pdfborder={0 0 0},backref=false,colorlinks=true]
+ {hyperref}
+\hypersetup{
+ allcolors=red}
+
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+%===================================
+%% --  Page margins
+\usepackage{geometry}
+\geometry{verbose,twoside,a4paper,
+    % Main margins 
+top=3cm,
+bottom=3cm,
+inner=2.5cm,outer=2.5cm,
+    % Split of top margins
+headheight=2.2cm,headsep=0.5cm,
+    % Split of bottom margin
+footskip=0.5cm,
+    % Split of outer margin
+marginparsep=0.5cm,
+marginparwidth=12.5pt % width of icon \faNewspaperO at 11pt
+}
+% Width of icon is computed with
+% \newlength{\myl} \settowidth{\myl}{\faNewspaperO} Width of icon \faNewspaperO is \the\myl.
+%===================================
+
+%===================================
+%% -- Header
+%\renewcommand{\thepage}{\roman{page}}% Roman numerals for page counter
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+% Custom fancy style (can be modified on the fly within the document as well)
+\fancyhf{} %Clear Everything.
+  % Current page number on the exterior
+\fancyhead[R]{Monteghetti {\it et al.}, JCOMP-D-18-00598, \thepage}
+  % Chapter name on the interior of even pages
+\fancyhead[L]{\nouppercase{\leftmark}}
+% Redefinition of the plain style
+% (This page style is used for the first page of Chapter, table of contents,
+% etc...)
+\fancypagestyle{plain}{
+       \fancyhf{} %Clear Everything.
+       \renewcommand{\headrule}{\hrule height 2pt \vspace{1mm}\hrule height 1pt}
+       \fancyhead[R]{\thepage}
+}
+%===================================
+
+%===================================
+%% -- tcolorbox to quote
+%\usepackage[most]{tcolorbox}
+\tcbuselibrary{most}
+\tcbuselibrary{breakable} % breakable boxes
+%\definecolor{background}{HTML}{F9F5E9}
+%\definecolor{linecolor}{HTML}{E0D7BC}
+\colorlet{background}{lightgray!80!white}
+\colorlet{linecolor}{black}
+
+\newtcolorbox{quotebox}[2][]{%
+leftupper=2em,
+colback=background,
+colframe=background,
+%fonttitle=\bfseries,
+coltitle=black,
+breakable,
+enhanced,
+attach boxed title to top right,
+boxed title style={empty},
+sharp corners,
+borderline north={0.5pt}{0pt}{linecolor},
+borderline north={0.5pt}{1.5pt}{linecolor},
+borderline south={0.5pt}{0pt}{linecolor},
+borderline south={0.5pt}{1.5pt}{linecolor},
+title=#2,#1}
+
+\tcbset{colback=white,
+%colframe=green!50!black,
+%fonttitle=\bfseries,
+coltitle=white,
+breakable,enhanced jigsaw,%breakable box
+%sharp corners,
+}
+%===================================
+
+%===================================
+%-- 'Remark' and TODO' command
+\usepackage{fontawesome}
+\usepackage{tcolorbox}
+   % enable macro
+\newcommand{\remark}[1]{%
+\begin{tcolorbox}[title=,colframe=white,colback=lightgray!50!white,fontupper=\sffamily\small]
+\faComment~#1
+\end{tcolorbox}}
+   % disable macro
+\renewcommand{\remark}[1]{}
+   % enable macro
+\newcounter{todocounter}
+\newcommand{\todo}[1]{\stepcounter{todocounter}\textbf{\textcolor{red}{(TODO \arabic{todocounter} -- #1)}}}
+   % disable macro
+%\renewcommand{\todo}[1]{\stepcounter{todocounter} \textbf{ \textcolor{red}{(\arabic{todocounter})} }}
+%===================================
+
+%===================================
+%%-- Misc.
+\usepackage{lipsum}
+% Write 'et al.'
+% Use \etal (no trailing space) or \etal{} (trailing space)
+\newcommand{\etal}{\emph{et al.}}
+  % Line numbering
+\usepackage{lineno}
+\modulolinenumbers[5]
+  % For option 'stretch fill image'
+\tcbuselibrary{skins}
+%===================================
+
+%===================================
+%% -- Color for review
+   % background color
+\colorlet{colorRevBG1}{blue!60!black} % dark blue
+\colorlet{colorRevBG2}{red!60!black} % dark red
+\colorlet{colorRevBG3}{green!40!black} % dark green
+  % front color
+\colorlet{colorRev1}{blue!80!black} % dark blue
+\colorlet{colorRev2}{red!80!black} % dark red
+\colorlet{colorRev3}{green!50!black} % dark green
+% Macro to enter revisions
+% Usage: \revision[No.]{text}
+%\usepackage{ifthen}
+\usepackage{xstring}
+\newcommand{\revision}[2]{%
+\IfStrEqCase{#1}{{1}{\textcolor{colorRev1}{#2}}
+    {2}{\textcolor{colorRev2}{#2}}
+    {3}{\textcolor{colorRev3}{#2}}}
+    [\PackageError{rev}{Unknown reviewer: #1}{Choose available.}]%
+}
+
+%===================================
+
+\makeatother
+
+\makeatother
+
+\begin{document}
+\thispagestyle{plain}
+
+\noindent {\Large{}JCOMP-D-18-00598}{\Large \par}
+
+\noindent \begin{flushleft}
+{\Large{}Energy analysis and discretization of nonlinear impedance
+boundary conditions for the time-domain linearized Euler equations}
+\par\end{flushleft}{\Large \par}
+
+\noindent \begin{flushleft}
+Florian Monteghetti, Denis Matignon, Estelle Piot
+\par\end{flushleft}
+
+\noindent \begin{flushleft}
+\today
+\par\end{flushleft}
+
+\begin{center}
+\textbf{\Large{}Response to reviewer \#1}
+\par\end{center}{\Large \par}
+
+We gratefully acknowledge the reviewer for his/her most constructive
+comments. The quality of the paper has benefited from his/her suggestions.
+Our responses are provided in this document.
+
+Revised passages have been highlighted in the PDF version of the manuscript,
+with a different color for \textcolor{colorRev1}{Reviewer \#1}, \textcolor{colorRev2}{Reviewer \#2},
+and \textcolor{colorRev3}{Reviewer \#3}.
+
+\tableofcontents{}
+
+\clearpage{}
+
+
+\section{Summary of revisions}
+
+The manuscript has been revised to account for the comments of the
+three reviewers. The revisions are highlighted in \revision{1}{blue
+for reviewer \#1}, in \revision{2}{red for reviewer \#2}, and in
+\revision{3}{green for reviewer \#3}. A summary of the revisions
+is given below.
+
+\begin{tcolorbox}[title=Summary of revisions (Reviewer No. 1),colframe=colorRevBG1]
+
+\begin{itemize}
+\item (Section~2.2) Additional emphasis has been put on the physical meaning
+of the admissibility conditions.
+\item (Section~2.3) 
+\item (Appendix~A) The part of the appendix that covers admissibility conditions
+has been rephrased to emphasize the anticausal example $z(t)=\delta(t)+\delta(t+\tau)$
+with $\tau>0$.\end{itemize}
+\end{tcolorbox}
+
+
+\begin{tcolorbox}[title=Summary of revisions (Reviewer No. 2),colframe=colorRevBG2]
+
+\begin{itemize}
+\item (Section~2.3) The impact of the energy definition on the analysis
+has been discussed.
+\item (Section~3.1) The modeling of grazing base flow in X has been clarified.
+\item (Section~3.3.1) The role of each step of the discretization process
+has been clarified.\end{itemize}
+\end{tcolorbox}
+
+
+\begin{tcolorbox}[title=Summary of revisions (Reviewer No. 3),colframe=colorRevBG3]
+
+\begin{itemize}
+\item The wording of the ``Significance and novelty'' document has been
+modified to account for applications in combustion.\end{itemize}
+\end{tcolorbox}
+
+
+We have also made the following minor modifications.
+\begin{itemize}
+\item ....
+\end{itemize}
+\clearpage{}
+
+
+\section[Document format]{Format of the present document}
+
+
+\subsubsection*{Format of response}
+
+An answer is formatted as follows. The reviewer is first quoted with
+a gray box that also indicates the position of the quote in the original
+review. The comment is then answered in the subsequent paragraph(s).
+A description of the revisions and their positions is then given in
+a green box.
+
+\begin{quotebox}{Reviewer No.$i\in\left\{1{,}2{,}3\right\} $ -- Position of the quote}
+"Direct quote of a comment provided by the reviewer No.$i$."
+\end{quotebox}
+
+Answer to the comment.
+
+\begin{tcolorbox}[title=Revision (Reviewer No. $i$),colframe=colorRevBG1]
+ Descriptions of the corresponding revisions in the manuscript.
+\end{tcolorbox}
+The color of the box matches the text color used in the revised manuscript,
+given below.
+\begin{itemize}
+\item \textcolor{colorRev1}{Reviewer \#1} 
+\item \textcolor{colorRev2}{Reviewer \#2} 
+\item \textcolor{colorRev3}{Reviewer \#3}
+\end{itemize}
+
+\subsubsection*{Remark on the use of references}
+
+In our responses, we refer to two families of bibliographic entries:
+\begin{itemize}
+\item The ones that are contained in the revised manuscript, which are referred
+to using the numerical style of the \emph{Journal}, e.g. {[}1{]}.
+\item References\emph{ specific to this document} and not necessarily contained
+in the manuscript. To avoid confusion, these references are quoted
+using an author-year citation style, e.g. \cite{foo2016bar}.
+\end{itemize}
+\clearpage{}
+
+
+\section{Reply to reviewer \#1}
+
+\begin{quotebox}{Reviewer No.1 -- Paragraphs 1 \& 2}
+Comment 1
+\end{quotebox}
+
+We thank the reviewer for these comments. We have addressed each one
+below. In the revised manuscript, the corresponding revisions are
+\textcolor{colorRev1}{highlighted in blue}.
+
+\begin{quotebox}{Reviewer No.1 -- Comment 1 (a)}
+
+Bla
+
+\end{quotebox}
+
+Detailed answer, if needed.
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 1 -- Comment No. 1),colframe=colorRevBG1]
+
+
+Summary of the revision.
+\end{tcolorbox}
+
+
+\clearpage{}
+
+\bibliographystyle{alpha}
+\bibliography{biblio}
+
+\end{document}
