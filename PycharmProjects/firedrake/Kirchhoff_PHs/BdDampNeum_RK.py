@@ -175,10 +175,8 @@ G_pl = G_pl[:, bd_dofs_mul]
 n_mul = len(bd_dofs_mul)
 # Force applied
 x, y = SpatialCoordinate(mesh)
-
 A = Constant(10**5)
-force = Expression('A*x[0]', A = A, degree=4, lx=l_x, ly=l_y)
-f_w = project(force, Vp)
+f_w = project(A*x, Vp)
 bp_pl = v_p * f_w * dx
 #
 
@@ -201,8 +199,8 @@ Rsys = P @ R_pl
 Fsys = P @ Bf_pl
 
 t0 = 0.0
-t_fin = 5
-n_t = 1000
+t_fin = 0.001
+n_t = 100
 t_span = [t0, t_fin]
 
 def sys(t,y):
@@ -214,13 +212,9 @@ def sys(t,y):
 
     return dydt
 
-
-# init_con = Expression(('sin(pi/lx*x[0])*sin(pi/ly*x[1])', \
-#                       '0', '0', '0'), degree=4, lx=l_x, ly=l_y, A = 0.001)
-init_con = Expression('A*pow(x[0], 2)', degree=4, lx=l_x, ly=l_y, A = 0.001)
-
+Aw = 0.001
 e_p0 = Function(Vp)
-e_p0.assign(project(init_con, Vp))
+e_p0.assign(project(Aw*x**2, Vp))
 y0 = np.zeros(n_tot,)
 y0[:n_Vp] = e_p0.vector().get_local()
 

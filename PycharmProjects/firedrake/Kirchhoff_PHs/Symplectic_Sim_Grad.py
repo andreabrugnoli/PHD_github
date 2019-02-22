@@ -22,13 +22,15 @@ matplotlib.rcParams['text.usetex'] = True
 
 E = 7e10
 nu = 0.35
-h = 0.05 # 0.01
+h = 0.001 #5 # 0.01
 rho = 2700  # kg/m^3
 D = E * h ** 3 / (1 - nu ** 2) / 12.
 
 L = 1
 l_x = L
 l_y = L
+
+n_sim = 2
 
 n = 5 #int(input("N element on each side: "))
 
@@ -215,7 +217,7 @@ f_w = project(A*x, Vp) # project(1000000*sin(6*pi/l_y*x), Vp) #
 b_p1 = -v_p * rho * h * g * dx #
 b_p2 = v_p * f_w * ds(3) + v_p * f_w * ds(4) + v_p * f_w * ds(2)
 
-n_sim = 2
+
 if n_sim == 1:
     b_p = b_p1
 else: b_p = b_p2
@@ -235,13 +237,9 @@ P_p = Id_p - S_p
 
 x, y = SpatialCoordinate(mesh)
 Aw = 0.001
-# init_p = Aw*(1 - cos(2*pi/l_x*x) )
-init_p = Expression('A*( pow(x[0], 2))', \
-                    degree=4, lx=l_x, ly=l_y, A = 0.001)
-init_q = Expression(('0', '0', '0'), degree=4, lx=l_x, ly=l_y)
 
 e_pw_0 = Function(Vp)
-e_pw_0.assign(project(init_p, Vp))
+e_pw_0.assign(project(A*x**2, Vp))
 ep_0 = np.zeros((n_Vp)) # e_pw_0.vector().get_local() #
 eq_0 = np.zeros((n_Vq))
 
@@ -253,8 +251,8 @@ solverSym = StormerVerletGrad(M_p, M_q, D_p, D_q, R_p, P_p, F_p)
 
 
 t_0 = 0
-dt = 1e-6
-t_f = 1e-2
+dt = 1e-9
+t_f = 1e-4
 n_ev = 100
 
 sol = solverSym.compute_sol(ep_0, eq_0, t_f, t_0 = t_0, dt = dt, n_ev = n_ev)
@@ -326,26 +324,24 @@ plt.plot(t_ev, H_vec, 'b-', label='Hamiltonian Plate (J)')
 plt.xlabel(r'{Time} (s)', fontsize=fntsize)
 # plt.ylabel(r'{Hamiltonian} (J)', fontsize=fntsize)
 plt.title(r"Hamiltonian trend",  fontsize=fntsize)
-plt.legend(loc='upper left')
+# plt.legend(loc='upper left')
 
-path_out = "/home/a.brugnoli/Plots_Videos/Kirchhoff_plots/Simulations/Article_Kirchh/"
-plt.savefig(path_out + "Sim" +str(n_sim) + "Hamiltonian.eps", format="eps")
+path_out = "/home/a.brugnoli/Plots_Videos/Videos/Kirchhoff_Plate/"
+# plt.savefig(path_out + "Sim" +str(n_sim) + "Hamiltonian.eps", format="eps")
 
-if n_sim == 1:
-    unit = "[\mu m]"
-else: unit = "[mm]"
 anim = animate2D(minZ, maxZ, wmm_CGvec, t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \
-                         zlabel = '$w $' + unit, title = 'Vertical Displacement')
+                         zlabel = '$w [\mu m]$', title = 'Vertical Displacement')
 
 
 # rallenty = 10
+# fps = int(n_ev/(t_f*rallenty))
 # Writer = animation.writers['ffmpeg']
-# writer = Writer(fps=int(n_ev/(t_f*rallenty)), metadata=dict(artist='Me'), bitrate=1800)
-# anim.save(path_out + 'Kirchh_Damped.mp4', writer=writer)
+# writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
+# anim.save(path_out + "Kirchh_Gravity.mp4", writer=writer)
 
 plt.show()
 
-plot_solutions = True
+plot_solutions = False
 if plot_solutions:
 
 

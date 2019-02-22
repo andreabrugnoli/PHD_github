@@ -204,13 +204,11 @@ def sys(t,y):
     return dydt
 
 
-init_con = Expression(('A*pow(x[0], 2)', \
-                      '0', '0', '0'), degree=4, A = 0.001)
 
-e_pl0 = Function(V)
-e_pl0.assign(project(init_con, V))
+e_p0 = Function(Vp)
+e_p0.assign(project(0.001*x**2, Vp))
 y0 = np.zeros(n_tot,)
-# y0[:n_pl] = e_pl0.vector().get_local()
+# y0[:n_Vp] = e_pl0.vector().get_local()
 
 t_ev = np.linspace(t0, t_fin, num = n_t)
 

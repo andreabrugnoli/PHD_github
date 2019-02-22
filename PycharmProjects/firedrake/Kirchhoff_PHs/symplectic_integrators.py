@@ -55,7 +55,7 @@ class StormerVerletGrad( object ):
             # Integration for p (n+1/2)
             bp = self.Mp @ ep_old + dt / 2 * self.Pp @ (self.Dq @ eq_old + self.Fp * (t < t_stop))
 
-            if t < 0.2 *t_f:
+            if t < t_stop:
                 ep_new = invAp @ bp
             else: ep_new = invAp_ctrl @ bp
             ep_old = ep_new
@@ -69,7 +69,7 @@ class StormerVerletGrad( object ):
             # Integration for p (n+1)
             bp = self.Mp @ ep_new + dt / 2 * self.Pp @ (self.Dq @ eq_old + self.Fp * (t < t_stop))
 
-            if t < 0.2 * t_f:
+            if t < t_stop:
                 ep_new = invAp @ bp
             else: ep_new = invAp_ctrl @ bp
 

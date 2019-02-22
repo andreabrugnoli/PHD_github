@@ -269,13 +269,9 @@ t_f = 1e-3
 n_ev = 100
 
 Aw = 0.001
-# init_p = Aw*(1 - cos(2*pi/l_x*x) )
-init_p = Expression('A*( pow(x[0], 2))', \
-                    degree=4, lx=l_x, ly=l_y, A = 0.001)
-init_q = Expression(('0', '0', '0'), degree=4, lx=l_x, ly=l_y)
 
 e_pw_0 = Function(Vp)
-e_pw_0.assign(project(init_p, Vp))
+e_pw_0.assign(project(Aw*x**2, Vp))
 ep_pl0 = e_pw_0.vector().get_local() #
 eq_pl0 = np.zeros((n_Vq))
 

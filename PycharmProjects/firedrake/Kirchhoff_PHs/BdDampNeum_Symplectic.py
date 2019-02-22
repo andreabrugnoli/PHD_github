@@ -17,6 +17,9 @@ from AnimateSurfFiredrake import animate2D
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as animation
 
+from symplectic_integrators import StormerVerletGrad
+
+
 matplotlib.rcParams['text.usetex'] = True
 
 
@@ -226,11 +229,8 @@ P_p = Id_p - S_p
 t_0 = 0
 dt = 1e-6
 
-t_f = 1e-3
-n_ev = 100
-
-n_t = int(t_f / dt)
-
+t_f = 5
+n_ev = 1000
 
 x, y = SpatialCoordinate(mesh)
 Aw = 0.001
@@ -243,8 +243,6 @@ e_pw_0 = Function(Vp)
 e_pw_0.assign(project(init_p, Vp))
 ep_0 = e_pw_0.vector().get_local() #
 eq_0 = np.zeros((n_Vq))
-
-from symplectic_integrators import StormerVerletGrad
 
 solverSym = StormerVerletGrad(M_p, M_q, D_p, D_q, R_p, P_p)
 
@@ -310,8 +308,7 @@ plt.ylabel(r'{Hamiltonian} (J)', fontsize=fntsize)
 # plt.title(r"Hamiltonian trend",
 #           fontsize=fntsize)
 # plt.legend(loc='upper left')
-
-path_out = "/home/a.brugnoli/Plots_Videos/Kirchhoff_plots/Simulations/Article_CDC/DampingInjection/"
+path_out = "/home/a.brugnoli/Plots_Videos/Plots/Kirchhoff_plots/Simulations/Article_CDC/DampingInjection/"
 # plt.savefig(path_out + "Hamiltonian.eps", format="eps")
 
 
@@ -325,50 +322,50 @@ anim = animate2D(minZ, maxZ, wmm_CGvec, t_ev, xlabel = '$x[m]$', ylabel = '$y [m
 # anim.save(path_out + 'Kirchh_Damped.mp4', writer=writer)
 
 plt.show()
-#
-#
-# plot_solutions = True
-# if plot_solutions:
-#
-#
-#     matplotlib.rcParams['text.usetex'] = True
-#
-#     n_fig = 50
-#     tol = 1e-6
-#
-#     for i in range(n_fig):
-#         index = int(n_ev/n_fig*(i+1)-1)
-#         w_fun = Function(Vp)
-#         w_fun.vector()[:] = w_mm[:, index]
-#
-#         Vp_CG = FunctionSpace(mesh, 'Lagrange', 3)
-#         wmm_wCG = project(w_fun, Vp_CG)
-#
-#         from firedrake.plot import _two_dimension_triangle_func_val
-#
-#         triangulation, Z = _two_dimension_triangle_func_val(wmm_wCG, 10)
-#         fig = plt.figure()
-#
-#         ax = fig.add_subplot(111, projection="3d")
-#         ax.collections.clear()
-#
-#         surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False, 'vmin': minZ, 'vmax': maxZ}
-#         # lab = 'Time =' + '{0:.2e}'.format(t_ev[index])
-#         surf = ax.plot_trisurf(triangulation, Z, **surf_opts)
-#         fig.colorbar(surf)
-#
-#         ax.set_xbound(-tol, l_x + tol)
-#         ax.set_xlabel('$x [m]$', fontsize=fntsize)
-#
-#         ax.set_ybound(-tol, l_y + tol)
-#         ax.set_ylabel('$y [m]$', fontsize=fntsize)
-#
-#         ax.w_zaxis.set_major_locator(LinearLocator(10))
-#         ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
-#
-#         ax.set_zlabel('$w [\mu m]$', fontsize=fntsize)
-#         ax.set_title('Vertical displacement ' +'$(t=$' + '{0:.2e}'.format(t_ev[index]) + '$s)$', fontsize=fntsize)
-#
-#         ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
-#
-#         plt.savefig(path_out + "Snapshot_t_" + str(index + 1) + ".eps", format="eps")
+
+
+plot_solutions = True
+if plot_solutions:
+
+
+    matplotlib.rcParams['text.usetex'] = True
+
+    n_fig = 200
+    tol = 1e-6
+
+    for i in range(n_fig):
+        index = int(n_ev/n_fig*(i+1)-1)
+        w_fun = Function(Vp)
+        w_fun.vector()[:] = w_mm[:, index]
+
+        Vp_CG = FunctionSpace(mesh, 'Lagrange', 3)
+        wmm_wCG = project(w_fun, Vp_CG)
+
+        from firedrake.plot import _two_dimension_triangle_func_val
+
+        triangulation, Z = _two_dimension_triangle_func_val(wmm_wCG, 10)
+        fig = plt.figure()
+
+        ax = fig.add_subplot(111, projection="3d")
+        ax.collections.clear()
+
+        surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False} #, 'vmin': minZ, 'vmax': maxZ}
+        # lab = 'Time =' + '{0:.2e}'.format(t_ev[index])
+        surf = ax.plot_trisurf(triangulation, Z, **surf_opts)
+        # fig.colorbar(surf)
+
+        ax.set_xbound(-tol, l_x + tol)
+        ax.set_xlabel('$x [m]$', fontsize=fntsize)
+
+        ax.set_ybound(-tol, l_y + tol)
+        ax.set_ylabel('$y [m]$', fontsize=fntsize)
+
+        ax.w_zaxis.set_major_locator(LinearLocator(10))
+        ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
+
+        ax.set_zlabel('$w [\mu m]$', fontsize=fntsize)
+        ax.set_title('Vertical displacement ' +'$(t=$' + '{0:.2e}'.format(t_ev[index]) + '$s)$', fontsize=fntsize)
+
+        ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
+
+        plt.savefig(path_out + "Snapshot_t" + str(index + 1) + ".eps", format="eps")
