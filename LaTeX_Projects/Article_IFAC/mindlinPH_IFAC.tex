@@ -138,6 +138,10 @@ The symmetric part of this operator corresponds to the deformation gradient in c
 \begin{equation*}
 \mathrm{Grad}(\bm{u}) := \frac{1}{2} \left(\nabla \bm{u} + \nabla^T \bm{u} \right).
 \end{equation*}
+For a vector field  $\bm{u}: \mathbb{R}^d \rightarrow \mathbb{R}^{d}$, the divergence operator reads
+\begin{equation*}
+\mathrm{div}(\bm u) = \nabla \cdot \bm{u} := \sum_{i = 1}^d \partial_{x_i} u_{i}.
+\end{equation*}
 For a tensor field $\bm{U}: \mathbb{R}^d \rightarrow \mathbb{R}^{d \times d}$, with elements $u_{ij}$, the divergence is a vector defined column-wise as
 \begin{equation*}
 	\mathrm{Div}(\bm U) = \nabla \cdot \bm{U} := \left( \sum_{i = 1}^d \partial_{x_i} u_{ij} \right)_{j = 1, \dots, d}.
@@ -252,23 +256,17 @@ where $\bm{I}_{2 \times 2}: \mathbb{V} \rightarrow \mathbb{V}$ is the identity o
 	The adjoint of the tensor divergence $\mathrm{Div}$ is $- \mathrm{Grad}$, the opposite of the symmetric gradient.
 \end{thm}
 
-The boundary values can be found by evaluating the time derivative of the Hamiltonian
+The boundary values can be found by evaluating the time derivative of the Hamiltonian  (\cite{BrugnoliMin})
 \begin{equation}
-\begin{aligned}
-\dot{H}&= \int_{\Omega} \left\{ \diffp{\alpha_w}{t} e_w  + \diffp{\bm\alpha_\theta}{t} \cdot \bm{e}_\theta + \diffp{\bm{A}_{\kappa}}{t} \cddot \bm{E}_{\kappa}  + \diffp{\bm\alpha_{\epsilon_s}}{t} \cdot \bm{e}_{\epsilon_s} \right\} \d\Omega\\
-&= \int_{\Omega} \left\{ \mathrm{div}(\bm{e}_{\epsilon_s}) e_w  + \mathrm{Div}(\bm{E}_{\kappa}) \cdot \bm{e}_\theta \right. \\
-&\qquad  \left. + \; \mathrm{Grad}(\bm{e}_{\theta}) \cddot \bm{E}_{\kappa}  + \mathrm{grad} (e_w) \cdot \bm{e}_{\epsilon_s} \right\} \d\Omega \\
-&= \int_{\partial \Omega} \left\{ w_t q_n  + \omega_n m_{nn} + \omega_s m_{ns} \right\} \d{s}.  \\
-\end{aligned}
+\dot{H}= \int_{\partial \Omega} \left\{ w_t q_n  + \omega_n m_{nn} + \omega_s m_{ns} \right\} \d{s}.  
 \end{equation}
 where $s$ is the curvilinear abscissa and the last integral is obtained by applying the Green-Gauss theorem.
 The boundary variable are defined as follows
 \begin{equation}
 \label{eq:QnMnnMns}
 \begin{aligned}
-\text{Shear Force}  \qquad q_{n} &:=  \bm{e}_{\epsilon_s} \cdot \bm{n},  \\
-\text{Flexural momentum} \quad 
-m_{nn} &:=   \bm{E}_{\kappa} \cddot (\bm{n}\otimes{\bm{n}}) 	\\
+\text{Shear Force} \qquad q_{n} &:=  \bm{e}_{\epsilon_s} \cdot \bm{n},  \\
+\text{Flexural momentum} \quad m_{nn} &:=   \bm{E}_{\kappa} \cddot (\bm{n}\otimes{\bm{n}}) 	\\
 \text{Torsional momentum} \quad m_{ns} &:=  \bm{E}_{\kappa} \cddot (\bm{s} \otimes{\bm{n}}),	
 \end{aligned}
 \end{equation}
@@ -285,10 +283,7 @@ where $\bm{u} \otimes {\bm{v}}$ denotes the outer product of vectors equivalent 
 \end{equation}
 
 \begin{remark}
-	Obviously this result is equivalent to the one found in the vectorial case, but the tensorial formulation is more suitable from the point of view of functional analysis since it makes appear intrinsic operators ($\mathrm{div}, \mathrm{Div}, \mathrm{grad}, \mathrm{Grad}$). The operators are here defined in a pure Euclidian patch and are the specialization of the exterior derivation "$\d$" of forms on manifolds, which is
-	the truly "coordinate free" operator transforming coenergy
-	variables in energy variables in the classical distributed
-	formulation.
+Obviously this result is equivalent to the one found in the vectorial case (see \cite{MacchelliMindlin}), but the tensorial formulation is more suitable from the point of view of functional analysis since it makes appear intrinsic operators ($\mathrm{div}, \mathrm{Div}, \mathrm{grad}, \mathrm{Grad}$). The operators are here defined in a pure Euclidian patch and are the specialization of the exterior derivation of forms on manifolds, which is	the coordinate free operator transforming coenergy variables in energy variables in the classical distributed formulation (see \cite{Golo}).
 \end{remark}
 
  \begin{remark}
@@ -779,7 +774,7 @@ The test case for this analysis is a simple square plate of side $L$, a benchmar
 	\item Half clamped half simply supported SCSC;
 	\item All clamped but one side free CCCF. 
 \end{itemize}
-Two different thickness to length ration are considered, $h/L=0.1$ representative of a thick plate and $h/L=0.01$ representative of a thin plate. 
+Two different thickness to length ratios are considered, $h/L=0.1$ representative of a thick plate and $h/L=0.01$ representative of a thin plate. 
 In order to compare our results the computed frequencies $\omega_{mn}^h$ in the following non-dimensional form:
 \begin{equation}
 	\widehat{\omega}_{mn}^h = \omega_{mn}^h L \left(\frac{2 (1 + \nu) \rho}{E}\right)^{1/2}
