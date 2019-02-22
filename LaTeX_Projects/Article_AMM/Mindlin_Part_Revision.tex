@@ -142,7 +142,7 @@
 	
 	
 	\section*{Introduction}
-	 The port-Hamiltonian (PH) framework is acquiring more visibility for its capability to represent a huge class of systems coming from different realms of physics. \RevTwo{The Hamiltonian formalism arising from the Legendre transformation of Euler-Lagrange system  has been already widely explored \cite{SymplecticElasticity}. The Legendre tranformation gives rise to a system of equations ruled by an Hamiltonian matrix on a symplectic space. On the contrary,  PH systems are defined with respect to a differential formally skew-symmetric Hamiltonian operator.} A main feature of this framework is its modularity. Finite-dimensional port-Hamiltonian systems can be easily interconnected together, as shown in \cite{Cervera2007}, allowing the construction of complex multi-physics systems. The interconnection is possible also in the infinite-dimensional case \cite{ShaftIntInfinite}, even if the procedure is not as straightforward as in the finite-dimensional case. Eventually, it is also possible to merge finite and infinite PH systems \cite{vanderShaftintFinInf}. These features and capabilities are particularly appealing for control engineers in order to simplify the modeling task in preliminary analyses.  \\
+	 The port-Hamiltonian (PH) framework is acquiring more visibility for its capability to represent a huge class of systems coming from different realms of physics. \RevTwo{The Hamiltonian formalism arising from the Legendre transformation of Euler-Lagrange system  has been already widely explored \cite{SymplecticElasticity}. The Legendre tranformation gives rise to a system of equations ruled by a Hamiltonian matrix on a symplectic space. On the contrary,  PH systems are defined with respect to a formally skew-symmetric Hamiltonian differential operator.} A main feature of this framework is its modularity. Finite-dimensional port-Hamiltonian systems can be easily interconnected together, as shown in \cite{Cervera2007}, allowing the construction of complex multi-physics systems. The interconnection is possible also in the infinite-dimensional case \cite{ShaftIntInfinite}, even if the procedure is not as straightforward as in the finite-dimensional case. Eventually, it is also possible to merge finite and infinite PH systems \cite{vanderShaftintFinInf}. These features and capabilities are particularly appealing for control engineers in order to simplify the modeling task in preliminary analyses.  \\
 	
 	
 	Distributed parameter systems are of relevant interest given the increased computational power available for simulations. PH distributed systems were initially presented in \cite{VANDERSCHAFT2002166}, by using the theory of differential forms. Links towards functional analysis have been made in \cite{Villegas} and an exhaustive reference about the subject can be found in \cite{BookZwart}. The fundamental feature of a distributed PH system is the underlying geometric interconnection structure, the so-called Stokes-Dirac structure, that describes the power flow across the boundary and inside the system, together with an energy functional, the Hamiltonian, that determines the nature of the system. Linear/nonlinear, parabolic/hyperbolic systems can be all recast into this framework, \cite{bookPHs}. Port-Hamiltonian systems are by definition open systems, able to interact with the environment through boundary ports. The definitions of these boundary variables is of utmost importance to show that a PH system is well posed ( see \cite{LeGorrec2005} for the proof in the 1D case). Applications coming from continuum mechanics, electrodynamics and thermodynamics can be integrated inside this framework. Academic examples typically considered are the transmission line, the shallow water equations and the Maxwell equations \cite{VANDERSCHAFT2002166}. \\
@@ -163,34 +163,34 @@
 		\item \RevOne{The constitutive relations, equations of motions and energies for the Mindlin-Reissner plate are detailed.}
 		\item The Mindlin plate port-Hamiltonian formulation is highlighted by defining energy and co-energy variables and the interconnection structure. The boundary variables are found by introducing the energy balance. Then the underlying Stokes-Dirac structure is easily obtained by defining the flow and effort spaces, together with the space of boundary variables.
 		\item The PFEM discretization for the Mindlin plate is detailed. The problem is put into weak form first, then the necessary integrations by parts are performed and finally the basis functions for the energy, co-energy and test functions are chosen.
-		\item \RevTwo{To demonstrate the consistency of the approach an eigenvalue study of a square plate considering various boundary conditions is performed, together with some temporal simulation. } 
+		\item \RevTwo{To demonstrate the consistency of the approach an eigenvalue study of a square plate considering various boundary conditions is performed, together with some time-domain simulation.} 
 	\end{enumerate}
 
 
 \RevOne{
 \section{Reminder on port-Hamiltonian systems}
-In this section the concept of Dirac structure and Stokes-Dirac structure are recalled. From these concepts finite and infinite dimensional port-Hamiltonian system are then derived by considering the port behavior. 
+In this section the concepts of Dirac structure and Stokes-Dirac structure are recalled. From these concepts finite and infinite dimensional port-Hamiltonian system are then derived by considering the port behavior. 
 \subsection{Dirac Structures}
-Consider an $n$-dimensional space $\mathcal{F}$ over the field $\mathbb{R}$ and $\mathcal{E} \equiv \mathcal{F}'$ its dual, i.e. the space of linear operator $\bm{e} : \mathcal{F} \rightarrow \mathbb{R}$. The elements of $\mathcal{F}$ are called flows, while the elements of $\mathcal{E}$ are called efforts. Those are port variables and their combination gives the power flowing inside the system. The space $\mathcal{B} = \mathcal{F} \times \mathcal{E}$ is called the space of power variables. Therefore the power is defined as  $\left\langle \bm{e}, \bm{f} \right\rangle = \bm{e}(\bm{f})$, where $\left\langle \bm{e} , \bm{f} \right\rangle$ is the dual product between $\bm{f}$ and $\bm{e}$.
+Consider an $n$-dimensional space $\mathcal{F}$ over the field $\mathbb{R}$ and $\mathcal{E} \equiv \mathcal{F}'$ its dual, i.e. the space of linear operator $\bm{e} : \mathcal{F} \rightarrow \mathbb{R}$. The elements of $\mathcal{F}$ are called flows, while the elements of $\mathcal{E}$ are called efforts. Those are port variables and their combination gives the power flowing inside the system. The space $\mathcal{B} = \mathcal{F} \times \mathcal{E}$ is called the bond space of power variables. Therefore the power is defined as  $\left\langle \bm{e}, \bm{f} \right\rangle = \bm{e}(\bm{f})$, where $\left\langle \bm{e} , \bm{f} \right\rangle$ is the dual product between $\bm{f}$ and $\bm{e}$.
 \begin{definition}[\cite{CourantDiracStructure}, Def. 1.1.1]
 	Given the space $\mathcal{F}$ and its dual $\mathcal{E}$ with respect to the inner product $\left\langle \cdot , \cdot \right\rangle : \mathcal{F} \times \mathcal{E} \rightarrow \mathbb{R}$, define the symmetric bilinear form:
 	\begin{equation}
-	\left\langle \left\langle (\bm{f}_1, \bm{e}_1), (\bm{f}_2, \bm{e}_2) \right\rangle \right\rangle := \left\langle \bm{e}_1, \bm{f}_2 \right\rangle +  \left\langle \bm{e}_2, \bm{f}_1 \right\rangle, \qquad (\bm{f}_i, \bm{e}_i) \in \mathcal{B}, \; i = 1, 2
+	\left\langle \left\langle (\bm{f}_1, \bm{e}_1), (\bm{f}_2, \bm{e}_2) \right\rangle \right\rangle := \left\langle \bm{e}_1, \bm{f}_2 \right\rangle +  \left\langle \bm{e}_2, \bm{f}_1 \right\rangle, \quad \text{with} \text (\bm{f}_i, \bm{e}_i) \in \mathcal{B}, \; i = 1, 2
 	\end{equation}
-	A Dirac structure on $\mathcal{B} := \mathcal{F} \times \mathcal{E}$ is a subspace $\mathcal{D} \subset \mathcal{B}$, which is maximally isotropic under $\left\langle \left\langle \cdot, \cdot \right\rangle \right\rangle$. 
+	A Dirac structure on $\mathcal{B} := \mathcal{F} \times \mathcal{E}$ is a subspace $\mathcal{D} \subset \mathcal{B}$, which equals its orthogonal complement with respect to $\left\langle \left\langle \cdot, \cdot \right\rangle \right\rangle: \mathcal{D} =\mathcal{D}^\perp$.
 \end{definition}
-Equivalently, a Dirac structure can be characterized as the subspace $\mathcal{D} \subset \mathcal{B}$ which equals its orthogonal complement with respect to $\left\langle \left\langle \cdot, \cdot \right\rangle \right\rangle: \mathcal{D} =\mathcal{D}^\perp$. This definition can be extended to consider distributed forces and dissipation \cite{Villegas}.
+This definition can be extended to consider distributed forces and dissipation \cite{Villegas}.
 \begin{proposition}
 	\label{prop:Dirac}
 Consider the space of power variables $\mathcal{F} \times \mathcal{E}$ and let $\mathcal{X}$ denote an $n$-dimensional space, the space of energy variables. Suppose that $\mathcal{F} := (\mathcal{F}_s, \ \mathcal{F}_e )$ and that $\mathcal{E} := (\mathcal{E}_s,  \ \mathcal{E}_e )$, with $\text{dim} \, \mathcal{F}_s = \text{dim} \, \mathcal{E}_s = n$ and $\text{dim} \, \mathcal{F}_e = \text{dim} \, \mathcal{E}_e = m$. Moreover, let $\bm{J}(\bm{x})$ denote
 	 a skew-symmetric matrix of dimension $n$ and by $\bm{B}(\bm{x})$ a matrix of dimension $n \times m$. Then, the set
 	\begin{equation}
-	D := \left\{ (\bm{f}_s, \bm{f}_e , \bm{e}_s ,\bm{e}_e ) \in \mathcal{F} \times \mathcal{E} \vert \quad \bm{f}_s = - \bm{J}(\bm{x}) \bm{e}_s - \bm{B}(\bm{x}) \bm{f}_e, \; \bm{e}_e = \bm{B}(\bm{x})^T \bm{e}_s \right\}
+	\mathcal{D} := \left\{ (\bm{f}_s, \bm{f}_e , \bm{e}_s ,\bm{e}_e ) \in \mathcal{F} \times \mathcal{E} \vert \quad \bm{f}_s = - \bm{J}(\bm{x}) \bm{e}_s - \bm{B}(\bm{x}) \bm{f}_e, \; \bm{e}_e = \bm{B}(\bm{x})^T \bm{e}_s \right\}
 \end{equation}
 is a Dirac structure.
 \end{proposition}
 \subsection{Finite-dimensional PHs}
-Consider the time-invariant system:
+Consider the time-invariant dynamical system:
 \begin{equation}
 \label{eq:finitePH}
 \begin{cases}
@@ -198,7 +198,7 @@ Consider the time-invariant system:
 \bm{y} &= B(\bm{x})^T \nabla H(\bm{x}),
 \end{cases}
 \end{equation}
-where $ H(\bm{x}) : \mathcal{X} \rightarrow \mathbb{R} $, the Hamiltonian, is a real valued function bounded from below. Such system is called port Hamiltonian, as it arises from the Hamiltonian modelling of a physical system and it interacts with the environment through the input $\bm{u}$ included in the formulation. The connection with the concept of Dirac is achieved by considering the following port behavior:
+where $ H(\bm{x}) : \mathcal{X} \rightarrow \mathbb{R} $, the Hamiltonian, is a real-valued function bounded from below. Such system is called port-Hamiltonian, as it arises from the Hamiltonian modelling of a physical system and it interacts with the environment through the input $\bm{u}$ included in the formulation. The connection with the concept of Dirac structure is achieved by considering the following port behavior:
 \begin{equation}
 \begin{aligned}
 \bm{f}_s &= - \dot{ \bm{x} }, \qquad 
@@ -210,14 +210,14 @@ where $ H(\bm{x}) : \mathcal{X} \rightarrow \mathbb{R} $, the Hamiltonian, is a 
 With this choice of the port variables system \eqref{eq:finitePH} defines, by proposition \ref{prop:Dirac}, a Dirac structure. Dissipation and distributed forces can be included and the corresponding system defines an extended Dirac structure, once the proper port variables are introduced.
 \subsection{Constant matrix differential operators}
 The treatment provided in \cite{MacchelliModelling} is here recovered, in order to have the most suitable definition of Stokes-Dirac structure for the mechanical systems considered in this paper.
-Let $\Omega$ denote a compact subset of $\mathbb{R}_d$ representing the spatial domain of the distributed parameter system. Then, let $\mathcal{U}$ and $\mathcal{V}$ denote two sets of smooth functions from $\Omega$ to $\mathbb{R}^{q_u}$ and $\mathbb{R}^{q_v}$ respectively.
+Let $\Omega$ denote a compact subset of $\mathbb{R}^d$ representing the spatial domain of the distributed parameter system. Then, let $\mathcal{U}$ and $\mathcal{V}$ denote two sets of smooth functions from $\Omega$ to $\mathbb{R}^{q_u}$ and $\mathbb{R}^{q_v}$ respectively.
 \begin{definition}
 A constant matrix differential operator of order $N$ is a map $L$ from $\mathcal{U}$ to $\mathcal{V}$ such that, given $\bm{u} = (u_1 , \dots , u_{q_u}) \in \mathcal{U}$ and $\bm{v} = (v_1 , . . . , v_{q_v}) \in \mathcal{V}$:
 \begin{equation}
 \label{eq:diffOp}
 \bm{v} = L \bm{u} \iff \bm{v} := \sum_{|\alpha|=0}^N  \bm{P}_{\alpha} D^{\alpha} \bm{u},
 \end{equation}
-where $\alpha := {\alpha_1, \dots , \alpha_d }$ is a multi-index of order $|\alpha| := \sum_{i=1}^d \alpha_i$, $\bm{P}_\alpha$ are a set of constant $q_v \times q_u$ matrices and $D^{\alpha} := \partial_{x_1}^{\alpha_1} \dots \partial_{x_d}^{\alpha_d}$ is an operator resulting from a combination of spatial derivatives. 
+where $\alpha := (\alpha_1, \dots , \alpha_d)$ is a multi-index of order $|\alpha| := \sum_{i=1}^d \alpha_i$, $\bm{P}_\alpha$ are a set of constant real $q_v \times q_u$ matrices and $D^{\alpha} := \partial_{x_1}^{\alpha_1} \dots \partial_{x_d}^{\alpha_d}$ is a differential operator of order $|\alpha|$ resulting from a combination of spatial derivatives. 
 \end{definition}
 \begin{definition}
 Consider the constant matrix differential operator \eqref{eq:diffOp}. Its formal adjoint is the map $L^*$ from $\mathcal{V}$ to $\mathcal{U}$ such that:
@@ -227,7 +227,7 @@ Consider the constant matrix differential operator \eqref{eq:diffOp}. Its formal
 \end{definition}
 \begin{definition}
 	\label{def:skewOp}
-Let $J$ denote a constant matrix differential operator. Then, J is skew-adjoint if and only if $J = -J^*$. This corresponds to the condition:
+Let $J$ denote a constant matrix differential operator. Then, J is skew-symmetric if and only if $J = -J^*$. This corresponds to the condition:
 \begin{equation}
 \bm{P}_{\alpha} = (-1)^{|\alpha| + 1} \bm{P}_{\alpha}^T, \quad \forall \alpha.
 \end{equation}
@@ -237,25 +237,25 @@ its adjoint is expressed by the following theorem.
 \begin{theorem}[\cite{PDE}, Chapter 9, theorem 9.37]
 Consider a matrix differential operator $L$ and let $L^*$ denote its formal adjoint. Then, for each function $\bm{u} \in \mathcal{U}$ and $\bm{v} \in \mathcal{V}$:
 \begin{equation}
-\int_{\Omega} \left( \bm{v}^T L \bm{u} - \bm{u}^T L^* \bm{v}\right) \d\Omega= \int_{\partial \Omega} B_L(\bm{u}, \bm{v}) \d{A},
+\int_{\Omega} \left( \bm{v}^T L \bm{u} - \bm{u}^T L^* \bm{v}\right) \d\Omega= \int_{\partial \Omega} \widetilde{B}_L(\bm{u}, \bm{v}) \d{A},
 \end{equation}
-where $B_L$ is a differential operator induced on $\partial\Omega$ by L, or equivalently:
+where $B_L$ is a differential operator induced on the boundary $\partial\Omega$ by L, or equivalently:
 \begin{equation}
-\bm{v}^T L \bm{u} - \bm{u}^T L^* \bm{v} = \mathrm{div} \, B_L(\bm{u}, \bm{v}).
+\bm{v}^T L \bm{u} - \bm{u}^T L^* \bm{v} = \mathrm{div} \, \widetilde{B}_L(\bm{u}, \bm{v}).
 \end{equation}
 \end{theorem}
-It is important to note that $B_L$ is a constant differential operator. The quantity $B_L(\bm{u}, \bm{v})$ is a constant linear combination of the functions $\bm{u}$ and $\bm{v}$ together with their spatial derivatives up to a certain order and depending on $L$.
+It is important to note that $\widetilde{B}_L$ is a constant differential operator. The quantity $\widetilde{B}_L(\bm{u}, \bm{v})$ is a constant linear combination of the functions $\bm{u}$ and $\bm{v}$ together with their spatial derivatives up to a certain order and depending on $L$.
 \begin{corollary}
-Consider a skew-adjoint differential operator $J$. Then, for each function $\bm{u} \in \mathcal{U}$ and $\bm{v} \in \mathcal{V}$ with $q_u = q_v = q$:
+Consider a skew-symmetric differential operator $J$. Then, for each function $\bm{u} \in \mathcal{U}$ and $\bm{v} \in \mathcal{V}$ with $q_u = q_v = q$:
 \begin{equation}
-\int_{\Omega} \left( \bm{v}^T J \bm{u} + \bm{u}^T J \bm{v}\right) \d\Omega= \int_{\partial \Omega} B_J(\bm{u}, \bm{v}) \d{A},
+\int_{\Omega} \left( \bm{v}^T J \bm{u} + \bm{u}^T J \bm{v}\right) \d\Omega= \int_{\partial \Omega} \widetilde{B}_J(\bm{u}, \bm{v}) \d{A},
 \end{equation}
-where $B_J$ is a symmetric differential operator on $\partial\Omega$ depending on the differential operator $J$.
+where $\widetilde{B}_J$ is a symmetric differential operator on $\partial\Omega$ depending on the differential operator $J$.
 \end{corollary}
 \subsection{Constant Stokes-Dirac structures}
-Following again \cite{MacchelliModelling} let $\mathcal{F}$ denote the space of flow, i.e. the space of smooth functions from the compact set $\Omega \subset \mathbb{R}^d$ to $\mathbb{R}^q$. For simplicity assume that  the space of effort variables is $\mathcal{E} \equiv \mathcal{F}$ (generally speaking these spaces are Hilbert spaces linked by duality, as in \cite{Villegas}). Given $\bm{f} = (f_1, \dots, f_q) \in \mathcal{F}$ and $\bm{e} = (e_1, \dots, e_q) \in \mathcal{E}$. Let $\bm{z} = B_\partial(\bm{e})$ denote the boundary terms, where $B_\partial$ provides the restriction on $\partial\Omega$ of the effort $e$ and of its spatial derivatives of proper order. Then it can be written, with some abuse of notation:
+Following again \cite{MacchelliModelling} let $\mathcal{F}$ denote the space of flows, i.e. the space of smooth functions from the compact set $\Omega \subset \mathbb{R}^d$ to $\mathbb{R}^q$. For simplicity assume that  the space of efforts is $\mathcal{E} \equiv \mathcal{F}$ (generally speaking these spaces are Hilbert spaces linked by duality, as in \cite{Villegas}). Given $\bm{f} = (f_1, \dots, f_q) \in \mathcal{F}$ and $\bm{e} = (e_1, \dots, e_q) \in \mathcal{E}$. Let $\bm{z} = B_\partial(\bm{e})$ denote the boundary terms, where $B_\partial$ provides the restriction on $\partial\Omega$ of the effort $e$ and of its spatial derivatives of proper order. Then it can be written:
 \begin{equation}
-\int_{\partial \Omega} B_J(\bm{e}_1, \bm{e}_2) \d{A} = \int_{\partial \Omega} B_J(\bm{z}_1, \bm{z}_2) \d{A}.
+\int_{\partial \Omega} \widetilde{B}_J(\bm{e}_1, \bm{e}_2) \d{A} = \int_{\partial \Omega} B_J(\bm{z}_1, \bm{z}_2) \d{A}, \quad \text{with} \quad  B_J(\bm{z}_1, \bm{z}_2) = \widetilde{B}_J(B_{\partial}(\bm{e}_1), B_{\partial}(\bm{e}_2))
 \end{equation}
 Define the set
 \begin{equation}
@@ -267,18 +267,18 @@ Consider the space of power variables $\mathcal{B} = \mathcal{F} \times \mathcal
 \begin{equation}
 \mathcal{D} = \left\{ (\bm{f}, \bm{e}, \bm{z}) \in  \mathcal{F} \times \mathcal{E} \times \mathcal{Z} \; \vert \; \bm{f} = -J \bm{e}, \; z = B_\partial(\bm{e}) \right\},
 \end{equation}
-is a Stokes–Dirac structure on F with respect to the pairing
+is a Stokes–Dirac structure on $\mathcal{B}$ with respect to the pairing
 \begin{equation}
 \left\langle \left\langle (\bm{f}_1, \bm{e}_1, \bm{z}_1), (\bm{f}_2, \bm{e}_2, \bm{z}_2) \right\rangle \right\rangle  := \int_{\Omega} \left( \bm{e}_1^T \bm{f}_2 + \bm{e}_2^T \bm{f}_1 \right) \d\Omega + \int_{\partial \Omega} B_J(\bm{z}_1, \bm{z}_2) \d{A}.
 \end{equation}
 \end{theorem}
 \begin{remark}
-The constant Stokes-Dirac structure has been defined in case of smooth vector valued functions for simplicity. In this context the pairing has been defined as the $L^2$ inner product of vector valued function. The definition is indeed more general and encompasses the case of more complex functional spaces. The Mindlin plate for example is defined on a mixed function space of scalar, vector and tensor valued functions. The result presented here remains valid provided that the proper inner product is chosen. Furthermore, the constant differential operator may contain intrinsic operators ($\mathrm{div}, \mathrm{grad}$) as it will be shown for the Mindlin plate case.
+The constant Stokes-Dirac structure has been defined in case of smooth vector valued functions for simplicity. In this context the pairing has been defined as the $L^2$ inner product of vector-valued function. The definition is indeed more general and encompasses the case of more complex functional spaces. The Mindlin plate for example is defined on a mixed function space of scalar-, vector- and tensor- valued functions. The result presented here remains valid provided that the proper inner product is being chosen. Furthermore, the constant differential operator may contain intrinsic operators ($\mathrm{div}, \mathrm{grad}$) as it will be shown for the Mindlin plate case.
 \end{remark}
 }
 
 \subsection{Infinite-dimensional PHs}
-Following \cite{BookZwart}, the prototypical example of the Timoshenko beam will be used to illustrate the class of distributed port-Hamiltonian systems. This model consists of two coupled PDEs, describing the vertical displacement and rotation scalar fields:
+Following \cite[Chapter~3]{BookZwart}, the prototypical example of the Timoshenko beam will be used to illustrate the class of distributed port-Hamiltonian systems. This model consists of two coupled PDEs, describing the vertical displacement and rotation scalar fields:
 \begin{equation}
 \label{eq:TimoModel}
 \begin{cases}
@@ -330,7 +330,7 @@ J =
 \diffp{}{x} & -1 & 0 & 0 \\
 \end{bmatrix} .
 \end{equation}
-\RevOne{By definition \eqref{def:skewOp}, the constant matrix differential operator $J$ is self-adjoint. In order to unveil the Stokes-Dirac structure for this model, boundary variables have to be defined. The energy rate is given by (see \cite{BookZwart} for a detailed derivation):
+\RevOne{By Definition \eqref{def:skewOp}, the constant matrix differential operator $J$ is skew-symmetric. In order to unveil the Stokes-Dirac structure for this model, boundary variables have to be defined. The energy rate is given by (see \cite{BookZwart} for a detailed derivation):
 \begin{equation}
 \dot{H} = \bm{f}_{\partial}^T \bm{e}_{\partial},
 \end{equation}
@@ -347,7 +347,7 @@ e_w(0) & e_{\phi}(0) & e_{\gamma}(L) & e_{\kappa}(L) \\
 \end{bmatrix}^T.
 \end{aligned}
 \end{equation}
-Consider now the bond space
+Consider now the power space
 \begin{equation}
 \label{eq:bondTimo}
 \mathcal{B} := \left\{(\bm{f}, \bm{e}, \bm{z}) \in \mathcal{F} \times \mathcal{E} \times \mathcal{Z} \right\},
@@ -361,20 +361,20 @@ The duality pairing between elements of $\mathcal{B}$ is then defined as follows
 \label{eq:bil_Timo}
 \left\langle \left\langle (\bm{f}_1, \bm{e}_1, \bm{z}_1), (\bm{f}_2, \bm{e}_2, \bm{z}_2) \right\rangle \right\rangle :=  \int_{0}^L \left( \bm{e}_1^T \bm{f}_2 + \bm{e}_2^T \bm{f}_1 \right) \d{x} + B_J(\bm{z}_1, \bm{z}_2) , 
 \end{equation}
-where $B_J(\bm{z}_1, \bm{z}_2) = (\bm{f}_{\partial, 1})^T \bm{e}_{\partial, 2} + (\bm{f}_{\partial, 2}) ^T \bm{e}_{\partial, 1}$. It is now possible to state the following theorem:
+where $B_J(\bm{z}_1, \bm{z}_2) := (\bm{f}_{\partial, 1})^T \bm{e}_{\partial, 2} + (\bm{f}_{\partial, 2}) ^T \bm{e}_{\partial, 1}$. It is now possible to state the following theorem:
 \begin{theorem}[Stokes-Dirac Structure for the Timoshenko beam]
 	Consider the space of power variables $\mathcal{B}$ defined in \eqref{eq:bondTimo}. By theorem \ref{th:StokesDirac} the linear subspace $\mathcal{D} \subset \mathcal{B}$
 	\begin{equation}
 	\mathcal{D} =  \left\{(\bm{f}, \bm{e},\bm{z}) \in \mathcal{B} | \; \bm{f} = - \diffp{\bm{\alpha}}{t} = -J\bm{e}, \; \bm{z} = \begin{pmatrix} \bm{f}_{\partial} \\ \bm{e}_{\partial} \end{pmatrix} 
  \right\},
 	\end{equation}
-	is a Stokes-Dirac structure with respect to the pairing $\left\langle \left\langle \cdot, \cdot \right\rangle \right\rangle$ given by \eqref{eq:bil_Timo}
+	is a Stokes-Dirac structure with respect to the pairing $\left\langle \left\langle \cdot, \cdot \right\rangle \right\rangle$ given by \eqref{eq:bil_Timo}.
 \end{theorem}
 }
 
 \section{Mindlin theory for thick plates}
 \label{sec:Min_Var}
-\RevOne{In this section first the classical model of thick plates is recalled by making use of a tensorial formalism to simplify the discussion of the port-Hamiltonian formulation.} The Mindlin plate theory, originally presented in \cite{mindlin}, is more suited for plates having a large thickness. The fibers, i.e. a segment perpendicular to the mid-plane, of the plate are supposed to remain straight after the deformation, but not necessarily normal to the mid-plane. For this reason two new kinematic variables have to be added, in order to represent the deflection of the cross sections. \RevOne{ Let $\theta_x$ denote the deflection of the cross section with respect to the opposite side of the $y$ axis and  $\theta_y$ its deflection along the $x$ axis. The displacement field is therefore given by the following relations:
+\RevOne{In this section the classical model of thick plates is first recalled by making use of a tensorial formalism to simplify the discussion on the port-Hamiltonian formulation.} The Mindlin plate theory, originally presented in \cite{mindlin}, is more suited for plates having a large thickness. The fibers, i.e. a segment perpendicular to the mid-plane, of the plate are supposed to remain straight after the deformation, but not necessarily normal to the mid-plane. For this reason two new kinematic variables have to be added, in order to represent the deflection of the cross sections. \RevOne{ Let $\theta_x$ denote the deflection of the cross section with respect to the opposite side of the $y$ axis and  $\theta_y$ its deflection along the $x$ axis. The displacement field is therefore given by the following relations:
 \begin{equation}
 \begin{aligned}
 u(x,y,z) &= -z \theta_x(x,y), \quad &\text{Displacement along $x$}, \\
@@ -382,7 +382,7 @@ v(x,y,z) &= -z \theta_y(x,y), \quad &\text{Displacement along $y$}, \\
 w(x,y,z) &= w(x,y),  \quad &\text{Displacement along $z$}. \\
 \end{aligned}
 \end{equation}
-Both bending and shear deformations are taken into. The bending part is described by the second order shear tensor:
+Both bending and shear deformations are taken into account. The bending part is described by the second order shear tensor:
 \begin{equation}
 \mathbb{E}_b = 
 \begin{bmatrix}
@@ -401,15 +401,15 @@ where $\bm{\theta} = (\theta_x, \, \theta_y)^T$. The tensor $\mathrm{Grad}(\bm{\
 \kappa_{xy} & \kappa_{yy} \\
 \end{bmatrix} := \mathrm{Grad}(\bm{\theta}) =  \frac{1}{2} \left(\nabla \otimes \bm{\theta} + \left(\nabla \otimes \bm{\theta}\right)^T \right),
 \end{equation}
-where $\bm{u} \otimes {\bm{v}}$ denotes the outer product of vectors equivalent to the dyadic product given by $\bm{u}\bm{v}^T$. The corresponding bending  stress field $\mathbb{S}_b$ is obtained considering the constitutive relation which, for an isotropic homogeneous material, reads:
+where $\bm{u} \otimes {\bm{v}}$ denotes the outer product of vectors, equivalent to the dyadic product given by $\bm{u}\bm{v}^T$. The corresponding bending  stress field $\mathbb{S}_b$ is obtained by considering the constitutive relation which, for an isotropic homogeneous material, reads:
 \begin{equation}
 	\mathbb{S}_{b} = \frac{E}{1-\nu^2} \left\{ (1-\nu) \mathbb{E}_b +\nu \bm{I}_{2 \times 2} \Tr(\mathbb{E}_b) \right\}
 \end{equation}
-where $E$ is the Young's modulus, $\nu$ the Poisson's ratio, $\bm{I}_{2 \times 2}$ the identity operator in $\mathbb{R}^2$ and $\Tr$ the trace operator. By averaging the torques produced by stresses along a fiber, it is possible to define the flexural momenta tensor:
+where $E$ is Young's modulus, $\nu$ Poisson's ratio, $\bm{I}_{2 \times 2}$ the identity operator in $\mathbb{R}^2$ and $\Tr$ the trace operator. By averaging the torques produced by stresses along a fiber, it is possible to define the flexural momenta tensor:
 \begin{equation}
 \mathbb{M}_{ij} = \int_{-\frac{h}{2} }^{ \frac{h}{2} } -z \, \mathbb{S}_{b, \; ij} \d z = \mathbb{D}_{ijkl} \,  \mathbb{K}_{kl}, 
 \end{equation}
-where $h$ is the plate thickness and $\mathbb{D}$ is the a forth order symmetric tensor and represents the bending rigidity tensor. The components of the momenta tensor are given by the following relations:
+where $h$ is the plate thickness and $\mathbb{D}$ is the a fourth order symmetric tensor and represents the bending rigidity tensor. The components of the momenta tensor are given by the following relations:
 \begin{equation}
 	\mathbb{M} = \begin{bmatrix}
 	M_{xx} &  M_{xy}\\
@@ -421,7 +421,7 @@ where $h$ is the plate thickness and $\mathbb{D}$ is the a forth order symmetric
 	M_{xy} &= D\left(1 - \nu \right) \kappa_{xy}, \\
 	\end{aligned} 
 \end{equation}
-where $D = \frac{E h^3}{12 (1 - \nu^2)}$ is the bending rigidity. The shear deformations are instead described using the shear strain vector:
+where $D = \frac{E h^3}{12 (1 - \nu^2)}$ is the bending rigidity. The shear deformations are described using the shear strain vector:
 \begin{equation}	
 \bm{\epsilon}_s = 
 \begin{pmatrix}
@@ -433,7 +433,7 @@ where $D = \frac{E h^3}{12 (1 - \nu^2)}$ is the bending rigidity. The shear defo
 \diffp{w}{y} - \theta_y \\
 \end{pmatrix}.
 \end{equation}
-The corresponding stress field is simply given by $\bm\sigma_s = G \bm{\epsilon}_s$, where $G$ is the shear modulus $G = \frac{E}{2 (1 + \nu)}$. The shear forces are again obtained by averaging the shear stress along plate fibers. However, given the excessive rigidity of the shear contribution, a correction factor $k = 5/6$ \cite{mindlin} is introduced:
+The corresponding stress field is simply given by $\bm\sigma_s = G \bm{\epsilon}_s$, where $G$ is the shear modulus $G = \frac{E}{2 (1 + \nu)}$. The shear forces are again obtained by averaging the shear stress along plate fibers. However, given the excessive rigidity of the shear contribution, a correction factor $k = 5/6$ (see \cite{mindlin}) is introduced:
 \begin{equation}
 	\bm{q} = \begin{pmatrix}
 	q_x \\
@@ -445,18 +445,18 @@ The corresponding stress field is simply given by $\bm\sigma_s = G \bm{\epsilon}
 	\gamma_{yz} \\
 	\end{pmatrix}.
 \end{equation}
-All the needed variables are now defined and the equations of motions can be recalled: \cite{mindlin}
+All the needed variables are now defined and the equations of motions can be recalled (see \cite{mindlin}): 
 \begin{equation}
 \begin{cases}
 \displaystyle \rho h \diffp[2]{w}{t} &= \mathrm{div}(\bm{q}),  \vspace{1mm}\\
 \displaystyle \rho\frac{h^3}{12} \diffp[2]{\bm \theta}{t} &= \bm{q} + \mathrm{Div}(\mathbb{M}), \\
 \end{cases}
 \end{equation}
-where $\rho$ is the plate mass density. The operators $\mathrm{div}()$ and $\mathrm{Div}()$ denote the divergence of a vector and of a tensor, respectively:
+where $\rho$ is the plate mass density. The differential operators $\mathrm{div}()$ and $\mathrm{Div}()$ denote the divergence of a vector and of a tensor, respectively:
 \begin{equation*}
 \bm{a} = \mathrm{Div}(\mathbb{A})  \qquad \text{with } \bm{a}_i = \mathrm{div}(\mathbb{A}_{ji}) = \sum_{j = 1}^n \diffp{\mathbb{A}_{ji}}{x_j},
 \end{equation*}
-where $\bm{a}$ is defined column-wise. The kinetic and potential energy densities per unit area ($\mathcal{K}$ and $\mathcal{U}$), are respectively given by:
+where $\bm{a}$ is defined column-wise. The kinetic and potential energy densities per unit area ($\mathcal{K}$ and $\mathcal{U}$), are given respectively by:
 \begin{align*}
 \mathcal{K} &= \frac{1}{2} \rho \left\{ h \left(\diffp{w}{t}\right)^2 +  \frac{h^3}{12} \diffp{\bm\theta}{t} \cdot \diffp{\bm\theta}{t} \right\} ,\\
 \mathcal{U} &= \frac{1}{2} \left\{ \mathbb{M} \cddot \mathbb{K} + \bm{q} \cdot \bm{\epsilon}_s \right\} .	
@@ -482,7 +482,7 @@ The Hamiltonian energy is first considered in order to find the proper energy va
 \label{eq:H_min}
 H = \int_{\Omega} \frac{1}{2} \left\{ \rho h \left(\diffp{w}{t} \right)^2 + \frac{\rho h^3}{12} \diffp{\bm{\theta}}{t} \cdot   \diffp{\bm{\theta}}{t} +   \mathbb{M} \cddot \mathbb{K} + \bm{q} \cdot \bm{\epsilon}_s  \right\}  \d\Omega, 
 \end{equation}
-The choice of the energy variables scalar is the same as in \cite{MacchelliMindlin} but here scalar,}  vector and tensor variables are grouped together:
+The choice of the energy variables is the same as in \cite{MacchelliMindlin} but here scalar,}  vector and tensor variables are gathered together:
 \begin{equation}
 \begin{aligned}
 \alpha_w &= \rho h \diffp{w}{t}, \quad &\text{Linear momentum,} \\
@@ -505,7 +505,7 @@ e_w &:= \diffd{H}{\alpha_w} = \diffp{w}{t},  \quad &\text{Linear velocity,} \\
 \end{aligned}
 \end{equation}
 \begin{proposition}
-	The variational derivative of the Hamiltonian with respect to the curvatures tensor is the momenta tensor $\diffd{H}{\mathbb{A}_{\kappa}} = \mathbb{M}$.
+	The variational derivative of the Hamiltonian with respect to the curvature tensor is the momenta tensor $\diffd{H}{\mathbb{A}_{\kappa}} = \mathbb{M}$.
 	\begin{proof}
 		The contribution due to the bending part in Hamiltonian is given by 
 		\[H_b(\mathbb{K}) = \frac{1}{2} \int_{\Omega}  \mathbb{M} \cddot \mathbb{K} \; \d\Omega = \frac{1}{2} \int_{\Omega} \Tr(\mathbb{M}^T \mathbb{K}) \; \d\Omega, \]
@@ -519,15 +519,10 @@ e_w &:= \diffd{H}{\alpha_w} = \diffp{w}{t},  \quad &\text{Linear velocity,} \\
 		\[H_b(\mathbb{K}_0+ \varepsilon \delta\mathbb{K}) = \frac{1}{2} \int_{\Omega} \Tr(\mathbb{M}_0^T \mathbb{K}_0) \; \d\Omega + \varepsilon \int_{\Omega} \left\{ \Tr(\mathbb{M}_0^T \delta\mathbb{K})\right\}\; \d\Omega  + O(\varepsilon^2). \]
 		By definition of the variational derivative (see e.g. \cite{VANDERSCHAFT2002166}) it can be written
 		\[H_b(\mathbb{K}_0+ \varepsilon \delta\mathbb{K}) = H_b(\mathbb{K}_0) + \varepsilon \left\langle \diffd{H_b}{\mathbb{K}} , \delta\mathbb{K}  \right\rangle_{\mathscr{H}} + O(\varepsilon^2), \]
-		where $\mathscr{H}$ is the space of the square integrable symmetric tensors endowed with the integral of the tensor contraction as inner product. By identification then $\diffd{H_b}{\mathbb{K}} = \diffd{H}{\mathbb{K}} = \mathbb{M}_0$.
+		where $\mathscr{H}$ is the space of the square integrable symmetric tensors endowed with the integral of the tensor contraction as inner product. Then, by identification $\diffd{H_b}{\mathbb{K}} = \diffd{H}{\mathbb{K}} = \mathbb{M}_0$.
 	\end{proof}
 \end{proposition}
 
-
-Let us denote $\mathrm{div}()$ and $\mathrm{Div}()$ the divergence of a vector and of a tensor, respectively:
-\begin{equation*}
-    \bm{\varepsilon} = \mathrm{Div}(\mathbb{E})  \qquad \text{with } \bm{\varepsilon}_i = \mathrm{div}(\mathbb{E}_{ji}) = \sum_{j = 1}^n \diffp{\mathbb{E}_{ji}}{x_j}.
-\end{equation*}
 The port-Hamiltonian system is expressed as follows:
 \begin{equation}
 \begin{cases}
@@ -636,7 +631,7 @@ We shall now establish the total energy balance in terms of boundary variables. 
 &= \int_{\partial \Omega} \left\{ w_t \, q_n  + \omega_n \, M_{nn} + \omega_s \, M_{ns} \right\} \d{s},  \\
 \end{aligned}
 \end{equation}
-where $s$ is the curvilinear abscissa. The last integral is obtained by applying the Green-Gauss theorem. The boundary variable appearing in \eqref{eq:PowRate} and illustrated in Figure \ref{fig:Cauchy_law} are defined as follows:
+where $s$ is the curvilinear abscissa. The last integral is obtained by applying Green-Gauss theorem. The boundary variables appearing in the last line of \eqref{eq:PowRate} and illustrated in Figure \ref{fig:Cauchy_law} are defined as follows:
 \begin{equation}
 \label{eq:QnMnnMns}
 \begin{aligned}
@@ -646,7 +641,7 @@ M_{nn} &:=  \mathbb{M} \cddot (\bm{n}\otimes{\bm{n}}) = \mathbb{E}_{\kappa} \cdd
 \text{Torsional momentum} \quad M_{ns} &:= \mathbb{M} \cddot (\bm{s}\otimes{\bm{n}}) = \mathbb{E}_{\kappa} \cddot (\bm{s}\otimes{\bm{n}}),	
 \end{aligned},
 \end{equation}
-where $\bm{u} \otimes {\bm{v}}$ denotes the outer product of vectors equivalent to a matrix given by $\bm{u}\bm{v}^T$. Vectors $\bm{n}$ and $\bm{s}$ designate the normal and tangential unit vector to the boundary, as shown in Figure \ref{fig:plate_ref}. The corresponding power conjugated variables are:
+Vectors $\bm{n}$ and $\bm{s}$ designate the normal and tangential unit vectors to the boundary, as shown in Figure \ref{fig:plate_ref}. The corresponding power conjugated variables are:
 \begin{equation}
 \label{eq:wtwnws}
 \begin{aligned}
@@ -654,7 +649,7 @@ where $\bm{u} \otimes {\bm{v}}$ denotes the outer product of vectors equivalent 
 \text{Flexural rotation} \quad 
 \omega_{n} &:= \diffp{\bm{\theta}}{t} \cdot \bm{n} = \bm{e}_\theta \cdot \bm{n} \\
 \text{Torsional rotation} \quad 
-\omega_{s} &:= \diffp{\bm{\theta}}{t} \cdot \bm{s} = \bm{e}_\theta \cdot \bm{s},	
+\omega_{s} &:= \diffp{\bm{\theta}}{t} \cdot \bm{s} = \bm{e}_\theta \cdot \bm{s}.	
 \end{aligned},
 \end{equation}
 Analogously to the Timoshenko beam case, the Stokes-Dirac structure for the Mindlin plate can now be defined. Consider now the bond space:
@@ -682,9 +677,9 @@ The duality pairing between elements of $\mathcal{B}$ is then defined as follows
 \label{eq:bil_Min}
 \left\langle \left\langle (\bm{f}_1, \bm{e}_1, \bm{z}_1), (\bm{f}_2, \bm{e}_2, \bm{z}_2) \right\rangle \right\rangle :=  \left\langle \bm{e}_1, \bm{f}_2 \right\rangle_{\mathscr{L}^2(\Omega)}  +  \left\langle \bm{e}_2,  \bm{f}_1  \right\rangle_{\mathscr{L}^2(\Omega)} + \int_{\partial \Omega} B_J(\bm{z}_1, \bm{z}_2) \d{s} , 
 \end{equation}
-where the pairing $\left\langle \cdot, \cdot \right\rangle_{\mathscr{L}^2(\Omega)}$ is the $L^2$ inner product on space $\mathscr{L}^2(\Omega)$ and $B_J(\bm{z}_1, \bm{z}_2) = (\bm{f}_{\partial, 1})^T \bm{e}_{\partial, 2} + (\bm{f}_{\partial, 2}) ^T \bm{e}_{\partial, 1}$. 
+where the pairing $\left\langle \cdot, \cdot \right\rangle_{\mathscr{L}^2(\Omega)}$ is the $L^2$ inner product on space $\mathscr{L}^2(\Omega)$ and $B_J(\bm{z}_1, \bm{z}_2) := (\bm{f}_{\partial, 1})^T \bm{e}_{\partial, 2} + (\bm{f}_{\partial, 2}) ^T \bm{e}_{\partial, 1}$. 
 \begin{theorem}[Stokes-Dirac Structure for the Mindlin plate in tensorial form]
-	Consider the space of power variables $\mathcal{B}$ defined in \eqref{eq:bondMin} and the matrix differential operator $J$ defined in \eqref{eq:PH_sys_Min_Ten}. By theorem \ref{th:StokesDirac}, the linear subspace $\mathcal{D} \subset \mathcal{B}$:
+	Consider the space of power variables $\mathcal{B}$ defined in \eqref{eq:bondMin} and the matrix differential operator $J$ in~\eqref{eq:PH_sys_Min_Ten}. By theorem \ref{th:StokesDirac}, the linear subspace $\mathcal{D} \subset \mathcal{B}$:
 	\begin{equation}
 	\mathcal{D} =  \left\{(\bm{f}, \bm{e},\bm{z}) \in \mathcal{B} | \; \bm{f} = - \diffp{\bm{\alpha}}{t} = -J\bm{e}, \; \bm{z} = \begin{pmatrix} \bm{f}_{\partial} \\ \bm{e}_{\partial} \end{pmatrix} 
 	\right\},
@@ -692,7 +687,7 @@ where the pairing $\left\langle \cdot, \cdot \right\rangle_{\mathscr{L}^2(\Omega
 	is a Stokes-Dirac structure with respect to the pairing $\left\langle \left\langle \cdot, \cdot \right\rangle \right\rangle$ given by \eqref{eq:bil_Min}.
 \end{theorem}
 \begin{remark}
-	The Hamiltonian formulation and associated Stokes-Dirac structure involve an Hamiltonian formally skew-symmetric differential operator $J$ on the space $\mathcal{E}$ of the coenergy variables. This represent a significant difference with respect to the Hamiltonian system obtained by the Legendre transformation of the Euler-Lagrange system \cite{jetMin}. In the former formulation the total dimension of this system is 8, in the latter 6. Furthermore, the latter system is ruled by an algebraic operator, the differential part being hidden in the variational derivative of the Hamiltonian, leading to the following system:
+	The Hamiltonian formulation and associated Stokes-Dirac structure involve a Hamiltonian skew-symmetric differential operator $J$ on the space $\mathcal{E}$ of the coenergy variables. This represents a significant difference with respect to the Hamiltonian system obtained by the Legendre transformation of the Euler-Lagrange system \cite{jetMin}. In the former formulation the total dimension of this system is 8, in the latter 6. Furthermore, the latter system is ruled by an algebraic operator, the differential part being hidden in the variational derivative of the Hamiltonian, leading to the following system:
 	\begin{equation}
 	\begin{pmatrix}
 	w\\ \theta_x\\ \theta_y\\p_w\\p_{\theta, x}\\p_{\theta, y}\\
@@ -819,7 +814,7 @@ e_w &= \sum_{i = 1}^{N_w} \phi_w^i(x,y) \, e_w^i(t),  \\
 \bm{e}_{\gamma} &= \sum_{i = 1}^{N_{\gamma}} \bm\phi_{\gamma}^i(x,y) \, e_{\gamma}^i(t).\\
 \end{aligned} 
 \end{equation}
-The basis functions $\phi_w^i, \, \bm\phi_\theta^i, \, \bm\Phi_\kappa^i, \, \bm\phi_{\gamma}^i$ have to be chosen in a suitable function space $\mathcal{V}^h$ in the domain of operator $J$, defined in \eqref{eq:PH_sys_Min_Ten}, i.e. $\mathcal{V}^h \subset \mathcal{V} \in \mathcal{D}(J)$. This will be discussed in section \ref{sec:Num}. The discretized skew-symmetric bilinear form on the right side of \eqref{eq:WF_Min_Dyn} then becomes:
+The basis functions $\phi_w^i, \, \bm\phi_\theta^i, \, \bm\Phi_\kappa^i, \, \bm\phi_{\gamma}^i$ have to be chosen in a suitable function space $\mathcal{V}^h$ in the domain of operator $J$, defined in \eqref{eq:PH_sys_Min_Ten}, i.e. $\mathcal{V}^h \subset \mathcal{V} \in \mathcal{D}(J)$. This will be discussed in section \ref{sec:Num}. The discretized skew-symmetric bilinear form on the right-hand side of \eqref{eq:WF_Min_Dyn} then becomes:
 \begin{equation}
 \bm{J}_d = 
 \begin{bmatrix}
@@ -837,7 +832,7 @@ where the matrices are computed in the following way:
 \bm{D}_0(i,j)  &= -\int_{\Omega} \bm{\phi}_{\gamma}^i \cdot  \bm{\phi}^j_{\theta} \d\Omega, \quad \in \mathbb{R}^{N_{\gamma} \times N_\theta}. \\
 \end{aligned}
 \end{equation}
-The notation $A(i,j)$ indicates the entry in the matrix corresponding to the $i \, {\text{th}}$ row and $j \,{\text{th}}$ column. The energy variables are deduced from the co-energy variables:
+The notation $\bm{D}(i,j)$ indicates the entry in matrix $\bm{D}$ corresponding to the $i \, {\text{th}}$ row and $j \,{\text{th}}$ column. The energy variables are deduced from the co-energy variables:
 \begin{equation}
 \begin{aligned}
 \alpha_w &= \rho h e_w, \\
@@ -848,7 +843,7 @@ The notation $A(i,j)$ indicates the entry in the matrix corresponding to the $i 
 \bm\alpha_{\gamma} &= \frac{1}{G h k} \bm{e}_{\gamma}. \\
 \end{aligned}
 \end{equation}
-The symmetric bilinear form on the left side of \eqref{eq:WF_Min_Dyn} is discretized as:
+The symmetric bilinear form on the left-hand side of \eqref{eq:WF_Min_Dyn} is discretized as:
 \begin{equation}
 	\begin{gathered}
 	\bm{M} = \text{diag}[\bm{M}_w,\, \bm{M}_\theta,\, \bm{M}_\kappa,\, \bm{M}_{\gamma}], \quad \text{with} \\
@@ -887,7 +882,7 @@ where the inner components are computed as:
 \bm{B}_{M_{ns}}(i,j) &= \int_{\partial\Omega} (\bm{\phi}_{\theta}^i \cdot \bm{s})\, \phi_{M_{ns}}^j \d{s} \quad \in \mathbb{R}^{N_w \times N_{M_{ns}}}. \\
 \end{aligned}
 \end{equation}
-The final port-Hamiltonian system, as defined in \cite{beattie2018linear} is written as:
+The final port-Hamiltonian system (as defined in \cite{beattie2018linear}, where the presence of a mass matrix $\bm{M}$ is taken into account) is written as:
 \begin{equation}
 \label{eq:PHdiscr_Min}
 \begin{aligned}
@@ -996,12 +991,12 @@ The port-Hamiltonian finite-dimensional system is rewritten equivalently by high
 \end{aligned}
 \end{equation}
 }
-This port-Hamiltonian system is an algebraic-differential system which can be treated applying results detailed in \cite{vanderSchaft2013,beattie2018linear}.
+This differential-algebraic port-Hamiltonian system can be treated applying results detailed in \cite{vanderSchaft2013,beattie2018linear}.
 
 \RevTwo{
 \section{Numerical studies}
 \label{sec:Num}
-In this section, the consistency of the proposed model is illustrated numerically. For this purpose the computation of the eigenvalues of a square plate and temporal simulations for several boundary conditions are presented. The formulation used in the numerical implementation is the one presented in section \ref{sec:FD_system}. 
+In this section, the consistency of the proposed model is illustrated numerically. For this purpose the computation of the eigenvalues of a square plate and time-domain simulations for several boundary conditions are presented. The formulation used in the numerical implementation is the one presented in section \ref{sec:FD_system}. 
 \subsection{Finite Element Choice}
 The domain of the operator $J$ in \eqref{eq:PH_sys_Min_Ten} is $\mathcal{D}(J) = H^{1}(\Omega) \times H^{1}(\Omega, \mathbb{R}^2) \times H^{\text{Div}}(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}}) \times H^{\text{div}}(\Omega, \mathbb{R}^2)$ and boundary conditions. For this reason a suitable choice for the functional space is:
 \begin{equation*}
@@ -1010,31 +1005,31 @@ The domain of the operator $J$ in \eqref{eq:PH_sys_Min_Ten} is $\mathcal{D}(J) =
 since $\mathscr{H} \subset \mathcal{D}(J)$. Then, for the Finite Element choice, denote:
 \[ H_r^1(\mathbb{P}_l) = \{ v \in H^1(\Omega)|\; v_{|T} \in \mathbb{P}_l \; \forall T \in \mathbb{T}_r \} 
 \]
-the finite element space which is a subspace of $H^1(\Omega)$, based on the shape function space of piecewise polynomials of degree $l$. The shape function space is defined over the mesh $\mathbb{T}_r = \bigcup_i T_i$, where the cells $T_i$ are triangles. These spaces can be scalar-valued, vector-valued or symmetric tensor-valued, depending on the variables to be discretized. The parameter $r$ is the average size of a mesh element. In the following all the variables, the co-energy variables $\bm{e}$ and the Lagrange multipliers $\bm\lambda$ are discretized by the same finite element space. The Lagrange multipliers are anyway defined only over the boundary. The analysis were conducted using two different finite element spaces:
+the finite element space which is a subspace of $H^1(\Omega)$, based on the shape function space of piecewise polynomials of degree $l$. The shape function space is defined over the mesh $\mathbb{T}_r = \bigcup_i T_i$, where the cells $T_i$ are triangles. These spaces can be scalar-valued, vector-valued or symmetric tensor-valued, depending on the variables to be discretized. The parameter $r$ is the average size of a mesh element. In the following all the variables, the co-energy variables $\bm{e}$ and the Lagrange multipliers $\bm\lambda$ are discretized by the same finite element space. Anyway, the Lagrange multipliers are defined only over the boundary. The analysis were conducted using two different finite element spaces:
 \begin{enumerate}
 	\item the first order Lagrange polynomials $H_r^1(\mathbb{P}_1)$;
 	\item the second order Lagrange polynomials $H_r^1(\mathbb{P}_2)$.
 \end{enumerate}
 \begin{remark}
-This choice does not correspond to the optimal one given by $\mathcal{D}(J)$. Anyway, due to the lack of Arnold-Winther elements \cite{Arnold2002} (that discretizes the space $H^{\text{Div}}(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}})$) in the Fenics librairy (or in any other standard librairy), this is the best available option for numerical computations.
+This choice does not correspond to the optimal one given by $\mathcal{D}(J)$. Anyway, due to the lack of Arnold-Winther elements \cite{Arnold2002} (that discretizes the space $H^{\text{Div}}(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}})$) in Fenics library (or in any other standard library), this is the best available option for numerical computations.
 \end{remark}
 \subsection{Eigenvalues Computation}
 The test case for this analysis is a simple square plate of side $L$, a benchmark problem which has been studied in \cite{dawe1980rayleigh, huang1984nine, duran1999approximation} for different boundary conditions: 
 \begin{itemize}
 	\item all clamped CCCC, i.e. $w_t = 0, \, \omega_n = 0,  \, \omega_s = 0$; 
 	\item simply supported hard SSSS, i.e. $w_t = 0, \, M_{nn} = 0,  \, \omega_s = 0$;
-	\item half clamped half simply supported SCSC;
+	\item half-clamped half-simply supported SCSC;
 	\item all clamped but one side free CCCF (for the free condition it holds $q_n = 0, \, M_{nn} = 0,  \, M_{ns} = 0$). 
 \end{itemize}
-Two different thickness to length ratio are considered: $h/L=0.1$ representative of a thick plate and $h/L=0.01$ representative of a thin plate. In order to compare our results with \cite{dawe1980rayleigh}, the frequencies $\omega_{mn}^h$ are computed in the following non-dimensional form:
+Two different thickness to length ratios $h/L$ are considered: $h/L=0.1$ representative of a thick plate and $h/L=0.01$ representative of a thin plate. In order to compare our results with \cite{dawe1980rayleigh}, the frequencies $\omega_{mn}^h$ are computed in the following non-dimensional form:
 \begin{equation*}
 \widehat{\omega}_{mn}^h = \omega_{mn}^h L \left(\frac{2 (1 + \nu) \rho}{E}\right)^{1/2},
 \end{equation*}
-$m$ and $n$ being the numbers of half-waves occurring in the modes shapes in the $x$ and $y$ directions, respectively. The only parameters which influence the results are the Poisson's ratio $\nu=0.3$, the correction factor $k$, whose value is taken equal to $k = 0.8601$ for CCCC and CCCF, $k = 0.8333$ for SSSS, $k = 0.822$ for SCSC (for comparison purposes) and the thickness-to-span ratio $h/L$. The reported non-dimensional frequencies are independent of the remaining geometrical and physical parameters.  The error is computed as:
+$m$ and $n$ being the numbers of half-waves occurring in the mode shapes in the $x$ and $y$ directions, respectively. The only parameters which influence the results are Poisson's ratio $\nu=0.3$, the correction factor $k$, whose value is taken equal to $k = 0.8601$ for CCCC and CCCF, $k = 0.8333$ for SSSS, $k = 0.822$ for SCSC (for comparison purposes) and the thickness-to-span ratio $h/L$. The reported non-dimensional frequencies are independent of the remaining geometrical and physical parameters.  The error is computed as:
 \begin{equation*}
 \varepsilon = \frac{\text{abs}(\widehat{\omega}_{mn}^h - \omega_{mn}^{DR})}{\omega_{mn}^{DR}},
 \end{equation*}
-where $\omega_{mn}^{DR}$ are the eigenvalues calculated in \cite{dawe1980rayleigh} using an analytical procedure. The results obtained using $H_r^1(\mathbb{P}_1), H_r^1(\mathbb{P}_2)$ for the thick and thin case are reported in Tables \ref{tab:thick}, \ref{tab:thin} respectively, together with the results from \cite{dawe1980rayleigh} (D-R) and \cite{huang1984nine} (H-H). For linear polynomials the mesh consists of a regular grid with 10 and 20 elements by side. For quadratic polynomials the mesh consists of a regular grid with 5 and 10 elements by side. Ten elements in $H_r^1(\mathbb{P}_1)$ and 5 in $H_r^1(\mathbb{P}_2)$ have the same degree of freedom $n=968$. Analogously, 20 elements in $H_r^1(\mathbb{P}_1)$ and 10 in $H_r^1(\mathbb{P}_2)$ have the same degree of freedom $n=3528$.  In the thick plate case,  the error is limited to $2\%$ in each for any choice of the finite element space.  On the contrary the thin case exhibits worse results, particularly for the polynomials of order 1. This must be linked to the shear locking phenomenon since $\bm{M}_{w} \propto h$, $\bm{M}_{\theta} \propto h^3$, $\bm{M}_{\kappa} \propto h^{-3}$ and $\bm{M}_{\gamma} \propto h^{-1}$. Higher order elements (like the second order Lagrange polynomials $\mathbb{P}_2$) allow alleviating the problem, but this issue is still present with very thin plate as the results worsen when the thickness to length ratio decreases to $h/L = 0.01$. The computed eigenvalues are anyway consistent with those obtained with other methodologies. The first four eigenvectors for the different cases are reported as well (see Fig. \ref{fig:CCCC} to \ref{fig:CCCF}).
+where $\omega_{mn}^{DR}$ are the eigenvalues calculated in \cite{dawe1980rayleigh} using an analytical procedure. The results obtained using $H_r^1(\mathbb{P}_1), H_r^1(\mathbb{P}_2)$ for the thick and thin case are reported in Tables \ref{tab:thick}, \ref{tab:thin} respectively, together with the results from \cite{dawe1980rayleigh} (D-R) and \cite{huang1984nine} (H-H). For linear polynomials the mesh consists of a regular grid with 10 and 20 elements by side. For quadratic polynomials the mesh consists of a regular grid with 5 and 10 elements by side. Ten elements in $H_r^1(\mathbb{P}_1)$ and 5 in $H_r^1(\mathbb{P}_2)$ have the same number of degree of freedom $n=968$. Analogously, 20 elements in $H_r^1(\mathbb{P}_1)$ and 10 in $H_r^1(\mathbb{P}_2)$ have the same degree of freedom $n=3528$.  In the thick plate case,  the error is limited to $2\%$ in each for any choice of the finite element space.  On the contrary the thin case exhibits worse results, particularly for the polynomials of order 1. This must be linked to the shear locking phenomenon since $\bm{M}_{w} \propto h$, $\bm{M}_{\theta} \propto h^3$, $\bm{M}_{\kappa} \propto h^{-3}$ and $\bm{M}_{\gamma} \propto h^{-1}$. Higher order elements (like the second order Lagrange polynomials $\mathbb{P}_2$) allow alleviating the problem, but this issue is still present with very thin plate as the results worsen when the thickness to length ratio decreases to $h/L = 0.01$. Anyway, the computed eigenvalues are consistent with those obtained with other methods. The first four eigenvectors for the different cases are reported as well (see Fig. \ref{fig:CCCC} to \ref{fig:CCCF}).
 }
 
 \begin{table}[p]
@@ -1186,7 +1181,7 @@ where $\omega_{mn}^{DR}$ are the eigenvalues calculated in \cite{dawe1980rayleig
 \end{figure}
 
 \RevTwo{
-\subsection{Temporal Simulations}
+\subsection{Time-domain Simulations}
 \begin{table}[h!]
 	\centering
 	\begin{tabular}{|c|c|}
@@ -1231,19 +1226,19 @@ where $\omega_{mn}^{DR}$ are the eigenvalues calculated in \cite{dawe1980rayleig
 	\caption[Hamiltonian]{Hamiltonian trend for the two simulations}
 	\label{fig:Hamiltonian}
 \end{figure}
-In this analysis, a square plate, subject either to a non null shear force on the boundaries either to a distributed force over the domain is considered. The physical parameters and simulation setting are reported in Table \ref{tab:par}. Ten elements for each side and second order Lagrange polynomials are used. The symplectic St\"ormer-Verlet integrator is employed, so that when no solicitation is applied to the system, the Hamiltonian is preserved. Two different simulation with different BC are considered. The initial conditions are set to zero for each variable. For the first simulation, a cantilever plate subject to gravity is considered. In order to add gravity the corresponding functional has to be discretized:
+In this analysis, a square plate, subject either to a non null shear force on the boundaries, either to a distributed force over the domain is considered. The physical parameters and simulation settings are reported in Table \ref{tab:par}. Ten elements for each side and second order Lagrange polynomials are used. The symplectic St\"ormer-Verlet time integrator is employed, so that when no solicitation is applied to the system, the Hamiltonian is preserved. Two different simulations with different boundary conditions are considered. The initial conditions are set to zero for each variable. For the first simulation, a cantilever plate subject to gravity is considered. In order to add gravity the corresponding functional has to be discretized:
 \[\bm{f}_{\text{gravity}} = - \int_{\Omega} v_w \rho h g \d{\Omega},
 \]
-where $g = 10 [m/s^2]$ is the gravity acceleration. This solicitation, that applies from $t=0$, is then simply added to the first line of system \eqref{eq:PHdiscr_mixed}.
-For the first simulation the following boundary conditions, corresponding to the cases CFCF, are considered:
+where $g = 10 [m/s^2]$ is the gravity acceleration. This excitation, that applies from $t=0$, is then simply added to the first line of system \eqref{eq:PHdiscr_mixed}.
+For the first simulation the following boundary conditions, corresponding to the CFCF cases, are considered:
 \begin{equation*} \text{Simulation $n^\circ \, 1$} \;
 \begin{cases}
 w_t = 0, \, \omega_n = \omega_s= 0, \quad &\text{for } x=0 \text{ and } x=1,\\
 q_n = 0, \, M_{nn} = M_{ns}= 0, \quad &\text{for } y=0,\\
-q_n = 0, \, M_{nn} = M_{ns}= 0, \quad &\text{for } y=1,\\
+q_n = 0, \, M_{nn} = M_{ns}= 0, \quad &\text{for } y=1.\\
 \end{cases}
 \end{equation*}
-Since the solicitation admits a potential, the Hamiltonian does not correspond to the the total energy, that now includes the potential energy:
+Since this force admits a potential, the Hamiltonian does not correspond to the the total energy, that now includes the potential energy:
 \begin{equation*}
 E_p = \int_{\Omega} \rho h g w \d{\Omega}, 
 \end{equation*}
@@ -1261,12 +1256,11 @@ where $f(x, t)$ is the excitation defined by:
 \begin{equation*}
 f(x, t) = \begin{cases}
 10^5 \,\sin \left( \frac{\pi}{L} x \right) \; [Pa \cdot m], \; &\forall t< 0.25 \, t_{\text{end}}, \\
-0, \; &\forall t\geq 0.25 \, t_{\text{end}} \\
+0, \; &\forall t\geq 0.25 \, t_{\text{end}}, \\
 \end{cases}
 \end{equation*} 
-$t_{\text{end}}$ being defined in table \ref{tab:par}
-In this case inhomogeneous boundary conditions are considered. \\
-Snapshots of the vertical displacement field are reported in Figures \ref{fig:sim1}, \ref{fig:sim2}. This field is obtained from the velocity field $e_w = \diffp{w}{t}$ by applying the trapezoidal rule integration. For both simulations the output is consistent with the imposed BC and with the physical intuition of the observed phenomenon. The symplectic integration has been used to demonstrate numerically the conservation of total energy. The Hamiltonian for both simulation is reported in Figure \ref{fig:Hamiltonian}. For the first one the total energy $E_t = H + E_p$ is the conserved quantity and it stays constant equal to zero as expected. For the second simulation the Hamiltonian is conserved quantity once the excitation is set back to zero. The conservation of energy is also evident from Figure \ref{fig:sim2}. The boundary conditions are such that the energy increases monotonically as long as the excitation is present.  The deformation attained at the final time of the excitation  repeats itself symmetrically with respect to axis $y = L/2$ with period given by $1/2 \; t_{\text{end}}$.
+$t_{\text{end}}$ being defined in Table \ref{tab:par}. In this case inhomogeneous boundary conditions are considered. \\
+Snapshots of the vertical displacement field are reported in Figures \ref{fig:sim1}, \ref{fig:sim2}. This field is obtained from the velocity field $e_w = \diffp{w}{t}$ by applying the trapezoidal rule integration. For both simulations the output is consistent with the imposed BC and with the physical intuition of the observed phenomenon. The symplectic integration has been used to demonstrate numerically the conservation of total energy. The Hamiltonian for both simulations is reported in Figure \ref{fig:Hamiltonian}. For the first one the total energy $E_t = H + E_p$ is the conserved quantity and it remains constant equal to zero as expected. For the second simulation the Hamiltonian is the conserved quantity, once the excitation is set back to zero. The conservation of energy is also obvious from Figure \ref{fig:sim2}. The boundary conditions are such that the energy increases monotonically as long as the excitation is present.  The deformation attained at the final time of the excitation  repeats itself symmetrically with respect to axis $y = L/2$ with period given by $1/2 \; t_{\text{end}}$.
 } 
 
 \begin{figure}[t]%
@@ -1314,13 +1308,13 @@ Snapshots of the vertical displacement field are reported in Figures \ref{fig:si
 In this paper the port-Hamiltonian formulation of the Mindlin plate was enriched by the equivalent tensorial formulation and by a symplectic discretization method. The PFEM method, applied to this formulation, proves again its versatility, since it stays valid and applicable even in more complicated examples like the one presented in this article. \RevOne{Many features of this method and of the tensorial PH formulation are of interest:
 \begin{itemize}
 	\item its capability of preserving the port-Hamiltonian structure;
-	\item the natural derivation of boundary port variables as inputs;
-	\item the possibility of dealing with mixed boundary conditions inside the framework of  port-Hamiltonian descriptor systems PHDAEs  detailed in \cite{beattie2018linear};
-	\item the easy implementability of the method using standard Finite Element libraries (Fenics \cite{LoggMardalEtAl2012} in this case);
+	\item the natural derivation of boundary port-variables as inputs;
+	\item the possibility of dealing with mixed boundary conditions inside the framework of  port-Hamiltonian descriptor systems PHDAEs,  detailed in \cite{beattie2018linear};
+	\item the easy implementability of the method using standard Finite Element libraries (Fenics \cite{LoggMardalEtAl2012} in our case);
 	\item a coordinate free representation which makes possible to treat other planar geometries (circular, ellipsoidal, annular etc).
 \end{itemize}  
 The formulation presented in this paper could be completed with a precise analysis of the well-posedness, in the input-output sense (as in \cite{waveEqZwart} for the wave equation in $\mathbb{R}^d$). Furthermore a proper convergence analysis is needed. Using conforming elements requires the Arnold-Winther elements. Unfortunately these are not included inside Fenics (or in any standard library).  \\ \\
-Another important aspect is the implementation of suitable control laws. The proposed method paves the way to the use of passivity-based approaches and of energy shaping methods. These techniques were already largely studied in the literature \cite{Ortega2002, OrtegaContrInt} for the finite dimensional case. However, the distributed case is mainly limited to one geometrical dimension \cite{MaccContrDist}.}  It would be of great interest, especially for control engineers, to conceive a controller able to respect given performance specifications. The port-Hamiltonian formalism and its powerfulness in modeling complex systems could be linked to standard control methodologies, already well known in the industrial field, like the $LQR$ or $H^\infty$ methodology.   
+Another important aspect is the implementation of suitable control laws. The proposed method paves the way to the use of passivity-based approaches and of energy shaping methods. These techniques have already been largely studied in the literature \cite{Ortega2002, OrtegaContrInt} for the finite-dimensional case. However, the distributed case is mainly limited to one geometrical dimension \cite{MaccContrDist}.}  It would be of great interest, especially for control engineers, to conceive a controller able to respect given performance specifications. The port-Hamiltonian formalism and its powerfulness in modeling complex systems could be linked to standard control methodologies, already well known in the industrial field, like the $LQR$ or $H^\infty$ methodologies.   
 
 \section*{Acknowledgments}
 This work is  supported by the project ANR-16-CE92-0028,
@@ -1328,7 +1322,7 @@ entitled {\em Interconnected Infinite-Dimensional systems for Heterogeneous
 Media}, INFIDHEM, financed by the French National
 Research Agency (ANR) and the Deutsche Forschungsgemeinschaft (DFG).
 Further information is available at {\url{https://websites.isae-supaero.fr/infidhem/the-project}}.  \\
-Moreover the author would like to thank Michel Sala\"un for the fruitful and insightful discussions
+Moreover the authors would like to thank Michel Sala\"un from ISAE-SUPAERO for the fruitful and insightful discussions.
    
 \bibliographystyle{unsrt}
 \bibliography{biblio_Mindlin_Revision} 

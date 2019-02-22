@@ -313,11 +313,11 @@ The basis function $\phi_w^i, \, \bm\Phi_\kappa^i \in \mathbb{S}, $ have to be c
 \bm{D}_{\mathrm{H}} & 0\\
 \end{bmatrix},
 \end{equation}
-where $\bm{A}^T$ is the transpose of matrix $\bm{A}$. The matrix $\bm{D}_{\mathrm{H}}$ is computed in the following way
+where $\bm{D}_{\mathrm{H}}^T$ is the transpose of matrix $\bm{D}_{\mathrm{H}}$. Matrix $\bm{D}_{\mathrm{H}}$ is computed in the following way
 \begin{equation}
 \bm{D}_{\mathrm{H}}(i,j) = \int_{\Omega} \bm{\Phi}_{\kappa}^i : \mathrm{Grad}(\mathrm{grad}(\phi_w^j)) \d\Omega, \quad \in \mathbb{R}^{N_\kappa \times N_w},
 \end{equation}
-where $\bm{A}(i,j)$ indicates the entry in the matrix corresponding to the $i \, {\text{th}}$ row and $j \,{\text{th}}$ column. The energy variables are deduced from the co-energy variables  thanks to:
+where $\bm{D}_{\mathrm{H}}(i,j)$ indicates the entry in the matrix corresponding to the $i \, {\text{th}}$ row and $j \,{\text{th}}$ column. The energy variables are deduced from the co-energy variables  thanks to:
 \begin{equation}
 \alpha_w = \rho h e_w, \qquad \bm{A}_{\kappa} = \bm{D}^{-1} \bm{E}_{\kappa}.
 \end{equation}
@@ -359,7 +359,7 @@ where $\Gamma_{C},\Gamma_{S}$ are subsets of the boundary where clamped and simp
 \bm{0} & \bm{0}  \\
 \end{bmatrix},
 \]
- where the subscript $N, D$ refer to Neumann and Dirichlet boundary conditions, the final port-Hamiltonian descriptor system (pHDAEs), as defined in \cite{beattie2018linear}, is written as
+in which the subscripts $N$ and $D$ refer to Neumann and Dirichlet boundary conditions, the final port-Hamiltonian descriptor system (pHDAEs), as defined in \cite{beattie2018linear}, is written as
 \begin{equation}
 \begin{aligned}
 \label{eq:discr_pl}
@@ -471,7 +471,7 @@ v_G \\ \omega_{G} \\
 with $v_G, \ \omega_{G}, \ J_G$ the linear velocity, angular velocity and rotary inertia about $G$, the center of mass, $M$ the total mass  and $F_z, T_x$ the force along $z$ and the torque along $x$. The Hamiltonian reads $H_{\text{rod}}  = \frac{1}{2} \left(M_G {v_G}^2 + J_G {\omega_G}^2 \right)$. The rod is welded to a rectangular thin plate of sides $L_x, L_y$ on side $x = L_x$. The boundary variables for the plate involved in the interconnection are 
 \[u_{\partial, \text{pl}} = w_t(x = L_x, y),  \qquad  y_{\partial, \text{pl}} = \widetilde{q}_n(x = L_x, y).
 \]
-The space $\mathscr{Y}$ is the space of square-integrable functions on with support $\Gamma_{\text{int}} = \left\{ (x,y) \vert \; x=L_x, 0 \le y \le L_y  \right\}$. The compact interconnection operator then reads
+Space $\mathscr{Y}$ is the space of square-integrable functions on with support $\Gamma_{\text{int}} = \left\{ (x,y) \vert \; x=L_x, 0 \le y \le L_y  \right\}$. The compact interconnection operator then reads
 \begin{equation}
 \mathcal{W} y_{\partial, \text{pl}} = \begin{pmatrix}
 \int_{\Gamma_{\text{int}}} y_{\partial, \text{pl}} \d{s} \\
@@ -486,7 +486,7 @@ The adjoint operator is then obtained considering that $\bm{u}_{\text{rod}} = \m
 
 The interconnection \eqref{eq:int_inf} will ensure that the two components are connected in a power preserving manner.
 \subsection{Finite-dimensional setting}
-Consider a rectangular plate of size $L_x, L_y$, clamped at $\Gamma_{D} = \left\{ x=0, \; 0 \le y \le L_y  \right\}$, and welded to a rigid rod on $\Gamma_{\text{int}} = \left\{ x=L_x, \; 0 \le y \le L_y  \right\}$. The discretized system \eqref{eq:discr_pl} is now modified to take into account the presence of an inhomogeneous Dirichlet boundary condition, i.e the input needed for the interconnection. It reads
+Consider a rectangular plate of size $L_x, L_y$, clamped at $\Gamma_{D} = \left\{(x,y) \vert \;  x=0, \; 0 \le y \le L_y  \right\}$, and welded to a rigid rod on $\Gamma_{\text{int}} = \left\{ (x,y) \vert \;  x=L_x, \; 0 \le y \le L_y  \right\}$. The discretized system \eqref{eq:discr_pl} is now modified to take into account the presence of an inhomogeneous Dirichlet boundary condition, i.e the input needed for the interconnection. It reads
 \begin{equation}
 \begin{aligned}
 \begin{bmatrix}
@@ -524,7 +524,7 @@ Here the Lagrange multipliers and associated matrices $\bm{\lambda}_D =  (\bm\la
 \end{aligned}
 \end{equation}
 
-where $\bm{e}_{\text{rod}} = (v_G; \; \omega_{G}), \; \bm{M}_{\text{rod}} = \mathrm{diag}(M_G, \, J_G)$. The interconnection matrix if obtained once the operator $\mathcal{W}^*$ is put into weak form
+where $\bm{e}_{\text{rod}} = (v_G; \; \omega_{G}), \; \bm{M}_{\text{rod}} = \mathrm{diag}(M_G, \, J_G)$. The interconnection matrix if obtained once the operator $\mathcal{W}^*$ is set into weak form
 \begin{align*}
 \bm{W}^T(i,j) &= \left\langle \bm{\phi}^i_{\widetilde{q}_n}, \; \mathcal{W}^* \bm{\phi}^j_{\mathbb{R}^2} \right\rangle_{L^2(\Gamma_{\text{int}})} \\
 &= \int_{\Gamma_{\text{int}}} [\bm{\phi}^i_{\widetilde{q}_n}, \; \bm{\phi}^i_{\widetilde{q}_n} (y - L_y/2) ]\d{s},
@@ -576,7 +576,6 @@ with $\bm{M} = \text{diag}(\bm{M}_{\text{pl}}, \, \bm{M}_{\text{rod}}), \; \bm{G
 \caption{Hamiltonian trend \ref{fig:H_rod} for the interconnection of a cantilever plate with a rigid rod . For comparison in \ref{fig:H_Norod} the same simulation is performed without including the rod}
 \label{fig:HamInt}
 \end{figure}
-
 \begin{table}[t]
 	\centering
 	\begin{tabular}{|c|c|}
@@ -607,9 +606,7 @@ with $\bm{M} = \text{diag}(\bm{M}_{\text{pl}}, \, \bm{M}_{\text{rod}}), \; \bm{G
 	\label{tab:par}
 \end{table}
 
-Snapshots of simulations without and with the rigid rod are reported in Figs. \ref{fig:IntNoRod}, \ref{fig:IntRod}\footnote{\label{note:1}Complete videos are accessible at \url{https://github.com/andreabrugnoli/Goodies_pH_plates}}. The deformations undergone by the plate are clearly affected by the presence of the rod: the maximum deformation as well as the Hamiltonian value \ref{fig:HamInt}, once the excitation is removed, are lower. The interconnected side remains straight during the whole simulation, meaning that the constraints are respected.
-
-\begin{figure*}[ht]
+\begin{figure*}[th]
 	\centering
 	\subfloat[$t=0.25 \; t_{\text{end}}$]{\includegraphics[width=0.25\linewidth]{SnapNoRod_t25_cropped.eps}%
 		\label{fig:NoRod_1}}
@@ -640,10 +637,9 @@ Snapshots of simulations without and with the rigid rod are reported in Figs. \r
 	\caption{Snapshots at 4 different times ($t_{\text{end}} = 10 \,[ms]$) of a cantilever plate undergoing solicitation \eqref{eq:force_rod}. The plate is connected to a rigid rod in $x = L_x$. Note the different deformation amplitude with respect to \ref{fig:IntNoRod}}
 	\label{fig:IntRod}
 \end{figure*}
-
-
-\section{Damping Injection}
-\begin{figure}[tb]
+Snapshots of simulations without and with the rigid rod are reported in Figs. \ref{fig:IntNoRod}, \ref{fig:IntRod}\footnote{\label{note:1}Complete videos are accessible at \url{https://github.com/andreabrugnoli/Goodies_pH_plates}}. The deformations undergone by the plate are clearly affected by the presence of the rod: the maximum deformation as well as the Hamiltonian value \ref{fig:HamInt}, once the excitation is removed, are lower. The interconnected side remains straight during the whole simulation, meaning that the constraints are respected.
+\section{Boundary control by Damping Injection}
+\begin{figure}[t]
 	\centering
 	\includegraphics[width=0.6\linewidth]{HamiltonianDamped_cropped.eps}
 	\caption{Hamiltonian trend considering a boundary control by damping injection}
@@ -673,9 +669,9 @@ System \eqref{eq:discr_pl} now reads
 \bm{\lambda}_D \\
 \end{pmatrix}.
 \end{equation}
-The matrix $\bm{R} = \bm{B}_N \bm{Z} \bm{B}_N^T \succcurlyeq 0$ is semi-positive definitive because of the input-output collocated feature of pH system. The energy rate evaluates to (\cite{beattie2018linear} theorem 13)
+The matrix $\bm{R} = \bm{B}_N \bm{Z} \bm{B}_N^T \succcurlyeq 0$ is semi-positive definitive because of the collocated input-output feature of pH systems. The energy rate evaluates to (\cite{beattie2018linear} theorem 13)
 \[\dot{H} _{\text{pl}} = - \bm{e}_{\text{pl}}^T \; \bm{R} \; \bm{e}_{\text{pl}} \le 0. \]
-Therefore, the Hamiltonian energy is a Lyapunov function and the asymptotic stability of configuration $\bm{e}_{\text{pl}} = \bm{0}$ is deduced using LaSalle' invariance  principle (\cite{bookPHs}  chapter 6, proposition 6.2). As a numerical illustration a cantilever square plate clamped in $x=0$ with parameters given in Table~\ref{tab:par} is consider. The controller gain matrix is set to $\bm{Z} = 100 \ \bm{I}$. The initial condition, that must be compatible with the constraints, reads
+Therefore, the Hamiltonian energy is a Lyapunov function and the asymptotic stability of configuration $\bm{e}_{\text{pl}} = \bm{0}$ is deduced using LaSalle' invariance  principle (\cite{bookPHs}  chapter 6, proposition 6.2). As a numerical illustration a cantilever square plate clamped in $x=0$ with parameters given in Table~\ref{tab:par} is considered. The controller gain matrix is set to $\bm{K} = 100 \ \bm{I}$. The initial condition, that must be compatible with the constraints, reads
 \[e_w(x,y,0) = x^2, \quad \bm{E}_{\kappa}(x,y,0)=0\]
 The control law is activated after 1 second. The discrete Hamiltonian, computed using \eqref{eq:H_discr} goes almost to zero in 4 seconds (Fig. \ref{fig:H_Damped}). Snapshot of simulation, reported in Fig.~\ref{fig:SnapDamp}, show the decreasing amplitudes of the oscillations\footnote{See footnote \ref{note:1}}, as the plate gradually reaches the undeformed equilibrium state.
 
@@ -710,7 +706,7 @@ In this paper the port-Hamiltonian tensorial formulation has been discussed. A s
 
 
 
-\addtolength{\textheight}{-1.3cm}   % This command serves to balance the column lengths
+%\addtolength{\textheight}{-1.3cm}   % This command serves to balance the column lengths
 % on the last page of the document manually. It shortens
 % the textheight of the last page by a suitable amount.
 % This command does not take effect until the next page
