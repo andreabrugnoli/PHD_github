@@ -292,7 +292,7 @@ where ${w}(x,t)$ is the transverse displacement and $\phi(x,t)$ is the rotation 
 \alpha_{w} &:= \rho(x) \diffp{w}{t}(x,t), \quad &\text{\RevOne{Linear Momentum,}} \\
 \alpha_{\phi} &:= I_{\rho}(x) \diffp{\phi}{t}(x,t), \quad &\text{\RevOne{Angular Momentum,}} \\
 \alpha_{\kappa} &:= \diffp{\phi}{x}(x,t), \quad &\text{\RevOne{Curvature,}} \\
-\alpha_{\gamma} &:= \diffp{w}{x}(x,t) - \phi(x,t) \quad &\text{\RevOne{Shear Deformation}}. \\
+\alpha_{\gamma} &:= \diffp{w}{x}(x,t) - \phi(x,t), \quad &\text{\RevOne{Shear Deformation}}. \\
 \end{aligned}
 \end{equation}
 
@@ -315,7 +315,7 @@ The co-energy variables are found by computing the variational derivative of the
 e_{w} &:= \diffd{H}{\alpha_w} = \diffp{w}{t}(x,t), \quad &\text{\RevOne{Linear Velocity,}} \\
 e_{\phi} &:= \diffd{H}{\alpha_{\phi}} = \diffp{\phi}{t}(x,t), \quad &\text{\RevOne{Angular Velocity,}} \\
 e_{\kappa} &:= \diffd{H}{\alpha_{\kappa}} =EI(x) \diffp{\phi}{x}(x,t), \quad &\text{\RevOne{Flexural Momentum,}}\\
-e_{\gamma} &:= \diffd{H}{\alpha_{\gamma}} = K(x) \left(\diffp{w}{x}(x,t) - \phi(x,t) \right) \quad &\text{\RevOne{Shear Force}}. \\
+e_{\gamma} &:= \diffd{H}{\alpha_{\gamma}} = K(x) \left(\diffp{w}{x}(x,t) - \phi(x,t) \right), \quad &\text{\RevOne{Shear Force}}. \\
 \end{aligned}
 \end{equation}
 These variables are again collected in the vector $\bm{e} = (e_{w}, \, e_{\phi}, \, e_{\kappa}, \, e_{\gamma} )^T $, so that \RevOne{system \eqref{eq:TimoModel} can be rewritten in terms of energy and co-energy variables:}
@@ -403,7 +403,7 @@ where $\bm{\theta} = (\theta_x, \, \theta_y)^T$. The tensor $\mathrm{Grad}(\bm{\
 \end{equation}
 where $\bm{u} \otimes {\bm{v}}$ denotes the outer product of vectors, equivalent to the dyadic product given by $\bm{u}\bm{v}^T$. The corresponding bending  stress field $\mathbb{S}_b$ is obtained by considering the constitutive relation which, for an isotropic homogeneous material, reads:
 \begin{equation}
-	\mathbb{S}_{b} = \frac{E}{1-\nu^2} \left\{ (1-\nu) \mathbb{E}_b +\nu \bm{I}_{2 \times 2} \Tr(\mathbb{E}_b) \right\}
+	\mathbb{S}_{b} = \frac{E}{1-\nu^2} \left\{ (1-\nu) \mathbb{E}_b +\nu \bm{I}_{2 \times 2} \Tr(\mathbb{E}_b) \right\},
 \end{equation}
 where $E$ is Young's modulus, $\nu$ Poisson's ratio, $\bm{I}_{2 \times 2}$ the identity operator in $\mathbb{R}^2$ and $\Tr$ the trace operator. By averaging the torques produced by stresses along a fiber, it is possible to define the flexural momenta tensor:
 \begin{equation}
@@ -463,11 +463,11 @@ where $\bm{a}$ is defined column-wise. The kinetic and potential energy densitie
 \end{align*} 
 where the tensor contraction $ \mathbb{M} \cddot \mathbb{K}$ in Cartesian coordinates is expressed as:
 \[\mathbb{M} \cddot \mathbb{K} = \sum_{i,j = 1}^{2} M_{ij} \kappa_{ij} = \Tr(\mathbb{M}^T \mathbb{K}). \]
-The total energy density is the sum of kinetic and potential energies:
+The total energy density is the sum of kinetic and potential energies
 \begin{equation}
 \mathcal{H} = \mathcal{K} + \mathcal{U}
 \end{equation}
-and the corresponding energies are given by:
+and the corresponding energies
 \begin{equation}
 H = \int_{\Omega} \mathcal{H} \ \d\Omega, \qquad K = \int_{\Omega} \mathcal{K} \ \d\Omega, \qquad U = \int_{\Omega} \mathcal{U} \ \d\Omega,
 \end{equation}
@@ -507,17 +507,17 @@ e_w &:= \diffd{H}{\alpha_w} = \diffp{w}{t},  \quad &\text{Linear velocity,} \\
 \begin{proposition}
 	The variational derivative of the Hamiltonian with respect to the curvature tensor is the momenta tensor $\diffd{H}{\mathbb{A}_{\kappa}} = \mathbb{M}$.
 	\begin{proof}
-		The contribution due to the bending part in Hamiltonian is given by 
+		The contribution due to the bending part in Hamiltonian is given by:
 		\[H_b(\mathbb{K}) = \frac{1}{2} \int_{\Omega}  \mathbb{M} \cddot \mathbb{K} \; \d\Omega = \frac{1}{2} \int_{\Omega} \Tr(\mathbb{M}^T \mathbb{K}) \; \d\Omega, \]
 		where the momenta tensor depends on the curvatures tensor $\mathbb{M}_{ij} = \mathbb{D}_{ijkl}\mathbb{K}_{kl} $ where $\mathbb{D} = \mathbb{D}^T$ is a fourth order symmetric positive definite tensor.
-		So a variation $\delta\mathbb{K}$ of the curvatures tensor with respect to a given value $\mathbb{K}_0$ leads to
+		So a variation $\delta\mathbb{K}$ of the curvatures tensor with respect to a given value $\mathbb{K}_0$ leads to:
 		\[H_b(\mathbb{K}_0+ \varepsilon \delta\mathbb{K}) = \frac{1}{2} \int_{\Omega} \Tr(\mathbb{M}_0^T \mathbb{K}_0) \; \d\Omega + \varepsilon \frac{1}{2} \int_{\Omega} \left\{ \Tr(\mathbb{M}_0^T \delta\mathbb{K}) + \Tr(\delta\mathbb{M}^T \mathbb{K}_0)\right\}\; \d\Omega  + O(\varepsilon^2). \]
 		The term $\Tr(\delta\mathbb{M}^T \mathbb{K}_0)$ can be further manipulated as follows 
 		\[ \Tr(\delta\mathbb{M}^T \mathbb{K}_0) = \Tr(\mathbb{K}_0^T \delta\mathbb{M}) = \Tr(\mathbb{K}_0^T \, \mathbb{D} \, \delta\mathbb{K}) = \Tr(\mathbb{M}_0^T \delta\mathbb{K}),
 		\]
 		 so that 
 		\[H_b(\mathbb{K}_0+ \varepsilon \delta\mathbb{K}) = \frac{1}{2} \int_{\Omega} \Tr(\mathbb{M}_0^T \mathbb{K}_0) \; \d\Omega + \varepsilon \int_{\Omega} \left\{ \Tr(\mathbb{M}_0^T \delta\mathbb{K})\right\}\; \d\Omega  + O(\varepsilon^2). \]
-		By definition of the variational derivative (see e.g. \cite{VANDERSCHAFT2002166}) it can be written
+		By definition of the variational derivative (see e.g. \cite{VANDERSCHAFT2002166}) it can be written:
 		\[H_b(\mathbb{K}_0+ \varepsilon \delta\mathbb{K}) = H_b(\mathbb{K}_0) + \varepsilon \left\langle \diffd{H_b}{\mathbb{K}} , \delta\mathbb{K}  \right\rangle_{\mathscr{H}} + O(\varepsilon^2), \]
 		where $\mathscr{H}$ is the space of the square integrable symmetric tensors endowed with the integral of the tensor contraction as inner product. Then, by identification $\diffd{H_b}{\mathbb{K}} = \diffd{H}{\mathbb{K}} = \mathbb{M}_0$.
 	\end{proof}
@@ -746,11 +746,11 @@ So defining $v_{\omega_n} :=\bm{v}_{\theta} \cdot \bm{n}$ and $v_{\omega_s} := \
 \begin{equation}
 \label{eq:WF_Min_Dyn}
 \begin{cases}
-\displaystyle\int_{\Omega} v_w \diffp{\alpha_w}{t}  \d\Omega  &= - \displaystyle\int_{\Omega} \mathrm{grad}(v_w)  \cdot \bm{e}_{\gamma}  \d\Omega +  \displaystyle\int_{\partial \Omega} v_w q_n  \d{s} \vspace{2mm}\\
-\displaystyle\int_{\Omega} \bm{v}_{\theta} \cdot \diffp{\bm\alpha_{\theta}}{t}   \d\Omega &=  -\displaystyle\int_{\Omega} \left\{ \mathrm{Grad}(\bm{v}_{\theta}) \cddot \mathbb{E}_{\kappa} - \bm{v}_{\theta} \cdot \bm{e}_{\gamma}\right\}  \d\Omega + \displaystyle\int_{\partial \Omega} \left\{ v_{\omega_n} M_{nn} + v_{\omega_s} M_{ns} \right\}  \d{s} \vspace{2mm} \\
-\displaystyle\int_{\Omega} \mathbb{V}_{\kappa} \cddot \diffp{\mathbb{A}_{\kappa}}{t}   \d\Omega &= \displaystyle\int_{\Omega} \mathbb{V}_{\kappa} \cddot \mathrm{Grad}(\bm{e}_\theta)  \d\Omega  \vspace{2mm} \\
-\displaystyle\int_{\Omega} \bm{v}_{\gamma} \cdot \diffp{\bm\alpha_{\gamma}}{t}   \d\Omega &= \displaystyle\int_{\Omega} \bm{v}_{\gamma} \cdot (\mathrm{grad}({e}_{w}) - \bm{e}_{\theta})  \d\Omega
-\end{cases}.
+\displaystyle\int_{\Omega} v_w \diffp{\alpha_w}{t}  \d\Omega  &= - \displaystyle\int_{\Omega} \mathrm{grad}(v_w)  \cdot \bm{e}_{\gamma}  \d\Omega +  \displaystyle\int_{\partial \Omega} v_w q_n  \d{s}, \vspace{2mm}\\
+\displaystyle\int_{\Omega} \bm{v}_{\theta} \cdot \diffp{\bm\alpha_{\theta}}{t}   \d\Omega &=  -\displaystyle\int_{\Omega} \left\{ \mathrm{Grad}(\bm{v}_{\theta}) \cddot \mathbb{E}_{\kappa} - \bm{v}_{\theta} \cdot \bm{e}_{\gamma}\right\}  \d\Omega + \displaystyle\int_{\partial \Omega} \left\{ v_{\omega_n} M_{nn} + v_{\omega_s} M_{ns} \right\}  \d{s}, \vspace{2mm} \\
+\displaystyle\int_{\Omega} \mathbb{V}_{\kappa} \cddot \diffp{\mathbb{A}_{\kappa}}{t}   \d\Omega &= \displaystyle\int_{\Omega} \mathbb{V}_{\kappa} \cddot \mathrm{Grad}(\bm{e}_\theta)  \d\Omega,  \vspace{2mm} \\
+\displaystyle\int_{\Omega} \bm{v}_{\gamma} \cdot \diffp{\bm\alpha_{\gamma}}{t}   \d\Omega &= \displaystyle\int_{\Omega} \bm{v}_{\gamma} \cdot (\mathrm{grad}({e}_{w}) - \bm{e}_{\theta})  \d\Omega.
+\end{cases}
 \end{equation}
 In this first case,  the boundary controls $\bm{u}_\partial$ and the corresponding output $\bm{y}_\partial$ are: 
 \[\bm{u}_\partial = 
@@ -773,10 +773,10 @@ Alternatively, in this second case, the same procedure can be performed on the t
 \begin{equation}
 \label{eq:WF_Min_Kin}
 \begin{cases}
-\displaystyle\int_{\Omega} v_w \diffp{\alpha_w}{t}  \d\Omega  &= \displaystyle \int_{\Omega} v_w \mathrm{div}(\bm{e}_{\gamma})  \d\Omega \vspace{2mm}\\
-\displaystyle\int_{\Omega} \bm{v}_{\theta} \cdot \diffp{\bm\alpha_{\theta}}{t}   \d\Omega &= \displaystyle \int_{\Omega} \bm{v}_{\theta} \cdot (\mathrm{Div}(\mathbb{E}_{\kappa}) + \bm{e}_{\gamma}) \;  \d\Omega \vspace{2mm} \\
-\displaystyle\int_{\Omega} \mathbb{V}_{\kappa} \cddot \diffp{\mathbb{A}_{\kappa}}{t}   \d\Omega &= - \displaystyle\int_{\Omega} \mathrm{Div}(\mathbb{V}_{\kappa}) \cdot \bm{e}_\theta \;  \d\Omega +  \displaystyle\int_{\partial \Omega} \left\{ v_{M_{nn}} \omega_{n} + v_{M_{ns}} \omega_{s} \right\}  \d{s} \vspace{2mm} \\
-\displaystyle\int_{\Omega} \bm{v}_{\gamma} \cdot \diffp{\bm\alpha_{\gamma}}{t}   \d\Omega &=  - \displaystyle\int_{\Omega} \left\{ \mathrm{div}(\bm{v}_{\gamma}) e_w + \bm{v}_{\gamma} \cdot \bm{e}_{\theta} \right\} \, \d\Omega + \displaystyle\int_{\partial \Omega} v_{q_{n}} w_t \;  \d{s}
+\displaystyle\int_{\Omega} v_w \diffp{\alpha_w}{t}  \d\Omega  &= \displaystyle \int_{\Omega} v_w \mathrm{div}(\bm{e}_{\gamma})  \d\Omega, \vspace{2mm}\\
+\displaystyle\int_{\Omega} \bm{v}_{\theta} \cdot \diffp{\bm\alpha_{\theta}}{t}   \d\Omega &= \displaystyle \int_{\Omega} \bm{v}_{\theta} \cdot (\mathrm{Div}(\mathbb{E}_{\kappa}) + \bm{e}_{\gamma}) \;  \d\Omega, \vspace{2mm} \\
+\displaystyle\int_{\Omega} \mathbb{V}_{\kappa} \cddot \diffp{\mathbb{A}_{\kappa}}{t}   \d\Omega &= - \displaystyle\int_{\Omega} \mathrm{Div}(\mathbb{V}_{\kappa}) \cdot \bm{e}_\theta \;  \d\Omega +  \displaystyle\int_{\partial \Omega} \left\{ v_{M_{nn}} \omega_{n} + v_{M_{ns}} \omega_{s} \right\}  \d{s}, \vspace{2mm} \\
+\displaystyle\int_{\Omega} \bm{v}_{\gamma} \cdot \diffp{\bm\alpha_{\gamma}}{t}   \d\Omega &=  - \displaystyle\int_{\Omega} \left\{ \mathrm{div}(\bm{v}_{\gamma}) e_w + \bm{v}_{\gamma} \cdot \bm{e}_{\theta} \right\} \, \d\Omega + \displaystyle\int_{\partial \Omega} v_{q_{n}} w_t \;  \d{s},
 \end{cases}
 \end{equation}
 
@@ -848,12 +848,12 @@ The symmetric bilinear form on the left-hand side of \eqref{eq:WF_Min_Dyn} is di
 	\begin{gathered}
 	\bm{M} = \text{diag}[\bm{M}_w,\, \bm{M}_\theta,\, \bm{M}_\kappa,\, \bm{M}_{\gamma}], \quad \text{with} \\
 	\begin{aligned}
-	&\bm{M}_w(i,j) = \int_{\Omega} \rho h \, \bm{\phi}_w^i \, \bm{\phi}_w^j \d\Omega \; \in \mathbb{R}^{N_w \times N_w}, \\
-	&\bm{M}_\theta(i,j) = \int_{\Omega} \frac{\rho h^3}{12} \bm{\phi}_\theta^i \cdot \bm{\phi}_\theta^j \d\Omega \; \in \mathbb{R}^{N_\theta \times N_\theta},\\
+	&\bm{M}_w(i,j) = \int_{\Omega} \rho h \, \bm{\phi}_w^i \, \bm{\phi}_w^j \d\Omega, \; \in \mathbb{R}^{N_w \times N_w}, \\
+	&\bm{M}_\theta(i,j) = \int_{\Omega} \frac{\rho h^3}{12} \bm{\phi}_\theta^i \cdot \bm{\phi}_\theta^j \d\Omega, \; \in \mathbb{R}^{N_\theta \times N_\theta},\\
 	\end{aligned} \qquad
 	\begin{aligned}
-	&\bm{M}_\kappa(i,j) = \int_{\Omega}  \left( \mathbb{D}^{-1} \bm{\Phi}_\kappa^i \right) \cddot \bm{\Phi}_\kappa^j \d\Omega \; \in \mathbb{R}^{N_\kappa \times N_\kappa},\\
-	&\bm{M}_{\gamma}(i,j) = \int_{\Omega} \frac{1}{G h k} \bm{\phi}_{\gamma}^i \cdot \bm{\phi}_{\gamma}^j \d\Omega \; \in \mathbb{R}^{N_{\gamma} \times N_{\gamma}}. \\
+	&\bm{M}_\kappa(i,j) = \int_{\Omega}  \left( \mathbb{D}^{-1} \bm{\Phi}_\kappa^i \right) \cddot \bm{\Phi}_\kappa^j \d\Omega, \; \in \mathbb{R}^{N_\kappa \times N_\kappa},\\
+	&\bm{M}_{\gamma}(i,j) = \int_{\Omega} \frac{1}{G h k} \bm{\phi}_{\gamma}^i \cdot \bm{\phi}_{\gamma}^j \d\Omega, \; \in \mathbb{R}^{N_{\gamma} \times N_{\gamma}}. \\
 	\end{aligned}
 	\end{gathered}
 \end{equation}
@@ -872,14 +872,14 @@ The variables are defined only over the boundary $\partial\Omega$. Consequently,
 0 & \bm{B}_{M_{nn}} & \bm{B}_{M_{ns}} \\
 0 & 0 & 0 \\
 0 & 0 & 0 \\
-\end{bmatrix},
+\end{bmatrix}.
 \end{equation}
-where the inner components are computed as:
+The inner components are computed as:
 \begin{equation}
 \begin{aligned}
-\bm{B}_{q_n}(i,j) &= \int_{\partial\Omega} {\phi}_{w}^i \, {\phi}_{q_n}^j \d{s} \quad \in \mathbb{R}^{N_w \times N_{q_n}} , \\
-\bm{B}_{M_{nn}}(i,j) &= \int_{\partial\Omega} (\bm{\phi}_{\theta}^i \cdot \bm{n})\, \phi_{M_{nn}}^j \d{s} \quad \in \mathbb{R}^{N_w \times N_{M_{nn}}} , \\
-\bm{B}_{M_{ns}}(i,j) &= \int_{\partial\Omega} (\bm{\phi}_{\theta}^i \cdot \bm{s})\, \phi_{M_{ns}}^j \d{s} \quad \in \mathbb{R}^{N_w \times N_{M_{ns}}}. \\
+\bm{B}_{q_n}(i,j) &= \int_{\partial\Omega} {\phi}_{w}^i \, {\phi}_{q_n}^j \d{s}, \quad \in \mathbb{R}^{N_w \times N_{q_n}} , \\
+\bm{B}_{M_{nn}}(i,j) &= \int_{\partial\Omega} (\bm{\phi}_{\theta}^i \cdot \bm{n})\, \phi_{M_{nn}}^j \d{s}, \quad \in \mathbb{R}^{N_w \times N_{M_{nn}}} , \\
+\bm{B}_{M_{ns}}(i,j) &= \int_{\partial\Omega} (\bm{\phi}_{\theta}^i \cdot \bm{s})\, \phi_{M_{ns}}^j \d{s}, \quad \in \mathbb{R}^{N_w \times N_{M_{ns}}}. \\
 \end{aligned}
 \end{equation}
 The final port-Hamiltonian system (as defined in \cite{beattie2018linear}, where the presence of a mass matrix $\bm{M}$ is taken into account) is written as:
@@ -902,7 +902,7 @@ H_d &= \frac{1}{2} \int_{\Omega} \left\{ \alpha_w e_w + \bm{\alpha}_\theta \cdot
 }
 Then it naturally follows that:
 \begin{equation}
-\dot{H}_d = \bm{y}_{\partial}^T \bm{u}_{\partial}
+\dot{H}_d = \bm{y}_{\partial}^T \bm{u}_{\partial}.
 \end{equation}
 This is equivalent to the energy balance of the continuous system, expressed by equation \eqref{eq:PowRate}. Definition \eqref{eq:Hd}, together with system \eqref{eq:PHdiscr_Min} are the finite-dimensional equivalent of \eqref{eq:H_min} and  \eqref{eq:PH_sys_Min_Ten}. Again, the discretized system obtained via PFEM shares the same properties as those of the original infinite-dimensional system, the discretization method is therefore structure-preserving. \\
 
