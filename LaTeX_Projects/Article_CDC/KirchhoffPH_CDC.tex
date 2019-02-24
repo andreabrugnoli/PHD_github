@@ -324,8 +324,8 @@ where $\bm{D}_{\mathrm{H}}(i,j)$ indicates the entry in the matrix corresponding
 The symmetric bilinear form on the left-hand side of \eqref{eq:WF_Neum} is discretized as $\bm{M}_{\text{pl}} = \text{diag}[\bm{M}_w,\, \bm{M}_\kappa]$ with
 \begin{equation}
 \begin{aligned}
-&\bm{M}_w(i,j) = \int_{\Omega} \rho h \, \bm{\phi}_w^i \, \bm{\phi}_w^j \d\Omega \; \in \mathbb{R}^{N_w \times N_w}, \\
-&\bm{M}_\kappa(i,j) = \int_{\Omega}  \left( \bm{D}^{-1} \bm{\Phi}_\kappa^i \right) \cddot \bm{\Phi}_\kappa^j \d\Omega \; \in \mathbb{R}^{N_\kappa \times N_\kappa},\\
+&\bm{M}_w(i,j) = \int_{\Omega} \rho h \, \bm{\phi}_w^i \, \bm{\phi}_w^j \d\Omega, \; \in \mathbb{R}^{N_w \times N_w}, \\
+&\bm{M}_\kappa(i,j) = \int_{\Omega}  \left( \bm{D}^{-1} \bm{\Phi}_\kappa^i \right) \cddot \bm{\Phi}_\kappa^j \d\Omega, \; \in \mathbb{R}^{N_\kappa \times N_\kappa},\\
 \end{aligned}
 \end{equation}
 To deal with generic boundary conditions, Lagrange multipliers have to be introduced in \eqref{eq:Neum_funct}
@@ -527,7 +527,7 @@ Here the Lagrange multipliers and associated matrices $\bm{\lambda}_D =  (\bm\la
 where $\bm{e}_{\text{rod}} = (v_G; \; \omega_{G}), \; \bm{M}_{\text{rod}} = \mathrm{diag}(M_G, \, J_G)$. The interconnection matrix if obtained once the operator $\mathcal{W}^*$ is set into weak form
 \begin{align*}
 \bm{W}^T(i,j) &= \left\langle \bm{\phi}^i_{\widetilde{q}_n}, \; \mathcal{W}^* \bm{\phi}^j_{\mathbb{R}^2} \right\rangle_{L^2(\Gamma_{\text{int}})} \\
-&= \int_{\Gamma_{\text{int}}} [\bm{\phi}^i_{\widetilde{q}_n}, \; \bm{\phi}^i_{\widetilde{q}_n} (y - L_y/2) ]\d{s},
+\bm{W}^T(i,:) &= \int_{\Gamma_{\text{int}}} [\bm{\phi}^i_{\widetilde{q}_n}, \; \bm{\phi}^i_{\widetilde{q}_n} (y - L_y/2) ]\d{s},
 \end{align*}
 
 where $\bm{\phi}^j_{\mathbb{R}^2},  \; \forall j = 1,2$ is the canonical basis of $\mathbb{R}^2$. The final system is obtained considering the power preserving interconnection $\bm{u}_{\text{rod}} = - \bm{W} \bm{y}_{\text{pl}}, \; \bm{u}_{\text{pl}} = \bm{W}^T \bm{y}_{\text{rod}}$. Then the augmented system is found to be
@@ -542,14 +542,14 @@ with $\bm{x}_{\text{aug}} = (\bm{e}_{\text{pl}}, \bm{e}_{\text{rod}}, \bm{\lambd
 \bm{M}_{\text{pl}} & \bm{0} & \bm{0} \\
 \bm{0} & \bm{M}_{\text{rod}} &\bm{0} \\
 \bm{0} & \bm{0} &\bm{0} \\
-\end{bmatrix}, \;
+\end{bmatrix}, 
 \bm{J}_{\text{aug}}=\begin{bmatrix}
 \bm{J}_d & \bm{0} & \bm{G}_D \\
 \bm{0} & \bm{0} & \bm{G}_{\text{rod}}\\
 -\bm{G}_D^T & -\bm{G}_{\text{rod}}^T & \bm{0} \\
-\end{bmatrix},
+\end{bmatrix}
 \end{equation}
-with $\bm{G}_{\text{rod}} = -\bm{B}^T\bm{W}$. 
+where $\bm{G}_{\text{rod}} = -\bm{B}^T\bm{W}$. 
 \subsection{Numerical Simulation}
 To validate the approach numerical simulations on system \eqref{eq:aug_Int} are carried out. A  plate clamped in $x=0$ is considered. A final time equal to $t_{\text{end}} = 10 [ms]$ is taken and a vertical distributed force, given by formula
 \begin{equation}\label{eq:force_rod}
@@ -561,9 +561,8 @@ To validate the approach numerical simulations on system \eqref{eq:aug_Int} are 
 
 acts on the plate. The rigid rod has mass $M = 50 \, [kg]$ and length $L_{\text{rod}} = 1 [m]$. The plate parameters and settings for the discretization (a uniform grid is taken) are provided in Table \ref{tab:par}. The constraints are eliminated considering the projection matrix \cite{Heiland_red}
 \begin{equation} \label{eq:proj}
-\bm{P}_{\lambda} = \bm{I} - \bm{G} \left(\bm{G}^T \bm{M}^{-1} \bm{G} \right)^{-1} \bm{G}^T \bm{M}^{-1}
+\bm{P}_{\lambda} = \bm{I} - \bm{G} \left(\bm{G}^T \bm{M}^{-1} \bm{G} \right)^{-1} \bm{G}^T \bm{M}^{-1},
 \end{equation}
- 
 with $\bm{M} = \text{diag}(\bm{M}_{\text{pl}}, \, \bm{M}_{\text{rod}}), \; \bm{G} = [\bm{G}_D; \; \bm{G}_{\text{rod}}]$.
 
 \begin{figure}[t]
