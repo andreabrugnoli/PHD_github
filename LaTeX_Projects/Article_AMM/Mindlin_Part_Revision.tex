@@ -40,13 +40,8 @@
 \newcolumntype{m}{>{\columncolor{Yellow}[.8\tabcolsep]}c}
 \newcolumntype{b}{>{\columncolor{Blue}[.8\tabcolsep]}c}
 
-
-\newcommand{\RevOne}[1]{\textcolor{blue!80!black}{#1}}
-\newcommand{\RevTwo}[1]{\textcolor{red!80!black}{#1}}
-
-%\newcommand{\RevOne}[1]{\textcolor{black}{#1}}
-%\newcommand{\RevTwo}[1]{\textcolor{black}{#1}}
-
+\newcommand{\firstReviewer}[1]{\textcolor{red!80!black}{#1}}
+\newcommand{\secondReviewer}[1]{\textcolor{blue!80!black}{#1}}
 
 %\usepackage{hyperref}
 
@@ -142,7 +137,7 @@
 	
 	
 	\section*{Introduction}
-	 The port-Hamiltonian (PH) framework is acquiring more visibility for its capability to represent a huge class of systems coming from different realms of physics. \RevTwo{The Hamiltonian formalism arising from the Legendre transformation of Euler-Lagrange system  has been already widely explored \cite{SymplecticElasticity}. The Legendre tranformation gives rise to a system of equations ruled by a Hamiltonian matrix on a symplectic space. On the contrary,  PH systems are defined with respect to a formally skew-symmetric Hamiltonian differential operator.} A main feature of this framework is its modularity. Finite-dimensional port-Hamiltonian systems can be easily interconnected together, as shown in \cite{Cervera2007}, allowing the construction of complex multi-physics systems. The interconnection is possible also in the infinite-dimensional case \cite{ShaftIntInfinite}, even if the procedure is not as straightforward as in the finite-dimensional case. Eventually, it is also possible to merge finite and infinite PH systems \cite{vanderShaftintFinInf}. These features and capabilities are particularly appealing for control engineers in order to simplify the modeling task in preliminary analyses.  \\
+	 The port-Hamiltonian (PH) framework is acquiring more visibility for its capability to represent a huge class of systems coming from different realms of physics. \firstReviewer{The Hamiltonian formalism arising from the Legendre transformation of Euler-Lagrange system  has been already widely explored \cite{SymplecticElasticity}. The Legendre tranformation gives rise to a system of equations ruled by a Hamiltonian matrix on a symplectic space. On the contrary,  PH systems are defined with respect to a formally skew-symmetric Hamiltonian differential operator.} A main feature of this framework is its modularity. Finite-dimensional port-Hamiltonian systems can be easily interconnected together, as shown in \cite{Cervera2007}, allowing the construction of complex multi-physics systems. The interconnection is possible also in the infinite-dimensional case \cite{ShaftIntInfinite}, even if the procedure is not as straightforward as in the finite-dimensional case. Eventually, it is also possible to merge finite and infinite PH systems \cite{vanderShaftintFinInf}. These features and capabilities are particularly appealing for control engineers in order to simplify the modeling task in preliminary analyses.  \\
 	
 	
 	Distributed parameter systems are of relevant interest given the increased computational power available for simulations. PH distributed systems were initially presented in \cite{VANDERSCHAFT2002166}, by using the theory of differential forms. Links towards functional analysis have been made in \cite{Villegas} and an exhaustive reference about the subject can be found in \cite{BookZwart}. The fundamental feature of a distributed PH system is the underlying geometric interconnection structure, the so-called Stokes-Dirac structure, that describes the power flow across the boundary and inside the system, together with an energy functional, the Hamiltonian, that determines the nature of the system. Linear/nonlinear, parabolic/hyperbolic systems can be all recast into this framework, \cite{bookPHs}. Port-Hamiltonian systems are by definition open systems, able to interact with the environment through boundary ports. The definitions of these boundary variables is of utmost importance to show that a PH system is well posed ( see \cite{LeGorrec2005} for the proof in the 1D case). Applications coming from continuum mechanics, electrodynamics and thermodynamics can be integrated inside this framework. Academic examples typically considered are the transmission line, the shallow water equations and the Maxwell equations \cite{VANDERSCHAFT2002166}. \\
@@ -155,19 +150,19 @@
 	
 	The research community is focusing on structure-preserving discretization techniques since several years. In \cite{Golo}, the authors made use of a mixed finite element spatial discretization for 1D hyperbolic system of conservation laws, introducing different low-order basis functions for the energy and co-energy variables. Pseudo-spectral methods relying on higher-order global polynomial approximations were studied in \cite{moulla:hal-01625008}. This method was used and extended to take into account unbounded control operators in \cite{articleFlavio}. More recently a simplicial discretization based on discrete exterior calculus was proposed in \cite{SESLIJA20121509}. This approach comes with additional complexities, since a primal and a dual meshes have to be defined but the discretization is structure-preserving, regardless of the spatial dimension of the problem. Weak formulations which lead to Galerkin numerical approximations began to be explored in the last years. In \cite{WeakForm_Kot} the prototypical example of hyperbolic systems of two conservation law was discretized by a weak formulation. In this approach the boundary is split according to the causality of boundary ports, so that mixed boundary conditions are easily handled, but still dual meshes have to be defined.  \\
 	
-	The main contributions of this paper is the enrichment of the port-Hamiltonian formulation for the Mindlin plate model, by making use of tensor calculus (see \cite[Chapter~16]{Grinfield}), together with a consistent discretization method.  This kind of model was already presented in \cite{MacchelliMindlin} and \RevOne{using the jet bundle formalism in \cite{jetMin}} but here a novel formulation based on tensorial calculus is introduced.  The second contribution of this paper concerns the extension of the Partitioned Finite Element Method (PFEM) to the Mindlin plate model. In this approach, originally presented in \cite{CardosoRibeiro2018}, once the system has been put into weak form, a subset of the equations is integrated by parts, so that boundary variables are naturally included into the formulation and appear as control inputs, the collocated outputs being defined accordingly. Then, the discretization of energy and co-energy variables (and the associated test functions) leads directly to a full rank representation for the finite-dimensional port-Hamiltonian system. If mixed boundary conditions are to be considered, the finite-dimensional system contains constraints, leading to an algebraic differential system (DAE), which can be treated and analyzed by referring to \cite{vanderSchaft2013, beattie2018linear}. This approach, similarly to the one detailed in \cite{WeakForm_Kot}, makes possible the usage of FEM software, like FEniCS \cite{LoggMardalEtAl2012}. The final discretized system can be further reduced by using appropriate model reduction techniques, as explained in \cite{TONG20132727, Mehrmann2018}  \\
+	The main contributions of this paper is the enrichment of the port-Hamiltonian formulation for the Mindlin plate model, by making use of tensor calculus (see \cite[Chapter~16]{Grinfield}), together with a consistent discretization method.  This kind of model was already presented in \cite{MacchelliMindlin} and \secondReviewer{using the jet bundle formalism in \cite{jetMin}} but here a novel formulation based on tensorial calculus is introduced.  The second contribution of this paper concerns the extension of the Partitioned Finite Element Method (PFEM) to the Mindlin plate model. In this approach, originally presented in \cite{CardosoRibeiro2018}, once the system has been put into weak form, a subset of the equations is integrated by parts, so that boundary variables are naturally included into the formulation and appear as control inputs, the collocated outputs being defined accordingly. Then, the discretization of energy and co-energy variables (and the associated test functions) leads directly to a full rank representation for the finite-dimensional port-Hamiltonian system. If mixed boundary conditions are to be considered, the finite-dimensional system contains constraints, leading to an algebraic differential system (DAE), which can be treated and analyzed by referring to \cite{vanderSchaft2013, beattie2018linear}. This approach, similarly to the one detailed in \cite{WeakForm_Kot}, makes possible the usage of FEM software, like FEniCS \cite{LoggMardalEtAl2012}. The final discretized system can be further reduced by using appropriate model reduction techniques, as explained in \cite{TONG20132727, Mehrmann2018}  \\
 	
-	The paper is divided into \RevTwo{five} main sections 
+	The paper is divided into \firstReviewer{five} main sections 
 	\begin{enumerate}
 		\item The framework of finite-dimensional port-Hamiltonian systems (PHs) and the notion of Dirac and Stokes-Dirac structures are recalled. The infinite-dimensional case is then illustrated by means of the Timoshenko beam model, the 1D counterpart of the Mindlin plate model.
-		\item \RevOne{The constitutive relations, equations of motions and energies for the Mindlin-Reissner plate are detailed.}
+		\item \secondReviewer{The constitutive relations, equations of motions and energies for the Mindlin-Reissner plate are detailed.}
 		\item The Mindlin plate port-Hamiltonian formulation is highlighted by defining energy and co-energy variables and the interconnection structure. The boundary variables are found by introducing the energy balance. Then the underlying Stokes-Dirac structure is easily obtained by defining the flow and effort spaces, together with the space of boundary variables.
 		\item The PFEM discretization for the Mindlin plate is detailed. The problem is put into weak form first, then the necessary integrations by parts are performed and finally the basis functions for the energy, co-energy and test functions are chosen.
-		\item \RevTwo{To demonstrate the consistency of the approach an eigenvalue study of a square plate considering various boundary conditions is performed, together with some time-domain simulation.} 
+		\item \firstReviewer{To demonstrate the consistency of the approach an eigenvalue study of a square plate considering various boundary conditions is performed, together with some time-domain simulation.} 
 	\end{enumerate}
 
 
-\RevOne{
+\secondReviewer{
 \section{Reminder on port-Hamiltonian systems}
 In this section the concepts of Dirac structure and Stokes-Dirac structure are recalled. From these concepts finite and infinite dimensional port-Hamiltonian system are then derived by considering the port behavior. 
 \subsection{Dirac Structures}
@@ -289,10 +284,10 @@ Following \cite[Chapter~3]{BookZwart}, the prototypical example of the Timoshenk
 where ${w}(x,t)$ is the transverse displacement and $\phi(x,t)$ is the rotation angle of a fiber of the beam. The coefficients $\rho(x), I_{\rho}(x), E(x), I(x)$ and $K(x)$ are the mass per unit length, the rotary moment of inertia of a cross section, Young's modulus of elasticity, the moment of inertia of a cross section and the shear modulus, respectively. The energy variables are chosen as follows:
 \begin{equation}
 \begin{aligned}
-\alpha_{w} &:= \rho(x) \diffp{w}{t}(x,t), \quad &\text{\RevOne{Linear Momentum,}} \\
-\alpha_{\phi} &:= I_{\rho}(x) \diffp{\phi}{t}(x,t), \quad &\text{\RevOne{Angular Momentum,}} \\
-\alpha_{\kappa} &:= \diffp{\phi}{x}(x,t), \quad &\text{\RevOne{Curvature,}} \\
-\alpha_{\gamma} &:= \diffp{w}{x}(x,t) - \phi(x,t), \quad &\text{\RevOne{Shear Deformation}}. \\
+\alpha_{w} &:= \rho(x) \diffp{w}{t}(x,t), \quad &\text{\secondReviewer{Linear Momentum,}} \\
+\alpha_{\phi} &:= I_{\rho}(x) \diffp{\phi}{t}(x,t), \quad &\text{\secondReviewer{Angular Momentum,}} \\
+\alpha_{\kappa} &:= \diffp{\phi}{x}(x,t), \quad &\text{\secondReviewer{Curvature,}} \\
+\alpha_{\gamma} &:= \diffp{w}{x}(x,t) - \phi(x,t), \quad &\text{\secondReviewer{Shear Deformation}}. \\
 \end{aligned}
 \end{equation}
 
@@ -312,13 +307,13 @@ Q =
 The co-energy variables are found by computing the variational derivative of the Hamiltonian (see  \cite{MacchelliTimo}):
 \begin{equation}
 \begin{aligned}
-e_{w} &:= \diffd{H}{\alpha_w} = \diffp{w}{t}(x,t), \quad &\text{\RevOne{Linear Velocity,}} \\
-e_{\phi} &:= \diffd{H}{\alpha_{\phi}} = \diffp{\phi}{t}(x,t), \quad &\text{\RevOne{Angular Velocity,}} \\
-e_{\kappa} &:= \diffd{H}{\alpha_{\kappa}} =EI(x) \diffp{\phi}{x}(x,t), \quad &\text{\RevOne{Flexural Momentum,}}\\
-e_{\gamma} &:= \diffd{H}{\alpha_{\gamma}} = K(x) \left(\diffp{w}{x}(x,t) - \phi(x,t) \right), \quad &\text{\RevOne{Shear Force}}. \\
+e_{w} &:= \diffd{H}{\alpha_w} = \diffp{w}{t}(x,t), \quad &\text{\secondReviewer{Linear Velocity,}} \\
+e_{\phi} &:= \diffd{H}{\alpha_{\phi}} = \diffp{\phi}{t}(x,t), \quad &\text{\secondReviewer{Angular Velocity,}} \\
+e_{\kappa} &:= \diffd{H}{\alpha_{\kappa}} =EI(x) \diffp{\phi}{x}(x,t), \quad &\text{\secondReviewer{Flexural Momentum,}}\\
+e_{\gamma} &:= \diffd{H}{\alpha_{\gamma}} = K(x) \left(\diffp{w}{x}(x,t) - \phi(x,t) \right), \quad &\text{\secondReviewer{Shear Force}}. \\
 \end{aligned}
 \end{equation}
-These variables are again collected in the vector $\bm{e} = (e_{w}, \, e_{\phi}, \, e_{\kappa}, \, e_{\gamma} )^T $, so that \RevOne{system \eqref{eq:TimoModel} can be rewritten in terms of energy and co-energy variables:}
+These variables are again collected in the vector $\bm{e} = (e_{w}, \, e_{\phi}, \, e_{\kappa}, \, e_{\gamma} )^T $, so that \secondReviewer{system \eqref{eq:TimoModel} can be rewritten in terms of energy and co-energy variables:}
 \begin{equation}
 \label{eq:PH_Timo}
 \diffp{\bm{\alpha}}{t} = J \mathbf{e},  	\qquad \text{where} \qquad
@@ -330,7 +325,7 @@ J =
 \diffp{}{x} & -1 & 0 & 0 \\
 \end{bmatrix} .
 \end{equation}
-\RevOne{By Definition \eqref{def:skewOp}, the constant matrix differential operator $J$ is skew-symmetric. In order to unveil the Stokes-Dirac structure for this model, boundary variables have to be defined. The energy rate is given by (see \cite{BookZwart} for a detailed derivation):
+\secondReviewer{By Definition \eqref{def:skewOp}, the constant matrix differential operator $J$ is skew-symmetric. In order to unveil the Stokes-Dirac structure for this model, boundary variables have to be defined. The energy rate is given by (see \cite{BookZwart} for a detailed derivation):
 \begin{equation}
 \dot{H} = \bm{f}_{\partial}^T \bm{e}_{\partial},
 \end{equation}
@@ -374,7 +369,7 @@ where $B_J(\bm{z}_1, \bm{z}_2) := (\bm{f}_{\partial, 1})^T \bm{e}_{\partial, 2} 
 
 \section{Mindlin theory for thick plates}
 \label{sec:Min_Var}
-\RevOne{In this section the classical model of thick plates is first recalled by making use of a tensorial formalism to simplify the discussion on the port-Hamiltonian formulation.} The Mindlin plate theory, originally presented in \cite{mindlin}, is more suited for plates having a large thickness. The fibers, i.e. a segment perpendicular to the mid-plane, of the plate are supposed to remain straight after the deformation, but not necessarily normal to the mid-plane. For this reason two new kinematic variables have to be added, in order to represent the deflection of the cross sections. \RevOne{ Let $\theta_x$ denote the deflection of the cross section with respect to the opposite side of the $y$ axis and  $\theta_y$ its deflection along the $x$ axis. The displacement field is therefore given by the following relations:
+\secondReviewer{In this section the classical model of thick plates is first recalled by making use of a tensorial formalism to simplify the discussion on the port-Hamiltonian formulation.} The Mindlin plate theory, originally presented in \cite{mindlin}, is more suited for plates having a large thickness. The fibers, i.e. a segment perpendicular to the mid-plane, of the plate are supposed to remain straight after the deformation, but not necessarily normal to the mid-plane. For this reason two new kinematic variables have to be added, in order to represent the deflection of the cross sections. \secondReviewer{ Let $\theta_x$ denote the deflection of the cross section with respect to the opposite side of the $y$ axis and  $\theta_y$ its deflection along the $x$ axis. The displacement field is therefore given by the following relations:
 \begin{equation}
 \begin{aligned}
 u(x,y,z) &= -z \theta_x(x,y), \quad &\text{Displacement along $x$}, \\
@@ -476,7 +471,7 @@ where $\Omega$ is an open connected set of $\mathbb{R}^2$.
 
 \section{PH tensorial formulation of the Mindlin plate}
 \label{sec:PH_ten_Min}
-In this section the new tensorial formulation for the Mindlin plate is presented. \RevOne{Obviously this result is equivalent to the one found in the vectorial case \cite{MacchelliMindlin}, but the tensorial formulation is more suitable from the point of view of functional analysis since it makes appear intrinsic operators ($\mathrm{div}, \mathrm{Div}, \mathrm{grad}, \mathrm{Grad}$) as it will be shown in the following, regardless of the choice of coordinate frame. \newline
+In this section the new tensorial formulation for the Mindlin plate is presented. \secondReviewer{Obviously this result is equivalent to the one found in the vectorial case \cite{MacchelliMindlin}, but the tensorial formulation is more suitable from the point of view of functional analysis since it makes appear intrinsic operators ($\mathrm{div}, \mathrm{Div}, \mathrm{grad}, \mathrm{Grad}$) as it will be shown in the following, regardless of the choice of coordinate frame. \newline
 The Hamiltonian energy is first considered in order to find the proper energy variables:
 \begin{equation}
 \label{eq:H_min}
@@ -621,7 +616,7 @@ It can be observed that the interconnection structure given by $J$ in \eqref{eq:
 	\caption{Reference frames and notations.}
 	\label{fig:plate_ref}
 \end{figure}
-\RevOne{
+\secondReviewer{
 We shall now establish the total energy balance in terms of boundary variables. Those will then be part of the underlying Stokes-Dirac structure of this model:
 \begin{equation}
 \label{eq:PowRate}
@@ -784,7 +779,7 @@ where $v_{M_{nn}} = \mathbb{V}_{\kappa} \cddot (\bm{n} \otimes \bm{n}), \;  v_{M
 In this second case,  the boundary controls $\bm{u}_\partial$ and corresponding output $\bm{y}_\partial$ are:
 \[\bm{u}_\partial = 
 \begin{pmatrix}
-\RevOne{w_t} \\
+\secondReviewer{w_t} \\
 \omega_{n} \\
 \omega_{s} \\
 \end{pmatrix}_{\partial \Omega}, \qquad
@@ -798,7 +793,7 @@ M_{ns} \\
 
 \subsection{Finite-dimensional port-Hamiltonian system}
 \label{sec:FD_system}
-\RevTwo{
+\firstReviewer{
 In this section the formulation \eqref{eq:WF_Min_Dyn} is used is order to explain the discretization procedure. Test and co-energy variables are discretized using the same basis functions (Galerkin Method):
 \begin{equation}
 \begin{aligned}
@@ -959,7 +954,7 @@ So that the output equation becomes:
 	\label{fig:mix_bcs}
 \end{figure}
 
-The port-Hamiltonian finite-dimensional system is rewritten equivalently by highlighting the known control terms, the Lagrange multipliers (reactions at the boundary) and the constraints, arising from the fact that \RevTwo{the function $\bm{y}_{\lambda}$ is known. In case of a homogenous Dirichlet condition, i.e. $\bm{y}_{\lambda} = 0$, it is obtained:
+The port-Hamiltonian finite-dimensional system is rewritten equivalently by highlighting the known control terms, the Lagrange multipliers (reactions at the boundary) and the constraints, arising from the fact that \firstReviewer{the function $\bm{y}_{\lambda}$ is known. In case of a homogenous Dirichlet condition, i.e. $\bm{y}_{\lambda} = 0$, it is obtained:
 \begin{equation}
 \label{eq:PHdiscr_mixed}
 \begin{aligned}
@@ -993,7 +988,7 @@ The port-Hamiltonian finite-dimensional system is rewritten equivalently by high
 }
 This differential-algebraic port-Hamiltonian system can be treated applying results detailed in \cite{vanderSchaft2013,beattie2018linear}.
 
-\RevTwo{
+\firstReviewer{
 \section{Numerical studies}
 \label{sec:Num}
 In this section, the consistency of the proposed model is illustrated numerically. For this purpose the computation of the eigenvalues of a square plate and time-domain simulations for several boundary conditions are presented. The formulation used in the numerical implementation is the one presented in section \ref{sec:FD_system}. 
@@ -1180,7 +1175,7 @@ where $\omega_{mn}^{DR}$ are the eigenvalues calculated in \cite{dawe1980rayleig
 	\label{fig:CCCF}%
 \end{figure}
 
-\RevTwo{
+\firstReviewer{
 \subsection{Time-domain Simulations}
 \begin{table}[h!]
 	\centering
@@ -1305,7 +1300,7 @@ Snapshots of the vertical displacement field are reported in Figures \ref{fig:si
 
 \section*{Conclusions and Perspectives}
 
-In this paper the port-Hamiltonian formulation of the Mindlin plate was enriched by the equivalent tensorial formulation and by a symplectic discretization method. The PFEM method, applied to this formulation, proves again its versatility, since it stays valid and applicable even in more complicated examples like the one presented in this article. \RevOne{Many features of this method and of the tensorial PH formulation are of interest:
+In this paper the port-Hamiltonian formulation of the Mindlin plate was enriched by the equivalent tensorial formulation and by a symplectic discretization method. The PFEM method, applied to this formulation, proves again its versatility, since it stays valid and applicable even in more complicated examples like the one presented in this article. \secondReviewer{Many features of this method and of the tensorial PH formulation are of interest:
 \begin{itemize}
 	\item its capability of preserving the port-Hamiltonian structure;
 	\item the natural derivation of boundary port-variables as inputs;

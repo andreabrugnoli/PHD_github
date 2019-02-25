@@ -34,11 +34,8 @@
 \newtheorem{remark}{Remark}
 \newtheorem{proposition}{Proposition}
 
-\newcommand{\revOne}[1]{\textcolor{blue!80!black}{#1}}
-\newcommand{\revTwo}[1]{\textcolor{red!80!black}{#1}}
-
-%\newcommand{\revOne}[1]{\textcolor{black}{#1}}
-%\newcommand{\revTwo}[1]{\textcolor{black}{#1}}
+\newcommand{\firstReviewer}[1]{\textcolor{red!80!black}{#1}}
+\newcommand{\secondReviewer}[1]{\textcolor{blue!80!black}{#1}}
 
 \newcommand{\sqboxs}{1.2ex}% the square size
 \newcommand{\sqboxf}{0.6pt}% the border in \sqboxEmpty
@@ -140,10 +137,10 @@
 	\end{frontmatter}
 		
 \section*{Introduction}
-As presented in part I of this companion paper, the port-Hamiltonian (PH) formalism \cite{BookZwart, bookPHs, Villegas} allows the structured modeling and discretization of multi-physics applications involving interconnected finite- and infinite-dimensional systems \cite{Cervera2007,ShaftIntInfinite}. Preserving the port-Hamiltonian structure in the discretization process is a keypoint to take benefit of this powerful formalism. This issue was first addressed in \cite{Golo}, with a mixed finite element spatial discretization method, and in \cite{moulla:hal-01625008}, with pseudo-spectral methods relying on higher-order global polynomial approximations. All those methods are difficult to implement, especially for those system the spatial dimension of which is bigger than one. Very recently weak formulations which lead to Galerkin numerical approximations began to be explored: in \cite{WeakForm_Kot}, a structure preserving finite element method was introduced for the wave equation in a two-dimensional domain; this method exhibits good results, both in the spectral analysis and simulation part, though requiring of a primal and a dual mesh on the geometry of the problem. Another approach is the partitioned finite element method (PFEM) proposed in \cite{CardosoRibeiro2018}, already largely explored in part I of this companion paper. The advantages of this latter methodology are its simplicity of implementation and its potential to carry over to a wide set of examples, no matter the spatial dimension of the problem. The possible use of open source software like FEniCS \cite{LoggMardalEtAl2012} \revTwo{or Firedrake \cite{firedrake}} is also an appealing feature of this latter method  \\
+As presented in part I of this companion paper, the port-Hamiltonian (PH) formalism \cite{BookZwart, bookPHs, Villegas} allows the structured modeling and discretization of multi-physics applications involving interconnected finite- and infinite-dimensional systems \cite{Cervera2007,ShaftIntInfinite}. Preserving the port-Hamiltonian structure in the discretization process is a keypoint to take benefit of this powerful formalism. This issue was first addressed in \cite{Golo}, with a mixed finite element spatial discretization method, and in \cite{moulla:hal-01625008}, with pseudo-spectral methods relying on higher-order global polynomial approximations. All those methods are difficult to implement, especially for those system the spatial dimension of which is bigger than one. Very recently weak formulations which lead to Galerkin numerical approximations began to be explored: in \cite{WeakForm_Kot}, a structure preserving finite element method was introduced for the wave equation in a two-dimensional domain; this method exhibits good results, both in the spectral analysis and simulation part, though requiring of a primal and a dual mesh on the geometry of the problem. Another approach is the partitioned finite element method (PFEM) proposed in \cite{CardosoRibeiro2018}, already largely explored in part I of this companion paper. The advantages of this latter methodology are its simplicity of implementation and its potential to carry over to a wide set of examples, no matter the spatial dimension of the problem. The possible use of open source software like FEniCS \cite{LoggMardalEtAl2012} \firstReviewer{or Firedrake \cite{firedrake}} is also an appealing feature of this latter method  \\
 
-In part II of this companion paper, the modeling and discretization of thin plates described by the Kirchhoff-Love plate model is carried out within the PH framework, allowing for boundary control and observation. Compared to the existing literature on either the symplectic Hamiltonian formulation of  \cite{LI2016984,LI2018310}, or the port-Hamiltonian framework through jet theory in \revOne{\cite{jetMin,jetKirchh}}, the main contribution of this paper concerns the PH formalism based on a Stokes-Dirac structure. This formalism is presented both in vectorial and tensorial forms.  Moreover, the tensorial formalism \cite[Chapter~16]{Grinfield} highlights that this model mimics the interconnection structure of its one-dimensional counterpart, i.e. the Euler-Bernoulli beam. Compared to part I dedicated to thick plate Mindlin model in which first-order differential operators are explored in dimension two, and compared to \cite{LeGorrec2005} in which second-  or higher-order differential operators were explored in dimension one only, the contribution of this paper is the PH formalism of systems of dimension two described with second-order  differential operators, such as the Kirchhoff-Love  model. The model, once written in a tensorial form, highlights new insights on second-order differential operators: especially the double divergence and the Hessian are proved to be adjoint operators one of another, which represents another important contribution of this paper.
-Finally, the extension of the PFEM method  to the structure-preserving discretization of the Kirchhoff model  is also a novelty of the paper. It allows simple implementation of numerical schemes compared to the jet theory formalism, while preserving the structure of PHS at the discrete level. \revTwo{The last section is dedicated to numerical studies of this model using Firedrake \cite{firedrake}.}
+In part II of this companion paper, the modeling and discretization of thin plates described by the Kirchhoff-Love plate model is carried out within the PH framework, allowing for boundary control and observation. Compared to the existing literature on either the symplectic Hamiltonian formulation of  \cite{LI2016984,LI2018310}, or the port-Hamiltonian framework through jet theory in \secondReviewer{\cite{jetMin,jetKirchh}}, the main contribution of this paper concerns the PH formalism based on a Stokes-Dirac structure. This formalism is presented both in vectorial and tensorial forms.  Moreover, the tensorial formalism \cite[Chapter~16]{Grinfield} highlights that this model mimics the interconnection structure of its one-dimensional counterpart, i.e. the Euler-Bernoulli beam. Compared to part I dedicated to thick plate Mindlin model in which first-order differential operators are explored in dimension two, and compared to \cite{LeGorrec2005} in which second-  or higher-order differential operators were explored in dimension one only, the contribution of this paper is the PH formalism of systems of dimension two described with second-order  differential operators, such as the Kirchhoff-Love  model. The model, once written in a tensorial form, highlights new insights on second-order differential operators: especially the double divergence and the Hessian are proved to be adjoint operators one of another, which represents another important contribution of this paper.
+Finally, the extension of the PFEM method  to the structure-preserving discretization of the Kirchhoff model  is also a novelty of the paper. It allows simple implementation of numerical schemes compared to the jet theory formalism, while preserving the structure of PHS at the discrete level. \firstReviewer{The last section is dedicated to numerical studies of this model using Firedrake \cite{firedrake}.}
 
 \section{Second-order distributed PH systems: Euler-Bernoulli beam}	
 The Euler-Bernoulli beam is the one-dimensional equivalent of the Kirchhoff-Love plate.  This model consists of one PDE, describing the vertical displacement along the beam length:
@@ -224,13 +221,13 @@ The duality pairing between elements of $\mathcal{B}$ is then defined as follows
 \end{equation}
 The Stokes-Dirac structure for the Euler-Bernoulli beam is therefore:
 \begin{theorem}[From \cite{LeGorrec2005}, Stokes-Dirac structure for the Bernoulli beam]
-	Consider the space of power variables \revOne{$\mathcal{B}$ defined in \eqref{eq:BondEB}} and the bilinear form (+pairing operator) $\ll , \gg$ given by \eqref{eq:bil_Timo}. Define the following linear subspace $\mathcal{D} \subset \mathcal{F} \times \mathcal{E}$:
+	Consider the space of power variables \secondReviewer{$\mathcal{B}$ defined in \eqref{eq:BondEB}} and the bilinear form (+pairing operator) $\ll , \gg$ given by \eqref{eq:bil_Timo}. Define the following linear subspace $\mathcal{D} \subset \mathcal{F} \times \mathcal{E}$:
 	\begin{equation}
 	\mathcal{D} =  \left\{(\bm{f},\bm{f}_{\partial},\bm{e},\bm{e}_{\partial}) \in \mathcal{F} \times \mathcal{E} | \; \bm{f} = -J\bm{e} \right\},
 	\end{equation}
-	\revOne{where $\bm{f}_{\partial}$ and $\bm{e}_{\partial}$} were defined in \eqref{eq:BoundPortEB}. Then, it holds $\mathcal{D} = \mathcal{D}^{\perp}$, where $\mathcal{D}^{\perp}$ is understood in the sense of orthogonality with respect to the bilinear product $\ll , \gg$,  i.e $\mathcal{D}$ is a Stokes-Dirac structure. 
+	\secondReviewer{where $\bm{f}_{\partial}$ and $\bm{e}_{\partial}$} were defined in \eqref{eq:BoundPortEB}. Then, it holds $\mathcal{D} = \mathcal{D}^{\perp}$, where $\mathcal{D}^{\perp}$ is understood in the sense of orthogonality with respect to the bilinear product $\ll , \gg$,  i.e $\mathcal{D}$ is a Stokes-Dirac structure. 
 \end{theorem}
-\revOne{
+\secondReviewer{
 \begin{remark}
 	For what concerns the use of this model for control and simulation purposes, the reader can refer to \cite{stabBeam} for a stability and stabilization proof of the Euler-Bernoulli beam or to \cite{aoues:hal-01738092} for an illustration of a rotating spacecraft with flexible appendages model as PH Bernoulli beams.
 \end{remark}
@@ -304,7 +301,7 @@ Hooke's constitutive law for isotropic material is considered for the constituti
 0  &  0 & \frac{1-\nu}{2}\\
 \end{bmatrix}.
 \end{equation}
-where $\nu$ is Poisson's ratio and $E$ Young's modulus. \revOne{These physical parameters may be inhomogeneous, i.e. $\nu = \nu(x, y, z), \, E = E(x, y, z)$. The generalized momenta are found by integrating the stresses along the fiber:
+where $\nu$ is Poisson's ratio and $E$ Young's modulus. \secondReviewer{These physical parameters may be inhomogeneous, i.e. $\nu = \nu(x, y, z), \, E = E(x, y, z)$. The generalized momenta are found by integrating the stresses along the fiber:
 \begin{equation*}
 \bm{M} =
 \begin{pmatrix}
@@ -351,7 +348,7 @@ In this section the port-Hamiltonian formulation of the Kirchhoff plate is prese
 \subsection{PH vectorial formulation of the Kirchhoff plate}
 \label{sec:PH_vec_Kir}
 
-To obtain a port-Hamiltonian system (PHs) the energy variables as well as the underlying Stokes-Dirac structure, associated with the skew-adjoint operator $J$, have to be properly defined. \revOne{Consider the Hamiltonian energy:
+To obtain a port-Hamiltonian system (PHs) the energy variables as well as the underlying Stokes-Dirac structure, associated with the skew-adjoint operator $J$, have to be properly defined. \secondReviewer{Consider the Hamiltonian energy:
 \begin{equation}
 \begin{aligned}
 H &=  \int_{\Omega} \frac{1}{2} \left\{ \mu \left(\diffp{w}{t}\right)^2 + \bm{M} \cdot \bm{\kappa} \right\} \d{\Omega} \\
@@ -385,7 +382,7 @@ The port-Hamiltonian system and skew-symmetric operator relating energy and co-e
 \diffp{}{x,y} +  \diffp{}{y,x} & 0 & 0 & 0 \\
 \end{bmatrix}.
 \end{equation}
-\revOne{ The first line of the skew-symmetric operator in \eqref{eq:PH_Kirchh} is found by considering Eq. \eqref{eq:KirchhClass}. The remaining lines express Clairaut’s theorem for the vertical displacement. This theorem states that, for smooth functions, higher order partial derivative commute. Consider the second, third and forth lines of system \eqref{eq:PH_Kirchh}:
+\secondReviewer{ The first line of the skew-symmetric operator in \eqref{eq:PH_Kirchh} is found by considering Eq. \eqref{eq:KirchhClass}. The remaining lines express Clairaut’s theorem for the vertical displacement. This theorem states that, for smooth functions, higher order partial derivative commute. Consider the second, third and forth lines of system \eqref{eq:PH_Kirchh}:
 \[ \diffp{\kappa_{xx}}{t} = \diffp[2]{w_t}{x}, \qquad \diffp{\kappa_{yy}}{t} = \diffp[2]{w_t}{y}, \qquad  \diffp{\kappa_{xy}}{t} = 2 \diffp{w_t}{x,y}.
 \] Then, since $w_t = \diffp{w}{t}, \, \kappa_{xx} = \diffp[2]{w}{x}, \, \kappa_{yy} = \diffp[2]{w}{y}, \, \kappa_{xy} = 2 \diffp{w}{x, y}$, it holds:
 \[ \diffp[1,2]{w}{t,x} = \diffp[2,1]{w}{x,t}, \qquad \diffp[1,2]{w}{t,y} = \diffp[2,1]{w}{y,t}, \qquad  \diffp{w}{t,x,y} = \diffp{w}{x,y,t},  
@@ -471,7 +468,7 @@ So the time derivative of the Hamiltonian can be finally written as:
 \begin{equation}
 \dot{H} = \int_{\partial \Omega} \left\{ w_t \, q_n + \diffp{w_t}{s} \, M_{ns} + \diffp{w_t}{n} \, M_{nn}\right\} \d{s}.
 \end{equation}
-\revOne{Variables $w_t$ and $\diffp{w_t}{s}$ are not independent as they are differentially related with respect to derivation along $s$, the curvilinear abscissa of the boundary domain (see for instance \cite{timoshenko1959theory})}. Another integration by part is needed to highlight appropriate \revOne{independent} power conjugated variables. Let us suppose that the boundary is a closed and regular curve. Then the integration by parts along a closed boundary leads to:
+\secondReviewer{Variables $w_t$ and $\diffp{w_t}{s}$ are not independent as they are differentially related with respect to derivation along $s$, the curvilinear abscissa of the boundary domain (see for instance \cite{timoshenko1959theory})}. Another integration by part is needed to highlight appropriate \secondReviewer{independent} power conjugated variables. Let us suppose that the boundary is a closed and regular curve. Then the integration by parts along a closed boundary leads to:
 \begin{equation}
 \int_{\partial \Omega} \diffp{w_t}{s} \, M_{ns} \ \d{s}= - \int_{\partial \Omega} \diffp{M_{ns}}{s} \, w_t \ \d{s}.
 \end{equation}
@@ -485,7 +482,7 @@ Equation \eqref{eq:energyBal_Kir} is of utmost importance, since it contains the
 
 \subsubsection{Underlying Stokes-Dirac structure} 
 
-Let $\mathcal{F}$ denote the flow space and let $\mathcal{E}$ denote the effort space. For simplicity we take  $\mathcal{F} \equiv  \mathcal{E} = \mathcal{C}^\infty(\Omega, \mathbb{R}^4)$, the space of smooth vector-valued functions in $\mathbb{R}^4$. Equation \eqref{eq:energyBal_Kir} allows identifying the boundary terms of the underlying Stokes-Dirac structures. The space of boundary \revOne{variables} is a vector of four components given by:
+Let $\mathcal{F}$ denote the flow space and let $\mathcal{E}$ denote the effort space. For simplicity we take  $\mathcal{F} \equiv  \mathcal{E} = \mathcal{C}^\infty(\Omega, \mathbb{R}^4)$, the space of smooth vector-valued functions in $\mathbb{R}^4$. Equation \eqref{eq:energyBal_Kir} allows identifying the boundary terms of the underlying Stokes-Dirac structures. The space of boundary \secondReviewer{variables} is a vector of four components given by:
 \begin{equation*}
 \mathcal{Z} = \{\bm{z} | \, \bm{z} = B_{\partial}(\bm{e}), \forall \, \bm{e} \in \mathcal{E} \},  \qquad \bm{z} = \left( \widetilde{q}_n, w_t, M_{nn}, \diffp{w_t}{n} \right)^T .
 \end{equation*}
@@ -657,7 +654,7 @@ More involved dissipation models can be found in \cite{DissDenis}. More specific
 \subsection{PH tensorial formulation of the Kirchhoff plate}
 \label{sec:PH_ten_Kir}
 
-In section \ref{sec:PH_vec_Kir} the Stokes-Dirac structure of the Kirchhoff plate was found by using a vectorial notation for the curvatures and momenta. \revOne{In fact} these variables are of tensorial nature and in the following the tensorial formulation takes the place of the vectorial one. First let us rewrite the momenta and curvatures as symmetric matrices (corresponding to the choice of a Cartesian frame for the representation of tensors):
+In section \ref{sec:PH_vec_Kir} the Stokes-Dirac structure of the Kirchhoff plate was found by using a vectorial notation for the curvatures and momenta. \secondReviewer{In fact} these variables are of tensorial nature and in the following the tensorial formulation takes the place of the vectorial one. First let us rewrite the momenta and curvatures as symmetric matrices (corresponding to the choice of a Cartesian frame for the representation of tensors):
 \begin{equation}
 \mathbb{K} = 
 \begin{bmatrix}
@@ -670,7 +667,7 @@ M_{xx} & M_{xy} \\
 M_{xy} & M_{yy} \\
 \end{bmatrix},
 \end{equation}
-where now, with a slight abuse of notation, $\kappa_{xy}$ \revOne{differs by $1/2$ from the definition given in equation \eqref{eq:CurVec}}, i.e. $\kappa_{xy} =\diffp{w}{x,y}$. All the other quantities stay the same with respect to what stated in section \ref{sec:VarKir}. The Hamiltonian energy is written as:
+where now, with a slight abuse of notation, $\kappa_{xy}$ \secondReviewer{differs by $1/2$ from the definition given in equation \eqref{eq:CurVec}}, i.e. $\kappa_{xy} =\diffp{w}{x,y}$. All the other quantities stay the same with respect to what stated in section \ref{sec:VarKir}. The Hamiltonian energy is written as:
 \begin{equation}
 \label{eq:H_Kir_Ten}
 H = \int_{\Omega} \left\{ \frac{1}{2} \mu \left(\diffp{w}{t} \right)^2 + \frac{1}{2} \mathbb{M} \cddot \mathbb{K}  \right\}  \d{\Omega} ,
@@ -687,7 +684,7 @@ e_w := \diffd{H}{\alpha_w} = \diffp{w}{t} := w_t,  \qquad  \mathbb{E}_{\kappa} :
 \begin{remark}
 For the variational derivative with respect to a tensor, see Propostion 1 in \cite{BrugnoliMin}.
 \end{remark}
-The port-Hamiltonian system \revOne{\eqref{eq:PH_Kirchh} is now rewritten as:}
+The port-Hamiltonian system \secondReviewer{\eqref{eq:PH_Kirchh} is now rewritten as:}
 \begin{equation}
 \label{eq:PH_sys_Kir_Ten_pr}
 \begin{cases}
@@ -728,7 +725,7 @@ A: \; \mathscr{H}_1& \rightarrow \mathscr{H}_2, \\
 \mathbb{E}& \rightarrow \mathrm{div}(\mathrm{Div}(\mathbb{E})) = e, \\	\end{aligned}
 \qquad \text{with } \bm{e} = \mathrm{div}(\mathrm{Div}(\mathbb{E})) = \sum_{i = 1}^n \sum_{j = 1}^n \diffp{\mathbb{E}_{ij}}{x_i,x_j}.
 \]
-We \revOne{shall} identify $A^*$
+We \secondReviewer{shall} identify $A^*$
 \[
 \begin{aligned}
 A^*: \; \mathscr{H}_2& \rightarrow \mathscr{H}_1, \\
@@ -744,7 +741,7 @@ such that \[
 \]
 
 
-The function have to belong to the operator domain, so for instance $f \in \mathcal{C}_0^2(\Omega) \in \mathrm{Domain}(A^*)$ the space of twice differentiable scalar functions with compact support on an open simply connected set $\Omega$ and additionally $\mathbb{E}$ can be chosen in the set $\mathcal{C}_{0}^2(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}}) \in \mathrm{Domain}(A)$, the space of twice differentiable $2 \times 2$ symmetric tensors with compact support on $\Omega$. \revOne{ A classical result is the fact that the adjoint of the vector divergence is $\mathrm{div}^* = -\mathrm{grad}$ as stated in \cite{kurula2012duality}. This may be generalized to the adjoint of the tensor divergence $\mathrm{Div}^* = -\mathrm{Grad}$ (see Theorem 4 of \cite{BrugnoliMin}).} Considering that $A$ is the composition of two different operators $A = \mathrm{div} \circ \mathrm{Div}$ and that the adjoint of a composed operator is the adjoint of each operator in reverse order, i.e. $(B \circ C)^* = C^* \circ B^*$, then it can be stated
+The function have to belong to the operator domain, so for instance $f \in \mathcal{C}_0^2(\Omega) \in \mathrm{Domain}(A^*)$ the space of twice differentiable scalar functions with compact support on an open simply connected set $\Omega$ and additionally $\mathbb{E}$ can be chosen in the set $\mathcal{C}_{0}^2(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}}) \in \mathrm{Domain}(A)$, the space of twice differentiable $2 \times 2$ symmetric tensors with compact support on $\Omega$. \secondReviewer{ A classical result is the fact that the adjoint of the vector divergence is $\mathrm{div}^* = -\mathrm{grad}$ as stated in \cite{kurula2012duality}. This may be generalized to the adjoint of the tensor divergence $\mathrm{Div}^* = -\mathrm{Grad}$ (see Theorem 4 of \cite{BrugnoliMin}).} Considering that $A$ is the composition of two different operators $A = \mathrm{div} \circ \mathrm{Div}$ and that the adjoint of a composed operator is the adjoint of each operator in reverse order, i.e. $(B \circ C)^* = C^* \circ B^*$, then it can be stated
 \[
 A^* = (\mathrm{div} \circ \mathrm{Div})^* = \mathrm{Div}^* \circ \mathrm{div}^* = \mathrm{Grad} \circ \mathrm{grad}.
 \]  
@@ -771,7 +768,7 @@ where all zeros are intended as nullifying operator from the space of input vari
 \begin{remark}
 The interconnection structure $J$ now resembles that of the Bernoulli beam. The double divergence and the double gradient coincide, in dimension one, with the second derivative.
 \end{remark}
-Again the boundary \revOne{port variables} can be found by evaluating the time derivative of the Hamiltonian:
+Again the boundary \secondReviewer{port variables} can be found by evaluating the time derivative of the Hamiltonian:
 \begin{equation}
 \begin{aligned}
 \dot{H}&= \int_{\Omega} \left\{ \diffp{\alpha_w}{t} e_w  + \diffp{\mathbb{A}_{\kappa}}{t} \cddot \mathbb{E}_{\kappa} \right\} \d\Omega \\
@@ -781,7 +778,7 @@ Again the boundary \revOne{port variables} can be found by evaluating the time d
 &=\int_{\partial \Omega} \left\{ q_n w_t + \diffp{w_t}{n} M_{nn} + \diffp{w_t}{s}  M_{ns}   \right\} \d{s}. 
 \end{aligned}
 \end{equation}
-\revOne{
+\secondReviewer{
 \begin{remark}
 The definitions
 \[q_n=  - \bm{n} \cdot \mathrm{Div}(\mathbb{E}_{\kappa}), \quad M_{nn} = \left(\bm{n} \otimes \bm{n} \right) \cddot \mathbb{E}_{\kappa}, \quad M_{ns} = \left(\bm{n} \otimes \bm{s} \right) \cddot \mathbb{E}_{\kappa}\] 
@@ -800,7 +797,7 @@ If a regular boundary is considered the final energy balance is exactly the same
 \begin{equation}
 \dot{H} = \int_{\partial \Omega} \left\{ w_t \, \widetilde{q}_n + \diffp{w_t}{n} \, M_{nn}\right\} \ \d{s},  \qquad \text{where }\widetilde{q}_n := q_n - \diffp{M_{ns}}{s}.
 \end{equation} 
-The tensorial formulation allows highlighting the intrinsic differential operators. Furthermore the symmetric nature of the variables is explicitly expressed by the usage of symmetric tensors. \revOne{Now that the energy balance has been established in terms of the boundary variables the Stokes-Dirac structure for the Kirchhoff plate in tensorial form can be defined. Consider now the bond space:
+The tensorial formulation allows highlighting the intrinsic differential operators. Furthermore the symmetric nature of the variables is explicitly expressed by the usage of symmetric tensors. \secondReviewer{Now that the energy balance has been established in terms of the boundary variables the Stokes-Dirac structure for the Kirchhoff plate in tensorial form can be defined. Consider now the bond space:
 \begin{equation}
 \label{eq:bondKir}
 \mathcal{B} := \left\{(\bm{f}, \bm{e}, \bm{z}) \in \mathcal{F} \times \mathcal{E} \times \mathcal{Z} \right\},
@@ -839,7 +836,7 @@ where the pairing $\left\langle \cdot, \cdot \right\rangle_{\mathscr{L}^2(\Omega
 }
 
 \section{Discretization of the Kirchhoff plate using a Partioned Finite Element Method} 
-Following the procedure illustrated in \cite{CardosoRibeiro2018} the Kirchhoff plate written as a port-Hamiltonian system can be discretized by using a Partitioned Finite Element Method (PFEM). \revOne{This method is an extension of the Mixed Finite Element Method to the case of pH systems and requires the integration by parts to be performed, so that the symplectic structure is preserved. It consists of three different steps:
+Following the procedure illustrated in \cite{CardosoRibeiro2018} the Kirchhoff plate written as a port-Hamiltonian system can be discretized by using a Partitioned Finite Element Method (PFEM). \secondReviewer{This method is an extension of the Mixed Finite Element Method to the case of pH systems and requires the integration by parts to be performed, so that the symplectic structure is preserved. It consists of three different steps:
 	\begin{enumerate}
 		\item the system is first put into weak form;
 		\item once the boundary control of interest is selected, the corresponding subsystem is integrated by parts;
@@ -940,7 +937,7 @@ M_{nn} \\
 
 \subsection{Finite-dimensional port-Hamiltonian system}
 
-\revTwo{
+\firstReviewer{
 In this section, the discretization procedure is applied to formulation \eqref{eq:WF_Kir_Dyn}. The same procedure may be performed using formulation \eqref{eq:WF_Kir_Kin}. In Section \ref{sec:Eigen} both strategies will be used to compute the eigenvalues of a square plate. \\
 Test and co-energy variables are discretized using the same basis functions (Galerkin Method):
 \begin{equation}
@@ -1022,9 +1019,9 @@ Using equations \eqref{eq:PHdiscr_Kir}, \eqref{eq:Hd_Kir} the time derivative of
 \begin{equation}
 \dot{H}_d = \bm{y}_{\partial}^T \bm{u}_{\partial}.
 \end{equation}
-The above Equation is equivalent to the energy balance of the continuous system, expressed by \eqref{eq:energyBal_Kir}. Definition \eqref{eq:Hd_Kir}, together with system \eqref{eq:PHdiscr_Kir} are the finite-dimensional equivalent of \eqref{eq:H_Kir_Ten} and  \eqref{eq:PH_sys_Kir_Ten}. The discretized system obtained via PFEM shares the \revOne{port-Hamiltonian structure} of the original infinite-dimensional system, the discretization method is therefore structure preserving. 
+The above Equation is equivalent to the energy balance of the continuous system, expressed by \eqref{eq:energyBal_Kir}. Definition \eqref{eq:Hd_Kir}, together with system \eqref{eq:PHdiscr_Kir} are the finite-dimensional equivalent of \eqref{eq:H_Kir_Ten} and  \eqref{eq:PH_sys_Kir_Ten}. The discretized system obtained via PFEM shares the \secondReviewer{port-Hamiltonian structure} of the original infinite-dimensional system, the discretization method is therefore structure preserving. 
 
-\revTwo{
+\firstReviewer{
 \section{Numerical studies}
 \label{sec:Num}
 In this section we illustrate numerically the consistency of discrete model obtained with PFEM. For this purpose computation of the eigenvalues of a square plate and time-domain simulations for several boundary conditions are presented. 
@@ -1274,7 +1271,7 @@ where $\omega_{n}^{L}$ are the eigenvalues computed in \cite{LeissaRect}. The re
 	\label{fig:FSFS}%
 \end{figure}
 
-\revTwo{
+\firstReviewer{
 	\subsection{Time-domain Simulations}
 	\begin{table}[t]
 		\centering
@@ -1390,7 +1387,7 @@ where $\omega_{n}^{L}$ are the eigenvalues computed in \cite{LeissaRect}. The re
 
 
 \section*{Conclusions and Future Perspectives}
-\revOne{
+\secondReviewer{
 In this paper the port-Hamiltonian formulation of the Kirchhoff plate was detailed with the equivalent vectorial and a tensorial representation. The tensorial formalism allowed showing the adjointness relation between the double divergence of a symmetric tensor and the Hessian of a scalar field. This result represent a appealing novelty for mathematical working on functional a analysis. Moreover, many features of the PFEM are of interest:
 \begin{itemize}
 	\item its capability of preserving the port-Hamiltonian structure;
