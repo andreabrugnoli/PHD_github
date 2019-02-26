@@ -283,7 +283,7 @@ Fsys = P @ Bf_int
 t0 = 0.0
 fac = 5
 t_base = 0.001
-t_fin = t_base *fac
+t_fin =  0.01
 n_t = 200
 t_span = [t0, t_fin]
 
@@ -373,9 +373,6 @@ plt.title(r"Hamiltonian trend",
           fontsize=16)
 plt.legend(loc='upper left')
 
-plt.show()
-
-
 from AnimateTwoPlates import animate2D
 import matplotlib.animation as animation
 sol = np.concatenate( (w_pl1_mm, w_pl2_mm), axis=0)
@@ -384,10 +381,10 @@ y = np.concatenate( (y_pl, y_pl), axis=0)
 anim = animate2D(x_pl, y_pl, w_pl1_mm, w_pl2_mm, t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \
                          zlabel = '$w [mm]$', title = 'Vertical Displacement')
 
-Writer = animation.writers['ffmpeg']
-writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
+# Writer = animation.writers['ffmpeg']
+# writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
 #
-anim.save('IntPlates.mp4', writer=writer)
+# anim.save('IntPlates.mp4', writer=writer)
 
 
 plt.show()
