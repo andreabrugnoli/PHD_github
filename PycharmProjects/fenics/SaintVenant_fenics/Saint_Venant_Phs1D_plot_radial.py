@@ -13,11 +13,11 @@ from scipy import integrate
 from scipy import linalg as la
 
 
-n = 30
+n = 10
 deg = 1
 
-g = 10
-rho = 1000
+g = 1
+rho = 1
 # kg/m^3
 
 # Operators and functions
@@ -69,8 +69,8 @@ ds = Measure('ds', subdomain_data=boundaries)
 
 # Finite element defition
 
-P_p = FiniteElement('DG', mesh.ufl_cell(), 0)
-P_q = FiniteElement('CG', mesh.ufl_cell(), 1)
+P_p = FiniteElement('DG', mesh.ufl_cell(), 1)
+P_q = FiniteElement('CG', mesh.ufl_cell(), 2)
 
 
 Vp = FunctionSpace(mesh, P_p)
@@ -143,7 +143,11 @@ Hdes = 1
 h_eq_ = Function(Vq)
 h_eq_.vector()[:] = Hdes
 
-Hd = 0.5*(1./rho * al_q_*dot(al_p_, al_p_) + rho*g*al_q_**2)*r*dx
+Hd = 0.5*(1./rho * al_q_*dot(al_p_, al_p_) + rho*g*al_q_**2) * r * dx
+
+Hd_p = 0.5*1./rho * al_q_*dot(al_p_, al_p_) * r * dx
+Hd_q = 0.5*rho*g*al_q_**2 * r * dx
+
 Lyap = 0.5*(1./rho * al_q_*dot(al_p_, al_p_) + rho*g*(al_q_ - h_eq_)**2)*r*dx
 
 e_p_ = derivative(Hd, al_p_)
@@ -159,7 +163,7 @@ Jtilde = invM @ J @ invM
 
 # Stormer Verlet integrator
 B = np.concatenate((np.zeros((n_Vp,)), B_r), axis=0).reshape((-1, 1))
-z = 0.001
+z = 1
 R = z * B @ B.T
 Rtilde = invM @ R @ invM
 
@@ -188,13 +192,13 @@ def fun(t,y):
 
     e = np.concatenate((e_p, e_q), axis = 0)
 
-    dydt = Jtilde @ e - Rtilde @ (e - e0) * (t > 0.5)
+    dydt = Jtilde @ e  - Rtilde @ (e - e0) * (t > 1)
 
     return dydt
 
-h = 0.1
+h = 0.01
 init_p = Expression('0', degree=0)
-init_q = Expression('H + h *sin(pi/L*x[0])', degree=4, H = Hdes, h = h, L = L)
+init_q = Expression('H + h *cos(pi/L*x[0])', degree=4, H = Hdes, h = h, L = L)
 
 al_p_.assign(interpolate(init_p, Vp))
 al_q_.assign(interpolate(init_q, Vq))
@@ -208,7 +212,7 @@ eq_0 = assemble(e_q_).get_local()
 y0 = np.concatenate((alp_0, alq_0), axis = 0)
 
 t0 = 0.0
-t_fin = 3
+t_fin = 5
 n_t = 300
 t_span = [t0, t_fin]
 
@@ -265,62 +269,33 @@ def LyaFunc(p,q):
     al_q_.vector()[:] = 1.*q
     return assemble(Lyap)
 
-H_vec = np.zeros((n_ev))
+H_vec = np.zeros((n_ev, ))
 V_vec = np.zeros((n_ev))
 for i in range(n_ev):
-    H_vec[i] = HamFunc(alp_sol[:,i], alq_sol[:,i]) # computed with fenics
-    V_vec[i] = LyaFunc(alp_sol[:,i], alq_sol[:,i])
+    H_vec[i] = HamFunc(alp_sol[:, i], alq_sol[:, i])
+    V_vec[i] = LyaFunc(alp_sol[:, i], alq_sol[:, i])
 
 fntsize = 16
 
-path_out = "/home/a.brugnoli/PycharmProjects/fenics/SaintVenant_fenics/Simulations/RadialReduction/"
+# path_out = "/home/a.brugnoli/PycharmProjects/fenics/SaintVenant_fenics/Simulations/RadialReduction/"
 
 plt.figure()
-plt.plot(t_ev, H_vec, 'r-')
+plt.plot(t_ev, H_vec, 'r')
 plt.xlabel(r'{Time} (s)',fontsize=fntsize)
 plt.ylabel('Total Energy (J)' ,fontsize=fntsize)
 
-plt.savefig(path_out + "Hamiltonian.eps", format="eps")
+# plt.savefig(path_out + "Hamiltonian.eps", format="eps")
 
 plt.figure()
 plt.plot(t_ev, V_vec, 'g-', label = 'Lyapunov Function (J)')
 plt.xlabel(r'{Time} (s)',fontsize=fntsize)
 plt.ylabel('Lyapunov Function (J)' ,fontsize=fntsize)
 
-plt.savefig(path_out + "Lyapunov.eps", format="eps")
-
-# from matplotlib import animation
-#
-# # First set up the figure, the axis, and the plot element we want to animate
-# fig = plt.figure(1)
-# ax = plt.axes(xlim=(0, L), ylim=(H -1.01*h, H +1.01*h))
-# line, = ax.plot([], [], lw=2)
-#
-# # initialization function: plot the background of each frame
-# def init():
-#     line.set_data(x_ev, alq_0)
-#     return line,
-#
-# # animation function.  This is called sequentially
-# def animate(i):
-#     line.set_data(x_ev, alq_sol[:,i])
-#     return line,
-#
-# # call the animator.  blit=True means only re-draw the parts that have changed.
-# anim = animation.FuncAnimation(fig, animate, init_func=init,
-#                                frames=len(t_ev), interval=20, blit=False)
-#
-# # save the animation as an mp4.  This requires ffmpeg or mencoder to be
-# # installed.  The extra_args ensure that the x264 codec is used, so that
-# # the video can be embedded in html5.  You may need to adjust this for
-# # your system: for more information, see
-# # http://matplotlib.sourceforge.net/api/animation_api.html
-# # anim.save('basic_animation.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
-#
-# plt.show()
 
 
-# Make data.
+# plt.savefig(path_out + "Lyapunov.eps", format="eps")
+
+# # Make data.
 
 fig = plt.figure()
 ax = fig.gca(projection='3d')
@@ -354,14 +329,46 @@ h_plot._edgecolors2d=h_plot._edgecolors3d
 
 fig.colorbar(h_plot, shrink=0.5, aspect=5)
 
-plt.savefig(path_out + "Height.eps", format="eps")
-plt.show()
-
-from AnimateSurf import animate2D
-
-x_plot = r_plot*np.cos(th_plot)
-y_plot = r_plot*np.sin(th_plot)
-
-anim = animate2D(x_plot, y_plot, alq_sol_plot, t_ev)
+# plt.savefig(path_out + "Height.eps", format="eps")
 
 plt.show()
+
+# from AnimateSurf import animate2D
+#
+# x_plot = r_plot*np.cos(th_plot)
+# y_plot = r_plot*np.sin(th_plot)
+#
+# anim = animate2D(x_plot, y_plot, alq_sol_plot, t_ev)
+#
+# plt.show()
+
+
+# from matplotlib import animation
+#
+# # First set up the figure, the axis, and the plot element we want to animate
+# fig = plt.figure(1)
+# ax = plt.axes(xlim=(0, L), ylim=(H -1.01*h, H +1.01*h))
+# line, = ax.plot([], [], lw=2)
+#
+# # initialization function: plot the background of each frame
+# def init():
+#     line.set_data(x_ev, alq_0)
+#     return line,
+#
+# # animation function.  This is called sequentially
+# def animate(i):
+#     line.set_data(x_ev, alq_sol[:,i])
+#     return line,
+#
+# # call the animator.  blit=True means only re-draw the parts that have changed.
+# anim = animation.FuncAnimation(fig, animate, init_func=init,
+#                                frames=len(t_ev), interval=20, blit=False)
+#
+# # save the animation as an mp4.  This requires ffmpeg or mencoder to be
+# # installed.  The extra_args ensure that the x264 codec is used, so that
+# # the video can be embedded in html5.  You may need to adjust this for
+# # your system: for more information, see
+# # http://matplotlib.sourceforge.net/api/animation_api.html
+# # anim.save('basic_animation.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
+#
+# plt.show()
