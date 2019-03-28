@@ -51,6 +51,7 @@ class Rexternal(SubDomain):
 r = Expression('x[0]', degree=2)
 theta = Expression('x[1]', degree=2)
 
+
 def grad_pol(u):
     return as_vector([u.dx(0), 1 / r * u.dx(1)])
 
@@ -152,6 +153,9 @@ Hdes = 1
 h_eq_ = Function(Vq)
 h_eq_.vector()[:] = Hdes
 Hd = 0.5 * (1. / rho * al_q_ * dot(al_p_, al_p_) + rho * g * al_q_ ** 2) * r * dx
+Hd_p = 0.5*1./rho * al_q_*dot(al_p_, al_p_) * r * dx
+Hd_q = 0.5*rho*g*al_q_**2 * r * dx
+
 Lyap = 0.5 * (1. / rho * al_q_ * dot(al_p_, al_p_) + rho * g * (al_q_ - h_eq_) ** 2) * r * dx
 # Hd = 0.5*(1./rho*dot(al_p_, al_p_) + rho*g*al_q_**2)*dx
 
@@ -167,20 +171,6 @@ D_q_tilde = la.inv(M_p) @ D_q @ la.inv(M_q)
 D_p_tilde = la.inv(M_q) @ D_p @ la.inv(M_p)
 invM = la.inv(M)
 Jtilde = invM @ J @ invM
-
-
-def HamFunc(p, q):
-    # this method should work for both linear and nonlinear Hamiltonian
-    al_p_.vector()[:] = 1. * p
-    al_q_.vector()[:] = 1. * q
-    return assemble(Hd)
-
-
-def LyaFunc(p, q):
-    # this method should work for both linear and nonlinear Hamiltonian
-    al_p_.vector()[:] = 1. * p
-    al_q_.vector()[:] = 1. * q
-    return assemble(Lyap)
 
 
 def HamFuncXE(p, q):
@@ -254,7 +244,7 @@ def fun(t, y):
     e_q = e_q_fenics(al_p, al_q)
 
     e = np.concatenate((e_p, e_q), axis=0)
-    dydt = Jtilde @ e - Rr @ (e - e0) * (t > 0.5)
+    dydt = Jtilde @ e - 0.0 * Rr @ (e - e0) * (t > 0.5)
 
     return dydt
 
@@ -309,7 +299,7 @@ n_t = 300
 y0 = np.concatenate((alp_0, alq_0), axis=0)
 t_span = [t0, t_fin]
 t_ev = np.linspace(t0, t_fin, num=n_t)
-sol = integrate.solve_ivp(fun, t_span, y0, method='RK45', vectorized=False, t_eval=t_ev, atol=1e-6, rtol=1e-6)
+sol = integrate.solve_ivp(fun, t_span, y0, method='RK45', vectorized=False, t_eval=t_ev, atol=1e-8, rtol=1e-8)
 al_sol = sol.y
 t_ev = sol.t
 n_ev = len(t_ev)
@@ -318,9 +308,21 @@ alp_sol = al_sol[: n_Vp, :]
 alq_sol = al_sol[n_Vp: n_V, :]
 
 # plot Hamiltonian
+def HamFunc(p, q):
+    # this method should work for both linear and nonlinear Hamiltonian
+    al_p_.vector()[:] = 1. * p
+    al_q_.vector()[:] = 1. * q
+    return assemble(Hd), assemble(Hd_p), assemble(Hd_q)
+
+
+def LyaFunc(p, q):
+    # this method should work for both linear and nonlinear Hamiltonian
+    al_p_.vector()[:] = 1. * p
+    al_q_.vector()[:] = 1. * q
+    return assemble(Lyap)
 
 H_vec_int = np.zeros((n_ev,))
-H_vec = np.zeros((n_ev,))
+H_vec = np.zeros((n_ev,3))
 V_vec = np.zeros((n_ev,))
 
 for i in range(n_ev):
@@ -332,7 +334,7 @@ fntsize = 16
 path_out = "./"
 
 plt.figure()
-plt.plot(t_ev, H_vec, 'r-')
+plt.plot(t_ev, H_vec[:,0], 'r', t_ev, H_vec[:, 1], 'b', t_ev, H_vec[:, 2], 'g')
 plt.xlabel(r'{Time} (s)', fontsize=fntsize)
 plt.ylabel('Total Energy (J)', fontsize=fntsize)
 

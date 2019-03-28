@@ -14,11 +14,13 @@ from scipy import linalg as la
 
 
 n = 10
-deg = 1
+deg_p = 0
+deg_q = 2
+elem_p = 'DG'
+elem_q = 'CG'
 
-g = 1
-rho = 1
-# kg/m^3
+g = 10
+rho = 1000 # kg/m^3
 
 # Operators and functions
 
@@ -27,8 +29,8 @@ rho = 1
 # circle = mshr.Circle(Point(0, 0), R)
 # mesh = mshr.generate_mesh(circle, n)
 
-L = 1
-mesh = IntervalMesh(n, 0, L)
+R = 1
+mesh = IntervalMesh(n, 0, R)
 
 d = mesh.geometry().dim()
 # plot(mesh)
@@ -45,7 +47,7 @@ class Left(SubDomain):
 
 class Right(SubDomain):
     def inside(self, x, on_boundary):
-        return abs(x[0] - L) < DOLFIN_EPS and on_boundary
+        return abs(x[0] - R) < DOLFIN_EPS and on_boundary
 
 
 # Boundary conditions on displacement
@@ -60,7 +62,6 @@ boundaries = MeshFunction("size_t", mesh, mesh.topology().dim() - 1)
 boundaries.set_all(0)
 left.mark(boundaries, 1)
 right.mark(boundaries, 2)
-ds = Measure('ds', subdomain_data= boundaries)
 # lower.mark(boundaries, 3)
 # upper.mark(boundaries, 4)
 
@@ -69,8 +70,8 @@ ds = Measure('ds', subdomain_data=boundaries)
 
 # Finite element defition
 
-P_p = FiniteElement('DG', mesh.ufl_cell(), 1)
-P_q = FiniteElement('CG', mesh.ufl_cell(), 2)
+P_p = FiniteElement(elem_p, mesh.ufl_cell(), deg_p)
+P_q = FiniteElement(elem_q, mesh.ufl_cell(), deg_q)
 
 
 Vp = FunctionSpace(mesh, P_p)
@@ -92,20 +93,20 @@ v_q = TestFunction(Vq)
 al_p = TrialFunction(Vp)
 al_q = TrialFunction(Vq)
 
-r = Expression("x[0]", degree = 4)
+r = Expression("x[0]", degree=2)
 
 m_p = v_p * al_p * r * dx #inner(v_p, al_p) * dx
 m_q = v_q * al_q * r * dx #inner(v_q, al_q) * dx
 
-j_grad = -v_p * al_q.dx(0) * r * dx # -dot(v_p, grad(al_q) * dx
-j_gradIP = +v_q.dx(0) * al_p * r * dx # dot(grad(v_q), al_p) * dx
+j_grad = - v_p * al_q.dx(0) * r * dx # -dot(v_p, grad(al_q) * dx
+j_gradIP = + v_q.dx(0) * al_p * r * dx # dot(grad(v_q), al_p) * dx
 #
 # j_div = -v_q * al_p.dx(0) * dx # -v_q * div(al_p)) * dx
 # j_divIP = v_p.dx(0) * al_q *dx # div(v_p)* al_q * dx
 #
 
-B_l = assemble(-v_q * r * ds(1))
-B_r = assemble(v_q * r * ds(2))
+B_l = assemble(- v_q * r * ds(1))
+B_r = assemble(+ v_q * r * ds(2))
 
 B_l = B_l.get_local()
 B_lT = np.transpose(B_l)
@@ -143,12 +144,12 @@ Hdes = 1
 h_eq_ = Function(Vq)
 h_eq_.vector()[:] = Hdes
 
-Hd = 0.5*(1./rho * al_q_*dot(al_p_, al_p_) + rho*g*al_q_**2) * r * dx
+Hd = 0.5*(1./rho * al_q_*al_p_**2 + rho*g*al_q_**2) * r * dx
 
-Hd_p = 0.5*1./rho * al_q_*dot(al_p_, al_p_) * r * dx
+Hd_p = 0.5*1./rho * al_q_*al_p_**2 * r * dx
 Hd_q = 0.5*rho*g*al_q_**2 * r * dx
 
-Lyap = 0.5*(1./rho * al_q_*dot(al_p_, al_p_) + rho*g*(al_q_ - h_eq_)**2)*r*dx
+Lyap = 0.5*(1./rho * al_q_*al_p_**2 + rho*g*(al_q_ - h_eq_)**2)*r*dx
 
 e_p_ = derivative(Hd, al_p_)
 e_q_ = derivative(Hd, al_q_)
@@ -164,8 +165,8 @@ Jtilde = invM @ J @ invM
 # Stormer Verlet integrator
 B = np.concatenate((np.zeros((n_Vp,)), B_r), axis=0).reshape((-1, 1))
 z = 1
-R = z * B @ B.T
-Rtilde = invM @ R @ invM
+Rmat = z * B @ B.T
+Rtilde = invM @ Rmat @ invM
 
 al_p_.assign(Constant(0))
 al_q_.assign(Constant(Hdes))
@@ -192,13 +193,13 @@ def fun(t,y):
 
     e = np.concatenate((e_p, e_q), axis = 0)
 
-    dydt = Jtilde @ e  - Rtilde @ (e - e0) * (t > 1)
+    dydt = Jtilde @ e - 0.0*Rtilde @ (e - e0) * (t > 1)
 
     return dydt
 
 h = 0.01
 init_p = Expression('0', degree=0)
-init_q = Expression('H + h *cos(pi/L*x[0])', degree=4, H = Hdes, h = h, L = L)
+init_q = Expression('H + h*cos(pi/R*r)', degree=4, H=Hdes, h=h, R=R, r=r)
 
 al_p_.assign(interpolate(init_p, Vp))
 al_q_.assign(interpolate(init_q, Vq))
@@ -212,14 +213,14 @@ eq_0 = assemble(e_q_).get_local()
 y0 = np.concatenate((alp_0, alq_0), axis = 0)
 
 t0 = 0.0
-t_fin = 5
+t_fin = 3
 n_t = 300
 t_span = [t0, t_fin]
 
 t_ev = np.linspace(t0,t_fin, num = n_t)
 
-sol = integrate.solve_ivp(fun, t_span, y0, method='RK45', vectorized=False, t_eval = t_ev, \
-                          atol = 1e-6, rtol = 1e-6)
+sol = integrate.solve_ivp(fun, t_span, y0, method='RK45', vectorized=False, t_eval=t_ev, \
+                          atol = 1e-8, rtol = 1e-7)
 
 al_sol = sol.y
 t_ev = sol.t
@@ -261,7 +262,7 @@ def HamFunc(p,q):
     #this method should work for both linear and nonlinear Hamiltonian
     al_p_.vector()[:] = 1.*p
     al_q_.vector()[:] = 1.*q
-    return assemble(Hd)
+    return assemble(Hd), assemble(Hd_p), assemble(Hd_q)
 
 def LyaFunc(p,q):
     #this method should work for both linear and nonlinear Hamiltonian
@@ -269,7 +270,7 @@ def LyaFunc(p,q):
     al_q_.vector()[:] = 1.*q
     return assemble(Lyap)
 
-H_vec = np.zeros((n_ev, ))
+H_vec = np.zeros((n_ev, 3))
 V_vec = np.zeros((n_ev))
 for i in range(n_ev):
     H_vec[i] = HamFunc(alp_sol[:, i], alq_sol[:, i])
@@ -280,7 +281,7 @@ fntsize = 16
 # path_out = "/home/a.brugnoli/PycharmProjects/fenics/SaintVenant_fenics/Simulations/RadialReduction/"
 
 plt.figure()
-plt.plot(t_ev, H_vec, 'r')
+plt.plot(t_ev, H_vec[:,0], 'r', t_ev, H_vec[:, 1], 'b', t_ev, H_vec[:, 2], 'g')
 plt.xlabel(r'{Time} (s)',fontsize=fntsize)
 plt.ylabel('Total Energy (J)' ,fontsize=fntsize)
 

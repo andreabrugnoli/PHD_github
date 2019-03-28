@@ -75,7 +75,9 @@ mesh = UnitSquareMesh(n_x, n_y, quadrilateral=False)
 
 nameFE = 'Bell'
 name_FEp = nameFE
-name_FEq = nameFE
+name_FEq = 'Hermite'
+
+deg_q = 3
 
 if name_FEp == 'Morley':
     deg_p = 2
@@ -146,8 +148,8 @@ bc_dict = {1: bc_1, 2: bc_2, 3: bc_3, 4: bc_4}
 n = FacetNormal(mesh)
 # s = as_vector([-n[1], n[0]])
 
-V_qn = FunctionSpace(mesh, 'Lagrange', 2)
-V_Mnn = FunctionSpace(mesh, 'Lagrange', 2)
+V_qn = FunctionSpace(mesh, 'Lagrange', 1)
+V_Mnn = FunctionSpace(mesh, 'Lagrange', 1)
 
 Vu = V_qn * V_Mnn
 
@@ -223,7 +225,7 @@ omega.sort()
 
 # NonDimensional China Paper
 
-n_om = 6
+n_om = 3
 
 omega_tilde = L ** 2 * sqrt(rho * h / D) * omega
 for i in range(n_om):
@@ -244,7 +246,7 @@ if plot_eigenvectors:
     plt.close('all')
     matplotlib.rcParams['text.usetex'] = True
 
-    for i in range(6):
+    for i in range(n_om):
         eig_real_w = Function(Vp)
         eig_imag_w = Function(Vp)
 
@@ -277,9 +279,9 @@ if plot_eigenvectors:
         ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
 
         path_out2 = "/home/a.brugnoli/PycharmProjects/firedrake/Kirchhoff_PHs/Eig_Kirchh/Imag_Eig/"
-        plt.savefig(path_out2 + "Case" + bc_input + "_el" + str(n) + "_FE_" + name_FEp + "_eig_" + str(i+1) + ".eps", format="eps")
+        # plt.savefig(path_out2 + "Case" + bc_input + "_el" + str(n) + "_FE_" + name_FEp + "_eig_" + str(i+1) + ".eps", format="eps")
 
-    # plt.show()
+plt.show()
 
 
 

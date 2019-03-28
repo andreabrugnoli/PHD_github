@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 
 import scipy.linalg as la
 
-n = 10 #int(input("Number of elements for side: "))
-deg = 1 #int(input('Degree for FE: '))
+n = 6 #int(input("Number of elements for side: "))
+deg = 2 #int(input('Degree for FE: '))
 nreq = 10
 
 E = 1 #(7e10)
@@ -20,7 +20,7 @@ if thick == 'y':
 else:
     h = 0.01
 
-case_study =  'CCCC' #input("Select the case under study: ") # 'CCCC' #
+case_study = input("Select the case under study: ") # 'CCCC' #
 
 # save_eigenvector = 'n' #input('Plot Eigenvector: ')
 plot_eigenvector = 'y'
@@ -141,8 +141,8 @@ lower.mark(boundaries, 4)
 
 P_pw = FiniteElement('CG', triangle, deg)
 P_pth = VectorElement('CG', triangle, deg)
-P_qth = TensorElement('CG', triangle, deg, shape=(2, 2), symmetry=True)
-P_qw = VectorElement('CG', triangle, deg)
+P_qth = TensorElement('DG', triangle, deg-1, shape=(2, 2), symmetry=True)
+P_qw = VectorElement('DG', triangle, deg-1)
 
 
 element = MixedElement([P_pw, P_pth, P_qth, P_qw])
@@ -262,7 +262,7 @@ if case_study == 'CFFF':
     # bcs_q = [bc_Mxx_r, bc_Mxy, bc_Myy_b, bc_Myy_t, bc_Qx_r, bc_Qy_b, bc_Qy_t]
 
 
-bcs = bcs_p + bcs_q
+bcs = bcs_p
 # if not bcs:
 #     raise ValueError("Empty bcs")
 # Assemble the stiffness matrix and the mass matrix.
@@ -347,9 +347,8 @@ from matplotlib import cm
 
 plt.close('all')
 matplotlib.rcParams['text.usetex'] = True
-matplotlib.rcParams['text.latex.unicode'] = True
 
-n_fig = 5
+n_fig = 4
 
 if plot_eigenvector == 'y':
 
@@ -392,34 +391,34 @@ if plot_eigenvector == 'y':
             # path_out1 = "/home/a.brugnoli/PycharmProjects/Mindlin_Phs_fenics/Figures_Eig_Min/RealEig/"
             # plt.savefig(path_out1 + "Case" + case_study + "_el" + str(n) + "_deg" + str(deg) + "_thick_" + \
             #             str(thick) + "_eig_" + str(i+1) + ".eps", format="eps")
-
-
-    for i in range(n_fig):
-        z2 = z_imag
-        minZ2 = min(z2)
-        maxZ2 = max(z2)
-
-        if minZ2 != maxZ2:
-
-            fig2 = plt.figure(n_fig + i+1)
-
-            ax2 = fig2.add_subplot(111, projection='3d')
-            # ax2.zaxis._axinfo['label']['space_factor'] = 20
-
-            ax2.set_xlim(min(x) - tol, max(x) + tol)
-            ax2.set_xlabel('$x$', fontsize=fntsize)
-
-            ax2.set_ylim(min(y) - tol, max(y) + tol)
-            ax2.set_ylabel('$y$', fontsize=fntsize)
-
-            # ax2.set_zlabel('$v_{e_{p,w}}$', fontsize=fntsize)
-            ax2.set_title('$v_{e_{p,w}}$', fontsize=fntsize)
-
-            ax2.set_zlim(minZ2 - 0.01 * abs(minZ2), maxZ2 + 0.01 * abs(maxZ2))
-            ax2.w_zaxis.set_major_locator(LinearLocator(10))
-            ax2.w_zaxis.set_major_formatter(FormatStrFormatter('%.04f'))
-
-            ax2.plot_trisurf(x, y, z2, cmap=cm.jet, linewidth=0, antialiased=False)
+    #
+    #
+    # for i in range(n_fig):
+    #     z2 = z_imag
+    #     minZ2 = min(z2)
+    #     maxZ2 = max(z2)
+    #
+    #     if minZ2 != maxZ2:
+    #
+    #         fig2 = plt.figure(n_fig + i+1)
+    #
+    #         ax2 = fig2.add_subplot(111, projection='3d')
+    #         # ax2.zaxis._axinfo['label']['space_factor'] = 20
+    #
+    #         ax2.set_xlim(min(x) - tol, max(x) + tol)
+    #         ax2.set_xlabel('$x$', fontsize=fntsize)
+    #
+    #         ax2.set_ylim(min(y) - tol, max(y) + tol)
+    #         ax2.set_ylabel('$y$', fontsize=fntsize)
+    #
+    #         # ax2.set_zlabel('$v_{e_{p,w}}$', fontsize=fntsize)
+    #         ax2.set_title('$v_{e_{p,w}}$', fontsize=fntsize)
+    #
+    #         ax2.set_zlim(minZ2 - 0.01 * abs(minZ2), maxZ2 + 0.01 * abs(maxZ2))
+    #         ax2.w_zaxis.set_major_locator(LinearLocator(10))
+    #         ax2.w_zaxis.set_major_formatter(FormatStrFormatter('%.04f'))
+    #
+    #         ax2.plot_trisurf(x, y, z2, cmap=cm.jet, linewidth=0, antialiased=False)
 
             # path_out2 = "/home/a.brugnoli/PycharmProjects/Mindlin_Phs_fenics/Figures_Eig_Min/ImagEig/"
             # plt.savefig(path_out2 + "Case" + case_study + "_el" + str(n) + "_deg" + str(deg) + "_thick_" \

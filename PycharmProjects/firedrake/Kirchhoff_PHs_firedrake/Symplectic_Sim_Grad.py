@@ -22,7 +22,7 @@ matplotlib.rcParams['text.usetex'] = True
 
 E = 7e10
 nu = 0.35
-h = 0.001 #5 # 0.01
+h = 0.05
 rho = 2700  # kg/m^3
 D = E * h ** 3 / (1 - nu ** 2) / 12.
 
@@ -30,7 +30,7 @@ L = 1
 l_x = L
 l_y = L
 
-n_sim = 2
+n_sim = 1
 
 n = 5 #int(input("N element on each side: "))
 
@@ -251,8 +251,8 @@ solverSym = StormerVerletGrad(M_p, M_q, D_p, D_q, R_p, P_p, F_p)
 
 
 t_0 = 0
-dt = 1e-9
-t_f = 1e-4
+dt = 1e-7
+t_f = 1e-3
 n_ev = 100
 
 sol = solverSym.compute_sol(ep_0, eq_0, t_f, t_0 = t_0, dt = dt, n_ev = n_ev)

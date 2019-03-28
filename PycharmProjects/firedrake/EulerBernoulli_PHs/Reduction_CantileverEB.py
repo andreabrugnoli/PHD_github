@@ -13,8 +13,8 @@ import scipy.linalg as la
 from scipy.io import savemat
 
 
-E = 2e11
-rho = 7900  # kg/m^3
+E = 2e9
+rho = 2700  # kg/m^3
 nu = 0.3
 
 b = 0.05
@@ -24,10 +24,10 @@ A = b * h
 I = 1./12 * b * h**3
 
 EI = E * I
-L = 0.1
+L = 1
 
 
-n = 50
+n = 30
 deg = 3
 
 
@@ -151,8 +151,8 @@ omega.sort()
 
 k_n = omega**(0.5)*L*(rho*A/(EI))**(0.25)
 print("Smallest positive normalized eigenvalues computed: ")
-for i in range(10):
-    print(k_n[i])
+# for i in range(3):
+#    print(k_n[i])
 
 # Reduction projection matrices
 
@@ -160,7 +160,7 @@ for i in range(10):
 E = M_aug
 A = -J_aug
 
-n_red = 5
+n_red = 10
 s0 = 0.00001
 
 tol = 1e-16

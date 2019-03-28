@@ -9,21 +9,21 @@ import matplotlib.pyplot as plt
 import scipy.linalg as la
 
 
-E = 7e10
-rho = 2000  # kg/m^3
+E = 2e11
+rho = 7900  # kg/m^3
 nu = 0.3
 
-b = 0.01
+b = 0.05
 h = 0.01
 A = b * h
 
 I = 1./12 * b * h**3
 
 EI = E * I
-L = 1
+L = 0.1
 
 
-n = 10
+n = 100
 deg = 3
 
 
@@ -57,23 +57,26 @@ al_p = rho * A * e_p
 al_q = 1./EI * e_q
 
 dx = Measure('dx')
+ds = Measure('ds')
 m_p = v_p * al_p * dx
 m_q = v_q * al_q * dx
 m =  m_p + m_q
 
 j_divDiv = -v_p * e_q.dx(0).dx(0) * dx
-j_divDivIP =v_q.dx(0).dx(0) * e_p * dx
+j_divDivIP = v_q.dx(0).dx(0) * e_p * dx
 
 j_gradgrad = v_q * e_p.dx(0).dx(0) * dx
 j_gradgradIP = -v_p.dx(0).dx(0) * e_q * dx
 
 
-j = j_gradgrad + j_gradgradIP
+j = j_divDiv + j_divDivIP
+# j = j_gradgrad + j_gradgradIP
 
 
 bc_w = DirichletBC(V.sub(0), Constant(0.0), 1)
 # bc_M = DirichletBC(V.sub(0), Constant(0.0), 2)
 
+g_Hess = - v_p * ds + v_p.dx(0) * ds
 
 boundary_dofs = sorted(bc_w.nodes)
 
@@ -119,12 +122,11 @@ MM = np.array(petsc_m.convert("dense").getDenseArray())
 #                  ])
 #
 
-tol = 0 #10**(-6)
-
+tol = 0
 eigenvalues, eigvectors = la.eig(JJ, MM)
 omega_all = np.imag(eigenvalues)
 
-index = omega_all>tol
+index = omega_all>=tol
 
 omega = omega_all[index]
 eigvec_omega = eigvectors[:, index]
@@ -133,11 +135,13 @@ eigvec_omega = eigvec_omega[:, perm]
 
 omega.sort()
 
-k_n = omega**(0.5)*(rho*A/(EI))**(0.25)
+k_n = omega**(0.5)*L*(rho*A/(EI))**(0.25)
 print("Smallest positive normalized eigenvalues computed: ")
 for i in range(10):
-    print(k_n[i])
+    print(k_n[i], omega[i])
 
+plt.plot(np.real(eigenvalues), np.imag(eigenvalues), 'bo')
+plt.show()
 
 # eigvec_w = eigvec_omega[dofs_Vpw, :]
 # eigvec_w_real = np.real(eigvec_w)

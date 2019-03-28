@@ -165,13 +165,15 @@ tab_x = tab_coord[:, 0]
 tab_y = tab_coord[:, 1]
 
 
-dof_int_l = ((tab_x == l_x) & (tab_y == l_y/2)).nonzero()[0][0]
-dof_int_r = ((tab_x == 0.0) & (tab_y == l_y/2)).nonzero()[0][0]
+dof_int1_l = ((tab_x == l_x) & (tab_y == l_y/4)).nonzero()[0][0]
+dof_int1_r = ((tab_x == 0.0) & (tab_y == l_y/4)).nonzero()[0][0]
+
+dof_int2_l = ((tab_x == l_x) & (tab_y == 3*l_y/4)).nonzero()[0][0]
+dof_int2_r = ((tab_x == 0.0) & (tab_y == 3*l_y/4)).nonzero()[0][0]
 
 n_qn = V_qn.dim()
-Gint_pl1 = G_all[:, (dof_int_l, dof_int_l + n_qn)]
-
-Gint_pl2 = G_all[:, (dof_int_r, dof_int_r + n_qn)]
+Gint_pl1 = G_all[:, (dof_int1_l, dof_int1_l + n_qn, dof_int2_l, dof_int2_l + n_qn)]
+Gint_pl2 = G_all[:, (dof_int1_r, dof_int1_r + n_qn, dof_int2_r, dof_int2_r + n_qn)]
 
 Gint = np.concatenate((Gint_pl1, -Gint_pl2), axis=0)
 
@@ -181,7 +183,7 @@ G = np.concatenate((G_D, Gint), axis=1)
 
 x, y = SpatialCoordinate(mesh)
 A = Constant(10**5)
-f_w = project(A*y, Vp)
+f_w = project(A*(y-l_y/2)**2, Vp)
 b_f1 = v_p * f_w * dx  # ds(3) - v_pw * f_w *  ds(4)
 Bf_pl1 = assemble(b_f1, mat_type='aij').vector().get_local()
 
@@ -315,10 +317,11 @@ sol = np.concatenate( (w_pl1_mm, w_pl2_mm), axis=0)
 anim = animate2D(minZ, maxZ, wmm_pl1_CGvec, wmm_pl2_CGvec, t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \
                          zlabel = '$w [mm]$', title = 'Vertical Displacement')
 
-# Writer = animation.writers['ffmpeg']
-# writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
+Writer = animation.writers['ffmpeg']
+writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
 #
-# anim.save('IntPlates.mp4', writer=writer)
+# pathout = './'
+# anim.save(pathout + 'IntKirchoffPlates.mp4', writer=writer)
 
 
 plt.show()

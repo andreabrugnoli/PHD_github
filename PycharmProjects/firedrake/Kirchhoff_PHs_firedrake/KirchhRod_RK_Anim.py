@@ -191,7 +191,6 @@ n_mul = len(boundary_dofs)
 x, y = SpatialCoordinate(mesh)
 g = Constant(10)
 A = Constant(10**6)
-f = Expression('A*(x[1] + pow(x[1] - ly/2,2))', A = A, ly = l_y, degree = 4)
 f_w = project(A*(y/10 + (y-l_y/2)**2), Vp)
 bp_pl = v_p * f_w * dx                  # v_p * f_w * ds(3) - v_p * f_w * ds(4)
 #                                       # -v_p * rho * h * g * dx #

@@ -188,14 +188,13 @@ def sys(t,y):
     else: dydt = invM_pl @ ( (Jsys - Rsys) @ y )
     return dydt
 
+x, y = SpatialCoordinate(mesh)
+init_con = x**2
 
-init_con = Expression(('sin(pi/lx*x[0])*sin(pi/ly*x[1])', \
-                      '0', '0', '0'), degree=4, lx=l_x, ly=l_y)
-
-e_pl0 = Function(V)
-e_pl0.assign(project(init_con, V))
+e_p0 = Function(Vp)
+e_p0.assign(project(init_con, Vp))
 y0 = np.zeros(n_tot,)
-y0[:n_pl] = e_pl0.vector().get_local()
+y0[:n_Vp] = e_p0.vector().get_local()
 
 t_ev = np.linspace(t0, t_fin, num = n_t)
 

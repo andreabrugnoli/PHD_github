@@ -20,13 +20,15 @@ def animate2D(minSol, maxSol, solPl1_list, solPl2_list, t, xlabel = None, ylabel
     def update_plot(frame_number, solPl1_list, solPl2_list, plot):
         ax.collections.clear()
         lab = 'Time =' + '{0:.2e}'.format(t[frame_number])
-        triangulation1, Z1 = _two_dimension_triangle_func_val(solPl1_list[frame_number], 10)
+        Z1 = _two_dimension_triangle_func_val(solPl1_list[frame_number], 10)[1]
         plot = ax.plot_trisurf(triangulation1, Z1, label=lab, **surf_opts1)
         plot._facecolors2d = plot._facecolors3d
         plot._edgecolors2d = plot._edgecolors3d
 
-        triangulation2, Z2 = _two_dimension_triangle_func_val(solPl2_list[frame_number], 10)
+        Z2 = _two_dimension_triangle_func_val(solPl2_list[frame_number], 10)[1]
         ax.plot_trisurf(triangulation2, Z2, **surf_opts2)
+
+        ax.legend()
 
     ax.set_xlabel(xlabel, fontsize=fntsize)
     ax.set_ylabel(ylabel, fontsize=fntsize)
@@ -54,8 +56,10 @@ def animate2D(minSol, maxSol, solPl1_list, solPl2_list, t, xlabel = None, ylabel
     plot = ax.plot_trisurf(triangulation1, Z1, label=lab, **surf_opts1)
 
     triangulation2, Z2 = _two_dimension_triangle_func_val(solPl2_list[0], 10)
+    triangulation2.x = triangulation2.x + 1.
     ax.plot_trisurf(triangulation2, Z2, label=lab, **surf_opts2)
 
     anim = animation.FuncAnimation(fig, update_plot, frames=len(t),\
                                     interval = 10, fargs=(solPl1_list, solPl2_list, plot))
+
     return anim

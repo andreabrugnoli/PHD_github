@@ -6,6 +6,8 @@ np.set_printoptions(threshold=np.inf)
 from math import floor, sqrt, pi
 import scipy.linalg as la
 
+import matplotlib.pyplot as plt
+
 
 E = 2e11
 nu = 0.3
@@ -17,7 +19,7 @@ L = 1
 l_x = L
 l_y = L
 
-n = 5 #int(input("N element on each side: "))
+n = 4 #int(input("N element on each side: "))
 
 
 # Plate bending stiffness :math:`D=\dfrac{Eh^3}{12(1-\nu^2)}` and shear stiffness :math:`F = \kappa Gh`
@@ -73,7 +75,9 @@ mesh = UnitSquareMesh(n_x, n_y, quadrilateral=False)
 
 nameFE = 'Bell'
 name_FEp = nameFE
-name_FEq = nameFE
+name_FEq = 'Hermite'
+
+deg_q = 3
 
 if name_FEp == 'Morley':
     deg_p = 2
@@ -223,13 +227,13 @@ eigvec_omega = eigvec_omega[:, perm]
 omega.sort()
 
 # NonDimensional China Paper
-n_om = 6
+n_om = 3
 
 omega_tilde = L**2*sqrt(rho*h/D)*omega
 for i in range(n_om):
     print(omega_tilde[i])
 
-plot_eigenvectors = False
+plot_eigenvectors = True
 if plot_eigenvectors:
 
     fntsize = 15
@@ -243,7 +247,7 @@ if plot_eigenvectors:
     plt.close('all')
     matplotlib.rcParams['text.usetex'] = True
 
-    for i in range(6):
+    for i in range(n_om):
         eig_real_w = Function(Vp)
         eig_imag_w = Function(Vp)
 
@@ -280,7 +284,7 @@ if plot_eigenvectors:
         # plt.savefig(path_out2 + "Case" + bc_input + "_el" + str(n) + "_FE_" + name_FEp + "_eig_" + str(i + 1) + ".eps",
         #             format="eps")
 
-    plt.show()
+plt.show()
 
 
 

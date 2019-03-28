@@ -281,7 +281,7 @@ Rsys = P @ Rint
 Fsys = P @ Bf_int
 
 t0 = 0.0
-fac = 5
+
 t_base = 0.001
 t_fin =  0.01
 n_t = 200
