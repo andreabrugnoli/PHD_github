@@ -1,0 +1,295 @@
+%% LyX 2.1.5 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage{color}
+\usepackage{tcolorbox}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\usepackage{url}
+\usepackage[unicode=true,pdfusetitle,
+ bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
+ breaklinks=false,pdfborder={0 0 0},backref=false,colorlinks=true]
+ {hyperref}
+\hypersetup{allcolors=red}
+
+\def\onedot{$\mathsurround0pt\ldotp$}
+\def\cddot{% two dots stacked vertically
+	\mathbin{\vcenter{\baselineskip.67ex
+			\hbox{\onedot}\hbox{\onedot}}%
+}}
+
+\makeatletter \renewcommand\d[1]{\ensuremath{%
+		\;\mathrm{d}#1\@ifnextchar\d{\!}{}}}
+\makeatother
+
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+%===================================
+%% --  Page margins
+\usepackage{geometry}
+\geometry{verbose,twoside,a4paper,
+    % Main margins 
+top=3cm,
+bottom=3cm,
+inner=2.5cm,outer=2.5cm,
+    % Split of top margins
+headheight=2.2cm,headsep=0.5cm,
+    % Split of bottom margin
+footskip=0.5cm,
+    % Split of outer margin
+marginparsep=0.5cm,
+marginparwidth=12.5pt % width of icon \faNewspaperO at 11pt
+}
+% Width of icon is computed with
+% \newlength{\myl} \settowidth{\myl}{\faNewspaperO} Width of icon \faNewspaperO is \the\myl.
+%===================================
+
+%===================================
+%% -- Header
+%\renewcommand{\thepage}{\roman{page}}% Roman numerals for page counter
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+% Custom fancy style (can be modified on the fly within the document as well)
+\fancyhf{} %Clear Everything.
+  % Current page number on the exterior
+\fancyhead[R]{Brugnoli {\it et al.},   APM-D-18-02038, \thepage}
+  % Chapter name on the interior of even pages
+\fancyhead[L]{\nouppercase{\leftmark}}
+% Redefinition of the plain style
+% (This page style is used for the first page of Chapter, table of contents,
+% etc...)
+\fancypagestyle{plain}{
+       \fancyhf{} %Clear Everything.
+       \renewcommand{\headrule}{\hrule height 2pt \vspace{1mm}\hrule height 1pt}
+       \fancyhead[R]{\thepage}
+}
+%===================================
+
+%===================================
+%% -- tcolorbox to quote
+%\usepackage[most]{tcolorbox}
+\tcbuselibrary{most}
+\tcbuselibrary{breakable} % breakable boxes
+%\definecolor{background}{HTML}{F9F5E9}
+%\definecolor{linecolor}{HTML}{E0D7BC}
+\colorlet{background}{lightgray!80!white}
+\colorlet{linecolor}{black}
+
+\newtcolorbox{quotebox}[2][]{%
+leftupper=2em,
+colback=background,
+colframe=background,
+%fonttitle=\bfseries,
+coltitle=black,
+breakable,
+enhanced,
+attach boxed title to top right,
+boxed title style={empty},
+sharp corners,
+borderline north={0.5pt}{0pt}{linecolor},
+borderline north={0.5pt}{1.5pt}{linecolor},
+borderline south={0.5pt}{0pt}{linecolor},
+borderline south={0.5pt}{1.5pt}{linecolor},
+title=#2,#1}
+
+\tcbset{colback=white,
+%colframe=green!50!black,
+%fonttitle=\bfseries,
+coltitle=white,
+breakable,enhanced jigsaw,%breakable box
+%sharp corners,
+}
+%===================================
+
+%===================================
+%-- 'Remark' and TODO' command
+\usepackage{fontawesome}
+\usepackage{tcolorbox}
+   % enable macro
+\newcommand{\remark}[1]{%
+\begin{tcolorbox}[title=,colframe=white,colback=lightgray!50!white,fontupper=\sffamily\small]
+\faComment~#1
+\end{tcolorbox}}
+   % disable macro
+\renewcommand{\remark}[1]{}
+   % enable macro
+\newcounter{todocounter}
+\newcommand{\todo}[1]{\stepcounter{todocounter}\textbf{\textcolor{red}{(TODO \arabic{todocounter} -- #1)}}}
+   % disable macro
+%\renewcommand{\todo}[1]{\stepcounter{todocounter} \textbf{ \textcolor{red}{(\arabic{todocounter})} }}
+%===================================
+
+%===================================
+%%-- Misc.
+\usepackage{lipsum}
+% Write 'et al.'
+% Use \etal (no trailing space) or \etal{} (trailing space)
+\newcommand{\etal}{\emph{et al.}}
+  % Line numbering
+\usepackage{lineno}
+\modulolinenumbers[5]
+  % For option 'stretch fill image'
+\tcbuselibrary{skins}
+%===================================
+
+%===================================
+%% -- Color for review
+   % background color
+\colorlet{colorRevBG1}{red!60!black} % dark red
+\colorlet{colorRevBG2}{blue!60!black} % dark blue
+\colorlet{colorRevBG3}{green!40!black} % dark green
+  % front color
+\colorlet{colorRev1}{red!80!black} % dark red
+\colorlet{colorRev2}{blue!80!black} % dark blue
+\colorlet{colorRev3}{green!50!black} % dark green
+% Macro to enter revisions
+% Usage: \revision[No.]{text}
+%\usepackage{ifthen}
+\usepackage{xstring}
+\newcommand{\revision}[2]{%
+\IfStrEqCase{#1}{{1}{\textcolor{colorRev1}{#2}}
+    {2}{\textcolor{colorRev2}{#2}}
+    {3}{\textcolor{colorRev3}{#2}}}
+    [\PackageError{rev}{Unknown reviewer: #1}{Choose available.}]%
+}
+
+%===================================
+
+\makeatother
+
+\makeatother
+
+\begin{document}
+\thispagestyle{plain}
+
+\noindent {\Large{} APM-D-18-02037, APM-D-18-02038
+}{\Large \par}
+
+\noindent \begin{flushleft}
+{\Large{}Port-Hamiltonian formulation and Symplectic discretization of Plate models \\
+	\vspace{2mm}\large\textit{Part I : Mindlin model for thick plates} \\
+	\vspace{2mm}\large\textit{Part II : Kirchhoff model for thin plates}
+}
+\par\end{flushleft}{\Large \par}
+
+\noindent \begin{flushleft}
+Andrea Brugnoli, Daniel Alazard, Val\'erie Pommier-Budinger, Denis Matignon
+\par\end{flushleft}
+
+\noindent \begin{flushleft}
+\today
+\par\end{flushleft}
+
+\begin{center}
+\textbf{\Large{}Response to reviewers}
+\par\end{center}{\Large \par}
+
+We gratefully acknowledge each reviewer for the comments. We resume here the corrections apported to both papers.
+
+\section*{Reviewer 1}
+The reviewer suggests to give a comment in the introduction part,in order to clarify that the paper addresses a different subject from the the papers of Symplectic approach for plate bending. \\ 
+
+In the introduction of Part I we have added a remark upon the Symplectic elasticity advantages: \\
+\textcolor{colorRev1}{This approach offer insights on analytical solutions (see [4] for a closed solution of the eigenproblem of rectangular Reissner plates) and is of use whenever easy engineering solutions are sought after.} \\
+In this way the respective advantages of the two approaches are underlined. When it comes to obtain easy engineering solutions the Symplectic Elasticity paradigm is a powerful tool. The PH one on the contrary can be employed for complex applications involving large systems constructed in a modular way. The reader can therefore consult the Symplectic Elasticity references if its objective is the former.
+
+\section*{Reviewer 2}
+
+\subsection*{Part I: Mindlin model for thick plates}
+
+Following remarks 
+\begin{itemize}
+	\item Introduction
+	\begin{itemize}
+	\item page 1: formally skew-symmetric Hamiltonian differential operator is a pleonasm as
+	a Hamiltonian operator should be skew-symmetric and obey the Jacobi identities [1]..
+	Maybe you may just keep: Hamiltonian operator ? .
+	\item the authors might refer to for the relation between Lagrangian and Hamiltonian formu-
+	lations including port variables and Dirac structures [2, 3]
+	\end{itemize}
+	\item Reminder on port Hamiltonian systems
+	\begin{itemize}
+	\item page 4: I do not like orthogonal complement which reminds of a metric structure but
+	would rather prefer: isotropic and coisotropic.
+	\item page 6 Remark 1: Rather then inner product which reminds of a metric, I would write
+	pairing (which just means the bilinearity)
+	\end{itemize}
+\end{itemize}
+we provide corresponding corrections in the manuscript. In the highlighted version the corresponding corrections are highlighted in blue. \\
+
+For the remark "page 20 : The sentence Anyway, the Lagrange multipliers are defined only over the boundary. is cryptic." we have added a small period to better explain how the Lagrange multiplier are dealt with: \\
+\textcolor{colorRev2}{The Lagrange multipliers $\bm{\lambda}$ are discretized by using  Lagrange polynomials defined over the boundary. The order of the Lagrange polynomials is the same as the one chosen for the co-energy variable. The corresponding finite element space is denoted by $H_r^1(\mathbb{P}_l, \partial \Omega)$.} \\
+
+Concerning the comment "page 20: Remark 4. The sentence This choice does not correspond to the optimal one given by $D(J)$. is not understandable. Please recall the equation where the operator $J$ is defined ! Is it not $H$ ? What means optimal : the projection space does not belong to the domain ?", with optimal we meant the fact that the finite elements have the minimum possible degree of regularity. Performing a numerical analysis of this PH system is still to be done and not easy. We simply wanted to suggest the fact that the for the numerical analysis the Arnold Winther element is more suited than Lagrange polynomials. We decide therefore to remove the remark and just leave a comment in the conclusion: \\
+\textcolor{colorRev2}{The Arnold-Winther element should be investigated as they provide a conforming approximation of space $H^{\text{Div}}(\Omega, \mathbb{R}^{2 \times 2}_\text{sym})$. Unfortunately, this are not included inside FEniCS (or in any standard library).}
+
+
+\subsection*{Part II: Kirchhoff model for thin plates}
+We followed the suggestion \\
+"page 6. After the sentence: This theorem states that, for smooth functions, higher order partial derivative commute., remove all detailed equations. This statement is enough as it corresponds to define the jet bundle over the displacements."
+and eliminate the superfluous comments.
+
+\subsection*{Common remark}
+One comment was adressed to both papers: \\
+"page 21: It is written: The symplectic Störmer-Verlet time integrator is employed, so that
+when no solicitation is applied to the system, the Hamiltonian is preserved. In theory the
+symplectic scheme should preserve the symplectic structure not the Hamiltonian which is
+expected not to be conserved by to oscillate around a mean value ? Furthermore how do
+you aply the scheme to a model which is defined with respect to a skew-symmetric matrix
+which is not in canonical coordinates?"
+
+It is true that for closed systems the Hamiltonian is not perfectly conserved but only the symplectic structure. For this we modified the comment:
+\textcolor{colorRev2}{The St\"ormer-Verlet time integrator is employed, so that the symplectic structure is preserved.} \\
+For what concerned how this integrator is employed in our particular case, this integrator (also known as leapfrog in the context of PDEs) does not require a skew-symmetric matrix in canonical coordinates (another application to non canonical skew-symmetric matrices can be found in \cite{Trenchant}). Given the system 
+\begin{equation*}
+\begin{aligned}
+M_p \dot{e}_p &= D e_q \\
+M_q \dot{e}_q &= -D^T e_p \\
+\end{aligned}
+\end{equation*}
+the Leapfrog (St\"ormer-Verlet) scheme consist of three steps
+\begin{equation*}
+\begin{aligned}
+M_p {e}^{n+1/2}_p &= M_p {e}^{n}_p + \frac{\Delta t}{2} D e^n_q \\
+M_q {e}^{n+1}_q &= M_q {e}^{n}_q - \Delta t D^T e^{n+1/2}_p \\
+M_p {e}^{n+1}_p &= M_p {e}^{n+1/2}_p + \frac{\Delta t}{2} D e^{n+1}_q \\
+\end{aligned}
+\end{equation*}
+
+Furthermore, the constrained case can be dealt with as well by applying the RATTLE scheme \cite[Chapter VII]{hairer2006geometric}. For the system
+\begin{equation*}
+\begin{aligned}
+M_p \dot{e}_p &= D e_q + G \lambda \\
+M_q \dot{e}_q &= -D^T e_p \\
+0 & = -G^T e_p
+\end{aligned}
+\end{equation*}
+the Leapfrog scheme is modified by inserting the projection matrix $P_{\lambda} = {I} - {G} \left({G}^T {M}_p^{-1} {G} \right)^{-1} {G}^T {M}_p^{-1}$ in the dynamics of $e_p$ (this corresponds to derive and solve for $\lambda$ the constrain equation, given the actual $e_q$ variable)
+\begin{equation*}
+\begin{aligned}
+M_p {e}^{n+1/2}_p &= M_p {e}^{n}_p + \frac{\Delta t}{2} P_{\lambda} D e^n_q \\
+M_q {e}^{n+1}_q &= M_q {e}^{n}_q - \Delta t D^T e^{n+1/2}_p \\
+M_p {e}^{n+1}_p &= M_p {e}^{n+1/2}_p + \frac{\Delta t}{2} P_{\lambda} D e^{n+1}_q \\
+\end{aligned}
+\end{equation*}
+
+\section*{Minor Modification for Part II}
+We also modify the definition of the flux variables in the augmented Dirac Structure considering dissipation of section 3.1.2 so that the pairing is analogous to the other pairing defined elsewhere. From 3.1.2. \\
+The augmented structure
+\begin{multline}
+\mathcal{D}_r := \Bigl\{ (\bm{f}, \bm{f}_r) \in \mathcal{F}, \ (\bm{e}, \bm{e}_r) \in \mathcal{E}, \ \bm{z} \in \mathcal{Z} \; |  \\
+\bm{f} = - \frac{\partial \bm{\alpha}}{\partial t} = -J \bm{e} - G_R \bm{f}_r, \; \bm{f}_r = - S \bm{e}_r, \; \bm{e}_r = G^*_R \bm{e},  \;  \bm{z} = B_{\partial}(\bm{e})	
+\Big\}
+\end{multline}
+is a Stokes-Dirac structure with respect to the paring 
+\begin{multline}
+\ll (\bm{f}_1, \bm{f}_{r, 1}, \bm{e}_1, \bm{e}_{r, 1}, \bm{z}_1), (\bm{f}_2, \bm{f}_{r, 2}, \bm{e}_2, \bm{e}_{r, 2}, \bm{z}_2) \gg  \,= \\
+\int_{\Omega} \left[ \bm{e}_1^T \bm{f}_2 + \bm{e}_2^T \bm{f}_1 + \bm{e}_{r, 1}^T \bm{f}_{r, 2} + \bm{e}_{r, 2}^T \bm{f}_{r, 1} \right] d\Omega  + \int_{\partial \Omega} B_J(\bm{z}_1, \bm{z}_2) \, ds.
+\end{multline}
+
+\bibliographystyle{alpha}
+\bibliography{biblio_Response2} 
+
+
+\end{document}
