@@ -1,14 +1,34 @@
-load B; load Br; load E; load Er; load J; load Jr;
+clc
+close all
+clear all
 
+addpath('/home/a.brugnoli/sources/dstools/')
 
+load E; load J; load B; 
+load Er; load Jr; load Br;
+load Er1; load Jr1; load Br1;
+load Er2; load Jr2; load Br2;
 
 sys_full = dss(J,B,B',0,E) ;
 sys_red = dss(Jr,Br,Br',0,Er);
+sys_red1 = dss(Jr1,Br1,Br1',0,Er1);
+sys_red2 = dss(Jr2,Br2,Br2',0,Er2);
+%  
+% [isp, sys_full] = isproper(sys_full);
+% [isp, sys_red] = isproper(sys_red);
+% 
+sys_full = minreal(sys_full);
+sys_red = minreal(sys_red);
+sys_red1 = minreal(sys_red1);
+sys_red2 = minreal(sys_red2);
+figure(1)
+bode(sys_full, sys_red)
+figure(2)
+bode(sys_full, sys_red1)
+figure(3)
+bode(sys_full, sys_red2)
 
-figure()
-bode(sys_full)
-hold on
-bode(sys_red)
 
-eig_full = eig(E, J)
-eig_red = eig(Er, Jr)
+%eig_full = eig(E, J)
+%eig_red = eig(Er, Jr)
+
