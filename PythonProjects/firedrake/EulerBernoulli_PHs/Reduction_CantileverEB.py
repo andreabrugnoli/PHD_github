@@ -2,8 +2,10 @@
 
 from firedrake import *
 import numpy as np
+np.set_printoptions(threshold=np.inf)
+
 import sys
-sys.path.append('/home/a.brugnoli/PycharmProjects/Reduction_Index2DAE')
+sys.path.append('/home/a.brugnoli/GitProjects/PythonProjects/Reduction_Index2DAE')
 
 from module_reduction import proj_matrices
 from math import floor, sqrt, pi
@@ -49,6 +51,7 @@ V = V_p * V_q
 
 n_V = V.dim()
 n_Vp = V_p.dim()
+n_Vq = V_q.dim()
 
 v = TestFunction(V)
 v_p, v_q = split(v)
@@ -95,6 +98,7 @@ G_L = np.zeros((n_V, len(g_l)))
 G_R = np.zeros((n_V, len(g_r)))
 
 
+
 for counter, item in enumerate(g_l):
     G_L[:, counter] = assemble(item).vector().get_local()
 
@@ -107,7 +111,7 @@ x = SpatialCoordinate(mesh)
 a = 3*L/4
 b = L
 ctr_loc = conditional(And(ge(x[0], a), le(x[0], b)), 1, 0)
-b_p =  v_p.dx(0) * ds(1) # v_p * ctr_loc * dx
+b_p =  v_p.dx(0) * ds(2) # v_p * ctr_loc * dx
 
 # Assemble the stiffness matrix and the mass matrix.
 Bp = assemble(b_p)
@@ -120,59 +124,38 @@ M = np.array(petsc_m.convert("dense").getDenseArray())
 
 n_lmb = len(G.T)
 
-
 Z_lmb = np.zeros((n_lmb, n_lmb))
 
-J_aug = np.vstack([ np.hstack([J, G]),
+J_full = np.vstack([ np.hstack([J, G]),
                     np.hstack([-G.T, Z_lmb])
                 ])
 
 Z_el = np.zeros((n_V, n_lmb))
 
-M_aug = np.vstack([ np.hstack([M,       Z_el]),
+E_full = np.vstack([ np.hstack([M,       Z_el]),
                     np.hstack([Z_el.T, Z_lmb])
                  ])
 
-B = np.zeros((len(M_aug), 1))
-B[:n_V] = Bp.vector().get_local().reshape((-1, 1))
+B_full = np.zeros((len(E_full), 1))
+B_full[:n_V] = Bp.vector().get_local().reshape((-1, 1))
 
-tol = 1e-9
-eigenvalues, eigvectors = la.eig(J_aug, M_aug)
-omega_all = np.imag(eigenvalues)
-
-index = omega_all >= tol
-
-omega = omega_all[index]
-eigvec_omega = eigvectors[:, index]
-perm = np.argsort(omega)
-eigvec_omega = eigvec_omega[:, perm]
-
-omega.sort()
-
-k_n = omega**(0.5)*L*(rho*A/(EI))**(0.25)
-print("Smallest positive normalized eigenvalues computed: ")
-# for i in range(3):
-#    print(k_n[i])
 
 # Reduction projection matrices
+A_full = -J_full
 
-
-E = M_aug
-A = -J_aug
-
-n_red = 10
+n_red = 20
 s0 = 0.00001
 
 tol = 1e-16
-V1, V2 = proj_matrices(E, A, B, s0, n_red, n_Vp, n_V, tol)
+V1, V2 = proj_matrices(E_full, A_full, B_full, s0, n_red, n_Vp, n_V, tol)
 
 # V_red = np.vstack((V1, V2))
 
-M1 = E[:n_Vp, :n_Vp]
-M2 = E[n_Vp:n_V, n_Vp:n_V]
+M1 = E_full[:n_Vp, :n_Vp]
+M2 = E_full[n_Vp:n_V, n_Vp:n_V]
 
-G = J_aug[n_Vp:n_V, :n_Vp]
-N = J_aug[n_V:, :n_Vp]
+G = J_full[n_Vp:n_V, :n_Vp]
+N = J_full[n_V:, :n_Vp]
 
 
 M1_red = V1.T @ M1 @ V1
@@ -190,26 +173,74 @@ J_red = np.zeros(E_red.shape)
 J_red[n1_red:, :n1_red] = np.concatenate((G_red, N_red), axis=0)
 J_red[:n1_red, n1_red:] = -np.concatenate((G_red, N_red)).T
 
-B1_red = V1.T @ B[:n_Vp]
+B1_red = V1.T @ B_full[:n_Vp]
 
 B_red = np.zeros((len(E_red), 1))
 B_red[:n1_red] = B1_red
 
-pathout = '/home/a.brugnoli/MatlabProjects/ReductionPHDAEind2/'
+
+UT_N, S_N, V_N = np.linalg.svd(N.T, full_matrices=True)
+VT_N = V_N.T
+
+S_N = np.diag(S_N)
+
+U = la.block_diag(UT_N, np.eye((n_Vq, n_Vq)), VT_N)
+
+E_til = U.T @ E_full @ U
+J_til = U.T @ J_full @ U
+B_til = U.T @ B_full
+
+E_til = E_til[n_lmb:, n_lmb:]; J_til = J_til[n_lmb:, n_lmb:]; B_til = B_til[n_lmb:]
+pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/ReductionPHDAEind2/'
 
 E_file = 'E'; J_file = 'J'; B_file = 'B'
-savemat(pathout + E_file, mdict={E_file: E})
-savemat(pathout + J_file, mdict={J_file: J_aug})
-savemat(pathout + B_file, mdict={B_file: B})
+savemat(pathout + E_file, mdict={E_file: E_full})
+savemat(pathout + J_file, mdict={J_file: J_full})
+savemat(pathout + B_file, mdict={B_file: B_full})
 
-Er_file = 'Er'; Jr_file = 'Jr'; Br_file = 'Br'
-savemat(pathout + Er_file, mdict={Er_file: E_red})
-savemat(pathout + Jr_file, mdict={Jr_file: J_red})
-savemat(pathout + Br_file, mdict={Br_file: B_red})
+E_file = 'Etil'; J_file = 'Jtil'; B_file = 'Btil'
+savemat(pathout + E_file, mdict={E_file: E_til})
+savemat(pathout + J_file, mdict={J_file: J_til})
+savemat(pathout + B_file, mdict={B_file: B_til})
+#
+# Er_file = 'Er2'; Jr_file = 'Jr2'; Br_file = 'Br2'
+# savemat(pathout + Er_file, mdict={Er_file: E_red})
+# savemat(pathout + Jr_file, mdict={Jr_file: J_red})
+# savemat(pathout + Br_file, mdict={Br_file: B_red})
 
-
-
-
-
-
-
+# tol = 1e-9
+# eigenvalues, eigvectors = la.eig(J_full, E_full)
+# omega_all = np.imag(eigenvalues)
+#
+# index = omega_all > 0#  tol
+#
+# omega = omega_all[index]
+# eigvec_omega = eigvectors[:, index]
+# perm = np.argsort(omega)
+# eigvec_omega = eigvec_omega[:, perm]
+#
+# omega.sort()
+#
+# eigenvalues_r, eigvectors_r = la.eig(J_red, E_red)
+# omega_all_r = np.imag(eigenvalues_r)
+#
+# index_r = omega_all_r > 0
+#
+# omega_r = omega_all_r[index_r]
+# eigvec_omega_r = eigvectors_r[:, index_r]
+# perm_r = np.argsort(omega_r)
+# eigvec_omega_r = eigvec_omega[:, perm_r]
+#
+# omega_r.sort()
+#
+# k_n = omega**(0.5)*L*(rho*A/(EI))**(0.25)
+# k_n_r = omega_r**(0.5)*L*(rho*A/(EI))**(0.25)
+# print("Smallest positive normalized eigenvalues computed: ")
+# for i in range(len(omega_r)):
+#    print(k_n[i], k_n_r[i])
+#
+#
+# print(E_red.shape)
+# plt.plot(np.real(eigenvalues), np.imag(eigenvalues), 'o')
+# plt.plot(np.real(eigenvalues_r), np.imag(eigenvalues_r), '+')
+# plt.show()
