@@ -11,7 +11,7 @@ load Er; load Jr; load Br;
 % load Er2; load Jr2; load Br2;
 
 sys_full = dss(J,B,B',0,E);
-% sys_full = minreal(sys_full);
+sys_full = minreal(sys_full);
 % [isp, sys_full] = isproper(sys_full);
 
 % sys_reg = dss(Jtil,Btil,Btil',0,Etil);
@@ -19,7 +19,7 @@ sys_full = dss(J,B,B',0,E);
 % [isp, sys_red] = isproper(sys_red);
 
 sys_red = dss(Jr,Br,Br',0,Er);
-% sys_red = minreal(sys_red);
+sys_red = minreal(sys_red);
 
 % sys_red1 = dss(Jr1,Br1,Br1',0,Er1);
 % sys_red1 = minreal(sys_red1);

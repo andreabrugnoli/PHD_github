@@ -137,8 +137,7 @@ E_full = np.vstack([ np.hstack([M,       Z_el]),
                  ])
 
 B_full = np.zeros((len(E_full), 1))
-# B_full[:n_V] = Bp.vector().get_local().reshape((-1, 1))
-B_full[-2] = 1
+B_full[:n_V] = Bp.vector().get_local().reshape((-1, 1))
 
 # Reduction projection matrices
 A_full = -J_full
@@ -176,8 +175,8 @@ J_red[:n1_red, n1_red:] = -np.concatenate((G_red, N_red)).T
 B1_red = V1.T @ B_full[:n_Vp]
 
 B_red = np.zeros((len(E_red), 1))
-# B_red[:n1_red] = B1_red
-B_red[-1] = 1
+B_red[:n1_red] = B1_red
+
 
 pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/ReductionPHDAEind2/'
 
