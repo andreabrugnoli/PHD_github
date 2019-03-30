@@ -137,8 +137,8 @@ E_full = np.vstack([ np.hstack([M,       Z_el]),
                  ])
 
 B_full = np.zeros((len(E_full), 1))
-B_full[:n_V] = Bp.vector().get_local().reshape((-1, 1))
-
+# B_full[:n_V] = Bp.vector().get_local().reshape((-1, 1))
+B_full[-2] = 1
 
 # Reduction projection matrices
 A_full = -J_full
@@ -176,21 +176,9 @@ J_red[:n1_red, n1_red:] = -np.concatenate((G_red, N_red)).T
 B1_red = V1.T @ B_full[:n_Vp]
 
 B_red = np.zeros((len(E_red), 1))
-B_red[:n1_red] = B1_red
+# B_red[:n1_red] = B1_red
+B_red[-1] = 1
 
-
-UT_N, S_N, V_N = np.linalg.svd(N.T, full_matrices=True)
-VT_N = V_N.T
-
-S_N = np.diag(S_N)
-
-U = la.block_diag(UT_N, np.eye((n_Vq, n_Vq)), VT_N)
-
-E_til = U.T @ E_full @ U
-J_til = U.T @ J_full @ U
-B_til = U.T @ B_full
-
-E_til = E_til[n_lmb:, n_lmb:]; J_til = J_til[n_lmb:, n_lmb:]; B_til = B_til[n_lmb:]
 pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/ReductionPHDAEind2/'
 
 E_file = 'E'; J_file = 'J'; B_file = 'B'
@@ -198,15 +186,31 @@ savemat(pathout + E_file, mdict={E_file: E_full})
 savemat(pathout + J_file, mdict={J_file: J_full})
 savemat(pathout + B_file, mdict={B_file: B_full})
 
-E_file = 'Etil'; J_file = 'Jtil'; B_file = 'Btil'
-savemat(pathout + E_file, mdict={E_file: E_til})
-savemat(pathout + J_file, mdict={J_file: J_til})
-savemat(pathout + B_file, mdict={B_file: B_til})
+Er_file = 'Er'; Jr_file = 'Jr'; Br_file = 'Br'
+savemat(pathout + Er_file, mdict={Er_file: E_red})
+savemat(pathout + Jr_file, mdict={Jr_file: J_red})
+savemat(pathout + Br_file, mdict={Br_file: B_red})
+
 #
-# Er_file = 'Er2'; Jr_file = 'Jr2'; Br_file = 'Br2'
-# savemat(pathout + Er_file, mdict={Er_file: E_red})
-# savemat(pathout + Jr_file, mdict={Jr_file: J_red})
-# savemat(pathout + Br_file, mdict={Br_file: B_red})
+# UT_N, S_N, V_N = np.linalg.svd(N.T, full_matrices=True)
+# VT_N = V_N.T
+#
+# S_N = np.diag(S_N)
+#
+# U = la.block_diag(UT_N, np.eye(n_Vq), VT_N)
+#
+# E_til = U.T @ E_full @ U
+# J_til = U.T @ J_full @ U
+# B_til = U.T @ B_full
+#
+# E_til = E_til[n_lmb:, n_lmb:]; J_til = J_til[n_lmb:, n_lmb:]; B_til = B_til[n_lmb:]
+#
+# E_file = 'Etil'; J_file = 'Jtil'; B_file = 'Btil'
+# savemat(pathout + E_file, mdict={E_file: E_til})
+# savemat(pathout + J_file, mdict={J_file: J_til})
+# savemat(pathout + B_file, mdict={B_file: B_til})
+#
+
 
 # tol = 1e-9
 # eigenvalues, eigvectors = la.eig(J_full, E_full)
