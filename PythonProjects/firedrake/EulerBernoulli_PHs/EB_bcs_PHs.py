@@ -21,7 +21,7 @@ A = b * h
 I = 1./12 * b * h**3
 
 EI = E * I
-L = 0.1
+L = 1
 
 
 n = 10
@@ -60,7 +60,7 @@ dx = Measure('dx')
 ds = Measure('ds')
 m_p = v_p * al_p * dx
 m_q = v_q * al_q * dx
-m =  m_p + m_q
+m = m_p + m_q
 
 j_divDiv = -v_p * e_q.dx(0).dx(0) * dx
 j_divDivIP = v_q.dx(0).dx(0) * e_p * dx
@@ -130,10 +130,17 @@ M_aug = np.vstack([ np.hstack([MM, Z_al_u]),
 
 
 tol = 1e-9
+# JJ[:, :2] = 0
+# MM[:, :2] = 0
+# JJ[:2, :] = 0
+# MM[:2, :] = 0
+#
+# eigenvalues, eigvectors = la.eig(JJ, MM)
 eigenvalues, eigvectors = la.eig(J_aug, M_aug)
+
 omega_all = np.imag(eigenvalues)
 
-index = omega_all >= tol
+index = omega_all >= 0
 
 omega = omega_all[index]
 eigvec_omega = eigvectors[:, index]

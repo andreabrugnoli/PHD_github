@@ -45,7 +45,7 @@ V = V_p * V_q
 
 print(V.dim())
 
-n_w = V.sub(0).dim()
+n_Vp = V_p.dim()
 
 v = TestFunction(V)
 v_p, v_q = split(v)
@@ -92,41 +92,12 @@ petsc_m = M.M.handle
 JJ = np.array(petsc_j.convert("dense").getDenseArray())
 MM = np.array(petsc_m.convert("dense").getDenseArray())
 
-# B_u = assemble(b_u_omn, mat_type='aij')
-# B_y = assemble(b_y_omn, mat_type='aij')
-#
-# petsc_b_u =  B_u.M.handle
-# petsc_b_y =  B_y.M.handle
-#
-# # print(B_u.array().shape)
-# B_in  = np.array(petsc_b_u.convert("dense").getDenseArray())[:, boundary_dofs]
-# B_out = np.array(petsc_b_y.convert("dense").getDenseArray())[boundary_dofs, :]
-
-#
-# N_al = V.dim()
-# N_u = len(boundary_dofs)
-# # print(N_u)
-#
-# Z_u = np.zeros((N_u, N_u))
-#
-#
-# J_aug = np.vstack([ np.hstack([JJ, B_in]),
-#                     np.hstack([B_out, Z_u])
-#                 ])
-#
-# Z_al_u = np.zeros((N_al, N_u))
-# Z_u_al = np.zeros((N_u, N_al))
-#
-# M_aug = np.vstack([ np.hstack([MM, Z_al_u]),
-#                     np.hstack([Z_u_al,    Z_u])
-#                  ])
-#
 
 tol = 0
 eigenvalues, eigvectors = la.eig(JJ, MM)
 omega_all = np.imag(eigenvalues)
 
-index = omega_all>=tol
+index = omega_all>tol
 
 omega = omega_all[index]
 eigvec_omega = eigvectors[:, index]
@@ -141,96 +112,36 @@ for i in range(10):
     print(k_n[i], omega[i])
 
 plt.plot(np.real(eigenvalues), np.imag(eigenvalues), 'bo')
+
+eigvec_w = eigvec_omega[:n_Vp, :]
+eigvec_w_real = np.real(eigvec_w)
+eigvec_w_imag = np.imag(eigvec_w)
+
+eig_funH2 = Function(V_p)
+Vp_4proj = FunctionSpace(mesh, "CG", 2)
+eig_funH1 = Function(Vp_4proj)
+
+n_fig = 3
+plot_eigenvector = True
+if plot_eigenvector:
+
+    for i in range(n_fig):
+        z_real = eigvec_w_real[:, i]
+        z_imag = eigvec_w_imag[:, i]
+
+        tol = 1e-6
+        fntsize = 20
+
+        # eig_funH2.vector()[:] = z_real
+        # eig_funH1.assign(project(eig_funH2, Vp_4proj))
+        # plot(eig_funH1)
+
+        eig_funH2.vector()[:] = z_imag
+        eig_funH1.assign(project(eig_funH2, Vp_4proj))
+        plot(eig_funH1)
+        plt.xlabel('$x$', fontsize=fntsize)
+        plt.title('Eigenvector $e_p$', fontsize=fntsize)
+
 plt.show()
 
-# eigvec_w = eigvec_omega[dofs_Vpw, :]
-# eigvec_w_real = np.real(eigvec_w)
-# eigvec_w_imag = np.imag(eigvec_w)
 
-# import matplotlib
-# import matplotlib.pyplot as plt
-# from mpl_toolkits.mplot3d import Axes3D
-# from matplotlib.ticker import LinearLocator, FormatStrFormatter
-# from matplotlib import cm
-#
-# plt.close('all')
-# matplotlib.rcParams['text.usetex'] = True
-# matplotlib.rcParams['text.latex.unicode'] = True
-
-# n_fig = 5
-#
-# if plot_eigenvector == 'y':
-#
-#     for i in range(n_fig):
-#         z_real = eigvec_w_real[:, i]
-#         z_imag = eigvec_w_imag[:, i]
-#
-#         tol = 1e-6
-#         fntsize = 20
-#
-#         if matplotlib.is_interactive():
-#             plt.ioff()
-#
-#
-#         z1 = z_real
-#         minZ1 = min(z1)
-#         maxZ1 = max(z1)
-#
-#         if minZ1 != maxZ1:
-#
-#             fig1 = plt.figure(i)
-#
-#             ax1 = fig1.add_subplot(111, projection='3d')
-#             # ax1.zaxis._axinfo['label']['space_factor'] = 20
-#
-#             ax1.set_xbound(min(x) - tol, max(x) + tol)
-#             ax1.set_xlabel('$x$', fontsize=fntsize)
-#
-#             ax1.set_ybound(min(y) - tol, max(y) + tol)
-#             ax1.set_ylabel('$y$', fontsize=fntsize)
-#
-#             ax1.set_title('$v_{e_{p,w}}$', fontsize=fntsize)
-#
-#             ax1.set_zlim3d(minZ1 - 0.01*abs(minZ1), maxZ1 + 0.01*abs(maxZ1))
-#             ax1.w_zaxis.set_major_locator(LinearLocator(10))
-#             ax1.w_zaxis.set_major_formatter(FormatStrFormatter('%.04f'))
-#
-#             ax1.plot_trisurf(x, y, z1, cmap=cm.jet, linewidth=0, antialiased=False)
-#
-#             # path_out1 = "/home/a.brugnoli/PycharmProjects/Mindlin_Phs_fenics/Figures_Eig_Min/RealEig/"
-#             # plt.savefig(path_out1 + "Case" + case_study + "_el" + str(n) + "_deg" + str(deg) + "_thick_" + \
-#             #             str(thick) + "_eig_" + str(i+1) + ".eps", format="eps")
-#
-#
-#     for i in range(n_fig):
-#         z2 = z_imag
-#         minZ2 = min(z2)
-#         maxZ2 = max(z2)
-#
-#         if minZ2 != maxZ2:
-#
-#             fig2 = plt.figure(n_fig + i+1)
-#
-#             ax2 = fig2.add_subplot(111, projection='3d')
-#             # ax2.zaxis._axinfo['label']['space_factor'] = 20
-#
-#             ax2.set_xlim(min(x) - tol, max(x) + tol)
-#             ax2.set_xlabel('$x$', fontsize=fntsize)
-#
-#             ax2.set_ylim(min(y) - tol, max(y) + tol)
-#             ax2.set_ylabel('$y$', fontsize=fntsize)
-#
-#             # ax2.set_zlabel('$v_{e_{p,w}}$', fontsize=fntsize)
-#             ax2.set_title('$v_{e_{p,w}}$', fontsize=fntsize)
-#
-#             ax2.set_zlim(minZ2 - 0.01 * abs(minZ2), maxZ2 + 0.01 * abs(maxZ2))
-#             ax2.w_zaxis.set_major_locator(LinearLocator(10))
-#             ax2.w_zaxis.set_major_formatter(FormatStrFormatter('%.04f'))
-#
-#             ax2.plot_trisurf(x, y, z2, cmap=cm.jet, linewidth=0, antialiased=False)
-#
-#             # path_out2 = "/home/a.brugnoli/PycharmProjects/Mindlin_Phs_fenics/Figures_Eig_Min/ImagEig/"
-#             # plt.savefig(path_out2 + "Case" + case_study + "_el" + str(n) + "_deg" + str(deg) + "_thick_" \
-#             #             + str(thick) + "_eig_" + str(i+1) + ".eps", format="eps")
-#
-#     plt.show()
