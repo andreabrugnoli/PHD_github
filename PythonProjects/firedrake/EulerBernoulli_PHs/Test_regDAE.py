@@ -1,7 +1,10 @@
 
 from firedrake import *
 import numpy as np
+np.set_printoptions(threshold=np.inf)
+
 import scipy.linalg as la
+from scipy.io import savemat
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -22,19 +25,14 @@ I = 1./12 * b * h**3
 EI = E * I
 L = 1
 
-
-n = 10
+n = 2
 deg = 3
 
-
-# The unit square mesh is divided in :math:`N\times N` quadrilaterals::
-L = 1
 
 mesh = IntervalMesh(n, L)
 
 # plot(mesh)
 # plt.show()
-
 
 # Finite element defition
 
@@ -70,10 +68,6 @@ j_gradgradIP = -v_p.dx(0).dx(0) * e_q * dx
 j = j_gradgrad + j_gradgradIP
 # j = j_divDiv + j_divDivIP
 
-# bc_w = DirichletBC(V.sub(0), Constant(0.0), 1)
-# bc_M = DirichletBC(V.sub(0), Constant(0.0), 2)
-# boundary_dofs = sorted(bc_w.nodes)
-
 gCC_Hess = [- v_p * ds(1), + v_p.dx(0) * ds(1), - v_p * ds(2), v_p.dx(0) * ds(2)]
 gSS_Hess = [- v_p * ds(1), - v_p * ds(2)]
 
@@ -90,14 +84,13 @@ g_r = [] # gCF_divDiv
 G_L = np.zeros((n, len(g_l)))
 G_R = np.zeros((n, len(g_r)))
 
-
 for counter, item in enumerate(g_l):
     G_L[:, counter] = assemble(item).vector().get_local()
 
 for counter, item in enumerate(g_r):
     G_R[:, counter] = assemble(item).vector().get_local()
 
-G = np.concatenate((G_L, G_R), axis=1)
+G_lmb = np.concatenate((G_L, G_R), axis=1)
 
 # Assemble the stiffness matrix and the mass matrix.
 J = assemble(j, mat_type='aij')
@@ -106,28 +99,95 @@ M = assemble(m, mat_type='aij')
 petsc_j = J.M.handle
 petsc_m = M.M.handle
 
+
+b_F = v_p * ds(2)
+B_F = assemble(b_F).vector().get_local()
+
 JJ = np.array(petsc_j.convert("dense").getDenseArray())
 MM = np.array(petsc_m.convert("dense").getDenseArray())
 
-n_al = V.dim()
-n_lmb = len(G.T)
-# print(N_u)
+n_lmb = len(G_lmb.T)
+n_tot = n + n_lmb
 
 Z_u = np.zeros((n_lmb, n_lmb))
 
 
-J_aug = np.vstack([ np.hstack([JJ, G]),
-                    np.hstack([-G.T, Z_u])
+J_aug = np.vstack([ np.hstack([JJ, G_lmb]),
+                    np.hstack([-G_lmb.T, Z_u])
                 ])
 
-Z_al_u = np.zeros((n_al, n_lmb))
-Z_u_al = np.zeros((n_lmb, n_al))
+Z_al_u = np.zeros((n, n_lmb))
+Z_u_al = np.zeros((n_lmb, n))
 
-M_aug = np.vstack([ np.hstack([MM, Z_al_u]),
-                    np.hstack([Z_u_al,    Z_u])
-                 ])
+M_aug = np.vstack([np.hstack([MM, Z_al_u]),
+                   np.hstack([Z_u_al,    Z_u])])
 
+B_aug = np.zeros((n_tot, 1))
+B_aug[:n] = B_F.reshape((-1, 1))
 
-tol = 1e-9
+n_u = len(B_aug.T)
+Omega = la.null_space(np.concatenate((M_aug, B_aug.T)))
 
-E_4reg = np.concatenate((M_aug, np.concatenate((G.T, np.zeros(n_lmb, n_lmb)), axis=1)))
+assert len(Omega.T) == n_lmb
+
+E_4reg = np.concatenate((M_aug, Omega.T @ J_aug))
+A_4reg = np.concatenate((J_aug, np.zeros((n_lmb, n_tot))))
+B_4reg = np.concatenate((B_aug, np.zeros((n_lmb, n_u))))
+
+rankEreg = np.linalg.matrix_rank(E_4reg)
+assert rankEreg == n
+q = n_tot - n
+
+U, Sigma_all, VT = np.linalg.svd(E_4reg, full_matrices=True)
+Sigma = Sigma_all[:n]
+
+UT = U.T
+V = VT.T
+
+Atil = UT @ A_4reg @ V
+A11 = Atil[:n, :n]
+A12 = Atil[:n, -q:]
+A21 = Atil[-2*q:, :n]
+A22 = Atil[-2*q:, -q:]
+
+A22plus = np.linalg.solve(A22.T @ A22, A22.T)
+
+V11 = V[:n, :n]
+V12 = V[:n, -q:]
+V21 = V[-q:, :n]
+V22 = V[-q:, -q:]
+
+Btil = UT @ B_4reg
+
+B1 = Btil[:n, :]
+B2 = Btil[n:, :]
+
+invSigma = np.reciprocal(Sigma)
+F = np.diag(invSigma) @ (A11 - A12 @ A22plus @ A21)
+G = np.diag(invSigma) @ (B1 - A12 @ A22plus @ B2)
+
+C1 = B_aug[:n, :].T
+C2 = B_aug[n:, :].T
+
+Vtil11 = V11 - V12 @ A22plus @ A21
+Vtil21 = V21 - V22 @ A22plus @ A21
+
+V12plus = V12 @ A22plus @ B2
+V22plus = V22 @ A22plus @ B2
+
+H = C1 @ Vtil11 + C2 @ Vtil21
+L = - C1 @ V12plus - C2 @ V22plus
+
+T_z2x = np.concatenate((Vtil11, Vtil21))
+T_z2u = np.concatenate((V12plus, V22plus))
+
+pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/ReductionPHDAEind2/'
+
+F_file = 'F'; G_file = 'G'; H_file = 'H'; L_file = 'L'
+T_z2x_file = 'T_z2x'; T_z2u_file = 'T_z2u'
+savemat(pathout + F_file, mdict={F_file: F})
+savemat(pathout + G_file, mdict={G_file: G})
+savemat(pathout + H_file, mdict={H_file: H})
+savemat(pathout + L_file, mdict={L_file: L})
+savemat(pathout + T_z2x_file, mdict={T_z2x_file: T_z2x})
+savemat(pathout + T_z2u_file, mdict={T_z2u_file: T_z2u})

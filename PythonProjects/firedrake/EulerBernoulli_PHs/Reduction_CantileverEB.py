@@ -1,22 +1,21 @@
 # EB beam written with the port Hamiltonian approach
 
-from firedrake import *
 import numpy as np
+from firedrake import *
+
 np.set_printoptions(threshold=np.inf)
 
 import sys
-sys.path.append('/home/a.brugnoli/GitProjects/PythonProjects/Reduction_Index2DAE')
+sys.path.append('/home/a.brugnoli/GitProjects/PythonProjects/modules_pHDAE')
 
 from module_reduction import proj_matrices
-from math import floor, sqrt, pi
-import matplotlib.pyplot as plt
 
 import scipy.linalg as la
 from scipy.io import savemat
 
 
-E = 2e9
-rho = 2700  # kg/m^3
+E = 2e11
+rho = 7900  # kg/m^3
 nu = 0.3
 
 b = 0.05
@@ -29,12 +28,8 @@ EI = E * I
 L = 1
 
 
-n = 30
+n = 2
 deg = 3
-
-
-# The unit square mesh is divided in :math:`N\times N` quadrilaterals::
-L = 1
 
 mesh = IntervalMesh(n, L)
 
@@ -111,7 +106,7 @@ x = SpatialCoordinate(mesh)
 a = 3*L/4
 b = L
 ctr_loc = conditional(And(ge(x[0], a), le(x[0], b)), 1, 0)
-b_p =  v_p.dx(0) * ds(2) # v_p * ctr_loc * dx
+b_p = v_p * ds(2) #  v_p.dx(0) * ds(2) # v_p * ctr_loc * dx
 
 # Assemble the stiffness matrix and the mass matrix.
 Bp = assemble(b_p)
@@ -142,41 +137,16 @@ B_full[:n_V] = Bp.vector().get_local().reshape((-1, 1))
 # Reduction projection matrices
 A_full = -J_full
 
-n_red = 20
+n_red = 2
 s0 = 0.00001
 
 tol = 1e-16
-V1, V2 = proj_matrices(E_full, A_full, B_full, s0, n_red, n_Vp, n_V, tol)
-
-# V_red = np.vstack((V1, V2))
 
 M1 = E_full[:n_Vp, :n_Vp]
 M2 = E_full[n_Vp:n_V, n_Vp:n_V]
 
 G = J_full[n_Vp:n_V, :n_Vp]
 N = J_full[n_V:, :n_Vp]
-
-
-M1_red = V1.T @ M1 @ V1
-M2_red = V2.T @ M2 @ V2
-
-n1_red = len(M1_red)
-n2_red = len(M1_red) + len(M2_red)
-
-E_red = la.block_diag(M1_red, M2_red, Z_lmb)
-
-G_red = V2.T @ G @ V1
-N_red = N @ V1
-
-J_red = np.zeros(E_red.shape)
-J_red[n1_red:, :n1_red] = np.concatenate((G_red, N_red), axis=0)
-J_red[:n1_red, n1_red:] = -np.concatenate((G_red, N_red)).T
-
-B1_red = V1.T @ B_full[:n_Vp]
-
-B_red = np.zeros((len(E_red), 1))
-B_red[:n1_red] = B1_red
-
 
 pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/ReductionPHDAEind2/'
 
@@ -185,10 +155,32 @@ savemat(pathout + E_file, mdict={E_file: E_full})
 savemat(pathout + J_file, mdict={J_file: J_full})
 savemat(pathout + B_file, mdict={B_file: B_full})
 
-Er_file = 'Er'; Jr_file = 'Jr'; Br_file = 'Br'
-savemat(pathout + Er_file, mdict={Er_file: E_red})
-savemat(pathout + Jr_file, mdict={Jr_file: J_red})
-savemat(pathout + Br_file, mdict={Br_file: B_red})
+# V1, V2 = proj_matrices(E_full, A_full, B_full, s0, n_red, n_Vp, n_V, tol)
+#
+# M1_red = V1.T @ M1 @ V1
+# M2_red = V2.T @ M2 @ V2
+#
+# n1_red = len(M1_red)
+# n2_red = len(M1_red) + len(M2_red)
+#
+# E_red = la.block_diag(M1_red, M2_red, Z_lmb)
+#
+# G_red = V2.T @ G @ V1
+# N_red = N @ V1
+#
+# J_red = np.zeros(E_red.shape)
+# J_red[n1_red:, :n1_red] = np.concatenate((G_red, N_red), axis=0)
+# J_red[:n1_red, n1_red:] = -np.concatenate((G_red, N_red)).T
+#
+# B1_red = V1.T @ B_full[:n_Vp]
+#
+# B_red = np.zeros((len(E_red), 1))
+# B_red[:n1_red] = B1_red
+
+# Er_file = 'Er'; Jr_file = 'Jr'; Br_file = 'Br'
+# savemat(pathout + Er_file, mdict={Er_file: E_red})
+# savemat(pathout + Jr_file, mdict={Jr_file: J_red})
+# savemat(pathout + Br_file, mdict={Br_file: B_red})
 
 #
 # UT_N, S_N, V_N = np.linalg.svd(N.T, full_matrices=True)

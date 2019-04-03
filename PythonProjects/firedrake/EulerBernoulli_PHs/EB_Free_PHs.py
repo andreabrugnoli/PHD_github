@@ -69,8 +69,8 @@ j_gradgrad = v_q * e_p.dx(0).dx(0) * dx
 j_gradgradIP = -v_p.dx(0).dx(0) * e_q * dx
 
 
-j = j_divDiv + j_divDivIP
-# j = j_gradgrad + j_gradgradIP
+# j = j_divDiv + j_divDivIP
+j = j_gradgrad + j_gradgradIP
 
 
 bc_w = DirichletBC(V.sub(0), Constant(0.0), 1)
@@ -111,7 +111,7 @@ print("Smallest positive normalized eigenvalues computed: ")
 for i in range(10):
     print(k_n[i], omega[i])
 
-plt.plot(np.real(eigenvalues), np.imag(eigenvalues), 'bo')
+# plt.plot(np.real(eigenvalues), np.imag(eigenvalues), 'bo')
 
 eigvec_w = eigvec_omega[:n_Vp, :]
 eigvec_w_real = np.real(eigvec_w)
