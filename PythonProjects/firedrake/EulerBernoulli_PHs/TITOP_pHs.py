@@ -6,6 +6,7 @@ import scipy.linalg as la
 
 import matplotlib
 import matplotlib.pyplot as plt
+from scipy.io import savemat
 
 plt.close('all')
 matplotlib.rcParams['text.usetex'] = True
@@ -24,10 +25,8 @@ EI = E * I
 L = 1
 
 
-
-n = 3
+n = 2
 deg = 3
-
 
 # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
 L = 1
@@ -88,7 +87,10 @@ Mp[n_rig:n_Vp, :n_rig] = Mp_fr
 Mp[:n_rig, n_rig:] = Mp_fr.T
 Mp[n_rig:, n_rig:] = Mp_f
 
+
 M_all = la.block_diag(Mp, Mq)
+Q_all = la.block_diag(la.inv(Mp), la.inv(Mq))
+
 
 j_divDiv = -v_p * e_q.dx(0).dx(0) * dx
 j_divDivIP = v_q.dx(0).dx(0) * e_p * dx
@@ -110,66 +112,74 @@ J_all[n_Vp:, n_rig:n_Vp] = D_f
 J_all[n_rig:n_Vp, n_Vp:] = -D_f.T
 
 
-b_21 = v_q * ds(2)
-b_22 = v_q.dx(0) * ds(2)
+b_21 = v_p * ds(2)
+b_22 = v_p.dx(0) * ds(2)
 b_33 = -v_q.dx(0) * ds
 b_34 = v_q * ds - x[0] * v_q.dx(0) * ds
 
 n_u = 4
-B = np.zeros((n_V, n_u))
 
-B_21 = assemble(b_21).vector().get_local()
-B_22 = assemble(b_22).vector().get_local()
-B_33 = assemble(b_33).vector().get_local()
-B_34 = assemble(b_34).vector().get_local()
+B_21 = assemble(b_21).vector().get_local().reshape((-1, 1))
+B_22 = assemble(b_22).vector().get_local().reshape((-1, 1))
+B_33 = assemble(b_33).vector().get_local().reshape((-1, 1))
+B_34 = assemble(b_34).vector().get_local().reshape((-1, 1))
 
-tol = 1e-6
-eigenvalues, eigvectors = la.eig(J_all, M_all)
-omega_all = np.imag(eigenvalues)
+B_all = np.zeros((n_V, 1))
+B_all[:n_Vp] = B_21
 
-index = omega_all >= -tol
+pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/ReductionPHDAEind2/'
+Q_file = 'Q_22P'; J_file = 'J_22P'; B_file = 'B_22P'
+savemat(pathout + Q_file, mdict={Q_file: Q_all})
+savemat(pathout + J_file, mdict={J_file: J_all})
+savemat(pathout + B_file, mdict={B_file: B_all})
 
-omega = omega_all[index]
-eigvec_omega = eigvectors[:, index]
-perm = np.argsort(omega)
-eigvec_omega = eigvec_omega[:, perm]
-
-omega.sort()
-
-k_n = omega**(0.5)*L*(rho*A/(EI))**(0.25)
-print("Smallest positive normalized eigenvalues computed: ")
-for i in range(4):
-    print(k_n[i])
-
-
-eigvec_w = eigvec_omega[:n_Vp, :]
-eigvec_w_real = np.real(eigvec_w)
-eigvec_w_imag = np.imag(eigvec_w)
-
-eig_funH2 = Function(Vp)
-Vp_4proj = FunctionSpace(mesh, "CG", 2)
-eig_funH1 = Function(Vp_4proj)
-
-n_fig = 3
-plot_eigenvector = True
-if plot_eigenvector:
-
-    for i in range(n_fig):
-        z_real = eigvec_w_real[:, i]
-        z_imag = eigvec_w_imag[:, i]
-
-        tol = 1e-6
-        fntsize = 20
-
-
-        # eig_funH2.vector()[:] = z_real
-        # eig_funH1.assign(project(eig_funH2, Vp_4proj))
-        # plot(eig_funH1)
-
-        eig_funH2.vector()[:] = z_imag
-        eig_funH1.assign(project(eig_funH2, Vp_4proj))
-        plot(eig_funH1)
-        plt.xlabel('$x$', fontsize=fntsize)
-        plt.title('Eigenvector $e_p$', fontsize=fntsize)
-
-    plt.show()
+# tol = 1e-6
+# eigenvalues, eigvectors = la.eig(J_all, M_all)
+# omega_all = np.imag(eigenvalues)
+#
+# index = omega_all >= -tol
+#
+# omega = omega_all[index]
+# eigvec_omega = eigvectors[:, index]
+# perm = np.argsort(omega)
+# eigvec_omega = eigvec_omega[:, perm]
+#
+# omega.sort()
+#
+# k_n = omega**(0.5)*L*(rho*A/(EI))**(0.25)
+# print("Smallest positive normalized eigenvalues computed: ")
+# for i in range(4):
+#     print(k_n[i])
+#
+#
+# eigvec_w = eigvec_omega[:n_Vp, :]
+# eigvec_w_real = np.real(eigvec_w)
+# eigvec_w_imag = np.imag(eigvec_w)
+#
+# eig_funH2 = Function(Vp)
+# Vp_4proj = FunctionSpace(mesh, "CG", 2)
+# eig_funH1 = Function(Vp_4proj)
+#
+# n_fig = 3
+# plot_eigenvector = True
+# if plot_eigenvector:
+#
+#     for i in range(n_fig):
+#         z_real = eigvec_w_real[:, i]
+#         z_imag = eigvec_w_imag[:, i]
+#
+#         tol = 1e-6
+#         fntsize = 20
+#
+#
+#         # eig_funH2.vector()[:] = z_real
+#         # eig_funH1.assign(project(eig_funH2, Vp_4proj))
+#         # plot(eig_funH1)
+#
+#         eig_funH2.vector()[:] = z_imag
+#         eig_funH1.assign(project(eig_funH2, Vp_4proj))
+#         plot(eig_funH1)
+#         plt.xlabel('$x$', fontsize=fntsize)
+#         plt.title('Eigenvector $e_p$', fontsize=fntsize)
+#
+#     plt.show()
