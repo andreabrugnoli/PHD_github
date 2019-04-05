@@ -9,7 +9,7 @@
 
 \usepackage{authblk}	
 \usepackage{geometry}
-\geometry{top=2cm,bottom=2.5cm,left=2.5cm,right=2.5cm}
+\geometry{top=3.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm}
 
 \usepackage{mathrsfs}
 
@@ -61,7 +61,7 @@
   \;\mathrm{d}#1\@ifnextchar\d{\!}{}}}
 \makeatother
 
-\title{Port-Hamiltonian formulation and \\ Symplectic discretization of plate models\\
+\title{Port-Hamiltonian formulation and \\ symplectic discretization of plate models\\
 	Part II : Kirchhoff model for thin plates}	
 
 \author[1]{Andrea Brugnoli\thanks{andrea.brugnoli@isae.fr}}
@@ -84,7 +84,7 @@
 \section*{Introduction}
 As presented in part I of this companion paper, the port-Hamiltonian (PH) formalism \cite{BookZwart, bookPHs, Villegas} allows the structured modeling and discretization of multi-physics applications involving interconnected finite- and infinite-dimensional systems \cite{Cervera2007,ShaftIntInfinite}. Preserving the port-Hamiltonian structure in the discretization process is a keypoint to take benefit of this powerful formalism. This issue was first addressed in \cite{Golo}, with a mixed finite element spatial discretization method, and in \cite{moulla:hal-01625008}, with pseudo-spectral methods relying on higher-order global polynomial approximations. All those methods are difficult to implement, especially for those system the spatial dimension of which is bigger than one. Very recently weak formulations which lead to Galerkin numerical approximations began to be explored: in \cite{WeakForm_Kot}, a structure preserving finite element method was introduced for the wave equation in a two-dimensional domain; this method exhibits good results, both in the spectral analysis and simulation part, though requiring of a primal and a dual mesh on the geometry of the problem. Another approach is the partitioned finite element method (PFEM) proposed in \cite{CardosoRibeiro2018}, already largely explored in part I of this companion paper. The advantages of this latter methodology are its simplicity of implementation and its potential to carry over to a wide set of examples, no matter the spatial dimension of the problem. The possible use of open source software like FEniCS \cite{LoggMardalEtAl2012} {or Firedrake \cite{firedrake}} is also an appealing feature of this latter method  \\
 
-In part II of this companion paper, the modelling and discretization of thin plates described by the Kirchhoff-Love plate model is carried out within the PH framework, allowing for boundary control and observation. Compared to the existing literature on either the symplectic Hamiltonian formulation of  \cite{LI2016984,LI2018310}, or the port-Hamiltonian framework through jet theory in {\cite{jetMin,jetKirchh}}, the main contribution of this paper concerns the PH formalism based on a Stokes-Dirac structure. This formalism is presented both in vectorial and tensorial forms.  Moreover, the tensorial formalism \cite[Chapter~16]{Grinfield} highlights that this model mimics the interconnection structure of its one-dimensional counterpart, i.e. the Euler-Bernoulli beam. Compared to part I dedicated to thick plate Mindlin model in which first-order differential operators are explored in dimension two, and compared to \cite{LeGorrec2005} in which second-  or higher-order differential operators were explored in dimension one only, the contribution of this paper is the PH formalism of systems of dimension two described with second-order  differential operators, such as the Kirchhoff-Love  model. The model, once written in a tensorial form, highlights new insights on second-order differential operators: especially the double divergence and the Hessian are proved to be adjoint operators one of another, which represents another important contribution of this paper.
+In part II of this companion paper, the modeling and discretization of thin plates described by the Kirchhoff-Love plate model is carried out within the PH framework, allowing for boundary control and observation. {The existing literature dealing with the symplectic Hamiltonian formulation of the Kirchoff plate \cite{LI2016984,LI2018310} focused mainly on analytical solution for the free vibration problem. This approach is powerful whenever easy solution are sought for but does not extend to systems interconnected in complex manners.} Furthermore, plate models were investigated withing the port-Hamiltonian framework using jet theory  {\cite{jetMin,jetKirchh}}, but the numerical implementation of such models remains cumbersome. The main contribution of this paper concerns the representation of the Kirchhoff plate using the concept of Stokes-Dirac structure, so to take advantage from the modularity of this geometric structure. This formalism is presented both in vectorial and tensorial forms.  Moreover, the tensorial formalism \cite[Chapter~16]{Grinfield} highlights that this model mimics the interconnection structure of its one-dimensional counterpart, i.e. the Euler-Bernoulli beam. Compared to part I dedicated to thick plate Mindlin model in which first-order differential operators are explored in dimension two, and compared to \cite{LeGorrec2005} in which second-  or higher-order differential operators were explored in dimension one only, the contribution of this paper is the PH formalism of systems of dimension two described with second-order  differential operators, such as the Kirchhoff-Love  model. The model, once written in a tensorial form, highlights new insights on second-order differential operators: especially the double divergence and the Hessian are proved to be adjoint operators one of another, which represents another important contribution of this paper.
 Finally, the extension of the PFEM method  to the structure-preserving discretization of the Kirchhoff model  is also a novelty of the paper. It allows simple implementation of numerical schemes compared to the jet theory formalism, while preserving the structure of PHS at the discrete level. {The last section is dedicated to numerical studies of this model using Firedrake \cite{firedrake}.}
 
 \section{Second-order distributed PH systems: Euler-Bernoulli beam}	
@@ -327,13 +327,7 @@ The port-Hamiltonian system and skew-symmetric operator relating energy and co-e
 \diffp{}{x,y} +  \diffp{}{y,x} & 0 & 0 & 0 \\
 \end{bmatrix}.
 \end{equation}
-{ The first line of the skew-symmetric operator in \eqref{eq:PH_Kirchh} is found by considering Eq. \eqref{eq:KirchhClass}. The remaining lines express Clairaut’s theorem for the vertical displacement. This theorem states that, for smooth functions, higher order partial derivative commute. Consider the second, third and forth lines of system \eqref{eq:PH_Kirchh}:
-	\[ \diffp{\kappa_{xx}}{t} = \diffp[2]{w_t}{x}, \qquad \diffp{\kappa_{yy}}{t} = \diffp[2]{w_t}{y}, \qquad  \diffp{\kappa_{xy}}{t} = 2 \diffp{w_t}{x,y}.
-	\] Then, since $w_t = \diffp{w}{t}, \, \kappa_{xx} = \diffp[2]{w}{x}, \, \kappa_{yy} = \diffp[2]{w}{y}, \, \kappa_{xy} = 2 \diffp{w}{x, y}$, it holds:
-	\[ \diffp[1,2]{w}{t,x} = \diffp[2,1]{w}{x,t}, \qquad \diffp[1,2]{w}{t,y} = \diffp[2,1]{w}{y,t}, \qquad  \diffp{w}{t,x,y} = \diffp{w}{x,y,t},  
-	\] 
-	which is exactly Clairaut’s theorem for the vertical displacement.
-}
+The first line of the skew-symmetric operator in \eqref{eq:PH_Kirchh} is found by considering Eq. \eqref{eq:KirchhClass}. The remaining lines express Clairaut’s theorem for the vertical displacement. This theorem states that, for smooth functions, higher order partial derivative commute. 
 \begin{remark}
 	From the Schwarz theorem for $C^2$ functions the mixed derivative could be be expressed as $2 \diffp{}{x,y}$, instead of $\diffp{}{y,x} + \diffp{}{x,y}$. However, in this way the symmetry intrinsically present in $\gamma_{xy} = -z \left( \diffp{w}{y,x} + \diffp{w}{x,y} \right)$ would be lost. The mixed derivative is here split to reestablish the symmetric nature of curvatures and momenta (that are of tensorial nature as explained later in Section \ref{sec:PH_ten_Kir}).
 \end{remark}
@@ -528,14 +522,12 @@ B_{\partial}(\bm{e}) =
 	\end{multline}
 	Since the relation has to be valid for each $\bm\omega_\beta \in \mathcal{D}$ the flux and effort variables are in $\mathcal{D}$. For the boundary terms the same procedure as before has to be applied by considering the definition of the momenta over the boundary (see equation \eqref{eq:QnMnnMns}). Then it can be stated that $\bm\omega_\alpha \in \mathcal{D}$.
 \end{proof}
-
 \subsubsection{Including dissipation and external forces in the model}
 Distributed forces or control and dissipative relations can be easily included in an augmented Stokes-Dirac structure by simply defining the appropriate conjugated variables. \\
 
 If distributed forces have to be considered, then the set
 \begin{multline}
-\mathcal{D}_d := \left\{ (\bm{f}, \bm{f}_d, \bm{e}, \bm{e}_d, \bm{z}) \in \mathcal{F}\times\mathcal{F}_d\times\mathcal{E}\times\mathcal{E}_d\times\mathcal{Z} \; |  \right. \\
-\left. \bm{f}= - \diffp{\bm{\alpha}}{t} = -J \bm{e} - G_d \bm{f}_d, \; \bm{e}_d = G^*_d \bm{e}, \;  \bm{e} = B_{\partial}(\bm{e}) \right\}
+\mathcal{D}_d := \Bigl\{ (\bm{f}, \bm{f}_d, \bm{e}, \bm{e}_d, \bm{z}) \in \mathcal{F}\times\mathcal{F}_d\times\mathcal{E}\times\mathcal{E}_d\times\mathcal{Z} \; |  \\ \bm{f}= - \diffp{\bm{\alpha}}{t} = -J \bm{e} - G_d \bm{f}_d, \; \bm{e}_d = G^*_d \bm{e}, \;  \bm{z} = B_{\partial}(\bm{e}) \Bigr\}
 \end{multline}
 is a Stokes-Dirac structure with respect to the paring 
 \begin{multline}
@@ -566,30 +558,15 @@ R = G_R S G_R^* ,
 \end{equation}
 where $S=r$ is a coercive operator (in this case simply a positive scalar), $G_R =  \left(1 \ 0 \ 0 \ 0 \right)^T$ and $G_R^*$ denotes the adjoint operator to $G_R$. The augmented structure
 \begin{multline}
-\mathcal{D}_r := \left\{ (\bm{f}, \bm{f}_r) \in \mathcal{F}, \ (\bm{e}, \bm{e}_r) \in \mathcal{E}, \ \bm{z} \in \mathcal{Z} \; |  \right. \\
-\left. 
-\begin{pmatrix}
-\bm{f} \\
-\bm{f}_r \\
-\end{pmatrix}
-= 
-\begin{bmatrix}
-J & G_R \\
--G_R^* & 0 \\
-\end{bmatrix}
-\begin{pmatrix}
-\bm{e} \\
-\bm{e}_r \\
-\end{pmatrix}, 
-\;\bm{f} = \diffp{\bm{\alpha}}{t}, \; \bm{e}_r = S \bm{f}_r, \;  \bm{z} = B_{\partial}(\bm{e})
-\right\}
+\mathcal{D}_r := \Bigl\{ (\bm{f}, \bm{f}_r) \in \mathcal{F}, \ (\bm{e}, \bm{e}_r) \in \mathcal{E}, \ \bm{z} \in \mathcal{Z} \; |  \\
+\bm{f} = - \diffp{\bm{\alpha}}{t} = -J \bm{e} - G_R \bm{f}_r, \; \bm{f}_r = - S \bm{e}_r, \; \bm{e}_r = G^*_R \bm{e},  \;  \bm{z} = B_{\partial}(\bm{e})	
+\Big\}
 \end{multline}
 is a Stokes-Dirac structure with respect to the paring 
 \begin{multline}
 \ll (\bm{f}_1, \bm{f}_{r, 1}, \bm{e}_1, \bm{e}_{r, 1}, \bm{z}_1), (\bm{f}_2, \bm{f}_{r, 2}, \bm{e}_2, \bm{e}_{r, 2}, \bm{z}_2) \gg  \,= \\
-\int_{\Omega} \left[ \bm{e}_1^T \bm{f}_2 + \bm{e}_2^T \bm{f}_1\right] \,d\Omega - \int_{\Omega} \left[ \bm{e}_{r, 1}^T \bm{f}_{r, 2} + \bm{e}_{r, 2}^T \bm{f}_{r, 1} \right] d\Omega  - \int_{\partial \Omega} B_J(\bm{z}_1, \bm{z}_2) \, ds,
+\int_{\Omega} \left[ \bm{e}_1^T \bm{f}_2 + \bm{e}_2^T \bm{f}_1 + \bm{e}_{r, 1}^T \bm{f}_{r, 2} + \bm{e}_{r, 2}^T \bm{f}_{r, 1} \right] d\Omega  + \int_{\partial \Omega} B_J(\bm{z}_1, \bm{z}_2) \, ds.
 \end{multline}
-where the minus sign for the boundary term arises from the different definition of the flow variables ($\bm{f}= \diffp{\bm{\alpha}}{t}$).
 
 \begin{remark}
 	More involved dissipation models can be found in \cite{DissDenis}. More specifically, for Kirchhoff plate, some specific damping models can be found in \cite{LambourgJASA}.
@@ -1214,7 +1191,7 @@ The above Equation is equivalent to the energy balance of the continuous system,
 	\caption[Hamiltonian]{Hamiltonian trend for the two simulations.}
 	\label{fig:Hamiltonian}
 \end{figure}
-In this analysis we consider a square plate, subject either to a non null shear force on the boundaries either to a distributed force over the domain. The physical parameters and simulation settings are reported in Table \ref{tab:par}. The energy variables and Lagrange multipliers are discretized using Bell shape functions (regular mesh of five elements for each side) and second order Lagrange polynomials respectively. The symplectic St\"ormer-Verlet integrator is employed, so that, when no solicitation is applied to the system, the Hamiltonian is preserved. Two different simulations with different boundary conditions are considered. The initial conditions are set to zero for each variable. For the first simulation a plate subject to gravity is considered. 
+In this analysis we consider a square plate, subject either to a non null shear force on the boundaries either to a distributed force over the domain. The physical parameters and simulation settings are reported in Table \ref{tab:par}. The energy variables and Lagrange multipliers are discretized using Bell shape functions (regular mesh of five elements for each side) and second order Lagrange polynomials respectively. The St\"ormer-Verlet time integrator is employed, so that the symplectic structure is preserved. Two different simulations with different boundary conditions are considered. The initial conditions are set to zero for each variable. For the first simulation a plate subject to gravity is considered. 
 For this simulation, the following  boundary conditions, corresponding to the case CCCF are considered:
 \begin{equation} \text{Simulation $n^\circ \, 1$} \;
 \begin{cases}
