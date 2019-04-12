@@ -1,6 +1,6 @@
 import numpy as np
-from module_reduction import ortho
-from module_reduction import splitting
+from reduction_phdae import ortho
+from reduction_phdae import splitting
 from scipy.linalg import block_diag
 
 

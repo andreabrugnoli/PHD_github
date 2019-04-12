@@ -5,6 +5,23 @@ import pygsvd
 
 
 def proj_matrices(E, A, B, s0, L, n1, n2, tol):
+    """Reduction of pHDAE based on the article
+    On structure preserving model reduction for damped wave propagation in transport network
+    Matrices are supposed to have the structure
+
+    A = [-D -G^T -N^T
+          G  0    0
+          N  0    0];
+
+    E = [M1   0  0
+          0  M2  0
+          0   0  0];
+
+    B = [B1
+          0
+          0];
+
+    """
 
     M1 = E[:n1, :n1]; M2 = E[n1:n2, n1:n2]
     W, r = krylov(E, A, B, s0, L, tol)
@@ -15,6 +32,7 @@ def proj_matrices(E, A, B, s0, L, n1, n2, tol):
 
     G = A[n1:n2, :n1]
     nullG = null_space(G)
+
 
     if s0 == 0.0:
         x1_L = r[:n1, :]
@@ -33,17 +51,17 @@ def krylov(E, A, B, s0, L, tol):
     m = B.shape[1]
 
     W = np.zeros((n, m * L))
-    r = np.linalg.solve((s0 * E + A), B)
+    r = np.linalg.solve((s0 * E - A), B)
     r = ortho(r, np.zeros((0, 0)), E, tol)
     W[:, :m] = r
 
     for l in range(1, L):
-        r = np.linalg.solve((s0 * E + A), E @ r)
+        r = np.linalg.solve((s0 * E - A), E @ r)
         r = ortho(r, W[:, :l*m], E, tol)
         W[:, l * m:(l + 1) * m] = r
 
     if s0 == 0:
-        r = np.linalg.solve((s0 * E + A), E @ r)
+        r = np.linalg.solve((s0 * E - A), E @ r)
         r = ortho(r, W, E, tol)
 
     return W, r
@@ -88,16 +106,23 @@ def ortho(V, W, E, tol):
 
 
 def splitting(W1, W2, M1, M2, tol):
-    R1 = np.linalg.cholesky(M1)
-    R2 = np.linalg.cholesky(M2)
+    L1 = np.linalg.cholesky(M1)
+    L2 = np.linalg.cholesky(M2)
 
-    C, S, X, U1, U2 = pygsvd.gsvd(R1 @ W1, R2 @ W2)
+    R1 = L1.T
+    R2 = L2.T
 
-    kc = C > tol
-    ks = S > tol
+    C, S, X, U1, U2 = pygsvd.gsvd(R1 @ W1, R2 @ W2, extras='uv')
+
+    kc = np.logical_and(C > tol, S < 1 - tol)
+    ks = np.logical_and(S > tol, C < 1 - tol)
+
+    # kc = np.square(C) > tol
+    # ks = np.square(S) > tol
 
     W1 = solve_triangular(R1, U1)
     W2 = solve_triangular(R1, U2)
+
     W1 = W1[:, kc]
     W2 = W2[:, ks]
 
