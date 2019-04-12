@@ -6,7 +6,8 @@ from classes_phdae import SysPhdae
 def transformer(sys1, sys2, ind1, ind2, C):
     """Transformer interconnection of pHDAE systems considering the following convection
     u1_int = - C^T u2_int
-    y2_int = C y1_int
+    y2_int =   C y1_int
+    This kind of connection is of use for connecting bodies in a multibody system
     """
 
     assert isinstance(sys1, SysPhdae)
