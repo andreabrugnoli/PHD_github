@@ -9,7 +9,7 @@
 
 \usepackage{authblk}	
 \usepackage{geometry}
-\geometry{top=3.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm}
+\geometry{top=3cm,bottom=3cm,left=2.5cm,right=2.5cm}
 
 \usepackage{mathrsfs}
 
@@ -84,7 +84,7 @@
 \section*{Introduction}
 As presented in part I of this companion paper, the port-Hamiltonian (PH) formalism \cite{BookZwart, bookPHs, Villegas} allows the structured modeling and discretization of multi-physics applications involving interconnected finite- and infinite-dimensional systems \cite{Cervera2007,ShaftIntInfinite}. Preserving the port-Hamiltonian structure in the discretization process is a keypoint to take benefit of this powerful formalism. This issue was first addressed in \cite{Golo}, with a mixed finite element spatial discretization method, and in \cite{moulla:hal-01625008}, with pseudo-spectral methods relying on higher-order global polynomial approximations. All those methods are difficult to implement, especially for those system the spatial dimension of which is bigger than one. Very recently weak formulations which lead to Galerkin numerical approximations began to be explored: in \cite{WeakForm_Kot}, a structure preserving finite element method was introduced for the wave equation in a two-dimensional domain; this method exhibits good results, both in the spectral analysis and simulation part, though requiring of a primal and a dual mesh on the geometry of the problem. Another approach is the partitioned finite element method (PFEM) proposed in \cite{CardosoRibeiro2018}, already largely explored in part I of this companion paper. The advantages of this latter methodology are its simplicity of implementation and its potential to carry over to a wide set of examples, no matter the spatial dimension of the problem. The possible use of open source software like FEniCS \cite{LoggMardalEtAl2012} {or Firedrake \cite{firedrake}} is also an appealing feature of this latter method  \\
 
-In part II of this companion paper, the modeling and discretization of thin plates described by the Kirchhoff-Love plate model is carried out within the PH framework, allowing for boundary control and observation. {The existing literature dealing with the symplectic Hamiltonian formulation of the Kirchoff plate \cite{LI2016984,LI2018310} focused mainly on analytical solution for the free vibration problem. This approach is powerful whenever easy solution are sought for but does not extend to systems interconnected in complex manners.} Furthermore, plate models were investigated withing the port-Hamiltonian framework using jet theory  {\cite{jetMin,jetKirchh}}, but the numerical implementation of such models remains cumbersome. The main contribution of this paper concerns the representation of the Kirchhoff plate using the concept of Stokes-Dirac structure, so to take advantage from the modularity of this geometric structure. This formalism is presented both in vectorial and tensorial forms.  Moreover, the tensorial formalism \cite[Chapter~16]{Grinfield} highlights that this model mimics the interconnection structure of its one-dimensional counterpart, i.e. the Euler-Bernoulli beam. Compared to part I dedicated to thick plate Mindlin model in which first-order differential operators are explored in dimension two, and compared to \cite{LeGorrec2005} in which second-  or higher-order differential operators were explored in dimension one only, the contribution of this paper is the PH formalism of systems of dimension two described with second-order  differential operators, such as the Kirchhoff-Love  model. The model, once written in a tensorial form, highlights new insights on second-order differential operators: especially the double divergence and the Hessian are proved to be adjoint operators one of another, which represents another important contribution of this paper.
+In part II of this companion paper, the modeling and discretization of thin plates described by the Kirchhoff-Love plate model is carried out within the PH framework, allowing for boundary control and observation. {The existing literature dealing with the symplectic Hamiltonian formulation of the Kirchhoff plate \cite{LI2016984,LI2018310} focused mainly on analytical solution for the free vibration problem. This approach is powerful whenever easy solution are sought for but does not extend to systems interconnected in complex manners.} Furthermore, plate models were investigated withing the port-Hamiltonian framework using jet theory  {\cite{jetMin,jetKirchh}}, but the numerical implementation of such models remains cumbersome. The main contribution of this paper concerns the representation of the Kirchhoff plate using the concept of Stokes-Dirac structure, so to take advantage from the modularity of this geometric structure. This formalism is presented both in vectorial and tensorial forms.  Moreover, the tensorial formalism \cite[Chapter~16]{Grinfield} highlights that this model mimics the interconnection structure of its one-dimensional counterpart, i.e. the Euler-Bernoulli beam. Compared to part I dedicated to thick plate Mindlin model in which first-order differential operators are explored in dimension two, and compared to \cite{LeGorrec2005} in which second-  or higher-order differential operators were explored in dimension one only, the contribution of this paper is the PH formalism of systems of dimension two described with second-order  differential operators, such as the Kirchhoff-Love  model. The model, once written in a tensorial form, highlights new insights on second-order differential operators: especially the double divergence and the Hessian are proved to be adjoint operators one of another, which represents another important contribution of this paper.
 Finally, the extension of the PFEM method  to the structure-preserving discretization of the Kirchhoff model  is also a novelty of the paper. It allows simple implementation of numerical schemes compared to the jet theory formalism, while preserving the structure of PHS at the discrete level. {The last section is dedicated to numerical studies of this model using Firedrake \cite{firedrake}.}
 
 \section{Second-order distributed PH systems: Euler-Bernoulli beam}	
@@ -329,7 +329,7 @@ The port-Hamiltonian system and skew-symmetric operator relating energy and co-e
 \end{equation}
 The first line of the skew-symmetric operator in \eqref{eq:PH_Kirchh} is found by considering Eq. \eqref{eq:KirchhClass}. The remaining lines express Clairaut’s theorem for the vertical displacement. This theorem states that, for smooth functions, higher order partial derivative commute. 
 \begin{remark}
-	From the Schwarz theorem for $C^2$ functions the mixed derivative could be be expressed as $2 \diffp{}{x,y}$, instead of $\diffp{}{y,x} + \diffp{}{x,y}$. However, in this way the symmetry intrinsically present in $\gamma_{xy} = -z \left( \diffp{w}{y,x} + \diffp{w}{x,y} \right)$ would be lost. The mixed derivative is here split to reestablish the symmetric nature of curvatures and momenta (that are of tensorial nature as explained later in Section \ref{sec:PH_ten_Kir}).
+	From the Schwarz theorem for $C^2$ functions the mixed derivative could be be expressed as $2 \diffp{}{x,y}$, instead of $\diffp{}{y,x} + \diffp{}{x,y}$. However, in this way the symmetry intrinsically present in $\kappa_{xy} = \diffp{w}{y,x} + \diffp{w}{x,y}$ would be lost. The mixed derivative is here split to reestablish the symmetric nature of curvatures and momenta (that are of tensorial nature as explained in Section \ref{sec:PH_ten_Kir}).
 \end{remark}
 The boundary variables are obtained by evaluating the time derivative of the Hamiltonian:
 \begin{align*}
@@ -1003,7 +1003,7 @@ The above Equation is equivalent to the energy balance of the continuous system,
 	\label{tab:eigNoFree}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[b]
 	\centering	
 	\begin{tabular}{|c|b g m|b g m|b g m|}
 		\hline 
@@ -1104,10 +1104,6 @@ The above Equation is equivalent to the energy balance of the continuous system,
 	\caption[Eigenvectors for CSFS]{Eigenvectors for the CSFS case.}%
 	\label{fig:CSFS}%
 \end{figure}
-
-\clearpage
-\newpage
-
 \begin{figure}[ht]%
 	\minipage{0.25\textwidth}%
 	\includegraphics[width=\linewidth]{CaseSSFS_eln_FE_Bell_eig_1.eps}
