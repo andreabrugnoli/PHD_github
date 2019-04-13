@@ -4,8 +4,9 @@ from firedrake import *
 import numpy as np
 import scipy.linalg as la
 import sys
-sys.path.append("../../modules_phdae")
-from classes_phdae import SysPhdaeRig
+sys.path.append("/home/a.brugnoli/GitProjects/PythonProjects/modules_phdae")
+from classes_phsystem import SysPhdaeRig
+
 
 
 class FloatingEB(SysPhdaeRig):

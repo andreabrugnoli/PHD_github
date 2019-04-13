@@ -1,13 +1,11 @@
-
+import matplotlib.pyplot as plt
 import numpy as np
 import scipy.linalg as la
-import matplotlib.pyplot as plt
-from math import pi
-
 import sys
-sys.path.append("../../../modules_phdae/")
-from classes_beam import FloatingEB
-from classes_phdae import SysPhdae, SysPhdaeRig
+sys.path.append("/home/a.brugnoli/GitProjects/PythonProjects/modules_phdae")
+sys.path.append("/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake")
+from classes_phsystem import SysPhdaeRig
+from system_components.classes_beam import FloatingEB
 
 n_el = 2
 
@@ -30,6 +28,12 @@ J_payload = 0.5 * 10**-3  # kg/m^2
 n_rig = 3
 
 beam1 = FloatingEB(n_el, rho1, EI1, L1, J_joint=J_joint1)
+E_hinged = beam1.E[2:, 2:]
+J_hinged = beam1.J[2:, 2:]
+B_hinged = beam1.B[2:, 2:]
+beam1_hinged = SysPhdaeRig(len(E_hinged), 0, 1, beam1.n_p, beam1.n_q,
+                           E=E_hinged, J=J_hinged, B=B_hinged)
+
 beam2 = FloatingEB(n_el, rho2, EI2, L2, m_joint=m_joint2, J_joint=J_joint2)
 
 M_payload = la.block_diag(m_payload, m_payload, J_payload)
@@ -42,22 +46,19 @@ alpha2 = 0
 R = np.array([[np.cos(alpha2), np.sin(alpha2)],
               [-np.sin(alpha2), np.cos(alpha2)]])
 
-ind1 = np.array([3, 4], dtype=int)
+ind1 = np.array([1, 2], dtype=int)
 ind2_int1 = np.array([0, 1], dtype=int)
-
-n_int = 4*n_rig - len(ind1)*2
-
-ind2_int2 = np.array([n_int-3, n_int-2, n_int-1] , dtype=int)
-ind3 = np.array([0, 1, 2], dtype=int)
 
 # sys_int1 = SysPhdae.transformer(beam1, beam2, ind1, ind2_int1, R)
 # sys_all = SysPhdae.transformer(sys_int1, payload, ind2_int2, ind3, np.eye(3))
 
-sys_int1 = SysPhdaeRig.transformer_ordered(beam1, beam2, ind1, ind2_int1, R)
-sys_all  = SysPhdaeRig.transformer_ordered(sys_int1, payload, ind2_int2, ind3, np.eye(3))
+sys_int1 = SysPhdaeRig.transformer_ordered(beam1_hinged, beam2, ind1, ind2_int1, R)
+n_int = len(sys_int1.B.T)
+print(n_int)
+ind2_int2 = np.array([n_int-3, n_int-2, n_int-1] , dtype=int)
+ind3 = np.array([0, 1, 2], dtype=int)
 
-print(sys_all.G)
-print(sys_int1.G)
+sys_all = SysPhdaeRig.transformer_ordered(sys_int1, payload, ind2_int2, ind3, np.eye(3))
 
 plt.figure(); plt.spy(sys_int1.E)
 plt.figure(); plt.spy(sys_int1.J)
@@ -74,7 +75,7 @@ M_all = sys_all.E
 # plt.spy(M_all)
 # plt.show()
 
-eigenvalues, eigvectors = la.eig(J_all[2:, 2:], M_all[2:, 2:])
+eigenvalues, eigvectors = la.eig(J_all, M_all)
 
 omega_all = np.imag(eigenvalues)
 
