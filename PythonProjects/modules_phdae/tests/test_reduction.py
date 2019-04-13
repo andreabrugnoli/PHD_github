@@ -3,7 +3,6 @@ from reduction_phdae import ortho
 from reduction_phdae import splitting
 from scipy.linalg import block_diag
 
-
 n=8
 m=3
 k=3
