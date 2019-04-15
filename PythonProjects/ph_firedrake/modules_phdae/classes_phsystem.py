@@ -68,11 +68,13 @@ class SysPhdae:
 
         if Q is not None:
             assert Q.shape == matr_shape
-            assert check_symmetry(Q)
             assert check_positive_matrix(Q)
+            assert (Q.T @ E).all() == (E.T @ Q).all()
             self.Q = Q
         else:
             self.Q = np.eye(n)
+
+
 
         if R is not None:
             assert R.shape == matr_shape
@@ -166,8 +168,8 @@ class SysPhdaeRig(SysPhdae):
     Variables for the rigid motion and constraints might not be present
     """
 
-    def __init__(self, n, n_lmb, n_r, n_p, n_q, E, J, B, R=None, Q=None):
-        SysPhdae.__init__(self, n, n_lmb, E=E, J=J, B=B, R=R, Q=Q)
+    def __init__(self, n, n_lmb, n_r, n_p, n_q, E, J, B, R=None):
+        SysPhdae.__init__(self, n, n_lmb, E=E, J=J, B=B, R=R)
 
         assert n_r >= 0 and isinstance(n_r, int)
         assert n_lmb >= 0 and isinstance(n_lmb, int)
@@ -199,7 +201,6 @@ class SysPhdaeRig(SysPhdae):
         self.M_f = self.E[n_r:n_e, n_r:n_e]
         self.J_f = self.J[n_r:n_e, n_r:n_e]
         self.R_f = self.R[n_r:n_e, n_r:n_e]
-        self.Q_f = self.Q[n_r:n_e, n_r:n_e]
         self.B_f = self.B[n_r:n_e]
         self.G_f = self.J[n_r:n_e, n_e:]
 
@@ -208,7 +209,6 @@ class SysPhdaeRig(SysPhdae):
         self.M_e = self.E[:n_e, :n_e]
         self.J_e = self.J[:n_e, :n_e]
         self.B_e = self.B[:n_e]
-        self.Q_e = self.Q[:n_e, :n_e]
         self.R_e = self.R[:n_e, :n_e]
 
     def transformer_ordered(self, sys2, ind1, ind2, C):
@@ -251,11 +251,10 @@ class SysPhdaeRig(SysPhdae):
         E_perm = permute_rows_columns(sys_mixed.E, perm_index)
         J_perm = permute_rows_columns(sys_mixed.J, perm_index)
         R_perm = permute_rows_columns(sys_mixed.R, perm_index)
-        Q_perm = permute_rows_columns(sys_mixed.Q, perm_index)
         B_perm = permute_rows(sys_mixed.B, perm_index)
 
         sys_ordered = SysPhdaeRig(n_int, nlmb_int, nr_int, np_int, nq_int,
-                                      E=E_perm, J=J_perm, R=R_perm, Q=Q_perm, B=B_perm)
+                                      E=E_perm, J=J_perm, R=R_perm, B=B_perm)
 
         return sys_ordered
 
@@ -265,36 +264,22 @@ class SysPhdaeRig(SysPhdae):
 
         T = np.concatenate((GannL, la.inv(G.T @ G) @ G.T))
         invT = la.inv(T)
-        print(T)
         assert np.linalg.matrix_rank(T @ G) == self.n_lmb
 
         Mtil = T @ self.M_e @ T.T
         Jtil = T @ self.J_e @ T.T
         Rtil = T @ self.R_e @ T.T
-        Qtil = invT.T @ self.Q_e @ invT
         Btil = T @ self.B_e
 
         n_z = self.n_e - self.n_lmb
-        Qtil11 = Qtil[:n_z, :n_z]
-        Qtil22 = Qtil[n_z:, n_z:]
-        Qtil12 = Qtil[:n_z, n_z:]
-        Qtil21 = Qtil[n_z:, :n_z]
-        Qz1to2 =  -la.inv(Qtil22) @ Qtil21
-        Q_shur = Qtil11 + Qtil12 @ Qz1to2
-
-        Mtil11 = Mtil[:n_z, :n_z]
-        Mtil22 = Mtil[n_z:, n_z:]
-        Mtil12 = Mtil[:n_z, n_z:]
-        Mtil21 = Mtil[n_z:, :n_z]
-        M_Qshur = Mtil11 + Mtil12 @ Qz1to2
 
         J_ode = Jtil[:n_z, :n_z]
         R_ode = Rtil[:n_z, :n_z]
-        Q_ode = Q_shur @ la.inv(M_Qshur)
+        M_ode = Mtil[:n_z, :n_z]
+        Q_ode = la.inv(M_ode)
         B_ode = Btil[:n_z]
 
-        T_ode2dae = T.T @ np.concatenate((np.eye(n_z), Qz1to2)) @ la.inv(M_Qshur)
-
+        T_ode2dae = T.T @ np.concatenate((np.eye(n_z), np.zeros((self.n_lmb, n_z)))) @ Q_ode
         sysOde = SysPhode(n_z, J=J_ode, R=R_ode, Q=Q_ode, B=B_ode)
 
         return sysOde, T_ode2dae
@@ -325,7 +310,7 @@ def check_positive_matrix(mat):
         return False
 
 
-tol = 1e-14
+tol = 1e-10
 
 
 def check_symmetry(mat):
