@@ -8,6 +8,20 @@ import matplotlib.pyplot as plt
 
 import scipy.linalg as la
 
+#
+# E = 2e11
+# rho = 7900  # kg/m^3
+# nu = 0.3
+#
+# b = 0.05
+# h = 0.01
+# A = b * h
+#
+# I = 1./12 * b * h**3
+#
+# EI = E * I
+# L = 0.1
+
 
 E = 2e11
 rho = 7900  # kg/m^3
@@ -20,15 +34,11 @@ A = b * h
 I = 1./12 * b * h**3
 
 EI = E * I
-L = 0.1
-
-
-n = 100
-deg = 3
-
-
-# The unit square mesh is divided in :math:`N\times N` quadrilaterals::
 L = 1
+coeff_norm = L*(rho*A/EI)**(0.25)
+
+n = 10
+deg = 3
 
 mesh = IntervalMesh(n, L)
 
@@ -106,11 +116,11 @@ eigvec_omega = eigvec_omega[:, perm]
 
 omega.sort()
 
-k_n = omega**(0.5)*L*(rho*A/(EI))**(0.25)
+k_n = np.sqrt(omega)*coeff_norm
 print("Smallest positive normalized eigenvalues computed: ")
 for i in range(10):
-    print(k_n[i], omega[i])
-
+    print(k_n[i])
+#
 # plt.plot(np.real(eigenvalues), np.imag(eigenvalues), 'bo')
 
 eigvec_w = eigvec_omega[:n_Vp, :]
@@ -142,6 +152,6 @@ if plot_eigenvector:
         plt.xlabel('$x$', fontsize=fntsize)
         plt.title('Eigenvector $e_p$', fontsize=fntsize)
 
-plt.show()
-
-
+    plt.show()
+#
+#

@@ -6,6 +6,7 @@ sys.path.append("/home/a.brugnoli/GitProjects/PythonProjects/modules_phdae")
 sys.path.append("/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake")
 from classes_phsystem import SysPhdaeRig
 from system_components.classes_beam import FloatingEB
+from scipy.io import savemat
 
 n_el = 2
 
@@ -54,38 +55,51 @@ ind2_int1 = np.array([0, 1], dtype=int)
 
 sys_int1 = SysPhdaeRig.transformer_ordered(beam1_hinged, beam2, ind1, ind2_int1, R)
 n_int = len(sys_int1.B.T)
-print(n_int)
 ind2_int2 = np.array([n_int-3, n_int-2, n_int-1] , dtype=int)
 ind3 = np.array([0, 1, 2], dtype=int)
 
-sys_all = SysPhdaeRig.transformer_ordered(sys_int1, payload, ind2_int2, ind3, np.eye(3))
+sys_dae = SysPhdaeRig.transformer_ordered(sys_int1, payload, ind2_int2, ind3, np.eye(3))
 
-plt.figure(); plt.spy(sys_int1.E)
-plt.figure(); plt.spy(sys_int1.J)
-plt.figure(); plt.spy(sys_all.E)
-plt.figure(); plt.spy(sys_all.J)
-plt.show()
+J_dae = sys_dae.J
+E_dae = sys_dae.E
+B_dae = sys_dae.B
 
-J_all = sys_all.J
-M_all = sys_all.E
+sys_ode, T = sys_dae.dae_to_ode()
+
+J_ode = sys_ode.J
+Q_ode = sys_ode.Q
+B_ode = sys_ode.B
+
+pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/ComparisonAlvaro/'
+Qode_file = 'Q_ode'; Jode_file = 'J_ode'; Bode_file = 'B_ode'
+savemat(pathout + Qode_file, mdict={Qode_file: Q_ode})
+savemat(pathout + Jode_file, mdict={Jode_file: J_ode})
+savemat(pathout + Bode_file, mdict={Bode_file: B_ode})
+
+Edae_file = 'E_dae'; Jdae_file = 'J_dae'; Bdae_file = 'B_dae'
+savemat(pathout + Edae_file, mdict={Edae_file: E_dae})
+savemat(pathout + Jdae_file, mdict={Jdae_file: J_dae})
+savemat(pathout + Bdae_file, mdict={Bdae_file: B_dae})
+
+# plt.figure(); plt.spy(sys_int1.E)
+# plt.figure(); plt.spy(sys_int1.J)
+# plt.figure(); plt.spy(sys_all.E)
+# plt.figure(); plt.spy(sys_all.J)
+# plt.show()
 
 # plt.figure()
 # plt.spy(J_all)
 # plt.figure()
 # plt.spy(M_all)
 # plt.show()
-
-eigenvalues, eigvectors = la.eig(J_all, M_all)
-
-omega_all = np.imag(eigenvalues)
-
-index = omega_all > 0
-
-omega = omega_all[index]
-eigvec_omega = eigvectors[:, index]
-perm = np.argsort(omega)
-eigvec_omega = eigvec_omega[:, perm]
-
-omega.sort()
-
-print(omega)
+#
+# eigenvalues, eigvectors = la.eig(J_dae, E_dae)
+# omega_all = np.imag(eigenvalues)
+# index = omega_all > 0
+# omega = omega_all[index]
+# eigvec_omega = eigvectors[:, index]
+# perm = np.argsort(omega)
+# eigvec_omega = eigvec_omega[:, perm]
+# omega.sort()
+#
+# print(omega)

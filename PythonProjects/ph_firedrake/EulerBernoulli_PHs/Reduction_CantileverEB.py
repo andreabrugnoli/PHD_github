@@ -8,7 +8,7 @@ np.set_printoptions(threshold=np.inf)
 import sys
 sys.path.append('/home/a.brugnoli/GitProjects/PythonProjects/modules_pHDAE')
 
-from module_reduction import proj_matrices
+import module_reduction
 
 import scipy.linalg as la
 from scipy.io import savemat
@@ -28,7 +28,7 @@ EI = E * I
 L = 1
 
 
-n = 2
+n = 30
 deg = 3
 
 mesh = IntervalMesh(n, L)
@@ -135,12 +135,12 @@ B_full = np.zeros((len(E_full), 1))
 B_full[:n_V] = Bp.vector().get_local().reshape((-1, 1))
 
 # Reduction projection matrices
-A_full = -J_full
+# A_full = -J_full
 
-n_red = 2
-s0 = 0.00001
+n_red = 10
+s0 = 0.001
 
-tol = 1e-16
+tol = 1e-10
 
 M1 = E_full[:n_Vp, :n_Vp]
 M2 = E_full[n_Vp:n_V, n_Vp:n_V]
@@ -155,32 +155,32 @@ savemat(pathout + E_file, mdict={E_file: E_full})
 savemat(pathout + J_file, mdict={J_file: J_full})
 savemat(pathout + B_file, mdict={B_file: B_full})
 
-# V1, V2 = proj_matrices(E_full, A_full, B_full, s0, n_red, n_Vp, n_V, tol)
-#
-# M1_red = V1.T @ M1 @ V1
-# M2_red = V2.T @ M2 @ V2
-#
-# n1_red = len(M1_red)
-# n2_red = len(M1_red) + len(M2_red)
-#
-# E_red = la.block_diag(M1_red, M2_red, Z_lmb)
-#
-# G_red = V2.T @ G @ V1
-# N_red = N @ V1
-#
-# J_red = np.zeros(E_red.shape)
-# J_red[n1_red:, :n1_red] = np.concatenate((G_red, N_red), axis=0)
-# J_red[:n1_red, n1_red:] = -np.concatenate((G_red, N_red)).T
-#
-# B1_red = V1.T @ B_full[:n_Vp]
-#
-# B_red = np.zeros((len(E_red), 1))
-# B_red[:n1_red] = B1_red
+V1, V2 = module_reduction.proj_matrices(E_full, J_full, B_full, s0, n_red, n_Vp, n_V, tol)
 
-# Er_file = 'Er'; Jr_file = 'Jr'; Br_file = 'Br'
-# savemat(pathout + Er_file, mdict={Er_file: E_red})
-# savemat(pathout + Jr_file, mdict={Jr_file: J_red})
-# savemat(pathout + Br_file, mdict={Br_file: B_red})
+M1_red = V1.T @ M1 @ V1
+M2_red = V2.T @ M2 @ V2
+
+n1_red = len(M1_red)
+n2_red = len(M1_red) + len(M2_red)
+
+E_red = la.block_diag(M1_red, M2_red, Z_lmb)
+
+G_red = V2.T @ G @ V1
+N_red = N @ V1
+
+J_red = np.zeros(E_red.shape)
+J_red[n1_red:, :n1_red] = +np.concatenate((G_red, N_red), axis=0)
+J_red[:n1_red, n1_red:] = -np.concatenate((G_red, N_red)).T
+
+B1_red = V1.T @ B_full[:n_Vp]
+
+B_red = np.zeros((len(E_red), 1))
+B_red[:n1_red] = B1_red
+
+Er_file = 'Er'; Jr_file = 'Jr'; Br_file = 'Br'
+savemat(pathout + Er_file, mdict={Er_file: E_red})
+savemat(pathout + Jr_file, mdict={Jr_file: J_red})
+savemat(pathout + Br_file, mdict={Br_file: B_red})
 
 #
 # UT_N, S_N, V_N = np.linalg.svd(N.T, full_matrices=True)

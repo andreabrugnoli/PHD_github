@@ -3,12 +3,12 @@
 from firedrake import *
 import numpy as np
 import scipy.linalg as la
+from scipy import signal
 
 import matplotlib
 import matplotlib.pyplot as plt
 from scipy.io import savemat
 
-plt.close('all')
 matplotlib.rcParams['text.usetex'] = True
 
 E = 2e11
@@ -25,11 +25,8 @@ EI = E * I
 L = 1
 
 
-n = 2
+n = 1
 deg = 3
-
-# The unit square mesh is divided in :math:`N\times N` quadrilaterals::
-L = 1
 
 mesh = IntervalMesh(n, L)
 x = SpatialCoordinate(mesh)
@@ -57,25 +54,27 @@ al_q = 1./EI * e_q
 
 dx = Measure('dx')
 ds = Measure('ds')
+
+isnot_P = conditional(ne(x[0], 0.0), 1., 0.)
 m_p = v_p * al_p * dx
 m_q = v_q * al_q * dx
 
 
-petsc_mq = assemble(m_q, mat_type='aij').M.handle
-Mq = np.array(petsc_mq.convert("dense").getDenseArray())
+petsc_m_q = assemble(m_q, mat_type='aij').M.handle
+Mq = np.array(petsc_m_q.convert("dense").getDenseArray())
 
-petsc_mp = assemble(m_p, mat_type='aij').M.handle
-Mp_FEM = np.array(petsc_mp.convert("dense").getDenseArray())
+petsc_m_p = assemble(m_p, mat_type='aij').M.handle
+Mp_FEM = np.array(petsc_m_p.convert("dense").getDenseArray())
 
 n_rig = 2
 Mp_f = Mp_FEM[n_rig:, n_rig:]
 
 Mp_fr = np.zeros((n_Vp - n_rig, n_rig))
-Mp_fr[:, 0] = assemble(rho * A * v_p * dx).vector().get_local()[n_rig:]
-Mp_fr[:, 1] = assemble(rho * A * v_p * x[0] * dx).vector().get_local()[n_rig:]
+Mp_fr[:, 0] = assemble(v_p * rho * A * dx).vector().get_local()[n_rig:]
+Mp_fr[:, 1] = assemble(v_p * rho * A * x[0] * dx).vector().get_local()[n_rig:]
 
 Mp_r = np.zeros((n_rig, n_rig))
-m_tot =  rho * A * L
+m_tot = rho * A * L
 Mp_r[0][0] = m_tot
 Mp_r[1][1] = 1/3 * m_tot * L**2
 Mp_r[0][1] = m_tot * L/2
@@ -83,14 +82,12 @@ Mp_r[1][0] = m_tot * L/2
 
 Mp = np.zeros((n_Vp, n_Vp))
 Mp[:n_rig, :n_rig] = Mp_r
-Mp[n_rig:n_Vp, :n_rig] = Mp_fr
+Mp[n_rig:, :n_rig] = Mp_fr
 Mp[:n_rig, n_rig:] = Mp_fr.T
 Mp[n_rig:, n_rig:] = Mp_f
 
-
 M_all = la.block_diag(Mp, Mq)
 Q_all = la.block_diag(la.inv(Mp), la.inv(Mq))
-
 
 j_divDiv = -v_p * e_q.dx(0).dx(0) * dx
 j_divDivIP = v_q.dx(0).dx(0) * e_p * dx
@@ -98,8 +95,8 @@ j_divDivIP = v_q.dx(0).dx(0) * e_p * dx
 j_gradgrad = v_q * e_p.dx(0).dx(0) * dx
 j_gradgradIP = -v_p.dx(0).dx(0) * e_q * dx
 
-petcs_j_qp = assemble(j_gradgrad).M.handle
-D_f = np.array(petcs_j_qp.convert("dense").getDenseArray())[:, n_rig:]
+petcs_j_grgr = assemble(j_gradgrad).M.handle
+D_f = np.array(petcs_j_grgr.convert("dense").getDenseArray())[:, n_rig:]
 
 D_r = np.zeros((n_Vq, n_rig))
 D_r[:, 0] = assemble(v_q.dx(0).dx(0) * dx).vector().get_local()
@@ -111,11 +108,14 @@ J_all[:n_rig, n_Vp:] = -D_r.T
 J_all[n_Vp:, n_rig:n_Vp] = D_f
 J_all[n_rig:n_Vp, n_Vp:] = -D_f.T
 
+# D_f = np.array(petcs_j_grgr.convert("dense").getDenseArray())
+# J_all[n_Vp:, :n_Vp] = D_f
+# J_all[:n_Vp, n_Vp:] = -D_f.T
 
 b_21 = v_p * ds(2)
 b_22 = v_p.dx(0) * ds(2)
-b_33 = -v_q.dx(0) * ds
-b_34 = v_q * ds - x[0] * v_q.dx(0) * ds
+b_33 = v_q.dx(0) * ds
+b_34 = -v_q * ds  # - x[0] * v_q.dx(0) * ds
 
 n_u = 4
 
@@ -125,40 +125,66 @@ B_33 = assemble(b_33).vector().get_local().reshape((-1, 1))
 B_34 = assemble(b_34).vector().get_local().reshape((-1, 1))
 
 B_all = np.zeros((n_V, 1))
-B_all[:n_Vp] = B_21
+# B_all[:n_Vp] = B_21
+B_all[n_Vp:] = B_33
 
-pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/ReductionPHDAEind2/'
-Q_file = 'Q_22P'; J_file = 'J_22P'; B_file = 'B_22P'
-savemat(pathout + Q_file, mdict={Q_file: Q_all})
-savemat(pathout + J_file, mdict={J_file: J_all})
-savemat(pathout + B_file, mdict={B_file: B_all})
+sys = signal.StateSpace(J_all @ Q_all, B_all, B_all.T @ Q_all, 0)
 
-# tol = 1e-6
-# eigenvalues, eigvectors = la.eig(J_all, M_all)
-# omega_all = np.imag(eigenvalues)
-#
-# index = omega_all >= -tol
-#
-# omega = omega_all[index]
-# eigvec_omega = eigvectors[:, index]
-# perm = np.argsort(omega)
-# eigvec_omega = eigvec_omega[:, perm]
-#
-# omega.sort()
-#
-# k_n = omega**(0.5)*L*(rho*A/(EI))**(0.25)
-# print("Smallest positive normalized eigenvalues computed: ")
-# for i in range(4):
-#     print(k_n[i])
-#
-#
-# eigvec_w = eigvec_omega[:n_Vp, :]
-# eigvec_w_real = np.real(eigvec_w)
-# eigvec_w_imag = np.imag(eigvec_w)
-#
-# eig_funH2 = Function(Vp)
-# Vp_4proj = FunctionSpace(mesh, "CG", 2)
-# eig_funH1 = Function(Vp_4proj)
+t_fin = 1.
+n_ev = 1000
+t_ev = np.linspace(0, t_fin, num=n_ev)
+u = np.ones_like(t_ev)
+t_out, y_out, x_out = signal.lsim(sys, u, t_ev)
+
+e_out = np.zeros_like(x_out)
+
+for i in range(n_ev):
+    e_out[i, :] = Q_all @ x_out[i, :]
+
+plt.plot(t_out, e_out[:, 0])
+# plt.plot(t_out, y_out)
+
+plt.show()
+
+# w, mag, phase = signal.bode(sys)
+# plt.figure()
+# plt.semilogx(w, mag)    # Bode magnitude plot
+# plt.figure()
+# plt.semilogx(w, phase)  # Bode phase plot
+
+# pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/ReductionPHDAEind2/'
+# M_file = 'M_22P'; Q_file = 'Q_22P'; J_file = 'J_22P'; B_file = 'B_22P'
+# savemat(pathout + M_file, mdict={M_file: M_all})
+# savemat(pathout + Q_file, mdict={Q_file: Q_all})
+# savemat(pathout + J_file, mdict={J_file: J_all})
+# savemat(pathout + B_file, mdict={B_file: B_all})
+
+tol = 1e-6
+eigenvalues, eigvectors = la.eig(J_all, M_all)
+omega_all = np.imag(eigenvalues)
+
+index = omega_all >= -tol
+
+omega = omega_all[index]
+eigvec_omega = eigvectors[:, index]
+perm = np.argsort(omega)
+eigvec_omega = eigvec_omega[:, perm]
+
+omega.sort()
+
+k_n = omega**(0.5)*L*(rho*A/(EI))**(0.25)
+print("Smallest positive normalized eigenvalues computed: ")
+for i in range(4):
+    print(k_n[i])
+
+
+eigvec_w = eigvec_omega[:n_Vp, :]
+eigvec_w_real = np.real(eigvec_w)
+eigvec_w_imag = np.imag(eigvec_w)
+
+eig_funH2 = Function(Vp)
+Vp_4proj = FunctionSpace(mesh, "CG", 2)
+eig_funH1 = Function(Vp_4proj)
 #
 # n_fig = 3
 # plot_eigenvector = True

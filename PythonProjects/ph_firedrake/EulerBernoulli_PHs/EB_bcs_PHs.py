@@ -140,7 +140,7 @@ eigenvalues, eigvectors = la.eig(J_aug, M_aug)
 
 omega_all = np.imag(eigenvalues)
 
-index = omega_all >= 0
+index = omega_all > 0
 
 omega = omega_all[index]
 eigvec_omega = eigvectors[:, index]

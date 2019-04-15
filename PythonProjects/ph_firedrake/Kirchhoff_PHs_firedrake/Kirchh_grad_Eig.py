@@ -19,7 +19,7 @@ L = 1
 l_x = L
 l_y = L
 
-n = 4 #int(input("N element on each side: "))
+n = 5 #int(input("N element on each side: "))
 
 # Plate bending stiffness :math:`D=\dfrac{Eh^3}{12(1-\nu^2)}` and shear stiffness :math:`F = \kappa Gh`
 # with a shear correction factor :math:`\kappa = 5/6` for a homogeneous plate
@@ -73,7 +73,7 @@ mesh = UnitSquareMesh(n_x, n_y, quadrilateral=False)
 # plot(mesh)
 # plt.show()
 
-nameFE = 'Bell'
+nameFE = 'Hermite'
 name_FEp = nameFE
 name_FEq = 'Hermite'
 
@@ -177,22 +177,18 @@ petsc_m = M.M.handle
 JJ = np.array(petsc_j.convert("dense").getDenseArray())
 MM = np.array(petsc_m.convert("dense").getDenseArray())
 
-B_u = assemble(b_u, mat_type='aij')
-# B_y = assemble(b_y_omn, mat_type='aij')
-
-petsc_b_u = B_u.M.handle
-# petsc_b_y =  B_y.M.handle
-
-# print(B_u.array().shape)
-B_in = np.array(petsc_b_u.convert("dense").getDenseArray())
-# B_out = np.array(petsc_b_y.convert("dense").getDenseArray())
-
-
-boundary_dofs = np.where(B_in.any(axis=0))[0]  # np.where(~np.all(B_in == 0, axis=0) == True) #
-B_in = B_in[:, boundary_dofs]
-
 N_al = V.dim()
-N_u = len(boundary_dofs)
+
+if b_u:
+    B_u = assemble(b_u, mat_type='aij')
+    petsc_b_u = B_u.M.handle
+    B_in = np.array(petsc_b_u.convert("dense").getDenseArray())
+    boundary_dofs = np.where(B_in.any(axis=0))[0]  # np.where(~np.all(B_in == 0, axis=0) == True) #
+    B_in = B_in[:, boundary_dofs]
+else:
+    B_in = np.empty((N_al, 0))
+
+N_u = len(B_in.T)
 # print(N_u)
 
 Z_u = np.zeros((N_u, N_u))
@@ -227,7 +223,7 @@ omega.sort()
 
 n_om = 3
 
-omega_tilde = L ** 2 * sqrt(rho * h / D) * omega
+omega_tilde = (L/pi) ** 2 * sqrt(rho * h / D) * omega
 for i in range(n_om):
     print(omega_tilde[i])
 

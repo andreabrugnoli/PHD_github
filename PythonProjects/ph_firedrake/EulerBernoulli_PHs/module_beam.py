@@ -95,4 +95,4 @@ class FloatingEB(SystemPHDAE):
         B[:n_rig, :n_rig] = np.eye(n_rig)
         B[:n_rig, n_rig:] = tau_CP.T
 
-        SystemPHDAE.__init__(self, n=n_tot, E=M, J=J, B=B)
+        SystemPHDAE.__init__(self, n_tot, E=M, J=J, B=B)
