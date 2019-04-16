@@ -1,6 +1,6 @@
 % Model Alvaro 
-addpath('../TITOP_tools/')
-addpath('../Parameters/')
+addpath('/home/a.brugnoli/GitProjects/MatlabProjects/PH/PH_TITOP/TITOP_tools/')
+addpath('/home/a.brugnoli/GitProjects/MatlabProjects/PH/PH_TITOP/Settings/')
 % model_constants
 parameters
 
@@ -36,7 +36,7 @@ theta2 = 0;
 T21=[cos(theta2) -sin(theta2) 0; sin(theta2) cos(theta2) 0;0 0 1];
 
 
-[a,b,c,d]=linmod('titop_op_pivot');
+[a,b,c,d]=linmod('titop_ol');
 directDynamicsSuper = ss(a,b,c,d);
 sys_titop=directDynamicsSuper*tf(1, [1 0]);
 

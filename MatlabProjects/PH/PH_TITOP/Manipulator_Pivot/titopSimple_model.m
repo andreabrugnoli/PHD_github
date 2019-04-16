@@ -32,7 +32,7 @@ theta2 = 0;
 T21=[cos(theta2) -sin(theta2) 0; sin(theta2) cos(theta2) 0;0 0 1];
 
 
-[a,b,c,d]=linmod('titopSimple_ol_pivot');
+[a,b,c,d]=linmod('titopSimple_ol');
 directDynamicsSuper = ss(a,b,c,d);
 sys_titop=directDynamicsSuper*tf(1, [1 0]);
 

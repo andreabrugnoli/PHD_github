@@ -39,6 +39,7 @@ class SysPhode:
         else:
             self.B = np.eye(n)
 
+
 class SysPhdae:
     def __init__(self, n, n_lmb, E=None, J=None, R=None, Q=None, B=None):
         """General phdae class. Only the size of the system is needed"""
@@ -74,8 +75,6 @@ class SysPhdae:
         else:
             self.Q = np.eye(n)
 
-
-
         if R is not None:
             assert R.shape == matr_shape
             assert check_symmetry(R)
@@ -88,6 +87,11 @@ class SysPhdae:
             self.B = B
         else:
             self.B = np.eye(n)
+
+        if len(B.T) == 0:
+            self.m = 1
+        else:
+            self.m = len(B.T)
 
     def transformer(self, sys2, ind1, ind2, C):
         """Transformer interconnection of pHDAE systems considering the following convection
@@ -146,7 +150,20 @@ class SysPhdae:
 
         return sys_int
 
+    def pivot(self, i_plus, i_minus):
+        """Pivot interconnection to model actuated hinge and other 1 dof internal actuator"""
+        assert isinstance(i_plus, int) and isinstance(i_minus, int)
+        assert i_plus != i_minus
 
+        col = self.B[:, i_plus] - self.B[:, i_minus]
+        if i_plus > i_minus:
+            B_pivot = np.delete(self.B, i_plus, 1)
+            B_pivot[:, i_minus] = col
+        else:
+            B_pivot = np.delete(self.B, i_minus, 1)
+            B_pivot[:, i_plus] = col
+
+        self.B = B_pivot
 
 
 class SysPhdaeRig(SysPhdae):
@@ -263,7 +280,7 @@ class SysPhdaeRig(SysPhdae):
         GannL = la.null_space(G.T).T
 
         T = np.concatenate((GannL, la.inv(G.T @ G) @ G.T))
-        invT = la.inv(T)
+        # invT = la.inv(T)
         assert np.linalg.matrix_rank(T @ G) == self.n_lmb
 
         Mtil = T @ self.M_e @ T.T
@@ -283,10 +300,6 @@ class SysPhdaeRig(SysPhdae):
         sysOde = SysPhode(n_z, J=J_ode, R=R_ode, Q=Q_ode, B=B_ode)
 
         return sysOde, T_ode2dae
-
-
-
-
 
 
 def permute_rows_columns(mat, ind_perm):

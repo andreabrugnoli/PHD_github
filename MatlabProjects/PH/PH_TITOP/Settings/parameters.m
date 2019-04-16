@@ -15,9 +15,11 @@ J_payload = 0.5 * 10^(-3);  % kg/m^2
 
 w0 = 1e-5;
 wf = 1e6;
+
 kp1 = 160;
 kv1 = 11;
 kp2 = 60;
 kv2 = 1.1;
 alpha_rel = 60*pi/180;
 rad_deg = 180/pi;
+
