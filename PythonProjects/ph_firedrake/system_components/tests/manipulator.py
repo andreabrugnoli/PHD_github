@@ -50,7 +50,7 @@ J_ode = sys_ode.J
 Q_ode = sys_ode.Q
 B_ode = sys_ode.B
 
-pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/ComparisonAlvaro/'
+pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/PH_TITOP/Matrices_manipulator/'
 Qode_file = 'Q_ode'; Jode_file = 'J_ode'; Bode_file = 'B_ode'
 savemat(pathout + Qode_file, mdict={Qode_file: Q_ode})
 savemat(pathout + Jode_file, mdict={Jode_file: J_ode})

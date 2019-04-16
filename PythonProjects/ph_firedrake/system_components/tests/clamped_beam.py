@@ -4,9 +4,9 @@ import scipy.linalg as la
 from modules_phdae.classes_phsystem import SysPhdaeRig
 from system_components.classes_beam import FloatingEB
 from scipy.io import savemat
-from system_components.tests.parameters import n_el, rho1, EI1, L1, n_rig
+from system_components.tests.parameters import n_el, rho1, EI1, L1, n_rig, J_joint1, m_joint1
 
-beam = FloatingEB(n_el, rho1, EI1, L1, m_joint=0, J_joint=0)
+beam = FloatingEB(n_el, rho1, EI1, L1, m_joint=m_joint1, J_joint=J_joint1)
 
 J = beam.J_e
 M = beam.M_e
@@ -28,7 +28,7 @@ E_aug = np.vstack([np.hstack([M, Z_al_lmb]),
 B_C = B[:, n_rig:]
 
 B_e = np.concatenate((np.zeros_like(B_C), B_C), axis=1)
-B_lmb = np.concatenate((np.eye(n_lmb), Z_lmb), axis=1)
+B_lmb = np.concatenate((np.eye(3), Z_lmb), axis=1)
 
 B_aug = np.concatenate((B_e, B_lmb))
 
@@ -37,7 +37,7 @@ n_aug = n_e + n_lmb
 beam_dae = SysPhdaeRig(n_aug, n_lmb, n_rig, beam.n_p, beam.n_q, E=E_aug, J=J_aug, B=B_aug)
 beam_ode, T = beam_dae.dae_to_ode()
 
-pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/PH_TITOP/Matrices_ClampedEB/'
+pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/PH_TITOP/SimpleBeam/Matrices_ClampedEB/'
 Edae_file = 'E_dae'; Jdae_file = 'J_dae'; Bdae_file = 'B_dae'
 savemat(pathout + Edae_file, mdict={Edae_file: beam_dae.E})
 savemat(pathout + Jdae_file, mdict={Jdae_file: beam_dae.J})
@@ -46,7 +46,7 @@ savemat(pathout + Bdae_file, mdict={Bdae_file: beam_dae.B})
 Jode_file = 'J_ode'; Qode_file = 'Q_ode'; Bode_file = 'B_ode'
 savemat(pathout + Jode_file, mdict={Jode_file: beam_ode.J})
 savemat(pathout + Qode_file, mdict={Qode_file: beam_ode.Q})
-savemat(pathout + Bode_file, mdict={Bode_file: beam_ode.B})
+savemat(pathout + Bode_file, mdict={Bode_file: beam_ode.B[:, 3:]})
 
 
 # tol = 1e-6
