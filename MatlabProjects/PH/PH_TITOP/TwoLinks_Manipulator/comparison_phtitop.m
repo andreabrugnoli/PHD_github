@@ -44,41 +44,41 @@ alpha2_dl = y_out{10}.Values.Data;
 dalpha1_dl = y_out{11}.Values.Data;
 dalpha2_dl = y_out{12}.Values.Data;
 
-col_tt = 'm.'
-col_ph = 'b'
-col_dl = 'r'
-% leg = {'Titop', 'pH', 'de Luca'}
-% figure(); plot(t_out, alpha1_tt, col_tt, t_out, alpha1_ph, col_ph, t_out, alpha1_dl, col_dl);
-% set_graphics(gca, 'Time (s)', '$\theta_1 (t)$ Degrees/s', leg, fntsize,'Angular displacement');
-% print(strcat(path_fig,'alpha1'),'-depsc')
-% 
-% figure(); plot(t_out, alpha2_tt, col_tt, t_out, alpha2_ph, col_ph, t_out, alpha2_dl, col_dl);
-% set_graphics(gca, 'Time (s)', '$\theta_2 (t)$ Degrees/s', leg, fntsize,'Angular displacement');
-% print(strcat(path_fig,'alpha2'),'-depsc')
-% 
-% figure(); plot(t_out, dalpha1_tt, col_tt, t_out, dalpha1_ph, col_ph, t_out, dalpha1_dl, col_dl);
-% set_graphics(gca, 'Time (s)', '$\dot{\theta}_1 (t)$ Degrees/s', leg, fntsize,'Angular velocity');
-% print(strcat(path_fig,'dalpha1'),'-depsc')
-% 
-% figure(); plot(t_out, dalpha2_tt, col_tt, t_out, dalpha2_ph, col_ph, t_out, dalpha2_dl, col_dl);
-% set_graphics(gca, 'Time (s)', '$\dot{\theta}_2 (t)$ Degrees/s', leg, fntsize,'Angular velocity');
-% print(strcat(path_fig,'dalpha2'),'-depsc')
-
-leg = {'pH', 'de Luca'};
-figure(); plot(t_out, alpha1_ph, col_ph, t_out, alpha1_dl, col_dl);
+col_tt = 'c.'
+col_ph = 'b-'
+col_dl = 'r--'
+leg = {'Titop', 'pH', 'de Luca'}
+figure(); plot(t_out, alpha1_tt, col_tt, t_out, alpha1_ph, col_ph, t_out, alpha1_dl, col_dl);
 set_graphics(gca, 'Time (s)', '$\theta_1 (t)$ Degrees/s', leg, fntsize,'Angular displacement');
 print(strcat(path_fig,'alpha1'),'-depsc')
 
-figure(); plot(t_out, alpha2_ph, col_ph, t_out, alpha2_dl, col_dl);
+figure(); plot(t_out, alpha2_tt, col_tt, t_out, alpha2_ph, col_ph, t_out, alpha2_dl, col_dl);
 set_graphics(gca, 'Time (s)', '$\theta_2 (t)$ Degrees/s', leg, fntsize,'Angular displacement');
 print(strcat(path_fig,'alpha2'),'-depsc')
 
-figure(); plot(t_out, dalpha1_ph, col_ph, t_out, dalpha1_dl, col_dl);
+figure(); plot(t_out, dalpha1_tt, col_tt, t_out, dalpha1_ph, col_ph, t_out, dalpha1_dl, col_dl);
 set_graphics(gca, 'Time (s)', '$\dot{\theta}_1 (t)$ Degrees/s', leg, fntsize,'Angular velocity');
 print(strcat(path_fig,'dalpha1'),'-depsc')
 
-figure(); plot(t_out, dalpha2_ph, col_ph, t_out, dalpha2_dl, col_dl);
+figure(); plot(t_out, dalpha2_tt, col_tt, t_out, dalpha2_ph, col_ph, t_out, dalpha2_dl, col_dl);
 set_graphics(gca, 'Time (s)', '$\dot{\theta}_2 (t)$ Degrees/s', leg, fntsize,'Angular velocity');
 print(strcat(path_fig,'dalpha2'),'-depsc')
+
+% leg = {'pH', 'de Luca'};
+% figure(); plot(t_out, alpha1_ph, col_ph, t_out, alpha1_dl, col_dl);
+% set_graphics(gca, 'Time (s)', '$\theta_1 (t)$ Degrees/s', leg, fntsize,'Angular displacement');
+% print(strcat(path_fig,'alpha1'),'-depsc')
+% 
+% figure(); plot(t_out, alpha2_ph, col_ph, t_out, alpha2_dl, col_dl);
+% set_graphics(gca, 'Time (s)', '$\theta_2 (t)$ Degrees/s', leg, fntsize,'Angular displacement');
+% print(strcat(path_fig,'alpha2'),'-depsc')
+% 
+% figure(); plot(t_out, dalpha1_ph, col_ph, t_out, dalpha1_dl, col_dl);
+% set_graphics(gca, 'Time (s)', '$\dot{\theta}_1 (t)$ Degrees/s', leg, fntsize,'Angular velocity');
+% print(strcat(path_fig,'dalpha1'),'-depsc')
+% 
+% figure(); plot(t_out, dalpha2_ph, col_ph, t_out, dalpha2_dl, col_dl);
+% set_graphics(gca, 'Time (s)', '$\dot{\theta}_2 (t)$ Degrees/s', leg, fntsize,'Angular velocity');
+% print(strcat(path_fig,'dalpha2'),'-depsc')
 
 

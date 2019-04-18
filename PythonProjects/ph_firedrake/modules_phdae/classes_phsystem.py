@@ -39,6 +39,12 @@ class SysPhode:
         else:
             self.B = np.eye(n)
 
+        try:
+            self.m = B.shape[1]
+        except IndexError:
+            self.m = 1
+
+
 
 class SysPhdae:
     def __init__(self, n, n_lmb, E=None, J=None, R=None, Q=None, B=None):
@@ -88,10 +94,10 @@ class SysPhdae:
         else:
             self.B = np.eye(n)
 
-        if len(B.T) == 0:
+        try:
+            self.m = B.shape[1]
+        except IndexError:
             self.m = 1
-        else:
-            self.m = len(B.T)
 
     def transformer(self, sys2, ind1, ind2, C):
         """Transformer interconnection of pHDAE systems considering the following convection
