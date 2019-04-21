@@ -1,6 +1,6 @@
 close all; clc;
-addpath('/home/a.brugnoli/GitProjects/MatlabProjects/PH/PH_TITOP/Settings/')
-addpath('/home/a.brugnoli/GitProjects/MatlabProjects/PH/PH_TITOP/DeLuca/')
+addpath('/home/a.brugnoli/GitProjects/MatlabProjects/PH/Settings/')
+addpath('./DeLuca/')
 model_constants;
 ph_model;
 titop_model;
@@ -10,20 +10,18 @@ fntsize = 13;
 figure(); sigma(sys_phode, 'r', sys_titop, 'b', {w0, wf})
 set_graphics_sigma(gca, fntsize)
 legend('PHODE', 'TITOP')
-print(strcat(path_fig,'Sigma_TT_PH'),'-depsc')
+% print(strcat(path_fig,'Sigma_TT_PH'),'-depsc')
 figure(); sigma(sys_phode, 'r', sys_phdae, 'g', {w0, wf})
 set_graphics_sigma(gca, fntsize)
 legend('PHODE', 'PHDAE')
-print(strcat(path_fig,'Sigma_2PH'),'-depsc')
+% print(strcat(path_fig,'Sigma_2PH'),'-depsc')
 
-alsoDL = true(1);
 t0 = 0; tfin = 4;
-time_span = [t0 tfin];
 paramNameValStruct.Solver = 'ode45'; 
 paramNameValStruct.StartTime = num2str(t0);
 paramNameValStruct.StopTime = num2str(tfin);
-paramNameValStruct.AbsTol = '1e-6';
-paramNameValStruct.RelTol = '1e-6';
+% paramNameValStruct.AbsTol = '1e-6';
+% paramNameValStruct.RelTol = '1e-6';
 sim_out = sim('manipulator_cl', paramNameValStruct);
 
 t_out = sim_out.tout;
@@ -50,35 +48,19 @@ col_dl = 'r--'
 leg = {'Titop', 'pH', 'de Luca'}
 figure(); plot(t_out, alpha1_tt, col_tt, t_out, alpha1_ph, col_ph, t_out, alpha1_dl, col_dl);
 set_graphics(gca, 'Time (s)', '$\theta_1 (t)$ Degrees/s', leg, fntsize,'Angular displacement');
-print(strcat(path_fig,'alpha1'),'-depsc')
+% print(strcat(path_fig,'alpha1'),'-depsc')
 
 figure(); plot(t_out, alpha2_tt, col_tt, t_out, alpha2_ph, col_ph, t_out, alpha2_dl, col_dl);
 set_graphics(gca, 'Time (s)', '$\theta_2 (t)$ Degrees/s', leg, fntsize,'Angular displacement');
-print(strcat(path_fig,'alpha2'),'-depsc')
+% print(strcat(path_fig,'alpha2'),'-depsc')
 
 figure(); plot(t_out, dalpha1_tt, col_tt, t_out, dalpha1_ph, col_ph, t_out, dalpha1_dl, col_dl);
 set_graphics(gca, 'Time (s)', '$\dot{\theta}_1 (t)$ Degrees/s', leg, fntsize,'Angular velocity');
-print(strcat(path_fig,'dalpha1'),'-depsc')
+% print(strcat(path_fig,'dalpha1'),'-depsc')
 
 figure(); plot(t_out, dalpha2_tt, col_tt, t_out, dalpha2_ph, col_ph, t_out, dalpha2_dl, col_dl);
 set_graphics(gca, 'Time (s)', '$\dot{\theta}_2 (t)$ Degrees/s', leg, fntsize,'Angular velocity');
-print(strcat(path_fig,'dalpha2'),'-depsc')
-
-% leg = {'pH', 'de Luca'};
-% figure(); plot(t_out, alpha1_ph, col_ph, t_out, alpha1_dl, col_dl);
-% set_graphics(gca, 'Time (s)', '$\theta_1 (t)$ Degrees/s', leg, fntsize,'Angular displacement');
-% print(strcat(path_fig,'alpha1'),'-depsc')
-% 
-% figure(); plot(t_out, alpha2_ph, col_ph, t_out, alpha2_dl, col_dl);
-% set_graphics(gca, 'Time (s)', '$\theta_2 (t)$ Degrees/s', leg, fntsize,'Angular displacement');
-% print(strcat(path_fig,'alpha2'),'-depsc')
-% 
-% figure(); plot(t_out, dalpha1_ph, col_ph, t_out, dalpha1_dl, col_dl);
-% set_graphics(gca, 'Time (s)', '$\dot{\theta}_1 (t)$ Degrees/s', leg, fntsize,'Angular velocity');
-% print(strcat(path_fig,'dalpha1'),'-depsc')
-% 
-% figure(); plot(t_out, dalpha2_ph, col_ph, t_out, dalpha2_dl, col_dl);
-% set_graphics(gca, 'Time (s)', '$\dot{\theta}_2 (t)$ Degrees/s', leg, fntsize,'Angular velocity');
 % print(strcat(path_fig,'dalpha2'),'-depsc')
+
 
 

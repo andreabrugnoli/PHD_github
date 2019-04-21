@@ -4,7 +4,7 @@ from scipy.linalg import null_space
 import pygsvd
 
 
-def proj_matrices(E, A, B, s0, L, n1, n2, tol):
+def proj_matrices(E, A, B, s0, L, n1, n2, tol=1e-14):
     """Reduction of pHDAE based on the article
     On structure preserving model reduction for damped wave propagation in transport network
     Matrices are supposed to have the structure
@@ -49,7 +49,6 @@ def krylov(E, A, B, s0, L, tol):
     if len(B.shape) == 1:
         B = B.reshape((-1, 1))
     m = B.shape[1]
-
     W = np.zeros((n, m * L))
     r = np.linalg.solve((s0 * E - A), B)
     r = ortho(r, np.zeros((0, 0)), E, tol)
@@ -99,7 +98,6 @@ def ortho(V, W, E, tol):
             d[k] = np.sqrt(V[:, k].T @ E @ V[:, k])
             if d[k] > tol:
                 V[:, k] = V[:, k] / d[k]
-
     # Only keep relevant vector
     V = V[:, d > tol]
     return V
@@ -121,7 +119,7 @@ def splitting(W1, W2, M1, M2, tol):
     # ks = np.square(S) > tol
 
     W1 = solve_triangular(R1, U1)
-    W2 = solve_triangular(R1, U2)
+    W2 = solve_triangular(R2, U2)
 
     W1 = W1[:, kc]
     W2 = W2[:, ks]

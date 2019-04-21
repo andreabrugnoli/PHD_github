@@ -28,7 +28,7 @@ E_aug = np.vstack([np.hstack([M, Z_al_lmb]),
 B_C = B[:, n_rig:]
 
 B_e = np.concatenate((np.zeros_like(B_C), B_C), axis=1)
-B_lmb = np.concatenate((np.eye(3), Z_lmb), axis=1)
+B_lmb = np.concatenate((np.eye(n_lmb), Z_lmb), axis=1)
 
 B_aug = np.concatenate((B_e, B_lmb))
 

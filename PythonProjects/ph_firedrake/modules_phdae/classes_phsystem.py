@@ -1,6 +1,8 @@
 # General PHDAE
 import numpy as np
 import scipy.linalg as la
+from modules_phdae.reduction_phdae import proj_matrices
+import warnings
 
 
 class SysPhode:
@@ -45,10 +47,9 @@ class SysPhode:
             self.m = 1
 
 
-
 class SysPhdae:
     def __init__(self, n, n_lmb, E=None, J=None, R=None, Q=None, B=None):
-        """General phdae class. Only the size of the system is needed"""
+        """General phdae clasnp.linalg.matrix_rank(M) == n_tot:s. Only the size of the system is needed"""
         assert n > 0 and isinstance(n, int)
         assert n_lmb >= 0 and isinstance(n_lmb, int)
 
@@ -59,11 +60,12 @@ class SysPhdae:
 
         if E is not None:
             assert E.shape == matr_shape
-            assert np.linalg.matrix_rank(E) == n - n_lmb
+            if not np.linalg.matrix_rank(E) == n - n_lmb:
+                warnings.warn("Matrux E does not have the expected rank. Possible singular mass matrix")
             self.E = E
         else:
             E = np.eye(n)
-            E[-n_lmb:, -n_lmb] = 0.0
+            E[n-n_lmb:, n-n_lmb:] = 0.0
             self.E = E
 
         if J is not None:
@@ -192,7 +194,6 @@ class SysPhdaeRig(SysPhdae):
     """
 
     def __init__(self, n, n_lmb, n_r, n_p, n_q, E, J, B, R=None):
-        SysPhdae.__init__(self, n, n_lmb, E=E, J=J, B=B, R=R)
 
         assert n_r >= 0 and isinstance(n_r, int)
         assert n_lmb >= 0 and isinstance(n_lmb, int)
@@ -200,39 +201,46 @@ class SysPhdaeRig(SysPhdae):
         assert n_q >= 0 and isinstance(n_q, int)
         assert n_r + n_p + n_q + n_lmb == n
 
+        if R is None:
+            R = np.zeros((n, n))
+
         n_e = n_p + n_q + n_r
-        np_end = n_r + n_p
 
         M_r = E[:n_r, :n_r]
-        M_fr = E[n_r:np_end, :n_r]
-        M_rf = E[:n_r, n_r:np_end]
+        M_fr = E[n_r:n_e, :n_r]
+        M_rf = E[:n_r, n_r:n_e]
         if n_p > 0:
             assert M_fr.all() == M_rf.T.all()
         if n_r > 0:
-            assert np.count_nonzero(J[:n_r, :n_e]) == 0 and  np.count_nonzero(J[:n_e, :n_r]) == 0
+            assert np.count_nonzero(J[:n_r, :n_e]) == 0 and np.count_nonzero(J[:n_e, :n_r]) == 0
         if n_r > 0 and n_p > 0:
             assert np.count_nonzero(E[:, n_e:]) == 0 and np.count_nonzero(E[n_e:, :]) == 0
 
         self.n_r = n_r
         self.M_r = M_r
         self.M_fr = M_fr
-        self.B_r = self.B[:n_r]
+        self.B_r = B[:n_r]
         self.G_r = J[:n_r, n_e:]
 
         self.n_p = n_p
         self.n_q = n_q
-        self.M_f = self.E[n_r:n_e, n_r:n_e]
-        self.J_f = self.J[n_r:n_e, n_r:n_e]
-        self.R_f = self.R[n_r:n_e, n_r:n_e]
-        self.B_f = self.B[n_r:n_e]
-        self.G_f = self.J[n_r:n_e, n_e:]
+        self.n_f = n_p + n_q
+        self.M_f = E[n_r:n_e, n_r:n_e]
+        self.J_f = J[n_r:n_e, n_r:n_e]
+        self.R_f = R[n_r:n_e, n_r:n_e]
+        self.B_f = B[n_r:n_e]
+        self.G_f = J[n_r:n_e, n_e:]
 
-        self.n_e = n_e
+        self.n_e = self.n_r + self.n_p + self.n_q
         self.G_e = np.concatenate((self.G_r, self.G_f))
-        self.M_e = self.E[:n_e, :n_e]
-        self.J_e = self.J[:n_e, :n_e]
-        self.B_e = self.B[:n_e]
-        self.R_e = self.R[:n_e, :n_e]
+        self.B_e = np.concatenate((self.B_r, self.B_f))
+        self.M_e = la.block_diag(self.M_r, self.M_f)
+        self.M_e[n_r:, :n_r] = self.M_fr
+        self.M_e[:n_r, n_r:] = self.M_fr.T
+        self.J_e = la.block_diag(np.zeros((n_r, n_r)), self.J_f)
+        self.R_e = la.block_diag(np.zeros((n_r, n_r)), self.R_f)
+
+        SysPhdae.__init__(self, n, n_lmb, E=E, J=J, B=B, R=R)
 
     def transformer_ordered(self, sys2, ind1, ind2, C):
 
@@ -307,6 +315,33 @@ class SysPhdaeRig(SysPhdae):
 
         return sysOde, T_ode2dae
 
+    def reduce_system(self, s0, n_red):
+        n_rig = self.n_r
+        E_red = self.E[n_rig:, n_rig:]
+        A_red = self.J[n_rig:, n_rig:] - self.R[n_rig:, n_rig:]
+        B_red = self.B[n_rig:, n_rig:]
+        Vp, Vq = proj_matrices(E_red, A_red, B_red, s0, n_red, self.n_p, self.n_f)
+
+        V_f = la.block_diag(Vp, Vq)
+
+        self.n_p = len(Vp.T)
+        self.n_q = len(Vq.T)
+
+        self.M_f = V_f.T @ self.M_f @ V_f
+        self.M_fr = V_f.T @ self.M_fr
+        self.J_f = V_f.T @ self.J_f @ V_f
+        self.R_f = V_f.T @ self.R_f @ V_f
+        self.B_f = V_f.T @ self.B_f
+        self.G_f = V_f.T @ self.G_f
+
+        self.n_e = self.n_r + self.n_p + self.n_q
+        self.G_e = np.concatenate((self.G_r, self.G_f))
+        self.B_e = np.concatenate((self.B_r, self.B_f))
+        self.M_e = la.block_diag(self.M_r, self.M_f)
+        self.M_e[n_rig:, :n_rig] = self.M_fr
+        self.M_e[:n_rig, n_rig:] = self.M_fr.T
+        self.J_e = la.block_diag(np.zeros((n_rig, n_rig)), self.J_f)
+        self.R_e = la.block_diag(np.zeros((n_rig, n_rig)), self.R_f)
 
 def permute_rows_columns(mat, ind_perm):
     assert len(ind_perm) == len(mat) and len(ind_perm) == len(mat.T)

@@ -11,6 +11,7 @@ from matplotlib import pyplot as plt
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
+import warnings
 
 matplotlib.rcParams['text.usetex'] = True
 
@@ -129,30 +130,26 @@ class FloatingKP(SysPhdaeRig):
         def bending_curv_vec(MM):
             return dot(C_b_vec, MM)
 
-        def tensor_divDiv_vec(MM):
-            return MM[0].dx(0).dx(0) + MM[1].dx(1).dx(1) + 2 * MM[2].dx(0).dx(1)
+        # def tensor_divDiv_vec(MM):
+        #     return MM[0].dx(0).dx(0) + MM[1].dx(1).dx(1) + 2 * MM[2].dx(0).dx(1)
 
-        def Gradgrad_vec(u):
+        def gradgrad_vec(u):
             return as_vector([ u.dx(0).dx(0), u.dx(1).dx(1), 2 * u.dx(0).dx(1) ])
 
         mesh = RectangleMesh(nx, ny, Lx, Ly, quadrilateral=False)
         x, y = SpatialCoordinate(mesh)
 
-        name_FEp = 'Bell'
-        name_FEq = 'Bell'
-        deg_p = 5
-        deg_q = 5
+        name_FE = "Bell"
+        deg = 5
+        ndof_Vp = 6
 
-
-
-        Vp = FunctionSpace(mesh, name_FEp, deg_p)
-        Vq = VectorFunctionSpace(mesh, name_FEq, deg_q, dim=3)
+        Vp = FunctionSpace(mesh, name_FE, deg)
+        Vq = VectorFunctionSpace(mesh, name_FE, deg, dim=3)
 
         V = Vp * Vq
         n_Vp = Vp.dim()
         n_Vq = Vq.dim()
         n_V = n_Vp + n_Vq
-
 
         v = TestFunction(V)
         v_p, v_q = split(v)
@@ -169,11 +166,10 @@ class FloatingKP(SysPhdaeRig):
         m_q = inner(v_q, al_q) * dx
         m_form = m_p + m_q
 
-        j_gradgrad = inner(v_q, Gradgrad_vec(e_p)) * dx
-        j_gradgradIP = -inner(Gradgrad_vec(v_p), e_q) * dx
+        j_gradgrad = inner(v_q, gradgrad_vec(e_p)) * dx
+        j_gradgradIP = -inner(gradgrad_vec(v_p), e_q) * dx
 
-        j_grad = j_gradgrad + j_gradgradIP
-        j_form = j_grad
+        j_form = j_gradgrad + j_gradgradIP
         petsc_j = assemble(j_form, mat_type='aij').M.handle
         petsc_m = assemble(m_form, mat_type='aij').M.handle
 
@@ -183,7 +179,6 @@ class FloatingKP(SysPhdaeRig):
         tab_coord = mesh.coordinates.dat.data
         i_P = find_point(tab_coord, coord_P)[0]
 
-        ndof_Vp = 6
         n_p = n_Vp - ndof_Vp
         n_q = n_Vq
         dof_P = i_P*ndof_Vp
@@ -200,12 +195,8 @@ class FloatingKP(SysPhdaeRig):
         M_f = M_f[dofs2keep, :]
         M_f = M_f[:, dofs2keep]
 
-        n_rig = 6  # 3D Spatial motion
-        n_fl = n_V - ndof_Vp
-        n_tot = n_rig + n_fl
-
-        x_G = Lx/2
-        y_G = Ly/2
+        # x_G = Lx/2
+        # y_G = Ly/2
         x_P, y_P = tab_coord[i_P]
 
         assert x_P == 0 or x_P == Lx or x_P == 0 or y_P == Ly
@@ -213,34 +204,35 @@ class FloatingKP(SysPhdaeRig):
         Jxx = assemble(rho*h*(y-y_P)**2*dx)
         Jyy = assemble(rho*h*(x-x_P)**2*dx)
 
+        n_rig = 3  # Displacement about z, rotations about x and y
+        n_fl = n_p + n_q
+        n_tot = n_rig + n_fl
+
         M_r = np.zeros((n_rig, n_rig))
         m_plate = rho * h * Lx * Ly
-        M_r[:3, :3] = m_plate*np.eye(3)
-        M_r[2, 3] = m_plate*(y_G - y_P)
-        M_r[3, 2] = M_r[2, 3]
-        M_r[2, 4] = -m_plate * (x_G - x_P)
-        M_r[4, 2] = M_r[2, 4]
+        M_r[0, 0] = m_plate
+        M_r[1, 1] = Jxx
+        M_r[2, 2] = Jyy
+        M_r[0, 1] = assemble(rho * h * (y - y_P) * dx) # m_plate*(y_G - y_P)  #
+        M_r[1, 0] = M_r[0, 1]
+        M_r[0, 2] = assemble(- rho * h * (x - x_P) * dx) # -m_plate * (x_G - x_P)  #
+        M_r[2, 0] = M_r[0, 2]
+        M_r[1, 2] = assemble(- rho * h * (x - x_P) * (y - y_P) * dx)
+        M_r[2, 1] = M_r[1, 2]
 
-        M_r[3][3] = Jxx
-        M_r[4][4] = Jyy
-        M_r[5][5] = Jxx + Jyy
 
-        M_fr = np.zeros((n_fl, n_rig))
-        M_fr[:, 2] = assemble(v_p * rho * h * dx).vector().get_local()[dofs2keep]
-        M_fr[:, 3] = assemble(v_p * rho * h * (y - y_P) * dx).vector().get_local()[dofs2keep]
-        M_fr[:, 4] = assemble(- v_p * rho * h * (x - x_P) * dx).vector().get_local()[dofs2keep]
+        M_fr = np.zeros((n_p + n_q, n_rig))
+        M_fr[:, 0] = assemble(v_p * rho * h * dx).vector().get_local()[dofs2keep]
+        M_fr[:, 1] = assemble(v_p * rho * h * (y - y_P) * dx).vector().get_local()[dofs2keep]
+        M_fr[:, 2] = assemble(- v_p * rho * h * (x - x_P) * dx).vector().get_local()[dofs2keep]
 
         M = np.zeros((n_tot, n_tot))
         M[:n_rig, :n_rig] = M_r
         M[n_rig:, :n_rig] = M_fr
         M[:n_rig, n_rig:] = M_fr.T
         M[n_rig:, n_rig:] = M_f
-        assert np.linalg.matrix_rank(M_r) == n_rig
-        assert np.linalg.matrix_rank(M_f[:n_p, :n_p]) == n_p
-        assert np.linalg.matrix_rank(M_f[n_p:, n_p:]) == n_q
-        assert np.linalg.matrix_rank(M[:n_Vp, :n_Vp]) == n_Vp
-        print(np.linalg.matrix_rank(M), n_tot)
-        assert np.linalg.matrix_rank(M) == n_tot
+        if not np.linalg.matrix_rank(M) == n_tot:
+            warnings.warn("Singular mass matrix")
 
         J = np.zeros((n_tot, n_tot))
         J[n_rig:, n_rig:] = J_f
@@ -253,50 +245,72 @@ class FloatingKP(SysPhdaeRig):
         # 3: plane y == 0
         # 4: plane y == 1
 
-        n = FacetNormal(mesh)
-        # s = as_vector([-n[1], n[0]])
+        n_vers = FacetNormal(mesh)
+        s_vers = as_vector([-n_vers[1], n_vers[0]])
 
-        V_qn = FunctionSpace(mesh, 'Lagrange', 1)
-        V_Mnn = FunctionSpace(mesh, 'Lagrange', 1)
+        V_f = FunctionSpace(mesh, 'CG', 1)
 
-        Vu = V_qn * V_Mnn
-        n_qn = V_qn.dim()
+        Vu = V_f * V_f * V_f
+        n_f = V_f.dim()
 
-        q_n, M_nn = TrialFunction(Vu)
-        v_omn = dot(grad(v_p), n)
+        q_n, M_nn, M_ns = TrialFunction(Vu)
 
-        b_form = v_p * q_n * ds + v_omn * M_nn * ds
+        v_omn = dot(grad(v_p), n_vers)
+        v_oms = dot(grad(v_p), s_vers)
+
+        b_form = v_p * q_n * ds + v_omn * M_nn * ds + v_oms * M_ns * ds
         petsc_b = assemble(b_form, mat_type='aij').M.handle
         B_FEM = np.array(petsc_b.convert("dense").getDenseArray())
 
-        n_C = len(coord_C)
+        B_vp = assemble(v_p * ds).vector().get_local()
+        B_omn = assemble(v_omn * ds).vector().get_local()
+        B_oms = assemble(v_oms * ds).vector().get_local()
+
+        n_C = coord_C.shape[0]
         n_u = n_rig*(n_C + 1)
         B = np.zeros((n_tot, n_u))
         B[:n_rig, :n_rig] = np.eye(n_rig)
-
-        Br_C = np.eye(n_rig)
-        Bf_C = np.zeros((n_fl, n_rig))
 
         for i in range(n_C):
             i_C = find_point(tab_coord, coord_C[i])[0]
             x_C, y_C = tab_coord[i_C]
 
+            dof_C = i_C*ndof_Vp
+            dofs_C = list(range(dof_C, dof_C + ndof_Vp))
+            dofs_NotC = list(set(range(n_V)).difference(set(dofs_C)))
+
+            B_vpC = B_vp
+            B_vpC[dofs_NotC] = 0
+            B_omnC = B_omn
+            B_omnC[dofs_NotC] = 0
+            B_omsC = B_oms
+            B_omsC[dofs_NotC] = 0
+
+
             assert x_C == 0 or x_C == Lx or y_C == 0 or y_C == Ly
 
+            Bf_C = np.zeros((n_fl, n_rig))
             tau_CP = np.eye(3)
             tau_CP[0, 1] = y_C - y_P
             tau_CP[0, 2] = -(x_C - x_P)
-            Br_C[2:5, 2:5] = tau_CP.T
+            Br_C = tau_CP.T
 
             # Force contribution to flexibility
-            Bf_C[:, 2] = B_FEM[dofs2keep, i_C]
+            # Bf_C[:, 0] = B_FEM[dofs2keep, i_C]
+            Bf_C[:, 0] = B_vpC[dofs2keep]
             # Momentum contribution to flexibility
             if x_C == 0 or x_C == Lx:
-                Bf_C[:, 4] = B_FEM[dofs2keep, n_qn + i_C]
+                # Bf_C[:, 1] = B_FEM[dofs2keep, 2 * n_f + i_C]
+                # Bf_C[:, 2] = B_FEM[dofs2keep, n_f + i_C]
+                Bf_C[:, 1] = B_omsC[dofs2keep]
+                Bf_C[:, 2] = B_omnC[dofs2keep]
             else:
-                Bf_C[:, 3] = B_FEM[dofs2keep, n_qn + i_C]
+                # Bf_C[:, 1] = B_FEM[dofs2keep, n_f + i_C]
+                # Bf_C[:, 2] = B_FEM[dofs2keep, 2 * n_f + i_C]
+                Bf_C[:, 1] = B_omnC[dofs2keep]
+                Bf_C[:, 2] = B_omsC[dofs2keep]
 
-            B[:, (i+1)*n_rig:(i+2)*n_rig] = np.concatenate((Br_C, Bf_C))
+            B[:, (i+1)*n_rig:(i+2)*n_rig] = np.concatenate((Br_C, Bf_C), axis=0)
 
         SysPhdaeRig.__init__(self, n_tot, 0, n_rig, n_p, n_q, E=M, J=J, B=B)
 
@@ -309,8 +323,6 @@ class FloatingKP(SysPhdaeRig):
             n_modes = input('Number modes to be visualized:')
 
             print_modes(M_FEM, J_FEM, mesh, Vp, n_modes)
-
-
 
 
 def find_point(coords, point):
@@ -327,7 +339,7 @@ def find_point(coords, point):
     return i_min, dist_min
 
 
-def print_modes(M, J, mesh, Vp, n_modes):
+def print_modes(M, J, grid, Vp, n_modes):
     eigenvalues, eigvectors = la.eig(J, M)
     omega_all = np.imag(eigenvalues)
 
@@ -346,7 +358,7 @@ def print_modes(M, J, mesh, Vp, n_modes):
 
     n_Vp = Vp.dim()
     for i in range(int(n_modes)):
-        print("Eigenvalue num " + str(i) + ":" + str(omega[i]))
+        print("Eigenvalue num " + str(i+1) + ":" + str(omega[i]))
         eig_real_w = Function(Vp)
         eig_imag_w = Function(Vp)
 
@@ -355,7 +367,7 @@ def print_modes(M, J, mesh, Vp, n_modes):
         eig_real_w.vector()[:] = eig_real_p
         eig_imag_w.vector()[:] = eig_imag_p
 
-        Vp_CG = FunctionSpace(mesh, 'Lagrange', 3)
+        Vp_CG = FunctionSpace(grid, 'Lagrange', 3)
         eig_real_wCG = project(eig_real_w, Vp_CG)
         eig_imag_wCG = project(eig_imag_w, Vp_CG)
 

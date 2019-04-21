@@ -1,15 +1,16 @@
 clc
 close all
 clear all
+addpath('/home/a.brugnoli/GitProjects/MatlabProjects/tools_sanfe/Beam/')
 addpath('./Matrices_FreeEB/')
-addpath('../Parameters/')
+
 load J_pH; load Q_pH; load B_pH
 
 parameters
 sys_pH = ss(J_pH*Q_pH, B_pH, B_pH'*Q_pH, 0);
 
 M = TwoPort_NElementsBeamTyRz(2, rho1, 1, L1, EI1, 1, 0);
-% Autre méthode
+
 Aug=[0 0 0 0;1 0 0 0;0 1 0 0;0 0 0 0;0 0 1 0;0 0 0 1];
 Dau=zeros(6,6); Dau(1,4)=1;Dau(4,1)=1;Dau(4,4)=-rho1*L1;
 Maug=Aug*M*Aug'+Dau;

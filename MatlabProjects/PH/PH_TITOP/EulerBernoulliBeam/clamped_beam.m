@@ -2,6 +2,8 @@ clc
 close all
 clear all
 addpath('./Matrices_ClampedEB/')
+addpath('/home/a.brugnoli/GitProjects/MatlabProjects/tools_sanfe/Beam/')
+
 load E_dae; load J_dae; load B_dae;
 load J_ode; load Q_ode; load B_ode;
 

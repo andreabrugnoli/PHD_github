@@ -1,8 +1,7 @@
 % Model Alvaro 
-addpath('/home/a.brugnoli/GitProjects/MatlabProjects/tool_sanfe/Beam/')
-addpath('/home/a.brugnoli/GitProjects/MatlabProjects/PH/PH_TITOP/Settings/')
+addpath('/home/a.brugnoli/GitProjects/MatlabProjects/tools_sanfe/Beam/')
 % model_constants
-parameters
+parameters;
 
 M1 = TwoPort_NElementsBeamTyRz(2, rho1,1,L1,EI1,1,0);
 M2 = TwoPort_NElementsBeamTyRz(2, rho2,1,L2,EI2,1,0);
