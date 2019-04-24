@@ -3,7 +3,7 @@
 from firedrake import *
 import numpy as np
 import scipy.linalg as la
-from module_ph_systems import SystemPHDAE
+from modules_phdae.classes_phsystem import SysPhdae
 
 
 class FloatingEB(SystemPHDAE):
@@ -95,4 +95,4 @@ class FloatingEB(SystemPHDAE):
         B[:n_rig, :n_rig] = np.eye(n_rig)
         B[:n_rig, n_rig:] = tau_CP.T
 
-        SystemPHDAE.__init__(self, n_tot, E=M, J=J, B=B)
+        SysPhdae.__init__(self, n_tot, E=M, J=J, B=B)

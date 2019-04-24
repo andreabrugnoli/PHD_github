@@ -22,8 +22,9 @@ class SysPhode:
 
         if Q is not None:
             assert Q.shape == matr_shape
-            if not check_positive_matrix(Q):
+            if not check_symmetry(Q):
                 warnings.warn("Q matrix is not symmetric according to tol. Mass matrix ill condiitioned")
+
             assert check_positive_matrix(Q)
             self.Q = Q
         else:
@@ -290,10 +291,6 @@ class SysPhdaeRig(SysPhdae):
         R_perm = permute_rows_columns(sys_mixed.R, perm_index)
         B_perm = permute_rows(sys_mixed.B, perm_index)
 
-        # n_e2 = nr_int + nq_int + np_int
-        # n_e = n_int - nlmb_int
-        # print(n_e, n_e2)
-        # print(np.linalg.matrix_rank(E_perm[:n_e, :n_e]), np.linalg.matrix_rank(E_perm), n_e)
         sys_ordered = SysPhdaeRig(n_int, nlmb_int, nr_int, np_int, nq_int,
                                       E=E_perm, J=J_perm, R=R_perm, B=B_perm)
 
@@ -317,6 +314,9 @@ class SysPhdaeRig(SysPhdae):
         J_ode = Jtil[:n_z, :n_z]
         R_ode = Rtil[:n_z, :n_z]
         M_ode = Mtil[:n_z, :n_z]
+
+        assert check_positive_matrix(self.M_e)
+
         Q_ode = la.inv(M_ode)
         B_ode = Btil[:n_z]
 

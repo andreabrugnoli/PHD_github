@@ -8,14 +8,14 @@ from scipy.io import savemat
 from system_components.tests.manipulator_constants import n_el, rho1, EI1, L1, rho2, EI2, L2, n_rig, J_joint1, J_joint2, J_payload, m_joint2, m_payload
 
 
-beam1 = FloatingPlanarEB(n_el, rho1, EI1, L1, J_joint=J_joint1)
+beam1 = FloatingPlanarEB(n_el, L1, rho1, 1, EI1, 1, J_joint=J_joint1)
 E_hinged = beam1.E[2:, 2:]
 J_hinged = beam1.J[2:, 2:]
 B_hinged = beam1.B[2:, 2:]
 beam1_hinged = SysPhdaeRig(len(E_hinged), 0, 1, beam1.n_p, beam1.n_q,
                            E=E_hinged, J=J_hinged, B=B_hinged)
 
-beam2 = FloatingPlanarEB(n_el, rho2, EI2, L2, m_joint=m_joint2, J_joint=J_joint2)
+beam2 = FloatingPlanarEB(n_el, L2, rho2, 1, EI2, 1, m_joint=m_joint2, J_joint=J_joint2)
 
 M_payload = la.block_diag(m_payload, m_payload, J_payload)
 J_payload = np.zeros((n_rig, n_rig))

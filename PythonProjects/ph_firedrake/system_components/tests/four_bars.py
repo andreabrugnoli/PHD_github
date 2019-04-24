@@ -1,10 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.linalg as la
-import sys
-from modules_phdae.classes_phsystem import SysPhdaeRig
+
+from modules_phdae.classes_phsystem import SysPhdaeRig, SysPhdae, check_positive_matrix
 from system_components.beams import FloatFlexBeam
-from scipy.io import savemat
 from system_components.tests.fourbars_constants import *
 from math import pi
 
@@ -69,8 +68,8 @@ def configuration(theta2, l1, l2, l3, l4):
 
     return R1, R2
 
-n_el = 2
 
+n_el = 2
 
 crank = FloatFlexBeam(n_el, L_crank, rho, A_crank, E, I_crank)
 E_hinged = crank.E[2:, 2:]
@@ -92,9 +91,6 @@ R1 = np.array([[np.cos(theta1), np.sin(theta1)],
 theta2 = r1[1, 0]
 theta3 = r1[2, 0]
 
-# print(theta2*180/pi)
-# print(theta3*180/pi)
-
 R2 = np.array([[np.cos(theta2), np.sin(theta2)],
               [-np.sin(theta2), np.cos(theta2)]])
 
@@ -107,34 +103,44 @@ ind_coupler = np.array([0, 1], dtype=int)
 
 crank_coupler = SysPhdaeRig.transformer_ordered(crank_hinged, coupler, ind_crank, ind_coupler, R2)
 
-
-n_int = crank_coupler.m
-ind_cr_coup = np.array([n_int-3, n_int-2], dtype=int)
+m_int = crank_coupler.m
+ind_cr_coup = np.array([m_int-3, m_int-2], dtype=int)
 ind_follower = np.array([0, 1], dtype=int)
 
 manipulator = SysPhdaeRig.transformer_ordered(crank_coupler, follower, ind_cr_coup, ind_follower, R3)
 
-# print(manipulator.G_f)
-
-E_man = manipulator.E
-J_man = manipulator.J
+mech_rig = 0
+E_man = manipulator.E[mech_rig:, mech_rig:]
+J_man = manipulator.J[mech_rig:, mech_rig:]
 
 n_man = len(E_man)
-rankE = np.linalg.matrix_rank(E_man)
-
-
 m_man = manipulator.m
-print(rankE, n_man, m_man)
-G_follower = manipulator.B[:, [m_man-3, m_man-2]]
 
-nlmb_ground = 2
+ind_cos_man = [0, m_man-3, m_man-2]
+ind_u_man = list(set(range(m_man)).difference(set(ind_cos_man)))
+
+G_man = manipulator.B[mech_rig:, ind_cos_man]
+B_man = manipulator.B[mech_rig:, ind_u_man]
+
+nlmb_ground = len(G_man.T)
 Z_lmb = np.zeros((nlmb_ground, nlmb_ground))
 
 E_mech = la.block_diag(E_man, Z_lmb)
 J_mech = la.block_diag(J_man, Z_lmb)
 
-J_mech[:n_man, n_man:] = G_follower
-J_mech[n_man:, :n_man] = -G_follower.T
+J_mech[:n_man, n_man:] = G_man
+J_mech[n_man:, :n_man] = -G_man.T
+
+
+B_mech = np.concatenate((B_man, np.zeros((nlmb_ground, len(B_man.T)))))
+
+n_mech = len(E_mech)
+nr_mech = manipulator.n_r
+nlmb_mech = manipulator.n_lmb + nlmb_ground
+np_mech = manipulator.n_p
+nq_mech = manipulator.n_q
+
+mech = SysPhdaeRig(n_mech, nlmb_mech, nr_mech, np_mech, nq_mech, E=E_mech, J=J_mech, B=B_mech)
 
 eigenvalues, eigvectors = la.eig(J_mech, E_mech)
 omega_all = np.imag(eigenvalues)
