@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.linalg as la
 from modules_phdae.classes_phsystem import SysPhdaeRig
-from system_components.thin_components import FloatingPlanarEB
+from system_components.beams import FloatingPlanarEB
 from scipy.io import savemat
 from system_components.tests.manipulator_constants import n_el, rho1, EI1, L1, J_joint1, m_joint1
 

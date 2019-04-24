@@ -40,6 +40,7 @@ def proj_matrices(E, A, B, s0, L, n1, n2, tol=1e-14):
     else:
         V1, V2 = modify(W1, W2, M1, M2, nullG, tol)
 
+    print(V1.shape, V2.shape)
     return V1, V2
 
 

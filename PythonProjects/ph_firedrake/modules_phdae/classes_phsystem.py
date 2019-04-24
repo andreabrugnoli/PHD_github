@@ -22,7 +22,8 @@ class SysPhode:
 
         if Q is not None:
             assert Q.shape == matr_shape
-            assert check_symmetry(Q)
+            if not check_positive_matrix(Q):
+                warnings.warn("Q matrix is not symmetric according to tol. Mass matrix ill condiitioned")
             assert check_positive_matrix(Q)
             self.Q = Q
         else:
@@ -61,7 +62,7 @@ class SysPhdae:
         if E is not None:
             assert E.shape == matr_shape
             if not np.linalg.matrix_rank(E) == n - n_lmb:
-                warnings.warn("Matrux E does not have the expected rank. Possible singular mass matrix")
+                warnings.warn("Matrix E does not have the expected rank. Possible singular mass matrix")
             self.E = E
         else:
             E = np.eye(n)
@@ -77,8 +78,10 @@ class SysPhdae:
 
         if Q is not None:
             assert Q.shape == matr_shape
-            assert check_positive_matrix(Q)
-            assert (Q.T @ E).all() == (E.T @ Q).all()
+            if not check_positive_matrix(Q):
+                warnings.warn("Q matrix is not symmetric according to tol. Mass matrix ill condiitioned")
+            if not (Q.T @ E - E.T @ Q).all() == 0:
+                warnings.warn("Q^T E != E^T Q")
             self.Q = Q
         else:
             self.Q = np.eye(n)
@@ -124,7 +127,7 @@ class SysPhdae:
         m1ext = m1 - m1int
         m2ext = m2 - m2int
 
-        n_lmb = m1int
+        nlmb_int = m1int
 
         ind1_bol = np.array([(i in ind1) for i in range(m1)])
         ind2_bol = np.array([(i in ind2) for i in range(m2)])
@@ -137,24 +140,24 @@ class SysPhdae:
 
         G_lmb = np.concatenate((-B1int @ C.T, B2int))
 
-        n = len(J_int)
-        n_aug = n + m1int
+        n_int = self.n + sys2.n
+        n_aug = n_int + nlmb_int
 
         J_aug = np.zeros((n_aug, n_aug))
-        J_aug[:n, :n] = J_int
-        J_aug[:n, n:] = G_lmb
-        J_aug[n:, :n] = -G_lmb.T
+        J_aug[:n_int, :n_int] = J_int
+        J_aug[:n_int, n_int:] = G_lmb
+        J_aug[n_int:, :n_int] = -G_lmb.T
 
-        E_aug = la.block_diag(self.E, sys2.E, np.zeros((n_lmb, n_lmb)))
-        R_aug = la.block_diag(R_int, np.zeros((n_lmb, n_lmb)))
-        Q_aug = la.block_diag(Q_int, np.eye(n_lmb))
+        E_aug = la.block_diag(self.E, sys2.E, np.zeros((nlmb_int, nlmb_int)))
+        R_aug = la.block_diag(R_int, np.zeros((nlmb_int, nlmb_int)))
+        Q_aug = la.block_diag(Q_int, np.eye(nlmb_int))
 
         Bext = la.block_diag(B1ext, B2ext)
-        B_aug = np.concatenate((Bext, np.zeros((n_lmb, m1ext + m2ext))))
+        B_aug = np.concatenate((Bext, np.zeros((nlmb_int, m1ext + m2ext))))
 
-        n_lmb = self.n_lmb + sys2.n_lmb + m2int
+        ntot_lmb = self.n_lmb + sys2.n_lmb + m2int
 
-        sys_int = SysPhdae(n_aug, n_lmb, E=E_aug, J=J_aug, R=R_aug, Q=Q_aug, B=B_aug)
+        sys_int = SysPhdae(n_aug, ntot_lmb, E=E_aug, J=J_aug, Q=Q_aug, R=R_aug, B=B_aug)
 
         return sys_int
 
@@ -178,7 +181,7 @@ class SysPhdaeRig(SysPhdae):
     """Class for PHDAEs flexible rigid body. The system has structure
     [M_r  M_rf  0] d/dt [e_r]   = [0         0    G_r] [e_r] + [B_r]
     [M_fr  M_f  0]      [e_f]     [0       J_f    G_f] [e_f]   [B_f]
-    [0      0   0]      [lmb]     [-G_r^  -G_f^T    0] [lmb]   [  0]
+    [0      0   0]      [lmb]     [-G_r^  -G_f^T    0] [lmb]   [B_lmb]
 
     The matrices have structure:
     J_f = [ 0    A
@@ -205,6 +208,7 @@ class SysPhdaeRig(SysPhdae):
             R = np.zeros((n, n))
 
         n_e = n_p + n_q + n_r
+        # assert np.linalg.matrix_rank(E) == n_e
 
         M_r = E[:n_r, :n_r]
         M_fr = E[n_r:n_e, :n_r]
@@ -239,6 +243,8 @@ class SysPhdaeRig(SysPhdae):
         self.M_e[:n_r, n_r:] = self.M_fr.T
         self.J_e = la.block_diag(np.zeros((n_r, n_r)), self.J_f)
         self.R_e = la.block_diag(np.zeros((n_r, n_r)), self.R_f)
+
+        self.B_lmb = B[n_e:]
 
         SysPhdae.__init__(self, n, n_lmb, E=E, J=J, B=B, R=R)
 
@@ -284,6 +290,10 @@ class SysPhdaeRig(SysPhdae):
         R_perm = permute_rows_columns(sys_mixed.R, perm_index)
         B_perm = permute_rows(sys_mixed.B, perm_index)
 
+        # n_e2 = nr_int + nq_int + np_int
+        # n_e = n_int - nlmb_int
+        # print(n_e, n_e2)
+        # print(np.linalg.matrix_rank(E_perm[:n_e, :n_e]), np.linalg.matrix_rank(E_perm), n_e)
         sys_ordered = SysPhdaeRig(n_int, nlmb_int, nr_int, np_int, nq_int,
                                       E=E_perm, J=J_perm, R=R_perm, B=B_perm)
 
@@ -320,6 +330,7 @@ class SysPhdaeRig(SysPhdae):
         E_red = self.E[n_rig:, n_rig:]
         A_red = self.J[n_rig:, n_rig:] - self.R[n_rig:, n_rig:]
         B_red = self.B[n_rig:, n_rig:]
+        print(B_red.shape)
         Vp, Vq = proj_matrices(E_red, A_red, B_red, s0, n_red, self.n_p, self.n_f)
 
         V_f = la.block_diag(Vp, Vq)
@@ -327,6 +338,10 @@ class SysPhdaeRig(SysPhdae):
         self.n_p = len(Vp.T)
         self.n_q = len(Vq.T)
 
+        Z_rig = np.zeros((n_rig, n_rig))
+        Z_lmb = np.zeros((self.n_lmb, self.n_lmb))
+
+        self.n_f = self.n_p + self.n_q
         self.M_f = V_f.T @ self.M_f @ V_f
         self.M_fr = V_f.T @ self.M_fr
         self.J_f = V_f.T @ self.J_f @ V_f
@@ -334,14 +349,23 @@ class SysPhdaeRig(SysPhdae):
         self.B_f = V_f.T @ self.B_f
         self.G_f = V_f.T @ self.G_f
 
-        self.n_e = self.n_r + self.n_p + self.n_q
+        self.n_e = n_rig + self.n_p + self.n_q
         self.G_e = np.concatenate((self.G_r, self.G_f))
         self.B_e = np.concatenate((self.B_r, self.B_f))
         self.M_e = la.block_diag(self.M_r, self.M_f)
         self.M_e[n_rig:, :n_rig] = self.M_fr
         self.M_e[:n_rig, n_rig:] = self.M_fr.T
-        self.J_e = la.block_diag(np.zeros((n_rig, n_rig)), self.J_f)
-        self.R_e = la.block_diag(np.zeros((n_rig, n_rig)), self.R_f)
+        self.J_e = la.block_diag(Z_rig, self.J_f)
+        self.R_e = la.block_diag(Z_rig, self.R_f)
+
+        self.n = self.n_e + self.n_lmb
+        self.E = la.block_diag(self.M_e, Z_lmb)
+        self.J = la.block_diag(self.J_e, Z_lmb)
+        self.J[:self.n_e, self.n_e:] = self.G_e
+        self.J[self.n_e:, :self.n_e] = -self.G_e.T
+        self.R = la.block_diag(self.R_e, Z_lmb)
+        self.Q = np.eye(self.n)
+        self.B = np.concatenate((self.B_e, self.B_lmb))
 
 def permute_rows_columns(mat, ind_perm):
     assert len(ind_perm) == len(mat) and len(ind_perm) == len(mat.T)

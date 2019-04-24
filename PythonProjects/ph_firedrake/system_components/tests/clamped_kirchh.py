@@ -1,5 +1,5 @@
 from firedrake import *
-from system_components.thin_components import FloatingKP
+from system_components.plates import FloatingKP
 from system_components.tests.kirchhoff_constants import rho, E, Lx, Ly, h, nu, nx, ny
 import numpy as np
 from scipy.io import savemat
@@ -8,9 +8,8 @@ from modules_phdae.classes_phsystem import SysPhdaeRig
 mesh = RectangleMesh(nx, ny, Lx, Ly, quadrilateral=False)
 tab_coord = mesh.coordinates.dat.data
 
-pointP = np.array([0, 0])
-pointC1 = np.array([Lx, 0]).reshape((-1, 2))
-
+pointP = np.array([0, Ly/2])
+pointC1 = np.array([Lx, Ly/2]).reshape((-1, 2))
 
 plate = FloatingKP(Lx, Ly, h, rho, E, nu, nx, ny, pointP, pointC1, modes=False)
 

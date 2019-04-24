@@ -3,7 +3,7 @@ import numpy as np
 import scipy.linalg as la
 import sys
 from modules_phdae.classes_phsystem import SysPhdaeRig
-from system_components.thin_components import FloatingPlanarEB
+from system_components.beams import FloatingPlanarEB
 from scipy.io import savemat
 from system_components.tests.manipulator_constants import n_el, rho1, EI1, L1, rho2, EI2, L2, n_rig, J_joint1, J_joint2, J_payload, m_joint2, m_payload
 
@@ -51,17 +51,17 @@ sys_ode, T = sys_dae.dae_to_ode()
 J_ode = sys_ode.J
 Q_ode = sys_ode.Q
 B_ode = sys_ode.B
-
-pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/PH_TITOP/TwoLinks_Manipulator/Matrices_manipulator/'
-Qode_file = 'Q_ode'; Jode_file = 'J_ode'; Bode_file = 'B_ode'
-savemat(pathout + Qode_file, mdict={Qode_file: Q_ode})
-savemat(pathout + Jode_file, mdict={Jode_file: J_ode})
-savemat(pathout + Bode_file, mdict={Bode_file: B_ode})
-
-Edae_file = 'E_dae'; Jdae_file = 'J_dae'; Bdae_file = 'B_dae'
-savemat(pathout + Edae_file, mdict={Edae_file: E_dae})
-savemat(pathout + Jdae_file, mdict={Jdae_file: J_dae})
-savemat(pathout + Bdae_file, mdict={Bdae_file: B_dae})
+#
+# pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/PH_TITOP/TwoLinks_Manipulator/Matrices_manipulator/'
+# Qode_file = 'Q_ode'; Jode_file = 'J_ode'; Bode_file = 'B_ode'
+# savemat(pathout + Qode_file, mdict={Qode_file: Q_ode})
+# savemat(pathout + Jode_file, mdict={Jode_file: J_ode})
+# savemat(pathout + Bode_file, mdict={Bode_file: B_ode})
+#
+# Edae_file = 'E_dae'; Jdae_file = 'J_dae'; Bdae_file = 'B_dae'
+# savemat(pathout + Edae_file, mdict={Edae_file: E_dae})
+# savemat(pathout + Jdae_file, mdict={Jdae_file: J_dae})
+# savemat(pathout + Bdae_file, mdict={Bdae_file: B_dae})
 
 # plt.figure(); plt.spy(sys_int1.E)
 # plt.figure(); plt.spy(sys_int1.J)
@@ -75,13 +75,13 @@ savemat(pathout + Bdae_file, mdict={Bdae_file: B_dae})
 # plt.spy(M_all)
 # plt.show()
 #
-# eigenvalues, eigvectors = la.eig(J_dae, E_dae)
-# omega_all = np.imag(eigenvalues)
-# index = omega_all > 0
-# omega = omega_all[index]
-# eigvec_omega = eigvectors[:, index]
-# perm = np.argsort(omega)
-# eigvec_omega = eigvec_omega[:, perm]
-# omega.sort()
-#
-# print(omega)
+eigenvalues, eigvectors = la.eig(J_dae, E_dae)
+omega_all = np.imag(eigenvalues)
+index = omega_all > 0
+omega = omega_all[index]
+eigvec_omega = eigvectors[:, index]
+perm = np.argsort(omega)
+eigvec_omega = eigvec_omega[:, perm]
+omega.sort()
+
+print(omega)
