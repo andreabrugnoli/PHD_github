@@ -313,17 +313,30 @@ class FloatTruss(SysPhdaeRig):
         SysPhdaeRig.__init__(self, n_tot, 0, n_rig, n_p, n_q, E=M, J=J, B=B)
 
 
-def draw_deformation(n_draw, u_dofs, w_dofs, L):
+def draw_deformation(n_draw, v_rig, v_fl, L):
     # Suppose no displacement in zero
-    assert len(w_dofs) == 2*len(u_dofs)
-    n_el = len(u_dofs)
-    dx_el = 1/n_el
+    assert len(v_rig)  == 3
+    assert len(v_fl) % 3 == 0
+    n_el = int(len(v_fl)/3)
+
+    ufl_dofs = v_fl[:n_el]
+    wfl_dofs = v_fl[n_el:]
+
+    dx_el = L/n_el
+
+    u_P = v_rig[0]
+    w_P = v_rig[1]
+    th_P = v_rig[2]
 
     ndr_el = int(n_draw/n_el)
     n_draw = ndr_el*n_el
-    x_coord = np.linspace(0, 1, num=n_draw+1)
-    u_coord = np.zeros((n_draw+1, ))
-    w_coord = np.zeros((n_draw+1, ))
+    x_coord = np.linspace(0, L, num=n_draw+1)
+
+    u_r = u_P*np.ones_like(x_coord)
+    w_r = w_P*np.ones_like(x_coord) + x_coord*th_P
+
+    u_fl = np.zeros_like(x_coord)
+    w_fl = np.zeros_like(x_coord)
 
     for i in range(n_el):
             for j in range(ndr_el):
@@ -339,43 +352,61 @@ def draw_deformation(n_draw, u_dofs, w_dofs, L):
                 phi4_w = + x_til**3 -x_til**2
 
                 if i == 0:
-                    u_coord[ind] = phi2_u*u_dofs[i]
-                    w_coord[ind] = phi3_w*w_dofs[2*i] + phi4_w*w_dofs[2*i+1]
+                    u_fl[ind] = phi2_u*ufl_dofs[i]
+                    w_fl[ind] = phi3_w*wfl_dofs[2*i] + phi4_w*wfl_dofs[2*i+1]
                 else:
-                    u_coord[ind] = phi1_u * u_dofs[i-1] + phi2_u * u_dofs[i]
-                    w_coord[ind] = phi1_w*w_dofs[2*(i-1)] + phi2_w*w_dofs[2*i-1] + \
-                                   phi3_w*w_dofs[2*i] + phi4_w*w_dofs[2*i+1]
+                    u_fl[ind] = phi1_u * ufl_dofs[i-1] + phi2_u * ufl_dofs[i]
+                    w_fl[ind] = phi1_w*wfl_dofs[2*(i-1)] + phi2_w*wfl_dofs[2*i-1] + \
+                                   phi3_w*wfl_dofs[2*i] + phi4_w*wfl_dofs[2*i+1]
 
-    return x_coord*L, u_coord, w_coord
+    u_tot = u_r + u_fl
+    w_tot = w_r + w_fl
+
+    return x_coord, u_tot, w_tot
 
 
-def draw_bending(n_draw, w_dofs, L):
+def draw_bending(n_draw, v_rig, v_fl, L):
     # Suppose no displacement in zero
-    assert len(w_dofs)/2 is int
-    n_el = len(w_dofs)/2
-    dx_el = 1/n_el
+    assert len(v_rig) == 3
+    assert len(v_fl) % 2 == 0
+    n_el = int(len(v_fl) / 2)
 
-    ndr_el = int(n_draw/n_el)
-    n_draw = ndr_el*n_el
-    x_coord = np.linspace(0, 1, num=n_draw+1)
-    u_coord = np.zeros((n_draw+1, ))
-    w_coord = np.zeros((n_draw+1, ))
+    wfl_dofs = v_fl
+
+    dx_el = L / n_el
+
+    u_P = v_rig[0]
+    w_P = v_rig[1]
+    th_P = v_rig[2]
+
+    ndr_el = int(n_draw / n_el)
+    n_draw = ndr_el * n_el
+    x_coord = np.linspace(0, L, num=n_draw + 1)
+
+    u_r = u_P * np.ones_like(x_coord)
+    w_r = w_P * np.ones_like(x_coord) + x_coord * th_P
+
+    u_fl = np.zeros_like(x_coord)
+    w_fl = np.zeros_like(x_coord)
 
     for i in range(n_el):
-            for j in range(ndr_el):
-                ind = i * ndr_el + j + 1
-                i_el = i*ndr_el
-                x_til = (x_coord[ind] - x_coord[i_el])/dx_el
+        for j in range(ndr_el):
+            ind = i * ndr_el + j + 1
+            i_el = i * ndr_el
+            x_til = (x_coord[ind] - x_coord[i_el]) / dx_el
 
-                phi1_w = 1 - 3 * x_til**2 + 2 * x_til**3
-                phi2_w = x_til - 2 * x_til**2 + x_til**3
-                phi3_w = + 3 * x_til ** 2 -2 * x_til ** 3
-                phi4_w = + x_til**3 -x_til**2
+            phi1_w = 1 - 3 * x_til ** 2 + 2 * x_til ** 3
+            phi2_w = x_til - 2 * x_til ** 2 + x_til ** 3
+            phi3_w = + 3 * x_til ** 2 - 2 * x_til ** 3
+            phi4_w = + x_til ** 3 - x_til ** 2
 
-                if i == 0:
-                    w_coord[ind] = phi3_w*w_dofs[2*i] + phi4_w*w_dofs[2*i+1]
-                else:
-                    w_coord[ind] = phi1_w*w_dofs[2*(i-1)] + phi2_w*w_dofs[2*i-1] + \
-                                   phi3_w*w_dofs[2*i] + phi4_w*w_dofs[2*i+1]
+            if i == 0:
+                w_fl[ind] = phi3_w * wfl_dofs[2 * i] + phi4_w * wfl_dofs[2 * i + 1]
+            else:
+                w_fl[ind] = phi1_w * wfl_dofs[2 * (i - 1)] + phi2_w * wfl_dofs[2 * i - 1] + \
+                            phi3_w * wfl_dofs[2 * i] + phi4_w * wfl_dofs[2 * i + 1]
 
-    return x_coord*L, u_coord, w_coord
+    u_tot = u_r
+    w_tot = w_r + w_fl
+
+    return x_coord, u_tot, w_tot
