@@ -2,10 +2,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.linalg as la
 
-from modules_phdae.classes_phsystem import SysPhdaeRig, SysPhdae, check_positive_matrix
-from system_components.beams import FloatFlexBeam
+from modules_phdae.classes_phsystem import SysPhdaeRig
+from system_components.beams import FloatFlexBeam, draw_deformation
 from system_components.tests.fourbars_constants import *
 from math import pi
+
 
 def configuration(theta2, l1, l2, l3, l4):
     """
@@ -109,18 +110,17 @@ ind_follower = np.array([0, 1], dtype=int)
 
 manipulator = SysPhdaeRig.transformer_ordered(crank_coupler, follower, ind_cr_coup, ind_follower, R3)
 
-mech_rig = 0
-E_man = manipulator.E[mech_rig:, mech_rig:]
-J_man = manipulator.J[mech_rig:, mech_rig:]
+E_man = manipulator.E
+J_man = manipulator.J
 
 n_man = len(E_man)
 m_man = manipulator.m
 
-ind_cos_man = [0, m_man-3, m_man-2]
+ind_cos_man = [5, 6, 0, 3]  #  [0, m_man-3, m_man-2]
 ind_u_man = list(set(range(m_man)).difference(set(ind_cos_man)))
 
-G_man = manipulator.B[mech_rig:, ind_cos_man]
-B_man = manipulator.B[mech_rig:, ind_u_man]
+G_man = manipulator.B[:, ind_cos_man]
+B_man = manipulator.B[:, ind_u_man]
 
 nlmb_ground = len(G_man.T)
 Z_lmb = np.zeros((nlmb_ground, nlmb_ground))
@@ -131,18 +131,19 @@ J_mech = la.block_diag(J_man, Z_lmb)
 J_mech[:n_man, n_man:] = G_man
 J_mech[n_man:, :n_man] = -G_man.T
 
-
-B_mech = np.concatenate((B_man, np.zeros((nlmb_ground, len(B_man.T)))))
-
-n_mech = len(E_mech)
-nr_mech = manipulator.n_r
-nlmb_mech = manipulator.n_lmb + nlmb_ground
-np_mech = manipulator.n_p
-nq_mech = manipulator.n_q
-
-mech = SysPhdaeRig(n_mech, nlmb_mech, nr_mech, np_mech, nq_mech, E=E_mech, J=J_mech, B=B_mech)
+# B_mech = np.concatenate((B_man, np.zeros((nlmb_ground, len(B_man.T)))))
+# n_mech = len(E_mech)
+# nr_mech = manipulator.n_r
+# nlmb_mech = manipulator.n_lmb + nlmb_ground
+# np_mech = manipulator.n_p
+# nq_mech = manipulator.n_q
+# mech = SysPhdaeRig(n_mech, nlmb_mech, nr_mech, np_mech, nq_mech, E=E_mech, J=J_mech, B=B_mech)
+# mech_ode = mech.dae_to_ode()
+# A_mech = mech_ode.J @ mech_ode.Q
+# eigenvalues, eigvectors = la.eig(A_mech)
 
 eigenvalues, eigvectors = la.eig(J_mech, E_mech)
+
 omega_all = np.imag(eigenvalues)
 index = omega_all > 0
 omega = omega_all[index]
@@ -151,45 +152,57 @@ perm = np.argsort(omega)
 eigvec_omega = eigvec_omega[:, perm]
 omega.sort()
 
+np_mech = manipulator.n_p
+nel_p = int(np_mech/3)  # Three elements compose the mechanism
+nel_dof = int(nel_p/3)
+
+nr_mech = manipulator.n_r
+
+eigmech_p = eigvec_omega[nr_mech:nr_mech+np_mech]
+i=0
+# for i in range(0):
+real_eig = np.real(eigmech_p[:, i])
+imag_eig = np.imag(eigmech_p[:, i])
+
+if np.linalg.norm(real_eig) > np.linalg.norm(imag_eig):
+    eigmech_p_i = real_eig
+else:
+    eigmech_p_i = imag_eig
+
+eigcrank_p = eigmech_p_i[:nel_p]
+eigcoupler_p = eigmech_p_i[nel_p:2*nel_p]
+eigfollower_p = eigmech_p_i[2*nel_p:]
+
+eigu_crank = eigcrank_p[:nel_dof]
+eigw_crank = eigcrank_p[nel_dof:]
+
+eigu_coupler = eigcoupler_p[:nel_dof]
+eigw_coupler = eigcoupler_p[nel_dof:]
+
+eigu_follower = eigfollower_p[:nel_dof]
+eigw_follower = eigfollower_p[nel_dof:]
+
+n_draw = 50
+
+x_crank, u_crank, w_crank = draw_deformation(n_draw, eigu_crank, eigw_crank, L_crank)
+#
+# fig = plt.figure(1); ax = fig.add_subplot(111)
+# ax.plot(x_crank, np.zeros_like(x_crank), 'r', label="Undeformed")
+# ax.plot(x_crank + u_crank, w_crank, 'b', label="Deformed")
+# ax.legend()
+#
+# x_coupler, u_coupler, w_coupler = draw_deformation(n_draw, eigu_coupler, eigw_coupler, L_coupler)
+# fig = plt.figure(2); ax = fig.add_subplot(111)
+# plt.plot(x_coupler, np.zeros_like(x_coupler), 'r', label="Undeformed")
+# plt.plot(x_coupler + u_coupler, w_coupler, 'b', label="Deformed")
+# ax.legend()
+#
+# x_follower, u_follower, w_follower = draw_deformation(n_draw, eigu_follower, eigw_follower, L_follower)
+# fig = plt.figure(3); ax = fig.add_subplot(111)
+# plt.plot(x_follower, np.zeros_like(x_follower), 'r', label="Undeformed")
+# plt.plot(x_follower + u_follower, w_follower, 'b', label="Deformed")
+# ax.legend()
+#
+# plt.show()
+
 print(omega)
-
-
-
-#
-# J_dae = sys_dae.J
-# E_dae = sys_dae.E
-# B_dae = sys_dae.B
-#
-# sys_ode, T = sys_dae.dae_to_ode()
-#
-# J_ode = sys_ode.J
-# Q_ode = sys_ode.Q
-# B_ode = sys_ode.B
-#
-# pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/PH_TITOP/TwoLinks_Manipulator/Matrices_manipulator/'
-# Qode_file = 'Q_ode'; Jode_file = 'J_ode'; Bode_file = 'B_ode'
-# savemat(pathout + Qode_file, mdict={Qode_file: Q_ode})
-# savemat(pathout + Jode_file, mdict={Jode_file: J_ode})
-# savemat(pathout + Bode_file, mdict={Bode_file: B_ode})
-#
-# Edae_file = 'E_dae'; Jdae_file = 'J_dae'; Bdae_file = 'B_dae'
-# savemat(pathout + Edae_file, mdict={Edae_file: E_dae})
-# savemat(pathout + Jdae_file, mdict={Jdae_file: J_dae})
-# savemat(pathout + Bdae_file, mdict={Bdae_file: B_dae})
-
-# plt.figure(); plt.spy(sys_int1.E)
-# plt.figure(); plt.spy(sys_int1.J)
-# plt.figure(); plt.spy(sys_all.E)
-# plt.figure(); plt.spy(sys_all.J)
-# plt.show()
-
-# plt.figure()
-# plt.spy(J_all)
-# plt.figure()
-# plt.spy(M_all)
-# plt.show()
-#
-
-
-
-

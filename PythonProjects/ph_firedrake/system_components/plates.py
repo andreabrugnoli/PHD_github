@@ -308,17 +308,17 @@ class FloatingBellKP(SysPhdaeRig):
         M_r[0, 0] = m_plate
         M_r[1, 1] = Jxx
         M_r[2, 2] = Jyy
-        M_r[0, 1] = assemble(rho * h * (y - y_P) * dx)  # m_plate*(y_G - y_P)  #
+        M_r[0, 1] = assemble(+rho * h * (y - y_P) * dx)  # m_plate*(y_G - y_P)  #
         M_r[1, 0] = M_r[0, 1]
-        M_r[0, 2] = assemble(- rho * h * (x - x_P) * dx)  # -m_plate * (x_G - x_P)  #
+        M_r[0, 2] = assemble(-rho * h * (x - x_P) * dx)  # -m_plate * (x_G - x_P)  #
         M_r[2, 0] = M_r[0, 2]
-        M_r[1, 2] = assemble(- rho * h * (x - x_P) * (y - y_P) * dx)
+        M_r[1, 2] = assemble(-rho * h * (x - x_P) * (y - y_P) * dx)
         M_r[2, 1] = M_r[1, 2]
 
         M_fr = np.zeros((n_p + n_q, n_rig))
-        M_fr[:, 0] = assemble(v_p * rho * h * dx).vector().get_local()[dofs2keep]
-        M_fr[:, 1] = assemble(v_p * rho * h * (y - y_P) * dx).vector().get_local()[dofs2keep]
-        M_fr[:, 2] = assemble(- v_p * rho * h * (x - x_P) * dx).vector().get_local()[dofs2keep]
+        M_fr[:, 0] = assemble(+v_p * rho * h * dx).vector().get_local()[dofs2keep]
+        M_fr[:, 1] = assemble(+v_p * rho * h * (y - y_P) * dx).vector().get_local()[dofs2keep]
+        M_fr[:, 2] = assemble(-v_p * rho * h * (x - x_P) * dx).vector().get_local()[dofs2keep]
 
         M = np.zeros((n_tot, n_tot))
         M[:n_rig, :n_rig] = M_r

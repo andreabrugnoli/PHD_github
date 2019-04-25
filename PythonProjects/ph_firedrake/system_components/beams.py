@@ -311,3 +311,71 @@ class FloatTruss(SysPhdaeRig):
         B[n_rig:, 3] = B_Fx
 
         SysPhdaeRig.__init__(self, n_tot, 0, n_rig, n_p, n_q, E=M, J=J, B=B)
+
+
+def draw_deformation(n_draw, u_dofs, w_dofs, L):
+    # Suppose no displacement in zero
+    assert len(w_dofs) == 2*len(u_dofs)
+    n_el = len(u_dofs)
+    dx_el = 1/n_el
+
+    ndr_el = int(n_draw/n_el)
+    n_draw = ndr_el*n_el
+    x_coord = np.linspace(0, 1, num=n_draw+1)
+    u_coord = np.zeros((n_draw+1, ))
+    w_coord = np.zeros((n_draw+1, ))
+
+    for i in range(n_el):
+            for j in range(ndr_el):
+                ind = i*ndr_el+j+1
+                i_el = i*ndr_el
+                x_til = (x_coord[ind] - x_coord[i_el])/dx_el
+                phi1_u = (1 - x_til)
+                phi2_u = x_til
+
+                phi1_w = 1 - 3 * x_til**2 + 2 * x_til**3
+                phi2_w = x_til - 2 * x_til**2 + x_til**3
+                phi3_w = + 3 * x_til ** 2 -2 * x_til ** 3
+                phi4_w = + x_til**3 -x_til**2
+
+                if i == 0:
+                    u_coord[ind] = phi2_u*u_dofs[i]
+                    w_coord[ind] = phi3_w*w_dofs[2*i] + phi4_w*w_dofs[2*i+1]
+                else:
+                    u_coord[ind] = phi1_u * u_dofs[i-1] + phi2_u * u_dofs[i]
+                    w_coord[ind] = phi1_w*w_dofs[2*(i-1)] + phi2_w*w_dofs[2*i-1] + \
+                                   phi3_w*w_dofs[2*i] + phi4_w*w_dofs[2*i+1]
+
+    return x_coord*L, u_coord, w_coord
+
+
+def draw_bending(n_draw, w_dofs, L):
+    # Suppose no displacement in zero
+    assert len(w_dofs)/2 is int
+    n_el = len(w_dofs)/2
+    dx_el = 1/n_el
+
+    ndr_el = int(n_draw/n_el)
+    n_draw = ndr_el*n_el
+    x_coord = np.linspace(0, 1, num=n_draw+1)
+    u_coord = np.zeros((n_draw+1, ))
+    w_coord = np.zeros((n_draw+1, ))
+
+    for i in range(n_el):
+            for j in range(ndr_el):
+                ind = i * ndr_el + j + 1
+                i_el = i*ndr_el
+                x_til = (x_coord[ind] - x_coord[i_el])/dx_el
+
+                phi1_w = 1 - 3 * x_til**2 + 2 * x_til**3
+                phi2_w = x_til - 2 * x_til**2 + x_til**3
+                phi3_w = + 3 * x_til ** 2 -2 * x_til ** 3
+                phi4_w = + x_til**3 -x_til**2
+
+                if i == 0:
+                    w_coord[ind] = phi3_w*w_dofs[2*i] + phi4_w*w_dofs[2*i+1]
+                else:
+                    w_coord[ind] = phi1_w*w_dofs[2*(i-1)] + phi2_w*w_dofs[2*i-1] + \
+                                   phi3_w*w_dofs[2*i] + phi4_w*w_dofs[2*i+1]
+
+    return x_coord*L, u_coord, w_coord

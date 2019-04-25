@@ -300,9 +300,10 @@ class SysPhdaeRig(SysPhdae):
         G = self.G_e
         GannL = la.null_space(G.T).T
 
-        T = np.concatenate((GannL, la.inv(G.T @ G) @ G.T))
-        # invT = la.inv(T)
-        assert np.linalg.matrix_rank(T @ G) == self.n_lmb
+        T = GannL
+        # T = np.concatenate((GannL, la.inv(G.T @ G) @ G.T))
+        #assert np.linalg.matrix_rank(T @ G) == self.n_lmb
+        assert check_positive_matrix(self.M_e)
 
         Mtil = T @ self.M_e @ T.T
         Jtil = T @ self.J_e @ T.T
@@ -315,15 +316,14 @@ class SysPhdaeRig(SysPhdae):
         R_ode = Rtil[:n_z, :n_z]
         M_ode = Mtil[:n_z, :n_z]
 
-        assert check_positive_matrix(self.M_e)
-
         Q_ode = la.inv(M_ode)
         B_ode = Btil[:n_z]
 
-        T_ode2dae = T.T @ np.concatenate((np.eye(n_z), np.zeros((self.n_lmb, n_z)))) @ Q_ode
         sysOde = SysPhode(n_z, J=J_ode, R=R_ode, Q=Q_ode, B=B_ode)
+        return sysOde
 
-        return sysOde, T_ode2dae
+        # T_ode2dae = T.T @ np.concatenate((np.eye(n_z), np.zeros((self.n_lmb, n_z)))) @ Q_ode
+        # return sysOde, T_ode2dae
 
     def reduce_system(self, s0, n_red):
         n_rig = self.n_r
