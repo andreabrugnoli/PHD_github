@@ -76,7 +76,6 @@ class FloatingKP(SysPhdaeRig):
         n_e = n_rig + n_fl
 
         x_P, y_P = tab_coord[i_P]
-        assert x_P == 0 or x_P == Lx or x_P == 0 or y_P == Ly
 
         Jxx = assemble(rho * h * (y - y_P) ** 2 * dx)
         Jyy = assemble(rho * h * (x - x_P) ** 2 * dx)
@@ -99,30 +98,24 @@ class FloatingKP(SysPhdaeRig):
         M_fr[:, 2] = assemble(- v_p * rho * h * (x - x_P) * dx).vector().get_local()
 
         # B matrices based on Lagrange
-
-        n_vers = FacetNormal(mesh)
-        s_vers = as_vector([-n_vers[1], n_vers[0]])
-
         Vf = FunctionSpace(mesh, 'CG', 1)
-        q_n = TrialFunction(Vf)
-        M_nn = TrialFunction(Vf)
-        M_ns = TrialFunction(Vf)
+        Fz = TrialFunction(Vf)
+        Mx = TrialFunction(Vf)
+        My = TrialFunction(Vf)
 
-        v_omn = dot(grad(v_p), n_vers)
-        v_oms = dot(grad(v_p), s_vers)
+        v_gradx = v_p.dx(0)
+        v_grady = v_p.dx(1)
 
-        b_vp = v_p * q_n * ds
-        b_omn = v_omn * M_nn * ds
-        b_oms = v_oms * M_ns * ds
+        b_Fz = v_p * Fz * ds
+        b_Mx = v_grady * Mx * ds
+        b_My = -v_gradx * My * ds
 
-        petsc_vp = assemble(b_vp, mat_type='aij').M.handle
-        B_vp = np.array(petsc_vp.convert("dense").getDenseArray())
-
-        petsc_omn = assemble(b_omn, mat_type='aij').M.handle
-        B_omn = np.array(petsc_omn.convert("dense").getDenseArray())
-
-        petsc_oms = assemble(b_oms, mat_type='aij').M.handle
-        B_oms = np.array(petsc_oms.convert("dense").getDenseArray())
+        petsc_bFz = assemble(b_Fz, mat_type='aij').M.handle
+        B_Fz = np.array(petsc_bFz.convert("dense").getDenseArray())
+        petsc_bMx = assemble(b_Mx, mat_type='aij').M.handle
+        B_Mx = np.array(petsc_bMx.convert("dense").getDenseArray())
+        petsc_bMy = assemble(b_My, mat_type='aij').M.handle
+        B_My = np.array(petsc_bMy.convert("dense").getDenseArray())
 
         n_C = coord_C.shape[0]
         n_u = n_rig * (n_C + 1)
@@ -145,30 +138,34 @@ class FloatingKP(SysPhdaeRig):
             # Force contribution to flexibility
 
             Bf_C = np.zeros((n_fl, n_rig))
-            Bf_C[:, 0] = B_vp[:, i_C]
-
-            # Momentum contribution to flexibility
-            if x_C == 0 or x_C == Lx:
-                Bf_C[:, 1] = B_oms[:, i_C]
-                Bf_C[:, 2] = B_omn[:, i_C]
-
-            else:
-                Bf_C[:, 1] = B_omn[:, i_C]
-                Bf_C[:, 2] = B_oms[:, i_C]
+            Bf_C[:, 0] = B_Fz[:, i_C]
+            Bf_C[:, 1] = B_Mx[:, i_C]
+            Bf_C[:, 2] = B_My[:, i_C]
 
             B[:, (i + 1) * n_rig:(i + 2) * n_rig] = np.concatenate((Br_C, Bf_C), axis=0)
 
         Gf_P = np.zeros((n_fl, n_rig))
-        Gf_P[:, 0] = B_vp[:, i_P]
 
         # Momentum contribution to flexibility
-        if x_P == 0 or x_P == Lx:
-            Gf_P[:, 1] = B_oms[:, i_P]
-            Gf_P[:, 2] = B_omn[:, i_P]
-
+        if x_P == 0 or x_P == Lx or x_P == 0 or y_P == Ly:
+                Gf_P[:, 0] = B_Fz[:, i_P]
+                Gf_P[:, 1] = B_Mx[:, i_P]
+                Gf_P[:, 2] = B_My[:, i_P]
         else:
-            Gf_P[:, 1] = B_omn[:, i_P]
-            Gf_P[:, 2] = B_oms[:, i_P]
+
+            g_Fz = v_p * Fz * dx
+            g_Mx = v_p.dx(1) * Mx * dx
+            g_My = -v_p.dx(0) * My * dx
+            petsc_gFz = assemble(g_Fz, mat_type='aij').M.handle
+            G_Fz = np.array(petsc_gFz.convert("dense").getDenseArray())
+            petsc_gMx = assemble(g_Mx, mat_type='aij').M.handle
+            G_Mx = np.array(petsc_gMx.convert("dense").getDenseArray())
+            petsc_gMy = assemble(g_My, mat_type='aij').M.handle
+            G_My = np.array(petsc_gMy.convert("dense").getDenseArray())
+
+            Gf_P[:, 0] = G_Fz[:, i_P]
+            Gf_P[:, 1] = G_Mx[:, i_P]
+            Gf_P[:, 2] = G_My[:, i_P]
 
         n_lmb = n_rig
         Z_lmb = np.zeros((n_lmb, n_lmb))
@@ -294,7 +291,9 @@ class FloatingBellKP(SysPhdaeRig):
 
         x_P, y_P = tab_coord[i_P]
 
-        assert x_P == 0 or x_P == Lx or x_P == 0 or y_P == Ly
+        print(x_P, y_P)
+
+        # assert x_P == 0 or x_P == Lx or x_P == 0 or y_P == Ly
 
         Jxx = assemble(rho*h*(y-y_P)**2*dx)
         Jyy = assemble(rho*h*(x-x_P)**2*dx)
@@ -332,30 +331,24 @@ class FloatingBellKP(SysPhdaeRig):
         J[n_rig:, n_rig:] = J_f
 
         # B MATRIX
-
-        n_vers = FacetNormal(mesh)
-        s_vers = as_vector([-n_vers[1], n_vers[0]])
-
         Vf = FunctionSpace(mesh, 'CG', 1)
-        q_n = TrialFunction(Vf)
-        M_nn = TrialFunction(Vf)
-        M_ns = TrialFunction(Vf)
+        Fz = TrialFunction(Vf)
+        Mx = TrialFunction(Vf)
+        My = TrialFunction(Vf)
 
-        v_omn = dot(grad(v_p), n_vers)
-        v_oms = dot(grad(v_p), s_vers)
+        v_gradx = v_p.dx(0)
+        v_grady = v_p.dx(1)
 
-        b_vp = v_p * q_n * ds
-        b_omn = v_omn * M_nn * ds
-        b_oms = v_oms * M_ns * ds
+        b_Fz = v_p * Fz * ds
+        b_Mx = v_grady * Mx * ds
+        b_My = -v_gradx * My * ds
 
-        petsc_vp = assemble(b_vp, mat_type='aij').M.handle
-        B_vp = np.array(petsc_vp.convert("dense").getDenseArray())
-
-        petsc_omn = assemble(b_omn, mat_type='aij').M.handle
-        B_omn = np.array(petsc_omn.convert("dense").getDenseArray())
-
-        petsc_oms = assemble(b_oms, mat_type='aij').M.handle
-        B_oms = np.array(petsc_oms.convert("dense").getDenseArray())
+        petsc_bFz = assemble(b_Fz, mat_type='aij').M.handle
+        B_Fz = np.array(petsc_bFz.convert("dense").getDenseArray())
+        petsc_bMx = assemble(b_Mx, mat_type='aij').M.handle
+        B_Mx = np.array(petsc_bMx.convert("dense").getDenseArray())
+        petsc_bMy = assemble(b_My, mat_type='aij').M.handle
+        B_My = np.array(petsc_bMy.convert("dense").getDenseArray())
 
         n_C = coord_C.shape[0]
         n_u = n_rig*(n_C + 1)
@@ -375,16 +368,9 @@ class FloatingBellKP(SysPhdaeRig):
             Br_C = tau_CP.T
 
             # Force contribution to flexibility
-            Bf_C[:, 0] = B_vp[dofs2keep, i_C]
-
-            # Momentum contribution to flexibility
-            if x_C == 0 or x_C == Lx:
-                Bf_C[:, 1] = B_oms[dofs2keep, i_C]
-                Bf_C[:, 2] = B_omn[dofs2keep, i_C]
-
-            else:
-                Bf_C[:, 1] = B_omn[dofs2keep, i_C]
-                Bf_C[:, 2] = B_oms[dofs2keep, i_C]
+            Bf_C[:, 0] = B_Fz[dofs2keep, i_C]
+            Bf_C[:, 1] = B_Mx[dofs2keep, i_C]
+            Bf_C[:, 2] = B_My[dofs2keep, i_C]
 
             B[:, (i+1)*n_rig:(i+2)*n_rig] = np.concatenate((Br_C, Bf_C), axis=0)
 

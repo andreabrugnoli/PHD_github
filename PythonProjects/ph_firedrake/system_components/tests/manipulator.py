@@ -75,9 +75,9 @@ B_ode = sys_ode.B
 # plt.spy(M_all)
 # plt.show()
 #
-eigenvalues, eigvectors = la.eig(J_dae, E_dae)
+eigenvalues, eigvectors = la.eig(beam1_hinged.J, beam1_hinged.E)
 omega_all = np.imag(eigenvalues)
-index = omega_all > 0
+index = omega_all >= 0
 omega = omega_all[index]
 eigvec_omega = eigvectors[:, index]
 perm = np.argsort(omega)

@@ -103,26 +103,6 @@ def draw_mechanism(eig_r, eig_p, th1, n_dr):
 
     R3 = np.array([[np.cos(th3), np.sin(th3)],
                    [-np.sin(th3), np.cos(th3)]])
-    #
-    # vC_cr = np.array([u_cr[-1], w_cr[-1]])
-    # vP_cl = np.array([u_cl[0], w_cl[0]])
-    #
-    # vC_cl = np.array([u_cl[-1], w_cl[-1]])
-    # vP_fl = np.array([u_fl[0], w_fl[0]])
-    #
-    # vC_fl = np.array([u_fl[-1], w_fl[-1]])
-    #
-    # print(R2 @ vC_cr, vP_cl)
-    # print(R3 @ vC_cl, vP_fl)
-    # print(vC_fl)
-
-    u_cr = u_cr - u_cr[0]
-    u_cl = u_cl - u_cl[0]
-    u_fl = u_fl - u_fl[0]
-
-    w_cr = w_cr - w_cr[0]
-    w_cl = w_cl - w_cl[0]
-    w_fl = w_fl - w_fl[0]
 
     n_cr = len(x_cr)
     n_cl = len(x_cl)
@@ -145,25 +125,22 @@ def draw_mechanism(eig_r, eig_p, th1, n_dr):
     xIdef_fl = np.zeros((2, n_fl))
 
     xPI_cr = np.zeros((2,))
-    xPIdef_cr = np.zeros((2,))
 
     for i in range(n_cr):
         xI_cr[:, i] = R1.T @ xNdef_cr[:, i] + xPI_cr
-        xIdef_cr[:, i] = R1.T @ xdef_cr[:, i] + xPIdef_cr
+        xIdef_cr[:, i] = R1.T @ xdef_cr[:, i] + xPI_cr
 
     xPI_cl = xI_cr[:, -1]
-    xPIdef_cl = xIdef_cr[:, -1]
 
     for i in range(n_cl):
         xI_cl[:, i] = R1.T @ R2.T @ xNdef_cl[:, i] + xPI_cl
-        xIdef_cl[:, i] = R1.T @ R2.T @ xdef_cl[:, i] + xPIdef_cl
+        xIdef_cl[:, i] = R1.T @ R2.T @ xdef_cl[:, i] + xPI_cl
 
     xPI_fl = xI_cl[:, -1]
-    xPIdef_fl = xIdef_cl[:, -1]
 
     for i in range(n_fl):
         xI_fl[:, i] = R1.T @ R2.T @ R3.T @ xNdef_fl[:, i] + xPI_fl
-        xIdef_fl[:, i] = R1.T @ R2.T @ R3.T @ xdef_fl[:, i] + xPIdef_fl
+        xIdef_fl[:, i] = R1.T @ R2.T @ R3.T @ xdef_fl[:, i] + xPI_fl
 
     xI_mech = np.hstack((xI_cr, xI_cl, xI_fl))
     xIdef_mech = np.hstack((xIdef_cr, xIdef_cl, xIdef_fl))
@@ -281,7 +258,7 @@ def compute_eigs(n_om, n_els, theta_cr, draw=False):
 
             draw_mechanism(eigmech_r, eigmech_p, theta_cr, 50)
 
-            plt.savefig("Def_theta" + str(int(theta_cr * 180 / pi)) + "_num" + str(i+1) + ".eps")
+            # plt.savefig("Def_theta" + str(int(theta_cr * 180 / pi)) + "_num" + str(i+1) + ".eps")
             plt.show()
 
     return omega[:n_om], eigmech_vel[:, n_om]
