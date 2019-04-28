@@ -24,14 +24,14 @@ EI = E * I
 L = 1
 
 
-n = 10
+n_el = 2
 deg = 3
 
 
 # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
 L = 1
 
-mesh = IntervalMesh(n, L)
+mesh = IntervalMesh(n_el, L)
 
 # plot(mesh)
 # plt.show()
@@ -151,7 +151,7 @@ omega.sort()
 
 k_n = omega**(0.5)*L*(rho*A/(EI))**(0.25)
 print("Smallest positive normalized eigenvalues computed: ")
-for i in range(10):
+for i in range(n_el*2):
     print(k_n[i])
 
 # plt.plot(np.real(eigenvalues), np.imag(eigenvalues), 'bo')
@@ -166,7 +166,7 @@ Vp_4proj = FunctionSpace(mesh, "CG", 2)
 eig_funH1 = Function(Vp_4proj)
 
 n_fig = 3
-plot_eigenvector = True
+plot_eigenvector = False
 if plot_eigenvector:
 
     for i in range(n_fig):

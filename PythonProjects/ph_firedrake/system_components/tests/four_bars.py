@@ -247,9 +247,9 @@ def compute_eigs(n_om, n_els, theta_cr, draw=False):
             imag_norm = np.linalg.norm(imag_eig)
 
             if real_norm > imag_norm:
-                eigmech_vel_i = real_eig / (real_norm * max_eig) * 0.1
+                eigmech_vel_i = real_eig / (real_norm * max_eig) * 0.3
             else:
-                eigmech_vel_i = imag_eig / (imag_norm * max_eig) * 0.1
+                eigmech_vel_i = imag_eig / (imag_norm * max_eig) * 0.3
 
             eigmech_vel_i = eigmech_vel_i
 
@@ -292,10 +292,10 @@ def omegatheta_plot(n_elem, theta_vec, n_om):
 
 n_el = 2
 th_vec = np.linspace(0, 2*pi, 50)
-n_omega = 3
+n_omega = 10
 
 # omegatheta_plot(n_el, th_vec, n_omega)
 
-# compute_eigs(n_omega, n_el, 0, draw=True)
-compute_eigs(n_omega, n_el, pi, draw=True)
+compute_eigs(n_omega, n_el, 7*pi/10, draw=True)
+# compute_eigs(n_omega, n_el, pi, draw=True)
 

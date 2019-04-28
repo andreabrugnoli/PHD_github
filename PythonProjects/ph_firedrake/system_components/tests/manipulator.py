@@ -75,7 +75,7 @@ B_ode = sys_ode.B
 # plt.spy(M_all)
 # plt.show()
 #
-eigenvalues, eigvectors = la.eig(beam1_hinged.J, beam1_hinged.E)
+eigenvalues, eigvectors = la.eig(sys_dae.J, sys_dae.E)
 omega_all = np.imag(eigenvalues)
 index = omega_all >= 0
 omega = omega_all[index]

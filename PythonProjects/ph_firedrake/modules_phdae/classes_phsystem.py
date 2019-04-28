@@ -109,6 +109,7 @@ class SysPhdae:
         """Transformer interconnection of pHDAE systems considering the following convection
         u1_int = - C^T u2_int
         y2_int =   C y1_int
+        C is the trasformation matrix from 1 to 2
         This kind of connection is of use for connecting bodies in a multibody system
         """
 
@@ -159,6 +160,52 @@ class SysPhdae:
         ntot_lmb = self.n_lmb + sys2.n_lmb + m2int
 
         sys_int = SysPhdae(n_aug, ntot_lmb, E=E_aug, J=J_aug, Q=Q_aug, R=R_aug, B=B_aug)
+
+        return sys_int
+
+    def gyrator(self, sys2, ind1, ind2, C):
+        """Gyrator interconnection of pHDAE systems considering the following convection
+        u1_int = + C^T y2_int
+        u2_int = - C y1_int
+        C is the trasformation matrix from 1 to 2
+        This kind of connection is of use for connecting bodies in a multibody system
+        """
+
+        assert isinstance(sys2, SysPhdae)
+        assert C.shape == (len(ind2), len(ind1))
+
+        n1 = self.n
+        n2 = sys2.n
+        n_int = n1 + n2
+
+        m1 = len(self.B.T)
+        m2 = len(sys2.B.T)
+
+        m1int = len(ind1)
+        m2int = len(ind2)
+
+        ind1_bol = np.array([(i in ind1) for i in range(m1)])
+        ind2_bol = np.array([(i in ind2) for i in range(m2)])
+
+        B1int = self.B[:, ind1_bol]
+        B2int = sys2.B[:, ind2_bol]
+
+        B1ext = self.B[:, ~ind1_bol]
+        B2ext = sys2.B[:, ~ind2_bol]
+
+        E_int = la.block_diag(self.E, sys2.E)
+        J_int = la.block_diag(self.J, sys2.J)
+        R_int = la.block_diag(self.R, sys2.R)
+        Q_int = la.block_diag(self.Q, sys2.Q)
+
+        J_int[:n1, n1:] = B1int @ C.T @ B2int.T
+        J_int[n1:, :n1] = - B2int @ C @ B1int.T
+
+        Bext = la.block_diag(B1ext, B2ext)
+
+        nlmb_int = self.n_lmb + sys2.n_lmb
+
+        sys_int = SysPhdae(n_int, nlmb_int, E=E_int, J=J_int, Q=Q_int, R=R_int, B=Bext)
 
         return sys_int
 

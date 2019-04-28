@@ -3,7 +3,7 @@
 from firedrake import *
 import numpy as np
 import scipy.linalg as la
-from modules_phdae.classes_phsystem import SysPhdaeRig, check_positive_matrix
+from modules_phdae.classes_phsystem import SysPhdaeRig, check_positive_matrix, check_skew_symmetry
 import warnings
 np.set_printoptions(threshold=np.inf)
 
@@ -42,14 +42,34 @@ class FloatingPlanarEB(SysPhdaeRig):
         petsc_m = assemble(m_form, mat_type='aij').M.handle
         M_FEM = np.array(petsc_m.convert("dense").getDenseArray())
 
+        j_gradgrad = v_q * e_p.dx(0).dx(0) * dx
+        j_gradgradIP = -v_p.dx(0).dx(0) * e_q * dx
+
+        j_form = j_gradgrad + j_gradgradIP
+
+        petcs_j = assemble(j_form, mat_type='aij').M.handle
+        J_FEM = np.array(petcs_j.convert("dense").getDenseArray())
+
+        dofs2dump = list([0, 1])
+        dofs2keep = list(set(range(n_V)).difference(set(dofs2dump)))
+
+        M_f = M_FEM
+        M_f = M_f[:, dofs2keep]
+        M_f = M_f[dofs2keep, :]
+
+        J_f = J_FEM
+        J_f = J_f[:, dofs2keep]
+        J_f = J_f[dofs2keep, :]
+
         n_rig = 3  # Planar motion
-        n_fl = n_V - 2
+        n_fl = n_V - len(dofs2dump)
         n_tot = n_rig + n_fl
-        M_f = M_FEM[-n_fl:, -n_fl:]
+        n_p = n_Vp - 2
+        n_q = n_Vq
 
         M_fr = np.zeros((n_fl, n_rig))
-        M_fr[:, 1] = assemble(v_p * rho * A * dx).vector().get_local()[2:]
-        M_fr[:, 2] = assemble(v_p * rho * A * x[0] * dx).vector().get_local()[2:]
+        M_fr[:, 1] = assemble(v_p * rho * A * dx).vector().get_local()[dofs2keep]
+        M_fr[:, 2] = assemble(v_p * rho * A * x[0] * dx).vector().get_local()[dofs2keep]
 
         M_r = np.zeros((n_rig, n_rig))
         m_beam = rho * L
@@ -66,34 +86,22 @@ class FloatingPlanarEB(SysPhdaeRig):
         M[:n_rig, n_rig:] = M_fr.T
         M[n_rig:, n_rig:] = M_f
 
+        J = np.zeros((n_tot, n_tot))
+        J[n_rig:, n_rig:] = J_f
+
         assert check_positive_matrix(M)
 
-        j_gradgrad = v_q * e_p.dx(0).dx(0) * dx
-        j_gradgradIP = -v_p.dx(0).dx(0) * e_q * dx
-
-        j_form = j_gradgrad + j_gradgradIP
-
-        petcs_j = assemble(j_form, mat_type='aij').M.handle
-        J_FEM = np.array(petcs_j.convert("dense").getDenseArray())
-
-        J = np.zeros((n_tot, n_tot))
-        J[n_rig:, n_rig:] = J_FEM[-n_fl:, -n_fl:]
-
         tau_CP = np.array([[1, 0, 0], [0, 1, L], [0, 0, 1]])
-        b_F = v_p * ds(2)
-        b_M = v_p.dx(0) * ds(2)
+        b_Fy = v_p * ds(2)
+        b_Mz = v_p.dx(0) * ds(2)
 
-        B_Ffl = assemble(b_F).vector().get_local()
-        B_Mfl = assemble(b_M).vector().get_local()
+        B_Fy = assemble(b_Fy).vector().get_local().reshape((-1, 1))[dofs2keep]
+        B_Mz = assemble(b_Mz).vector().get_local().reshape((-1, 1))[dofs2keep]
 
         B = np.zeros((n_tot, 6))
-        B[1:, 4] = B_Ffl
-        B[1:, 5] = B_Mfl
         B[:n_rig, :n_rig] = np.eye(n_rig)
         B[:n_rig, n_rig:] = tau_CP.T
-
-        n_p = n_Vp - 2
-        n_q = n_Vq
+        B[n_rig:, 4:] = np.hstack((B_Fy, B_Mz))
 
         SysPhdaeRig.__init__(self, n_tot, 0, n_rig, n_p, n_q, E=M, J=J, B=B)
 
@@ -149,7 +157,7 @@ class FloatFlexBeam(SysPhdaeRig):
         dofs2keep = list(set(range(n_V)).difference(set(dofs2dump)))
 
         n_rig = 3  # Planar motion
-        n_fl = n_V - n_rig
+        n_fl = n_V - len(dofs2dump)
         n_p = n_p - n_rig
         n_tot = n_rig + n_fl
 
@@ -311,6 +319,126 @@ class FloatTruss(SysPhdaeRig):
         B[n_rig:, 3] = B_Fx
 
         SysPhdaeRig.__init__(self, n_tot, 0, n_rig, n_p, n_q, E=M, J=J, B=B)
+
+
+class FreeEB(SysPhdaeRig):
+
+    def __init__(self, n_el, L, rho, A, E, I):
+        mesh = IntervalMesh(n_el, L)
+        x = SpatialCoordinate(mesh)
+
+        # Finite element defition
+        deg = 3
+        Vp = FunctionSpace(mesh, "Hermite", deg)
+        Vq = FunctionSpace(mesh, "Hermite", deg)
+
+        V = Vp * Vq
+        n_Vp = Vp.dim()
+        n_Vq = Vq.dim()
+        n_V = V.dim()
+
+        v = TestFunction(V)
+        v_p, v_q = split(v)
+
+        e = TrialFunction(V)
+        e_p, e_q = split(e)
+
+        al_p = rho * A * e_p
+        al_q = 1. / (E * I) * e_q
+
+        dx = Measure('dx')
+        ds = Measure('ds')
+
+        m_form = v_p * al_p * dx + v_q * al_q * dx
+
+        petsc_m = assemble(m_form, mat_type='aij').M.handle
+        M = np.array(petsc_m.convert("dense").getDenseArray())
+
+        assert check_positive_matrix(M)
+
+        j_gradgrad = v_q * e_p.dx(0).dx(0) * dx
+        j_gradgradIP = -v_p.dx(0).dx(0) * e_q * dx
+
+        j_form = j_gradgrad + j_gradgradIP
+
+        petcs_j = assemble(j_form, mat_type='aij').M.handle
+        J = np.array(petcs_j.convert("dense").getDenseArray())
+
+        assert check_skew_symmetry(J)
+
+        b0_Fy = v_p * ds(1)
+        b0_Mz = v_p.dx(0) * ds(1)
+        bL_Fy = v_p * ds(2)
+        bL_Mz = v_p.dx(0) * ds(2)
+
+        B0_Fy = assemble(b0_Fy).vector().get_local().reshape((-1, 1))
+        B0_Mz = assemble(b0_Mz).vector().get_local().reshape((-1, 1))
+        BL_Fy = assemble(bL_Fy).vector().get_local().reshape((-1, 1))
+        BL_Mz = assemble(bL_Mz).vector().get_local().reshape((-1, 1))
+
+        B = np.hstack((B0_Fy, B0_Mz, BL_Fy, BL_Mz))
+
+        SysPhdaeRig.__init__(self, n_V, 0, 0, n_Vp, n_Vq, E=M, J=J, B=B)
+
+
+class ClampedEB(SysPhdaeRig):
+
+    def __init__(self, n_el, L, rho, A, E, I):
+        mesh = IntervalMesh(n_el, L)
+        x = SpatialCoordinate(mesh)
+
+        # Finite element defition
+        deg = 3
+        Vp = FunctionSpace(mesh, "Hermite", deg)
+        Vq = FunctionSpace(mesh, "Hermite", deg)
+
+        V = Vp * Vq
+        n_Vp = Vp.dim()
+        n_Vq = Vq.dim()
+        n_V = V.dim()
+
+        v = TestFunction(V)
+        v_p, v_q = split(v)
+
+        e = TrialFunction(V)
+        e_p, e_q = split(e)
+
+        al_p = rho * A * e_p
+        al_q = 1. / (E * I) * e_q
+
+        dx = Measure('dx')
+        ds = Measure('ds')
+
+        m_form = v_p * al_p * dx + v_q * al_q * dx
+
+        petsc_m = assemble(m_form, mat_type='aij').M.handle
+        M = np.array(petsc_m.convert("dense").getDenseArray())
+
+        assert check_positive_matrix(M)
+
+        j_divDiv = -v_p * e_q.dx(0).dx(0) * dx
+        j_divDivIP = v_q.dx(0).dx(0) * e_p * dx
+
+        j_form = j_divDiv + j_divDivIP
+
+        petcs_j = assemble(j_form, mat_type='aij').M.handle
+        J = np.array(petcs_j.convert("dense").getDenseArray())
+
+        assert check_skew_symmetry(J)
+
+        b0_wy = v_q.dx(0) * ds(1)
+        b0_phiz = - v_q * ds(1)
+        bL_wy = - v_q.dx(0) * ds(2)
+        bL_phiz = v_q * ds(2)
+
+        B0_wy = assemble(b0_wy).vector().get_local().reshape((-1, 1))
+        B0_phiz = assemble(b0_phiz).vector().get_local().reshape((-1, 1))
+        BL_wy = assemble(bL_wy).vector().get_local().reshape((-1, 1))
+        BL_phiz = assemble(bL_phiz).vector().get_local().reshape((-1, 1))
+
+        B = np.hstack((B0_wy, B0_phiz, BL_wy, BL_phiz))
+
+        SysPhdaeRig.__init__(self, n_V, 0, 0, n_Vp, n_Vq, E=M, J=J, B=B)
 
 
 def draw_deformation(n_draw, v_rig, v_fl, L):

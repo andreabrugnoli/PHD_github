@@ -4,23 +4,26 @@ from system_components.tests.kirchhoff_constants import *
 import numpy as np
 import scipy.linalg as la
 from scipy.io import savemat
-from modules_phdae.classes_phsystem import SysPhdaeRig
+from modules_phdae.classes_phsystem import SysPhdaeRig, check_positive_matrix
+
 
 pointP = np.array([0, Ly/2])
-pointC1 = np.array([0, 5*Ly/6]).reshape((-1, 2))
+pointC1 = np.array([Lx, Ly/2]).reshape((-1, 2))
 
 plate = FloatingKP(Lx, Ly, h, rho, E, nu, nx, ny, pointP, pointC1, modes=True)
-# plate = FloatingBellKP(Lx, Ly, h, rho, E, nu, nx, ny, pointP, pointC1, modes=True)
+# plate = FloatingBellKP(Lx, Ly, h, rho, E, nu, nx, ny, pointP, pointC1, modes=False)
 
 J = plate.J
 M = plate.E
+assert check_positive_matrix(M)
 B = plate.B
 n_e = plate.n
-n_lmb = 3
+n_lmb = 6
 n_rig = plate.n_r
-G = np.zeros((n_e, n_lmb))
-G[:n_rig, :n_rig] = np.eye(n_lmb)
+G = B #np.zeros((n_e, n_lmb))
+#G[:n_rig, :n_rig] = np.eye(n_lmb)
 
+print(G)
 Z_lmb = np.zeros((n_lmb, n_lmb))
 Z_al_lmb = np.zeros((n_e, n_lmb))
 Z_u_lmb = np.zeros((n_lmb, n_e))
@@ -28,24 +31,29 @@ Z_u_lmb = np.zeros((n_lmb, n_e))
 J_aug = np.vstack([np.hstack([J, G]),
                     np.hstack([-G.T, Z_lmb])])
 
-E_aug = np.vstack([np.hstack([M, Z_al_lmb]),
-                    np.hstack([Z_u_lmb, Z_lmb])])
-B_C = B[:, n_rig:]
+E_aug = la.block_diag(M, Z_lmb)
 
-B_aug = np.concatenate((B_C, Z_lmb))
+# B_C = B[:, n_rig:]
+#
+# B_aug = np.concatenate((B_C, Z_lmb))
 
 n_aug = n_e + n_lmb
 
 eigenvalues, eigvectors = la.eig(J_aug, E_aug)
 omega_all = np.imag(eigenvalues)
-index = omega_all > 0
+
+index = omega_all > 1e-9
+
 omega = omega_all[index]
 eigvec_omega = eigvectors[:, index]
 perm = np.argsort(omega)
 eigvec_omega = eigvec_omega[:, perm]
+
 omega.sort()
 
-print(omega[:10])
+# NonDimensional China Paper
+
+
 
 # plate_dae = SysPhdaeRig(n_aug, n_lmb, n_rig, plate.n_p, plate.n_q, E=E_aug, J=J_aug, B=B_aug)
 #

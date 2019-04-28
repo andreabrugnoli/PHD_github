@@ -1,7 +1,7 @@
 from firedrake import *
 import numpy as np
 import scipy.linalg as la
-from modules_phdae.classes_phsystem import SysPhdaeRig
+from modules_phdae.classes_phsystem import SysPhdaeRig, check_positive_matrix
 import warnings
 np.set_printoptions(threshold=np.inf)
 
@@ -167,12 +167,11 @@ class FloatingKP(SysPhdaeRig):
             Gf_P[:, 1] = G_Mx[:, i_P]
             Gf_P[:, 2] = G_My[:, i_P]
 
-        n_lmb = n_rig
-        Z_lmb = np.zeros((n_lmb, n_lmb))
+        Z_lmb = np.zeros((n_u, n_u))
         Ef_aug = la.block_diag(M_f, Z_lmb)
         Jf_aug = la.block_diag(J_f, Z_lmb)
-        Jf_aug[:n_fl, n_fl:] = +Gf_P
-        Jf_aug[n_fl:, :n_fl] = -Gf_P.T
+        Jf_aug[:n_fl, n_fl:] = np.concatenate((Gf_P, B[n_rig:, n_rig:]), axis=1)
+        Jf_aug[n_fl:, :n_fl] = -np.concatenate((Gf_P, B[n_rig:, n_rig:]), axis=1).T #-Gf_P.T
 
         if modes:
             n_modes = input('Number modes to be visualized:')
@@ -196,7 +195,9 @@ class FloatingKP(SysPhdaeRig):
 
         if not np.linalg.matrix_rank(M) == len(M):
             warnings.warn("Singular mass matrix")
+        assert check_positive_matrix(M)
 
+        n_lmb = 3 # n_rig
         n_tot = n_e - n_lmb
         n_p = n_p - n_lmb
 
@@ -319,11 +320,9 @@ class FloatingBellKP(SysPhdaeRig):
         M_fr[:, 1] = assemble(+v_p * rho * h * (y - y_P) * dx).vector().get_local()[dofs2keep]
         M_fr[:, 2] = assemble(-v_p * rho * h * (x - x_P) * dx).vector().get_local()[dofs2keep]
 
-        M = np.zeros((n_tot, n_tot))
-        M[:n_rig, :n_rig] = M_r
+        M = la.block_diag(M_r, M_f)
         M[n_rig:, :n_rig] = M_fr
         M[:n_rig, n_rig:] = M_fr.T
-        M[n_rig:, n_rig:] = M_f
         if not np.linalg.matrix_rank(M) == n_tot:
             warnings.warn("Singular mass matrix")
 

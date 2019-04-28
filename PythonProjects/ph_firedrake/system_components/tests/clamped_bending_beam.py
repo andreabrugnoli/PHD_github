@@ -6,7 +6,7 @@ from system_components.beams import FloatingPlanarEB
 from scipy.io import savemat
 from system_components.tests.manipulator_constants import n_el, rho1, EI1, L1, n_rig, J_joint1, m_joint1
 
-beam = FloatingPlanarEB(n_el, rho1, EI1, L1, m_joint=m_joint1, J_joint=J_joint1)
+beam = FloatingPlanarEB(n_el, L1, rho1, 1, EI1, 1,  m_joint=m_joint1, J_joint=J_joint1)
 
 J = beam.J_e
 M = beam.M_e
@@ -37,7 +37,7 @@ n_aug = n_e + n_lmb
 beam_dae = SysPhdaeRig(n_aug, n_lmb, n_rig, beam.n_p, beam.n_q, E=E_aug, J=J_aug, B=B_aug)
 beam_ode, T = beam_dae.dae_to_ode()
 
-pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/PH_TITOP/SimpleBeam/Matrices_ClampedEB/'
+pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/PH_TITOP/EulerBernoulliBeam/Matrices_ClampedEB/'
 Edae_file = 'E_dae'; Jdae_file = 'J_dae'; Bdae_file = 'B_dae'
 savemat(pathout + Edae_file, mdict={Edae_file: beam_dae.E})
 savemat(pathout + Jdae_file, mdict={Jdae_file: beam_dae.J})

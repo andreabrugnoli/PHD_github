@@ -5,22 +5,8 @@ import numpy as np
 np.set_printoptions(threshold=np.inf)
 from math import floor, sqrt, pi
 import matplotlib.pyplot as plt
-
 import scipy.linalg as la
 
-#
-# E = 2e11
-# rho = 7900  # kg/m^3
-# nu = 0.3
-#
-# b = 0.05
-# h = 0.01
-# A = b * h
-#
-# I = 1./12 * b * h**3
-#
-# EI = E * I
-# L = 0.1
 
 
 E = 2e11
@@ -37,7 +23,7 @@ EI = E * I
 L = 1
 coeff_norm = L*(rho*A/EI)**(0.25)
 
-n = 10
+n = 2
 deg = 3
 
 mesh = IntervalMesh(n, L)
@@ -132,7 +118,7 @@ Vp_4proj = FunctionSpace(mesh, "CG", 2)
 eig_funH1 = Function(Vp_4proj)
 
 n_fig = 3
-plot_eigenvector = True
+plot_eigenvector = False
 if plot_eigenvector:
 
     for i in range(n_fig):
