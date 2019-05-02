@@ -7,7 +7,6 @@ np.set_printoptions(threshold=np.inf)
 
 import scipy.linalg as la
 import matplotlib.pyplot as plt
-from slepc4py import SLEPc
 from petsc4py import PETSc
 
 #parameters["matnest"] = False

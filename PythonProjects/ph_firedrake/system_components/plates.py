@@ -4,6 +4,12 @@ import scipy.linalg as la
 from modules_phdae.classes_phsystem import SysPhdaeRig, check_positive_matrix
 import warnings
 np.set_printoptions(threshold=np.inf)
+from matplotlib import pyplot as plt
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+from matplotlib import cm
+from firedrake.plot import _two_dimension_triangle_func_val
+from mpl_toolkits.mplot3d import Axes3D
+plt.rc('text', usetex=True)
 
 
 class FloatingKP(SysPhdaeRig):
@@ -32,8 +38,8 @@ class FloatingKP(SysPhdaeRig):
 
         name_FEp = "Bell"
         deg_p = 5
-        name_FEq = "Bell"
-        deg_q = 5
+        name_FEq = "Hermite"
+        deg_q = 3
 
         Vp = FunctionSpace(mesh, name_FEp, deg_p)
         Vq = VectorFunctionSpace(mesh, name_FEq, deg_q, dim=3)
@@ -167,9 +173,9 @@ class FloatingKP(SysPhdaeRig):
             Gf_P[:, 1] = G_Mx[:, i_P]
             Gf_P[:, 2] = G_My[:, i_P]
 
-        Z_lmb = np.zeros((n_u, n_u))
-        Ef_aug = la.block_diag(M_f, Z_lmb)
-        Jf_aug = la.block_diag(J_f, Z_lmb)
+        Z_u = np.zeros((n_u, n_u))
+        Ef_aug = la.block_diag(M_f, Z_u)
+        Jf_aug = la.block_diag(J_f, Z_u)
         Jf_aug[:n_fl, n_fl:] = np.concatenate((Gf_P, B[n_rig:, n_rig:]), axis=1)
         Jf_aug[n_fl:, :n_fl] = -np.concatenate((Gf_P, B[n_rig:, n_rig:]), axis=1).T #-Gf_P.T
 
@@ -185,21 +191,22 @@ class FloatingKP(SysPhdaeRig):
 
         B_r = B[:n_rig]
         B_f = T @ B[n_rig:]
+        B = np.concatenate((B_r, B_f))
 
         M = la.block_diag(M_r, M_f)
         M[n_rig:, :n_rig] = M_fr
         M[:n_rig, n_rig:] = M_fr.T
 
-        J = la.block_diag(Z_lmb, J_f)
-        B = np.concatenate((B_r, B_f))
+        Z_rig = np.zeros((n_rig, n_rig))
+        J = la.block_diag(Z_rig, J_f)
 
-        if not np.linalg.matrix_rank(M) == len(M):
-            warnings.warn("Singular mass matrix")
-        assert check_positive_matrix(M)
-
-        n_lmb = 3 # n_rig
+        n_lmb = 3  # n_rig
         n_tot = n_e - n_lmb
         n_p = n_p - n_lmb
+
+        if np.linalg.det(M) == 0:
+            warnings.warn("Singular mass matrix")
+        assert check_positive_matrix(M)
 
         SysPhdaeRig.__init__(self, n_tot, 0, n_rig, n_p, n_q, E=M, J=J, B=B)
 
@@ -234,8 +241,8 @@ class FloatingBellKP(SysPhdaeRig):
 
         name_FEp = "Bell"
         deg_p = 5
-        name_FEq = "Bell"
-        deg_q = 5
+        name_FEq = "Hermite"
+        deg_q = 3
         ndof_Vp = 6
 
         Vp = FunctionSpace(mesh, name_FEp, deg_p)
@@ -385,6 +392,229 @@ class FloatingBellKP(SysPhdaeRig):
 
             print_modes(M_FEM, J_FEM, mesh, Vp, n_modes)
 
+
+class FloatingMP(SysPhdaeRig):
+
+    def __init__(self, Lx, Ly, h, rho, E, nu, nx, ny, coord_P, coord_C=np.empty((0, 2)), modes=False):
+
+        # Mindlin plate written with the port Hamiltonian approach
+
+        G = E/(2 * (1 + nu))
+        k_sh = 5/6
+        F = G * h * k_sh
+        fl_rot = 12. / (E * h ** 3)
+
+        C_b = as_tensor([
+            [fl_rot, -nu * fl_rot, 0],
+            [-nu * fl_rot, fl_rot, 0],
+            [0, 0, fl_rot * 2 * (1 + nu)]
+        ])
+
+        # Operators for vectorial formulation
+
+        def bending_curv_vec(MM):
+            return dot(C_b, MM)
+
+        def gradSym_vec(u):
+            return as_vector([u[0].dx(0), u[1].dx(1), u[0].dx(1) + u[1].dx(0)])
+
+        # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
+        mesh = RectangleMesh(nx, ny, Lx, Ly, quadrilateral=False)
+        x, y = SpatialCoordinate(mesh)
+
+        # plot(mesh)
+        # plt.show()
+
+        # Finite element defition
+
+        deg = 2
+        Vp_w = FunctionSpace(mesh, "CG", deg)
+        Vp_th = VectorFunctionSpace(mesh, "CG", deg)
+        Vq_th = VectorFunctionSpace(mesh, "CG", deg, dim=3)
+        Vq_w = VectorFunctionSpace(mesh, "CG", deg)
+
+        V = Vp_w * Vp_th * Vq_th * Vq_w
+
+        v = TestFunction(V)
+        vp_w, vp_th, vq_th, vq_w = split(v)
+
+        e = TrialFunction(V)
+        ep_w, ep_th, eq_th, eq_w = split(e)
+
+        alp_w = rho * h * ep_w
+        alp_th = (rho * h ** 3) / 12. * ep_th
+        alq_th = bending_curv_vec(eq_th)
+        alq_w = 1. / F * eq_w
+
+        dx = Measure("dx")
+        ds = Measure("ds")
+
+        m_form = inner(vp_w, alp_w) * dx + inner(vp_th, alp_th) * dx +\
+                 inner(vq_th, alq_th) * dx + inner(vq_w, alq_w) * dx
+
+        # For vector notation
+
+        j_grad = dot(vq_w, grad(ep_w)) * dx
+        j_gradIP = -dot(grad(vp_w), eq_w) * dx
+
+        j_gradSym = inner(vq_th, gradSym_vec(ep_th)) * dx
+        j_gradSymIP = -inner(gradSym_vec(vp_th), eq_th) * dx
+
+        j_Id = dot(vp_th, eq_w) * dx
+        j_IdIP = -dot(vq_w, ep_th) * dx
+
+        j_form = j_grad + j_gradIP + j_gradSym + j_gradSymIP + j_Id + j_IdIP
+
+        # Assemble the stiffness matrix and the mass matrix.
+
+        petsc_j = assemble(j_form, mat_type="aij").M.handle
+        petsc_m = assemble(m_form, mat_type="aij").M.handle
+
+        J_f = np.array(petsc_j.convert("dense").getDenseArray())
+        M_f = np.array(petsc_m.convert("dense").getDenseArray())
+
+        tab_coord = mesh.coordinates.dat.data
+        i_P = find_point(tab_coord, coord_P)[0]
+
+        n_p = Vp_w.dim() + Vp_th.dim()
+        n_q = Vq_th.dim() + Vq_w.dim()
+
+        n_rig = 3  # Displacement about z, rotations about x and y
+        n_fl = n_p + n_q
+        n_e = n_rig + n_fl
+
+        x_P, y_P = tab_coord[i_P]
+
+        Jxx = assemble(rho * h * (y - y_P) ** 2 * dx)
+        Jyy = assemble(rho * h * (x - x_P) ** 2 * dx)
+
+        M_r = np.zeros((n_rig, n_rig))
+        m_plate = rho * h * Lx * Ly
+        M_r[0, 0] = m_plate
+        M_r[1, 1] = Jxx
+        M_r[2, 2] = Jyy
+        M_r[0, 1] = assemble(rho * h * (y - y_P) * dx)  # m_plate*(y_G - y_P)  #
+        M_r[1, 0] = M_r[0, 1]
+        M_r[0, 2] = assemble(- rho * h * (x - x_P) * dx)  # -m_plate * (x_G - x_P)  #
+        M_r[2, 0] = M_r[0, 2]
+        M_r[1, 2] = assemble(- rho * h * (x - x_P) * (y - y_P) * dx)
+        M_r[2, 1] = M_r[1, 2]
+
+        M_fr = np.zeros((n_fl, n_rig))
+        M_fr[:, 0] = assemble(vp_w * rho * h * dx).vector().get_local()
+        M_fr[:, 1] = assemble(vp_w * rho * h * (y - y_P) * dx).vector().get_local()
+        M_fr[:, 2] = assemble(- vp_w * rho * h * (x - x_P) * dx).vector().get_local()
+
+        # B matrices based on Lagrange
+        Vf = FunctionSpace(mesh, 'CG', 1)
+        Fz = TrialFunction(Vf)
+        Mx = TrialFunction(Vf)
+        My = TrialFunction(Vf)
+
+        v_phix, v_phiy = vp_th
+
+        b_Fz = vp_w * Fz * ds
+        b_Mx = v_phiy * Mx * ds
+        b_My = -v_phix * My * ds
+
+        petsc_bFz = assemble(b_Fz, mat_type='aij').M.handle
+        B_Fz = np.array(petsc_bFz.convert("dense").getDenseArray())
+        petsc_bMx = assemble(b_Mx, mat_type='aij').M.handle
+        B_Mx = np.array(petsc_bMx.convert("dense").getDenseArray())
+        petsc_bMy = assemble(b_My, mat_type='aij').M.handle
+        B_My = np.array(petsc_bMy.convert("dense").getDenseArray())
+
+        n_C = coord_C.shape[0]
+        n_u = n_rig * (n_C + 1)
+        B = np.zeros((n_e, n_u))
+
+        Br_P = np.eye(n_rig)
+        B[:n_rig, :n_rig] = Br_P
+
+        for i in range(n_C):
+            i_C = find_point(tab_coord, coord_C[i])[0]
+            x_C, y_C = tab_coord[i_C]
+
+            assert x_C == 0 or x_C == Lx or y_C == 0 or y_C == Ly
+
+            tau_CP = np.eye(3)
+            tau_CP[0, 1] = y_C - y_P
+            tau_CP[0, 2] = -(x_C - x_P)
+            Br_C = tau_CP.T
+
+            # Force contribution to flexibility
+
+            Bf_C = np.zeros((n_fl, n_rig))
+            Bf_C[:, 0] = B_Fz[:, i_C]
+            Bf_C[:, 1] = B_Mx[:, i_C]
+            Bf_C[:, 2] = B_My[:, i_C]
+
+            B[:, (i + 1) * n_rig:(i + 2) * n_rig] = np.concatenate((Br_C, Bf_C), axis=0)
+
+        Gf_P = np.zeros((n_fl, n_rig))
+
+        # Momentum contribution to flexibility
+        if x_P == 0 or x_P == Lx or x_P == 0 or y_P == Ly:
+            Gf_P[:, 0] = B_Fz[:, i_P]
+            Gf_P[:, 1] = B_Mx[:, i_P]
+            Gf_P[:, 2] = B_My[:, i_P]
+        else:
+
+            g_Fz = vp_w * Fz * dx
+            g_Mx = v_phiy * Mx * dx
+            g_My = -v_phix * My * dx
+            petsc_gFz = assemble(g_Fz, mat_type='aij').M.handle
+            G_Fz = np.array(petsc_gFz.convert("dense").getDenseArray())
+            petsc_gMx = assemble(g_Mx, mat_type='aij').M.handle
+            G_Mx = np.array(petsc_gMx.convert("dense").getDenseArray())
+            petsc_gMy = assemble(g_My, mat_type='aij').M.handle
+            G_My = np.array(petsc_gMy.convert("dense").getDenseArray())
+
+            Gf_P[:, 0] = G_Fz[:, i_P]
+            Gf_P[:, 1] = G_Mx[:, i_P]
+            Gf_P[:, 2] = G_My[:, i_P]
+
+        # To do modes Mindlin plate
+
+        # Z_u = np.zeros((n_u, n_u))
+        # Ef_aug = la.block_diag(M_f, Z_u)
+        # Jf_aug = la.block_diag(J_f, Z_u)
+        # Jf_aug[:n_fl, n_fl:] = np.concatenate((Gf_P, B[n_rig:, n_rig:]), axis=1)
+        # Jf_aug[n_fl:, :n_fl] = -np.concatenate((Gf_P, B[n_rig:, n_rig:]), axis=1).T
+
+        # if modes:
+        #     n_modes = input('Number modes to be visualized:')
+        #     print_modes(Ef_aug, Jf_aug, mesh, Vp_w, n_modes)
+
+        T = la.null_space(Gf_P.T).T
+
+        M_f = T @ M_f @ T.T
+        M_fr = T @ M_fr
+        J_f = T @ J_f @ T.T
+
+        B_r = B[:n_rig]
+        B_f = T @ B[n_rig:]
+        B = np.concatenate((B_r, B_f))
+
+        M = la.block_diag(M_r, M_f)
+        M[n_rig:, :n_rig] = M_fr
+        M[:n_rig, n_rig:] = M_fr.T
+
+        Z_rig = np.zeros((n_rig, n_rig))
+        J = la.block_diag(Z_rig, J_f)
+
+        n_lmb = 3  # n_rig
+        n_tot = n_e - n_lmb
+        n_p = n_p - n_lmb
+
+        if np.linalg.det(M) == 0:
+            warnings.warn("Singular mass matrix")
+        assert check_positive_matrix(M)
+
+        SysPhdaeRig.__init__(self, n_tot, 0, n_rig, n_p, n_q, E=M, J=J, B=B)
+
+
+
 def find_point(coords, point):
 
     n_cor = len(coords)
@@ -397,15 +627,6 @@ def find_point(coords, point):
             i_min = i
 
     return i_min, dist_min
-
-
-import matplotlib
-from matplotlib import pyplot as plt
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
-from matplotlib import cm
-from firedrake.plot import _two_dimension_triangle_func_val
-from mpl_toolkits.mplot3d import Axes3D
-matplotlib.rcParams['text.usetex'] = True
 
 
 def print_modes(M, J, grid, Vp, n_modes):

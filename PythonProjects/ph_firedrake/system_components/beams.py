@@ -226,7 +226,6 @@ class FloatFlexBeam(SysPhdaeRig):
         SysPhdaeRig.__init__(self, n_tot, 0, n_rig, n_p, n_q, E=M, J=J, B=B)
 
 
-
 class FloatTruss(SysPhdaeRig):
 
     def __init__(self, n_el, L, rho, A, E):
@@ -441,6 +440,118 @@ class ClampedEB(SysPhdaeRig):
         SysPhdaeRig.__init__(self, n_V, 0, 0, n_Vp, n_Vq, E=M, J=J, B=B)
 
 
+class FreeTruss(SysPhdaeRig):
+
+    def __init__(self, n_el, L, rho, A, E):
+        mesh = IntervalMesh(n_el, L)
+        x = SpatialCoordinate(mesh)
+
+        # Finite element defition
+        deg = 1
+        Vp = FunctionSpace(mesh, "Lagrange", deg)
+        Vq = FunctionSpace(mesh, "Lagrange", deg)
+
+        V = Vp * Vq
+        n_Vp = Vp.dim()
+        n_Vq = Vq.dim()
+        n_V = V.dim()
+
+        v = TestFunction(V)
+        v_p, v_q = split(v)
+
+        e = TrialFunction(V)
+        e_p, e_q = split(e)
+
+        al_p = rho * A * e_p
+        al_q = 1. / (E * A) * e_q
+
+        dx = Measure('dx')
+        ds = Measure('ds')
+
+        m_form = v_p * al_p * dx + v_q * al_q * dx
+
+        petsc_m = assemble(m_form, mat_type='aij').M.handle
+        M = np.array(petsc_m.convert("dense").getDenseArray())
+
+        assert check_positive_matrix(M)
+
+        j_grad = v_q * e_p.dx(0) * dx
+        j_gradIP = -v_p.dx(0) * e_q * dx
+
+        j_form = j_grad + j_gradIP
+
+        petcs_j = assemble(j_form, mat_type='aij').M.handle
+        J = np.array(petcs_j.convert("dense").getDenseArray())
+
+        assert check_skew_symmetry(J)
+
+        b0_N = v_p * ds(1)
+        bL_N = v_p * ds(2)
+
+        B0_Fy = assemble(b0_N).vector().get_local().reshape((-1, 1))
+        BL_Fy = assemble(bL_N).vector().get_local().reshape((-1, 1))
+
+        B = np.hstack((B0_Fy, BL_Fy))
+
+        SysPhdaeRig.__init__(self, n_V, 0, 0, n_Vp, n_Vq, E=M, J=J, B=B)
+
+
+class ClampedTruss(SysPhdaeRig):
+
+    def __init__(self, n_el, L, rho, A, E):
+        mesh = IntervalMesh(n_el, L)
+        x = SpatialCoordinate(mesh)
+
+        # Finite element defition
+        deg = 1
+        Vp = FunctionSpace(mesh, "Lagrange", deg)
+        Vq = FunctionSpace(mesh, "Lagrange", deg)
+
+        V = Vp * Vq
+        n_Vp = Vp.dim()
+        n_Vq = Vq.dim()
+        n_V = V.dim()
+
+        v = TestFunction(V)
+        v_p, v_q = split(v)
+
+        e = TrialFunction(V)
+        e_p, e_q = split(e)
+
+        al_p = rho * A * e_p
+        al_q = 1. / (E * A) * e_q
+
+        dx = Measure('dx')
+        ds = Measure('ds')
+
+        m_form = v_p * al_p * dx + v_q * al_q * dx
+
+        petsc_m = assemble(m_form, mat_type='aij').M.handle
+        M = np.array(petsc_m.convert("dense").getDenseArray())
+
+        assert check_positive_matrix(M)
+
+        j_div = v_p * e_q.dx(0) * dx
+        j_divIP = -v_q.dx(0) * e_p * dx
+
+        j_form = j_div + j_divIP
+
+        petcs_j = assemble(j_form, mat_type='aij').M.handle
+        J = np.array(petcs_j.convert("dense").getDenseArray())
+
+        assert check_skew_symmetry(J)
+
+        b0_D = -v_q * ds(1)
+        bL_D = v_q * ds(2)
+
+        B0_D = assemble(b0_D).vector().get_local().reshape((-1, 1))
+        BL_D = assemble(bL_D).vector().get_local().reshape((-1, 1))
+
+        B = np.hstack((B0_D, BL_D))
+
+        SysPhdaeRig.__init__(self, n_V, 0, 0, n_Vp, n_Vq, E=M, J=J, B=B)
+
+
 def draw_deformation(n_draw, v_rig, v_fl, L):
     # Suppose no displacement in zero
     assert len(v_rig)  == 3
@@ -477,7 +588,7 @@ def draw_deformation(n_draw, v_rig, v_fl, L):
                 phi1_w = 1 - 3 * x_til**2 + 2 * x_til**3
                 phi2_w = x_til - 2 * x_til**2 + x_til**3
                 phi3_w = + 3 * x_til ** 2 -2 * x_til ** 3
-                phi4_w = + x_til**3 -x_til**2
+                phi4_w = + x_til**3 - x_til**2
 
                 if i == 0:
                     u_fl[ind] = phi2_u*ufl_dofs[i]
@@ -507,32 +618,82 @@ def draw_bending(n_draw, v_rig, v_fl, L):
     w_P = v_rig[1]
     th_P = v_rig[2]
 
-    ndr_el = int(n_draw / n_el)
-    n_draw = ndr_el * n_el
-    x_coord = np.linspace(0, L, num=n_draw + 1)
+    x_coord = np.linspace(0, L, num=n_draw)
 
     u_r = u_P * np.ones_like(x_coord)
     w_r = w_P * np.ones_like(x_coord) + x_coord * th_P
 
-    u_fl = np.zeros_like(x_coord)
     w_fl = np.zeros_like(x_coord)
 
-    for i in range(n_el):
-        for j in range(ndr_el):
-            ind = i * ndr_el + j + 1
-            i_el = i * ndr_el
-            x_til = (x_coord[ind] - x_coord[i_el]) / dx_el
+    i_el = 0
+    xin_elem = i_el * dx_el
 
-            phi1_w = 1 - 3 * x_til ** 2 + 2 * x_til ** 3
-            phi2_w = x_til - 2 * x_til ** 2 + x_til ** 3
-            phi3_w = + 3 * x_til ** 2 - 2 * x_til ** 3
-            phi4_w = + x_til ** 3 - x_til ** 2
+    for i in range(n_draw):
 
-            if i == 0:
-                w_fl[ind] = phi3_w * wfl_dofs[2 * i] + phi4_w * wfl_dofs[2 * i + 1]
-            else:
-                w_fl[ind] = phi1_w * wfl_dofs[2 * (i - 1)] + phi2_w * wfl_dofs[2 * i - 1] + \
-                            phi3_w * wfl_dofs[2 * i] + phi4_w * wfl_dofs[2 * i + 1]
+        x_til = (x_coord[i] - xin_elem) / dx_el
+
+        if x_til > 1:
+            i_el = i_el+1
+            xin_elem = i_el * dx_el
+            x_til = (x_coord[i] - xin_elem) / dx_el
+
+        phi1_w = 1 - 3 * x_til ** 2 + 2 * x_til ** 3
+        phi2_w = x_til - 2 * x_til ** 2 + x_til ** 3
+        phi3_w = + 3 * x_til ** 2 - 2 * x_til ** 3
+        phi4_w = + x_til ** 3 - x_til ** 2
+
+        if i_el == 0:
+            w_fl[i] = phi3_w * wfl_dofs[2 * i_el] + phi4_w * wfl_dofs[2 * i_el + 1]
+        else:
+            w_fl[i] = phi1_w * wfl_dofs[2 * (i_el - 1)] + phi2_w * wfl_dofs[2 * i_el - 1] + \
+                        phi3_w * wfl_dofs[2 * i_el] + phi4_w * wfl_dofs[2 * i_el + 1]
+
+    u_tot = u_r
+    w_tot = w_r + w_fl
+
+    return x_coord, u_tot, w_tot
+
+
+def draw_allbending(n_draw, v_rig, v_fl, L):
+    # Suppose displacement in every point
+    assert len(v_rig) == 3
+    assert len(v_fl) % 2 == 0
+    n_el = int(len(v_fl) / 2) - 1
+
+    wfl_dofs = v_fl
+
+    dx_el = L / n_el
+
+    u_P = v_rig[0]
+    w_P = v_rig[1]
+    th_P = v_rig[2]
+
+    x_coord = np.linspace(0, L, num=n_draw)
+
+    u_r = u_P * np.ones_like(x_coord)
+    w_r = w_P * np.ones_like(x_coord) + x_coord * th_P
+
+    w_fl = np.zeros_like(x_coord)
+
+    i_el = 0
+    xin_elem = i_el * dx_el
+
+    for i in range(n_draw):
+
+        x_til = (x_coord[i] - xin_elem) / dx_el
+
+        if x_til > 1:
+            i_el = i_el + 1
+            xin_elem = i_el * dx_el
+            x_til = (x_coord[i] - xin_elem) / dx_el
+
+        phi1_w = 1 - 3 * x_til ** 2 + 2 * x_til ** 3
+        phi2_w = x_til - 2 * x_til ** 2 + x_til ** 3
+        phi3_w = + 3 * x_til ** 2 - 2 * x_til ** 3
+        phi4_w = + x_til ** 3 - x_til ** 2
+
+        w_fl[i] = phi1_w * wfl_dofs[2 * i_el] + phi2_w * wfl_dofs[2 * i_el + 1] + \
+                    phi3_w * wfl_dofs[2 * i_el + 2] + phi4_w * wfl_dofs[2 * i_el + 3]
 
     u_tot = u_r
     w_tot = w_r + w_fl

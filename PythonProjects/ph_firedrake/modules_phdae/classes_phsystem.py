@@ -343,6 +343,53 @@ class SysPhdaeRig(SysPhdae):
 
         return sys_ordered
 
+    def gyrator_ordered(self, sys2, ind1, ind2, C):
+
+        assert isinstance(sys2, SysPhdaeRig)
+        sys_mixed = self.gyrator(sys2, ind1, ind2, C)
+        n_r1 = self.n_r
+        n_r2 = sys2.n_r
+
+        n_p1 = self.n_p
+        n_p2 = sys2.n_p
+        n_q1 = self.n_q
+        n_q2 = sys2.n_q
+
+        n1_end = self.n
+        n2 = sys2.n
+        np1_end = n_r1 + n_p1
+        nq1_end = np1_end + n_q1
+
+        nr2_end = n1_end + n_r2
+        np2_end = nr2_end + n_p2
+        nq2_end = np2_end + n_q2
+        n2_end = n1_end + n2
+
+        n_int = sys_mixed.n
+        assert n_int == n1_end + n2
+        nlmb_int = sys_mixed.n_lmb
+
+        nr_int = n_r1 + n_r2
+        np_int = n_p1 + n_p2
+        nq_int = n_q1 + n_q2
+
+        nr_index = list(range(n_r1)) + list(range(n1_end, nr2_end))
+        np_index = list(range(n_r1, np1_end)) + list(range(nr2_end, np2_end))
+        nq_index = list(range(np1_end, nq1_end)) + list(range(np2_end, nq2_end))
+        nlmb_index = list(range(nq1_end, n1_end)) + list(range(nq2_end, n2_end))
+
+        perm_index = nr_index + np_index + nq_index + nlmb_index
+
+        E_perm = permute_rows_columns(sys_mixed.E, perm_index)
+        J_perm = permute_rows_columns(sys_mixed.J, perm_index)
+        R_perm = permute_rows_columns(sys_mixed.R, perm_index)
+        B_perm = permute_rows(sys_mixed.B, perm_index)
+
+        sys_ordered = SysPhdaeRig(n_int, nlmb_int, nr_int, np_int, nq_int,
+                                      E=E_perm, J=J_perm, R=R_perm, B=B_perm)
+
+        return sys_ordered
+
     def dae_to_ode(self):
         G = self.G_e
         GannL = la.null_space(G.T).T
@@ -376,42 +423,45 @@ class SysPhdaeRig(SysPhdae):
         E_red = self.E[n_rig:, n_rig:]
         A_red = self.J[n_rig:, n_rig:] - self.R[n_rig:, n_rig:]
         B_red = self.B[n_rig:, n_rig:]
-        print(B_red.shape)
+
         Vp, Vq = proj_matrices(E_red, A_red, B_red, s0, n_red, self.n_p, self.n_f)
 
         V_f = la.block_diag(Vp, Vq)
 
-        self.n_p = len(Vp.T)
-        self.n_q = len(Vq.T)
+        n_p = len(Vp.T)
+        n_q = len(Vq.T)
+        n_lmb = self.n_lmb
 
         Z_rig = np.zeros((n_rig, n_rig))
-        Z_lmb = np.zeros((self.n_lmb, self.n_lmb))
+        Z_lmb = np.zeros((n_lmb, n_lmb))
 
-        self.n_f = self.n_p + self.n_q
-        self.M_f = V_f.T @ self.M_f @ V_f
-        self.M_fr = V_f.T @ self.M_fr
-        self.J_f = V_f.T @ self.J_f @ V_f
-        self.R_f = V_f.T @ self.R_f @ V_f
-        self.B_f = V_f.T @ self.B_f
-        self.G_f = V_f.T @ self.G_f
+        M_f = V_f.T @ self.M_f @ V_f
+        M_fr = V_f.T @ self.M_fr
+        J_f = V_f.T @ self.J_f @ V_f
+        R_f = V_f.T @ self.R_f @ V_f
+        B_f = V_f.T @ self.B_f
+        G_f = V_f.T @ self.G_f
 
-        self.n_e = n_rig + self.n_p + self.n_q
-        self.G_e = np.concatenate((self.G_r, self.G_f))
-        self.B_e = np.concatenate((self.B_r, self.B_f))
-        self.M_e = la.block_diag(self.M_r, self.M_f)
-        self.M_e[n_rig:, :n_rig] = self.M_fr
-        self.M_e[:n_rig, n_rig:] = self.M_fr.T
-        self.J_e = la.block_diag(Z_rig, self.J_f)
-        self.R_e = la.block_diag(Z_rig, self.R_f)
+        n_e = n_rig + n_p + n_q
+        G_e = np.concatenate((self.G_r, G_f))
+        B_e = np.concatenate((self.B_r, B_f))
+        M_e = la.block_diag(self.M_r, M_f)
+        M_e[n_rig:, :n_rig] = M_fr
+        M_e[:n_rig, n_rig:] = M_fr.T
+        J_e = la.block_diag(Z_rig, J_f)
+        R_e = la.block_diag(Z_rig, R_f)
 
-        self.n = self.n_e + self.n_lmb
-        self.E = la.block_diag(self.M_e, Z_lmb)
-        self.J = la.block_diag(self.J_e, Z_lmb)
-        self.J[:self.n_e, self.n_e:] = self.G_e
-        self.J[self.n_e:, :self.n_e] = -self.G_e.T
-        self.R = la.block_diag(self.R_e, Z_lmb)
-        self.Q = np.eye(self.n)
-        self.B = np.concatenate((self.B_e, self.B_lmb))
+        n = n_e + n_lmb
+        E = la.block_diag(M_e, Z_lmb)
+        J = la.block_diag(J_e, Z_lmb)
+        J[:n_e, n_e:] = G_e
+        J[n_e:, :n_e] = -G_e.T
+        R = la.block_diag(R_e, Z_lmb)
+        B = np.concatenate((B_e, self.B_lmb))
+
+        sys_red = SysPhdaeRig(n, n_lmb, n_rig, n_p, n_q, E=E, J=J, B=B, R=R)
+        return sys_red
+
 
 def permute_rows_columns(mat, ind_perm):
     assert len(ind_perm) == len(mat) and len(ind_perm) == len(mat.T)
@@ -438,8 +488,10 @@ tol = 1e-10
 
 
 def check_symmetry(mat):
+    # print(np.linalg.norm(mat - mat.T), tol)
     return np.linalg.norm(mat - mat.T) < tol
 
 
 def check_skew_symmetry(mat):
+    # print(np.linalg.norm(mat + mat.T), tol)
     return np.linalg.norm(mat + mat.T) < tol

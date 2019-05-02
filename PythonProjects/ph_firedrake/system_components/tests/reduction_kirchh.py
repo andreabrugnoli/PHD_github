@@ -1,5 +1,5 @@
 from firedrake import *
-from system_components.beams import find_point, FloatingKP
+from system_components.plates import FloatingKP
 from system_components.tests.kirchhoff_constants import rho, E, Lx, Ly, h, nu, nx, ny
 import numpy as np
 from scipy.io import savemat
@@ -25,7 +25,7 @@ savemat(pathout + Mode_file, mdict={Mode_file: plate.M_e})
 savemat(pathout + Jode_file, mdict={Jode_file: plate.J_e})
 savemat(pathout + Bode_file, mdict={Bode_file: plate.B_e})
 
-plate.reduce_system(0.001, 10)
+plate = plate.reduce_system(0.001, 10)
 Mode_file = 'Mr'; Jode_file = 'Jr'; Bode_file = 'Br'
 savemat(pathout + Mode_file, mdict={Mode_file: plate.M_e})
 savemat(pathout + Jode_file, mdict={Jode_file: plate.J_e})

@@ -1,24 +1,45 @@
 import numpy as np
 import scipy.linalg as la
-from system_components.beams import FreeEB, ClampedEB
-from modules_phdae.classes_phsystem import SysPhdae
+from math import pi
+from system_components.beams import FreeEB, ClampedEB, FreeTruss, ClampedTruss, draw_allbending, draw_bending
+from modules_phdae.classes_phsystem import SysPhdaeRig
 import matplotlib.pyplot as plt
-from scipy.io import savemat
+plt.rc('text', usetex=True)
+
 from system_components.tests.manipulator_constants import *
 
-n_el = 1
+fntsize = 15
+n_el = 16
+L = 1
+frac = 2
+per = 1/frac
+L1 = per * L
+L2 = (1-per) * L
 
-# Cantilever truss frequency: (2*k-1)/2*pi for k=1,2,...
-per = 0.5
-beamC = ClampedEB(n_el, per*L1, rho1, 1, EI1, 1)
-beamF = FreeEB(n_el, (1-per)*L1, rho1, 1, EI1, 1)
+n_el1 = int(n_el/frac)
+n_el2 = n_el - n_el1
 
-beamCantilever = SysPhdae.gyrator(beamC, beamF, [2, 3], [0, 1], np.eye(2))
+beamCC = ClampedEB(n_el1, L1, 1, 1, 1, 1)
+beamFF = FreeEB(n_el2, L2, 1, 1, 1, 1)
 
-plt.spy(beamCantilever.E)
+npC = beamCC.n_p
+npF = beamFF.n_p
 
-eigenvalues, eigvectors = la.eig(beamCantilever.J, beamCantilever.E)
-# eigenvalues, eigvectors = la.eig(beamC.J, beamC.E)
+beamCF = SysPhdaeRig.gyrator_ordered(beamCC, beamFF, [2, 3], [0, 1], np.eye(2))
+
+npCF = beamCF.n_p
+
+# beamCC = ClampedTruss(n_el1, L1, 1, 1, 1)
+# beamFF = FreeTruss(n_el2, L2, 1, 1, 1)
+#
+# npC = beamCC.n_p
+# npF = beamFF.n_p
+#
+# beamCF = SysPhdaeRig.gyrator_ordered(beamCC, beamFF, [1], [0], np.array([[1]]))
+#
+# npCF = beamCF.n_p
+
+eigenvalues, eigvectors = la.eig(beamCF.J, beamCF.E)
 
 omega_all = np.imag(eigenvalues)
 
@@ -31,25 +52,27 @@ eigvec_omega = eigvec_omega[:, perm]
 
 omega.sort()
 
-k_n = omega**(0.5)*L1*(rho1/(EI1))**(0.25)
+# k_n = omega**(0.5)*L*(rho1/(EI1))**(0.25)
 print("Smallest positive normalized eigenvalues computed: ")
-for i in range(n_el*2):
-    print(k_n[i])
+for i in range(4):
+    # Cantilever truss frequency: (2*k-1)/2*pi for k=1,2,...
+    print(np.sqrt(omega[i]))
 
-#
-# pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/PH_TITOP/EulerBernoulliBeam/Matrices_ClampedEB/'
-# Edae_file = 'E_dae'; Jdae_file = 'J_dae'; Bdae_file = 'B_dae'
-# savemat(pathout + Edae_file, mdict={Edae_file: beamCantilever.E})
-# savemat(pathout + Jdae_file, mdict={Jdae_file: beamCantilever.J})
-# savemat(pathout + Bdae_file, mdict={Bdae_file: beamCantilever.B})
-#
-# Jode_file = 'J_ode'; Qode_file = 'Q_ode'; Bode_file = 'B_ode'
-# savemat(pathout + Jode_file, mdict={Jode_file: beamCantilever.J})
-# savemat(pathout + Qode_file, mdict={Qode_file: la.inv(beamCantilever.E)})
-# savemat(pathout + Bode_file, mdict={Bode_file: beamCantilever.B})
+    real_eig = np.real(np.concatenate((eigvec_omega[:npC, i], eigvec_omega[npC + 2:npCF, i]), axis=0))
+    imag_eig = np.imag(np.concatenate((eigvec_omega[:npC, i], eigvec_omega[npC + 2:npCF, i]), axis=0))
 
+    if np.linalg.norm(real_eig) > np.linalg.norm(imag_eig):
+        eig = real_eig
+    else:
+        eig = imag_eig
 
-#
+    x1, u1, w1 = draw_allbending(50, [0, 0, 0], eig, L)
+    x2, u2, w2 = draw_bending(50, [0, 0, 0], eig[2:], L)
+
+    plt.plot(x1, w1, 'r', x2, w2, 'b')
+    plt.legend(("With w0", "Without w0"))
+    plt.show()
+
 # beam = FloatTruss(n_el, 1, 1, 1, 1)
 #
 # eigenvalues, eigvectors = la.eig(beam.J[n_rig:, n_rig:], beam.E[n_rig:, n_rig:])
@@ -63,6 +86,7 @@ for i in range(n_el*2):
 # perm = np.argsort(omega)
 # eigvec_omega = eigvec_omega[:, perm]
 #
+
 # omega.sort()
 #
 # print("Smallest positive normalized eigenvalues computed: ")
