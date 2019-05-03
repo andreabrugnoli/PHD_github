@@ -4,43 +4,17 @@ from fenics import *
 import numpy as np
 np.set_printoptions(threshold=np.inf)
 import mshr
-import matplotlib.pyplot as plt
-
 import scipy.linalg as la
-
-import matplotlib
+from Mindlin_PHs_fenics.parameters import *
+from modules_phdae.classes_phsystem import SysPhdaeRig
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from matplotlib import cm
+plt.rc('text', usetex=True)
 
-matplotlib.rcParams['text.usetex'] = True
-
-n = 10 #int(input("Number of elements for side: "))
-deg = 1 #int(input('Degree for FE: '))
-nreq = 10
-
-E = 1 #(7e10)
-nu = (0.3)
-thick = 'y' #input("Thick plate: ")
-if thick == 'y':
-    h = 0.1
-else:
-    h = 0.01
-
-plot_eigenvector = 'y'
-
-bc_input = input('Select Boundary Condition: ')   #'SSSS'
-
-
-rho = 1 #(2000)  # kg/m^3
-if (bc_input == 'CCCC' or  bc_input == 'CCCF'):
-    k =  0.8601 # 5./6. #
-elif bc_input == 'SSSS':
-    k = 0.8333
-elif bc_input == 'SCSC':
-    k = 0.822
-else: k =  0.8601
+deg = 2
+plot_eigenvector = 'n'
 
 L = 1
 
@@ -66,74 +40,58 @@ C_b = as_tensor([
     [0, 0, fl_rot * (1 + nu) / 2]
 ])
 
+
 # Operators and functions
 def gradSym(u):
     return 0.5 * (nabla_grad(u) + nabla_grad(u).T)
     # return sym(nabla_grad(u))
 
+
 def strain2voigt(eps):
     return as_vector([eps[0, 0], eps[1, 1], 2 * eps[0, 1]])
+
 
 def voigt2stress(S):
     return as_tensor([[S[0], S[2]], [S[2], S[1]]])
 
+
 def bending_moment(u):
     return voigt2stress(dot(D_b, strain2voigt(u)))
+
 
 def bending_curv(u):
     return voigt2stress(dot(C_b, strain2voigt(u)))
 
 # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
 
-L = 1
-l_x = L
-l_y = L
 
-n_x, n_y = n, n
-mesh = RectangleMesh(Point(0, 0), Point(L, L), n_x, n_y, "right/left")
+rect = mshr.Rectangle(Point(0, 0), Point(Lx, Ly))
+hole = mshr.Circle(Point(0, 0), r)
 
-# domain = mshr.Rectangle(Point(0, 0), Point(l_x, l_y))
-# mesh = mshr.generate_mesh(domain, n, "cgal")
-
+domain = rect - hole
+mesh = mshr.generate_mesh(domain, n)
+#
 # plot(mesh)
 # plt.show()
 
 # Domain, Subdomains, Boundary, Suboundaries
-class Left(SubDomain):
+class Bottom(SubDomain):
     def inside(self, x, on_boundary):
-        return abs(x[0] - 0.0) < DOLFIN_EPS and on_boundary
-
-class Right(SubDomain):
-    def inside(self, x, on_boundary):
-        return abs(x[0] - l_x) < DOLFIN_EPS and on_boundary
-
-class Lower(SubDomain):
-    def inside(self, x, on_boundary):
-        return abs(x[1] - 0.0) < DOLFIN_EPS and on_boundary
-
-class Upper(SubDomain):
-    def inside(self, x, on_boundary):
-        return abs(x[1] - l_y) < DOLFIN_EPS and on_boundary
-
+        return abs(x[0]**2 + x[1]**2 - r**2) < 1e-2 and\
+               x[0] <= r and x[1] <= r and on_boundary
 # Boundary conditions on rotations
-left = Left()
-right = Right()
-lower = Lower()
-upper = Upper()
 
+
+bottom = Bottom()
 boundaries = MeshFunction("size_t", mesh, mesh.topology().dim() - 1)
-boundaries.set_all(5)
-left.mark(boundaries, 1)
-lower.mark(boundaries, 2)
-right.mark(boundaries, 3)
-upper.mark(boundaries, 4)
+bottom.mark(boundaries, 1)
 
 # Finite element defition
 
 P_pw = FiniteElement('CG', triangle, deg)
 P_pth = VectorElement('CG', triangle, deg)
 P_qth = TensorElement('CG', triangle, deg, shape=(2, 2), symmetry=True)
-P_qw = VectorElement('CG', triangle, deg) # FiniteElement('RT', triangle, deg) # 
+P_qw = VectorElement('CG', triangle, deg) # FiniteElement('RT', triangle, deg) #
 
 
 element = MixedElement([P_pw, P_pth, P_qth, P_qw])
@@ -155,12 +113,6 @@ ds = Measure('ds', subdomain_data=boundaries)
 
 m = inner(v_pw, al_pw) * dx + inner(v_pth, al_pth) * dx + inner(v_qth, al_qth) * dx + inner(v_qw, al_qw) * dx
 
-j_div = v_pw * div(e_qw) * dx
-j_divIP = -div(v_qw) * e_pw * dx
-
-j_divSym = dot(v_pth, div(e_qth)) * dx
-j_divSymIP = -dot(div(v_qth), e_pth) * dx
-
 j_grad = dot(v_qw, grad(e_pw)) * dx
 j_gradIP = -dot(grad(v_pw), e_qw) * dx
 
@@ -170,21 +122,16 @@ j_gradSymIP = -inner(gradSym(v_pth), e_qth) * dx
 j_Id = dot(v_pth, e_qw) * dx
 j_IdIP = -dot(v_qw, e_pth) * dx
 
-j_alldiv = j_div + j_divIP + j_divSym + j_divSymIP + j_Id + j_IdIP
 j_allgrad = j_grad + j_gradIP + j_gradSym + j_gradSymIP + j_Id + j_IdIP
 
 j = j_allgrad
 
-bc_1, bc_2, bc_3, bc_4 = bc_input
-
-bc_dict = {1: bc_1, 2: bc_2, 3: bc_3, 4: bc_4}
-
 n = FacetNormal(mesh)
 s = as_vector([ -n[1], n[0] ])
 
-P_qn = FiniteElement('CG', triangle, deg)
-P_Mnn = FiniteElement('CG', triangle, deg)
-P_Mns = FiniteElement('CG', triangle, deg)
+P_qn = FiniteElement('CG', triangle, 1)
+P_Mnn = FiniteElement('CG', triangle, 1)
+P_Mns = FiniteElement('CG', triangle, 1)
 
 element_u = MixedElement([P_qn, P_Mnn, P_Mns])
 
@@ -195,51 +142,32 @@ q_n, M_nn, M_ns = TrialFunction(Vu)
 v_omn = dot(v_pth, n)
 v_oms = dot(v_pth, s)
 
-b_vec = []
-for key,val in bc_dict.items():
-    if val == 'C':
-        b_vec.append( v_pw * q_n * ds(key) + v_omn * M_nn * ds(key) + v_oms * M_ns * ds(key))
-    elif val == 'S':
-        b_vec.append(v_pw * q_n * ds(key) + v_oms * M_ns * ds(key))
+b_form = v_pw * q_n * ds(1) + v_omn * M_nn * ds(1) + v_oms * M_ns * ds(1)
 
-
-b_u = sum(b_vec)
-
-J, M, B = PETScMatrix(), PETScMatrix(), PETScMatrix()
-
-J = assemble(j)
-M = assemble(m)
-B = assemble(b_u)
-
-JJ = J.array()
-MM = M.array()
-B_in  = B.array()
+JJ = assemble(j).array()
+MM = assemble(m).array()
+B_in = assemble(b_form).array()
 
 boundary_dofs = np.where(B_in.any(axis=0))[0]
-B_in = B_in[:,boundary_dofs]
+B_in = B_in[:, boundary_dofs]
 
-N_al = V.dim()
-N_u = len(boundary_dofs)
+n_tot = V.dim()
+n_u = len(boundary_dofs)
 # print(N_u)
 
-Z_u = np.zeros((N_u, N_u))
+Z_u = np.zeros((n_u, n_u))
 
-J_aug = np.vstack([ np.hstack([JJ, B_in]),
-                    np.hstack([-B_in.T, Z_u])
-                ])
+J_aug = np.vstack([np.hstack([JJ, B_in]),
+                    np.hstack([-B_in.T, Z_u])])
 
-Z_al_u = np.zeros((N_al, N_u))
-Z_u_al = np.zeros((N_u, N_al))
 
-M_aug = np.vstack([ np.hstack([MM, Z_al_u]),
-                    np.hstack([Z_u_al,    Z_u])
-                 ])
+M_aug = la.block_diag(MM, Z_u)
 tol = 10**(-9)
 
 eigenvalues, eigvectors = la.eig(J_aug, M_aug)
 omega_all = np.imag(eigenvalues)
 
-index = omega_all>=tol
+index = omega_all > tol
 
 omega = omega_all[index]
 eigvec_omega = eigvectors[:, index]
@@ -250,10 +178,9 @@ omega.sort()
 
 nconv = len(omega)
 
-omega_tilde = omega*L*((2*(1+nu)*rho)/E)**0.5
-
-for i in range(min(nconv, nreq)):
-    print(omega_tilde[i])
+print("Eigenvalues full system")
+for i in range(10):
+    print(omega[i]/(2*pi))
 
 d = mesh.geometry().dim()
 dofV_x = V.tabulate_dof_coordinates().reshape((-1, d))
@@ -265,16 +192,78 @@ dofs_Vqw = V.sub(3).dofmap().dofs()
 
 dofVpw_x = dofV_x[dofs_Vpw]
 
-x = dofVpw_x[:,0]
-y = dofVpw_x[:,1]
+x = dofVpw_x[:, 0]
+y = dofVpw_x[:, 1]
 
 eigvec_w = eigvec_omega[dofs_Vpw, :]
 eigvec_w_real = np.real(eigvec_w)
 eigvec_w_imag = np.imag(eigvec_w)
 
+dofs_Vp = dofs_Vpw + dofs_Vpth
+dofs_Vq = dofs_Vqth + dofs_Vqw
+
+n_p = len(dofs_Vp)
+n_q = len(dofs_Vq)
+
+n_fl = n_p + n_q
+
+Mp = MM[:, dofs_Vp]
+Mp = Mp[dofs_Vp, :]
+
+Mq = MM[:, dofs_Vq]
+Mq = Mq[dofs_Vq, :]
+
+Dq = JJ[:, dofs_Vq]
+Dq = Dq[dofs_Vp, :]
+
+Dp = JJ[:, dofs_Vp]
+Dp = Dp[dofs_Vq, :]
+
+Bp = B_in[dofs_Vp]
+Bq = B_in[dofs_Vq]
+
+M_ord = la.block_diag(Mp, Mq)
+J_ord = np.zeros((n_fl, n_fl))
+J_ord[:n_p, n_p:] = Dq
+J_ord[n_p:, :n_p] = Dp
+B_ord = np.concatenate((Bp, Bq), axis=0)
+
+# from IPython import embed; embed()
 
 
-n_fig = 5
+plate = SysPhdaeRig(n_fl, 0, 0, n_p, n_q, E=M_ord, J=J_ord, B=B_ord)
+
+plate_red, V_red = plate.reduce_system(0.001, 20)
+
+Jred = plate_red.J_f
+Mred = plate_red.M_f
+Bred = plate_red.B_f
+
+Jred_aug = np.vstack([np.hstack([Jred, Bred]),
+                    np.hstack([-Bred.T, Z_u])])
+
+Mred_aug = la.block_diag(Mred, Z_u)
+
+tol = 10**(-9)
+
+eigenvalues, eigvectors = la.eig(Jred_aug, Mred_aug)
+omega_all = np.imag(eigenvalues)
+
+index = omega_all > tol
+
+omega = omega_all[index]
+eigvec_omega = eigvectors[:, index]
+perm = np.argsort(omega)
+eigvec_omega = eigvec_omega[:, perm]
+
+omega.sort()
+
+print("Eigenvalues reduced system")
+for i in range(5):
+    print(omega[i]/(2*pi))
+
+
+n_fig = 8
 
 if plot_eigenvector == 'y':
 
@@ -285,13 +274,20 @@ if plot_eigenvector == 'y':
         tol = 1e-6
         fntsize = 20
 
-        z1 = z_real
+        zreal_norm = np.linalg.norm(z_real)
+        zimag_norm = np.linalg.norm(z_imag)
+
+        if zreal_norm > zimag_norm:
+            z1 = z_real
+        else:
+            z1 = z_imag
+
         minZ1 = min(z1)
         maxZ1 = max(z1)
 
         if minZ1 != maxZ1:
 
-            fig1 = plt.figure(i)
+            fig1 = plt.figure()
 
             ax1 = fig1.add_subplot(111, projection='3d')
             # ax1.zaxis._axinfo['label']['space_factor'] = 20
@@ -314,36 +310,4 @@ if plot_eigenvector == 'y':
             # plt.savefig(path_out1 + "Case" + case_study + "_el" + str(n) + "_deg" + str(deg) + "_thick_" + \
             #             str(thick) + "_eig_" + str(i+1) + ".eps", format="eps")
 
-
-    # for i in range(n_fig):
-    #     z2 = z_imag
-    #     minZ2 = min(z2)
-    #     maxZ2 = max(z2)
-    #
-    #     if minZ2 != maxZ2:
-    #
-    #         fig2 = plt.figure(n_fig + i+1)
-    #
-    #         ax2 = fig2.add_subplot(111, projection='3d')
-    #         # ax2.zaxis._axinfo['label']['space_factor'] = 20
-    #
-    #         ax2.set_xlim(min(x) - tol, max(x) + tol)
-    #         ax2.set_xlabel('$x$', fontsize=fntsize)
-    #
-    #         ax2.set_ylim(min(y) - tol, max(y) + tol)
-    #         ax2.set_ylabel('$y$', fontsize=fntsize)
-    #
-    #         # ax2.set_zlabel('$v_{e_{p,w}}$', fontsize=fntsize)
-    #         ax2.set_title('$v_{e_{p,w}}$', fontsize=fntsize)
-    #
-    #         ax2.set_zlim(minZ2 - 0.01 * abs(minZ2), maxZ2 + 0.01 * abs(maxZ2))
-    #         ax2.w_zaxis.set_major_locator(LinearLocator(10))
-    #         ax2.w_zaxis.set_major_formatter(FormatStrFormatter('%.04f'))
-    #
-    #         ax2.plot_trisurf(x, y, z2, cmap=cm.jet, linewidth=0, antialiased=False)
-
-            # path_out2 = "/home/a.brugnoli/PycharmProjects/Mindlin_Phs_fenics/Figures_Eig_Min/ImagEig/"
-            # plt.savefig(path_out2 + "Case" + case_study + "_el" + str(n) + "_deg" + str(deg) + "_thick_" \
-            #             + str(thick) + "_eig_" + str(i+1) + ".eps", format="eps")
-
-    plt.show()
+plt.show()

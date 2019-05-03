@@ -373,7 +373,7 @@ plt.title(r"Hamiltonian trend",
           fontsize=16)
 plt.legend(loc='upper left')
 
-from AnimateTwoPlates import animate2D
+from Mindlin_PHs_fenics.AnimateTwoPlates import animate2D
 import matplotlib.animation as animation
 sol = np.concatenate( (w_pl1_mm, w_pl2_mm), axis=0)
 x = np.concatenate( (x_pl, l_x + x_pl), axis=0)
