@@ -7,6 +7,7 @@ import mshr
 import scipy.linalg as la
 from Mindlin_PHs_fenics.parameters import *
 from modules_phdae.classes_phsystem import SysPhdaeRig
+from modules_phdae.reduction_mindlin import proj_matrices
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
@@ -199,45 +200,62 @@ eigvec_w = eigvec_omega[dofs_Vpw, :]
 eigvec_w_real = np.real(eigvec_w)
 eigvec_w_imag = np.imag(eigvec_w)
 
-dofs_Vp = dofs_Vpw + dofs_Vpth
 dofs_Vq = dofs_Vqth + dofs_Vqw
 
-n_p = len(dofs_Vp)
+n_pw = len(dofs_Vpw)
+n_pth = len(dofs_Vpth)
+n_p = n_pw + n_pth
 n_q = len(dofs_Vq)
 
 n_fl = n_p + n_q
 
-Mp = MM[:, dofs_Vp]
-Mp = Mp[dofs_Vp, :]
+Mpw = MM[:, dofs_Vpw]
+Mpw = Mpw[dofs_Vpw, :]
+
+Mpth = MM[:, dofs_Vpth]
+Mpth = Mpth[dofs_Vpth, :]
 
 Mq = MM[:, dofs_Vq]
 Mq = Mq[dofs_Vq, :]
 
-Dq = JJ[:, dofs_Vq]
-Dq = Dq[dofs_Vp, :]
+Dqw = JJ[:, dofs_Vq]
+Dqw = Dqw[dofs_Vpw, :]
 
-Dp = JJ[:, dofs_Vp]
-Dp = Dp[dofs_Vq, :]
+Dqth = JJ[:, dofs_Vq]
+Dqth = Dqth[dofs_Vpth, :]
 
-Bp = B_in[dofs_Vp]
+Dpw = JJ[:, dofs_Vpw]
+Dpw = Dpw[dofs_Vq, :]
+
+Dpth = JJ[:, dofs_Vpth]
+Dpth = Dpth[dofs_Vq, :]
+
+Bpw = B_in[dofs_Vpw]
+Bpth = B_in[dofs_Vpth]
 Bq = B_in[dofs_Vq]
 
-M_ord = la.block_diag(Mp, Mq)
+M_ord = la.block_diag(Mpw, Mpth, Mq)
 J_ord = np.zeros((n_fl, n_fl))
-J_ord[:n_p, n_p:] = Dq
-J_ord[n_p:, :n_p] = Dp
-B_ord = np.concatenate((Bp, Bq), axis=0)
+
+J_ord[:n_pw, n_p:] = Dqw
+J_ord[n_pw:n_p, n_p:] = Dqth
+J_ord[n_p:, :n_pw] = Dpw
+J_ord[n_p:, n_pw:n_p] = Dpth
+
+B_ord = np.concatenate((Bpw, Bpth, Bq), axis=0)
 
 # from IPython import embed; embed()
 
 
 plate = SysPhdaeRig(n_fl, 0, 0, n_p, n_q, E=M_ord, J=J_ord, B=B_ord)
 
-plate_red, V_red = plate.reduce_system(0.001, 20)
+# plate_red, V_red = plate.reduce_system(0.001, 20)
+Vpw, Vpth, Vq, nw_red, nth_red = proj_matrices(plate.E, plate.J, plate.B, 0.001, 20, n_pw, n_p, n_fl, tol=1e-14)
+Vred = la.block_diag(Vpw, Vpth, Vq)
 
-Jred = plate_red.J_f
-Mred = plate_red.M_f
-Bred = plate_red.B_f
+Jred = Vred.T @ J_ord @ Vred
+Mred = Vred.T @ M_ord @ Vred
+Bred = Vred.T @ B_ord @ Vred
 
 Jred_aug = np.vstack([np.hstack([Jred, Bred]),
                     np.hstack([-Bred.T, Z_u])])
@@ -268,6 +286,11 @@ n_fig = 8
 if plot_eigenvector == 'y':
 
     for i in range(n_fig):
+
+        eigvec_w = Vpw @ eigvec_omega[:nw_red, i]
+        eigvec_w_real = np.real(eigvec_w)
+        eigvec_w_imag = np.imag(eigvec_w)
+
         z_real = eigvec_w_real[:, i]
         z_imag = eigvec_w_imag[:, i]
 
