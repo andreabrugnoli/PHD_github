@@ -426,6 +426,7 @@ class SysPhdaeRig(SysPhdae):
 
         Vp, Vq = proj_matrices(E_red, A_red, B_red, s0, n_red, self.n_p, self.n_f)
 
+        # print(Vp.shape, Vq.shape)
         V_f = la.block_diag(Vp, Vq)
 
         n_p = len(Vp.T)

@@ -9,6 +9,7 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from matplotlib import cm
 from firedrake.plot import _two_dimension_triangle_func_val
 from mpl_toolkits.mplot3d import Axes3D
+from math import pi
 plt.rc('text', usetex=True)
 
 
@@ -33,7 +34,11 @@ class FloatingKP(SysPhdaeRig):
         def gradgrad_vec(u):
             return as_vector([u.dx(0).dx(0), u.dx(1).dx(1), 2 * u.dx(0).dx(1)])
 
-        mesh = RectangleMesh(nx, ny, Lx, Ly, quadrilateral=False)
+        # mesh = RectangleMesh(nx, ny, Lx, Ly, quadrilateral=False)
+        mesh = Mesh("plate_hole.msh")
+
+        plot(mesh); plt.show()
+
         x, y = SpatialCoordinate(mesh)
 
         name_FEp = "Bell"
@@ -82,6 +87,7 @@ class FloatingKP(SysPhdaeRig):
         n_e = n_rig + n_fl
 
         x_P, y_P = tab_coord[i_P]
+        print(x_P, y_P)
 
         Jxx = assemble(rho * h * (y - y_P) ** 2 * dx)
         Jyy = assemble(rho * h * (x - x_P) ** 2 * dx)
@@ -134,7 +140,8 @@ class FloatingKP(SysPhdaeRig):
             i_C = find_point(tab_coord, coord_C[i])[0]
             x_C, y_C = tab_coord[i_C]
 
-            assert x_C == 0 or x_C == Lx or y_C == 0 or y_C == Ly
+            print(x_C, y_C)
+            # assert x_C == 0 or x_C == Lx or y_C == 0 or y_C == Ly
 
             tau_CP = np.eye(3)
             tau_CP[0, 1] = y_C - y_P
@@ -152,26 +159,30 @@ class FloatingKP(SysPhdaeRig):
 
         Gf_P = np.zeros((n_fl, n_rig))
 
+        Gf_P[:, 0] = B_Fz[:, i_P]
+        Gf_P[:, 1] = B_Mx[:, i_P]
+        Gf_P[:, 2] = B_My[:, i_P]
+
         # Momentum contribution to flexibility
-        if x_P == 0 or x_P == Lx or x_P == 0 or y_P == Ly:
-                Gf_P[:, 0] = B_Fz[:, i_P]
-                Gf_P[:, 1] = B_Mx[:, i_P]
-                Gf_P[:, 2] = B_My[:, i_P]
-        else:
-
-            g_Fz = v_p * Fz * dx
-            g_Mx = v_p.dx(1) * Mx * dx
-            g_My = -v_p.dx(0) * My * dx
-            petsc_gFz = assemble(g_Fz, mat_type='aij').M.handle
-            G_Fz = np.array(petsc_gFz.convert("dense").getDenseArray())
-            petsc_gMx = assemble(g_Mx, mat_type='aij').M.handle
-            G_Mx = np.array(petsc_gMx.convert("dense").getDenseArray())
-            petsc_gMy = assemble(g_My, mat_type='aij').M.handle
-            G_My = np.array(petsc_gMy.convert("dense").getDenseArray())
-
-            Gf_P[:, 0] = G_Fz[:, i_P]
-            Gf_P[:, 1] = G_Mx[:, i_P]
-            Gf_P[:, 2] = G_My[:, i_P]
+        # if x_P == 0 or x_P == Lx or x_P == 0 or y_P == Ly:
+        #     Gf_P[:, 0] = B_Fz[:, i_P]
+        #     Gf_P[:, 1] = B_Mx[:, i_P]
+        #     Gf_P[:, 2] = B_My[:, i_P]
+        # else:
+        #
+        #     g_Fz = v_p * Fz * dx
+        #     g_Mx = v_p.dx(1) * Mx * dx
+        #     g_My = -v_p.dx(0) * My * dx
+        #     petsc_gFz = assemble(g_Fz, mat_type='aij').M.handle
+        #     G_Fz = np.array(petsc_gFz.convert("dense").getDenseArray())
+        #     petsc_gMx = assemble(g_Mx, mat_type='aij').M.handle
+        #     G_Mx = np.array(petsc_gMx.convert("dense").getDenseArray())
+        #     petsc_gMy = assemble(g_My, mat_type='aij').M.handle
+        #     G_My = np.array(petsc_gMy.convert("dense").getDenseArray())
+        #
+        #     Gf_P[:, 0] = G_Fz[:, i_P]
+        #     Gf_P[:, 1] = G_Mx[:, i_P]
+        #     Gf_P[:, 2] = G_My[:, i_P]
 
         Z_u = np.zeros((n_u, n_u))
         Ef_aug = la.block_diag(M_f, Z_u)
@@ -181,7 +192,7 @@ class FloatingKP(SysPhdaeRig):
 
         if modes:
             n_modes = input('Number modes to be visualized:')
-            print_modes(Ef_aug, Jf_aug, mesh, Vp, n_modes)
+            printmodes_kir(Ef_aug, Jf_aug, mesh, Vp, n_modes)
 
         T = la.null_space(Gf_P.T).T
 
@@ -204,8 +215,8 @@ class FloatingKP(SysPhdaeRig):
         n_tot = n_e - n_lmb
         n_p = n_p - n_lmb
 
-        if np.linalg.det(M) == 0:
-            warnings.warn("Singular mass matrix")
+        if np.linalg.det(M_f) == 0:
+            warnings.warn("Singular flexible mass matrix")
         assert check_positive_matrix(M)
 
         SysPhdaeRig.__init__(self, n_tot, 0, n_rig, n_p, n_q, E=M, J=J, B=B)
@@ -380,8 +391,6 @@ class FloatingBellKP(SysPhdaeRig):
 
             B[:, (i+1)*n_rig:(i+2)*n_rig] = np.concatenate((Br_C, Bf_C), axis=0)
 
-        SysPhdaeRig.__init__(self, n_tot, 0, n_rig, n_p, n_q, E=M, J=J, B=B)
-
         if modes:
             M_FEM[dofs2dump, :] = 0
             M_FEM[:, dofs2dump] = 0
@@ -390,7 +399,9 @@ class FloatingBellKP(SysPhdaeRig):
 
             n_modes = input('Number modes to be visualized:')
 
-            print_modes(M_FEM, J_FEM, mesh, Vp, n_modes)
+            printmodes_kir(M_FEM, J_FEM, mesh, Vp, n_modes)
+
+        SysPhdaeRig.__init__(self, n_tot, 0, n_rig, n_p, n_q, E=M, J=J, B=B)
 
 
 class FloatingMP(SysPhdaeRig):
@@ -398,10 +409,15 @@ class FloatingMP(SysPhdaeRig):
     def __init__(self, Lx, Ly, h, rho, E, nu, nx, ny, coord_P, coord_C=np.empty((0, 2)), modes=False):
 
         # Mindlin plate written with the port Hamiltonian approach
+        k_sh = 5 / 6
 
-        G = E/(2 * (1 + nu))
-        k_sh = 5/6
+
+        D = E * h ** 3 / (1 - nu ** 2) / 12.
+        G = E / 2 / (1 + nu)
         F = G * h * k_sh
+
+        # Useful Matrices
+
         fl_rot = 12. / (E * h ** 3)
 
         C_b = as_tensor([
@@ -419,11 +435,12 @@ class FloatingMP(SysPhdaeRig):
             return as_vector([u[0].dx(0), u[1].dx(1), u[0].dx(1) + u[1].dx(0)])
 
         # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
-        mesh = RectangleMesh(nx, ny, Lx, Ly, quadrilateral=False)
+        # mesh = RectangleMesh(nx, ny, Lx, Ly, quadrilateral=False)
+        mesh = Mesh("plate_hole.msh")
         x, y = SpatialCoordinate(mesh)
 
-        # plot(mesh)
-        # plt.show()
+        plot(mesh)
+        plt.show()
 
         # Finite element defition
 
@@ -484,6 +501,7 @@ class FloatingMP(SysPhdaeRig):
         n_e = n_rig + n_fl
 
         x_P, y_P = tab_coord[i_P]
+        print(x_P, y_P)
 
         Jxx = assemble(rho * h * (y - y_P) ** 2 * dx)
         Jyy = assemble(rho * h * (x - x_P) ** 2 * dx)
@@ -506,16 +524,29 @@ class FloatingMP(SysPhdaeRig):
         M_fr[:, 2] = assemble(- vp_w * rho * h * (x - x_P) * dx).vector().get_local()
 
         # B matrices based on Lagrange
+        n = FacetNormal(mesh)
+        s = as_vector([-n[1], n[0]])
+
         Vf = FunctionSpace(mesh, 'CG', 1)
-        Fz = TrialFunction(Vf)
-        Mx = TrialFunction(Vf)
-        My = TrialFunction(Vf)
 
-        v_phix, v_phiy = vp_th
+        q_n = TrialFunction(Vf)
+        v_omn = dot(vp_th, n)
+        v_oms = dot(vp_th, s)
 
-        b_Fz = vp_w * Fz * ds
-        b_Mx = v_phiy * Mx * ds
-        b_My = -v_phix * My * ds
+        b_Fz = vp_w * q_n * ds
+        b_Mx = v_omn * q_n * ds
+        b_My = v_oms * q_n * ds
+
+        # Vf = FunctionSpace(mesh, 'CG', 1)
+        # Fz = TrialFunction(Vf)
+        # Mx = TrialFunction(Vf)
+        # My = TrialFunction(Vf)
+        #
+        # v_phix, v_phiy = vp_th
+        #
+        # b_Fz = vp_w * Fz * ds
+        # b_Mx = v_phiy * Mx * ds
+        # b_My = -v_phix * My * ds
 
         petsc_bFz = assemble(b_Fz, mat_type='aij').M.handle
         B_Fz = np.array(petsc_bFz.convert("dense").getDenseArray())
@@ -534,8 +565,8 @@ class FloatingMP(SysPhdaeRig):
         for i in range(n_C):
             i_C = find_point(tab_coord, coord_C[i])[0]
             x_C, y_C = tab_coord[i_C]
-
-            assert x_C == 0 or x_C == Lx or y_C == 0 or y_C == Ly
+            print(x_C, y_C)
+            # assert x_C == 0 or x_C == Lx or y_C == 0 or y_C == Ly
 
             tau_CP = np.eye(3)
             tau_CP[0, 1] = y_C - y_P
@@ -553,38 +584,43 @@ class FloatingMP(SysPhdaeRig):
 
         Gf_P = np.zeros((n_fl, n_rig))
 
-        # Momentum contribution to flexibility
-        if x_P == 0 or x_P == Lx or x_P == 0 or y_P == Ly:
-            Gf_P[:, 0] = B_Fz[:, i_P]
-            Gf_P[:, 1] = B_Mx[:, i_P]
-            Gf_P[:, 2] = B_My[:, i_P]
-        else:
+        Gf_P[:, 0] = B_Fz[:, i_P]
+        Gf_P[:, 1] = B_Mx[:, i_P]
+        Gf_P[:, 2] = B_My[:, i_P]
 
-            g_Fz = vp_w * Fz * dx
-            g_Mx = v_phiy * Mx * dx
-            g_My = -v_phix * My * dx
-            petsc_gFz = assemble(g_Fz, mat_type='aij').M.handle
-            G_Fz = np.array(petsc_gFz.convert("dense").getDenseArray())
-            petsc_gMx = assemble(g_Mx, mat_type='aij').M.handle
-            G_Mx = np.array(petsc_gMx.convert("dense").getDenseArray())
-            petsc_gMy = assemble(g_My, mat_type='aij').M.handle
-            G_My = np.array(petsc_gMy.convert("dense").getDenseArray())
+        # # Momentum contribution to flexibility
+        # if x_P == 0 or x_P == Lx or x_P == 0 or y_P == Ly:
+        #     Gf_P[:, 0] = B_Fz[:, i_P]
+        #     Gf_P[:, 1] = B_Mx[:, i_P]
+        #     Gf_P[:, 2] = B_My[:, i_P]
+        # else:
+        #
+        #     g_Fz = vp_w * Fz * dx
+        #     g_Mx = v_phiy * Mx * dx
+        #     g_My = -v_phix * My * dx
+        #     petsc_gFz = assemble(g_Fz, mat_type='aij').M.handle
+        #     G_Fz = np.array(petsc_gFz.convert("dense").getDenseArray())
+        #     petsc_gMx = assemble(g_Mx, mat_type='aij').M.handle
+        #     G_Mx = np.array(petsc_gMx.convert("dense").getDenseArray())
+        #     petsc_gMy = assemble(g_My, mat_type='aij').M.handle
+        #     G_My = np.array(petsc_gMy.convert("dense").getDenseArray())
+        #
+        #     Gf_P[:, 0] = G_Fz[:, i_P]
+        #     Gf_P[:, 1] = G_Mx[:, i_P]
+        #     Gf_P[:, 2] = G_My[:, i_P]
 
-            Gf_P[:, 0] = G_Fz[:, i_P]
-            Gf_P[:, 1] = G_Mx[:, i_P]
-            Gf_P[:, 2] = G_My[:, i_P]
+        Z_u = np.zeros((n_u, n_u))
+        Ef_aug = la.block_diag(M_f, Z_u)
+        Jf_aug = la.block_diag(J_f, Z_u)
+        Gf =  np.concatenate((Gf_P, B[n_rig:, n_rig:]), axis=1)
+        Jf_aug[:n_fl, n_fl:] = Gf
+        Jf_aug[n_fl:, :n_fl] = -Gf.T
 
-        # To do modes Mindlin plate
 
-        # Z_u = np.zeros((n_u, n_u))
-        # Ef_aug = la.block_diag(M_f, Z_u)
-        # Jf_aug = la.block_diag(J_f, Z_u)
-        # Jf_aug[:n_fl, n_fl:] = np.concatenate((Gf_P, B[n_rig:, n_rig:]), axis=1)
-        # Jf_aug[n_fl:, :n_fl] = -np.concatenate((Gf_P, B[n_rig:, n_rig:]), axis=1).T
 
-        # if modes:
-        #     n_modes = input('Number modes to be visualized:')
-        #     print_modes(Ef_aug, Jf_aug, mesh, Vp_w, n_modes)
+        if modes:
+            n_modes = input('Number modes to be visualized:')
+            printmodes_min(Ef_aug, Jf_aug, Vp_w, n_modes)
 
         T = la.null_space(Gf_P.T).T
 
@@ -614,7 +650,6 @@ class FloatingMP(SysPhdaeRig):
         SysPhdaeRig.__init__(self, n_tot, 0, n_rig, n_p, n_q, E=M, J=J, B=B)
 
 
-
 def find_point(coords, point):
 
     n_cor = len(coords)
@@ -629,7 +664,7 @@ def find_point(coords, point):
     return i_min, dist_min
 
 
-def print_modes(M, J, grid, Vp, n_modes):
+def printmodes_kir(M, J, grid, Vp, n_modes):
     eigenvalues, eigvectors = la.eig(J, M)
     omega_all = np.imag(eigenvalues)
 
@@ -648,7 +683,7 @@ def print_modes(M, J, grid, Vp, n_modes):
 
     n_Vp = Vp.dim()
     for i in range(int(n_modes)):
-        print("Eigenvalue num " + str(i+1) + ":" + str(omega[i]))
+        print("Eigenvalue num " + str(i+1) + ":" + str(omega[i]/(2*pi)))
         eig_real_w = Function(Vp)
         eig_imag_w = Function(Vp)
 
@@ -684,3 +719,52 @@ def print_modes(M, J, grid, Vp, n_modes):
     plt.show()
 
 
+def printmodes_min(M, J, Vp_w, n_modes):
+    eigenvalues, eigvectors = la.eig(J, M)
+    omega_all = np.imag(eigenvalues)
+
+    index = omega_all > 1e-9
+
+    omega = omega_all[index]
+    eigvec_omega = eigvectors[:, index]
+    perm = np.argsort(omega)
+    eigvec_omega = eigvec_omega[:, perm]
+
+    omega.sort()
+
+    # NonDimensional China Paper
+
+    fntsize = 15
+
+    n_Vpw = Vp_w.dim()
+    for i in range(int(n_modes)):
+        print("Eigenvalue num " + str(i+1) + ":" + str(omega[i]/(2*pi)))
+        eig_real_w = Function(Vp_w)
+        eig_imag_w = Function(Vp_w)
+
+        eig_real_pw = np.real(eigvec_omega[:n_Vpw, i])
+        eig_imag_pw = np.imag(eigvec_omega[:n_Vpw, i])
+        eig_real_w.vector()[:] = eig_real_pw
+        eig_imag_w.vector()[:] = eig_imag_pw
+
+        norm_real_eig = np.linalg.norm(eig_real_w.vector().get_local())
+        norm_imag_eig = np.linalg.norm(eig_imag_w.vector().get_local())
+
+        if norm_imag_eig > norm_real_eig:
+            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_imag_w, 10)
+        else:
+            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_real_w, 10)
+
+        figure = plt.figure()
+        ax = figure.add_subplot(111, projection="3d")
+
+        ax.plot_trisurf(triangulation, z_goodeig, cmap=cm.jet)
+
+        ax.set_xlabel('$x [m]$', fontsize=fntsize)
+        ax.set_ylabel('$y [m]$', fontsize=fntsize)
+        ax.set_title('Eigenvector num '+str(i+1), fontsize=fntsize)
+
+        ax.w_zaxis.set_major_locator(LinearLocator(10))
+        ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
+
+    plt.show()

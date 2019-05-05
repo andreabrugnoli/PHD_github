@@ -1,23 +1,25 @@
 from firedrake import *
 from system_components.plates import FloatingKP, FloatingBellKP, FloatingMP
 from system_components.tests.kirchhoff_constants import *
+from math import pi
 import numpy as np
 import scipy.linalg as la
 from scipy.io import savemat
 from modules_phdae.classes_phsystem import SysPhdaeRig, check_positive_matrix
 
 
-pointP = np.array([0, 0])
-pointC1 = np.array([0, Ly/6]).reshape((-1, 2))
-pointC2 = np.array([0, 2*Ly/6]).reshape((-1, 2))
-pointC3 = np.array([0, 3*Ly/6]).reshape((-1, 2))
-pointC4 = np.array([0, 4*Ly/6]).reshape((-1, 2))
-pointC5 = np.array([0, 5*Ly/6]).reshape((-1, 2))
-pointC6 = np.array([0, 6*Ly/6]).reshape((-1, 2))
+pointP = np.array([0.1, 0])
+n_point = 5
+pointC1 = np.array([0.1*np.cos(pi/(2*n_point)), 0.1*np.sin(pi/(2*n_point))]).reshape((-1, 2))
+pointC2 = np.array([0.1*np.cos(2*pi/(2*n_point)), 0.1*np.sin(2*pi/(2*n_point))]).reshape((-1, 2))
+pointC3 = np.array([0.1*np.cos(3*pi/(2*n_point)), 0.1*np.sin(3*pi/(2*n_point))]).reshape((-1, 2))
+pointC4 = np.array([0.1*np.cos(4*pi/(2*n_point)), 0.1*np.sin(4*pi/(2*n_point))]).reshape((-1, 2))
+pointC5 = np.array([0.1*np.cos(5*pi/(2*n_point)), 0.1*np.sin(5*pi/(2*n_point))]).reshape((-1, 2))
 
-pointsC = np.vstack((pointC1, pointC2, pointC3, pointC4, pointC5, pointC6))
+pointsC = np.vstack((pointC1, pointC2, pointC3, pointC4, pointC5))
 
-plate = FloatingMP(Lx, Ly, h, rho, E, nu, nx, ny, pointP, modes=True)
+plate = FloatingMP(Lx, Ly, h, rho, E, nu, nx, ny, pointP, coord_C=pointsC, modes=True)
+print(plate.n_f)
 # plate = FloatingBellKP(Lx, Ly, h, rho, E, nu, nx, ny, pointP, pointC1, modes=False)
 
 # pl_red = plate.reduce_system(0.001, 6)

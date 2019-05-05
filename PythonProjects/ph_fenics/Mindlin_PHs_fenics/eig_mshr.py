@@ -7,7 +7,6 @@ import mshr
 import scipy.linalg as la
 from Mindlin_PHs_fenics.parameters import *
 from modules_phdae.classes_phsystem import SysPhdaeRig
-from modules_phdae.reduction_mindlin import proj_matrices
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
@@ -15,7 +14,6 @@ from matplotlib import cm
 plt.rc('text', usetex=True)
 
 deg = 2
-plot_eigenvector = 'n'
 
 L = 1
 
@@ -71,9 +69,9 @@ hole = mshr.Circle(Point(0, 0), r)
 
 domain = rect - hole
 mesh = mshr.generate_mesh(domain, n)
-#
-# plot(mesh)
-# plt.show()
+
+plot(mesh)
+plt.show()
 
 # Domain, Subdomains, Boundary, Suboundaries
 class Bottom(SubDomain):
@@ -249,13 +247,17 @@ B_ord = np.concatenate((Bpw, Bpth, Bq), axis=0)
 
 plate = SysPhdaeRig(n_fl, 0, 0, n_p, n_q, E=M_ord, J=J_ord, B=B_ord)
 
-# plate_red, V_red = plate.reduce_system(0.001, 20)
-Vpw, Vpth, Vq, nw_red, nth_red = proj_matrices(plate.E, plate.J, plate.B, 0.001, 20, n_pw, n_p, n_fl, tol=1e-14)
-Vred = la.block_diag(Vpw, Vpth, Vq)
+n_red = 5
+s0 = 0.001
 
-Jred = Vred.T @ J_ord @ Vred
-Mred = Vred.T @ M_ord @ Vred
-Bred = Vred.T @ B_ord @ Vred
+plate_red, V_red = plate.reduce_system(s0, n_red)
+Jred = plate_red.J_f
+Mred = plate_red.M_f
+Bred = plate_red.B_f
+
+np_red = plate_red.n_p
+nf_red = plate_red.n_f
+npw_red = int(np_red/3)
 
 Jred_aug = np.vstack([np.hstack([Jred, Bred]),
                     np.hstack([-Bred.T, Z_u])])
@@ -281,18 +283,20 @@ for i in range(5):
     print(omega[i]/(2*pi))
 
 
-n_fig = 8
+n_fig = 5
+plot_eigenvector = 'y'
 
 if plot_eigenvector == 'y':
 
     for i in range(n_fig):
 
-        eigvec_w = Vpw @ eigvec_omega[:nw_red, i]
+        eigvec_i = V_red @ eigvec_omega[:nf_red, i]
+        eigvec_w = eigvec_i[:n_pw]
         eigvec_w_real = np.real(eigvec_w)
         eigvec_w_imag = np.imag(eigvec_w)
 
-        z_real = eigvec_w_real[:, i]
-        z_imag = eigvec_w_imag[:, i]
+        z_real = eigvec_w_real
+        z_imag = eigvec_w_imag
 
         tol = 1e-6
         fntsize = 20

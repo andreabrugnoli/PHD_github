@@ -52,14 +52,15 @@ eigvec_omega = eigvec_omega[:, perm]
 
 omega.sort()
 
-# k_n = omega**(0.5)*L*(rho1/(EI1))**(0.25)
 print("Smallest positive normalized eigenvalues computed: ")
 for i in range(4):
     # Cantilever truss frequency: (2*k-1)/2*pi for k=1,2,...
     print(np.sqrt(omega[i]))
-
+    #
     real_eig = np.real(np.concatenate((eigvec_omega[:npC, i], eigvec_omega[npC + 2:npCF, i]), axis=0))
     imag_eig = np.imag(np.concatenate((eigvec_omega[:npC, i], eigvec_omega[npC + 2:npCF, i]), axis=0))
+    # real_eig = np.real(eigvec_omega[:npCF, i])
+    # imag_eig = np.imag(eigvec_omega[:npCF, i])
 
     if np.linalg.norm(real_eig) > np.linalg.norm(imag_eig):
         eig = real_eig
