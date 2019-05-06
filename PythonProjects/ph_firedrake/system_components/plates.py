@@ -35,7 +35,7 @@ class FloatingKP(SysPhdaeRig):
             return as_vector([u.dx(0).dx(0), u.dx(1).dx(1), 2 * u.dx(0).dx(1)])
 
         # mesh = RectangleMesh(nx, ny, Lx, Ly, quadrilateral=False)
-        mesh = Mesh("plate_hole.msh")
+        mesh = Mesh("plate_hole_ref2.msh")
 
         plot(mesh); plt.show()
 
@@ -114,13 +114,13 @@ class FloatingKP(SysPhdaeRig):
         Fz = TrialFunction(Vf)
         Mx = TrialFunction(Vf)
         My = TrialFunction(Vf)
-
         v_gradx = v_p.dx(0)
         v_grady = v_p.dx(1)
 
-        b_Fz = v_p * Fz * ds
-        b_Mx = v_grady * Mx * ds
-        b_My = -v_gradx * My * ds
+        is_clamped = conditional(And(le(x, 0.1), le(y, 0.1)), 1, 0)
+        b_Fz = v_p * Fz * is_clamped * ds
+        b_Mx = v_grady * Mx * is_clamped * ds
+        b_My = -v_gradx * My * is_clamped * ds
 
         petsc_bFz = assemble(b_Fz, mat_type='aij').M.handle
         B_Fz = np.array(petsc_bFz.convert("dense").getDenseArray())
@@ -184,11 +184,14 @@ class FloatingKP(SysPhdaeRig):
         #     Gf_P[:, 1] = G_Mx[:, i_P]
         #     Gf_P[:, 2] = G_My[:, i_P]
 
+
         Z_u = np.zeros((n_u, n_u))
         Ef_aug = la.block_diag(M_f, Z_u)
         Jf_aug = la.block_diag(J_f, Z_u)
-        Jf_aug[:n_fl, n_fl:] = np.concatenate((Gf_P, B[n_rig:, n_rig:]), axis=1)
-        Jf_aug[n_fl:, :n_fl] = -np.concatenate((Gf_P, B[n_rig:, n_rig:]), axis=1).T #-Gf_P.T
+
+        Gf_all = np.concatenate((Gf_P, B[n_rig:, n_rig:]), axis=1)
+        Jf_aug[:n_fl, n_fl:] = Gf_all
+        Jf_aug[n_fl:, :n_fl] = -Gf_all.T #-Gf_P.T
 
         if modes:
             n_modes = input('Number modes to be visualized:')
@@ -436,7 +439,7 @@ class FloatingMP(SysPhdaeRig):
 
         # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
         # mesh = RectangleMesh(nx, ny, Lx, Ly, quadrilateral=False)
-        mesh = Mesh("plate_hole.msh")
+        mesh = Mesh("plate_hole_ref2.msh")
         x, y = SpatialCoordinate(mesh)
 
         plot(mesh)
@@ -524,29 +527,18 @@ class FloatingMP(SysPhdaeRig):
         M_fr[:, 2] = assemble(- vp_w * rho * h * (x - x_P) * dx).vector().get_local()
 
         # B matrices based on Lagrange
-        n = FacetNormal(mesh)
-        s = as_vector([-n[1], n[0]])
 
         Vf = FunctionSpace(mesh, 'CG', 1)
+        Fz = TrialFunction(Vf)
+        Mx = TrialFunction(Vf)
+        My = TrialFunction(Vf)
 
-        q_n = TrialFunction(Vf)
-        v_omn = dot(vp_th, n)
-        v_oms = dot(vp_th, s)
+        v_phix, v_phiy = vp_th
 
-        b_Fz = vp_w * q_n * ds
-        b_Mx = v_omn * q_n * ds
-        b_My = v_oms * q_n * ds
-
-        # Vf = FunctionSpace(mesh, 'CG', 1)
-        # Fz = TrialFunction(Vf)
-        # Mx = TrialFunction(Vf)
-        # My = TrialFunction(Vf)
-        #
-        # v_phix, v_phiy = vp_th
-        #
-        # b_Fz = vp_w * Fz * ds
-        # b_Mx = v_phiy * Mx * ds
-        # b_My = -v_phix * My * ds
+        is_clamped = conditional(And(le(x, 0.1), le(y, 0.1)), 1, 0)
+        b_Fz = vp_w * Fz * is_clamped * ds
+        b_Mx = v_phiy * Mx * is_clamped * ds
+        b_My = -v_phix * My * is_clamped * ds
 
         petsc_bFz = assemble(b_Fz, mat_type='aij').M.handle
         B_Fz = np.array(petsc_bFz.convert("dense").getDenseArray())
@@ -612,7 +604,7 @@ class FloatingMP(SysPhdaeRig):
         Z_u = np.zeros((n_u, n_u))
         Ef_aug = la.block_diag(M_f, Z_u)
         Jf_aug = la.block_diag(J_f, Z_u)
-        Gf =  np.concatenate((Gf_P, B[n_rig:, n_rig:]), axis=1)
+        Gf = np.concatenate((Gf_P, B[n_rig:, n_rig:]), axis=1)
         Jf_aug[:n_fl, n_fl:] = Gf
         Jf_aug[n_fl:, :n_fl] = -Gf.T
 
@@ -643,7 +635,7 @@ class FloatingMP(SysPhdaeRig):
         n_tot = n_e - n_lmb
         n_p = n_p - n_lmb
 
-        if np.linalg.det(M) == 0:
+        if np.linalg.det(M_f) == 0:
             warnings.warn("Singular mass matrix")
         assert check_positive_matrix(M)
 
