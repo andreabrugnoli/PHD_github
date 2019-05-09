@@ -23,6 +23,7 @@
 \makeatother
 
 \bibliography{biblio_presCPDE}
+\AtBeginBibliography{\small}
 
 \usepackage{multirow}
 \usepackage[justification=centering]{caption}
@@ -50,10 +51,7 @@
 \newcolumntype{b}{>{\columncolor{Blue}[1\tabcolsep]}c}
 \newcolumntype{N}{>{\setbox0=\hbox\bgroup}c<{\egroup}@{}}
 
-\usepackage{movie15}
-%\usepackage{multimedia}
-%\usepackage{media9}
-
+\usepackage{multimedia}
 
 \graphicspath{{./Figures/},{./Videos/}}
 
@@ -143,6 +141,18 @@
 \normalsize
 \end{frame}
 
+\section{Introduction}
+
+\begin{frame}{PH framework and elasticity}
+The pH framework is appealing for its modularity and for being an interdisciplinary modeling tool. \\ 
+Main points of interest in this presentation:
+\begin{itemize}
+\item extend the pH framework to linear elasticity in 2D\footfullcite{MacchelliMindlin};
+\item make use of the widespread finite element method\footfullcite{WeakForm_Kot}\, \footfullcite{CardosoRibeiro2018}
+\end{itemize}
+
+\end{frame}
+
 \section{PH formulation of the Mindlin plate}
 \subsection{Mindlin-Reissner model for thick Plates}
 
@@ -189,21 +199,41 @@ are the bending curvature and shear strain. The symmetric gradient of a vector f
 }
 \end{frame}
 
-\begin{frame}{Hamiltonian energy}
-The Hamiltonian (total energy)  is the sum of kinetic and potential energy
+\begin{frame}{Hamiltonian energy and pH system}
+The Hamiltonian (total energy)  is given by
 \begin{equation*} 
 H =  \frac{1}{2} \int_{\Omega}\underbrace{ \rho h \left(\diffp{w}{t} \right)^2 +  \frac{\rho h^3}{12} \diffp{\bm{\theta}}{t} \cdot \diffp{\bm{\theta}}{t}  }_{\text{Kinetic energy}} + \underbrace{ \bm{M} \cddot \bm{K} + \bm{q} \cdot \bm{\gamma}}_{\text{Potential energy}}  \d\Omega,
 \end{equation*}
-where $\bm{M} \cddot \bm{K} := \sum_{\alpha, \beta} m_{\alpha \beta} \, \kappa_{\alpha \beta}$ is the tensor contraction.
-
+where $\bm{M} \cddot \bm{K} := \sum_{\alpha, \beta} m_{\alpha \beta} \, \kappa_{\alpha \beta}$ is the tensor contraction. 
 \end{frame}
+
 
 \subsection{Port-Hamiltonian formulation}
 
-
+\begin{frame}{Port Hamiltonian systems}
+\begin{block}{Linear port Hamiltonian system}
+\begin{equation*}
+\begin{cases}
+\displaystyle\diffp{\alpha}{t} = J \displaystyle\diffd{H}{\alpha},\\
+H = <\alpha, Q \alpha>_{\mathcal{L}^2} \\
+e := \displaystyle\diffd{H}{\alpha} =  Q \alpha,\\
+\end{cases} 
+\end{equation*}
+\end{block}
+Jargon:
+\begin{itemize}
+\item $\alpha$: {energies};\\
+\item $H$: {Hamiltonian}; \\
+\item $e$: {coenergies}; \\
+\item $J$: {skew symmetric unbounded operator}; \\
+\item $Q$: {bounded symmetric}; \\
+\end{itemize}
+\vspace{.5cm}
+How do we get there?
+\end{frame}
 
 \begin{frame}{Energy, coenergy variables}
-The energy variables are defined as in \footfullcite{MacchelliMindlin}
+Energy variables:
 \begin{equation*}
 \begin{aligned}
 \alpha_w &= \rho h \diffp{w}{t}, \\
@@ -291,7 +321,7 @@ J = \begin{bmatrix}
 0 & 0  & 0 & \bm{C} \\
 \end{bmatrix}
 \end{equation*}
-\begin{block}{Strong form for theMindlin plate}
+\begin{block}{Strong form for the Mindlin plate}
 	\begin{equation*}
 	\begin{cases}
 	\displaystyle\diffp{\alpha}{t} &= J e, \vspace{1mm} \\
@@ -311,11 +341,12 @@ J = \begin{bmatrix}
 \end{frame}
 
 \begin{frame}{Boundary variables}
+\begin{overlayarea}{\textwidth}{\textheight}
 Taking the energy rate and applying of the Green theorem
 \begin{equation*}
 \dot{H}= \int_{\partial \Omega} \left\{ \textcolor{red}{w_t} \textcolor{blue}{q_n}  + \textcolor{red}{\omega_n} \textcolor{blue}{m_{nn}} + \textcolor{red}{\omega_s} \textcolor{blue}{m_{ns}} \right\} \d{s}.  
 \end{equation*}
-\onslide*<1>{
+\only<1>{
 The dynamic boundary variable are defined as
 \begin{equation*}
 \begin{aligned}
@@ -325,7 +356,7 @@ The dynamic boundary variable are defined as
 \end{aligned}
 \end{equation*}
 where $\bm{u} \otimes {\bm{v}}$ denotes the outer product of vectors. \\
-The corresponding power conjugated (and essential) boundary variables  are
+The corresponding power conjugated boundary variables  are
 \begin{equation*}
 \begin{aligned}
 \textcolor{red}{\text{Vertical velocity}}  \qquad \textcolor{red}{w_t} &:= e_w, \\
@@ -336,11 +367,11 @@ The corresponding power conjugated (and essential) boundary variables  are
 \end{aligned}
 \end{equation*}
 }
-\onslide*<2>{
+\only<2>{
 \center
 \includegraphics[height=0.5\textheight]{Cauchy_law.eps}
-
 }
+\end{overlayarea}
 \end{frame}
 
 \section{Structure preserving discretization}
@@ -355,9 +386,10 @@ The structure-preserving discretization consists of three steps:
 \end{frame}
 
 \begin{frame}{$J$ decomposition}
+\begin{overlayarea}{\textwidth}{\textheight}
 Decomposing J in operators to be integrated by parts
-\[J = \textcolor{red}{J_{\text{div}}} + \textcolor{blue}{J_{\text{grad}}} + J_{\bm{I}}\] %\vspace{1cm}
-\onslide*<1>{
+\[J = \textcolor{red}{J_{\text{div}}} + \textcolor{blue}{J_{\text{grad}}} + J_{\bm{I}}\]
+\only<1>{
 \begin{equation*}
 J = 
 \begin{bmatrix}
@@ -367,8 +399,7 @@ J =
 	\textcolor{blue}{\mathrm{grad}} & -\bm{I}_{2 \times 2} &  0 & 0  \\
 	\end{bmatrix}
 \end{equation*}}
-
-\onslide*<2>{
+\only<2>{
 	\begin{equation*}
 	\textcolor{red}{J_{\text{div}}} := 
 	\begin{bmatrix}
@@ -378,8 +409,7 @@ J =
 	0 & 0 &  0 & 0  \\
 	\end{bmatrix}
 	\end{equation*}}
-
-\onslide*<3>{
+\only<3>{
 	\begin{equation*}
 	\textcolor{blue}{J_{\text{grad}}} := 
 	\begin{bmatrix}
@@ -389,8 +419,7 @@ J =
 	\textcolor{blue}{\mathrm{grad}} & 0  & 0 & 0  \\
 	\end{bmatrix}
 	\end{equation*}}
-
-\onslide*<4>{
+\only<4>{
 	\begin{equation*}
 	J_{\bm{I}} := 
 	\begin{bmatrix}
@@ -400,10 +429,10 @@ J =
 	0 & -\bm{I}_{2 \times 2} &  0 & 0  \\
 	\end{bmatrix}
 	\end{equation*}}
-
-\onslide<5>{From these definitions, it holds
+\only<5>{From these definitions, it holds
 	\[\textcolor{red}{J_{\text{div}}} = - \textcolor{blue}{J^*_{\text{grad}}},\]
 where $A^*$ is the formal adjoint of operator $A$.}
+\end{overlayarea}
 \end{frame}
 
 \begin{frame}{Weak form}
@@ -428,11 +457,12 @@ In order to preserve the pH structure the bilinear form $(v, Je)$ has to give ri
 \subsection{Boundary control through forces and momenta}
 
 \begin{frame}{Gradient formulation}
-If the operator $\textcolor{red}{J_{\text{div}}}$ is integrated by parts  then 
-\begin{equation}
-(v, Je) = \textcolor{blue}{j_{\text{grad}}}(v, e) + \textcolor{blue}{f_{N}}(v).
-\end{equation}
-\onslide*<1>{The bilinear form 
+\onslide*<1>{
+If the operator $\textcolor{red}{J_{\text{div}}}$ is integrated by parts  
+\begin{equation*}
+(v, Je) = \textcolor{blue}{j_{\text{grad}}}(v, e) + \textcolor{blue}{f_{N}}(v),
+\end{equation*}
+the bilinear form 
 	\begin{align*}
 	j_{\text{grad}}(v, e) &= (\textcolor{red}{J^*_{\text{div}}} v, e) + (v, \textcolor{blue}{J_{\text{grad}}}e) + (v, J_{\bm{I}} e), \\
 	& = (-\textcolor{blue}{J_{\text{grad}}} v, e) + (v, \textcolor{blue}{J_{\text{grad}}}e) + (v, J_{\bm{I}} e),
@@ -450,7 +480,7 @@ express the boundary control $\textcolor{blue}{\bm{u}_\partial}$ in terms of for
 	{q}_n \\
 	m_{nn} \\
 	m_{ns} \\
-	\end{pmatrix} \qquad
+	\end{pmatrix}, \qquad
 	\textcolor{red}{\bm{y}_\partial} = \Tr
 	\begin{pmatrix}
 	w_t \\
@@ -464,11 +494,12 @@ express the boundary control $\textcolor{blue}{\bm{u}_\partial}$ in terms of for
 \subsection{Boundary control through kinematic variables}
 
 \begin{frame}{Divergence formulation}
-If the operator $\textcolor{blue}{J_{\text{grad}}}$ is integrated by parts  then 
+\onslide*<1>{
+If the operator $\textcolor{blue}{J_{\text{grad}}}$ is integrated by parts 
 \begin{equation}
 (v, Je) = \textcolor{red}{j_{\text{div}}}(v, e) + \textcolor{red}{f_{D}}(v),
 \end{equation}
-\onslide*<1>{The bilinear form 
+the bilinear form 
 	\begin{align*}
 	j_{\text{div}}(v, e) &= (v, \textcolor{red}{J_{\text{div}}} e) + ( \textcolor{blue}{J^*_{\text{grad}}}v, e) + (v, J_{\bm{I}} e), \\
 	& = (v, \textcolor{red}{J_{\text{div}}} e) + (-\textcolor{red}{J_{\text{div}}}v, e) + (v, J_{\bm{I}} e),
@@ -485,13 +516,13 @@ If the operator $\textcolor{blue}{J_{\text{grad}}}$ is integrated by parts  then
 	w_t \\
 	\omega_n \\
 	\omega_s \\
-	\end{pmatrix} \qquad
+	\end{pmatrix}, \qquad
 	\textcolor{blue}{y_{\partial}} = \Tr
 	\begin{pmatrix}
 	{q}_n \\
 	m_{nn} \\
 	m_{ns} \\
-	\end{pmatrix}_{\partial \Omega}.
+	\end{pmatrix}.
 	\]
 }
 \end{frame}
@@ -508,7 +539,7 @@ Homogeneous boundary conditions:
 \vspace{.5cm}
 The \textcolor{blue}{gradient} formulation is adopted to discretize the system. This implies that 
 \begin{itemize}
-\item variables in \textcolor{blue}{Blue} are imposed weakly by setting  $\textcolor{blue}{\bm{f}_N}(v) = 0$
+\item variables in \textcolor{blue}{Blue} are imposed weakly by setting  $\textcolor{blue}{f_N}(v) = 0$
 \item variables in \textcolor{red}{Red} have to be imposed strongly (by select a functional space that incorporates those or by introducing Lagrange multipliers)
 \end{itemize}
 \end{frame}
@@ -529,22 +560,22 @@ Test and co-energy variables are discretized by a Galerkin Method, while energy 
 \bm{\lambda} \\
 \end{pmatrix}
 = \begin{bmatrix}
-\bm{J} & \bm{G}_D\\
--\bm{G}_D^T & 0 \\
+\bm{J}_{\text{grad}} & \textcolor{red}{\bm{G}_D}\\
+-\textcolor{red}{\bm{G}_D}^T & 0 \\
 \end{bmatrix}
 \begin{pmatrix}
 \bm{e}\\
 \bm{\lambda} \\
 \end{pmatrix} + 
 \begin{bmatrix}
-\bm{B}_N\\
+\textcolor{blue}{\bm{B}_N}\\
 0\\
 \end{bmatrix}
 \bm{u}_N
 \end{equation*}
 \begin{itemize}
-	\item $\bm{G}_D$ accounts for essential (Dirichlet) BCs;
-	\item $\bm{B}_N$ account for inhomogeneous natural (Neumann) BCs;
+	\item $\textcolor{red}{\bm{G}_D}$ accounts for Dirichlet (essential) BCs;
+	\item $\textcolor{blue}{\bm{B}_N}$ account for inhomogeneous Neumann (natural) BCs;
 \end{itemize}
 \end{block}
 
@@ -695,8 +726,8 @@ The eigenproblem is solved using the QR algorithm.
 			\hline 
 		\end{tabular} 
 		\captionsetup{width=0.95\linewidth}
-		\captionof{table}{Eigenvalues for $h/L = 0.01$ using $\mathbb{P}_1$:	\\
-			\sqbox{Blue} reference, \, \sqbox{Green} $\varepsilon<2\%$,\, \sqbox{GreenYellow} $\varepsilon<5\%$, \, 	
+		\captionof{table}{Eigenvalues for $h/L = 0.01$ using $\mathbb{P}_1$:	
+			\sqbox{Blue} reference, \, \sqbox{Green} $\varepsilon<2\%$, \, \\ \sqbox{GreenYellow} $\varepsilon<5\%$, \, 	
 			\sqbox{Yellow} $\varepsilon<15\%$, \, \sqbox{Orange} $\varepsilon<30\%$, \, \sqbox{Purple} $\varepsilon<50\%$,	
 			\, \sqbox{Red} $\varepsilon<80\%$.
 		}
@@ -743,15 +774,16 @@ The eigenproblem is solved using the QR algorithm.
 
 \subsection{Time domain simulations}
 
-\begin{frame}{Settings}
+\begin{frame}{Settings for time domain simulation}
 
 We consider a square plate under different BCs and external excitations.
 
 \begin{itemize}
+\item Finite element space $\mathbb{P}_2$;
+\item Number of finite elements $10 \times 10$;
 \item Integrator St\"ormer-Verlet;
 \item Integration step $1 [\mu s]$;
-\item Number of finite elements $5 \times 5$;
-\item Finite element space $\mathbb{P}_2$
+\item Total simulation time $t_{\text{fin}} = 10 [ms]$. 
 \end{itemize}
 
 \end{frame}
@@ -774,12 +806,17 @@ f(t) = \begin{cases}
 \end{equation}
 }
 \begin{center}
-\onslide*<2>{\includemovie[poster, mouse=true, controls=true, toolbar=true, autostop=true]{10cm}{6cm}{./Videos/Video_n1.mp4}}
+\onslide*<2>{
+\movie[width=0.9\textwidth, height = 0.7 \textheight]{Simulation 1}{./Videos/Video_n1.mp4}	
+}
+
+
 \onslide*<3>{
 \includegraphics[width=0.8\textwidth]{Sim1Hamiltonian.eps}
 }
 \end{center}
 \end{frame}
+
 
 \begin{frame}{Second simulation}
 \onslide*<1>{
@@ -794,13 +831,15 @@ The set of BC for the second simulation is
 where 
 \begin{equation}
 g(y, t) = \begin{cases}
-10^6 \, \sin \left( \frac{2 \pi}{L} y \right) \; [Pa \cdot m], \; &\forall t< 0.25 \, t_{\text{fin}}, \\
-0, \; &\forall t\geq 0.25 \, t_{\text{fin}}. \\
+10^6 \, \sin \left( \frac{2 \pi}{L} y \right) \; [Pa \cdot m], \; &\forall t< 0.1 \, t_{\text{fin}}, \\
+0, \; &\forall t\geq 0.1 \, t_{\text{fin}}. \\
 \end{cases}
 \end{equation}
 }
 \begin{center}
-\onslide*<2>{\includemovie[poster, mouse=true, controls=true, toolbar=true, autostop=true]{10cm}{6cm}{./Videos/Video_n2.mp4}}
+\onslide*<2>{
+	\movie[width=0.9\textwidth, height = 0.7 \textheight]{Simulation 2}{./Videos/Video_n2.mp4}	
+}
 	\onslide*<3>{
 		\includegraphics[width=0.8\textwidth]{Sim2Hamiltonian.eps}
 	}
@@ -812,22 +851,35 @@ g(y, t) = \begin{cases}
 Clamped plate subjected to gravity	
 }
 \begin{center}
-	\onslide*<1>{\includemovie[poster, mouse=true, controls=true, toolbar=true, autostop=true]{10cm}{6cm}{./Videos/Video_n3.mp4}}
+\onslide*<1>{
+			\movie[width=0.9\textwidth, height = 0.7 \textheight]{Simulation 3}{./Videos/Video_n3.mp4}	
+	}
 	\onslide*<2>{
 		\includegraphics[width=0.8\textwidth]{Sim3Hamiltonian.eps}
 	}
 \end{center}
 \end{frame}
 
-\begin{frame}[allowframebreaks]
-\printbibliography
+\section{Conclusion}
+\begin{frame}{Conclusion}
+Present and future developments:
+\begin{itemize}
+\item extend the port Hamiltonian formalism to thin plate\footfullcite{BrugnoliKir};
+\item model reduction for pHDAE of second order\footfullcite{Mehrmann2018};
+\end{itemize}
 \end{frame}
-
 
 \begin{frame}
 \centering
 Thank you for your attention. Questions?
 \end{frame}
+
+
+\begin{frame}[allowframebreaks]{References}
+\printbibliography
+\end{frame}
+
+
 
 
 \end{document}
