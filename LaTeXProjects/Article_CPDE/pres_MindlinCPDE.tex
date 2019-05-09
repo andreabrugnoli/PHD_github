@@ -11,6 +11,10 @@
 \usepackage{diffcoeff}
 \usepackage{tcolorbox}
 
+ %%BeginIpePreamble
+\usepackage{amsfonts}
+%%EndIpePreamble
+
 \usepackage{comment}
 
 \usepackage[backend=bibtex]{biblatex}
@@ -19,7 +23,6 @@
 \makeatother
 
 \bibliography{biblio_presCPDE}
-
 
 \usepackage{multirow}
 \usepackage[justification=centering]{caption}
@@ -42,15 +45,17 @@
 
 \definecolor{Grey}{rgb}{0.5,0.5,0.5}
 
-\newcolumntype{g}{>{\columncolor{Green}[.8\tabcolsep]}c}
-\newcolumntype{m}{>{\columncolor{Yellow}[.8\tabcolsep]}c}
-\newcolumntype{b}{>{\columncolor{Blue}[.8\tabcolsep]}c}
+\newcolumntype{g}{>{\columncolor{Green}[1\tabcolsep]}c}
+\newcolumntype{m}{>{\columncolor{Yellow}[1\tabcolsep]}c}
+\newcolumntype{b}{>{\columncolor{Blue}[1\tabcolsep]}c}
+\newcolumntype{N}{>{\setbox0=\hbox\bgroup}c<{\egroup}@{}}
 
 \usepackage{movie15}
 %\usepackage{multimedia}
 %\usepackage{media9}
 
-\graphicspath{{./Figures/}{./Animations/}}
+
+\graphicspath{{./Figures/},{./Videos/}}
 
 \newtheorem{remark}{Remark}
 \newtheorem{proposition}{Proposition}
@@ -121,33 +126,12 @@
 \end{frame}
 }
 
-%\AtBeginSubsection[]{
-%\begin{frame}<beamer>
-%\frametitle{Plan} %
-%\tableofcontents[currentsection,hideothersubsections,currentsubsection]  
-%\end{frame}
-%}
-
-%\AtBeginSection[]
-%{
-%	\begin{frame}<beamer>
-%	\frametitle{Outline}
-%	\tableofcontents[sectionstyle=show/shaded, subsectionstyle=show/show/hide]
-%\end{frame}
-%}
-
-%\AtBeginSubsection[]
-%{
-%\begin{frame}<beamer>
-%\frametitle{Outline}
-%\tableofcontents[sectionstyle=show/shaded, subsectionstyle=show/shaded/hide]
-%\end{frame}
-%}
-
 
 
 \begin{document}
 	
+\nocite{*}
+
 \begin{frame}
 	\titlepage
 \end{frame}
@@ -205,19 +189,13 @@ are the bending curvature and shear strain. The symmetric gradient of a vector f
 }
 \end{frame}
 
-\begin{frame}{Energies}
-The kinetic and potential energy density $\mathcal{K}$ and $\mathcal{U}$ read
-\begin{equation*}
-\begin{aligned}
-\mathcal{K} &=  \frac{1}{2} \left\{ \rho h \left(\diffp{w}{t} \right)^2 +  \frac{\rho h^3}{12} \diffp{\bm{\theta}}{t} \cdot \diffp{\bm{\theta}}{t}  \right\}, \\
-\mathcal{U} &= \frac{1}{2} \left\{ \bm{M} \cddot \bm{K} + \bm{q} \cdot \bm{\gamma}  \right\},
-\end{aligned}
-\end{equation*} 
-where $\bm{M} \cddot \bm{K} := \sum_{\alpha, \beta} m_{\alpha \beta} \, \kappa_{\alpha \beta}$ is the tensor contraction. \\
- The Hamiltonian (total energy)  is the sum of the two
+\begin{frame}{Hamiltonian energy}
+The Hamiltonian (total energy)  is the sum of kinetic and potential energy
 \begin{equation*} 
-H = \int_{\Omega} \left( \mathcal{K} + \mathcal{U} \right) \d\Omega. 
+H =  \frac{1}{2} \int_{\Omega}\underbrace{ \rho h \left(\diffp{w}{t} \right)^2 +  \frac{\rho h^3}{12} \diffp{\bm{\theta}}{t} \cdot \diffp{\bm{\theta}}{t}  }_{\text{Kinetic energy}} + \underbrace{ \bm{M} \cddot \bm{K} + \bm{q} \cdot \bm{\gamma}}_{\text{Potential energy}}  \d\Omega,
 \end{equation*}
+where $\bm{M} \cddot \bm{K} := \sum_{\alpha, \beta} m_{\alpha \beta} \, \kappa_{\alpha \beta}$ is the tensor contraction.
+
 \end{frame}
 
 \subsection{Port-Hamiltonian formulation}
@@ -225,7 +203,7 @@ H = \int_{\Omega} \left( \mathcal{K} + \mathcal{U} \right) \d\Omega.
 
 
 \begin{frame}{Energy, coenergy variables}
-The choice of the energy variables is the same as in \footfullcite{MacchelliMindlin}
+The energy variables are defined as in \footfullcite{MacchelliMindlin}
 \begin{equation*}
 \begin{aligned}
 \alpha_w &= \rho h \diffp{w}{t}, \\
@@ -252,8 +230,9 @@ e_w &:= \diffd{H}{\alpha_w} = \diffp{w}{t},  \\
 
 
 \begin{frame}{PH system}
-The port-Hamiltonian system is expressed as follows 
-\onslide*<1>
+
+\onslide*<1>{
+The classical model is rewritten as port-Hamiltonian system using the energy and coenergy variables 
 \begin{equation*}
 \diffp{}{t}
 \begin{pmatrix}
@@ -275,7 +254,7 @@ e_w \\
 \bm{e}_{\gamma} \\
 \end{pmatrix},
 \end{equation*}
-with $J$ skew symmetric. Moreover
+with $J$ skew symmetric and
 \begin{equation*}
 \begin{pmatrix}
 e_w \\
@@ -296,6 +275,39 @@ e_w \\
 \end{pmatrix},
 \end{equation*}
 with $Q$ coercive.
+}
+\onslide*<2>{
+\begin{equation*}
+J = \begin{bmatrix}
+0  & 0  & 0  & \mathrm{div} \\
+0 & 0 &  \mathrm{Div} & \bm{I}_{2 \times 2}\\
+0  & \mathrm{Grad}  & 0  & 0\\
+\mathrm{grad} & -\bm{I}_{2 \times 2} &  0 & 0  \\
+\end{bmatrix}, \quad Q = 
+\begin{bmatrix}
+1/(\rho h)  & 0  & 0 & 0 \\
+0 & 12/(\rho h^3)  & 0 & 0 \\
+0 & 0  & \bm{D} & 0 \\
+0 & 0  & 0 & \bm{C} \\
+\end{bmatrix}
+\end{equation*}
+\begin{block}{Strong form for theMindlin plate}
+	\begin{equation*}
+	\begin{cases}
+	\displaystyle\diffp{\alpha}{t} &= J e, \vspace{1mm} \\
+	e &= Q \alpha, \vspace{1mm} \\
+	H &= <\alpha, Q \alpha>_{\mathcal{L}^2} = <\alpha, e>_{\mathcal{L}^2}
+	\end{cases}
+	\end{equation*}
+	\begin{equation*}
+	\alpha := (\alpha_{w},\, \bm{\alpha}_{\theta},\, \bm{A}_{\kappa},\, \bm{\alpha}_{\gamma}), \qquad 
+	e := (e_{w},\, \bm{e}_{\theta},\, \bm{E}_{\kappa},\, \bm{e}_{\gamma}),
+	\end{equation*}
+	\[
+	\alpha, \ e \in \mathcal{L}^2 = L^2(\Omega) \times L^2(\Omega, \mathbb{R}^2) \times L^2(\Omega, \mathbb{R}_{\text{sym}}^{2 \times 2}) \times L^2(\Omega, \mathbb{R}^2)
+	\]
+\end{block}
+}
 \end{frame}
 
 \begin{frame}{Boundary variables}
@@ -303,7 +315,7 @@ Taking the energy rate and applying of the Green theorem
 \begin{equation*}
 \dot{H}= \int_{\partial \Omega} \left\{ \textcolor{red}{w_t} \textcolor{blue}{q_n}  + \textcolor{red}{\omega_n} \textcolor{blue}{m_{nn}} + \textcolor{red}{\omega_s} \textcolor{blue}{m_{ns}} \right\} \d{s}.  
 \end{equation*}
-
+\onslide*<1>{
 The dynamic boundary variable are defined as
 \begin{equation*}
 \begin{aligned}
@@ -323,6 +335,12 @@ The corresponding power conjugated (and essential) boundary variables  are
 \textcolor{red}{\omega_{s}} &:=  \bm{e}_\theta \cdot \bm{s}.
 \end{aligned}
 \end{equation*}
+}
+\onslide*<2>{
+\center
+\includegraphics[height=0.5\textheight]{Cauchy_law.eps}
+
+}
 \end{frame}
 
 \section{Structure preserving discretization}
@@ -389,18 +407,19 @@ where $A^*$ is the formal adjoint of operator $A$.}
 \end{frame}
 
 \begin{frame}{Weak form}
-To simplify the notation, all test and unknown functions can be collected in one set variable
+
+\begin{block}{Basic Weak form (before the integration by parts)}
 \begin{equation*}
-\begin{aligned}
-v &:= (v_{w},\, \bm{v}_{\theta},\, \bm{V}_{\kappa},\, \bm{v}_{\gamma}),\\
-\alpha &:= (\alpha_{w},\, \bm{\alpha}_{\theta},\, \bm{A}_{\kappa},\, \bm{\alpha}_{\gamma}), \\
-e &:= (e_{w},\, \bm{e}_{\theta},\, \bm{E}_{\kappa},\, \bm{e}_{\gamma}),
-\end{aligned}
+\left(v, \diffp{\alpha}{t}\right)_{\mathcal{L}^2} = (v, Je)_{\mathcal{L}^2}.
 \end{equation*}
-so that the previous system is rewritten compactly as
-\begin{equation*}
-\left(v, \diffp{\alpha}{t}\right) = (v, Je).
-\end{equation*}
+In order to preserve the pH structure the bilinear form $(v, Je)$ has to give rise to a skew symmetric matrix. Two strategies naturally achieve this goal:
+\begin{enumerate}
+\item<2-> integrating by parts $\textcolor{red}{J_{\text{div}}}$ (gradient formulation)
+\item<3-> integrating by parts $\textcolor{blue}{J_{\text{grad}}}$ (divergence formulation)
+\end{enumerate}
+\onslide<4->{Remark: other choices are possible but less physical.}
+\end{block}
+
 
 \end{frame}
 
@@ -497,7 +516,8 @@ The \textcolor{blue}{gradient} formulation is adopted to discretize the system. 
 \subsection{Finite-dimensional system}
 
 \begin{frame}{Galerkin method}
-Test and co-energy variables are discretized by a Galerkin Method, while energy variables are retrieve using the relation $\alpha = Q^{-1} e$. \\
+Test and co-energy variables are discretized by a Galerkin Method, while energy variables are retrieve using the relation $\alpha = Q^{-1} e$. 
+\begin{block}{Finite-dimensional system}
  Replacing the approximated variables into the weak form 
 \begin{equation*}
 \begin{bmatrix}
@@ -508,37 +528,75 @@ Test and co-energy variables are discretized by a Galerkin Method, while energy 
 \bm{e}\\
 \bm{\lambda} \\
 \end{pmatrix}
-= \begin{pmatrix}
+= \begin{bmatrix}
 \bm{J} & \bm{G}_D\\
 -\bm{G}_D^T & 0 \\
-\end{pmatrix}
+\end{bmatrix}
 \begin{pmatrix}
 \bm{e}\\
 \bm{\lambda} \\
 \end{pmatrix} + 
-\begin{pmatrix}
+\begin{bmatrix}
 \bm{B}_N\\
 0\\
-\end{pmatrix}
+\end{bmatrix}
 \bm{u}_N
 \end{equation*}
 \begin{itemize}
-\item $\bm{G}_D$ accounts for essential (Dirichlet) BCs;
-\item $\bm{B}_N$ account for inhomogeneous natural (Neumann) BCs;
+	\item $\bm{G}_D$ accounts for essential (Dirichlet) BCs;
+	\item $\bm{B}_N$ account for inhomogeneous natural (Neumann) BCs;
 \end{itemize}
+\end{block}
+
  
 \end{frame}
 
+\subsection{Finite element choice}
 
+\begin{frame}{Finite element (FE) choice}
+Domain of $J$:
+\begin{equation*}
+\label{eq:domJ}
+\mathcal{D}(J) = H^{1}(\Omega) \times H^{1}(\Omega, \mathbb{R}^2) \times H^{\text{Div}}(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}}) \times H^{\text{div}}(\Omega, \mathbb{R}^2) \quad \text{+ BCs}.
+\end{equation*}
+
+\begin{block}{Heuristic for selecting stable FE}
+Given the symmetric structure of the problem, all variables ($v, e, \lambda$) are discretized by the same FE space (same family, same degree). The analysis were conducted using two different spaces:
+	\begin{enumerate}
+	\item the first order Lagrange polynomials $\mathbb{P}_1$;
+	\item the second order Lagrange polynomials $\mathbb{P}_2$.
+\end{enumerate}
+\center
+\includegraphics[height=0.2\textheight]{LagrangeP1P2}
+\end{block}
+
+\end{frame}
 
 \section{Numerical simulations}
 
-\begin{frame}{Eigenvalues}
+
+\subsection{Eigenvalues computation}
+
+\begin{frame}{Eigenvalues analysis for a square plate}
+Non-dimensional eigenfrequencies:
+\begin{equation}
+\widehat{\omega}_{mn}^h = \omega_{mn}^h L \left(\frac{2 (1 + \nu) \rho}{E}\right)^{1/2}
+\end{equation}
+$m$ and $n$ being the numbers of half-waves occurring in the modes shapes in the $x$ and $y$ directions. The only parameters which influence the results are the Poisson's ratio $\nu=0.3$ (fixed) and the thickness-to-span ratio $h/L$. \\
+The error is computed by\footfullcite{dawe1980rayleigh}
+\begin{equation}
+\varepsilon = \frac{\text{abs}(\widehat{\omega}_{mn}^h - \omega_{mn}^{DR})}{\omega_{mn}^{DR}}.
+\end{equation}
+The eigenproblem is solved using the QR algorithm.
+
+\end{frame}
+
+\begin{frame}{Eigenvalues for the thick case $h/L=0.1$}
 \onslide*<1>{
 \begin{table}
 \footnotesize
 \centering	
-\begin{tabular}{|c||c||g|g||c||b|}
+\begin{tabular}{ccggNb}
 	\hline 
 	BCs					  & Mode & \cellcolor{white}$N=10$&\cellcolor{white} $N=20$& H-H &\cellcolor{white} D-R \\ 
 	\hline 
@@ -573,7 +631,7 @@ Test and co-energy variables are discretized by a Galerkin Method, while energy 
 	\begin{table}
 		\footnotesize
 		\centering
-		\begin{tabular}{|c||c||g|g||c||b|}
+		\begin{tabular}{ccggNb}
 			\hline 
 			BCs	& Mode & \cellcolor{white}$N=5$ & \cellcolor{white}$N=10$& H-H &\cellcolor{white} D-R \\ 
 			\hline
@@ -599,18 +657,19 @@ Test and co-energy variables are discretized by a Galerkin Method, while energy 
 			\hline 
 		\end{tabular} 
 		\captionsetup{width=0.95\linewidth}
-		\vspace{1mm}
 		\captionof{table}{Eigenvalues for $h/L = 0.1$ using $\mathbb{P}_2$: \\
 			\sqbox{Blue} reference, \, \sqbox{Green} $\varepsilon<2\%$,\, \sqbox{GreenYellow} $\varepsilon<5\%$, \, 	
 			\sqbox{Yellow} $\varepsilon<15\%$.}
 	\end{table}
 }
+\end{frame}
 
-\onslide*<3>{
+\begin{frame}{Eigenvalues for the thin case $h/L=0.01$}
+\onslide*<1>{
 	\begin{table}
 		\footnotesize
 		\centering	
-		\begin{tabular}{|c||c||c|c||c||b|}
+		\begin{tabular}{ccccNb}
 			\hline 
 			BCs					  & Mode &\cellcolor{white}$N=10$&\cellcolor{white}$N=20$& H-H &\cellcolor{white} D-R \\ 
 			\hline 
@@ -636,7 +695,6 @@ Test and co-energy variables are discretized by a Galerkin Method, while energy 
 			\hline 
 		\end{tabular} 
 		\captionsetup{width=0.95\linewidth}
-		\vspace{1mm}
 		\captionof{table}{Eigenvalues for $h/L = 0.01$ using $\mathbb{P}_1$:	\\
 			\sqbox{Blue} reference, \, \sqbox{Green} $\varepsilon<2\%$,\, \sqbox{GreenYellow} $\varepsilon<5\%$, \, 	
 			\sqbox{Yellow} $\varepsilon<15\%$, \, \sqbox{Orange} $\varepsilon<30\%$, \, \sqbox{Purple} $\varepsilon<50\%$,	
@@ -645,11 +703,11 @@ Test and co-energy variables are discretized by a Galerkin Method, while energy 
 \end{table}
 }
 
-\onslide*<4>{
+\onslide*<2>{
 \begin{table}[h]
 	\footnotesize
 	\centering
-	\begin{tabular}{|c||c||m|g||c||b|}
+	\begin{tabular}{ccmgNb}
 		\hline 
 		BCs					  & Mode & \cellcolor{white}$N=5$ & \cellcolor{white}$N=10$ & H-H & \cellcolor{white} D-R \\ 
 		\hline
@@ -675,36 +733,101 @@ Test and co-energy variables are discretized by a Galerkin Method, while energy 
 		\hline 
 	\end{tabular} 
 	\captionsetup{width=0.95\linewidth}
-	\vspace{1mm}
 	\captionof{table}{Eigenvalues for $h/L = 0.01$ using $\mathbb{P}_2$: \\
 		\sqbox{Blue} reference, \, \sqbox{Green} $\varepsilon<2\%$,\, \sqbox{GreenYellow} $\varepsilon<5\%$, \, 	
 		\sqbox{Yellow} $\varepsilon<15\%$.}
 \end{table}
 }
 \end{frame}
-\begin{comment}
-\begin{frame}
-\centering
-\textbf{Simulation output $e_w = \diffp{w}{t}$ \\ (scale factor $\times 500$, 100 frame per second)}
 
-\vspace{0.5cm}
 
-\includemovie[poster, mouse=true, controls=true, toolbar=true, autostop=true]{10cm}{6cm}{./Animations/Loaded_Plate_Video.mp4} 
-%\movie[start=0.0s, label=cells, height = 6cm, width=8cm, showcontrols=true, poster]{}{Video} 
+\subsection{Time domain simulations}
 
+\begin{frame}{Settings}
+
+We consider a square plate under different BCs and external excitations.
+
+\begin{itemize}
+\item Integrator St\"ormer-Verlet;
+\item Integration step $1 [\mu s]$;
+\item Number of finite elements $5 \times 5$;
+\item Finite element space $\mathbb{P}_2$
+\end{itemize}
 
 \end{frame}
 
-\begin{frame}
-\centering
-\includegraphics[width=0.8\textwidth]{Ham_MinLoaded.eps}
+\begin{frame}{First simulation}
+\onslide*<1>{
+Boundary conditions:
+\begin{itemize}
+	\item $x=0 \rightarrow$ Clamped,
+	\item $x=1 \rightarrow$ Free,
+	\item $y=0 \rightarrow q_n = f(t), \, m_{nn} = m_{ns}= 0$,
+	\item $y=1 \rightarrow q_n = -f(t), \, m_{nn} = m_{ns}= 0$,
+\end{itemize}
+where 
+\begin{equation}
+f(t) = \begin{cases}
+10^6 \; [Pa \cdot m], \; &\forall t< 0.25 \, t_{\text{fin}}, \\
+0, \; &\forall t\geq 0.25 \, t_{\text{fin}}. \\
+\end{cases}
+\end{equation}
+}
+\begin{center}
+\onslide*<2>{\includemovie[poster, mouse=true, controls=true, toolbar=true, autostop=true]{10cm}{6cm}{./Videos/Video_n1.mp4}}
+\onslide*<3>{
+\includegraphics[width=0.8\textwidth]{Sim1Hamiltonian.eps}
+}
+\end{center}
 \end{frame}
 
-\end{comment}
+\begin{frame}{Second simulation}
+\onslide*<1>{
+Boundary conditions:
+The set of BC for the second simulation is
+\begin{itemize}
+	\item $x=0 \rightarrow$ Clamped,
+	\item $x=1 \rightarrow q_n = g(y, t), \, m_{nn} = m_{ns}= 0$,
+	\item $y=0 \rightarrow$ Clamped,
+	\item $y=1 \rightarrow$ Clamped,
+\end{itemize}
+where 
+\begin{equation}
+g(y, t) = \begin{cases}
+10^6 \, \sin \left( \frac{2 \pi}{L} y \right) \; [Pa \cdot m], \; &\forall t< 0.25 \, t_{\text{fin}}, \\
+0, \; &\forall t\geq 0.25 \, t_{\text{fin}}. \\
+\end{cases}
+\end{equation}
+}
+\begin{center}
+\onslide*<2>{\includemovie[poster, mouse=true, controls=true, toolbar=true, autostop=true]{10cm}{6cm}{./Videos/Video_n2.mp4}}
+	\onslide*<3>{
+		\includegraphics[width=0.8\textwidth]{Sim2Hamiltonian.eps}
+	}
+\end{center}
+\end{frame}
+
+\begin{frame}{Third simulation}
+\onslide*<1>{
+Clamped plate subjected to gravity	
+}
+\begin{center}
+	\onslide*<1>{\includemovie[poster, mouse=true, controls=true, toolbar=true, autostop=true]{10cm}{6cm}{./Videos/Video_n3.mp4}}
+	\onslide*<2>{
+		\includegraphics[width=0.8\textwidth]{Sim3Hamiltonian.eps}
+	}
+\end{center}
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+\printbibliography
+\end{frame}
 
 
 \begin{frame}
 \centering
 Thank you for your attention. Questions?
 \end{frame}
+
+
 \end{document}

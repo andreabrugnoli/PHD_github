@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from matplotlib import cm
-from AnimateSurf import animate2D
+from Mindlin_PHs_fenics.AnimateSurf import animate2D
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as animation
 

@@ -14,18 +14,19 @@ from matplotlib import cm
 from Mindlin_PHs_fenics.AnimateSurf import animate2D
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as animation
+from Mindlin_PHs_fenics.symplectic_integrators import StormerVerletGrad
 plt.rc('text', usetex=True)
 
-n_sim = 2
+n_sim = 3
 
-n = 10
+n = 5
 deg = 2
 
 E = 7e10
 nu = 0.35
 h = 0.1
 rho = 2700  # kg/m^3
-k =  0.8601 # 5./6. #
+k = 0.8601 # 5./6. #
 L = 1
 
 D = E * h ** 3 / (1 - nu ** 2) / 12.
@@ -87,7 +88,7 @@ class Left(SubDomain):
 
 class Right(SubDomain):
     def inside(self, x, on_boundary):
-        return abs(x[0] - l_x) < DOLFIN_EPS and on_boundary
+        return abs(x[0] - L) < DOLFIN_EPS and on_boundary
 
 class Lower(SubDomain):
     def inside(self, x, on_boundary):
@@ -95,11 +96,7 @@ class Lower(SubDomain):
 
 class Upper(SubDomain):
     def inside(self, x, on_boundary):
-        return abs(x[1] - l_y) < DOLFIN_EPS and on_boundary
-
-class AllBoundary(SubDomain):
-    def inside(self, x, on_boundary):
-        return on_boundary
+        return abs(x[1] - L) < DOLFIN_EPS and on_boundary
 
 # Boundary conditions on displacement
 left = Left()
@@ -119,41 +116,53 @@ ds = Measure('ds', subdomain_data= boundaries)
 
 # Finite element defition
 
-P_pw = FiniteElement('P', triangle, deg)
-P_pth = VectorElement('P', triangle, deg)
-P_qth = TensorElement('P', triangle, deg, symmetry=True)
-P_qw = VectorElement('P', triangle, deg)
+P_pw = FiniteElement('CG', triangle, deg)
+P_pth = VectorElement('CG', triangle, deg)
+P_qth = TensorElement('CG', triangle, deg, symmetry=True)
+P_qw = VectorElement('CG', triangle, deg)
 
-elem = MixedElement([P_pw, P_pth, P_qth, P_qw])
+elem_p = MixedElement([P_pw, P_pth])
+elem_q = MixedElement([P_qth, P_qw])
 
-V = FunctionSpace(mesh, elem)
-n_V = V.dim()
+Vp = FunctionSpace(mesh, elem_p)
+Vq = FunctionSpace(mesh, elem_q)
 
-dofV_x = V.tabulate_dof_coordinates().reshape((-1, d))
+n_Vp = Vp.dim()
+n_Vq = Vq.dim()
+n_V = n_Vp + n_Vq
 
-dofs_Vpw = V.sub(0).dofmap().dofs()
-dofs_Vpth = V.sub(1).dofmap().dofs()
-dofs_Vqth = V.sub(2).dofmap().dofs()
-dofs_Vqw = V.sub(3).dofmap().dofs()
+dofVp_x = Vp.tabulate_dof_coordinates().reshape((-1, d))
+dofVq_x = Vq.tabulate_dof_coordinates().reshape((-1, d))
 
+vertex_x = mesh.coordinates().reshape((-1, d))
 
-dofVpw_x = dofV_x[dofs_Vpw]
+dofs_Vpw = Vp.sub(0).dofmap().dofs()
+dofs_Vpth = Vp.sub(1).dofmap().dofs()
 
-v = TestFunction(V)
-v_pw, v_pth, v_qth, v_qw = split(v)
+dofs_Vqw = Vq.sub(1).dofmap().dofs()
+dofs_Vqth = Vq.sub(0).dofmap().dofs()
 
-e = TrialFunction(V)
-e_pw, e_pth, e_qth, e_qw = split(e)
+dofVpw_x = dofVp_x[dofs_Vpw]
 
+v_p = TestFunction(Vp)
+v_pw, v_pth, = split(v_p)
+
+v_q = TestFunction(Vq)
+v_qth, v_qw = split(v_q)
+
+e_p = TrialFunction(Vp)
+e_pw, e_pth = split(e_p)
+
+e_q = TrialFunction(Vq)
+e_qth, e_qw = split(e_q)
 
 al_pw = rho * h * e_pw
 al_pth = (rho * h ** 3) / 12. * e_pth
 al_qth = bending_curv(e_qth)
 al_qw = 1. / F * e_qw
 
-m = inner(v_pw, al_pw) * dx + inner(v_pth, al_pth) * dx + \
-    inner(v_qth, al_qth) * dx + inner(v_qw, al_qw) * dx
-
+m_p = inner(v_pw, al_pw) * dx + inner(v_pth, al_pth) * dx
+m_q = inner(v_qth, al_qth) * dx + inner(v_qw, al_qw) * dx
 
 j_div = v_pw * div(e_qw) * dx
 j_divIP = -div(v_qw) * e_pw * dx
@@ -170,23 +179,41 @@ j_gradSymIP = -inner(gradSym(v_pth), e_qth) * dx
 j_Id = dot(v_pth, e_qw) * dx
 j_IdIP = -dot(v_qw, e_pth) * dx
 
-j_alldiv = j_div + j_divIP + j_divSym + j_divSymIP + j_Id + j_IdIP
-j_allgrad = j_grad + j_gradIP + j_gradSym + j_gradSymIP + j_Id + j_IdIP
+# j_alldiv = j_div + j_divIP + j_divSym + j_divSymIP + j_Id + j_IdIP
+# j_allgrad = j_grad + j_gradIP + j_gradSym + j_gradSymIP + j_Id + j_IdIP
+#
+# j = j_alldiv
 
-j = j_allgrad
+j_alldiv_q = j_div + j_divSym + j_Id
+j_alldiv_p = j_IdIP + j_divIP + j_divSymIP
 
+j_allgrad_p = j_grad + j_gradSym + j_IdIP
+j_allgrad_q = j_gradIP + j_gradSymIP + j_Id
 
+j_p = j_allgrad_p
+j_q = j_allgrad_q
+
+# j_p = j_alldiv_p
+# j_q = j_alldiv_q
 
 # Assemble the interconnection matrix and the mass matrix.
-J, M = PETScMatrix(), PETScMatrix()
+J_p, J_q, M_p, M_q = PETScMatrix(), PETScMatrix(), PETScMatrix(), PETScMatrix()
 
-J_pl = assemble(j).array()
-M_pl = assemble(m).array()
+J_p = assemble(j_p)
+J_q = assemble(j_q)
 
+M_p = assemble(m_p).array()
+M_q = assemble(m_q).array()
 
+D_p = J_p.array()
+D_q = J_q.array()
+
+R_p = np.zeros_like(M_p)
 if n_sim == 1:
     bc_input = 'CFFF'
-else: bc_input = 'CFCF'
+elif n_sim == 2:
+    bc_input = 'CCFC'
+else: bc_input = 'CCCC'
 
 # bc_input = input('Select Boundary Condition:')
 
@@ -224,10 +251,10 @@ g = sum(g_vec)
 G = PETScMatrix
 
 G = assemble(g)
-G_pl = G.array()
+G_p = G.array()
 
-bd_dofs_mul = np.where(G_pl.any(axis=0))[0]
-G_pl = G_pl[:, bd_dofs_mul]
+bd_dofs_mul = np.where(G_p.any(axis=0))[0]
+G_p = G_p[:, bd_dofs_mul]
 
 n_mul = len(bd_dofs_mul)
 
@@ -235,67 +262,62 @@ n_mul = len(bd_dofs_mul)
 
 
 g = Constant(10)
-force = Expression("A*sin(2*pi/lx*x[0])", degree=4, lx = l_x, A = 10**5)
-# force = Constant(1e6)
+force1 = Constant(1e3)
+
+force2 = Expression("A*sin(2*pi/l*x[1])", degree=4, l=L, A=force1)
 # f_p = v_pw * force * ds(2)
-f_p1 = - v_pw * rho * h * g * dx
-f_p2 = v_pw * force * ds(3) - v_pw * force * ds(4)
+
+f_p1 = v_pw * force1 * ds(3) - v_pw * force1 * ds(4)
+f_p2 = v_pw * force2 * ds(2)
+f_p3 = - v_pw * rho * h * g * dx
 
 if n_sim == 1:
     f_p = f_p1
-else:
+elif n_sim == 2:
     f_p = f_p2
+else:
+    f_p = f_p3
+F_p = assemble(f_p).get_local()
 
-F_int = assemble(f_p).get_local()
+Mp_sp = csc_matrix(M_p)
 
-Mint = M_pl
-Jint = J_pl
-Rint = np.zeros((n_V, n_V))
-Gint = G_pl
-Mint_sp = csc_matrix(Mint)
-invMint = inv_sp(Mint_sp)
-invMint = invMint.toarray()
+invMp = inv_sp(Mp_sp)
+invM_pl = invMp.toarray()
 
-S = Gint @ la.inv(Gint.T @ invMint @ Gint) @ Gint.T @ invMint
+S_p = G_p @ la.inv(G_p.T @ invMp @ G_p) @ G_p.T @ invMp
 
-I = np.eye(n_V)
+n_tot = n_Vp + n_Vq
+Id_p = np.eye(n_Vp)
+P_p = Id_p - S_p
 
-P = I - S
+t_0 = 0
+dt = 1e-6
 
-Jsys = P @ Jint
-Rsys = P @ Rint
-Fsys = P @ F_int
+t_f = 1e-2
+n_ev = 300
 
-t0 = 0.0
-t_fin = 1e-3
-t_span = [t0, t_fin]
+init_p = Expression(('A*sin(2*pi*x[0])*sin(2*pi*(x[0]-lx))*sin(2*pi*x[1])*sin(2*pi*(x[1]-ly))', '0', '0'), degree=4,
+                    lx=L, ly=L, A=10**(-3))
+init_q = Expression(('0', '0', '0', '0'), degree=4, lx=L, ly=L)
 
-def sys(t,y):
-    if t < 0.25 * t_fin:
-        bool_f = 1
-    else: bool_f = 0
-    dydt = invMint @ ( (Jsys - Rsys) @ y + Fsys *bool_f)
-    return dydt
+e_p0_fun = Function(Vp)
+e_p0_fun.assign(interpolate(init_p, Vp))
+ep_0 = np.zeros((n_Vp,))
+eq_0 = np.zeros((n_Vq,))
+
+solverSym = StormerVerletGrad(M_p, M_q, D_p, D_q, R_p, P_p, F_p)
+sol = solverSym.compute_sol(ep_0, eq_0, t_f, t_0=t_0, dt=dt, n_ev = n_ev)
+
+t_ev = sol.t_ev
+ep_sol = sol.ep_sol
+eq_sol = sol.eq_sol
 
 
-init_con = Expression(('sin(2*pi*x[0])*sin(2*pi*(x[0]-lx))*sin(2*pi*x[1])*sin(2*pi*(x[1]-ly))', \
-                      '0', '0', '0', '0', '0', '0', '0', '0'), degree=4, lx=l_x, ly=l_y)
+n_pw = Vp.sub(0).dim()
 
-e_pl0 = Function(V)
-e_pl0.assign(interpolate(init_con, V))
-y0 = np.zeros(n_V,)
-# y0[:n_pl] = e_pl0.vector().get_local()
+e_pw = ep_sol[dofs_Vpw, :]  # np.zeros((n_pw,n_t))
 
-t_ev = np.linspace(t0,t_fin, num=100)
-sol = integrate.solve_ivp(sys, t_span, y0, method='RK45', vectorized=False, t_eval=t_ev)
-
-n_ev = len(t_ev)
-
-e_pl = sol.y
-
-e_pw = e_pl[dofs_Vpw, :]  # np.zeros((n_pw,n_t))
-
-w0 = np.zeros((len(dofs_Vpw),))
+w0 = np.zeros((n_pw,))
 w = np.zeros(e_pw.shape)
 w[:, 0] = w0
 w_old = w[:, 0]
@@ -314,10 +336,8 @@ for i in range(1, n_ev):
 x = dofVpw_x[:, 0]
 y = dofVpw_x[:, 1]
 
-if n_sim == 1:
-    w_mm = w * 1000000
-else:
-    w_mm = w * 1000
+w_mm = w * 1000000
+
 
 minZ = w_mm.min()
 maxZ = w_mm.max()
@@ -327,56 +347,58 @@ H_vec = np.zeros((n_ev,))
 fntsize = 16
 
 for i in range(n_ev):
-    H_vec[i] = 0.5 * (e_pl[:, i].T @ M_pl @ e_pl[:, i])
+    H_vec[i] = 0.5 * (ep_sol[:, i].T @ M_p @ ep_sol[:, i] + eq_sol[:, i].T @ M_q @ eq_sol[:, i])
 
 fig = plt.figure()
 plt.plot(t_ev, H_vec, 'b-', label='Hamiltonian (J)')
-# plt.plot(t_ev, Ep, 'r-', label = 'Potential Energy (J)')
-# plt.plot(t_ev, H_vec + Ep, 'g-', label = 'Total Energy (J)')
+if n_sim == 3:
+    plt.plot(t_ev, Ep, 'r-', label = 'Potential Energy (J)')
+    plt.plot(t_ev, H_vec + Ep, 'g-', label = 'Total Energy (J)')
 plt.xlabel(r'{Time} (s)', fontsize=fntsize)
 # plt.ylabel(r'{Hamiltonian} (J)',fontsize=fntsize)
 plt.title(r"Hamiltonian trend",
           fontsize=fntsize)
-plt.legend(loc='upper left')
+plt.legend(loc='lower right')
 
 
-path_out = "/home/a.brugnoli/Plots_Videos/Mindlin_plots/Temp_Simulation/Article_Min/"
+path_out = "/home/a.brugnoli/Plots_Videos/Python/Plots/Mindlin_plots/Simulations/PresIFAC/"
 plt.savefig(path_out + "Sim" +str(n_sim) + "Hamiltonian.eps", format="eps")
 
 
 anim = animate2D(x, y, w_mm, t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \
-                         zlabel='$w [mm]$', title = 'Vertical Displacement')
+                         title='Vertical Displacement $[\mu m]$')
+
+
+Writer = animation.writers['ffmpeg']
+writer = Writer(fps=30, metadata=dict(artist='Me'), bitrate=1800)
+
+anim.save(path_out + 'Video_n' + str(n_sim) + '.mp4', writer=writer)
 
 plt.show()
 
-# Writer = animation.writers['ffmpeg']
-# writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
 #
-# anim.save('Video_n' + str(n_sim) + '.mp4', writer=writer)
-
-
-save_figs = True
-if save_figs:
-    n_fig = 4
-    tol = 1e-6
-    for i in range(n_fig):
-        index = int(n_ev/n_fig*(i+1)-1)
-        fig = plt.figure(i+1)
-        ax = fig.add_subplot(111, projection='3d')
-
-        surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False}  # , 'vmin': minZ, 'vmax': maxZ}
-
-        ax.set_xbound(min(x) - tol, max(x) + tol)
-        ax.set_xlabel('$x [m]$', fontsize=fntsize)
-        ax.set_ybound(min(y) - tol, max(y) + tol)
-        ax.set_ylabel('$y [m]$', fontsize=fntsize)
-        ax.set_zlabel('$w [mm]$', fontsize=fntsize)
-        ax.set_title('Vertical displacement', fontsize=fntsize)
-
-        ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
-        ax.w_zaxis.set_major_locator(LinearLocator(10))
-        ax.w_zaxis.set_major_formatter(FormatStrFormatter('%3.2f' ))
-
-        ax.plot_trisurf(x, y, w_mm[:,index], **surf_opts)
-        plt.savefig(path_out + "Sim" + str(n_sim) + "t" + str(index + 1) + ".eps", format="eps")
-        # plt.show()
+# save_figs = True
+# if save_figs:
+#     n_fig = 4
+#     tol = 1e-6
+#     for i in range(n_fig):
+#         index = int(n_ev/n_fig*(i+1)-1)
+#         fig = plt.figure(i+1)
+#         ax = fig.add_subplot(111, projection='3d')
+#
+#         surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False}  # , 'vmin': minZ, 'vmax': maxZ}
+#
+#         ax.set_xbound(min(x) - tol, max(x) + tol)
+#         ax.set_xlabel('$x [m]$', fontsize=fntsize)
+#         ax.set_ybound(min(y) - tol, max(y) + tol)
+#         ax.set_ylabel('$y [m]$', fontsize=fntsize)
+#         ax.set_zlabel('$w [mm]$', fontsize=fntsize)
+#         ax.set_title('Vertical displacement', fontsize=fntsize)
+#
+#         ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
+#         ax.w_zaxis.set_major_locator(LinearLocator(10))
+#         ax.w_zaxis.set_major_formatter(FormatStrFormatter('%3.2f' ))
+#
+#         ax.plot_trisurf(x, y, w_mm[:,index], **surf_opts)
+#         plt.savefig(path_out + "Sim" + str(n_sim) + "t" + str(index + 1) + ".eps", format="eps")
+#         # plt.show()

@@ -13,12 +13,14 @@ def animate2D(x, y, sol2D, t, xlabel = None, ylabel = None,  zlabel = None, titl
     tol = 1e-4
     fntsize = 20
 
+    t_conv = 1e6
+
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
     def update_plot(frame_number, sol2D, plot):
         ax.collections.clear()
-        lab = 'Time =' + '{0:.2e}'.format(t[frame_number])
+        lab = 'Time $[\mu s]$ =' + str(int(t[frame_number]*t_conv))
         plot = ax.plot_trisurf(x, y, sol2D[:, frame_number], \
                                   label=lab, **surf_opts)
         plot._facecolors2d = plot._facecolors3d
@@ -42,15 +44,15 @@ def animate2D(x, y, sol2D, t, xlabel = None, ylabel = None,  zlabel = None, titl
 
     ax.set_zlim(minSol - 1e-3 * abs(minSol), maxSol + 1e-3 * abs(maxSol))
     ax.w_zaxis.set_major_locator(LinearLocator(10))
-    ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
+    ax.w_zaxis.set_major_formatter(FormatStrFormatter('%.2g'))
 
     ax.set_title(title, fontsize=fntsize, loc='left')
 
-    lab = 'Time =' + '{0:.2e}'.format(t[0])
+    lab = 'Time $[\mu s]$ =' + str(int(t[0] * t_conv))
     surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False, 'vmin': minSol, 'vmax': maxSol}
     plot = ax.plot_trisurf(x, y, sol2D[:, 0], label = lab, **surf_opts)
     fig.colorbar(plot)
-    anim =  animation.FuncAnimation(fig, update_plot, frames=len(t), interval = 10, fargs=(sol2D, plot))
+    anim = animation.FuncAnimation(fig, update_plot, frames=len(t), interval=10, fargs=(sol2D, plot))
 
     return anim
 
