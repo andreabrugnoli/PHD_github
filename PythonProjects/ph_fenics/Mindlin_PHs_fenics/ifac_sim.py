@@ -17,9 +17,9 @@ import matplotlib.animation as animation
 from Mindlin_PHs_fenics.symplectic_integrators import StormerVerletGrad
 plt.rc('text', usetex=True)
 
-n_sim = 3
+n_sim = 1
 
-n = 5
+n = 10
 deg = 2
 
 E = 7e10
