@@ -11,8 +11,8 @@ from firedrake.plot import _two_dimension_triangle_func_val
 from mpl_toolkits.mplot3d import Axes3D
 plt.rc('text', usetex=True)
 
-n = 5
-deg = 2
+n = 10
+deg = 1
 
 pho = 1
 E = 1
@@ -74,7 +74,7 @@ mesh = UnitSquareMesh(n_x, n_y)
 
 Vp_w = FunctionSpace(mesh, "CG", deg)
 Vp_th = VectorFunctionSpace(mesh, "CG", deg)
-Vq_th = VectorFunctionSpace(mesh, "CG", deg, dim = 3)
+Vq_th = VectorFunctionSpace(mesh, "CG", deg, dim=3)
 Vq_w = VectorFunctionSpace(mesh, "CG", deg)
 
 V = Vp_w * Vp_th * Vq_th * Vq_w
@@ -188,41 +188,41 @@ omega.sort()
 
 omega_tilde = omega*L*((2*(1+nu)*rho)/E)**0.5
 
-for i in range(4):
+for i in range(10):
     print(omega_tilde[i])
 
-n_fig = 5
+n_fig = 15
 
 n_Vpw = Vp_w.dim()
-# fntsize = 15
-# for i in range(n_fig):
-#     # print("Eigenvalue num " + str(i + 1) + ":" + str(omega[i]))
-#     eig_real_w = Function(Vp_w)
-#     eig_imag_w = Function(Vp_w)
-#
-#     eig_real_pw = np.real(eigvec_omega[:n_Vpw, i])
-#     eig_imag_pw = np.imag(eigvec_omega[:n_Vpw, i])
-#     eig_real_w.vector()[:] = eig_real_pw
-#     eig_imag_w.vector()[:] = eig_imag_pw
-#
-#     norm_real_eig = np.linalg.norm(eig_real_w.vector().get_local())
-#     norm_imag_eig = np.linalg.norm(eig_imag_w.vector().get_local())
-#
-#     if norm_imag_eig > norm_real_eig:
-#         triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_imag_w, 10)
-#     else:
-#         triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_real_w, 10)
-#
-#     figure = plt.figure()
-#     ax = figure.add_subplot(111, projection="3d")
-#
-#     ax.plot_trisurf(triangulation, z_goodeig, cmap=cm.jet)
-#
-#     ax.set_xlabel('$x [m]$', fontsize=fntsize)
-#     ax.set_ylabel('$y [m]$', fontsize=fntsize)
-#     ax.set_title('Eigenvector num ' + str(i + 1), fontsize=fntsize)
-#
-#     ax.w_zaxis.set_major_locator(LinearLocator(10))
-#     ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
-#
-# plt.show()
+fntsize = 15
+for i in range(n_fig):
+    print("Eigenvalue num " + str(i + 1) + ":" + str(omega[i]))
+    eig_real_w = Function(Vp_w)
+    eig_imag_w = Function(Vp_w)
+
+    eig_real_pw = np.real(eigvec_omega[:n_Vpw, i])
+    eig_imag_pw = np.imag(eigvec_omega[:n_Vpw, i])
+    eig_real_w.vector()[:] = eig_real_pw
+    eig_imag_w.vector()[:] = eig_imag_pw
+
+    norm_real_eig = np.linalg.norm(eig_real_w.vector().get_local())
+    norm_imag_eig = np.linalg.norm(eig_imag_w.vector().get_local())
+
+    if norm_imag_eig > norm_real_eig:
+        triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_imag_w, 10)
+    else:
+        triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_real_w, 10)
+
+    figure = plt.figure()
+    ax = figure.add_subplot(111, projection="3d")
+
+    ax.plot_trisurf(triangulation, z_goodeig, cmap=cm.jet)
+
+    ax.set_xlabel('$x [m]$', fontsize=fntsize)
+    ax.set_ylabel('$y [m]$', fontsize=fntsize)
+    ax.set_title('Eigenvector num ' + str(i + 1), fontsize=fntsize)
+
+    ax.w_zaxis.set_major_locator(LinearLocator(10))
+    ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
+
+plt.show()

@@ -5,6 +5,7 @@ import numpy as np
 import scipy.linalg as la
 from modules_phdae.classes_phsystem import SysPhdaeRig, check_positive_matrix, check_skew_symmetry
 import warnings
+import matplotlib.pyplot as plt
 np.set_printoptions(threshold=np.inf)
 
 

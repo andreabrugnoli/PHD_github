@@ -18,17 +18,16 @@ class NeumannWave(SysPhdaeRig):
     def __init__(self, Lx, Ly, rho, T, nx, ny, modes=False):
 
         mesh = RectangleMesh(nx, ny, Lx, Ly, quadrilateral=False)
-        # mesh = Mesh("./meshes/DoubleDom.msh")
 
-        plot(mesh); plt.show()
+        # plot(mesh); plt.show()
 
         x, y = SpatialCoordinate(mesh)
 
         deg_p = 1
-        deg_q = 1
-        Vp = FunctionSpace(mesh, "Lagrange", deg_p)
-        # Vq = FunctionSpace(mesh, "RT", deg_q)
-        Vq = VectorFunctionSpace(mesh, "Lagrange", deg_q)
+        deg_q = 2
+        Vp = FunctionSpace(mesh, "CG", deg_p)
+        Vq = FunctionSpace(mesh, "RT", deg_q)
+        # Vq = VectorFunctionSpace(mesh, "DG", deg_q)
 
         V = Vp * Vq
 
@@ -38,11 +37,8 @@ class NeumannWave(SysPhdaeRig):
         e_v = TrialFunction(V)
         e_p, e_q = split(e_v)
 
-        # al_p = rho * e_p
-        # al_q = 1./T * e_q
-
-        al_p = e_p
-        al_q = e_q
+        al_p = rho * e_p
+        al_q = 1./T * e_q
 
         dx = Measure('dx')
         ds = Measure('ds')
@@ -66,16 +62,16 @@ class NeumannWave(SysPhdaeRig):
         n_e = V.dim()
 
         # B matrices based on Lagrange
-        Vf = FunctionSpace(mesh, 'Lagrange', 1)
+        Vf = FunctionSpace(mesh, 'CG', 1)
         f_N = TrialFunction(Vf)
 
         # is_clamped = conditional(And(le(x, 0.1), le(y, 0.1)), 1, 0)
-        b_N = v_p * f_N * ds
+        b_N = v_p * f_N * ds(1)
 
         petsc_bN = assemble(b_N, mat_type='aij').M.handle
         B_N = np.array(petsc_bN.convert("dense").getDenseArray())
 
-        boundary_dofs = np.where(B_N.any(axis=0))[0]  # np.where(~np.all(B_in == 0, axis=0) == True) #
+        boundary_dofs = np.where(B_N.any(axis=0))[0]
         B_N = B_N[:, boundary_dofs]
 
         n_u = B_N.shape[1]
@@ -94,6 +90,86 @@ class NeumannWave(SysPhdaeRig):
             printmodes(Ef_aug, Jf_aug, Vp, n_modes)
 
         SysPhdaeRig.__init__(self, n_e, 0, 0, n_p, n_q, E=MM, J=JJ, B=B_N)
+
+
+
+class DirichletWave(SysPhdaeRig):
+
+    def __init__(self, Lx, Ly, rho, T, nx, ny, modes=False):
+
+        mesh = RectangleMesh(nx, ny, Lx, Ly, quadrilateral=False)
+
+        # plot(mesh); plt.show()
+
+        x, y = SpatialCoordinate(mesh)
+
+        deg_p = 1
+        deg_q = 2
+        Vp = FunctionSpace(mesh, "CG", deg_p)
+        Vq = FunctionSpace(mesh, "RT", deg_q)
+        # Vq = VectorFunctionSpace(mesh, "Lagrange", deg_q)
+
+        V = Vp * Vq
+
+        v = TestFunction(V)
+        v_p, v_q = split(v)
+
+        e_v = TrialFunction(V)
+        e_p, e_q = split(e_v)
+
+        al_p = rho * e_p
+        al_q = 1./T * e_q
+
+        dx = Measure('dx')
+        ds = Measure('ds')
+        m_p = v_p * al_p * dx
+        m_q = dot(v_q, al_q) * dx
+        m_form = m_p + m_q
+
+        j_div = dot(v_p, div(e_q)) * dx
+        j_divIP = -dot(div(v_q), e_p) * dx
+
+        j_form = j_div + j_divIP
+        petsc_j = assemble(j_form, mat_type='aij').M.handle
+        petsc_m = assemble(m_form, mat_type='aij').M.handle
+
+        JJ = np.array(petsc_j.convert("dense").getDenseArray())
+        MM = np.array(petsc_m.convert("dense").getDenseArray())
+
+        n_p = Vp.dim()
+        n_q = Vq.dim()
+
+        n_e = V.dim()
+
+        # B matrices based on Lagrange
+        Vf = FunctionSpace(mesh, 'CG', 1)
+        f_D = TrialFunction(Vf)
+
+        n = FacetNormal(mesh)
+        # is_clamped = conditional(And(le(x, 0.1), le(y, 0.1)), 1, 0)
+        b_D = dot(v_q, n) * f_D * ds(2) + dot(v_q, n) * f_D * ds(3) + dot(v_q, n) * f_D * ds(4)
+
+        petsc_bD = assemble(b_D, mat_type='aij').M.handle
+        B_D = np.array(petsc_bD.convert("dense").getDenseArray())
+
+        boundary_dofs = np.where(B_D.any(axis=0))[0]
+        B_D = B_D[:, boundary_dofs]
+
+        n_u = B_D.shape[1]
+
+        Z_u = np.zeros((n_u, n_u))
+        Ef_aug = la.block_diag(MM, Z_u)
+        Jf_aug = la.block_diag(JJ, Z_u)
+
+        Jf_aug[:n_e, n_e:] = B_D
+        Jf_aug[n_e:, :n_e] = -B_D.T
+
+        if modes:
+            n_modes = input('Number modes to be visualized:')
+            # printmodes(MM, JJ, Vp, n_modes)
+            printmodes(Ef_aug, Jf_aug, Vp, n_modes)
+
+        SysPhdaeRig.__init__(self, n_e, 0, 0, n_p, n_q, E=MM, J=JJ, B=B_D)
 
 
 def find_point(coords, point):
@@ -115,7 +191,7 @@ def printmodes(M, J, Vp, n_modes):
     eigenvalues, eigvectors = la.eig(J, M)
     omega_all = np.imag(eigenvalues)
 
-    index = omega_all > 1e-9
+    index = omega_all > 0
 
     omega = omega_all[index]
     eigvec_omega = eigvectors[:, index]

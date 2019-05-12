@@ -6,6 +6,7 @@ import numpy as np
 np.set_printoptions(threshold=np.inf)
 from math import floor, sqrt, pi
 import matplotlib.pyplot as plt
+from firedrake.plot import _two_dimension_triangle_func_val
 
 import scipy.linalg as la
 
@@ -73,11 +74,8 @@ mesh = UnitSquareMesh(n_x, n_y, quadrilateral=False)
 # plot(mesh)
 # plt.show()
 
-nameFE = 'Hermite'
-name_FEp = nameFE
-name_FEq = 'Hermite'
-
-deg_q = 3
+name_FEp = 'Bell'
+name_FEq = 'Bell'
 
 if name_FEp == 'Morley':
     deg_p = 2
@@ -221,7 +219,7 @@ omega.sort()
 
 # NonDimensional China Paper
 
-n_om = 3
+n_om = 15
 
 omega_tilde = (L/pi) ** 2 * sqrt(rho * h / D) * omega
 for i in range(n_om):
@@ -255,13 +253,19 @@ if plot_eigenvectors:
         eig_real_wCG = project(eig_real_w, Vp_CG)
         eig_imag_wCG = project(eig_imag_w, Vp_CG)
 
-        from firedrake.plot import _two_dimension_triangle_func_val
-        triangulation, Z = _two_dimension_triangle_func_val(eig_imag_wCG, 10)
+        norm_real_eig = np.linalg.norm(eig_real_wCG.vector().get_local())
+        norm_imag_eig = np.linalg.norm(eig_imag_wCG.vector().get_local())
+
+        if norm_imag_eig > norm_real_eig:
+            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_imag_wCG, 10)
+        else:
+            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_real_wCG, 10)
+
 
         figure = plt.figure(i)
         ax = figure.add_subplot(111, projection="3d")
 
-        ax.plot_trisurf(triangulation, Z, cmap=cm.jet)
+        ax.plot_trisurf(triangulation, z_goodeig, cmap=cm.jet)
 
         ax.set_xbound(-tol, l_x + tol)
         ax.set_xlabel('$x [m]$', fontsize=fntsize)
