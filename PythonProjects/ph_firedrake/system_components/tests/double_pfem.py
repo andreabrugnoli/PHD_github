@@ -15,16 +15,6 @@ plt.rc('text', usetex=True)
 # wave = NeumannWave(1, 1, 1, 1, 10, 10, modes=True)
 # wave = DirichletWave(1, 1, 1, 1, 10, 10, modes=True)
 
-rho = 1
-T = 1
-
-path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/system_components/tests/meshes/"
-mesh1 = Mesh(path_mesh + "dom1.msh")
-mesh2 = Mesh(path_mesh + "dom2.msh")
-
-# plot(mesh1)
-# plot(mesh2)
-# plt.show()
 
 def create_sys1(mesh1, deg_p1, deg_q1):
     x1, y1 = SpatialCoordinate(mesh1)
@@ -69,7 +59,7 @@ def create_sys1(mesh1, deg_p1, deg_q1):
     J1 = np.array(petsc_j1.convert("dense").getDenseArray())
     M1 = np.array(petsc_m1.convert("dense").getDenseArray())
 
-    Vf1 = FunctionSpace(mesh1, 'CG', 1)
+    Vf1 = FunctionSpace(mesh1, "CG", 1)
     f_D = TrialFunction(Vf1)
     v_D = TestFunction(Vf1)
 
@@ -79,7 +69,7 @@ def create_sys1(mesh1, deg_p1, deg_q1):
     Mdelta = np.array(petsc_md.convert("dense").getDenseArray())
 
     n = FacetNormal(mesh1)
-    tolx1 = 1e-2
+    tolx1 = 1e-15
     is_int1 = conditional(gt(x1, tolx1), 1, 0)
     b_D = dot(v_q1, n) * f_D * is_int1 * ds1
 
@@ -109,6 +99,7 @@ def create_sys1(mesh1, deg_p1, deg_q1):
     sys1 = SysPhdaeRig(n_1, 0, 0, np_1, nq_1, E=M1, J=J1, B=B_D1)
 
     return sys1, Mdelta, Vp1
+
 
 def create_sys2(mesh2, deg_p2, deg_q2):
     x2, y2 = SpatialCoordinate(mesh2)
@@ -151,11 +142,11 @@ def create_sys2(mesh2, deg_p2, deg_q2):
     J2 = np.array(petsc_j2.convert("dense").getDenseArray())
     M2 = np.array(petsc_m2.convert("dense").getDenseArray())
 
-    Vf2 = FunctionSpace(mesh2, 'CG', 1)
+    Vf2 = FunctionSpace(mesh2, "CG", 1)
     f_N = TrialFunction(Vf2)
 
-    tolx1 = 1e-2
-    tolx2 = 0.3
+    tolx1 = 1e-15
+    tolx2 = 0.25
 
     toly1 = tolx1
     toly2 = 1 - toly1
@@ -198,7 +189,7 @@ def print_modes(sys1, sys2, Mdelta, Vp1, Vp2, n_modes):
     eigenvalues, eigvectors = la.eig(sys_CF.J_f, sys_CF.M_f)
     omega_all = np.imag(eigenvalues)
 
-    index = omega_all > 1e-9
+    index = omega_all > 0
 
     omega = omega_all[index]
     eigvec_omega = eigvectors[:, index]
@@ -220,54 +211,69 @@ def print_modes(sys1, sys2, Mdelta, Vp1, Vp2, n_modes):
         eig_real_p1.vector()[:] = np.real(eigvec_omega[:n_Vp1, i])
         eig_imag_p1.vector()[:] = np.imag(eigvec_omega[:n_Vp1, i])
 
-        norm_real_eig1 = np.linalg.norm(eig_real_p1.vector().get_local())
-        norm_imag_eig1 = np.linalg.norm(eig_imag_p1.vector().get_local())
-
-        if norm_imag_eig1 > norm_real_eig1:
-            triangulation1, z1_goodeig = _two_dimension_triangle_func_val(eig_imag_p1, 10)
-        else:
-            triangulation1, z1_goodeig = _two_dimension_triangle_func_val(eig_real_p1, 10)
-
         eig_real_p2 = Function(Vp2)
         eig_imag_p2 = Function(Vp2)
 
-        eig_real_p2.vector()[:] = np.real(eigvec_omega[n_Vp1:n_Vp1+n_Vp2, i])
-        eig_imag_p2.vector()[:] = np.imag(eigvec_omega[n_Vp1:n_Vp1+n_Vp2, i])
+        eig_real_p2.vector()[:] = np.real(eigvec_omega[n_Vp1:n_Vp1 + n_Vp2, i])
+        eig_imag_p2.vector()[:] = np.imag(eigvec_omega[n_Vp1:n_Vp1 + n_Vp2, i])
 
-        norm_real_eig2 = np.linalg.norm(eig_real_p2.vector().get_local())
-        norm_imag_eig2 = np.linalg.norm(eig_imag_p2.vector().get_local())
-
-        if norm_imag_eig2 > norm_real_eig2:
-            triangulation2, z2_goodeig = _two_dimension_triangle_func_val(eig_imag_p2, 10)
-        else:
-            triangulation2, z2_goodeig = _two_dimension_triangle_func_val(eig_real_p2, 10)
+        norm_real_eig = np.linalg.norm(np.real(eigvec_omega[:n_Vp1+n_Vp2, i]))
+        norm_imag_eig = np.linalg.norm(np.imag(eigvec_omega[:n_Vp1+n_Vp2, i]))
 
         figure = plt.figure()
         ax = figure.add_subplot(111, projection="3d")
 
-        plot_eig = ax.plot_trisurf(triangulation1, z1_goodeig, cmap=cm.jet, label="mesh1")
-        ax.plot_trisurf(triangulation2, z2_goodeig, cmap=cm.jet, label="mesh2")
-
-        plot_eig._facecolors2d = plot_eig._facecolors3d
-        plot_eig._edgecolors2d = plot_eig._edgecolors3d
-
-        ax.legend()
+        if norm_imag_eig > norm_real_eig:
+            # plot(eig_imag_p1, axes=ax, plot3d=True)
+            # plot(eig_imag_p2, axes=ax, plot3d=True)
+            triangulation1, z1_goodeig = _two_dimension_triangle_func_val(eig_imag_p1, 10)
+            triangulation2, z2_goodeig = _two_dimension_triangle_func_val(eig_imag_p2, 10)
+        else:
+            # plot(eig_real_p1, axes=ax, plot3d=True)
+            # plot(eig_real_p2, axes=ax, plot3d=True)
+            triangulation1, z1_goodeig = _two_dimension_triangle_func_val(eig_real_p1, 10)
+            triangulation2, z2_goodeig = _two_dimension_triangle_func_val(eig_real_p2, 10)
 
         ax.set_xlabel('$x [m]$', fontsize=fntsize)
         ax.set_ylabel('$y [m]$', fontsize=fntsize)
-        ax.set_title('Eigenvector num '+str(i+1), fontsize=fntsize)
+        ax.set_title('Eigenvector num ' + str(i + 1), fontsize=fntsize)
 
         ax.w_zaxis.set_major_locator(LinearLocator(10))
         ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
 
+        plot_eig1 = ax.plot_trisurf(triangulation1, z1_goodeig, cmap=cm.jet)
+        plot_eig1._facecolors2d = plot_eig1._facecolors3d
+        plot_eig1._edgecolors2d = plot_eig1._edgecolors3d
+
+        plot_eig2 = ax.plot_trisurf(triangulation2, z2_goodeig, cmap=cm.jet)
+        plot_eig2._facecolors2d = plot_eig2._facecolors3d
+        plot_eig2._edgecolors2d = plot_eig2._edgecolors3d
+
+        ax.legend(("mesh 1", "mesh2"))
+
+
         path_figs = "/home/a.brugnoli/Plots_Videos/Python/Plots/Waves/"
-        plt.savefig(path_figs + "Eig_n" + str(i) + ".eps")
+        # plt.savefig(path_figs + "Eig_n" + str(i) + ".eps")
 
     plt.show()
 
 
-sys1, Mdelta, Vp1 = create_sys1(mesh1, 1, 2)
-sys2, Vp2 = create_sys2(mesh2, 1, 2)
+rho = 1
+T = 1
+
+degp = 1
+degq = 2
+
+path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/system_components/tests/meshes/"
+mesh1 = Mesh(path_mesh + "dom1.msh")
+mesh2 = Mesh(path_mesh + "dom2.msh")
+
+# plot(mesh1)
+# plot(mesh2)
+# plt.show()
+
+sys1, Mdelta, Vp1 = create_sys1(mesh1, degp, degq)
+sys2, Vp2 = create_sys2(mesh2, degp, degq)
 
 print_modes(sys1, sys2, Mdelta, Vp1, Vp2, 10)
 

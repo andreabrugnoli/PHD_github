@@ -26,8 +26,10 @@ def animateInt2D(minSol, maxSol, solPl_list, x2, y2, solRod, t,\
         triangulation, Z = _two_dimension_triangle_func_val(solPl_list[frame_number], 10)
         plot_pl = ax.plot_trisurf( \
             triangulation, Z, cmap=cm.jet, label=lab, linewidth=0, antialiased=False)
+
         ax.plot(x2, y2, solRod[:, frame_number],\
                             linewidth=5, label = z2label, color='black')
+
         plot_pl._facecolors2d = plot_pl._facecolors3d
         plot_pl._edgecolors2d = plot_pl._edgecolors3d
 

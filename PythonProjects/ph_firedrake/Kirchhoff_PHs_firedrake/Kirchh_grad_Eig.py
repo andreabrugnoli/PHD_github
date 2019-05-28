@@ -221,7 +221,7 @@ omega.sort()
 
 n_om = 15
 
-omega_tilde = (L/pi) ** 2 * sqrt(rho * h / D) * omega
+omega_tilde = L**2*sqrt(rho*h/D)*omega
 for i in range(n_om):
     print(omega_tilde[i])
 
