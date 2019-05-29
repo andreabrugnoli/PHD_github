@@ -17,7 +17,7 @@ plt.rc('text', usetex=True)
 
 n_el = 5 #int(input("Number of elements for side: "))
 deg = 2 #int(input('Degree for FE: '))
-nreq = 10
+nreq = 4
 
 E = 1
 nu = 0.3
@@ -155,9 +155,9 @@ s_ver = as_vector([-n_ver[1], n_ver[0]])
 # M_nn = inner(e_qth, outer(n_ver, n_ver))
 # M_ns = inner(e_qth, outer(n_ver, s_ver))
 
-V_qn = FunctionSpace(mesh, "CG", deg)
-V_Mnn = FunctionSpace(mesh, "CG", deg)
-V_Mns = FunctionSpace(mesh, "CG", deg)
+V_qn = FunctionSpace(mesh, "CG", 1)
+V_Mnn = FunctionSpace(mesh, "CG", 1)
+V_Mns = FunctionSpace(mesh, "CG", 1)
 
 Vu = MixedFunctionSpace([V_qn, V_Mnn, V_Mns])
 

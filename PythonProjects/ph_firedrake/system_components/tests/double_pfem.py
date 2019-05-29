@@ -251,7 +251,6 @@ def print_modes(sys1, sys2, Mdelta, Vp1, Vp2, n_modes):
 
         ax.legend(("mesh 1", "mesh2"))
 
-
         path_figs = "/home/a.brugnoli/Plots_Videos/Python/Plots/Waves/"
         # plt.savefig(path_figs + "Eig_n" + str(i) + ".eps")
 
@@ -268,9 +267,9 @@ path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/system_com
 mesh1 = Mesh(path_mesh + "dom1.msh")
 mesh2 = Mesh(path_mesh + "dom2.msh")
 
-# plot(mesh1)
-# plot(mesh2)
-# plt.show()
+plot(mesh1)
+plot(mesh2)
+plt.show()
 
 sys1, Mdelta, Vp1 = create_sys1(mesh1, degp, degq)
 sys2, Vp2 = create_sys2(mesh2, degp, degq)
