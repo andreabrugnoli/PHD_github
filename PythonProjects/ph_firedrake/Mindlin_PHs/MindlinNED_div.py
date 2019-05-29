@@ -15,8 +15,8 @@ from math import pi
 plt.rc('text', usetex=True)
 
 
-n_el = 5 #int(input("Number of elements for side: "))
-deg = 1 #int(input('Degree for FE: '))
+n_el = 10 #int(input("Number of elements for side: "))
+deg = 0 #int(input('Degree for FE: '))
 nreq = 10
 
 E = 1
@@ -101,40 +101,42 @@ DG_deg = FiniteElement("DG", interval, deg)
 DG_deg1 = FiniteElement("DG", interval, deg+1)
 
 P_CG1_DG = TensorProductElement(CG_deg1, DG_deg)
-RT_horiz = HDivElement(P_CG1_DG)
 P_DG_CG1 = TensorProductElement(DG_deg, CG_deg1)
+
+RT_horiz = HDivElement(P_CG1_DG)
 RT_vert = HDivElement(P_DG_CG1)
 RT_quad = RT_horiz + RT_vert
 
 P_CG1_DG1 = TensorProductElement(CG_deg1, DG_deg1)
-BDM_horiz = HDivElement(P_CG1_DG1)
 P_DG1_CG1 = TensorProductElement(DG_deg1, CG_deg1)
+
+BDM_horiz = HDivElement(P_CG1_DG1)
 BDM_vert = HDivElement(P_DG1_CG1)
 BDM_quad = BDM_horiz + BDM_vert
 
 V_pw = FunctionSpace(mesh, "DG", deg)
 V_pth = VectorFunctionSpace(mesh, "DG", deg)
-V_qth = FunctionSpace(mesh, BDM_quad)
+V_qthD = FunctionSpace(mesh, BDM_quad)
 V_qth12 = FunctionSpace(mesh, "CG", deg+1)
 V_qw = FunctionSpace(mesh, BDM_quad)
 
-V = MixedFunctionSpace([V_pw, V_pth, V_qth, V_qth12, V_qw])
+V = MixedFunctionSpace([V_pw, V_pth, V_qthD, V_qth12, V_qw])
 
 n_V = V.dim()
 print(n_V)
 
 v = TestFunction(V)
-v_pw, v_pth, v_qth, v_qth12, v_qw = split(v)
+v_pw, v_pth, v_qthD, v_qth12, v_qw = split(v)
 
 e = TrialFunction(V)
-e_pw, e_pth, e_qth, e_qth12, e_qw = split(e)
+e_pw, e_pth, e_qthD, e_qth12, e_qw = split(e)
 
-v_qth = as_tensor([[v_qth[0], v_qth12],
-                    [v_qth12, v_qth[1]]
+v_qth = as_tensor([[v_qthD[0], v_qth12],
+                    [v_qth12, v_qthD[1]]
                    ])
 
-e_qth = as_tensor([[e_qth[0], e_qth12],
-                    [e_qth12, e_qth[1]]
+e_qth = as_tensor([[e_qthD[0], e_qth12],
+                    [e_qth12, e_qthD[1]]
                    ])
 
 al_pw = rho * h * e_pw
@@ -212,9 +214,19 @@ w_t, om_n, om_s = TrialFunction(Vu)
 b_vec = []
 for key,val in bc_dict.items():
     if val == 'F':
-        b_vec.append(v_qn * w_t * ds(key) + v_Mnn * om_n * ds(key) + v_Mns * om_s * ds(key))
+        if key == 1 or key == 2:
+            b_vec.append(v_qn * w_t * ds_v(key) + v_Mnn * om_n * ds_v(key) + v_Mns * om_s * ds_v(key))
+        elif key == 3:
+            b_vec.append(v_qn * w_t * ds_b + v_Mnn * om_n * ds_b + v_Mns * om_s * ds_b)
+        else:
+            b_vec.append(v_qn * w_t * ds_t + v_Mnn * om_n * ds_t + v_Mns * om_s * ds_t)
     elif val == 'S':
-        b_vec.append(v_Mnn * om_n * ds(key) )
+        if key == 1 or key == 2:
+            b_vec.append(v_Mnn * om_n * ds_v(key))
+        elif key == 3:
+            b_vec.append(v_Mnn * om_n * ds_b)
+        else:
+            b_vec.append(v_Mnn * om_n * ds_t)
 
 b_u = sum(b_vec)
 
