@@ -15,8 +15,8 @@ from math import pi
 plt.rc('text', usetex=True)
 
 
-n_el = 10 #int(input("Number of elements for side: "))
-deg = 0 #int(input('Degree for FE: '))
+n_el = 3 #int(input("Number of elements for side: "))
+deg = 2 #int(input('Degree for FE: '))
 nreq = 10
 
 E = 1
@@ -73,25 +73,25 @@ def gradSym(u):
     return 0.5 * (nabla_grad(u) + nabla_grad(u).T)
     # return sym(nabla_grad(u))
 
-# def bending_moment(kappa):
-#     momenta = D * ((1-nu) * kappa + nu * Identity(2) * tr(kappa))
-#     return momenta
+def bending_moment(kappa):
+    momenta = D * ((1-nu) * kappa + nu * Identity(2) * tr(kappa))
+    return momenta
+
+def bending_curv(momenta):
+    kappa = fl_rot * ((1+nu)*momenta - nu * Identity(2) * tr(momenta))
+    return kappa
 #
-# def bending_curv(momenta):
-#     kappa = fl_rot * ((1+nu)*momenta - nu * Identity(2) * tr(momenta))
-#     return kappa
-
-def strain2voigt(eps):
-    return as_vector([eps[0, 0], eps[1, 1], 2 * eps[0, 1]])
-
-def voigt2stress(S):
-    return as_tensor([[S[0], S[2]], [S[2], S[1]]])
-
-def bending_moment(u):
-    return voigt2stress(dot(D_b, strain2voigt(u)))
-
-def bending_curv(u):
-    return voigt2stress(dot(C_b, strain2voigt(u)))
+# def strain2voigt(eps):
+#     return as_vector([eps[0, 0], eps[1, 1], 2 * eps[0, 1]])
+#
+# def voigt2stress(S):
+#     return as_tensor([[S[0], S[2]], [S[2], S[1]]])
+#
+# def bending_moment(u):
+#     return voigt2stress(dot(D_b, strain2voigt(u)))
+#
+# def bending_curv(u):
+#     return voigt2stress(dot(C_b, strain2voigt(u)))
 
 
 # Finite element defition
