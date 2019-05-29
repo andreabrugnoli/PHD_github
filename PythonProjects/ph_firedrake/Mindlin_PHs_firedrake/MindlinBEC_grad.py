@@ -25,7 +25,7 @@ nu = 0.3
 rho = 1
 k = 0.8601
 L = 1
-h = 0.1
+h = 0.01
 
 plot_eigenvector = 'y'
 

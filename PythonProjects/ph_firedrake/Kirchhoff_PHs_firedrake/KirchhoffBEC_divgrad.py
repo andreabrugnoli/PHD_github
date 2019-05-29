@@ -15,19 +15,19 @@ from math import pi
 plt.rc('text', usetex=True)
 
 
-n_el = 5 #int(input("Number of elements for side: "))
-deg = 2 #int(input('Degree for FE: '))
+n_el = 10 #int(input("Number of elements for side: "))
+deg = 1 #int(input('Degree for FE: '))
+nreq = 10
 
-nreq = 5
-
-E = 70e9
+E = 1
 nu = 0.3
 
 rho = 1
+k = 0.8601
 L = 1
 h = 0.01
 
-plot_eigenvector = 'n'
+plot_eigenvector = 'y'
 
 bc_input = input('Select Boundary Condition: ')   #'SSSS'
 
@@ -35,13 +35,28 @@ bc_input = input('Select Boundary Condition: ')   #'SSSS'
 D = E * h ** 3 / (1 - nu ** 2) / 12.
 fl_rot = 12 / (E * h ** 3)
 
+D_b = as_tensor([
+  [D, D * nu, 0],
+  [D * nu, D, 0],
+  [0, 0, D * (1 - nu) / 2]
+])
+
+C_b = as_tensor([
+    [fl_rot, -nu * fl_rot, 0],
+    [-nu * fl_rot, fl_rot, 0],
+    [0, 0, fl_rot * (1 + nu) / 2]
+])
+
 # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
 
 L = 1
 
 n_x, n_y = n_el, n_el
 L_x, L_y = L, L
-mesh = RectangleMesh(n_x, n_y, L_x, L_y, quadrilateral=False)
+# mesh = RectangleMesh(n_x, n_y, L_x, L_y, quadrilateral=True)
+
+mesh_int = IntervalMesh(n_el, L)
+mesh = ExtrudedMesh(mesh_int, n_el)
 
 # domain = mshr.Rectangle(Point(0, 0), Point(l_x, l_y))
 # mesh = mshr.generate_mesh(domain, n, "cgal")
@@ -49,9 +64,11 @@ mesh = RectangleMesh(n_x, n_y, L_x, L_y, quadrilateral=False)
 # plot(mesh)
 # plt.show()
 
+
 # Operators and functions
 def gradSym(u):
     return 0.5 * (nabla_grad(u) + nabla_grad(u).T)
+    # return sym(nabla_grad(u))
 
 def bending_moment(kappa):
     momenta = D * ((1-nu) * kappa + nu * Identity(2) * tr(kappa))
@@ -61,49 +78,64 @@ def bending_curv(momenta):
     kappa = fl_rot * ((1+nu)*momenta - nu * Identity(2) * tr(momenta))
     return kappa
 
+# def strain2voigt(eps):
+#     return as_vector([eps[0, 0], eps[1, 1], 2 * eps[0, 1]])
+#
+# def voigt2stress(S):
+#     return as_tensor([[S[0], S[2]], [S[2], S[1]]])
+#
+# def bending_moment(u):
+#     return voigt2stress(dot(D_b, strain2voigt(u)))
+#
+# def bending_curv(u):
+#     return voigt2stress(dot(C_b, strain2voigt(u)))
+
+
 # Finite element defition
 
+CG_deg1 = FiniteElement("CG", interval, deg)
+DG_deg = FiniteElement("DG", interval, deg-1)
+DG_deg1 = FiniteElement("DG", interval, deg)
 
-V_p = FunctionSpace(mesh, "CG", deg)
-V_sk = FunctionSpace(mesh, "CG", deg)
-V_q1 = FunctionSpace(mesh, "RT", deg)
-V_q2 = FunctionSpace(mesh, "RT", deg)
+P_CG1_DG = TensorProductElement(CG_deg1, DG_deg)
+P_DG_CG1 = TensorProductElement(DG_deg, CG_deg1)
 
-V = MixedFunctionSpace([V_p, V_sk, V_q1, V_q2])
+RT_horiz = HDivElement(P_CG1_DG)
+RT_vert = HDivElement(P_DG_CG1)
+RT_quad = RT_horiz + RT_vert
+
+P_CG1_DG1 = TensorProductElement(CG_deg1, DG_deg1)
+P_DG1_CG1 = TensorProductElement(DG_deg1, CG_deg1)
+
+BDM_horiz = HDivElement(P_CG1_DG1)
+BDM_vert = HDivElement(P_DG1_CG1)
+BDM_quad = BDM_horiz + BDM_vert
+
+V_pw = FunctionSpace(mesh, "CG", deg)
+V_qthD = FunctionSpace(mesh, BDM_quad)
+V_qth12 = FunctionSpace(mesh, "CG", deg)
+
+V = MixedFunctionSpace([V_pw, V_qthD, V_qth12])
 
 n_V = V.dim()
 print(n_V)
 
 v = TestFunction(V)
-v_p, v_sk, v_q1, v_q2 = split(v)
+v_p, v_qD, v_q12 = split(v)
 
 e = TrialFunction(V)
-e_p, e_sk, e_q1, e_q2 = split(e)
+e_p, e_qD, e_q12 = split(e)
 
-v_q = as_tensor([[v_q1[0], v_q1[1]],
-                    [v_q2[0], v_q2[1]]
+v_q = as_tensor([[v_qD[0], v_q12],
+                    [v_q12, v_qD[1]]
                    ])
 
-e_q = as_tensor([[e_q1[0], e_q1[1]],
-                    [e_q2[0], e_q2[1]]
+e_q = as_tensor([[e_qD[0], e_q12],
+                    [e_q12, e_qD[1]]
                    ])
-
-# v_q = as_tensor([[v_q1[0], v_q2[0]],
-#                     [v_q1[1], v_q2[1]]
-#                    ])
-#
-# e_q = as_tensor([[e_q1[0], e_q2[0]],
-#                     [e_q1[1], e_q2[1]]
-#                    ])
 
 al_p = rho * h * e_p
 al_q = bending_curv(e_q)
-
-v_sk = as_tensor([[0, v_sk],
-                    [-v_sk, 0]])
-
-e_sk = as_tensor([[0, e_sk],
-                    [-e_sk, 0]])
 
 # v_skw = skew(v_skw)
 # al_skw = skew(e_skw)
@@ -111,9 +143,7 @@ e_sk = as_tensor([[0, e_sk],
 dx = Measure('dx')
 ds = Measure('ds')
 
-m_form = v_p * al_p * dx \
-    + inner(v_q, al_q) * dx + inner(v_q, e_sk) * dx \
-    + inner(v_sk, e_q) * dx
+m_form = v_p * al_p * dx + inner(v_q, al_q) * dx
 
 n_ver = FacetNormal(mesh)
 s_ver = as_vector([-n_ver[1], n_ver[0]])
@@ -124,8 +154,14 @@ v_mnn = inner(v_q, outer(n_ver, n_ver))
 e_mns = inner(e_q, outer(n_ver, s_ver))
 v_mns = inner(v_q, outer(n_ver, s_ver))
 
-j_graddiv = dot(grad(v_p),  div(e_q)) * dx + v_p * dot(grad(e_mns), s_ver) * ds
-j_divgrad = - dot(div(v_q), grad(e_p)) * dx - dot(grad(v_mns), s_ver) * e_p * ds
+j_graddiv = dot(grad(v_p),  div(e_q)) * dx \
+            + v_p * dot(grad(e_mns), s_ver) * ds_v \
+            + v_p * dot(grad(e_mns), s_ver) * ds_b \
+            + v_p * dot(grad(e_mns), s_ver) * ds_t
+j_divgrad = - dot(div(v_q), grad(e_p)) * dx \
+            - dot(grad(v_mns), s_ver) * e_p * ds_v \
+            - dot(grad(v_mns), s_ver) * e_p * ds_b \
+            - dot(grad(v_mns), s_ver) * e_p * ds_t
 
 j_form = j_graddiv + j_divgrad
 
@@ -141,7 +177,7 @@ bc_1, bc_2, bc_3, bc_4 = bc_input
 bc_dict = {1: bc_1, 3: bc_2, 2: bc_3, 4: bc_4}
 
 V_qn = FunctionSpace(mesh, "CG", deg)
-V_om = FunctionSpace(mesh, "RT", deg)
+V_om = FunctionSpace(mesh, BDM_quad)
 
 V_u = MixedFunctionSpace([V_qn, V_om])
 v_u = TrialFunction(V_u)
@@ -150,13 +186,31 @@ q_n, om_vec = split(v_u)
 om_n = dot(om_vec, n_ver)
 
 b_vec = []
+
 for key,val in bc_dict.items():
-    if val == 'C':
-        b_vec.append(v_p * q_n * ds(key))
-    elif val == 'S':
-        b_vec.append(v_p * q_n * ds(key) + v_mnn * om_n * ds(key))
-    elif val == 'F':
-        b_vec.append(v_mnn * om_n * ds(key))
+    if key == 1 or key == 2:
+        if val == 'C':
+            b_vec.append(v_p * q_n * ds_v(key))
+        elif val == 'S':
+            b_vec.append(v_p * q_n * ds_v(key) + v_mnn * om_n * ds_v(key))
+        elif val == 'F':
+            b_vec.append(v_mnn * om_n * ds_v(key))
+    elif key == 3:
+        if val == 'C':
+            b_vec.append(v_p * q_n * ds_b)
+        elif val == 'S':
+            b_vec.append(v_p * q_n * ds_b + v_mnn * om_n * ds_b)
+        elif val == 'F':
+            b_vec.append(v_mnn * om_n * ds_b)
+    else:
+        if val == 'C':
+            b_vec.append(v_p * q_n * ds_t)
+        elif val == 'S':
+            b_vec.append(v_p * q_n * ds_t + v_mnn * om_n * ds_t)
+        elif val == 'F':
+            b_vec.append(v_mnn * om_n * ds_t)
+
+
 
 b_u = sum(b_vec)
 
@@ -184,14 +238,12 @@ else:
 
 Z_u = np.zeros((n_u, n_u))
 
-J_aug = np.vstack([np.hstack([JJ, B_in]),
-                   np.hstack([-B_in.T, Z_u])
+J_aug = np.vstack([ np.hstack([JJ, B_in]),
+                    np.hstack([-B_in.T, Z_u])
                 ])
-
 M_aug = la.block_diag(MM, Z_u)
 tol = 10**(-6)
 
-# plt.spy(M_aug); plt.show()
 # plt.spy(J_aug); plt.show()
 
 eigenvalues, eigvectors = la.eig(J_aug, M_aug)
@@ -205,22 +257,22 @@ perm = np.argsort(omega)
 eigvec_omega = eigvec_omega[:, perm]
 
 omega.sort()
-norm_coeff = L ** 2 * np.sqrt(rho*h/D)
 
+norm_coeff = L ** 2 * np.sqrt(rho*h/D)
 omega_tilde = omega * norm_coeff
 
 for i in range(nreq):
     print(omega_tilde[i])
 
 n_fig = nreq
-
-
-n_Vpw = V_p.dim()
-fntsize = 15
+#
+#
+# n_Vpw = V_pw.dim()
+# fntsize = 15
 # for i in range(n_fig):
 #     print("Eigenvalue num " + str(i + 1) + ":" + str(omega_tilde[i]))
-#     eig_real_w = Function(V_p)
-#     eig_imag_w = Function(V_p)
+#     eig_real_w = Function(V_pw)
+#     eig_imag_w = Function(V_pw)
 #
 #     eig_real_pw = np.real(eigvec_omega[:n_Vpw, i])
 #     eig_imag_pw = np.imag(eigvec_omega[:n_Vpw, i])
@@ -230,15 +282,8 @@ fntsize = 15
 #     norm_real_eig = np.linalg.norm(eig_real_w.vector().get_local())
 #     norm_imag_eig = np.linalg.norm(eig_imag_w.vector().get_local())
 #
-#     if norm_imag_eig > norm_real_eig:
-#         triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_imag_w, 10)
-#     else:
-#         triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_real_w, 10)
-#
 #     figure = plt.figure()
 #     ax = figure.add_subplot(111, projection="3d")
-#
-#     ax.plot_trisurf(triangulation, z_goodeig, cmap=cm.jet)
 #
 #     ax.set_xlabel('$x [m]$', fontsize=fntsize)
 #     ax.set_ylabel('$y [m]$', fontsize=fntsize)
@@ -246,5 +291,10 @@ fntsize = 15
 #
 #     ax.w_zaxis.set_major_locator(LinearLocator(10))
 #     ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
+#
+#     if norm_imag_eig > norm_real_eig:
+#         plot(eig_imag_w, axes=ax, plot3d=True)
+#     else:
+#         plot(eig_real_w, axes=ax, plot3d=True)
 #
 # plt.show()
