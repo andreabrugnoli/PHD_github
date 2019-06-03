@@ -16,7 +16,7 @@ plt.rc('text', usetex=True)
 
 
 n_el = 5 #int(input("Number of elements for side: "))
-deg = 2 #int(input('Degree for FE: '))
+deg = 1 #int(input('Degree for FE: '))
 nreq = 10
 
 E = 1
@@ -25,11 +25,14 @@ nu = 0.3
 rho = 1
 k = 0.8601
 L = 1
-h = 0.01
+h = 0.1
 
 plot_eigenvector = 'y'
 
 bc_input = input('Select Boundary Condition: ')   #'SSSS'
+
+G = E / 2 / (1 + nu)
+F = G * h * k
 
 # Useful Matrices
 D = E * h ** 3 / (1 - nu ** 2) / 12.
@@ -77,6 +80,9 @@ def bending_moment(kappa):
 def bending_curv(momenta):
     kappa = fl_rot * ((1+nu)*momenta - nu * Identity(2) * tr(momenta))
     return kappa
+#
+def asym(sigma):
+    return sigma[0, 1] - sigma[1, 0]
 
 # def strain2voigt(eps):
 #     return as_vector([eps[0, 0], eps[1, 1], 2 * eps[0, 1]])
@@ -93,9 +99,9 @@ def bending_curv(momenta):
 
 # Finite element defition
 
-CG_deg1 = FiniteElement("CG", interval, deg)
-DG_deg = FiniteElement("DG", interval, deg-1)
-DG_deg1 = FiniteElement("DG", interval, deg)
+CG_deg1 = FiniteElement("CG", interval, deg+1)
+DG_deg = FiniteElement("DG", interval, deg)
+DG_deg1 = FiniteElement("DG", interval, deg+1)
 
 P_CG1_DG = TensorProductElement(CG_deg1, DG_deg)
 P_DG_CG1 = TensorProductElement(DG_deg, CG_deg1)
@@ -111,31 +117,38 @@ BDM_horiz = HDivElement(P_CG1_DG1)
 BDM_vert = HDivElement(P_DG1_CG1)
 BDM_quad = BDM_horiz + BDM_vert
 
-V_pw = FunctionSpace(mesh, "CG", deg)
-V_qthD = FunctionSpace(mesh, BDM_quad)
-V_qth12 = FunctionSpace(mesh, "CG", deg)
 
-V = MixedFunctionSpace([V_pw, V_qthD, V_qth12])
+V_pw = FunctionSpace(mesh, "DG", deg)
+V_rot = FunctionSpace(mesh, "DG", deg)
+V_pth = VectorFunctionSpace(mesh, "DG", deg)
+V_qth1 = FunctionSpace(mesh, BDM_quad)
+V_qth2 = FunctionSpace(mesh, BDM_quad)
+V_qw = FunctionSpace(mesh, BDM_quad)
+
+V = MixedFunctionSpace([V_pw, V_rot, V_pth, V_qth1, V_qth2, V_qw])
 
 n_V = V.dim()
 print(n_V)
 
 v = TestFunction(V)
-v_p, v_qD, v_q12 = split(v)
+v_pw, v_rot, v_pth, v_qth1, v_qth2, v_qw = split(v)
 
 e = TrialFunction(V)
-e_p, e_qD, e_q12 = split(e)
+e_pw, e_rot, e_pth, e_qth1, e_qth2, e_qw = split(e)
 
-v_q = as_tensor([[v_qD[0], v_q12],
-                    [v_q12, v_qD[1]]
+v_qth = as_tensor([[v_qth1[0], v_qth1[1]],
+                    [v_qth2[0], v_qth2[1]]
                    ])
 
-e_q = as_tensor([[e_qD[0], e_q12],
-                    [e_q12, e_qD[1]]
+e_qth = as_tensor([[e_qth1[0], e_qth1[1]],
+                    [e_qth2[0], e_qth2[1]]
                    ])
 
-al_p = rho * h * e_p
-al_q = bending_curv(e_q)
+al_pw = rho * h * e_pw
+al_pth = (rho * h ** 3) / 12. * e_pth
+al_qth = bending_curv(e_qth)
+al_qw = 1. / F * e_qw
+
 
 # v_skw = skew(v_skw)
 # al_skw = skew(e_skw)
@@ -143,27 +156,31 @@ al_q = bending_curv(e_q)
 dx = Measure('dx')
 ds = Measure('ds')
 
-m_form = v_p * al_p * dx + inner(v_q, al_q) * dx
+m_form = v_pw * al_pw * dx \
+    + dot(v_pth, al_pth) * dx  \
+    + inner(v_qth, al_qth) * dx + asym(v_qth) * e_rot * dx \
+    + dot(v_qw, al_qw) * dx \
+    + v_rot * asym(e_qth) * dx
 
-n_ver = FacetNormal(mesh)
-s_ver = as_vector([-n_ver[1], n_ver[0]])
+j_div = v_pw * div(e_qw) * dx
+j_divIP = -div(v_qw) * e_pw * dx
 
-e_mnn = inner(e_q, outer(n_ver, n_ver))
-v_mnn = inner(v_q, outer(n_ver, n_ver))
+j_divSym = dot(v_pth, div(e_qth)) * dx
+j_divSymIP = -dot(div(v_qth), e_pth) * dx
 
-e_mns = inner(e_q, outer(n_ver, s_ver))
-v_mns = inner(v_q, outer(n_ver, s_ver))
+# j_grad = dot(v_qw, grad(e_pw)) * dx
+# j_gradIP = -dot(grad(v_pw), e_qw) * dx
+#
+# j_gradSym = inner(v_qth, gradSym(e_pth)) * dx
+# j_gradSymIP = -inner(gradSym(v_pth), e_qth) * dx
 
-j_graddiv = dot(grad(v_p),  div(e_q)) * dx \
-            + v_p * dot(grad(e_mns), s_ver) * ds_v \
-            + v_p * dot(grad(e_mns), s_ver) * ds_b \
-            + v_p * dot(grad(e_mns), s_ver) * ds_t
-j_divgrad = - dot(div(v_q), grad(e_p)) * dx \
-            - dot(grad(v_mns), s_ver) * e_p * ds_v \
-            - dot(grad(v_mns), s_ver) * e_p * ds_b \
-            - dot(grad(v_mns), s_ver) * e_p * ds_t
+j_Id = dot(v_pth, e_qw) * dx
+j_IdIP = -dot(v_qw, e_pth) * dx
 
-j_form = j_graddiv + j_divgrad
+j_alldiv = j_div + j_divIP + j_divSym + j_divSymIP + j_Id + j_IdIP
+# j_allgrad = j_grad + j_gradIP + j_gradSym + j_gradSymIP + j_Id + j_IdIP
+
+j_form = j_alldiv
 
 # The boundary edges in this mesh are numbered as follows:
 
@@ -176,41 +193,46 @@ bc_1, bc_2, bc_3, bc_4 = bc_input
 
 bc_dict = {1: bc_1, 3: bc_2, 2: bc_3, 4: bc_4}
 
-V_qn = FunctionSpace(mesh, "CG", deg)
-V_om = FunctionSpace(mesh, BDM_quad)
 
-V_u = MixedFunctionSpace([V_qn, V_om])
-v_u = TrialFunction(V_u)
-q_n, om_vec = split(v_u)
+n_ver = FacetNormal(mesh)
+s_ver = as_vector([-n_ver[1], n_ver[0]])
 
-om_n = dot(om_vec, n_ver)
+v_qn = dot(v_qw, n_ver)
+v_Mnn = inner(v_qth, outer(n_ver, n_ver))
+v_Mns = inner(v_qth, outer(n_ver, s_ver))
+
+V_wt = FunctionSpace(mesh, "DG", deg)
+V_omn = FunctionSpace(mesh, "DG", deg)
+V_oms = FunctionSpace(mesh, "DG", deg)
+
+# V_wt = FunctionSpace(mesh, "CR", deg+1)
+# V_omn = FunctionSpace(mesh, "CR", deg+1)
+# V_oms = FunctionSpace(mesh, "CR", deg+1)
+
+Vu = MixedFunctionSpace([V_wt, V_omn, V_oms])
+
+w_t, om_n, om_s = TrialFunction(Vu)
+#
+# w_t = e_pw
+# om_n = dot(e_pth, n_ver)
+# om_s = dot(e_pth, s_ver)
 
 b_vec = []
-
 for key,val in bc_dict.items():
-    if key == 1 or key == 2:
-        if val == 'C':
-            b_vec.append(v_p * q_n * ds_v(key))
-        elif val == 'S':
-            b_vec.append(v_p * q_n * ds_v(key) + v_mnn * om_n * ds_v(key))
-        elif val == 'F':
-            b_vec.append(v_mnn * om_n * ds_v(key))
-    elif key == 3:
-        if val == 'C':
-            b_vec.append(v_p * q_n * ds_b)
-        elif val == 'S':
-            b_vec.append(v_p * q_n * ds_b + v_mnn * om_n * ds_b)
-        elif val == 'F':
-            b_vec.append(v_mnn * om_n * ds_b)
-    else:
-        if val == 'C':
-            b_vec.append(v_p * q_n * ds_t)
-        elif val == 'S':
-            b_vec.append(v_p * q_n * ds_t + v_mnn * om_n * ds_t)
-        elif val == 'F':
-            b_vec.append(v_mnn * om_n * ds_t)
-
-
+    if val == 'F':
+        if key == 1 or key == 2:
+            b_vec.append(v_qn * w_t * ds_v(key) + v_Mnn * om_n * ds_v(key) + v_Mns * om_s * ds_v(key))
+        elif key == 3:
+            b_vec.append(v_qn * w_t * ds_b + v_Mnn * om_n * ds_b + v_Mns * om_s * ds_b)
+        else:
+            b_vec.append(v_qn * w_t * ds_t + v_Mnn * om_n * ds_t + v_Mns * om_s * ds_t)
+    elif val == 'S':
+        if key == 1 or key == 2:
+            b_vec.append(v_Mnn * om_n * ds_v(key))
+        elif key == 3:
+            b_vec.append(v_Mnn * om_n * ds_b)
+        else:
+            b_vec.append(v_Mnn * om_n * ds_t)
 
 b_u = sum(b_vec)
 
@@ -258,8 +280,7 @@ eigvec_omega = eigvec_omega[:, perm]
 
 omega.sort()
 
-norm_coeff = L ** 2 * np.sqrt(rho*h/D)
-omega_tilde = omega * norm_coeff
+omega_tilde = omega*L*((2*(1+nu)*rho)/E)**0.5
 
 for i in range(nreq):
     print(omega_tilde[i])

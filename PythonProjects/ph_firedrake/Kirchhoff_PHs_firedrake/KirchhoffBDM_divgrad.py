@@ -66,8 +66,8 @@ def bending_curv(momenta):
 
 V_p = FunctionSpace(mesh, "CG", deg)
 V_sk = FunctionSpace(mesh, "CG", deg)
-V_q1 = FunctionSpace(mesh, "RT", deg)
-V_q2 = FunctionSpace(mesh, "RT", deg)
+V_q1 = FunctionSpace(mesh, "BDM", deg)
+V_q2 = FunctionSpace(mesh, "BDM", deg)
 
 V = MixedFunctionSpace([V_p, V_sk, V_q1, V_q2])
 
@@ -141,7 +141,7 @@ bc_1, bc_2, bc_3, bc_4 = bc_input
 bc_dict = {1: bc_1, 3: bc_2, 2: bc_3, 4: bc_4}
 
 V_qn = FunctionSpace(mesh, "CG", deg)
-V_om = FunctionSpace(mesh, "RT", deg)
+V_om = FunctionSpace(mesh, "BDM", deg)
 
 V_u = MixedFunctionSpace([V_qn, V_om])
 v_u = TrialFunction(V_u)

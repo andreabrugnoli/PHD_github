@@ -6,8 +6,12 @@ np.set_printoptions(threshold=np.inf)
 from math import floor, sqrt, pi
 import scipy.linalg as la
 
-import matplotlib.pyplot as plt
-
+from matplotlib import pyplot as plt
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+from matplotlib import cm
+from firedrake.plot import _two_dimension_triangle_func_val
+from mpl_toolkits.mplot3d import Axes3D
+from math import pi
 
 E = 2e11
 nu = 0.3
@@ -75,9 +79,7 @@ mesh = UnitSquareMesh(n_x, n_y, quadrilateral=False)
 
 nameFE = 'Bell'
 name_FEp = nameFE
-name_FEq = 'Hermite'
-
-deg_q = 3
+name_FEq = nameFE
 
 if name_FEp == 'Morley':
     deg_p = 2
@@ -93,9 +95,9 @@ elif name_FEq == 'Hermite':
 elif name_FEq == 'Argyris' or name_FEq == 'Bell':
     deg_q = 5
 
-Vp = FunctionSpace(mesh, name_FEp, deg_p)
-Vq = VectorFunctionSpace(mesh, name_FEq, deg_q, dim=3)
-V = Vp * Vq
+V_p = FunctionSpace(mesh, name_FEp, deg_p)
+V_q = VectorFunctionSpace(mesh, name_FEq, deg_q, dim=3)
+V = V_p * V_q
 
 n_Vp = V.sub(0).dim()
 n_Vq = V.sub(1).dim()
@@ -149,12 +151,17 @@ bc_dict = {1: bc_1, 2: bc_2, 3: bc_3, 4: bc_4}
 n = FacetNormal(mesh)
 s = as_vector([ -n[1], n[0] ])
 
-V_wt = FunctionSpace(mesh, 'Lagrange', 2)
-V_omn = FunctionSpace(mesh, 'Lagrange', 2)
+V_wt = FunctionSpace(mesh, 'CG', 1)
+V_omn = FunctionSpace(mesh, 'CG', 1)
+# V_om = FunctionSpace(mesh, "RT", 1)
 
-Vu = V_wt * V_omn
+V_u = MixedFunctionSpace([V_wt, V_omn])
+v_u = TrialFunction(V_u)
 
-wt, om_n = TrialFunction(Vu)
+wt, om_n = split(v_u)
+
+# om_n = dot(om_vec, n)
+
 
 v_Mnn = v_q[0]*n[0]**2 + v_q[1]*n[1]**2 + 2 * v_q[2]*n[0]*n[1]
 v_Mns = v_q[0]*s[0]*n[0] + v_q[1]*s[1]*n[1] + v_q[2]*(s[0]*n[1] + s[1]*n[0])
@@ -237,19 +244,12 @@ plot_eigenvectors = True
 if plot_eigenvectors:
 
     fntsize = 15
-
-    import matplotlib
-    from matplotlib import pyplot as plt
-    from matplotlib.ticker import LinearLocator, FormatStrFormatter
-    from matplotlib import cm
-    from mpl_toolkits.mplot3d import Axes3D
-
-    plt.close('all')
-    matplotlib.rcParams['text.usetex'] = True
+    n_fig = 3
+    n_Vpw = V_p.dim()
 
     for i in range(n_om):
-        eig_real_w = Function(Vp)
-        eig_imag_w = Function(Vp)
+        eig_real_w = Function(V_p)
+        eig_imag_w = Function(V_p)
 
         eig_real_p = np.real(eigvec_omega[:n_Vp, i])
         eig_imag_p = np.imag(eigvec_omega[:n_Vp, i])
@@ -260,14 +260,18 @@ if plot_eigenvectors:
         eig_real_wCG = project(eig_real_w, Vp_CG)
         eig_imag_wCG = project(eig_imag_w, Vp_CG)
 
-        from firedrake.plot import _two_dimension_triangle_func_val
+        norm_real_eig = np.linalg.norm(eig_real_wCG.vector().get_local())
+        norm_imag_eig = np.linalg.norm(eig_imag_wCG.vector().get_local())
 
-        triangulation, Z = _two_dimension_triangle_func_val(eig_imag_wCG, 10)
+        if norm_imag_eig > norm_real_eig:
+            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_imag_wCG, 10)
+        else:
+            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_real_wCG, 10)
 
         figure = plt.figure(i)
         ax = figure.add_subplot(111, projection="3d")
 
-        ax.plot_trisurf(triangulation, Z, cmap=cm.jet)
+        ax.plot_trisurf(triangulation, z_goodeig, cmap=cm.jet)
 
         ax.set_xbound(-tol, l_x + tol)
         ax.set_xlabel('$x [m]$', fontsize=fntsize)
@@ -279,14 +283,11 @@ if plot_eigenvectors:
 
         ax.w_zaxis.set_major_locator(LinearLocator(10))
         ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
-        #
-        # path_out2 = "/home/a.brugnoli/PycharmProjects/firedrake/Kirchhoff_PHs/Eig_Kirchh/Imag_Eig/"
-        # plt.savefig(path_out2 + "Case" + bc_input + "_el" + str(n) + "_FE_" + name_FEp + "_eig_" + str(i + 1) + ".eps",
-        #             format="eps")
+
+        path_out2 = "/home/a.brugnoli/PycharmProjects/firedrake/Kirchhoff_PHs/Eig_Kirchh/Imag_Eig/"
+        # plt.savefig(path_out2 + "Case" + bc_input + "_el" + str(n) + "_FE_" + name_FEp + "_eig_" + str(i+1) + ".eps", format="eps")
 
 plt.show()
-
-
 
 
 
