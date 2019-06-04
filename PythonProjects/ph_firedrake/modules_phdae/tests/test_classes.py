@@ -36,7 +36,7 @@ sysDAEfl = classes_phsystem.SysPhdaeRig(n, 1, 0, 2, n_q, J=J, E=E, B=B)
 # print("B_r flex DAE:", sysDAEfl.B_r)
 # print("G flex DAE:", sysDAEfl.G_e)
 
-sysOde, T = sysDAEfl.dae_to_ode()
+sysOde, T = sysDAEfl.dae_to_odeE()
 print("J converted Ode:", sysOde.J)
 print("Q converted Ode:", sysOde.Q)
 print("B converted Ode:", sysOde.B)

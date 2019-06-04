@@ -390,11 +390,12 @@ class SysPhdaeRig(SysPhdae):
 
         return sys_ordered
 
-    def dae_to_ode(self):
+    def dae_to_odeE(self):
         G = self.G_e
         GannL = la.null_space(G.T).T
 
         # T = GannL
+
         T = np.concatenate((GannL, la.inv(G.T @ G) @ G.T))
         assert np.linalg.matrix_rank(T @ G) == self.n_lmb
         assert check_positive_matrix(self.M_e)
@@ -417,6 +418,24 @@ class SysPhdaeRig(SysPhdae):
 
         T_ode2dae = T.T @ np.concatenate((np.eye(n_z), np.zeros((self.n_lmb, n_z)))) @ Q_ode
         return sysOde, T_ode2dae
+
+    def dae_to_odeCE(self):
+        G = self.G_e
+        GannL = la.null_space(G.T).T
+
+        T = GannL
+
+        Mode = T @ self.M_e @ T.T
+        Jode = T @ self.J_e @ T.T
+        Rode = T @ self.R_e @ T.T
+        Bode = T @ self.B_e
+
+        n_ode = self.n - self.n_lmb
+
+        sysOde = SysPhdae(n_ode, 0, E=Mode, J=Jode, R=Rode, B=Bode)
+
+        T_ode2dae = T.T
+        return sysOde, T_ode2dae, Mode
 
     def reduce_system(self, s0, n_red):
         n_rig = self.n_r

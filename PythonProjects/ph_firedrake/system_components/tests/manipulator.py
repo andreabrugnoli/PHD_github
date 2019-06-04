@@ -46,7 +46,7 @@ J_dae = sys_dae.J
 E_dae = sys_dae.E
 B_dae = sys_dae.B
 
-sys_ode, T = sys_dae.dae_to_ode()
+sys_ode, T = sys_dae.dae_to_odeE()
 
 J_ode = sys_ode.J
 Q_ode = sys_ode.Q

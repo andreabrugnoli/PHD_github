@@ -35,7 +35,7 @@ B_aug = np.concatenate((B_e, B_lmb))
 n_aug = n_e + n_lmb
 
 beam_dae = SysPhdaeRig(n_aug, n_lmb, n_rig, beam.n_p, beam.n_q, E=E_aug, J=J_aug, B=B_aug)
-beam_ode, T = beam_dae.dae_to_ode()
+beam_ode, T = beam_dae.dae_to_odeE()
 
 pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/PH_TITOP/EulerBernoulliBeam/Matrices_ClampedEB/'
 Edae_file = 'E_dae'; Jdae_file = 'J_dae'; Bdae_file = 'B_dae'

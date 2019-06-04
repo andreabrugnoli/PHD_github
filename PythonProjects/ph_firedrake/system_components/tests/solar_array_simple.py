@@ -44,7 +44,7 @@ print(G_r)
 print(np.linalg.matrix_rank(G_r))
 
 
-sys_SA = solar_array.dae_to_ode()[0]
+sys_SA = solar_array.dae_to_odeE()[0]
 
 pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/PH_TITOP/KirchhoffPlate/MatricesSASimple/'
 Qode_file = 'Q_pH'; Jode_file = 'J_pH'; Bode_file = 'B_pH'
