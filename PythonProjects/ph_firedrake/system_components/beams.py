@@ -568,9 +568,7 @@ def draw_deformation(n_draw, v_rig, v_fl, L):
     w_P = v_rig[1]
     th_P = v_rig[2]
 
-    ndr_el = int(n_draw/n_el)
-    n_draw = ndr_el*n_el
-    x_coord = np.linspace(0, L, num=n_draw+1)
+    x_coord = np.linspace(0, L, num=n_draw)
 
     u_r = u_P*np.ones_like(x_coord)
     w_r = w_P*np.ones_like(x_coord) + x_coord*th_P
@@ -578,26 +576,37 @@ def draw_deformation(n_draw, v_rig, v_fl, L):
     u_fl = np.zeros_like(x_coord)
     w_fl = np.zeros_like(x_coord)
 
-    for i in range(n_el):
-            for j in range(ndr_el):
-                ind = i*ndr_el+j+1
-                i_el = i*ndr_el
-                x_til = (x_coord[ind] - x_coord[i_el])/dx_el
-                phi1_u = (1 - x_til)
-                phi2_u = x_til
+    i_el = 0
+    xin_elem = i_el * dx_el
 
-                phi1_w = 1 - 3 * x_til**2 + 2 * x_til**3
-                phi2_w = x_til - 2 * x_til**2 + x_til**3
-                phi3_w = + 3 * x_til ** 2 -2 * x_til ** 3
-                phi4_w = + x_til**3 - x_til**2
+    for i in range(n_draw):
 
-                if i == 0:
-                    u_fl[ind] = phi2_u*ufl_dofs[i]
-                    w_fl[ind] = phi3_w*wfl_dofs[2*i] + phi4_w*wfl_dofs[2*i+1]
-                else:
-                    u_fl[ind] = phi1_u * ufl_dofs[i-1] + phi2_u * ufl_dofs[i]
-                    w_fl[ind] = phi1_w*wfl_dofs[2*(i-1)] + phi2_w*wfl_dofs[2*i-1] + \
-                                   phi3_w*wfl_dofs[2*i] + phi4_w*wfl_dofs[2*i+1]
+        x_til = (x_coord[i] - xin_elem) / dx_el
+
+        if x_til > 1:
+            i_el = i_el + 1
+            if i_el == n_el:
+                i_el = i_el - 1
+
+            xin_elem = i_el * dx_el
+            x_til = (x_coord[i] - xin_elem) / dx_el
+
+        phi1_u = (1 - x_til)
+        phi2_u = x_til
+
+        phi1_w = 1 - 3 * x_til ** 2 + 2 * x_til ** 3
+        phi2_w = x_til - 2 * x_til ** 2 + x_til ** 3
+        phi3_w = + 3 * x_til ** 2 - 2 * x_til ** 3
+        phi4_w = + x_til ** 3 - x_til ** 2
+
+        if i_el == 0:
+            u_fl[i] = phi2_u * ufl_dofs[i_el]
+            w_fl[i] = phi3_w * wfl_dofs[2 * i_el] + phi4_w * wfl_dofs[2 * i_el + 1]
+        else:
+            u_fl[i] = phi1_u * ufl_dofs[i_el-1] + phi2_u * ufl_dofs[i_el]
+            w_fl[i] = phi1_w * wfl_dofs[2 * (i_el - 1)] + phi2_w * wfl_dofs[2 * i_el - 1] + \
+                        phi3_w * wfl_dofs[2 * i_el] + phi4_w * wfl_dofs[2 * i_el + 1]
+
 
     u_tot = u_r + u_fl
     w_tot = w_r + w_fl
@@ -634,7 +643,10 @@ def draw_bending(n_draw, v_rig, v_fl, L):
         x_til = (x_coord[i] - xin_elem) / dx_el
 
         if x_til > 1:
-            i_el = i_el+1
+            i_el = i_el + 1
+            if i_el == n_el:
+                i_el = i_el - 1
+
             xin_elem = i_el * dx_el
             x_til = (x_coord[i] - xin_elem) / dx_el
 
@@ -685,6 +697,9 @@ def draw_allbending(n_draw, v_rig, v_fl, L):
 
         if x_til > 1:
             i_el = i_el + 1
+            if i_el == n_el:
+                i_el = i_el - 1
+
             xin_elem = i_el * dx_el
             x_til = (x_coord[i] - xin_elem) / dx_el
 

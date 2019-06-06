@@ -2,7 +2,6 @@ from firedrake import *
 import numpy as np
 
 np.set_printoptions(threshold=np.inf)
-from math import floor, sqrt, pi
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.rcParams['text.usetex'] = True
@@ -311,7 +310,7 @@ plt.title(r"Hamiltonian trend",
           fontsize=16)
 plt.legend(loc='upper left')
 
-from Kirchhoff_PHs_firedrake.AnimateTwoPlates import animate2D
+from tools_plotting.animate_2surf import animate2D
 import matplotlib.animation as animation
 sol = np.concatenate( (w_pl1_mm, w_pl2_mm), axis=0)
 anim = animate2D(minZ, maxZ, wmm_pl1_CGvec, wmm_pl2_CGvec, t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \

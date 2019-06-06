@@ -1,13 +1,9 @@
 import numpy as np
 import scipy.linalg as la
-from math import pi
-from system_components.beams import FreeEB, ClampedEB, draw_allbending, draw_bending
+from system_components.beams import FreeEB, ClampedEB, draw_allbending
 from modules_phdae.classes_phsystem import SysPhdaeRig
 import matplotlib.pyplot as plt
 plt.rc('text', usetex=True)
-from firedrake import *
-from system_components.tests.manipulator_constants import *
-
 
 fntsize = 15
 n_el = 30

@@ -1,13 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.linalg as la
-import sys
 from modules_phdae.classes_phsystem import SysPhdaeRig
 from system_components.beams import FloatingPlanarEB
 from math import pi
 from scipy import integrate
-from scipy.io import savemat
-from system_components.tests.manipulator_constants import n_el, rho1, EI1, L1, rho2, EI2, L2, n_rig, J_joint1, J_joint2, J_payload, m_joint2, m_payload
+from system_components.manipulator.manipulator_constants import n_el, rho1, EI1, L1, rho2, EI2, L2, n_rig, J_joint1, J_joint2, J_payload, m_joint2, m_payload
 
 
 beam1 = FloatingPlanarEB(n_el, L1, rho1, 1, EI1, 1, J_joint=J_joint1)
@@ -42,13 +40,13 @@ def build_man(theta2):
 
     sys_dae = SysPhdaeRig.transformer_ordered(sys_int1, payload, ind2_int2, ind3, np.eye(3))
 
-    sys_ode, T, M_ode = sys_dae.dae_to_odeCE()
+    sys_ode, T = sys_dae.dae_to_odeE()
 
     J_ode = sys_ode.J
     Q_ode = sys_ode.Q
     B_ode = sys_ode.B
 
-    return J_ode, Q_ode, B_ode, T, M_ode
+    return J_ode, Q_ode, B_ode
 
 
 # sys_int1 = SysPhdae.transformer(beam1, beam2, ind1, ind2_int1, R)
@@ -61,8 +59,6 @@ Kp2 = 60
 Kv1 = 11
 Kv2 = 1.1
 
-J_sys, Q_sys, B_sys, T, M_sys = build_man(0)
-
 
 def sys_manipulator_ode(t,y):
 
@@ -71,6 +67,8 @@ def sys_manipulator_ode(t,y):
 
     theta1 = theta_v[0]
     theta2 = theta_v[1]
+
+    J_sys, Q_sys, B_sys = build_man(theta2)
 
     theta1_dot = B_sys[:, 0].T @ Q_sys @ alpha_v
     theta2_dot = B_sys[:, 1].T @ Q_sys @ alpha_v
@@ -94,8 +92,7 @@ t_fin = 4
 n_t = 100
 t_ev = np.linspace(t0, t_fin, num=n_t)
 t_span = [t0, t_fin]
-ntot_sys = beam1_hinged.n + beam2.n + payload.n
-n_sys_ode = ntot_sys - 5 + 2
+n_sys_ode = beam1_hinged.n + beam2.n + payload.n - 5 + 2
 print(n_sys_ode)
 y0 = np.zeros((n_sys_ode, ))
 
@@ -104,24 +101,13 @@ sol = integrate.solve_ivp(sys_manipulator_ode, t_span, y0, method='RK45', vector
 t_ev = sol.t
 y_sol = sol.y
 
-alpha_sol = y_sol[:-2, :]
-
-e_sol = np.zeros_like(alpha_sol)
-etrue_sol = np.zeros((ntot_sys, n_t))
-for i in range(n_t):
-    e_sol[:, i] = M_sys @ alpha_sol[:, i]
-    etrue_sol[:, i] = T.T @ e_sol[:, i]
-    # x_cr, u_cr, w_cr = draw_bending(n_dr, eigcrank_r, eigcrank_p, L_crank)
-
-
-
 theta1_sol = y_sol[-2, :]
 theta2_sol = y_sol[-1, :]
 n_ev = len(t_ev)
 
 plt.figure()
-plt.plot(t_ev, theta1_sol*180/pi, 'r')
+plt.plot(t_ev, theta1_sol, 'r')
 plt.figure()
-plt.plot(t_ev, theta2_sol*180/pi, 'b')
+plt.plot(t_ev, theta2_sol, 'b')
 
 plt.show()
