@@ -42,38 +42,51 @@ def build_man(theta2):
 
     sys_dae = SysPhdaeRig.transformer_ordered(sys_int1, payload, ind2_int2, ind3, np.eye(3))
 
-    sys_ode, T_ode, M_ode = sys_dae.dae_to_odeCE()
-    # sys_ode, T_ode = sys_dae.dae_to_odeE()
+    return sys_dae
 
-    return sys_ode, T_ode, sys_dae
+sys_dae = build_man(0)
 
+J_e = sys_dae.J_e
+M_e = sys_dae.M_e
+B_e = sys_dae.B_e
+G_e = sys_dae.G_e
+
+Q_e = la.inv(M_e)
+
+n_e = sys_dae.n_e
+n_lmb = sys_dae.n_lmb
 ref_deg = 1
 theta1_ref = ref_deg*pi/180
 theta2r_ref = 0
-Kp1 = 160
-Kp2 = 60
-Kv1 = 11
-Kv2 = 1.1
+# Kp1 = 160
+# Kp2 = 60
+# Kv1 = 11
+# Kv2 = 1.1
 
-sys_ode, T_ode, sys_dae = build_man(0)
+Kp1 = 1
+Kp2 = 6
+Kv1 = 1
+Kv2 = 1
 
-J_sys = sys_ode.J
-Q_sys = sys_ode.Q
-B_sys = sys_ode.B
 
-
-def sys_manipulator_ode(t, y):
-
-    alpha_v = y[:-2]
+def reseqn(t, y, ydot, result):
+    """ we create residual equations for the problem"""
+    e_v = y[:n_e]
+    lmb = y[n_e:-2]
     theta_v = y[-2:]
+
+    de_v = ydot[:n_e]
+    dlmb = ydot[n_e:-2]
+    dtheta_v = ydot[-2:]
 
     theta1 = theta_v[0]
     theta2r = theta_v[1]
 
-    theta1_dot = B_sys[:, 0].T @ Q_sys @ alpha_v
-    theta2r_dot = B_sys[:, 1].T @ Q_sys @ alpha_v
+    theta_dot = B_e.T @ e_v
 
-    if t < 0.1:
+    theta1_dot, theta2r_dot = theta_dot
+
+    if t < 1:
         u1 = 0
         u2 = 0
         u_v = np.array([u1, u2])
@@ -82,37 +95,45 @@ def sys_manipulator_ode(t, y):
         u2 = Kp2 * (theta2r_ref - theta2r) - Kv2 * theta2r_dot
         u_v = np.array([u1, u2])
 
-    daldt_v = J_sys @ Q_sys @ alpha_v + B_sys @ u_v
-    dthdt_v = np.array([theta1_dot, theta2r_dot])
-    dydt = np.concatenate((daldt_v, dthdt_v))
-    return dydt
+    result[:n_e] = M_e @ de_v - J_e @ e_v - B_e @ u_v - G_e @ lmb
+    result[n_e:-2] = G_e.T @ Q_e @ (J_e @ e_v + G_e @ lmb + B_e @ u_v)
+    # result[n_e:-2] = G_e.T @ e_v
+    result[-2:] = dtheta_v - theta_dot
+
+    return 0
+
 
 t0 = 0
 t_fin = 2
-n_t = 500
+n_t = 100
 t_ev = np.linspace(t0, t_fin, num=n_t)
 t_span = [t0, t_fin]
-ntot_sys = beam1_hinged.n + beam2.n + payload.n
-n_sys_ode = ntot_sys - 5 + 2
 
+n_res = n_e + n_lmb + 2
 
-y0 = np.zeros((n_sys_ode, ))
+y0 = np.zeros((n_res, ))
+dy0 = np.zeros((n_res, ))
 
-sol = integrate.solve_ivp(sys_manipulator_ode, t_span, y0, method='RK45', vectorized=False, t_eval=t_ev)
+from scikits.odes import dae
+#instantiate the solver
+solver = dae('ida', reseqn, old_api=False)
+#obtain solution at a required time
 
-t_ev = sol.t
-y_sol = sol.y
+result = solver.solve(t_ev, y0, dy0)
+
+# sol = integrate.solve_ivp(sys_manipulator_ode, t_span, y0, method='RK45', vectorized=False, t_eval=t_ev)
+
+t_ev = result.values.t
+y_sol = result.values.y
 n_ev = len(t_ev)
 
 dt_vec = np.diff(t_ev)
 
-alpha_sol = y_sol[:-2, :]
+e_sol = y_sol[:n_e, :]
+lmb_sol = y_sol[n_e:-2, :]
 theta1_sol = y_sol[-2, :]
 theta2r_sol = y_sol[-1, :]
 theta2a_sol = theta1_sol + theta2r_sol
-
-e_sol = np.zeros_like(alpha_sol)
-eAll_sol = np.zeros((ntot_sys, n_ev))
 
 v_intI = np.zeros((2, n_ev))
 
@@ -159,17 +180,15 @@ n_p1 = n_r3 + beam1_hinged.n_p
 n_p2 = n_p1 + beam2.n_p
 
 for i in range(n_ev):
-    e_sol[:, i] = Q_sys @ alpha_sol[:, i]
-    eAll_sol[:, i] = T_ode @ e_sol[:, i]
 
-    dtheta1_sol[i] = B_sys[:, 0].T @ e_sol[:, i]
-    dtheta2r_sol[i] = B_sys[:, 1].T @ e_sol[:, i]
+    dtheta1_sol[i] = B_e[:, 0].T @ e_sol[:, i]
+    dtheta2r_sol[i] = B_e[:, 1].T @ e_sol[:, i]
 
     vx_rigB2 = L1 * dtheta1_sol[i] * np.sin(theta2r_sol[i])
     vy_rigB2 = L1 * dtheta1_sol[i] * np.cos(theta2r_sol[i])
 
-    print(eAll_sol[1, i] - vx_rigB2)
-    print(eAll_sol[2, i] - vy_rigB2)
+    print(e_sol[1, i] - vx_rigB2)
+    print(e_sol[2, i] - vy_rigB2)
 
 
     # vx_rigB2 = L1 * dtheta1_sol[i] * np.sin(theta2r_sol[i])
@@ -178,11 +197,11 @@ for i in range(n_ev):
     # erig_1 = np.array([0, 0, dtheta1_sol[i]])
     # erig_2 = np.array([vx_rigB2, vy_rigB2, om_rigB2])
 
-    erig_1 = np.array([0, 0, eAll_sol[0, i]])
-    erig_2 = np.array([eAll_sol[1, i], eAll_sol[2, i], eAll_sol[3, i]])
+    erig_1 = np.array([0, 0, e_sol[0, i]])
+    erig_2 = np.array([e_sol[1, i], e_sol[2, i], e_sol[3, i]])
 
-    ep_1 = eAll_sol[n_r1:n_p1, i]
-    ep_2 = eAll_sol[n_r3:n_p2, i]
+    ep_1 = e_sol[n_r1:n_p1, i]
+    ep_2 = e_sol[n_r3:n_p2, i]
 
     # ep_1 = np.zeros((n_p, ))
     # ep_2 = np.zeros((n_p, ))
@@ -217,18 +236,18 @@ for i in range(n_ev):
         xI_2[:, i] = xI_2[:, i - 1] + 0.5 * (vx_I2[:, i - 1] + vx_I2[:, i]) * dt_vec[i - 1]
         yI_2[:, i] = yI_2[:, i - 1] + 0.5 * (vy_I2[:, i - 1] + vy_I2[:, i]) * dt_vec[i - 1]
 
-        theta1Num_sol[i] = theta1Num_sol[i - 1] + 0.5 * (eAll_sol[0, i - 1] + eAll_sol[0, i]) * dt_vec[i - 1]
+        theta1Num_sol[i] = theta1Num_sol[i - 1] + 0.5 * (e_sol[0, i - 1] + e_sol[0, i]) * dt_vec[i - 1]
 
 #
-# plt.figure()
-# plt.plot(t_ev, theta1_sol*180/pi, 'r')
-# plt.figure()
-# plt.plot(t_ev, theta2r_sol*180/pi, 'b')
-#
-# plt.figure()
-# plt.plot(t_ev, dtheta1_sol*180/pi, 'r')
-# plt.figure()
-# plt.plot(t_ev, dtheta2r_sol*180/pi, 'b')
+plt.figure()
+plt.plot(t_ev, theta1_sol*180/pi, 'r')
+plt.figure()
+plt.plot(t_ev, theta2r_sol*180/pi, 'b')
+
+plt.figure()
+plt.plot(t_ev, dtheta1_sol*180/pi, 'r')
+plt.figure()
+plt.plot(t_ev, dtheta2r_sol*180/pi, 'b')
 
 
 x_manI = np.concatenate((xI_1, xI_2), axis=0)
@@ -237,8 +256,8 @@ y_manI = np.concatenate((yI_1, yI_2), axis=0)
 # anim = animate_plot(t_ev, xI_2, yI_2, xlabel=None, ylabel=None, title=None)
 # anim = animate_plot(t_ev, x_manI, y_manI, xlabel=None, ylabel=None, title=None
 
-from tools_plotting.animate_plotrigfl import animate_plot
-anim = animate_plot(t_ev, x_manI, y_manI, theta1_sol, theta2a_sol,  xlabel=None, ylabel=None, title=None)
+# from tools_plotting.animate_plotrigfl import animate_plot
+# anim = animate_plot(t_ev, x_manI, y_manI, theta1_sol, theta2a_sol,  xlabel=None, ylabel=None, title=None)
 
 # from tools_plotting.animate_plotrigfl import animate_plot
 # anim = animate_plot(t_ev, x_manI, y_manI, theta1_sol, theta2a_sol,  xlabel=None, ylabel=None, title=None)

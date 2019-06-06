@@ -108,14 +108,14 @@ MtzRyRx = ss(a,b,c,d);
 
 
 fprintf('Number of modes found: %d \n',nb_mode)
-% 
-% prompt = 'How many mode shapes do you want to visalize? \n';
-% nb_mode_shapes = input(prompt);
-% if nb_mode_shapes == 0
-%     return;
-% else
-%     printModes(nb_mode_shapes, P_id, GN_coord, V, D);
-% end
+
+prompt = 'How many mode shapes do you want to visalize? \n';
+nb_mode_shapes = input(prompt);
+if nb_mode_shapes == 0
+    return;
+else
+    printModes(nb_mode_shapes, P_id, GN_coord, V, D);
+end
 
 end
 
