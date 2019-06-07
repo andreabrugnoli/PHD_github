@@ -47,7 +47,7 @@ def build_man(theta2):
 
     return sys_ode, T_ode, sys_dae
 
-ref_deg = 60
+ref_deg = 1
 theta1_ref = ref_deg*pi/180
 theta2r_ref = 0
 Kp1 = 160
@@ -72,8 +72,7 @@ def sys_manipulator_ode(t, y):
 
     theta1_dot = B_sys[:, 0].T @ Q_sys @ alpha_v
     theta2r_dot = B_sys[:, 1].T @ Q_sys @ alpha_v
-
-    if t < 1:
+    if t < 0.1:
         u1 = 0
         u2 = 0
         u_v = np.array([u1, u2])
@@ -88,7 +87,7 @@ def sys_manipulator_ode(t, y):
     return dydt
 
 t0 = 0
-t_fin = 4
+t_fin = 5
 n_t = 500
 t_ev = np.linspace(t0, t_fin, num=n_t)
 t_span = [t0, t_fin]
@@ -140,15 +139,10 @@ vx_B2 = np.zeros((n_dr, n_ev))
 vy_B2 = np.zeros((n_dr, n_ev))
 
 theta1Num_sol = np.zeros((n_ev, ))
+theta2Num_sol = np.zeros((n_ev, ))
 dtheta1_sol = np.zeros((n_ev, ))
 dtheta2r_sol = np.zeros((n_ev, ))
 
-# n_r1 = 1
-# n_r2 = n_r1 + 3
-# n_r3 = n_r2  #+ 3
-#
-# n_p1 = n_r3 + n_p
-# n_p2 = n_p1 + n_p
 
 n_r1 = beam1_hinged.n_r
 
@@ -158,6 +152,7 @@ n_r3 = n_r2 + payload.n_r
 n_p1 = n_r3 + beam1_hinged.n_p
 n_p2 = n_p1 + beam2.n_p
 
+
 for i in range(n_ev):
     e_sol[:, i] = Q_sys @ alpha_sol[:, i]
     eAll_sol[:, i] = T_ode @ e_sol[:, i]
@@ -165,24 +160,14 @@ for i in range(n_ev):
     dtheta1_sol[i] = B_sys[:, 0].T @ e_sol[:, i]
     dtheta2r_sol[i] = B_sys[:, 1].T @ e_sol[:, i]
 
-    # vx_rigB2 = L1 * dtheta1_sol[i] * np.sin(theta2r_sol[i])
-    # vy_rigB2 = L1 * dtheta1_sol[i] * np.cos(theta2r_sol[i])
-    #
-    # print(eAll_sol[1, i] - vx_rigB2)
-    # print(eAll_sol[2, i] - vy_rigB2)
+    # erig_1 = np.array([0, 0, eAll_sol[0, i]])
+    # erig_2 = np.array([eAll_sol[1, i], eAll_sol[2, i], eAll_sol[3, i]])
 
+    erig_1 = np.zeros((3,))
+    erig_2 = np.zeros((3,))
 
-    # vx_rigB2 = L1 * dtheta1_sol[i] * np.sin(theta2r_sol[i])
-    # vy_rigB2 = L1 * dtheta1_sol[i] * np.cos(theta2r_sol[i])
-    # om_rigB2 = dtheta1_sol[i] + dtheta2r_sol[i]
-    # erig_1 = np.array([0, 0, dtheta1_sol[i]])
-    # erig_2 = np.array([vx_rigB2, vy_rigB2, om_rigB2])
-
-    erig_1 = np.array([0, 0, eAll_sol[0, i]])
-    erig_2 = np.array([eAll_sol[1, i], eAll_sol[2, i], eAll_sol[3, i]])
-
-    ep_1 = eAll_sol[n_r1:n_p1, i]
-    ep_2 = eAll_sol[n_r3:n_p2, i]
+    ep_1 = eAll_sol[n_r3:n_p1, i]
+    ep_2 = eAll_sol[n_p1:n_p2, i]
 
     # ep_1 = np.zeros((n_p, ))
     # ep_2 = np.zeros((n_p, ))
@@ -193,22 +178,17 @@ for i in range(n_ev):
     R_B1_I = np.array([[np.cos(theta1_sol[i]), -np.sin(theta1_sol[i])],
                        [np.sin(theta1_sol[i]),  np.cos(theta1_sol[i])]])
 
-    R_B2_I = np.array([[np.cos(theta2a_sol[i]), -np.sin(theta2a_sol[i])],
-                       [np.sin(theta2a_sol[i]),  np.cos(theta2a_sol[i])]])
+    R_B2_I = R_B1_I
 
     for j in range(n_dr):
         vx_I1[j, i], vy_I1[j, i] = R_B1_I @ np.array([vx_B1[j, i], vy_B1[j, i]])
-
         vx_I2[j, i], vy_I2[j, i] = R_B2_I @ np.array([vx_B2[j, i], vy_B2[j, i]])
 
-        # if j == 0:
-        #         v_intI2[:, i] = R_B2_I @ np.array([vx_B2[j, i], vy_B2[j, i]])
-        #
-        # if j == n_dr-1:
-        #         v_intI1[:, i] = R_B1_I @ np.array([vx_B1[j, i], vy_B1[j, i]])
+    v_intI2[:, i] = np.array([vx_I2[0, i], vy_I2[0, i]])
+    v_intI1[:, i] = np.array([vx_I1[-1, i], vy_I1[-1, i]])
 
-        # assert abs(v_intI1[:, i] - v_intI2[:, i]).all() < 1e-9
-        # print(v_intI1[:, i] - v_intI2[:, i])
+    # print(v_intI1[:, i] - v_intI2[:, i])
+    # assert np.linalg.norm(v_intI1[:, i] - v_intI2[:, i]) < 1e-15
 
     if i > 0:
         xI_1[:, i] = xI_1[:, i - 1] + 0.5 * (vx_I1[:, i - 1] + vx_I1[:, i]) * dt_vec[i - 1]
@@ -218,6 +198,7 @@ for i in range(n_ev):
         yI_2[:, i] = yI_2[:, i - 1] + 0.5 * (vy_I2[:, i - 1] + vy_I2[:, i]) * dt_vec[i - 1]
 
         theta1Num_sol[i] = theta1Num_sol[i - 1] + 0.5 * (eAll_sol[0, i - 1] + eAll_sol[0, i]) * dt_vec[i - 1]
+        theta2Num_sol[i] = theta1Num_sol[i - 1] + 0.5 * (eAll_sol[3, i - 1] + eAll_sol[3, i]) * dt_vec[i - 1]
 
 
 # plt.figure()
@@ -225,25 +206,20 @@ for i in range(n_ev):
 # plt.figure()
 # plt.plot(t_ev, theta2r_sol*180/pi, 'b')
 
-plt.figure()
-plt.plot(t_ev, dtheta1_sol*180/pi, 'r')
-plt.figure()
-plt.plot(t_ev, dtheta2r_sol*180/pi, 'b')
-
-plt.figure()
-plt.plot(t_ev, eAll_sol[0, :]*180/pi, 'r')
-plt.figure()
-plt.plot(t_ev, (eAll_sol[3, :] - eAll_sol[0, :])*180/pi, 'b')
+# plt.figure()
+# plt.plot(t_ev, dtheta1_sol*180/pi, 'r')
+# plt.figure()
+# plt.plot(t_ev, dtheta2r_sol*180/pi, 'b')
 
 
 x_manI = np.concatenate((xI_1, xI_2), axis=0)
 y_manI = np.concatenate((yI_1, yI_2), axis=0)
 
-# anim = animate_plot(t_ev, xI_2, yI_2, xlabel=None, ylabel=None, title=None)
-# anim = animate_plot(t_ev, x_manI, y_manI, xlabel=None, ylabel=None, title=None
+# anim = animate_plot(t_ev, xI_1, yI_1, xlabel=None, ylabel=None, title=None)
+anim = animate_plot(t_ev, x_manI, y_manI, xlabel=None, ylabel=None, title=None)
 
-# from tools_plotting.animate_plotrigfl import animate_plot
-# anim = animate_plot(t_ev, x_manI, y_manI, theta1_sol, theta2a_sol,  xlabel=None, ylabel=None, title=None)
+from tools_plotting.animate_plotrigfl import animate_plot
+# anim = animate_plot(t_ev, x_manI, y_manI, theta1Num_sol, theta2Num_sol,  xlabel=None, ylabel=None, title=None)
 
 # from tools_plotting.animate_plotrigfl import animate_plot
 # anim = animate_plot(t_ev, x_manI, y_manI, theta1_sol, theta2a_sol,  xlabel=None, ylabel=None, title=None)
