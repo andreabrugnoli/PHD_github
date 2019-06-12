@@ -479,7 +479,7 @@ class SysPhdaeRig(SysPhdae):
         B = np.concatenate((B_e, self.B_lmb))
 
         sys_red = SysPhdaeRig(n, n_lmb, n_rig, n_p, n_q, E=E, J=J, B=B, R=R)
-        return sys_red
+        return sys_red, V_f
 
 
 def permute_rows_columns(mat, ind_perm):
@@ -503,7 +503,7 @@ def check_positive_matrix(mat):
         return False
 
 
-tol = 1e-10
+tol = 1e-7
 
 
 def check_symmetry(mat):

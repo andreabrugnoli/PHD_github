@@ -160,11 +160,11 @@ for i in range(n_ev):
     dtheta1_sol[i] = B_sys[:, 0].T @ e_sol[:, i]
     dtheta2r_sol[i] = B_sys[:, 1].T @ e_sol[:, i]
 
-    # erig_1 = np.array([0, 0, eAll_sol[0, i]])
-    # erig_2 = np.array([eAll_sol[1, i], eAll_sol[2, i], eAll_sol[3, i]])
+    erig_1 = np.array([0, 0, eAll_sol[0, i]])
+    erig_2 = np.array([eAll_sol[1, i], eAll_sol[2, i], eAll_sol[3, i]])
 
-    erig_1 = np.zeros((3,))
-    erig_2 = np.zeros((3,))
+    # erig_1 = np.zeros((3,))
+    # erig_2 = np.zeros((3,))
 
     ep_1 = eAll_sol[n_r3:n_p1, i]
     ep_2 = eAll_sol[n_p1:n_p2, i]
@@ -188,7 +188,7 @@ for i in range(n_ev):
     v_intI1[:, i] = np.array([vx_I1[-1, i], vy_I1[-1, i]])
 
     # print(v_intI1[:, i] - v_intI2[:, i])
-    # assert np.linalg.norm(v_intI1[:, i] - v_intI2[:, i]) < 1e-15
+    assert np.linalg.norm(v_intI1[:, i] - v_intI2[:, i]) < 1e-15
 
     if i > 0:
         xI_1[:, i] = xI_1[:, i - 1] + 0.5 * (vx_I1[:, i - 1] + vx_I1[:, i]) * dt_vec[i - 1]
@@ -201,6 +201,9 @@ for i in range(n_ev):
         theta2Num_sol[i] = theta1Num_sol[i - 1] + 0.5 * (eAll_sol[3, i - 1] + eAll_sol[3, i]) * dt_vec[i - 1]
 
 
+u1_sol = Kp1 * (theta1_ref - theta1_sol) - Kv1 * dtheta1_sol
+u2_sol = Kp2 * (theta2r_ref - theta2r_sol) - Kv2 * dtheta2r_sol
+
 # plt.figure()
 # plt.plot(t_ev, theta1_sol*180/pi, 'r')
 # plt.figure()
@@ -212,6 +215,12 @@ for i in range(n_ev):
 # plt.plot(t_ev, dtheta2r_sol*180/pi, 'b')
 
 
+plt.figure()
+plt.plot(t_ev, u1_sol, 'r')
+plt.figure()
+plt.plot(t_ev, u2_sol, 'b')
+
+
 x_manI = np.concatenate((xI_1, xI_2), axis=0)
 y_manI = np.concatenate((yI_1, yI_2), axis=0)
 
@@ -221,8 +230,6 @@ anim = animate_plot(t_ev, x_manI, y_manI, xlabel=None, ylabel=None, title=None)
 from tools_plotting.animate_plotrigfl import animate_plot
 # anim = animate_plot(t_ev, x_manI, y_manI, theta1Num_sol, theta2Num_sol,  xlabel=None, ylabel=None, title=None)
 
-# from tools_plotting.animate_plotrigfl import animate_plot
-# anim = animate_plot(t_ev, x_manI, y_manI, theta1_sol, theta2a_sol,  xlabel=None, ylabel=None, title=None)
 
 # fps = 20
 # Writer = animation.writers['ffmpeg']

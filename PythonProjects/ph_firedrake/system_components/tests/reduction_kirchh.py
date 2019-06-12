@@ -21,14 +21,14 @@ plate = FloatingKP(Lx, Ly, h, rho, E, nu, nx, ny, pointP, coord_C=pointC1, modes
 
 pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/ReductionPHDAE/KP_Matrices/'
 Mode_file = 'M'; Jode_file = 'J'; Bode_file = 'B'
-savemat(pathout + Mode_file, mdict={Mode_file: plate.M_e})
-savemat(pathout + Jode_file, mdict={Jode_file: plate.J_e})
-savemat(pathout + Bode_file, mdict={Bode_file: plate.B_e})
+# savemat(pathout + Mode_file, mdict={Mode_file: plate.M_e})
+# savemat(pathout + Jode_file, mdict={Jode_file: plate.J_e})
+# savemat(pathout + Bode_file, mdict={Bode_file: plate.B_e})
 
-plate = plate.reduce_system(0.001, 10)
+plate = plate.reduce_system(0.001, 10)[0]
 Mode_file = 'Mr'; Jode_file = 'Jr'; Bode_file = 'Br'
-savemat(pathout + Mode_file, mdict={Mode_file: plate.M_e})
-savemat(pathout + Jode_file, mdict={Jode_file: plate.J_e})
-savemat(pathout + Bode_file, mdict={Bode_file: plate.B_e})
+# savemat(pathout + Mode_file, mdict={Mode_file: plate.M_e})
+# savemat(pathout + Jode_file, mdict={Jode_file: plate.J_e})
+# savemat(pathout + Bode_file, mdict={Bode_file: plate.B_e})
 
 
