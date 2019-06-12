@@ -1,0 +1,353 @@
+\documentclass[11t]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[cyr]{aeguill}
+\usepackage[english]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\usepackage{graphicx}
+
+\usepackage{authblk}	
+\usepackage{geometry}
+\geometry{top=3cm,bottom=3cm,left=2.5cm,right=2.5cm}
+
+\usepackage{mathrsfs}
+
+\usepackage{multirow}
+\usepackage[justification=centering]{caption}
+\usepackage{subfig}
+\usepackage{xcolor,colortbl}
+\usepackage{diffcoeff}
+
+\usepackage[colorlinks=true,linkcolor=black, citecolor=blue, urlcolor=blue]{hyperref}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\division}{\div}
+
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator*{\grad}{grad}
+\DeclareMathOperator*{\Grad}{Grad}
+\DeclareMathOperator*{\Div}{Div}
+\renewcommand{\div}{\operatorname{div}}
+\DeclareMathOperator*{\Hess}{Hess}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{remark}{Remark}
+\newtheorem{proposition}{Proposition}
+\newtheorem{definition}{Definition}
+\newtheorem{corollary}{Corollary}
+
+\graphicspath{{./Figures/}}
+
+\def\onedot{$\mathsurround0pt\ldotp$}
+\def\cddot{% two dots stacked vertically
+	\mathbin{\vcenter{\baselineskip.67ex
+			\hbox{\onedot}\hbox{\onedot}}%
+}}
+
+\makeatletter \renewcommand\d[1]{\ensuremath{%
+		\;\mathrm{d}#1\@ifnextchar\d{\!}{}}}
+\makeatother
+
+\title{Port-Hamiltonian Formulation of Thermoelasticity}	
+
+\author[1]{Andrea Brugnoli\thanks{andrea.brugnoli@isae.fr}}
+\author[1]{Daniel Alazard\thanks{daniel.alazard@isae.fr}}
+\author[1]{Val\'erie Pommier-Budinger \thanks{valerie.budinger@isae.fr}}
+\author[1]{Denis Matignon \thanks{denis.matignon@isae.fr}}
+\affil[1]{ISAE-SUPAERO, Universit\'e de Toulouse, France. \\
+	10 Avenue Edouard Belin, BP-54032, 31055 Toulouse Cedex 4.}
+
+\begin{document}
+\maketitle
+
+\section{Classical model}
+The classical model is detailed in \cite{Carlson1973}. The equations read
+\begin{equation}
+\begin{cases}
+\displaystyle \rho \diffp[2]{\bm{u}}{t} = \Div(\mathcal{S}_{\mathcal{E}T}) , \\
+\displaystyle \rho c_V \diffp{T}{t} = -\div(\bm{j}_Q) - T_0 \mathcal{C} \mathcal{A} \cddot \displaystyle\diffp{\mathcal{E}}{t}, \\
+\mathcal{S}_{\mathcal{E}T} = \mathcal{S_E} + \mathcal{S}_{T}, \\
+\mathcal{S_E} = \mathcal{C} \mathcal{E}, \\
+\mathcal{S}_{T} = - \mathcal{C} \mathcal{A} (T - T_0),  \\
+\mathcal{E} = \Grad(\bm{u}), \\
+\bm{j}_Q = -\mathcal{K} \, \mathrm{grad}(T).
+\end{cases}
+\end{equation}
+
+Here $\rho, c_V$ are the mass density and the specific heat density at constant strain, $\bm{u}$ is the displacement, $T, T_0$ are the temperature and the constant reference temperature, $\mathcal{E}$ is the strain tensor, $\mathcal{S}_E, \mathcal{S}_T$ are the stress tensor contribution due to mechanical deformation and a thermal field, $\bm{j}_Q$ is the heat flux. $\mathcal{C}$ is the elasticity tensor, $\mathcal{K}$ the thermal diffusivity tensor and $\mathcal{A}$ the thermal expansion tensor. 
+
+
+\section{PH Elasticity}
+The port-Hamiltonian elasticity formulation reads
+
+\begin{equation}
+\begin{aligned}
+\diffp{}{t}
+\begin{pmatrix}
+\bm{p} \\
+\mathcal{E} \\
+\end{pmatrix} &= 
+\begin{bmatrix}
+0 & \Div \\
+\Grad & 0 \\
+\end{bmatrix}
+\begin{pmatrix}
+\bm{v} \\
+\mathcal{S_E} \\
+\end{pmatrix} + 
+\begin{bmatrix}
+\bm{I} \\
+0 \\
+\end{bmatrix}\bm{u}_E, \\
+\bm{y}_E &= \begin{bmatrix}
+\bm{I} & 0 \\
+\end{bmatrix}\begin{pmatrix}
+\bm{v} \\
+\mathcal{S_E} \\
+\end{pmatrix}
+\end{aligned}
+\end{equation} 
+
+where $\bm{v}=\diffp{\bm{u}}{t}, \; \bm{p} = \rho \bm{v}$ and $\bm{u}_E$ is a distributed force  in the domain $\Omega$, meaning that 
+\begin{equation}
+\begin{pmatrix}
+\bm{v} \\
+\mathcal{S_E} \\
+\end{pmatrix}= 
+\begin{bmatrix}
+\rho^{-1} & 0\\
+0 & \mathcal{C} \\
+\end{bmatrix}
+\begin{pmatrix}
+\bm{p} \\
+\mathcal{E} \\
+\end{pmatrix}.
+\end{equation}
+
+\section{PH Heat equation}
+Taking as Hamiltonian the Lyapunov functional
+\begin{equation*}
+H = \frac{1}{2} \int_{\Omega} \rho c_v \frac{T^2}{T_0} \d\Omega.
+\end{equation*}
+This functional doesn't represent the actual internal energy. Nevertheless it has the dimension of an energy. Introducing as energy variable the actual internal energy
+\begin{equation}
+	\alpha_u := u =  \rho c_v T,
+\end{equation}
+and the corresponding coenergy 
+\begin{equation}
+	e_u := \diffd{H}{\alpha_u} = \frac{T}{T_0} := \theta,
+\end{equation}
+it is possible to express the heat equation as a pHDAE
+\begin{equation}
+\begin{aligned}
+\begin{bmatrix}
+1 & 0 \\
+0 & 0 \\
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+u \\
+\bm{j}_Q \\
+\end{pmatrix} &= 
+\begin{bmatrix}
+0 & -\div \\
+-\grad & - (T_0 \mathcal{K})^{-1} \\
+\end{bmatrix}
+\begin{pmatrix}
+\theta \\
+\bm{j}_Q \\
+\end{pmatrix} + 
+\begin{bmatrix}
+1 \\
+0 \\
+\end{bmatrix}u_T, \\
+y_T &= \begin{bmatrix}
+1 & 0 \\
+\end{bmatrix}\begin{pmatrix}
+e_u \\
+\bm{j}_Q \\
+\end{pmatrix}.
+\end{aligned}
+\end{equation} 
+The input $u_T$ represents a heat source. The operator 
+\[
+\mathfrak{A} = \begin{bmatrix}
+0 & -\div \\
+-\grad & - (T_0 \mathcal{K})^{-1} \\
+\end{bmatrix}
+\]
+can be decomposed in a skew-symmetric and a non negative definite symmetric part
+\[
+\mathfrak{J} = \begin{bmatrix}
+0 & -\div \\
+-\grad & 0 \\
+\end{bmatrix}, \qquad
+\mathfrak{R} = \begin{pmatrix}
+0 & 0 \\
+0 & (T_0 \mathcal{K})^{-1} \\
+\end{pmatrix}
+\]
+The first one accounts for the energy conservation, the second one for the dissipation.
+
+\section{Coupled PH System}
+The linear thermoelastic problem can be expressed as a coupled port-Hamiltonian system. For simplicity the second order tensor 
+\[\mathcal{B}:=T_0 \, \mathcal{C} \mathcal{A}\]
+ is introduced.
+ Consider the following power preserving interconnection
+
+\begin{align}
+\bm{u}_E &= - \Div(\mathcal{B} \, y_T) \\
+u_T &= - \mathcal{B} \cddot\Grad(\bm{y}_E) 
+\end{align}
+
+Using the expression of $y_T, \bm{y}_E$, considering that $T_0$ is constant in space and time and applying Schwarz theorem for smooth function, the inputs are equal to
+
+\begin{align*}
+\bm{u}_E &=  \Div(\mathcal{S}_T) \\
+u_T &= - \mathcal{B} \cddot  \Grad(\bm{v}) = - \mathcal{B} \cddot  \diffp{\mathcal{E}}{t} 
+\end{align*}
+The connection is power preserving as the interconnection can be compactly written as 
+\begin{align}
+\bm{u}_E &= \mathfrak{D}(y_T) \\
+u_T &= - \mathfrak{D}^*(\bm{y}_E) 
+\end{align}
+where the operator $\mathfrak{D} := - \Div(\mathcal{B} \, \cdot) : L^2(\Omega) \rightarrow L^2(\Omega, \mathbb{R}^3)$ has formal adjoint $ \mathfrak{D}^* =  \mathcal{B} \cddot  \Grad(\cdot): L^2(\Omega, \mathbb{R}^3) \rightarrow L^2(\Omega)$. As a consequence it holds
+\[
+\left\langle u_T, y_T \right\rangle_{L^2(\Omega)} + \left\langle \bm{u}_E, \bm{y}_E \right\rangle_{L^2(\Omega, \mathbb{R}^3)} = 0.
+\]
+ We are then in the position to write the coupled thermoelastic problem 
+
+\begin{equation}
+\begin{bmatrix}
+1 & 0 & 0 & 0\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 0\\
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+\bm{p} \\
+\mathcal{E} \\
+u \\
+\bm{j}_Q \\
+\end{pmatrix} = 
+\begin{bmatrix}
+0 & \Div & - \Div(\mathcal{B} \, \cdot) & 0\\
+\Grad & 0 & 0 & 0 \\
+- \mathcal{B} \cddot  \Grad & 0 & 0 & -\div \\
+0 & 0 & -\grad & - (T_0 \mathcal{K})^{-1} \\
+\end{bmatrix}
+\begin{pmatrix}
+\bm{v} \\
+\mathcal{S_E} \\
+\theta \\
+\bm{j}_Q \\
+\end{pmatrix}.
+\end{equation}
+
+This formulation allows to analyze the thermoelastic problem in an arbitrary dimension. The boundary conditions can be specified by specifying the trace over the boundary of the coenergies. The general homogeneous boundary conditions read 
+\begin{equation}
+\begin{aligned}
+\bm{u} &= 0 \quad \text{in } \Gamma_1 \times (0, +\infty), \\
+\theta &= 0 \quad \text{in } \Gamma_2 \times (0, +\infty),
+\end{aligned} \qquad
+\begin{aligned}
+\left(\mathcal{C} \Grad(\bm{u}) - \mathcal{B} \theta \right) \cdot \bm{n} &= 0 \quad \text{in } \Gamma_1^c \times (0, +\infty), \\
+- \mathcal{K} \grad(\theta) \cdot \bm{n} &= 0 \quad \text{in } \Gamma_2^c \times (0, +\infty),
+\end{aligned}
+\end{equation}
+Those can be rewritten equivalently in the pH Hamiltonian formalism as
+\begin{equation}
+\begin{aligned}
+\bm{v} &= 0 \quad \text{in } \Gamma_1 \times (0, +\infty), \\
+\theta &= 0 \quad \text{in } \Gamma_2 \times (0, +\infty),
+\end{aligned} \qquad
+\begin{aligned}
+\left(\mathcal{S_E} - \mathcal{B} \theta \right) \cdot \bm{n} &= 0 \quad \text{in } \Gamma_1^c \times (0, +\infty), \\
+\bm{j}_Q \cdot \bm{n} &= 0 \quad \text{in } \Gamma_2^c \times (0, +\infty),
+\end{aligned}
+\end{equation}
+
+\section{Bending of thin thermoelastic plates}
+
+The classical model of thermoelastic plates \cite{ThLasiecka}
+\begin{equation}
+\begin{cases}
+\displaystyle \rho h \diffp[2]{w}{t} + D \Delta^2 w + \div(\mathcal{A}(\bm{x}) \grad(T)) = 0, \vspace{2pt} \\
+\displaystyle \rho c_V \diffp{T}{t} - \div(\mathcal{K} \grad(T)) - \div(\mathcal{A}(\bm{x}) \grad\left(\diffp{w}{t}\right)) = 0,
+\end{cases}
+\end{equation}
+can be put in Hamiltonian form as follows
+\begin{equation}
+\begin{bmatrix}
+1 & 0 & 0 & 0\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 0\\
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+p \\
+\mathcal{W} \\
+u \\
+\bm{j}_Q \\
+\end{pmatrix} = 
+\begin{bmatrix}
+0 & -\div \circ \Div & \div(\mathcal{A}_{T_0}(\bm{x}) \grad \cdot) & 0\\
+\Grad \circ \grad & 0 & 0 & 0 \\
+- \div(\mathcal{A}_{T_0}(\bm{x}) \grad \cdot) & 0 & 0 & -\div \\
+0 & 0 & -\grad & - (T_0 \mathcal{K})^{-1} \\
+\end{bmatrix}
+\begin{pmatrix}
+v \\
+\mathcal{M} \\
+\theta \\
+\bm{j}_Q \\
+\end{pmatrix},
+\end{equation}
+with $\mathcal{A}_{T_0} = T_0 \mathcal{A}, \; p = \rho h \diffp{w}{t}, \; v = \diffp{w}{t}, \; \mathcal{W} = \Hess(w), \; \mathcal{M} = \mathcal{D \, W}$. \\
+The boundary conditions can again be imposed be considering a boundary differential operator on the coenergies.
+
+\paragraph{The Euler Bernoulli beam}
+In one dimension the previous model simplifies in
+\begin{equation}
+\begin{bmatrix}
+1 & 0 & 0 & 0\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 0\\
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+\alpha_w \\
+\alpha_\kappa \\
+u \\
+j_Q \\
+\end{pmatrix} = 
+\begin{bmatrix}
+0 & -\diffp[2]{}{x} & \diffp{}{x}(a(x) \diffp{}{x} \cdot) & 0\\
+\diffp[2]{}{x} & 0 & 0 & 0 \\
+- \diffp{}{x}(a(x) \diffp{}{x} \cdot) & 0 & 0 & - \diffp{}{x} \\
+0 & 0 & - \diffp{}{x} & - (T_0 k)^{-1} \\
+\end{bmatrix}
+\begin{pmatrix}
+e_w \\
+e_\kappa \\
+\theta \\
+j_Q \\
+\end{pmatrix},
+\end{equation}
+
+\section{Numerics (TO DO)}
+
+PFEM stays applicable to the thermoelastic problem, by taking care of obtaining a skew-symmetric form. 
+
+
+
+\bibliographystyle{unsrt}
+\bibliography{thermoelasticity} 
+	
+\end{document}
+\endinput

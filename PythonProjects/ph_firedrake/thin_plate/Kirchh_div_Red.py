@@ -12,6 +12,7 @@ from matplotlib import cm
 from firedrake.plot import _two_dimension_triangle_func_val
 from mpl_toolkits.mplot3d import Axes3D
 from math import pi
+from modules_phdae.classes_phsystem import SysPhdaeRig
 
 E = 2e11
 nu = 0.3
@@ -95,13 +96,13 @@ elif name_FEq == 'Hermite':
 elif name_FEq == 'Argyris' or name_FEq == 'Bell':
     deg_q = 5
 
-V_p = FunctionSpace(mesh, name_FEp, deg_p)
-V_q = VectorFunctionSpace(mesh, name_FEq, deg_q, dim=3)
-V = V_p * V_q
+Vp = FunctionSpace(mesh, name_FEp, deg_p)
+Vq = VectorFunctionSpace(mesh, name_FEq, deg_q, dim=3)
+V = Vp * Vq
 
 n_Vp = V.sub(0).dim()
 n_Vq = V.sub(1).dim()
-n_V  = V.dim()
+n_V = V.dim()
 print(n_V)
 
 v = TestFunction(V)
@@ -189,7 +190,6 @@ MM = np.array(petsc_m.convert("dense").getDenseArray())
 if b_vec:
     b_u = sum(b_vec)
     B_u = assemble(b_u, mat_type='aij')
-
     petsc_b_u = B_u.M.handle
     B_in = np.array(petsc_b_u.convert("dense").getDenseArray())
     boundary_dofs = np.where(B_in.any(axis=0))[0]
@@ -198,6 +198,12 @@ if b_vec:
 else:
     B_in = np.zeros((n_V, 0))
     N_u = 0
+
+
+x, y = SpatialCoordinate(mesh)
+con_dom1 = And(And(gt(x, L / 4), lt(x, 3 * L / 4)), And(gt(y, L / 4), lt(y, 3 * L / 4)))
+Dom_f = conditional(con_dom1, 1., 0.)
+B_f = assemble(v_p * Dom_f * dx).vector().get_local()
 
 Z_u = np.zeros((N_u, N_u))
 
@@ -209,43 +215,88 @@ J_aug = np.vstack([np.hstack([JJ, B_in]),
 Z_al_u = np.zeros((n_V, N_u))
 Z_u_al = np.zeros((N_u, n_V))
 
-M_aug = np.vstack([np.hstack([MM, Z_al_u]),
+E_aug = np.vstack([np.hstack([MM, Z_al_u]),
                    np.hstack([Z_u_al,    Z_u])
                    ])
-tol = 10**(-6)
 
-eigenvalues, eigvectors = la.eig(J_aug, M_aug)
-omega_all = np.imag(eigenvalues)
 
-index = omega_all>=tol
+B_aug = np.concatenate((B_f, np.zeros(N_u, )), axis=0).reshape((-1, 1))
 
-omega = omega_all[index]
-eigvec_omega = eigvectors[:, index]
-perm = np.argsort(omega)
-eigvec_omega = eigvec_omega[:, perm]
+plate_full = SysPhdaeRig(n_V+N_u, N_u, 0, n_Vp, n_Vq, E_aug, J_aug, B_aug)
 
-omega.sort()
+# plate_full = SysPhdaeRig(n_V, 0, 0, n_Vp, n_Vq, MM, JJ, B_in)
+
+s0 = 0.01
+n_red = 40
+plate_red, V_red = plate_full.reduce_system(s0, n_red)
+Vall_red = la.block_diag(V_red, np.eye(N_u))
+
+E_red = plate_red.E
+J_red = plate_red.J
+B_red = plate_red.B
+
+# J_red = np.vstack([np.hstack([J_red, B_red]),
+#                       np.hstack([-B_red.T, Z_u])
+#                       ])
+#
+# E_red = la.block_diag(M_red, Z_u)
+
+tol = 10 ** (-6)
+
+eigenvaluesF, eigvectorsF = la.eig(J_aug, E_aug)
+omega_allF = np.imag(eigenvaluesF)
+
+indexF = omega_allF >= tol
+
+omega_full = omega_allF[indexF]
+eigvec_full = eigvectorsF[:, indexF]
+permF = np.argsort(omega_full)
+eigvec_full = eigvec_full[:, permF]
+omega_full.sort()
+
+print(J_red.shape)
+eigenvaluesR, eigvectorsR = la.eig(J_red, E_red)
+omega_allR = np.imag(eigenvaluesR)
+
+index = omega_allR >= tol
+
+omega_red = omega_allR[index]
+eigvec_red = eigvectorsR[:, index]
+permR = np.argsort(omega_red)
+eigvec_red = eigvec_red[:, permR]
+omega_red.sort()
+
+print(Vall_red.shape, eigvec_red.shape)
+
+plt.plot(np.real(eigenvaluesF), np.imag(eigenvaluesF), 'r+', np.real(eigenvaluesR), np.imag(eigenvaluesR), 'bo')
+plt.legend(("Eigenvalues full", "Eigenvalues reduced"))
+plt.show()
 
 # NonDimensional China Paper
-n_om = 3
 
-omega_tilde = L**2*sqrt(rho*h/D)*omega
+n_om = 10
+
+omegaF_tilde = L**2*sqrt(rho*h/D)*omega_full
+omegaR_tilde = L**2*sqrt(rho*h/D)*omega_red
+
+# for i in range(n_om):
+#     print(omegaF_tilde[i])
+
 for i in range(n_om):
-    print(omega_tilde[i])
+    print(omegaF_tilde[i], omegaR_tilde[i])
 
+n_fig = 3
 plot_eigenvectors = True
 if plot_eigenvectors:
 
     fntsize = 15
-    n_fig = 3
-    n_Vpw = V_p.dim()
 
-    for i in range(n_om):
-        eig_real_w = Function(V_p)
-        eig_imag_w = Function(V_p)
+    for i in range(n_fig):
+        eig_real_w = Function(Vp)
+        eig_imag_w = Function(Vp)
 
-        eig_real_p = np.real(eigvec_omega[:n_Vp, i])
-        eig_imag_p = np.imag(eigvec_omega[:n_Vp, i])
+        eig_real_p = np.real(eigvec_full[:n_Vp, i])
+        eig_imag_p = np.imag(eigvec_full[:n_Vp, i])
         eig_real_w.vector()[:] = eig_real_p
         eig_imag_w.vector()[:] = eig_imag_p
 
@@ -261,7 +312,7 @@ if plot_eigenvectors:
         else:
             triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_real_wCG, 10)
 
-        figure = plt.figure(i)
+        figure = plt.figure()
         ax = figure.add_subplot(111, projection="3d")
 
         ax.plot_trisurf(triangulation, z_goodeig, cmap=cm.jet)
@@ -277,10 +328,48 @@ if plot_eigenvectors:
         ax.w_zaxis.set_major_locator(LinearLocator(10))
         ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
 
-        path_out2 = "/home/a.brugnoli/PycharmProjects/firedrake/Kirchhoff_PHs/Eig_Kirchh/Imag_Eig/"
+        # path_out2 = "/home/a.brugnoli/PycharmProjects/firedrake/Kirchhoff_PHs/Eig_Kirchh/Imag_Eig/"
+        # plt.savefig(path_out2 + "Case" + bc_input + "_el" + str(n) + "_FE_" + name_FEp + "_eig_" + str(i+1) + ".eps", format="eps")
+
+
+    for i in range(n_fig):
+        eig_real_w = Function(Vp)
+        eig_imag_w = Function(Vp)
+
+        eig_real_p = np.real((Vall_red @ eigvec_red[:, i])[:n_Vp])
+        eig_imag_p = np.imag((Vall_red @ eigvec_red[:, i])[:n_Vp])
+        eig_real_w.vector()[:] = eig_real_p
+        eig_imag_w.vector()[:] = eig_imag_p
+
+        Vp_CG = FunctionSpace(mesh, 'Lagrange', 3)
+        eig_real_wCG = project(eig_real_w, Vp_CG)
+        eig_imag_wCG = project(eig_imag_w, Vp_CG)
+
+        norm_real_eig = np.linalg.norm(eig_real_wCG.vector().get_local())
+        norm_imag_eig = np.linalg.norm(eig_imag_wCG.vector().get_local())
+
+        if norm_imag_eig > norm_real_eig:
+            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_imag_wCG, 10)
+        else:
+            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_real_wCG, 10)
+
+        figure = plt.figure()
+        ax = figure.add_subplot(111, projection="3d")
+
+        ax.plot_trisurf(triangulation, z_goodeig, cmap=cm.jet)
+
+        ax.set_xbound(-tol, l_x + tol)
+        ax.set_xlabel('$x [m]$', fontsize=fntsize)
+
+        ax.set_ybound(-tol, l_y + tol)
+        ax.set_ylabel('$y [m]$', fontsize=fntsize)
+
+        ax.set_title('$v_{e_{w}}$', fontsize=fntsize)
+
+        ax.w_zaxis.set_major_locator(LinearLocator(10))
+        ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
+
+        # path_out2 = "/home/a.brugnoli/PycharmProjects/firedrake/Kirchhoff_PHs/Eig_Kirchh/Imag_Eig/"
         # plt.savefig(path_out2 + "Case" + bc_input + "_el" + str(n) + "_FE_" + name_FEp + "_eig_" + str(i+1) + ".eps", format="eps")
 
 plt.show()
-
-
-

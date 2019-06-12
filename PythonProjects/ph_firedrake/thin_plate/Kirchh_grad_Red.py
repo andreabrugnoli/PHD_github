@@ -20,7 +20,7 @@ matplotlib.rcParams['text.usetex'] = True
 
 E = 2e11
 nu = 0.3
-h = 0.05
+h = 0.01
 rho = 8000  # kg/m^3
 D = E * h ** 3 / (1 - nu ** 2) / 12.
 
@@ -28,7 +28,7 @@ L = 1
 l_x = L
 l_y = L
 
-n = 4 #int(input("N element on each side: "))
+n = 5 #int(input("N element on each side: "))
 
 # Plate bending stiffness :math:`D=\dfrac{Eh^3}{12(1-\nu^2)}` and shear stiffness :math:`F = \kappa Gh`
 # with a shear correction factor :math:`\kappa = 5/6` for a homogeneous plate
@@ -94,10 +94,12 @@ elif name_FEp == 'Argyris' or name_FEp == 'Bell':
 
 if name_FEq == 'Morley':
     deg_q = 2
-elif name_FEq == 'Hermite':
+elif name_FEq == 'Hermite' or name_FEq == 'Lagrange':
     deg_q = 3
 elif name_FEq == 'Argyris' or name_FEq == 'Bell':
     deg_q = 5
+elif name_FEq == 'DG':
+    deg_q = 0
 
 Vp = FunctionSpace(mesh, name_FEp, deg_p)
 Vq = VectorFunctionSpace(mesh, name_FEq, deg_q, dim=3)
@@ -129,11 +131,11 @@ m_p = dot(v_p, al_p) * dx
 m_q = inner(v_q, al_q) * dx
 m = m_p + m_q
 
-j_divDiv = -v_p * tensor_divDiv_vec(e_q) * dx
+j_divDiv = - v_p * tensor_divDiv_vec(e_q) * dx
 j_divDivIP = tensor_divDiv_vec(v_q) * e_p * dx
 
 j_gradgrad = inner(v_q, Gradgrad_vec(e_p)) * dx
-j_gradgradIP = -inner(Gradgrad_vec(v_p), e_q) * dx
+j_gradgradIP = - inner(Gradgrad_vec(v_p), e_q) * dx
 
 j = j_gradgrad + j_gradgradIP  #
 
@@ -151,8 +153,8 @@ bc_1, bc_3, bc_2, bc_4 = bc_input
 
 bc_dict = {1: bc_1, 2: bc_2, 3: bc_3, 4: bc_4}
 
-n = FacetNormal(mesh)
-# s = as_vector([-n[1], n[0]])
+n_ver = FacetNormal(mesh)
+# s_ver = as_vector([-n[1], n[0]])
 
 V_qn = FunctionSpace(mesh, 'Lagrange', 1)
 V_Mnn = FunctionSpace(mesh, 'Lagrange', 1)
@@ -161,12 +163,12 @@ Vu = V_qn * V_Mnn
 
 q_n, M_nn = TrialFunction(Vu)
 
-v_omn = dot(grad(v_p), n)
+v_omn = dot(grad(v_p), n_ver)
 
 b_vec = []
 for key, val in bc_dict.items():
     if val == 'C':
-        b_vec.append( v_p * q_n * ds(key) + v_omn * M_nn * ds(key))
+        b_vec.append(v_p * q_n * ds(key) + v_omn * M_nn * ds(key))
     elif val == 'S':
         b_vec.append(v_p * q_n * ds(key))
 # Assemble the stiffness matrix and the mass matrix.
@@ -195,8 +197,6 @@ else:
     B_in = np.zeros((n_V, 0))
     N_u = 0
 
-# print(N_u)
-
 x, y = SpatialCoordinate(mesh)
 con_dom1 = And(And(gt(x, L/4), lt(x, 3*L/4)), And(gt(y, L/4), lt(y, 3*L/4)))
 Dom_f = conditional(con_dom1, 1., 0.)
@@ -218,13 +218,15 @@ E_aug = np.vstack([np.hstack([MM, Z_al_u]),
 
 B_aug = np.concatenate((B_f, np.zeros(N_u, )), axis=0).reshape((-1, 1))
 
+# E_aug = la.block_diag(np.eye(n_V), Z_u)
 plate_full = SysPhdaeRig(n_V+N_u, N_u, 0, n_Vp, n_Vq, E_aug, J_aug, B_aug)
 
 # plate_full = SysPhdaeRig(n_V, 0, 0, n_Vp, n_Vq, MM, JJ, B_in)
 
 s0 = 0.01
-n_red = 20
+n_red = 10
 plate_red, V_red = plate_full.reduce_system(s0, n_red)
+Vall_red = la.block_diag(V_red, np.eye(N_u))
 
 E_red = plate_red.E
 J_red = plate_red.J
@@ -257,7 +259,7 @@ index = omega_allR >= tol
 omega_red = omega_allR[index]
 eigvec_red = eigvectorsR[:, index]
 permR = np.argsort(omega_red)
-eigvec_red = eigvec_full[:, permR]
+eigvec_red = eigvec_red[:, permR]
 omega_red.sort()
 
 plt.plot(np.real(eigenvaluesF), np.imag(eigenvaluesF), 'r+', np.real(eigenvaluesR), np.imag(eigenvaluesR), 'bo')
@@ -275,9 +277,9 @@ for i in range(n_om):
     print(omegaF_tilde[i])
 
 for i in range(n_om):
-    print(omegaR_tilde[i])
+    print(omegaF_tilde[i], omegaR_tilde[i])
 
-n_fig = 5
+n_fig = 3
 plot_eigenvectors = True
 if plot_eigenvectors:
 
@@ -328,9 +330,8 @@ if plot_eigenvectors:
         eig_real_w = Function(Vp)
         eig_imag_w = Function(Vp)
 
-        Vall_red = la.block_diag(V_red, np.eye(N_u))
-        eig_real_p = np.real((Vall_red @ eigvec_red)[:n_Vp, i])
-        eig_imag_p = np.imag((Vall_red @ eigvec_red)[:n_Vp, i])
+        eig_real_p = np.real((Vall_red @ eigvec_red[:, i])[:n_Vp])
+        eig_imag_p = np.imag((Vall_red @ eigvec_red[:, i])[:n_Vp])
         eig_real_w.vector()[:] = eig_real_p
         eig_imag_w.vector()[:] = eig_imag_p
 
