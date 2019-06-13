@@ -4,14 +4,20 @@ from scipy.linalg import null_space
 import pygsvd
 
 
-def proj_matrices(E, A, B, s0, L, n1, n2, tol=1e-14):
+def proj_matrices(E, A, B, s0, L, n1, n2, oper="grad", tol=1e-14):
     """Reduction of pHDAE based on the article
     On structure preserving model reduction for damped wave propagation in transport network
     Matrices are supposed to have the structure
 
-    A = [-D -G^T -N^T
-          G  0    0
-          N  0    0];
+    if grad
+    A = [-D1 -G^T -N^T
+          G  -D2    0
+          N    0    0];
+
+    or if div
+    A = [-D1    G   0
+         -G^T  -D2 -N^T
+          0     N   0];
 
     E = [M1   0  0
           0  M2  0
@@ -22,7 +28,7 @@ def proj_matrices(E, A, B, s0, L, n1, n2, tol=1e-14):
           0];
 
     """
-
+    assert (oper == "grad" or oper == "div")
     M1 = E[:n1, :n1]; M2 = E[n1:n2, n1:n2]
     W, r = krylov(E, A, B, s0, L, tol)
 
@@ -30,18 +36,22 @@ def proj_matrices(E, A, B, s0, L, n1, n2, tol=1e-14):
 
     W1, W2 = splitting(W1, W2, M1, M2, tol)
 
-    G = A[n1:n2, :n1]
-    nullG = null_space(G)
+    if oper == "grad":
+        G = A[n1:n2, :n1]
+        N = A[n2:, :n1]
+        x_L = r[:n1, :]
+    else:
+        G = A[:n1, n1:n2]
+        N = A[n2:, n1:n2]
+        x_L = r[n1:n2, :]
 
 
     if s0 == 0.0:
-        x1_L = r[:n1, :]
-        V1, V2 = modifyAt0(W1, W2, M1, M2, nullG, x1_L, tol)
+        V1, V2 = modifyAt0(W1, W2, M1, M2, G, N, x_L, oper, tol)
     else:
-        V1, V2 = modify(W1, W2, M1, M2, nullG, tol)
+        V1, V2 = modify(W1, W2, M1, M2, G, N, oper, tol)
 
     return V1, V2
-
 
 
 def krylov(E, A, B, s0, L, tol):
@@ -127,15 +137,56 @@ def splitting(W1, W2, M1, M2, tol):
     return W1, W2
 
 
-def modify(W1, W2, M1, M2, nullG, tol):
-    V1 = ortho(np.concatenate((W1, nullG), axis=1), np.zeros((0, 0)), M1, tol)
-    V2 = ortho(W2, np.zeros((0, 0)), M2, tol)
+def modify(W1, W2, M1, M2, G, N, oper, tol):
+    GN = np.concatenate((G, N))
+    nullG = null_space(G)
+
+    if oper=="grad":
+        V1 = ortho(np.concatenate((W1, nullG), axis=1), np.zeros((0, 0)), M1, tol)
+        # V1 = ortho(W1, np.zeros((0, 0)), M1, tol)
+        V2 = ortho(W2, np.zeros((0, 0)), M2, tol)
+
+        # V2 = ortho(W2, np.zeros((0, 0)), M2, tol)
+        # H = GN @ np.linalg.solve(M1, GN.T)
+        # F = GN.T @ np.linalg.solve(H, np.concatenate((M2 @ V2, np.zeros((N.shape[0], V2.shape[1])))))
+        # V1 = np.linalg.solve(M1, F)
+        # V1 = ortho(np.concatenate((V1, nullG), axis=1), np.zeros((0, 0)), M1, tol)
+    else:
+        # V1 = ortho(W1, np.zeros((0, 0)), M1, tol)
+        # # V2 = ortho(W2, np.zeros((0, 0)), M2, tol)
+        # V2 = ortho(np.concatenate((W2, nullG), axis=1), np.zeros((0, 0)), M2, tol)
+
+        V1 = ortho(W1, np.zeros((0, 0)), M1, tol)
+        H = GN @ np.linalg.solve(M2, GN.T)
+        F = GN.T @ np.linalg.solve(H, np.concatenate((M1 @ V1, np.zeros((N.shape[0], V1.shape[1])))))
+        V2 = np.linalg.solve(M2, F)
+        V2 = ortho(np.concatenate((V2, nullG), axis=1), np.zeros((0, 0)), M2, tol)
 
     return V1, V2
 
 
-def modifyAt0(W1, W2, M1, M2, nullG, x1_L, tol):
-    V1 = ortho(np.concatenate((W1, x1_L, nullG), axis=1), np.zeros((0, 0)), M1, tol)
-    V2 = ortho(W2, np.zeros((0, 0)), M2, tol)
+def modifyAt0(W1, W2, M1, M2, G, N, x_L, oper, tol):
+
+    GN = np.concatenate((G, N))
+    nullG = null_space(G)
+
+    if oper=="grad":
+        V1 = ortho(np.concatenate((W1, x_L, nullG), axis=1), np.zeros((0, 0)), M1, tol)
+        V2 = ortho(W2, np.zeros((0, 0)), M2, tol)
+
+        # V2 = ortho(W2, np.zeros((0, 0)), M2, tol)
+        # H = GN @ np.linalg.solve(M1, GN.T)
+        # F = GN.T @ np.linalg.solve(H, np.concatenate((M2 @ V2, np.zeros((N.shape[0], V2.shape[1])))))
+        # V1 = np.linalg.solve(M1, F)
+        # V1 = ortho(np.concatenate((V1, x_L, nullG), axis=1), np.zeros((0, 0)), M1, tol)
+    else:
+        V1 = ortho(W1, np.zeros((0, 0)), M1, tol)
+        V2 = ortho(np.concatenate((W2, x_L, nullG), axis=1), np.zeros((0, 0)), M2, tol)
+
+        # V1 = ortho(W1, np.zeros((0, 0)), M1, tol)
+        # H = GN @ np.linalg.solve(M2, GN.T)
+        # F = GN.T @ np.linalg.solve(H, np.concatenate((M1 @ V1, np.zeros((N.shape[0], V1.shape[1])))))
+        # V2 = np.linalg.solve(M2, F)
+        # V2 = ortho(np.concatenate((V2, x_L, nullG), axis=1), np.zeros((0, 0)), M2, tol)
 
     return V1, V2

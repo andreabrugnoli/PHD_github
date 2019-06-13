@@ -15,8 +15,8 @@ from math import pi
 plt.rc('text', usetex=True)
 
 
-n_el = 3 #int(input("Number of elements for side: "))
-deg = 2 #int(input('Degree for FE: '))
+n_el = 10 #int(input("Number of elements for side: "))
+deg = 0 #int(input('Degree for FE: '))
 nreq = 10
 
 E = 1

@@ -274,7 +274,7 @@ plt.show()
 
 # NonDimensional China Paper
 
-n_om = 10
+n_om = 5
 
 omegaF_tilde = L**2*sqrt(rho*h/D)*omega_full
 omegaR_tilde = L**2*sqrt(rho*h/D)*omega_red
@@ -285,51 +285,51 @@ omegaR_tilde = L**2*sqrt(rho*h/D)*omega_red
 for i in range(n_om):
     print(omegaF_tilde[i], omegaR_tilde[i])
 
-n_fig = 3
+n_fig = 5
 plot_eigenvectors = True
 if plot_eigenvectors:
 
     fntsize = 15
 
-    for i in range(n_fig):
-        eig_real_w = Function(Vp)
-        eig_imag_w = Function(Vp)
-
-        eig_real_p = np.real(eigvec_full[:n_Vp, i])
-        eig_imag_p = np.imag(eigvec_full[:n_Vp, i])
-        eig_real_w.vector()[:] = eig_real_p
-        eig_imag_w.vector()[:] = eig_imag_p
-
-        Vp_CG = FunctionSpace(mesh, 'Lagrange', 3)
-        eig_real_wCG = project(eig_real_w, Vp_CG)
-        eig_imag_wCG = project(eig_imag_w, Vp_CG)
-
-        norm_real_eig = np.linalg.norm(eig_real_wCG.vector().get_local())
-        norm_imag_eig = np.linalg.norm(eig_imag_wCG.vector().get_local())
-
-        if norm_imag_eig > norm_real_eig:
-            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_imag_wCG, 10)
-        else:
-            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_real_wCG, 10)
-
-        figure = plt.figure()
-        ax = figure.add_subplot(111, projection="3d")
-
-        ax.plot_trisurf(triangulation, z_goodeig, cmap=cm.jet)
-
-        ax.set_xbound(-tol, l_x + tol)
-        ax.set_xlabel('$x [m]$', fontsize=fntsize)
-
-        ax.set_ybound(-tol, l_y + tol)
-        ax.set_ylabel('$y [m]$', fontsize=fntsize)
-
-        ax.set_title('$v_{e_{w}}$', fontsize=fntsize)
-
-        ax.w_zaxis.set_major_locator(LinearLocator(10))
-        ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
-
-        # path_out2 = "/home/a.brugnoli/PycharmProjects/firedrake/Kirchhoff_PHs/Eig_Kirchh/Imag_Eig/"
-        # plt.savefig(path_out2 + "Case" + bc_input + "_el" + str(n) + "_FE_" + name_FEp + "_eig_" + str(i+1) + ".eps", format="eps")
+    # for i in range(n_fig):
+    #     eig_real_w = Function(Vp)
+    #     eig_imag_w = Function(Vp)
+    #
+    #     eig_real_p = np.real(eigvec_full[:n_Vp, i])
+    #     eig_imag_p = np.imag(eigvec_full[:n_Vp, i])
+    #     eig_real_w.vector()[:] = eig_real_p
+    #     eig_imag_w.vector()[:] = eig_imag_p
+    #
+    #     Vp_CG = FunctionSpace(mesh, 'Lagrange', 3)
+    #     eig_real_wCG = project(eig_real_w, Vp_CG)
+    #     eig_imag_wCG = project(eig_imag_w, Vp_CG)
+    #
+    #     norm_real_eig = np.linalg.norm(eig_real_wCG.vector().get_local())
+    #     norm_imag_eig = np.linalg.norm(eig_imag_wCG.vector().get_local())
+    #
+    #     if norm_imag_eig > norm_real_eig:
+    #         triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_imag_wCG, 10)
+    #     else:
+    #         triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_real_wCG, 10)
+    #
+    #     figure = plt.figure()
+    #     ax = figure.add_subplot(111, projection="3d")
+    #
+    #     ax.plot_trisurf(triangulation, z_goodeig, cmap=cm.jet)
+    #
+    #     ax.set_xbound(-tol, l_x + tol)
+    #     ax.set_xlabel('$x [m]$', fontsize=fntsize)
+    #
+    #     ax.set_ybound(-tol, l_y + tol)
+    #     ax.set_ylabel('$y [m]$', fontsize=fntsize)
+    #
+    #     ax.set_title('$v_{e_{w}}$', fontsize=fntsize)
+    #
+    #     ax.w_zaxis.set_major_locator(LinearLocator(10))
+    #     ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
+    #
+    #     # path_out2 = "/home/a.brugnoli/PycharmProjects/firedrake/Kirchhoff_PHs/Eig_Kirchh/Imag_Eig/"
+    #     # plt.savefig(path_out2 + "Case" + bc_input + "_el" + str(n) + "_FE_" + name_FEp + "_eig_" + str(i+1) + ".eps", format="eps")
 
 
     for i in range(n_fig):

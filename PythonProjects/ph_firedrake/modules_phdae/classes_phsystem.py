@@ -437,13 +437,13 @@ class SysPhdaeRig(SysPhdae):
         T_ode2dae = T.T
         return sysOde, T_ode2dae, M_ode
 
-    def reduce_system(self, s0, n_red):
+    def reduce_system(self, s0, n_red, oper="grad"):
         n_rig = self.n_r
         E_red = self.E[n_rig:, n_rig:]
         A_red = self.J[n_rig:, n_rig:] - self.R[n_rig:, n_rig:]
         B_red = self.B[n_rig:, n_rig:]
 
-        Vp, Vq = proj_matrices(E_red, A_red, B_red, s0, n_red, self.n_p, self.n_f)
+        Vp, Vq = proj_matrices(E_red, A_red, B_red, s0, n_red, self.n_p, self.n_f, oper)
 
         V_f = la.block_diag(Vp, Vq)
 

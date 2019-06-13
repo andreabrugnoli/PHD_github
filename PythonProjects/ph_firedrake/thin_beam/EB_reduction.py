@@ -11,8 +11,7 @@ sys.path.append('/home/a.brugnoli/GitProjects/PythonProjects/modules_pHDAE')
 from modules_phdae.reduction_phdae import proj_matrices
 
 import scipy.linalg as la
-from scipy.io import savemat
-
+import matplotlib.pyplot as plt
 
 E = 2e11
 rho = 7900  # kg/m^3
@@ -39,8 +38,10 @@ mesh = IntervalMesh(n, L)
 
 # Finite element defition
 
+# V_p = FunctionSpace(mesh, "CG", deg)
 V_p = FunctionSpace(mesh, "Hermite", deg)
 V_q = FunctionSpace(mesh, "Hermite", deg)
+
 
 V = V_p * V_q
 
@@ -69,9 +70,10 @@ j_divDivIP = v_q.dx(0).dx(0) * e_p * dx
 j_gradgrad = v_q * e_p.dx(0).dx(0) * dx
 j_gradgradIP = -v_p.dx(0).dx(0) * e_q * dx
 
-j = j_gradgrad + j_gradgradIP
-# j = j_divDiv + j_divDivIP
+jgrad = j_gradgrad + j_gradgradIP
+jdiv = j_divDiv + j_divDivIP
 
+j = jdiv
 # bc_w = DirichletBC(V.sub(0), Constant(0.0), 1)
 # bc_M = DirichletBC(V.sub(0), Constant(0.0), 2)
 # boundary_dofs = sorted(bc_w.nodes)
@@ -86,8 +88,14 @@ gSS_divDiv = [v_q * ds(1), v_q * ds(2)]
 
 gCF_divDiv = [+ v_q * ds(2), - v_q.dx(0) * ds(2)]
 
-g_l = gCF_Hess
-g_r = []  # gCF_divDiv
+if j==jdiv:
+    g_l = []
+    g_r = gCF_divDiv
+else:
+    g_l = gCF_Hess
+    g_r = []
+
+
 
 G_L = np.zeros((n_V, len(g_l)))
 G_R = np.zeros((n_V, len(g_r)))
@@ -101,8 +109,8 @@ for counter, item in enumerate(g_r):
 G = np.concatenate((G_L, G_R), axis=1)
 
 x = SpatialCoordinate(mesh)
-a = 3*L/4
-b = L
+a = L/4
+b = 3*L/4
 ctr_loc = conditional(And(ge(x[0], a), le(x[0], b)), 1, 0)
 b_p = v_p * ctr_loc * dx # v_p * ds(2) #  v_p.dx(0) * ds(2) #
 
@@ -119,15 +127,15 @@ n_lmb = len(G.T)
 
 Z_lmb = np.zeros((n_lmb, n_lmb))
 
-J_full = np.vstack([ np.hstack([J, G]),
+J_full = np.vstack([np.hstack([J, G]),
                     np.hstack([-G.T, Z_lmb])
-                ])
+                    ])
 
 Z_el = np.zeros((n_V, n_lmb))
 
-E_full = np.vstack([ np.hstack([M,       Z_el]),
+E_full = np.vstack([np.hstack([M,       Z_el]),
                     np.hstack([Z_el.T, Z_lmb])
-                 ])
+                    ])
 
 B_full = np.zeros((len(E_full), 1))
 B_full[:n_V] = Bp.vector().get_local().reshape((-1, 1))
@@ -135,7 +143,7 @@ B_full[:n_V] = Bp.vector().get_local().reshape((-1, 1))
 # Reduction projection matrices
 # A_full = -J_full
 
-n_red = 10
+n_red = 5
 s0 = 0.001
 
 tol = 1e-10
@@ -146,14 +154,12 @@ M2 = E_full[n_Vp:n_V, n_Vp:n_V]
 G = J_full[n_Vp:n_V, :n_Vp]
 N = J_full[n_V:, :n_Vp]
 
-pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/ReductionPHDAEind2/'
+if j==jdiv:
+    oper="div"
+else:
+    oper="grad"
 
-E_file = 'E'; J_file = 'J'; B_file = 'B'
-savemat(pathout + E_file, mdict={E_file: E_full})
-savemat(pathout + J_file, mdict={J_file: J_full})
-savemat(pathout + B_file, mdict={B_file: B_full})
-
-V1, V2 = proj_matrices(E_full, J_full, B_full, s0, n_red, n_Vp, n_V, tol)
+V1, V2 = proj_matrices(E_full, J_full, B_full, s0, n_red, n_Vp, n_V, oper)
 
 M1_red = V1.T @ M1 @ V1
 M2_red = V2.T @ M2 @ V2
@@ -175,65 +181,38 @@ B1_red = V1.T @ B_full[:n_Vp]
 B_red = np.zeros((len(E_red), 1))
 B_red[:n1_red] = B1_red
 
-Er_file = 'Er'; Jr_file = 'Jr'; Br_file = 'Br'
-savemat(pathout + Er_file, mdict={Er_file: E_red})
-savemat(pathout + Jr_file, mdict={Jr_file: J_red})
-savemat(pathout + Br_file, mdict={Br_file: B_red})
 
-#
-# UT_N, S_N, V_N = np.linalg.svd(N.T, full_matrices=True)
-# VT_N = V_N.T
-#
-# S_N = np.diag(S_N)
-#
-# U = la.block_diag(UT_N, np.eye(n_Vq), VT_N)
-#
-# E_til = U.T @ E_full @ U
-# J_til = U.T @ J_full @ U
-# B_til = U.T @ B_full
-#
-# E_til = E_til[n_lmb:, n_lmb:]; J_til = J_til[n_lmb:, n_lmb:]; B_til = B_til[n_lmb:]
-#
-# E_file = 'Etil'; J_file = 'Jtil'; B_file = 'Btil'
-# savemat(pathout + E_file, mdict={E_file: E_til})
-# savemat(pathout + J_file, mdict={J_file: J_til})
-# savemat(pathout + B_file, mdict={B_file: B_til})
-#
+tol = 1e-9
+eigenvalues, eigvectors = la.eig(J_full, E_full)
+omega_all = np.imag(eigenvalues)
 
+index = omega_all > 0  #  tol
 
-# tol = 1e-9
-# eigenvalues, eigvectors = la.eig(J_full, E_full)
-# omega_all = np.imag(eigenvalues)
-#
-# index = omega_all > 0#  tol
-#
-# omega = omega_all[index]
-# eigvec_omega = eigvectors[:, index]
-# perm = np.argsort(omega)
-# eigvec_omega = eigvec_omega[:, perm]
-#
-# omega.sort()
-#
-# eigenvalues_r, eigvectors_r = la.eig(J_red, E_red)
-# omega_all_r = np.imag(eigenvalues_r)
-#
-# index_r = omega_all_r > 0
-#
-# omega_r = omega_all_r[index_r]
-# eigvec_omega_r = eigvectors_r[:, index_r]
-# perm_r = np.argsort(omega_r)
-# eigvec_omega_r = eigvec_omega[:, perm_r]
-#
-# omega_r.sort()
-#
-# k_n = omega**(0.5)*L*(rho*A/(EI))**(0.25)
-# k_n_r = omega_r**(0.5)*L*(rho*A/(EI))**(0.25)
-# print("Smallest positive normalized eigenvalues computed: ")
-# for i in range(len(omega_r)):
-#    print(k_n[i], k_n_r[i])
-#
-#
-# print(E_red.shape)
-# plt.plot(np.real(eigenvalues), np.imag(eigenvalues), 'o')
-# plt.plot(np.real(eigenvalues_r), np.imag(eigenvalues_r), '+')
-# plt.show()
+omega = omega_all[index]
+eigvec_omega = eigvectors[:, index]
+perm = np.argsort(omega)
+eigvec_omega = eigvec_omega[:, perm]
+
+omega.sort()
+
+eigenvalues_r, eigvectors_r = la.eig(J_red, E_red)
+omega_all_r = np.imag(eigenvalues_r)
+
+index_r = omega_all_r > 0
+
+omega_r = omega_all_r[index_r]
+eigvec_omega_r = eigvectors_r[:, index_r]
+perm_r = np.argsort(omega_r)
+eigvec_omega_r = eigvec_omega[:, perm_r]
+
+omega_r.sort()
+
+k_n = omega**(0.5)*L*(rho*A/(EI))**(0.25)
+k_n_r = omega_r**(0.5)*L*(rho*A/(EI))**(0.25)
+print("Smallest positive normalized eigenvalues computed: ")
+for i in range(len(omega_r)):
+   print(k_n[i], k_n_r[i])
+
+plt.plot(np.real(eigenvalues), np.imag(eigenvalues), 'o')
+plt.plot(np.real(eigenvalues_r), np.imag(eigenvalues_r), '+')
+plt.show()
