@@ -73,7 +73,7 @@ j_gradgradIP = -v_p.dx(0).dx(0) * e_q * dx
 jgrad = j_gradgrad + j_gradgradIP
 jdiv = j_divDiv + j_divDivIP
 
-j = jdiv
+j = jgrad
 # bc_w = DirichletBC(V.sub(0), Constant(0.0), 1)
 # bc_M = DirichletBC(V.sub(0), Constant(0.0), 2)
 # boundary_dofs = sorted(bc_w.nodes)
@@ -143,7 +143,7 @@ B_full[:n_V] = Bp.vector().get_local().reshape((-1, 1))
 # Reduction projection matrices
 # A_full = -J_full
 
-n_red = 5
+n_red = 10
 s0 = 0.001
 
 tol = 1e-10

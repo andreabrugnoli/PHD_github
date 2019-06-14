@@ -15,7 +15,7 @@ from math import pi
 plt.rc('text', usetex=True)
 
 
-n_el = 10 #int(input("Number of elements for side: "))
+n_el = 5 #int(input("Number of elements for side: "))
 deg = 1 #int(input('Degree for FE: '))
 nreq = 10
 
@@ -194,9 +194,9 @@ s_ver = as_vector([-n_ver[1], n_ver[0]])
 # M_nn = inner(e_qth, outer(n_ver, n_ver))
 # M_ns = inner(e_qth, outer(n_ver, s_ver))
 
-V_qn = FunctionSpace(mesh, "CG", deg)
-V_Mnn = FunctionSpace(mesh, "CG", deg)
-V_Mns = FunctionSpace(mesh, "CG", deg)
+V_qn = FunctionSpace(mesh, "CG", deg+1)
+V_Mnn = FunctionSpace(mesh, "CG", deg+1)
+V_Mns = FunctionSpace(mesh, "CG", deg+1)
 
 # V_qn = FunctionSpace(mesh, "DG", 0)
 # V_Mnn = FunctionSpace(mesh, "DG", 0)

@@ -185,11 +185,11 @@ J_aug = np.vstack([np.hstack([JJ, B_in]),
 E_aug = la.block_diag(MM, Z_u)
 B_aug = np.concatenate((B_f, np.zeros(n_u, )), axis=0).reshape((-1, 1))
 
-plate_full = SysPhdaeRig(n_V+n_u, n_u, 0, n_Vp, n_Vq, E_aug, J_aug, B_aug)
-# plate_full = SysPhdaeRig(n_V, 0, 0, n_Vp, n_Vq, MM, JJ, B_in)
+# plate_full = SysPhdaeRig(n_V+n_u, n_u, 0, n_Vp, n_Vq, E_aug, J_aug, B_aug)
+plate_full = SysPhdaeRig(n_V, 0, 0, n_Vp, n_Vq, MM, JJ, B_in)
 
 s0 = 0.01
-n_red = 100
+n_red = 10
 plate_red, V_red = plate_full.reduce_system(s0, n_red)
 Vall_red = la.block_diag(V_red, np.eye(n_u))
 
@@ -197,13 +197,13 @@ E_red = plate_red.E
 J_red = plate_red.J
 B_red = plate_red.B
 
-# print(np.linalg.matrix_rank(B_in), n_u)
+print(np.linalg.matrix_rank(B_in), n_u)
 
-# J_red = np.vstack([np.hstack([J_red, B_red]),
-#                       np.hstack([-B_red.T, Z_u])
-#                       ])
-#
-# E_red = la.block_diag(E_red, Z_u)
+J_red = np.vstack([np.hstack([J_red, B_red]),
+                      np.hstack([-B_red.T, Z_u])
+                      ])
+
+E_red = la.block_diag(E_red, Z_u)
 
 tol = 10 ** (-6)
 

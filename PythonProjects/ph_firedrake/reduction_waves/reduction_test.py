@@ -17,23 +17,23 @@ Lx = 1
 Ly = 1
 T = 1
 rho = 1
-nx = 10
-ny = 10
+nx = 8
+ny = 8
 wave_dirich = models.DirichletWave(Lx, Ly, rho, T, nx, ny, modes=False)
 wave_neumann = models.NeumannWave(Lx, Ly, rho, T, nx, ny, modes=False)
 
-wave = wave_neumann
+wave = wave_dirich
 E_full = wave.E
 J_full = wave.J
 B_full = wave.B
 
 s0 = 0.01
-n_red = 40
+n_red = 30
 if wave == wave_neumann:
     oper = "grad"
 else:
     oper = "div"
-    
+
 wave_red, V_red = wave.reduce_system(s0, n_red, oper)
 Vall_red = la.block_diag(V_red, np.eye(wave.n_lmb))
 
