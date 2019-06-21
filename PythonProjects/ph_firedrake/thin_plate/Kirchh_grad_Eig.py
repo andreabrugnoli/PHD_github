@@ -219,7 +219,7 @@ omega.sort()
 
 # NonDimensional China Paper
 
-n_om = 15
+n_om = 5
 
 omega_tilde = L**2*sqrt(rho*h/D)*omega
 for i in range(n_om):

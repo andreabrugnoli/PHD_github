@@ -16,7 +16,7 @@ from matplotlib import cm
 
 matplotlib.rcParams['text.usetex'] = True
 
-n = 4
+n = 5
 r = 2 #int(input('Degree for FE: '))
 nreq = 10
 
@@ -99,6 +99,9 @@ upper.mark(boundaries, 4)
 CG = FiniteElement('CG', mesh.ufl_cell(), r + 1)
 HHJ = FiniteElement('HHJ', mesh.ufl_cell(), r)
 V = FunctionSpace(mesh, CG * HHJ)
+n_V = V.dim()
+print(n_V)
+
 
 v = TestFunction(V)
 v_p, v_q = split(v)
@@ -124,13 +127,13 @@ v_mnn = inner(v_q, outer(n_ver, n_ver))
 e_mns = inner(e_q, outer(n_ver, s_ver))
 v_mns = inner(v_q, outer(n_ver, s_ver))
 
-j_1 = - inner(gradSym(grad(v_p)), e_q) * dx \
-      + dot(dot(v_q('+'), n_ver('+')), n_ver('+')) * jump(grad(e_p), n_ver) * dS \
-      + dot(dot(v_q, n_ver), n_ver) * dot(grad(e_p), n_ver) * ds
+j_1 = - inner(grad(grad(v_p)), e_q) * dx \
+      + jump(grad(v_p), n_ver) * dot(dot(e_q('+'), n_ver('+')), n_ver('+')) * dS \
+      + dot(grad(v_p), n_ver) * dot(dot(e_q, n_ver), n_ver) * ds
 
-j_2 = + inner(v_q, gradSym(grad(e_p))) * dx \
-      - jump(grad(v_p), n_ver) * dot(dot(e_q('+'), n_ver('+')), n_ver('+')) * dS \
-      - dot(grad(v_p), n_ver) * dot(dot(e_q, n_ver), n_ver) * ds
+j_2 = + inner(v_q, grad(grad(e_p))) * dx \
+      - dot(dot(v_q('+'), n_ver('+')), n_ver('+')) * jump(grad(e_p), n_ver) * dS \
+      - dot(dot(v_q, n_ver), n_ver) * dot(grad(e_p), n_ver) * ds
 
 
 j_form = j_1 + j_2
@@ -138,41 +141,37 @@ j_form = j_1 + j_2
 bc_1, bc_2, bc_3, bc_4 = bc_input
 
 bc_dict = {1: bc_1, 2: bc_2, 3: bc_3, 4: bc_4}
+loc_dict = {1: left, 2: lower, 3: right, 4: upper}
 
-Pqn = FiniteElement('CG', mesh.ufl_cell(), r)
-Pomn = FiniteElement('CG', mesh.ufl_cell(), r)
+bcs = []
+for key, val in bc_dict.items():
 
-element_u = MixedElement([Pqn, Pomn])
-
-Vu = FunctionSpace(mesh, element_u)
-
-q_n, om_n = TrialFunction(Vu)
-
-b_vec = []
-for key,val in bc_dict.items():
     if val == 'C':
-        b_vec.append(v_p * q_n * ds(key))
+        bcs.append(DirichletBC(V.sub(0), Constant(0.0), loc_dict[key]))
     elif val == 'S':
-        b_vec.append(v_p * q_n * ds(key) + v_mnn * om_n * ds(key))
+        bcs.append(DirichletBC(V.sub(0), Constant(0.0), loc_dict[key]))
+        bcs.append(DirichletBC(V.sub(1), Constant(((0.0, 0.0), (0.0, 0.0))), loc_dict[key]))
     elif val == 'F':
-        b_vec.append(v_mnn * om_n * ds(key))
+        bcs.append(DirichletBC(V.sub(1), Constant(((0.0, 0.0), (0.0, 0.0))), loc_dict[key]))
 
+boundary_dofs = []
+for bc in bcs:
+    for key in bc.get_boundary_values().keys():
+        boundary_dofs.append(key)
+boundary_dofs = sorted(boundary_dofs)
+n_lmb = len(boundary_dofs)
+
+G = np.zeros((n_V, n_lmb))
+for (i, j) in enumerate(boundary_dofs):
+    G[j, i] = 1
 
 J, M, B = PETScMatrix(), PETScMatrix(), PETScMatrix()
 n_V = V.dim()
 
+J, M = PETScMatrix(), PETScMatrix()
+
 J = assemble(j_form)
 M = assemble(m_form)
-if b_vec:
-    B = assemble(sum(b_vec))
-    G = B.array()
-    boundary_dofs = np.where(G.any(axis=0))[0]
-    G = G[:, boundary_dofs]
-    n_lmb = len(boundary_dofs)
-else:
-    G = np.empty((n_V, 0))
-    n_lmb = 0
-
 JJ = J.array()
 MM = M.array()
 
@@ -188,6 +187,7 @@ tol = 10**(-9)
 eigenvalues, eigvectors = la.eig(J_aug, M_aug)
 omega_all = np.imag(eigenvalues)
 
+tol = 10**(-9)
 index = omega_all >= tol
 
 omega = omega_all[index]

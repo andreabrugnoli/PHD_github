@@ -148,14 +148,17 @@ bc_1, bc_2, bc_3, bc_4 = bc_input
 
 bc_dict = {1: bc_1, 2: bc_2, 3: bc_3, 4: bc_4}
 
-Pqn = FiniteElement('CG', mesh.ufl_cell(), 1)
-Pomn = FiniteElement('CG', mesh.ufl_cell(), 1)
+Pqn = FiniteElement('CG', mesh.ufl_cell(), r)
+Pomn = FiniteElement('CG', mesh.ufl_cell(), r)
 
 element_u = MixedElement([Pqn, Pomn])
 
 Vu = FunctionSpace(mesh, element_u)
 
 q_n, om_n = TrialFunction(Vu)
+#
+# q_n = dot(div(e_q), n_ver) - dot(grad(e_mns), s_ver)
+# om_n = dot(grad(e_p), n_ver)
 
 b_vec = []
 for key,val in bc_dict.items():

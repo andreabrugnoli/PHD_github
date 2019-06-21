@@ -124,13 +124,13 @@ v_mnn = inner(v_q, outer(n_ver, n_ver))
 e_mns = inner(e_q, outer(n_ver, s_ver))
 v_mns = inner(v_q, outer(n_ver, s_ver))
 
-j_1 = - inner(gradSym(grad(v_p)), e_q) * dx \
-      + dot(dot(v_q('+'), n_ver('+')), n_ver('+')) * jump(grad(e_p), n_ver) * dS \
-      + dot(dot(v_q, n_ver), n_ver) * dot(grad(e_p), n_ver) * ds
+j_1 = - inner(grad(grad(v_p)), e_q) * dx \
+      + jump(grad(v_p), n_ver) * dot(dot(e_q('+'), n_ver('+')), n_ver('+')) * dS \
+      + dot(grad(v_p), n_ver) * dot(dot(e_q, n_ver), n_ver) * ds
 
-j_2 = + inner(v_q, gradSym(grad(e_p))) * dx \
-      - jump(grad(v_p), n_ver) * dot(dot(e_q('+'), n_ver('+')), n_ver('+')) * dS \
-      - dot(grad(v_p), n_ver) * dot(dot(e_q, n_ver), n_ver) * ds
+j_2 = + inner(v_q, grad(grad(e_p))) * dx \
+      - dot(dot(v_q('+'), n_ver('+')), n_ver('+')) * jump(grad(e_p), n_ver) * dS \
+      - dot(dot(v_q, n_ver), n_ver) * dot(grad(e_p), n_ver) * ds
 
 
 j_form = j_1 + j_2
@@ -138,26 +138,18 @@ j_form = j_1 + j_2
 bc_1, bc_2, bc_3, bc_4 = bc_input
 
 bc_dict = {1: bc_1, 2: bc_2, 3: bc_3, 4: bc_4}
+loc_dict = {1: left, 2: lower, 3: right, 4: upper}
 
 bcs = []
 for key, val in bc_dict.items():
-    if key == 1:
-        where = left
-        # V_nn = V.sub(1).sub(0)
-    elif key == 2:
-        where = lower
-    elif key == 3:
-        where = right
-    elif key == 4:
-        where = upper
 
     if val == 'C':
-        bcs.append(DirichletBC(V.sub(0), Constant(0.0), where))
+        bcs.append(DirichletBC(V.sub(0), Constant(0.0), loc_dict[key]))
     elif val == 'S':
-        bcs.append(DirichletBC(V.sub(0), Constant(0.0), where))
-        bcs.append(DirichletBC(V.sub(1), Constant(((0.0, 0.0), (0.0, 0.0))), where))
+        bcs.append(DirichletBC(V.sub(0), Constant(0.0), loc_dict[key]))
+        bcs.append(DirichletBC(V.sub(1), Constant(((0.0, 0.0), (0.0, 0.0))), loc_dict[key]))
     elif val == 'F':
-        bcs.append(DirichletBC(V.sub(1), Constant(((0.0, 0.0), (0.0, 0.0))), where))
+        bcs.append(DirichletBC(V.sub(1), Constant(((0.0, 0.0), (0.0, 0.0))), loc_dict[key]))
 
 
 J, M, B = PETScMatrix(), PETScMatrix(), PETScMatrix()
