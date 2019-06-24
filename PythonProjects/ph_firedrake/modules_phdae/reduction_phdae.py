@@ -171,7 +171,8 @@ def modifyAt0(W1, W2, M1, M2, G, N, x_L, oper, tol):
     nullG = null_space(G)
 
     if oper=="grad":
-        V1 = ortho(np.concatenate((W1, x_L, nullG), axis=1), np.zeros((0, 0)), M1, tol)
+        # V1 = ortho(np.concatenate((W1, x_L, nullG), axis=1), np.zeros((0, 0)), M1, tol)
+        V1 = ortho(W1, np.zeros((0, 0)), M1, tol)
         V2 = ortho(W2, np.zeros((0, 0)), M2, tol)
 
         # V2 = ortho(W2, np.zeros((0, 0)), M2, tol)

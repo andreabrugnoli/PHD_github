@@ -6,6 +6,7 @@ np.set_printoptions(threshold=np.inf)
 import matplotlib.pyplot as plt
 
 import scipy.linalg as la
+from modules_phdae.classes_phsystem import SysPhdaeRig
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -107,7 +108,7 @@ j_form = j_1 + j_2
 
 bc_1, bc_2, bc_3, bc_4 = bc_input
 
-bc_dict = {1: bc_1, 3: bc_2, 2: bc_3, 4: bc_4}
+bc_dict = {1: bc_1, 2: bc_2, 3: bc_3, 4: bc_4}
 
 # The boundary edges in this mesh are numbered as follows:
 
@@ -129,12 +130,10 @@ for key, val in bc_dict.items():
 
     elif val == 'S':
         bc_p = DirichletBC(Vp, Constant(0.0), key)
-        bc_q = DirichletBC(Vq, Constant(((0.0, 0.0), (0.0, 0.0))), key)
-
         for node in bc_p.nodes:
             boundary_dofs.append(node)
         bcs.append(bc_p)
-
+        bc_q = DirichletBC(Vq, Constant(((0.0, 0.0), (0.0, 0.0))), key)
         for node in bc_q.nodes:
             boundary_dofs.append(n_Vp + node)
         bcs.append(bc_q)
@@ -145,7 +144,8 @@ for key, val in bc_dict.items():
             boundary_dofs.append(n_Vp + node)
         bcs.append(bc_q)
 
-boundary_dofs = sorted(boundary_dofs)
+
+boundary_dofs = sorted(list(set(boundary_dofs)))
 n_lmb = len(boundary_dofs)
 
 G = np.zeros((n_V, n_lmb))
@@ -161,70 +161,152 @@ petsc_m = M.M.handle
 JJ = np.array(petsc_j.convert("dense").getDenseArray())
 MM = np.array(petsc_m.convert("dense").getDenseArray())
 
+x, y = SpatialCoordinate(mesh)
+con_dom1 = And(And(gt(x, L / 4), lt(x, 3 * L / 4)), And(gt(y, L / 4), lt(y, 3 * L / 4)))
+Dom_f = conditional(con_dom1, 1., 0.)
+B_f = assemble(v_p * Dom_f * dx).vector().get_local()
+
 Z_lmb = np.zeros((n_lmb, n_lmb))
 
 J_aug = np.vstack([np.hstack([JJ, G]),
                    np.hstack([-G.T, Z_lmb])
                 ])
 
-M_aug = la.block_diag(MM, Z_lmb)
-tol = 10**(-9)
+E_aug = la.block_diag(MM, Z_lmb)
+B_aug = np.concatenate((B_f, np.zeros(n_lmb, )), axis=0).reshape((-1, 1))
 
-eigenvalues, eigvectors = la.eig(J_aug, M_aug)
-omega_all = np.imag(eigenvalues)
+plate_full = SysPhdaeRig(n_V+n_lmb, n_lmb, 0, n_Vp, n_Vq, E_aug, J_aug, B_aug)
+# plate_full = SysPhdaeRig(n_V, 0, 0, n_Vp, n_Vq, MM, JJ, G)
 
-tol = 10**(-9)
-index = omega_all >= tol
+print(n_lmb, np.linalg.matrix_rank(G))
+s0 = 100
+n_red = 30
+plate_red, V_red = plate_full.reduce_system(s0, n_red)
+Vall_red = la.block_diag(V_red, np.eye(n_lmb))
 
-omega = omega_all[index]
-eigvec_omega = eigvectors[:, index]
-perm = np.argsort(omega)
-eigvec_omega = eigvec_omega[:, perm]
+E_red = plate_red.E
+J_red = plate_red.J
+B_red = plate_red.B
 
-omega.sort()
+# J_red = np.vstack([np.hstack([J_red, B_red]),
+#                       np.hstack([-B_red.T, Z_lmb])
+#                       ])
+#
+# E_red = la.block_diag(E_red, Z_lmb)
 
-omega_tilde = omega * norm_coeff
-n_om = 10
+tol = 10 ** (-6)
+
+eigenvaluesF, eigvectorsF = la.eig(J_aug, E_aug)
+omega_allF = np.imag(eigenvaluesF)
+
+indexF = omega_allF >= tol
+
+omega_full = omega_allF[indexF]
+eigvec_full = eigvectorsF[:, indexF]
+permF = np.argsort(omega_full)
+eigvec_full = eigvec_full[:, permF]
+omega_full.sort()
+
+print(J_red.shape)
+eigenvaluesR, eigvectorsR = la.eig(J_red, E_red)
+omega_allR = np.imag(eigenvaluesR)
+
+index = omega_allR >= tol
+
+omega_red = omega_allR[index]
+eigvec_red = eigvectorsR[:, index]
+permR = np.argsort(omega_red)
+eigvec_red = eigvec_red[:, permR]
+omega_red.sort()
+
+print(Vall_red.shape, eigvec_red.shape)
+
+plt.plot(np.real(eigenvaluesF), np.imag(eigenvaluesF), 'r+', np.real(eigenvaluesR), np.imag(eigenvaluesR), 'bo')
+plt.legend(("Eigenvalues full", "Eigenvalues reduced"))
+plt.show()
+
+# NonDimensional China Paper
+
+n_om = 5
+
+omegaF_tilde = L**2*sqrt(rho*h/D)*omega_full
+omegaR_tilde = L**2*sqrt(rho*h/D)*omega_red
+
+# for i in range(n_om):
+#     print(omegaF_tilde[i])
 
 for i in range(n_om):
-    print(omega_tilde[i])
+    print(omegaF_tilde[i], omegaR_tilde[i])
 
 n_fig = 5
-
-
 plot_eigenvectors = False
 if plot_eigenvectors:
 
     fntsize = 15
 
-    import matplotlib
-    from matplotlib import pyplot as plt
-    from matplotlib.ticker import LinearLocator, FormatStrFormatter
-    from matplotlib import cm
-    from mpl_toolkits.mplot3d import Axes3D
+    # for i in range(n_fig):
+    #     eig_real_w = Function(Vp)
+    #     eig_imag_w = Function(Vp)
+    #
+    #     eig_real_p = np.real(eigvec_full[:n_Vp, i])
+    #     eig_imag_p = np.imag(eigvec_full[:n_Vp, i])
+    #     eig_real_w.vector()[:] = eig_real_p
+    #     eig_imag_w.vector()[:] = eig_imag_p
+    #
+    #     Vp_CG = FunctionSpace(mesh, 'Lagrange', 3)
+    #     eig_real_wCG = project(eig_real_w, Vp_CG)
+    #     eig_imag_wCG = project(eig_imag_w, Vp_CG)
+    #
+    #     norm_real_eig = np.linalg.norm(eig_real_wCG.vector().get_local())
+    #     norm_imag_eig = np.linalg.norm(eig_imag_wCG.vector().get_local())
+    #
+    #     if norm_imag_eig > norm_real_eig:
+    #         triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_imag_wCG, 10)
+    #     else:
+    #         triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_real_wCG, 10)
+    #
+    #     figure = plt.figure()
+    #     ax = figure.add_subplot(111, projection="3d")
+    #
+    #     ax.plot_trisurf(triangulation, z_goodeig, cmap=cm.jet)
+    #
+    #     ax.set_xbound(-tol, l_x + tol)
+    #     ax.set_xlabel('$x [m]$', fontsize=fntsize)
+    #
+    #     ax.set_ybound(-tol, l_y + tol)
+    #     ax.set_ylabel('$y [m]$', fontsize=fntsize)
+    #
+    #     ax.set_title('$v_{e_{w}}$', fontsize=fntsize)
+    #
+    #     ax.w_zaxis.set_major_locator(LinearLocator(10))
+    #     ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
+    #
+    #     # path_out2 = "/home/a.brugnoli/PycharmProjects/firedrake/Kirchhoff_PHs/Eig_Kirchh/Imag_Eig/"
+    #     # plt.savefig(path_out2 + "Case" + bc_input + "_el" + str(n) + "_FE_" + name_FEp + "_eig_" + str(i+1) + ".eps", format="eps")
 
-    plt.close('all')
-    matplotlib.rcParams['text.usetex'] = True
 
     for i in range(n_fig):
         eig_real_w = Function(Vp)
         eig_imag_w = Function(Vp)
 
-        eig_real_p = np.real(eigvec_omega[:n_Vp, i])
-        eig_imag_p = np.imag(eigvec_omega[:n_Vp, i])
+        eig_real_p = np.real((Vall_red @ eigvec_red[:, i])[:n_Vp])
+        eig_imag_p = np.imag((Vall_red @ eigvec_red[:, i])[:n_Vp])
         eig_real_w.vector()[:] = eig_real_p
         eig_imag_w.vector()[:] = eig_imag_p
 
-        norm_real_eig = np.linalg.norm(eig_real_w.vector().get_local())
-        norm_imag_eig = np.linalg.norm(eig_imag_w.vector().get_local())
+        Vp_CG = FunctionSpace(mesh, 'Lagrange', 3)
+        eig_real_wCG = project(eig_real_w, Vp_CG)
+        eig_imag_wCG = project(eig_imag_w, Vp_CG)
+
+        norm_real_eig = np.linalg.norm(eig_real_wCG.vector().get_local())
+        norm_imag_eig = np.linalg.norm(eig_imag_wCG.vector().get_local())
 
         if norm_imag_eig > norm_real_eig:
-            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_imag_w, 10)
+            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_imag_wCG, 10)
         else:
-            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_real_w, 10)
+            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_real_wCG, 10)
 
-
-        figure = plt.figure(i)
+        figure = plt.figure()
         ax = figure.add_subplot(111, projection="3d")
 
         ax.plot_trisurf(triangulation, z_goodeig, cmap=cm.jet)
@@ -240,7 +322,7 @@ if plot_eigenvectors:
         ax.w_zaxis.set_major_locator(LinearLocator(10))
         ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
 
-        path_out2 = "/home/a.brugnoli/PycharmProjects/firedrake/Kirchhoff_PHs/Eig_Kirchh/Imag_Eig/"
+        # path_out2 = "/home/a.brugnoli/PycharmProjects/firedrake/Kirchhoff_PHs/Eig_Kirchh/Imag_Eig/"
         # plt.savefig(path_out2 + "Case" + bc_input + "_el" + str(n) + "_FE_" + name_FEp + "_eig_" + str(i+1) + ".eps", format="eps")
 
 plt.show()

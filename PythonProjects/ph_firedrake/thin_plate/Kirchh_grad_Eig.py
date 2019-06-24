@@ -226,7 +226,7 @@ for i in range(n_om):
     print(omega_tilde[i])
 
 
-plot_eigenvectors = True
+plot_eigenvectors = False
 if plot_eigenvectors:
 
     fntsize = 15

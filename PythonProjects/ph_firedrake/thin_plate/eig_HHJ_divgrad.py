@@ -94,14 +94,22 @@ v_mnn = inner(v_q, outer(n_ver, n_ver))
 e_mns = inner(e_q, outer(n_ver, s_ver))
 v_mns = inner(v_q, outer(n_ver, s_ver))
 
-j_1 = - inner(grad(grad(v_p)), e_q) * dx \
-      + jump(grad(v_p), n_ver) * dot(dot(e_q('+'), n_ver('+')), n_ver('+')) * dS \
-      + dot(grad(v_p), n_ver) * dot(dot(e_q, n_ver), n_ver) * ds
+# j_1 = + inner(grad(v_p), div(e_q)) * dx \
+#       - jump(grad(v_p), s_ver) * dot(dot(e_q('+'), n_ver('+')), s_ver('+')) * dS \
+#       - dot(grad(v_p), s_ver) * dot(dot(e_q, n_ver), s_ver) * ds
+#
+# j_2 = - inner(div(v_q), grad(e_p)) * dx \
+#       + dot(dot(v_q('+'), n_ver('+')), s_ver('+')) * jump(grad(e_p), s_ver) * dS \
+#       + dot(dot(v_q, n_ver), s_ver) * dot(grad(e_p), s_ver) * ds
 
-j_2 = + inner(v_q, grad(grad(e_p))) * dx \
-      - dot(dot(v_q('+'), n_ver('+')), n_ver('+')) * jump(grad(e_p), n_ver) * dS \
-      - dot(dot(v_q, n_ver), n_ver) * dot(grad(e_p), n_ver) * ds
+j_1 = + inner(grad(v_p), div(e_q)) * dx \
+      - dot(grad(v_p('+')), s_ver('+')) * dot(dot(e_q('+'), n_ver('+')), s_ver('+')) * dS \
+      - dot(grad(v_p), s_ver) * dot(dot(e_q, n_ver), s_ver) * ds \
 
+
+j_2 = - inner(div(v_q), grad(e_p)) * dx \
+      + dot(dot(v_q('+'), n_ver('+')), s_ver('+')) * dot(grad(e_p('+')), s_ver('+')) * dS \
+      + dot(dot(v_q, n_ver), s_ver) * dot(grad(e_p), s_ver) * ds \
 
 j_form = j_1 + j_2
 
@@ -192,7 +200,7 @@ for i in range(n_om):
 n_fig = 5
 
 
-plot_eigenvectors = False
+plot_eigenvectors = True
 if plot_eigenvectors:
 
     fntsize = 15

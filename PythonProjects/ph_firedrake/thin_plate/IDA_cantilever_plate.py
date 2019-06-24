@@ -192,7 +192,7 @@ for i in range(n_om):
 n_fig = 5
 
 
-plot_eigenvectors = False
+plot_eigenvectors = True
 if plot_eigenvectors:
 
     fntsize = 15

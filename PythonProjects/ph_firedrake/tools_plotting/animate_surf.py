@@ -45,7 +45,7 @@ def animate2D(minSol, maxSol, solFun_list, t, xlabel = None, ylabel = None,  zla
     lab = 'Time =' + '{0:.2e}'.format(t[0])
     triangulation, Z = _two_dimension_triangle_func_val(solFun_list[0], 10)
 
-    surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False, 'vmin' : minSol, 'vmax' : maxSol}
+    surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False, 'vmin':minSol, 'vmax':maxSol}
     plot = ax.plot_trisurf( triangulation, Z, label=lab, **surf_opts)
     fig.colorbar(plot)
 
