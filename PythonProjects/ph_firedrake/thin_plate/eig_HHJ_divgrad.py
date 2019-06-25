@@ -103,13 +103,13 @@ v_mns = inner(v_q, outer(n_ver, s_ver))
 #       + dot(dot(v_q, n_ver), s_ver) * dot(grad(e_p), s_ver) * ds
 
 j_1 = + inner(grad(v_p), div(e_q)) * dx \
-      - dot(grad(v_p('+')), s_ver('+')) * dot(dot(e_q('+'), n_ver('+')), s_ver('+')) * dS \
-      - dot(grad(v_p), s_ver) * dot(dot(e_q, n_ver), s_ver) * ds \
+      # - dot(grad(v_p('+')), s_ver('+')) * dot(dot(e_q('+'), s_ver('+')), n_ver('+')) * dS \
+      # - dot(grad(v_p), s_ver) * dot(dot(e_q, n_ver), s_ver) * ds \
 
 
 j_2 = - inner(div(v_q), grad(e_p)) * dx \
-      + dot(dot(v_q('+'), n_ver('+')), s_ver('+')) * dot(grad(e_p('+')), s_ver('+')) * dS \
-      + dot(dot(v_q, n_ver), s_ver) * dot(grad(e_p), s_ver) * ds \
+      # + dot(dot(v_q('+'), s_ver('+')), n_ver('+')) * dot(grad(e_p('+')), s_ver('+')) * dS \
+      # + dot(dot(v_q, n_ver), s_ver) * dot(grad(e_p), s_ver) * ds \
 
 j_form = j_1 + j_2
 
@@ -198,7 +198,6 @@ for i in range(n_om):
     print(omega_tilde[i])
 
 n_fig = 5
-
 
 plot_eigenvectors = True
 if plot_eigenvectors:

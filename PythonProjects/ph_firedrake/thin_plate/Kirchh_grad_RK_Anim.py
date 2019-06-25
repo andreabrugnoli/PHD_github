@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from matplotlib import cm
-from AnimateSurfFiredrake import animate2D
+from tools_plotting.animate_surf import animate2D
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as animation
 
@@ -192,7 +192,7 @@ Fsys = P @ Bf_pl
 
 
 t0 = 0.0
-t_fin = 0.01
+t_fin = 0.001
 n_t = 100
 t_span = [t0, t_fin]
 

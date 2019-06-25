@@ -9,14 +9,16 @@ import scipy.linalg as la
 
 import matplotlib
 import matplotlib.pyplot as plt
+from assimulo.solvers import IDA
+from assimulo.implicit_ode import Implicit_Problem
 from firedrake.plot import _two_dimension_triangle_func_val
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from matplotlib import cm
-
+from tools_plotting.animate_surf import animate2D
 matplotlib.rcParams['text.usetex'] = True
 
-n = 5
+n = 2
 r = 2 #int(input('Degree for FE: '))
 
 E = 2e11 # Pa
@@ -167,80 +169,131 @@ J_aug = np.vstack([np.hstack([JJ, G]),
                    np.hstack([-G.T, Z_lmb])
                 ])
 
-M_aug = la.block_diag(MM, Z_lmb)
-tol = 10**(-9)
+E_aug = la.block_diag(MM, Z_lmb)
 
-eigenvalues, eigvectors = la.eig(J_aug, M_aug)
-omega_all = np.imag(eigenvalues)
+v_omn = dot(grad(v_p), n_ver)
+V_mnn = FunctionSpace(mesh, 'Lagrange', 1)
+M_nn = TrialFunction(V_mnn)
+B_f = assemble(v_omn * M_nn * ds(2), mat_type='aij')
+petsc_b_u = B_f.M.handle
+B_u = np.array(petsc_b_u.convert("dense").getDenseArray())
+u_dofs = np.where(B_u.any(axis=0))[0]  # np.where(~np.all(B_in == 0, axis=0) == True) #
+B_u = B_u[:, u_dofs]
+n_u = len(u_dofs)
 
-tol = 10**(-9)
-index = omega_all >= tol
+# B_u = assemble(v_p * ds(2), mat_type='aij').vector().get_local()
+B_aug = np.concatenate((B_u, np.zeros((n_lmb, n_u))), axis=0)
+order = []
 
-omega = omega_all[index]
-eigvec_omega = eigvectors[:, index]
-perm = np.argsort(omega)
-eigvec_omega = eigvec_omega[:, perm]
+om_f = 3.4699366066454016/norm_coeff
 
-omega.sort()
+# invMM = la.inv(MM)
 
-omega_tilde = omega * norm_coeff
-n_om = 10
-
-for i in range(n_om):
-    print(omega_tilde[i])
-
-n_fig = 5
-
-
-plot_eigenvectors = True
-if plot_eigenvectors:
-
-    fntsize = 15
-
-    import matplotlib
-    from matplotlib import pyplot as plt
-    from matplotlib.ticker import LinearLocator, FormatStrFormatter
-    from matplotlib import cm
-    from mpl_toolkits.mplot3d import Axes3D
-
-    plt.close('all')
-    matplotlib.rcParams['text.usetex'] = True
-
-    for i in range(n_fig):
-        eig_real_w = Function(Vp)
-        eig_imag_w = Function(Vp)
-
-        eig_real_p = np.real(eigvec_omega[:n_Vp, i])
-        eig_imag_p = np.imag(eigvec_omega[:n_Vp, i])
-        eig_real_w.vector()[:] = eig_real_p
-        eig_imag_w.vector()[:] = eig_imag_p
-
-        norm_real_eig = np.linalg.norm(eig_real_w.vector().get_local())
-        norm_imag_eig = np.linalg.norm(eig_imag_w.vector().get_local())
-
-        if norm_imag_eig > norm_real_eig:
-            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_imag_w, 10)
-        else:
-            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_real_w, 10)
+# Simulate
+t_final = 1
+n_ev = 200
+t_ev = np.linspace(0, t_final, n_ev)
 
 
-        figure = plt.figure(i)
-        ax = figure.add_subplot(111, projection="3d")
+def dae_closed_phs(t, y, yd):
 
-        ax.plot_trisurf(triangulation, z_goodeig, cmap=cm.jet)
+    u = sin(om_f*t) * (t > 0.01*t_final)
 
-        ax.set_xbound(-tol, 1 + tol)
-        ax.set_xlabel('$x [m]$', fontsize=fntsize)
+    res = E_aug @ yd - J_aug @ y - B_aug @ np.ones((n_u,)) * u
+    # res = E_aug @ yd - J_aug @ y - B_aug * u
 
-        ax.set_ybound(-tol, 1 + tol)
-        ax.set_ylabel('$y [m]$', fontsize=fntsize)
+    return res
 
-        ax.set_title('$v_{e_{w}}$', fontsize=fntsize)
+    # res_e = E_aug[:n_e, :] @ yd - J_aug[:n_e, :] @ y - B_aug[:n_e] * u
+    # res_lmb = G.T @ invMM @ (J_aug[:n_e, :] @ y + B_aug[:n_e] * u)
+    #
+    # return np.concatenate((res_e, res_lmb))
 
-        ax.w_zaxis.set_major_locator(LinearLocator(10))
-        ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
 
-        path_out2 = "/home/a.brugnoli/PycharmProjects/firedrake/Kirchhoff_PHs/Eig_Kirchh/Imag_Eig/"
-        # plt.savefig(path_out2 + "Case" + bc_input + "_el" + str(n) + "_FE_" + name_FEp + "_eig_" + str(i+1) + ".eps", format="eps")
+def handle_result(solver, t, y, yd):
+
+    order.append(solver.get_last_order())
+
+    solver.t_sol.extend([t])
+    solver.y_sol.extend([y])
+    solver.yd_sol.extend([yd])
+
+    # The initial conditons
+
+y0 = np.zeros(n_V + n_lmb)  # Initial conditions
+yd0 = np.zeros(n_V + n_lmb)  # Initial conditions
+
+# Create an Assimulo implicit problem
+imp_mod = Implicit_Problem(dae_closed_phs, y0, yd0, name='dae_closed_pHs')
+imp_mod.handle_result = handle_result
+
+# Set the algebraic components
+imp_mod.algvar = list(np.concatenate((np.ones(n_V), np.zeros(n_lmb))))
+
+# Create an Assimulo implicit solver (IDA)
+imp_sim = IDA(imp_mod)  # Create a IDA solver
+
+# Sets the paramters
+imp_sim.atol = 1e-6  # Default 1e-6
+imp_sim.rtol = 1e-6  # Default 1e-6
+imp_sim.suppress_alg = True  # Suppres the algebraic variables on the error test
+imp_sim.report_continuously = True
+# imp_sim.maxh = 1e-6
+
+# Let Sundials find consistent initial conditions by use of 'IDA_YA_YDP_INIT'
+imp_sim.make_consistent('IDA_YA_YDP_INIT')
+
+
+t_sol, y_sol, yd_sol = imp_sim.simulate(t_final, 0, t_ev)
+e_sol = y_sol[:, :n_V].T
+lmb_sol = y_sol[:, n_V:].T
+
+ep_sol = e_sol[:n_Vp, :]
+w0 = np.zeros((n_Vp,))
+w_sol = np.zeros(ep_sol.shape)
+w_sol[:, 0] = w0
+w_old = w_sol[:, 0]
+n_ev = len(t_sol)
+dt_vec = np.diff(t_sol)
+
+
+for i in range(1, n_ev):
+
+    w_sol[:, i] = w_old + 0.5 * (ep_sol[:, i - 1] + ep_sol[:, i]) * dt_vec[i-1]
+    w_old = w_sol[:, i]
+
+wi_fun = Function(Vp)
+w_vec = []
+
+
+for i in range(n_ev):
+    wi_fun.vector()[:] = w_sol[:, i]
+    w_vec.append(interpolate(wi_fun, Vp))
+    # w_vec.append(wi_fun)
+
+maxZ = np.max(w_sol)
+minZ = np.min(w_sol)
+
+
+fntsize = 16
+# H_vec = np.zeros((n_ev,))
+#
+# for i in range(n_ev):
+#     H_vec[i] = 0.5 * (e_sol[:, i].T @ MM @ e_sol[:, i])
+#
+# fig, ax = plt.subplots()
+# ax.yaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
+# plt.plot(t_ev, H_vec, 'b-', label='Hamiltonian Plate (J)')
+# plt.xlabel(r'{Time} (s)', fontsize=fntsize)
+# plt.ylabel(r'{Hamiltonian} (J)', fontsize=fntsize)
+# plt.title(r"Hamiltonian trend",
+#           fontsize=fntsize)
+# plt.legend(loc='upper left')
+# path_out = "/home/a.brugnoli/Plots_Videos/Plots/Kirchhoff_plots/Simulations/Article_CDC/DampingInjection/"
+# plt.savefig(path_out + "Hamiltonian.eps", format="eps")
+
+anim = animate2D(minZ, maxZ, w_vec, t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \
+                         zlabel='$w [m]$', title = 'Vertical Displacement')
 
 plt.show()
+

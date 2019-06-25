@@ -29,7 +29,7 @@ EI = E * I
 L = 1
 
 
-n_elem = 3
+n_elem = 1
 deg = 3
 
 
@@ -178,7 +178,7 @@ imp_sim = IDA(imp_mod)  # Create a IDA solver
 # Sets the paramters
 imp_sim.atol = 1e-6  # Default 1e-6
 imp_sim.rtol = 1e-6  # Default 1e-6
-imp_sim.suppress_alg = True  # Suppres the algebraic variables on the error test
+imp_sim.suppress_alg = True  # Suppress the algebraic variables on the error test
 imp_sim.report_continuously = True
 # imp_sim.maxh = 1e-6
 

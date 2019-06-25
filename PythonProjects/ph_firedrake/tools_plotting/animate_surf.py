@@ -4,13 +4,14 @@ import matplotlib.animation as animation
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from mpl_toolkits.mplot3d import Axes3D
-
+import numpy as np
 from firedrake.plot import _two_dimension_triangle_func_val
 
 matplotlib.rcParams['text.usetex'] = True
 matplotlib.rcParams["legend.loc"] = 'upper right'
 
-def animate2D(minSol, maxSol, solFun_list, t, xlabel = None, ylabel = None,  zlabel = None, title = None):
+
+def animate2D(minSol, maxSol, solFun_list, t, xlabel=None, ylabel=None,  zlabel=None, title=None):
     tol = 1e-4
     fntsize = 20
 
@@ -49,7 +50,7 @@ def animate2D(minSol, maxSol, solFun_list, t, xlabel = None, ylabel = None,  zla
     plot = ax.plot_trisurf( triangulation, Z, label=lab, **surf_opts)
     fig.colorbar(plot)
 
-    anim =  animation.FuncAnimation(fig, update_plot, frames=len(t), interval = 10, fargs=(solFun_list, plot))
+    anim = animation.FuncAnimation(fig, update_plot, frames=len(t), interval = 10, fargs=(solFun_list, plot))
 
     return anim
 
