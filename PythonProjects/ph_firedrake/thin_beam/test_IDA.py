@@ -45,7 +45,7 @@ mesh = IntervalMesh(n_elem, L)
 # Finite element defition
 
 V_p = FunctionSpace(mesh, "Hermite", deg)
-V_q = FunctionSpace(mesh, "DG", deg-2)
+V_q = FunctionSpace(mesh, "Hermite", deg)
 
 V = V_p * V_q
 n_e = V.dim()

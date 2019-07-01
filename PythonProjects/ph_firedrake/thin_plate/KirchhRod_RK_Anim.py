@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from matplotlib import cm
-from AnimateIntFiredrake import animateInt2D
+from tools_plotting.animate_platerod import animateInt2D
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as animation
 
@@ -254,8 +254,8 @@ Rsys = P @ Rint
 Fsys = P @ Bf_int
 
 t0 = 0.0
-t_fin = 1
-n_t = 500
+t_fin = 0.001
+n_t = 100
 t_span = [t0, t_fin]
 
 def sys(t,y):
@@ -266,11 +266,11 @@ def sys(t,y):
     return dydt
 
 
-init_con = Expression(('sin(2*pi*x[0])*sin(2*pi*(x[0]-lx))*sin(2*pi*x[1])*sin(2*pi*(x[1]-ly))', \
-                      '0', '0', '0'), degree=4, lx=l_x, ly=l_y)
-
-e_pl0 = Function(V)
-e_pl0.assign(project(init_con, V))
+# init_con = Expression(('sin(2*pi*x[0])*sin(2*pi*(x[0]-lx))*sin(2*pi*x[1])*sin(2*pi*(x[1]-ly))', \
+#                       '0', '0', '0'), degree=4, lx=l_x, ly=l_y)
+#
+# e_pl0 = Function(V)
+# e_pl0.assign(project(init_con, V))
 y0 = np.zeros(n_tot,)
 # y0[:n_pl] = e_pl0.vector().get_local()
 
@@ -354,7 +354,8 @@ plt.title(r"Hamiltonian trend",
           fontsize = fntsize)
 plt.legend(loc='upper left')
 
-path_out = "/home/a.brugnoli/Plots_Videos/Kirchhoff_plots/Simulations/Article_CDC/InterconnectionRod/"
+# path_out = "/home/a.brugnoli/Plots_Videos/Kirchhoff_plots/Simulations/Article_CDC/InterconnectionRod/"
+path_out = "./"
 
 # plt.savefig(path_out + "HamiltonianRod.eps", format="eps")
 
@@ -367,9 +368,9 @@ fps = 20
 Writer = animation.writers['ffmpeg']
 writer = Writer(fps= fps, metadata=dict(artist='Me'), bitrate=1800)
 
-# anim.save(path_out + 'Kirchh_Rod.mp4', writer=writer)
+anim.save(path_out + 'Kirchh_Rod.mp4', writer=writer)
 
-plt.show()
+# plt.show()
 
 # save_solutions = True
 # if save_solutions:

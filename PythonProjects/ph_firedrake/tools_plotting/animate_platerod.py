@@ -55,7 +55,7 @@ def animateInt2D(minSol, maxSol, solPl_list, x2, y2, solRod, t,\
     ax.plot(x2, y2, solRod[:, 0], label=z2label, color='black')
 
     anim =  animation.FuncAnimation(fig, update_plot, frames=len(t),\
-                                    interval = 10, fargs=(solPl_list, solRod))
+                                    interval=10, fargs=(solPl_list, solRod))
 
 
 
