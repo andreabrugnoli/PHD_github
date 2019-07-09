@@ -5,7 +5,7 @@ from modules_phdae.classes_phsystem import SysPhdaeRig
 from system_components.beams import FloatingPlanarEB
 from math import pi
 from scipy import integrate
-from system_components.manipulator.manipulator_constants import n_el, rho1, EI1, L1, rho2, EI2, L2, n_rig, J_joint1, J_joint2, J_payload, m_joint2, m_payload
+from multibody_phs.manipulator.manipulator_constants import n_el, rho1, EI1, L1, rho2, EI2, L2, n_rig, J_joint1, J_joint2, J_payload, m_joint2, m_payload
 
 
 beam1 = FloatingPlanarEB(n_el, L1, rho1, 1, EI1, 1, J_joint=J_joint1)

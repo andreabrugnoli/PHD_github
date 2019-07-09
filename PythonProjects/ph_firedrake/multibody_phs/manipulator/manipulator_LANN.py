@@ -5,7 +5,7 @@ from modules_phdae.classes_phsystem import SysPhdaeRig
 from system_components.beams import FloatingPlanarEB, draw_bending
 from math import pi
 from scipy import integrate
-from system_components.manipulator.manipulator_constants import rho1, EI1, L1, rho2, EI2, L2, n_rig, J_joint1, J_joint2, J_payload, m_joint2, m_payload
+from multibody_phs.manipulator.manipulator_constants import rho1, EI1, L1, rho2, EI2, L2, n_rig, J_joint1, J_joint2, J_payload, m_joint2, m_payload
 from tools_plotting.animate_plot import animate_plot
 
 n_el = 2
@@ -227,7 +227,6 @@ y_manI = np.concatenate((yI_1, yI_2), axis=0)
 # anim = animate_plot(t_ev, xI_1, yI_1, xlabel=None, ylabel=None, title=None)
 anim = animate_plot(t_ev, x_manI, y_manI, xlabel=None, ylabel=None, title=None)
 
-from tools_plotting.animate_plotrigfl import animate_plot
 # anim = animate_plot(t_ev, x_manI, y_manI, theta1Num_sol, theta2Num_sol,  xlabel=None, ylabel=None, title=None)
 
 

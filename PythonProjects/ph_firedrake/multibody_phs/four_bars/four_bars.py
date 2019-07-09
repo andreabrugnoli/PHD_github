@@ -7,7 +7,7 @@ import scipy.linalg as la
 
 from modules_phdae.classes_phsystem import SysPhdaeRig
 from system_components.beams import FloatFlexBeam, draw_deformation
-from system_components.tests.fourbars_constants import *
+from multibody_phs.four_bars.fourbars_constants import *
 from math import pi
 
 
