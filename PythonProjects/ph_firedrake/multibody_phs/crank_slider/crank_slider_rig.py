@@ -6,38 +6,45 @@ import numpy as np
 import scipy.linalg as la
 
 from modules_phdae.classes_phsystem import SysPhdaeRig
-from system_components.beams import FloatFlexBeam, draw_deformation
 from math import pi
 
 from assimulo.solvers import IDA
 from assimulo.implicit_ode import Implicit_Problem
 
-L_crank = 0.15
-L_coupler = 0.3
-d = 0.006
-A_coupler = pi * d**2 / 4
-I_coupler = pi * d**4 / 64
-n_elem = 2
-rho_coupler = 7.87 * 10 ** 3
-E_coupler = 200 * 10**9
-omega_cr = 150
+L_crank = 0.2
+L_coupler = 0.5
+
+rpm = 60
+omega_cr = rpm * 2*pi/60
+# omega_cr = 150
+
+mass_coupler = 3
+mass_slider = 2
+J_coupler = 1/3 * mass_coupler * L_coupler**2
 
 nr_coupler = 3
-nr_mass = 2
-nr_tot = nr_coupler + nr_mass
+nr_slider = 2
+nr_tot = nr_coupler + nr_slider
 
-coupler = FloatFlexBeam(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler)
+M_coupler = np.array([[mass_coupler, 0, 0],
+                      [0, mass_coupler, mass_coupler * L_coupler/2],
+                      [0, mass_coupler * L_coupler/2, mass_coupler]])
 
-mass_coupler = rho_coupler * A_coupler * L_coupler
-M_mass = 0.5 * la.block_diag(mass_coupler, mass_coupler)
-J_mass = np.zeros((nr_mass, nr_mass))
-B_mass = np.eye(nr_mass)
+J_coupler = np.zeros((nr_coupler, nr_coupler))
+tau_CP = np.array([[1, 0, 0], [0, 1, L_coupler], [0, 0, 1]])
+B_coupler = np.concatenate((np.eye(nr_coupler), tau_CP.T), axis=1)
 
-mass = SysPhdaeRig(nr_mass, 0, nr_mass, 0, 0, E=M_mass, J=J_mass, B=B_mass)
+coupler = SysPhdaeRig(nr_coupler, 0, nr_coupler, 0, 0, E=M_coupler, J=J_coupler, B=B_coupler)
+
+M_slider = mass_slider*np.eye(nr_slider)
+J_slider = np.zeros((nr_slider, nr_slider))
+B_slider = np.eye(nr_slider)
+
+mass = SysPhdaeRig(nr_slider, 0, nr_slider, 0, 0, E=M_slider, J=J_slider, B=B_slider)
 
 sys = SysPhdaeRig.transformer_ordered(coupler, mass, [3, 4], [0, 1], np.eye(2))
 
-# plt.spy(sys.E); plt.show()
+plt.spy(sys.E); plt.show()
 
 M_sys = sys.E
 J_sys = sys.J
@@ -45,14 +52,9 @@ G_coupler = sys.B[:, [0, 1]]
 
 n_sys = sys.n
 n_e = sys.n_e
-n_p = sys.n_p
-n_pu = int(n_p/3)
-n_pw = n_p - n_pu
-
 n_tot = n_sys + 4  # 3 lambda et theta
 order = []
 
-dx = L_coupler/n_elem
 
 def dae_closed_phs(t, y, yd):
 
@@ -63,22 +65,12 @@ def dae_closed_phs(t, y, yd):
     theta_cl = y[-1]
     omega_cl = y[2]
 
-    p_coupler = M_sys[:2, :n_e] @ y_sys[:n_e]
-    p_mass = M_sys[nr_coupler:nr_tot, :n_e] @ y_sys[:n_e]
+    p_crank = M_sys[:2, :3] @ y_sys[:3]
+    p_mass = M_sys[3:5, 3:5] @ y_sys[3:5]
 
-    p_u = M_sys[nr_tot:nr_tot+n_pu, :n_e] @ y_sys[:n_e]
-    p_w = M_sys[nr_tot+n_pu:nr_tot+n_p, :n_e] @ y_sys[:n_e]
-
-    p_wdis = np.array([p_w[i] for i in range(len(p_w)) if i % 2 == 0])
-    p_udis = np.zeros_like(p_w)
-    p_udis[::2] = p_u
-
-
-    J_sys[:2, 2] = [+p_coupler[1], -p_coupler[0]]
-    J_sys[2, :2] = [-p_coupler[1], +p_coupler[0]]
+    J_sys[:2, 2] = [+p_crank[1], -p_crank[0]]
+    J_sys[2, :2] = [-p_crank[1], +p_crank[0]]
     J_sys[3:5, 2] = [+p_mass[1], -p_mass[0]]
-    J_sys[nr_tot:nr_tot+n_p, 2] = np.concatenate((p_wdis, -p_udis))
-    J_sys[2, nr_tot:nr_tot+n_p] = np.concatenate((-p_wdis, +p_udis))
 
     R_th = np.array([[np.cos(theta_cl), -np.sin(theta_cl)],
                     [np.sin(theta_cl), np.cos(theta_cl)]])
@@ -136,64 +128,45 @@ imp_sim.report_continuously = True
 imp_sim.make_consistent('IDA_YA_YDP_INIT')
 
 # Simulate
-t_final = 8/150
-n_ev = 750
+t_final = 0.08
+n_ev = 100
 t_ev = np.linspace(0, t_final, n_ev)
 t_sol, y_sol, yd_sol = imp_sim.simulate(t_final, 0, t_ev)
 e_sol = y_sol[:, :n_e].T
 lmb_sol = y_sol[:, n_e:-1].T
+
 th_cl_sol = y_sol[:, -1]
-
-er_cl_sol = e_sol[:nr_coupler, :]
-ep_sol = e_sol[nr_tot:nr_tot + n_p, :]
-om_cr_sol = er_cl_sol[2]
-
-nw = int(2*n_p/3)
-nu = int(n_p/3)
-
-up_sol = ep_sol[:nu, :]
-wp_sol = ep_sol[nu:, :]
+ercl_sol = e_sol[:nr_coupler, :]
+ersl_sol = e_sol[nr_coupler:nr_tot, :]
 
 n_ev = len(t_sol)
 dt_vec = np.diff(t_sol)
 
-n_plot = 11
-eu_plot = np.zeros((n_plot, n_ev))
-ew_plot = np.zeros((n_plot, n_ev))
-
-x_plot = np.linspace(0, L_coupler, n_plot)
-w_plot = np.zeros((n_plot, n_ev))
-
-t_plot = t_sol
+ersl_I = np.zeros_like(ersl_sol)
+wsl_I = np.zeros_like(ersl_sol)
+wsl_I[:, 0] = [L_coupler + L_crank, 0]
 
 for i in range(n_ev):
-    eu_plot[:, i], ew_plot[:, i] = draw_deformation(n_plot, [0, 0, 0], ep_sol[:, i], L_coupler)[1:3]
+    theta_cl = th_cl_sol[i]
+    R_th = np.array([[np.cos(theta_cl), -np.sin(theta_cl)],
+                     [np.sin(theta_cl), np.cos(theta_cl)]])
+    ersl_I[:, i] = R_th @ ersl_sol[:, i]
 
-ind_midpoint = int((n_plot-1)/2)
-
-euM_B = eu_plot[ind_midpoint, :]
-ewM_B = ew_plot[ind_midpoint, :]
-
-wM0 = 0
-uM0 = 0
-
-wM_B = np.zeros(n_ev)
-wM_Bold = wM0
-
-for i in range(1, n_ev):
-
-    wM_B[i] = wM_Bold + 0.5 * (ewM_B[i - 1] + ewM_B[i]) * dt_vec[i-1]
-
-    wM_Bold = wM_B[i]
+    if i>0:
+        wsl_I[:, i] = wsl_I[:, i-1] + 0.5 * (ersl_I[:, i] + ersl_I[:, i-1]) * dt_vec[i-1]
 
 fntsize = 16
 fig = plt.figure()
-plt.plot(omega_cr*t_ev, -wM_B/L_coupler, 'b-')
-plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
-plt.ylabel(r'w normalized', fontsize = fntsize)
-plt.title(r"Midpoint deflection", fontsize=fntsize)
-axes = plt.gca()
-# axes.set_ylim([-0.015, 0.02])
+plt.plot(t_ev, ersl_I[0,:], 'b-', t_ev, ersl_I[1,:], 'r-')
+plt.xlabel(r'{Time} (s)', fontsize = fntsize)
+plt.ylabel(r'$v$ slider', fontsize = fntsize)
+plt.title(r"Velocity slider", fontsize=fntsize)
+
+fig = plt.figure()
+plt.plot(t_ev, wsl_I[0,:], 'b-', t_ev, wsl_I[1,:], 'r-')
+plt.xlabel(r'{Time} (s)', fontsize = fntsize)
+plt.ylabel(r'$w$ slider', fontsize = fntsize)
+plt.title(r"Displacement slider", fontsize=fntsize)
 
 plt.show()
 # plt.legend(loc='upper left')
