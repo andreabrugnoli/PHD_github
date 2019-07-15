@@ -11,7 +11,7 @@ from firedrake.plot import _two_dimension_triangle_func_val
 from mpl_toolkits.mplot3d import Axes3D
 from math import pi
 plt.rc('text', usetex=True)
-from reduction_waves import models
+from waves import models
 
 Lx = 1
 Ly = 1

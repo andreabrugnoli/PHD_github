@@ -71,6 +71,9 @@ def create_sys1(mesh1, deg_p1, deg_q1):
     n = FacetNormal(mesh1)
     tolx1 = 1e-15
     is_int1 = conditional(gt(x1, tolx1), 1, 0)
+    # ray = sqrt(pow(x1, 2) + pow(y1, 2))
+    # is_int1 = conditional(gt(ray, 1.5), 1, 0)
+
     b_D = dot(v_q1, n) * f_D * is_int1 * ds1
 
     petsc_bD = assemble(b_D, mat_type='aij').M.handle
@@ -153,8 +156,11 @@ def create_sys2(mesh2, deg_p2, deg_q2):
 
     xis_int2 = conditional(And(gt(x2, tolx1), lt(x2, tolx2)), 1, 0)
     yis_int2 = conditional(And(gt(y2, toly1), lt(y2, toly2)), 1, 0)
-
     b_N = v_p2 * f_N * xis_int2 * yis_int2 * ds2
+
+    # ray = sqrt(pow(x2, 2) + pow(y2, 2))
+    # is_int2 = conditional(lt(ray, 2.5), 1, 0)
+    # b_N = v_p2 * f_N * is_int2 * ds2
 
     petsc_bN = assemble(b_N, mat_type='aij').M.handle
     B_N2 = np.array(petsc_bN.convert("dense").getDenseArray())
@@ -261,18 +267,22 @@ rho = 1
 T = 1
 
 degp = 1
-degq = 2
+degq = 1
 
-path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/system_components/tests/meshes/"
+path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/waves/meshes/"
 mesh1 = Mesh(path_mesh + "dom1.msh")
 mesh2 = Mesh(path_mesh + "dom2.msh")
+# mesh1 = Mesh(path_mesh + "circle1.msh")
+# mesh2 = Mesh(path_mesh + "circle2.msh")
 
-plot(mesh1)
-plot(mesh2)
+figure = plt.figure()
+ax = figure.add_subplot(111)
+plot(mesh1, axes=ax)
+plot(mesh2, axes=ax)
 plt.show()
 
 sys1, Mdelta, Vp1 = create_sys1(mesh1, degp, degq)
 sys2, Vp2 = create_sys2(mesh2, degp, degq)
 
-print_modes(sys1, sys2, Mdelta, Vp1, Vp2, 10)
+# print_modes(sys1, sys2, Mdelta, Vp1, Vp2, 10)
 
