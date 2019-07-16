@@ -4,7 +4,7 @@ import scipy.linalg as la
 np.set_printoptions(threshold=np.inf)
 from matplotlib import pyplot as plt
 from tools_plotting.animate_surf import animate2D
-from assimulo.solvers import IDA
+from assimulo.solvers import GLIMDA
 from assimulo.implicit_ode import Implicit_Problem
 
 plt.rc('text', usetex=True)
@@ -105,23 +105,11 @@ def dae_closed_phs(t, y, yd):
     ed_var = yd[:n_e]
 
     res_e = MM @ ed_var - JJ @ e_var - G_N @ lmb_var - B_Dxy - B_Dt * t
-    # res_lmb = - G_N.T @ e_var + B_N
-    res_lmb = G_N.T @ invMM @ (JJ @ e_var + G_N @ lmb_var + B_Dxy + B_Dt * t)
+    res_lmb = - G_N.T @ e_var + B_N
+    # res_lmb = G_N.T @ invMM @ (JJ @ e_var + G_N @ lmb_var + B_Dxy + B_Dt * t)
     # res_lmb = G_N.T @ ed_var
 
     return np.concatenate((res_e, res_lmb))
-
-
-order = []
-
-
-def handle_result(solver, t, y, yd):
-
-    order.append(solver.get_last_order())
-
-    solver.t_sol.extend([t])
-    solver.y_sol.extend([y])
-    solver.yd_sol.extend([yd])
 
 
 invMM = la.inv(MM)
@@ -129,46 +117,41 @@ ep_0 = project(u_Dxy, Vp).vector().get_local()
 eq_0 = project(as_vector([u_N*x/ray, u_N*y/ray]), Vq).vector().get_local()
 
 e_0 = np.concatenate((ep_0, eq_0))
-lmb_0 = la.solve(- G_N.T @ invMM @ G_N, G_N.T @ invMM @ (JJ @ e_0 + B_Dxy))
+# lmb_0 = la.solve(- G_N.T @ invMM @ G_N, G_N.T @ invMM @ (JJ @ e_0 + B_Dxy))
 
 y0 = np.zeros(n_e + n_lmb)  # Initial conditions
 
-de_0 = invMM @ (JJ @ e_0 + G_N @ lmb_0 + B_Dxy)
-dlmb_0 = la.solve(- G_N.T @ invMM @ G_N, G_N.T @ invMM @ (JJ @ de_0 + B_Dt))
+# de_0 = invMM @ (JJ @ e_0 + G_N @ lmb_0 + B_Dxy)
+# dlmb_0 = la.solve(- G_N.T @ invMM @ G_N, G_N.T @ invMM @ (JJ @ de_0 + B_Dt))
 
 y0[:n_p] = ep_0
 y0[n_p:n_V] = eq_0
-y0[n_V:] = lmb_0
+# y0[n_V:] = lmb_0
 
 yd0 = np.zeros(n_e + n_lmb)  # Initial conditions
-yd0[:n_V] = de_0
-yd0[n_V:] = dlmb_0
+# yd0[:n_V] = de_0
+# yd0[n_V:] = dlmb_0
 
 # Create an Assimulo implicit problem
 imp_mod = Implicit_Problem(dae_closed_phs, y0, yd0, name='dae_closed_pHs')
-imp_mod.handle_result = handle_result
 
 # Set the algebraic components
 imp_mod.algvar = list(np.concatenate((np.ones(n_e), np.zeros(n_lmb))))
 
 # Create an Assimulo implicit solver (IDA)
-imp_sim = IDA(imp_mod)  # Create a IDA solver
+imp_sim = GLIMDA(imp_mod)  # Create a IDA solver
 
 # Sets the paramters
 imp_sim.atol = 1e-6  # Default 1e-6
 imp_sim.rtol = 1e-6  # Default 1e-6
-imp_sim.suppress_alg = True  # Suppress the algebraic variables on the error test
 imp_sim.report_continuously = True
 # imp_sim.maxh = 1e-6
-
-# Let Sundials find consistent initial conditions by use of 'IDA_YA_YDP_INIT'
-imp_sim.make_consistent('IDA_YA_YDP_INIT')
 
 # Simulate
 t_final = 0.1
 n_ev = 100
 t_ev = np.linspace(0, t_final, n_ev)
-t_sol, y_sol, yd_sol = imp_sim.simulate(t_final, 0, t_ev)
+t_sol, y_sol, yd_sol = imp_sim.simulate(t_final)
 e_sol = y_sol[:, :n_e].T
 lmb_sol = y_sol[:, n_e:].T
 
