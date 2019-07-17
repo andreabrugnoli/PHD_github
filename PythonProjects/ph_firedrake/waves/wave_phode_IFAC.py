@@ -11,11 +11,11 @@ from firedrake.plot import _two_dimension_triangle_func_val
 from scipy import integrate
 from tools_plotting.animate_2surf import animate2D
 import matplotlib.animation as animation
-
+from assimulo.solvers import IDA
+from assimulo.implicit_ode import Implicit_Problem
 from mpl_toolkits.mplot3d import Axes3D
 from math import pi
 plt.rc('text', usetex=True)
-
 
 
 def create_sys(mesh1, mesh2, deg_p1, deg_q1, deg_p2, deg_q2):
@@ -267,61 +267,100 @@ def print_modes(sys, Vp1, Vp2, n_modes):
     plt.show()
 
 
-degp = 1
-degq = 1
-
+ind = 7
 path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/waves/meshes/"
-mesh1 = Mesh(path_mesh + "circle1_5.msh")
-mesh2 = Mesh(path_mesh + "circle2_5.msh")
-# mesh1 = Mesh(path_mesh + "circle1.msh")
-# mesh2 = Mesh(path_mesh + "circle2.msh")
-#
+mesh1 = Mesh(path_mesh + "circle1_" + str(ind) + ".msh")
+mesh2 = Mesh(path_mesh + "circle2_" + str(ind) + ".msh")
+
+
 # figure = plt.figure()
 # ax = figure.add_subplot(111)
 # plot(mesh1, axes=ax)
 # plot(mesh2, axes=ax)
 # plt.show()
+degp = 1
+degq = 2
 
 sys_DN, Vp1, Vp2, ep_0, eq_0 = create_sys(mesh1, mesh2, degp, degq, degp, degq)
 JJ = sys_DN.J
 MM = sys_DN.E
 BB = sys_DN.B
 
-invMM = la.inv(MM)
+n_p = len(ep_0)
+n_q = len(eq_0)
+n_e = n_p + n_q
+print(n_e)
+
 
 B_Dxy = np.reshape(BB[:, 0], (-1, ))
 B_Dt = np.reshape(BB[:, 1], (-1, ))
 B_N = np.reshape(BB[:, 2], (-1, ))
 
-t0 = 0.0
-t_fin = 0.1
-n_t = 100
-t_span = [t0, t_fin]
 
-def sys(t,y):
+def dae_closed_phs(t, y, yd):
 
-    dydt = invMM @ ( JJ @ y + B_Dxy + B_Dt * t + B_N)
+    res = MM @ yd - JJ @ y - B_Dxy - B_Dt * t - B_N
 
-    return dydt
+    return res
+
+
+order = []
+
+
+def handle_result(solver, t, y, yd):
+
+    order.append(solver.get_last_order())
+
+    solver.t_sol.extend([t])
+    solver.y_sol.extend([y])
+    solver.yd_sol.extend([yd])
 
 
 y0 = np.concatenate((ep_0, eq_0))
-t_ev = np.linspace(t0, t_fin, num = n_t)
 
-sol = integrate.solve_ivp(sys, t_span, y0, method='RK45', vectorized=False, t_eval = t_ev)
+yd0 = la.solve(MM, JJ @ y0 + B_Dxy + B_N) # Initial conditions
 
-t_ev = sol.t
-n_ev = len(t_ev)
-dt_vec = np.diff(t_ev)
+# Create an Assimulo implicit problem
+imp_mod = Implicit_Problem(dae_closed_phs, y0, yd0, name='dae_closed_pHs')
+imp_mod.handle_result = handle_result
+
+# Set the algebraic components
+imp_mod.algvar = list(np.ones(n_e))
+
+# Create an Assimulo implicit solver (IDA)
+imp_sim = IDA(imp_mod)  # Create a IDA solver
+
+# Sets the paramters
+imp_sim.atol = 1e-6  # Default 1e-6
+imp_sim.rtol = 1e-6  # Default 1e-6
+imp_sim.suppress_alg = True  # Suppress the algebraic variables on the error test
+imp_sim.report_continuously = True
+# imp_sim.maxh = 1e-6
+
+# Let Sundials find consistent initial conditions by use of 'IDA_YA_YDP_INIT'
+imp_sim.make_consistent('IDA_YA_YDP_INIT')
+
+# Simulate
+t_final = 0.1
+n_ev = 100
+t_ev = np.linspace(0, t_final, n_ev)
+t_sol, y_sol, yd_sol = imp_sim.simulate(t_final, 0, t_ev)
+
+y_sol = y_sol.T
+yd_sol = yd_sol.T
+
+n_ev = len(t_sol)
+dt_vec = np.diff(t_sol)
+
 
 n_p1 = Vp1.dim()
 n_p2 = Vp2.dim()
 
-ep1_sol = sol.y[:n_p1, :]
-ep2_sol = sol.y[n_p1:n_p1+n_p2, :]
-ep_sol = sol.y[:n_p1+n_p2, :]
+ep1_sol = y_sol[:n_p1, :]
+ep2_sol = y_sol[n_p1:n_p1+n_p2, :]
+ep_sol = y_sol[:n_p1+n_p2, :]
 
-e_sol = sol.y
+e_sol = y_sol
 
 w1_sol = np.zeros(ep1_sol.shape)
 w0_1 = np.zeros((n_p1,))

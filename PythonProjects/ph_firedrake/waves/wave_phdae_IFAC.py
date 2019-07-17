@@ -11,8 +11,9 @@ plt.rc('text', usetex=True)
 # Finite element defition
 
 # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
+ind = 5
 path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/waves/meshes/"
-mesh = Mesh(path_mesh + "circle_5.msh")
+mesh = Mesh(path_mesh + "circle_" + str(ind) + ".msh")
 
 # figure = plt.figure()
 # ax = figure.add_subplot(111)
@@ -71,7 +72,7 @@ u_Dxy = pow(x, 2) - pow(y, 2)
 ray = sqrt(pow(x, 2) + pow(y, 2))
 is_D = conditional(lt(ray, 1.5), 1, 0)
 b_Dxy = dot(v_q, n_ver) * u_Dxy * is_D * ds
-b_Dt = dot(v_q, n_ver) * 100 * is_D * ds
+b_Dt = dot(v_q, n_ver) * 10 * is_D * ds
 
 B_Dxy = assemble(b_Dxy).vector().get_local()
 B_Dt = assemble(b_Dt).vector().get_local()
@@ -106,8 +107,8 @@ def dae_closed_phs(t, y, yd):
 
     res_e = MM @ ed_var - JJ @ e_var - G_N @ lmb_var - B_Dxy - B_Dt * t
     # res_lmb = - G_N.T @ e_var + B_N
-    res_lmb = G_N.T @ invMM @ (JJ @ e_var + G_N @ lmb_var + B_Dxy + B_Dt * t)
-    # res_lmb = G_N.T @ ed_var
+    # res_lmb = G_N.T @ invMM @ (JJ @ e_var + G_N @ lmb_var + B_Dxy + B_Dt * t)
+    res_lmb = G_N.T @ ed_var
 
     return np.concatenate((res_e, res_lmb))
 
@@ -124,25 +125,25 @@ def handle_result(solver, t, y, yd):
     solver.yd_sol.extend([yd])
 
 
-invMM = la.inv(MM)
+# invMM = la.inv(MM)
 ep_0 = project(u_Dxy, Vp).vector().get_local()
 eq_0 = project(as_vector([u_N*x/ray, u_N*y/ray]), Vq).vector().get_local()
 
 e_0 = np.concatenate((ep_0, eq_0))
-lmb_0 = la.solve(- G_N.T @ invMM @ G_N, G_N.T @ invMM @ (JJ @ e_0 + B_Dxy))
+# lmb_0 = la.solve(- G_N.T @ invMM @ G_N, G_N.T @ invMM @ (JJ @ e_0 + B_Dxy))
 
 y0 = np.zeros(n_e + n_lmb)  # Initial conditions
 
-de_0 = invMM @ (JJ @ e_0 + G_N @ lmb_0 + B_Dxy)
-dlmb_0 = la.solve(- G_N.T @ invMM @ G_N, G_N.T @ invMM @ (JJ @ de_0 + B_Dt))
+# de_0 = invMM @ (JJ @ e_0 + G_N @ lmb_0 + B_Dxy)
+# dlmb_0 = la.solve(- G_N.T @ invMM @ G_N, G_N.T @ invMM @ (JJ @ de_0 + B_Dt))
 
 y0[:n_p] = ep_0
 y0[n_p:n_V] = eq_0
-y0[n_V:] = lmb_0
+# y0[n_V:] = lmb_0
 
 yd0 = np.zeros(n_e + n_lmb)  # Initial conditions
-yd0[:n_V] = de_0
-yd0[n_V:] = dlmb_0
+# yd0[:n_V] = de_0
+# yd0[n_V:] = dlmb_0
 
 # Create an Assimulo implicit problem
 imp_mod = Implicit_Problem(dae_closed_phs, y0, yd0, name='dae_closed_pHs')
