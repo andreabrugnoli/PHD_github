@@ -40,8 +40,8 @@ def create_sys(mesh1, mesh2, deg_p1, deg_q1, deg_p2, deg_q2):
     e1 = TrialFunction(V1)
     e_p1, e_q1 = split(e1)
 
-    rho = 1
-    T = as_tensor([[1, 0], [0, 1]])
+    rho = 0.1
+    T = as_tensor([[10, 0], [0, 10]])
 
     al_p1 = rho * e_p1
     al_q1 = dot(inv(T), e_q1)
@@ -83,7 +83,7 @@ def create_sys(mesh1, mesh2, deg_p1, deg_q1, deg_p2, deg_q2):
     is_int1 = conditional(gt(ray1, 1.25), 1, 0)
 
     b_Dxy = dot(v_q1, n_ver) * u_Dxy1 * is_D * ds1
-    b_Dt = dot(v_q1, n_ver) * 100 * is_D * ds1
+    b_Dt = dot(v_q1, n_ver) * is_D * ds1
 
     B_Dxy = np.reshape(assemble(b_Dxy).vector().get_local(), (-1, 1))
     B_Dt = np.reshape(assemble(b_Dt).vector().get_local(), (-1, 1))
@@ -267,21 +267,25 @@ def print_modes(sys, Vp1, Vp2, n_modes):
     plt.show()
 
 
-ind = 7
+ind = 15
 path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/waves/meshes/"
 mesh1 = Mesh(path_mesh + "circle1_" + str(ind) + ".msh")
 mesh2 = Mesh(path_mesh + "circle2_" + str(ind) + ".msh")
 
 
-# figure = plt.figure()
-# ax = figure.add_subplot(111)
-# plot(mesh1, axes=ax)
-# plot(mesh2, axes=ax)
-# plt.show()
-degp = 1
-degq = 2
+figure = plt.figure()
+ax = figure.add_subplot(111)
+plot(mesh1, axes=ax)
+plot(mesh2, axes=ax)
+plt.show()
 
-sys_DN, Vp1, Vp2, ep_0, eq_0 = create_sys(mesh1, mesh2, degp, degq, degp, degq)
+degp1 = 1
+degq1 = 2
+
+degp2 = 1
+degq2 = 2
+
+sys_DN, Vp1, Vp2, ep_0, eq_0 = create_sys(mesh1, mesh2, degp1, degq1, degp2, degq2)
 JJ = sys_DN.J
 MM = sys_DN.E
 BB = sys_DN.B
@@ -296,10 +300,14 @@ B_Dxy = np.reshape(BB[:, 0], (-1, ))
 B_Dt = np.reshape(BB[:, 1], (-1, ))
 B_N = np.reshape(BB[:, 2], (-1, ))
 
+t_final = 1
+om_D = 2*pi/t_final
+om_N = om_D/8
 
-def dae_closed_phs(t, y, yd):
 
-    res = MM @ yd - JJ @ y - B_Dxy - B_Dt * t - B_N
+def ode_closed_phs(t, y, yd):
+
+    res = MM @ yd - JJ @ y - B_Dxy - B_Dt * np.sin(om_D*t) - B_N * (1 + np.sin(om_N * t))
 
     return res
 
@@ -321,7 +329,7 @@ y0 = np.concatenate((ep_0, eq_0))
 yd0 = la.solve(MM, JJ @ y0 + B_Dxy + B_N) # Initial conditions
 
 # Create an Assimulo implicit problem
-imp_mod = Implicit_Problem(dae_closed_phs, y0, yd0, name='dae_closed_pHs')
+imp_mod = Implicit_Problem(ode_closed_phs, y0, yd0, name='dae_closed_pHs')
 imp_mod.handle_result = handle_result
 
 # Set the algebraic components
@@ -341,7 +349,6 @@ imp_sim.report_continuously = True
 imp_sim.make_consistent('IDA_YA_YDP_INIT')
 
 # Simulate
-t_final = 0.1
 n_ev = 100
 t_ev = np.linspace(0, t_final, n_ev)
 t_sol, y_sol, yd_sol = imp_sim.simulate(t_final, 0, t_ev)
@@ -411,11 +418,11 @@ plt.title(r"Hamiltonian trend",
 anim = animate2D(minZ, maxZ, w1fun_vec, w2fun_vec, t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \
                          zlabel = '$w [mm]$', title = 'Vertical Displacement')
 
+plt.show()
+
 # Writer = animation.writers['ffmpeg']
 # writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
-#
 # pathout = './'
-# anim.save(pathout + 'IntKirchoffPlates.mp4', writer=writer)
+# anim.save(pathout + 'wave_ode.mp4', writer=writer)
 
 
-plt.show()

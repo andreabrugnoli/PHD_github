@@ -6,22 +6,22 @@ from matplotlib import pyplot as plt
 from tools_plotting.animate_surf import animate2D
 from assimulo.solvers import IDA
 from assimulo.implicit_ode import Implicit_Problem
-
+from matplotlib import animation
 plt.rc('text', usetex=True)
 # Finite element defition
 
 # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
-ind = 5
+ind = 15
 path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/waves/meshes/"
 mesh = Mesh(path_mesh + "circle_" + str(ind) + ".msh")
 
-# figure = plt.figure()
-# ax = figure.add_subplot(111)
-# plot(mesh, axes=ax)
-# plt.show()
+figure = plt.figure()
+ax = figure.add_subplot(111)
+plot(mesh, axes=ax)
+plt.show()
 
-rho = 1
-T = as_tensor([[1, 0], [0, 1]])
+rho = 0.1
+T = as_tensor([[10, 0], [0, 10]])
 
 deg_p = 1
 deg_q = 2
@@ -72,7 +72,7 @@ u_Dxy = pow(x, 2) - pow(y, 2)
 ray = sqrt(pow(x, 2) + pow(y, 2))
 is_D = conditional(lt(ray, 1.5), 1, 0)
 b_Dxy = dot(v_q, n_ver) * u_Dxy * is_D * ds
-b_Dt = dot(v_q, n_ver) * 10 * is_D * ds
+b_Dt = dot(v_q, n_ver) * is_D * ds
 
 B_Dxy = assemble(b_Dxy).vector().get_local()
 B_Dt = assemble(b_Dt).vector().get_local()
@@ -97,6 +97,9 @@ G_N = G_N[:, neumann_dofs]
 B_N = assemble(b_N).vector().get_local()[neumann_dofs]
 
 n_lmb = G_N.shape[1]
+t_final = 1
+om_D = 2*pi/t_final
+om_N = om_D/8
 
 
 def dae_closed_phs(t, y, yd):
@@ -105,10 +108,10 @@ def dae_closed_phs(t, y, yd):
     lmb_var = y[n_e:]
     ed_var = yd[:n_e]
 
-    res_e = MM @ ed_var - JJ @ e_var - G_N @ lmb_var - B_Dxy - B_Dt * t
-    # res_lmb = - G_N.T @ e_var + B_N
-    # res_lmb = G_N.T @ invMM @ (JJ @ e_var + G_N @ lmb_var + B_Dxy + B_Dt * t)
-    res_lmb = G_N.T @ ed_var
+    res_e = MM @ ed_var - JJ @ e_var - G_N @ lmb_var - B_Dxy - B_Dt * np.sin(om_D*t)
+    # res_lmb = - G_N.T @ e_var + B_N * np.sin(om_N*t)
+    # res_lmb = G_N.T @ invMM @ (JJ @ e_var + G_N @ lmb_var + B_Dxy + B_Dt * np.sin(om_D*t))
+    res_lmb = -G_N.T @ ed_var + B_N * om_N * np.cos(om_N*t)
 
     return np.concatenate((res_e, res_lmb))
 
@@ -166,8 +169,7 @@ imp_sim.report_continuously = True
 imp_sim.make_consistent('IDA_YA_YDP_INIT')
 
 # Simulate
-t_final = 0.1
-n_ev = 100
+n_ev = 500
 t_ev = np.linspace(0, t_final, n_ev)
 t_sol, y_sol, yd_sol = imp_sim.simulate(t_final, 0, t_ev)
 e_sol = y_sol[:, :n_e].T
@@ -203,6 +205,7 @@ H_vec = np.zeros((n_ev,))
 
 for i in range(n_ev):
     H_vec[i] = 0.5 * (e_sol[:, i].T @ MM @ e_sol[:, i])
+
 fntsize = 16
 
 fig = plt.figure()
@@ -213,16 +216,16 @@ plt.title(r"Hamiltonian trend",
           fontsize=fntsize)
 # plt.legend(loc='upper left')
 
-# path_out = "./"
 
 anim = animate2D(minZ, maxZ, wfun_vec, t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \
-                         zlabel='$p$', title='pressure')
+                          zlabel='$p$', title='pressure')
 
 plt.show()
 
 # rallenty = 10
 # fps = 20
 # Writer = animation.writers['ffmpeg']
-# writer = Writer(fps= fps, metadata=dict(artist='Me'), bitrate=1800)
-#
-# anim.save(path_out + 'Kirchh_Rod.mp4', writer=writer)
+# writer = Writer(fps=fps, metadata=dict(artist='Me'), bitrate=1800)
+# path_out = "./"
+# anim.save(path_out + 'wave_dae.mp4', writer=writer)
+
