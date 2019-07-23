@@ -3,12 +3,13 @@ plt.rc('text', usetex=True)
 fntsize = 15
 
 import numpy as np
+import quaternion
 import scipy.linalg as la
 from scipy.integrate import solve_ivp
 from scipy.interpolate import interp1d
 
 from modules_phdae.classes_phsystem import SysPhdaeRig
-from system_components.beams import FloatFlexBeam, draw_deformation
+from system_components.beams import SpatialBeam, draw_deformation
 from math import pi
 
 from assimulo.solvers import IDA
@@ -19,39 +20,43 @@ L_coupler = 0.3
 d = 0.006
 A_coupler = pi * d**2 / 4
 I_coupler = pi * d**4 / 64
+Jxx_coupler = 2 * I_coupler
 n_elem = 2
 rho_coupler = 7.87 * 10 ** 3
 E_coupler = 200 * 10**9
 omega_cr = 150
 
-nr_coupler = 3
-nr_mass = 2
-nr_tot = nr_coupler + nr_mass
+nr_coupler = 6
+nr_slider = 3
+nr_tot = nr_coupler + nr_slider
 
-coupler = FloatFlexBeam(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler)
+coupler = SpatialBeam(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler, Jxx_coupler)
 
 mass_coupler = rho_coupler * A_coupler * L_coupler
-M_mass = 0.5 * la.block_diag(mass_coupler, mass_coupler)
-J_mass = np.zeros((nr_mass, nr_mass))
-B_mass = np.eye(nr_mass)
+mass_slider = 0.5 * mass_coupler
+M_slider = mass_slider * np.eye(nr_slider)
 
-mass = SysPhdaeRig(nr_mass, 0, nr_mass, 0, 0, E=M_mass, J=J_mass, B=B_mass)
+J_slider = np.zeros((nr_slider, nr_slider))
+B_slider = np.eye(nr_slider)
 
-sys = SysPhdaeRig.transformer_ordered(coupler, mass, [3, 4], [0, 1], np.eye(2))
+slider = SysPhdaeRig(nr_slider, 0, nr_slider, 0, 0, E=M_slider, J=J_slider, B=B_slider)
+
+sys = SysPhdaeRig.transformer_ordered(coupler, slider, [6, 7, 8], [0, 1, 3], np.eye(nr_slider))
 
 # plt.spy(sys.E); plt.show()
 
 M_sys = sys.E
 J_sys = sys.J
-G_coupler = sys.B[:, [0, 1]]
+G_coupler = sys.B[:, [0, 1, 2]]
 
 n_sys = sys.n
 n_e = sys.n_e
 n_p = sys.n_p
-n_pu = int(n_p/3)
-n_pw = n_p - n_pu
+n_pu = int(n_p/5)
+n_pv = 2*n_pu
+n_pw = 2*n_pu
 
-n_tot = n_sys + 4  # 3 lambda et theta
+n_tot = n_sys + 10  # 6 lambda and quaternions
 order = []
 
 dx = L_coupler/n_elem
@@ -60,17 +65,21 @@ dx = L_coupler/n_elem
 def dae_closed_phs(t, y, yd):
 
     yd_sys = yd[:n_sys]
-    y_sys = y[:n_sys]
-    lmd_cl = y[n_sys:-2]
-    lmd_mass = y[-2]
-    theta_cl = y[-1]
-    omega_cl = y[2]
+    dquat_cl = yd[-4:]
 
-    p_coupler = M_sys[:2, :n_e] @ y_sys[:n_e]
+    y_sys = y[:n_sys]
+    lmd_cl = y[n_sys:n_sys + 3]
+    lmd_mass = y[n_sys + 3: n_sys + 6]
+
+    quat_cl = y[-4:]
+    omega_cl = y[3:6]
+
+    p_coupler = M_sys[:3, :n_e] @ y_sys[:n_e]
     p_mass = M_sys[nr_coupler:nr_tot, :n_e] @ y_sys[:n_e]
 
     p_u = M_sys[nr_tot:nr_tot+n_pu, :n_e] @ y_sys[:n_e]
-    p_w = M_sys[nr_tot+n_pu:nr_tot+n_p, :n_e] @ y_sys[:n_e]
+    p_v = M_sys[nr_tot+n_pu:nr_tot+n_pu+n_pv, :n_e] @ y_sys[:n_e]
+    p_w = M_sys[nr_tot+n_pu+n_pv:nr_tot + n_p, :n_e] @ y_sys[:n_e]
 
     p_wdis = np.array([p_w[i] for i in range(len(p_w)) if i % 2 == 0])
     p_udis = np.zeros_like(p_w)
@@ -82,20 +91,26 @@ def dae_closed_phs(t, y, yd):
     J_sys[nr_tot:nr_tot+n_p, 2] = np.concatenate((p_wdis, -p_udis))
     J_sys[2, nr_tot:nr_tot+n_p] = np.concatenate((-p_wdis, +p_udis))
 
-    R_th = np.array([[np.cos(theta_cl), -np.sin(theta_cl)],
-                    [np.sin(theta_cl), np.cos(theta_cl)]])
+    Rot_cl = quaternion.as_rotation_matrix(np.quaternion(quat_cl))
 
-    G_mass = np.zeros(n_sys)
-    G_mass[nr_coupler:nr_coupler+2] = R_th[1, :]
+    G_slider = np.zeros(n_sys)
+    G_slider[nr_coupler:nr_coupler+2] = Rot_cl[3, :]
 
-    vC_cr = omega_cr * L_crank * np.array([-np.sin(omega_cr * t), np.cos(omega_cr * t)])
+    vC_cr = omega_cr * L_crank * np.array([0, -np.cos(omega_cr * t), -np.sin(omega_cr * t)])
 
-    res_sys = M_sys @ yd_sys - J_sys @ y_sys - G_coupler @ lmd_cl - G_mass * lmd_mass
-    res_cl = - G_coupler.T @ y_sys + R_th.T @ vC_cr
-    res_mass = np.reshape(G_mass, (1, -1)) @ y_sys
-    res_th = np.reshape(yd[-1] - omega_cl, (1, ))
+    res_sys = M_sys @ yd_sys - J_sys @ y_sys - G_coupler @ lmd_cl - G_slider * lmd_mass
+    res_cl = - G_coupler.T @ y_sys + Rot_cl.T @ vC_cr
+    res_mass = np.reshape(G_slider, (1, -1)) @ y_sys
+
+    Omegacl_mat = np.array([[0, -omega_cl[0], -omega_cl[1], -omega_cl[2]],
+                            [omega_cl[0], 0, omega_cl[2], -omega_cl[1]],
+                            [omega_cl[1], -omega_cl[2], 0, omega_cl[0]],
+                            [omega_cl[2], omega_cl[1], -omega_cl[0], 0]])
+
+    res_th = dquat_cl - 0.5 * Omegacl_mat @ quat_cl
 
     res = np.concatenate((res_sys, res_cl, res_mass, res_th), axis=0)
+
     return res
 
 
