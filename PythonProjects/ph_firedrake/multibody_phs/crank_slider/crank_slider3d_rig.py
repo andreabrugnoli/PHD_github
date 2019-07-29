@@ -4,7 +4,6 @@ fntsize = 15
 
 import numpy as np
 import quaternion
-from scipy.spatial.transform import Rotation
 from scipy.integrate import solve_ivp
 from scipy.interpolate import interp1d
 import scipy.linalg as la
@@ -16,7 +15,7 @@ from math import pi
 from assimulo.solvers import IDA
 from assimulo.implicit_ode import Implicit_Problem
 
-
+from tools_plotting.animate_lines import animate_line3d
 def skew(x):
     return np.array([[0, -x[2], x[1]],
                      [x[2], 0, -x[0]],
@@ -28,6 +27,8 @@ L_coupler = 0.3
 d = 0.006
 
 ecc = 0.1
+offset_cr = 0
+
 rho_coupler = 7.87 * 10 ** 3
 E_coupler = 200 * 10**9
 A_coupler = pi * d**2 / 4
@@ -47,12 +48,12 @@ nr_tot = nr_coupler + nr_slider
 
 M_coupler = la.block_diag(mass_coupler * np.eye(3), np.diag([Jxx_coupler, Jyy_coupler, Jzz_coupler]))
 
-s = mass_coupler* L_coupler/2 * np.array([[0, 0, 0],
-                                    [0,  0, 1],
-                                    [0, -1, 0]])
+s_moment = mass_coupler * L_coupler/2 * np.array([[0, 0, 0],
+                                          [0,  0, 1],
+                                          [0, -1, 0]])
 
-M_coupler[:3, 3:6] = s
-M_coupler[3:6, :3] = s.T
+M_coupler[:3, 3:6] = s_moment
+M_coupler[3:6, :3] = s_moment.T
 
 J_coupler = np.zeros((nr_coupler, nr_coupler))
 tau_CP = np.eye(nr_coupler)
@@ -75,7 +76,8 @@ sys = SysPhdaeRig.transformer_ordered(coupler, slider, [6, 7, 8], [0, 1, 2], np.
 
 # plt.spy(sys.E); plt.show()
 
-n_sys = sys.n
+# n_sys = sys.n
+n_sys = sys.n_e
 n_e = sys.n_e
 
 E_sys = sys.E
@@ -85,15 +87,18 @@ J_e = sys.J_e
 
 
 G_e = sys.G_e
+print(G_e)
 G_coupler = sys.B_e[:, [0, 1, 2]]
 G_slider = np.zeros((n_e, 2))
 
-n_tot = n_e + 12  # 2*8 lambda (3 coupler, 2 slider, 3 coupler-slider) and quaternions
+n_tot = n_e + 9  # 3 coupler, 2 slider, 3 coupler-slider and quaternions
 order = []
 
 dx = L_coupler/n_elem
 
-t_final = 2*pi/150
+t_final = pi/150
+
+invA_lmd = la.inv(G_e.T @ invM_sys @ G_e)
 
 
 def dae_closed_phs(t, y, yd):
@@ -108,9 +113,9 @@ def dae_closed_phs(t, y, yd):
 
     e_sys = y[:n_e]
 
-    lmd_sys = y[n_e:n_sys]
+    # lmd_sys = y[n_e:n_sys]
     lmd_cl = y[n_sys:n_sys + 3]
-    lmd_mass = y[n_sys + 3: n_sys + 5]
+    lmd_mass = y[n_sys + 3: -4]
 
     quat_cl = y[-4:]/np.linalg.norm(y[-4:])
 
@@ -127,24 +132,28 @@ def dae_closed_phs(t, y, yd):
 
     act_quat = np.quaternion(quat_cl[0], quat_cl[1], quat_cl[2], quat_cl[3])
     Rot_cl = quaternion.as_rotation_matrix(act_quat)
-    # Rot_cl = Rotation.from_quat(quat_cl).as_dcm()
-    # print(Rotation.from_dcm(Rot_cl).as_euler('ZYX', degrees=True))
 
     G_slider[nr_coupler:nr_tot, :] = Rot_cl[[1, 2], :].T
 
     vP_cl = omega_cr * L_crank * np.array([0, -np.cos(omega_cr * t), -np.sin(omega_cr * t)])
     dvP_cl = omega_cr**2 * L_crank * np.array([0, np.sin(omega_cr * t), -np.cos(omega_cr * t)])
 
+    lmd_sys = - invA_lmd @ G_e.T @ invM_sys @ (J_e @ e_sys + G_coupler @ lmd_cl + G_slider @ lmd_mass)
+
     res_sys = M_sys @ de_sys - J_e @ e_sys - G_coupler @ lmd_cl - G_slider @ lmd_mass - G_e @ lmd_sys
     deE_sys = invM_sys @ (J_e @ e_sys + G_coupler @ lmd_cl + G_slider @ lmd_mass + G_e @ lmd_sys)
 
+    res_lmb = G_e.T @ e_sys
+    # res_cl = - G_coupler.T @ e_sys + Rot_cl.T @ vP_cl
+    res_cl = - Rot_cl @ e_sys[:3] + vP_cl
+    res_slider = Rot_cl[[1, 2], :] @ e_sys[nr_coupler:nr_tot]
+
     dres_lmb = G_e.T @ deE_sys
-    dres_cl = - G_coupler.T @ deE_sys - skew(omega_cl) @ Rot_cl.T @ vP_cl + Rot_cl.T @ dvP_cl
+    # dres_cl = - G_coupler.T @ deE_sys - skew(omega_cl) @ Rot_cl.T @ vP_cl + Rot_cl.T @ dvP_cl
+    dres_cl = - Rot_cl @ deE_sys[:3] - Rot_cl @ skew(omega_cl) @ e_sys[:3] + dvP_cl
+
     dres_slider = Rot_cl[[1, 2], :] @ skew(omega_cl) @ e_sys[nr_coupler:nr_tot] + Rot_cl[[1, 2], :] @ deE_sys[nr_coupler:nr_tot]
 
-    res_lmb = G_e.T @ e_sys
-    res_cl = - G_coupler.T @ e_sys + Rot_cl.T @ vP_cl
-    res_slider = Rot_cl[[1, 2], :] @ e_sys[nr_coupler:nr_tot]
 
     Omegacl_mat = np.array([[0, -omega_cl[0], -omega_cl[1], -omega_cl[2]],
                             [omega_cl[0],   0, omega_cl[2], -omega_cl[1]],
@@ -153,7 +162,9 @@ def dae_closed_phs(t, y, yd):
 
     res_quat = dquat_cl - 0.5 * Omegacl_mat @ quat_cl
 
-    res = np.concatenate((res_sys, dres_lmb, dres_cl, dres_slider, res_quat), axis=0)
+    res = np.concatenate((res_sys, res_cl, res_slider, res_quat), axis=0)
+
+    # res = np.concatenate((res_sys, dres_lmb, res_cl, res_slider, res_quat), axis=0)
 
     return res
 
@@ -167,21 +178,9 @@ def handle_result(solver, t, y, yd):
     solver.yd_sol.extend([yd])
 
 
-# alpha1 = np.arctan2(L_crank, ecc)
-# alpha2 = np.arcsin(np.sqrt(ecc**2 + L_crank**2)/L_coupler)
-#
-# Rot_alpha1 = np.array([[1, 0, 0],
-#                        [0, np.cos(alpha1), -np.sin(alpha1)],
-#                        [0, np.sin(alpha1), np.cos(alpha1)]])
-#
-# Rot_alpha2 = np.array([[np.cos(alpha2), -np.sin(alpha2), 0],
-#                        [np.sin(alpha2), +np.cos(alpha2), 0],
-#                        [0, 0, 1]])
-#
-# T_I2B = Rot_alpha2 @ Rot_alpha1.T
-
-theta1 = np.arcsin(ecc/np.sqrt(L_coupler**2 - L_crank**2))
-theta2 = np.arcsin(L_crank/L_coupler)
+z0_cr = L_crank + offset_cr
+theta1 = np.arcsin(ecc/np.sqrt(L_coupler**2 - z0_cr**2))
+theta2 = np.arcsin(z0_cr/L_coupler)
 
 Rot_theta1 = np.array([[np.cos(theta1), -np.sin(theta1), 0],
                        [np.sin(theta1), +np.cos(theta1), 0],
@@ -192,20 +191,18 @@ Rot_theta2 = np.array([[np.cos(theta2), 0,  np.sin(theta2)],
                        [-np.sin(theta2), 0, np.cos(theta2)]])
 
 T_I2B = Rot_theta2.T @ Rot_theta1
-
-print(theta1*180/pi, theta2*180/pi)
-print(Rotation.from_dcm(T_I2B.T).as_euler('ZYX', degrees=True))
+R_B2I = T_I2B.T
 
 y0 = np.zeros(n_tot)  # Initial conditions
 yd0 = np.zeros(n_tot)  # Initial conditions
 
 v0P_I = np.array([0, -omega_cr * L_crank, 0])
-rP_I = np.array([0, 0, L_crank])
 
-xC_I = np.sqrt(L_coupler**2 - L_crank**2 - ecc**2)
-rC_I = np.array([xC_I, -ecc, 0])
+r0P_I = np.array([0, 0, z0_cr])
+x0C_I = np.sqrt(L_coupler**2 - z0_cr**2 - ecc**2)
+r0C_I = np.array([x0C_I, -ecc, 0])
 
-dir_couplerI = rP_I - rC_I
+dir_couplerI = r0P_I - r0C_I
 
 dir_om_cl = np.cross(dir_couplerI, v0P_I)
 dir_om_cl = dir_om_cl/np.linalg.norm(dir_om_cl)
@@ -215,11 +212,8 @@ om_clI = om_cl_norm * dir_om_cl
 
 y0[:3] = T_I2B @ v0P_I
 y0[3:6] = T_I2B @ om_clI
-quat_1 = quaternion.as_float_array(quaternion.from_rotation_matrix(T_I2B.T))
-quat_2 = Rotation.from_dcm(T_I2B.T).as_quat()
 
-print(quat_1, quat_2)
-y0[-4:] = quat_1
+y0[-4:] = quaternion.as_float_array(quaternion.from_rotation_matrix(R_B2I))
 
 
 y0[-9:-6] = T_I2B @ np.array([0, 0, - mass_coupler * omega_cr ** 2 * L_crank])
@@ -246,34 +240,78 @@ imp_sim.verbosity = 10
 imp_sim.make_consistent('IDA_YA_YDP_INIT')
 
 # Simulate
-n_ev = 1000
+n_ev = 100
 t_ev = np.linspace(0, t_final, n_ev)
 t_sol, y_sol, yd_sol = imp_sim.simulate(t_final, 0, t_ev)
 e_sol = y_sol[:, :n_e].T
 lmb_sol = y_sol[:, n_e:-4].T
-quat_cl_sol = y_sol[:, -4:]
-
-euler_angles = Rotation.from_quat(quat_cl_sol).as_euler('ZYX', degrees=True)
+quat_cl_sol = quaternion.as_quat_array(y_sol[:, -4:])
+e1B_quat = np.quaternion(0, 1, 0, 0)
 
 er_cl_sol = e_sol[:nr_coupler, :]
+vP_cl_sol = er_cl_sol[:3, :]
 om_cl_sol = er_cl_sol[3:6, :]
+er_sl_sol = e_sol[nr_coupler:nr_tot, :]
+
+e1I_sol = np.zeros((3, n_ev))
+rP_cl = np.zeros((3, n_ev))
+
+vslI_sol = np.zeros((3, n_ev))
+vclCI_sol = np.zeros((3, n_ev))
+
+PC_skew = skew([-L_coupler, 0, 0])
+
+for i in range(n_ev):
+    # e1I_quat = np.multiply(quat_cl_sol[i], np.multiply(e1B_quat, np.conjugate(quat_cl_sol[i])))
+    # e1I_sol[:, i] = L_coupler * quaternion.as_float_array(e1I_quat)[1:]
+    #
+    # vslB_quat = np.quaternion(0, er_sl_sol[0, i], er_sl_sol[1, i], er_sl_sol[2, i])
+    # vslI_quat = np.multiply(quat_cl_sol[i], np.multiply(vslB_quat, np.conjugate(quat_cl_sol[i])))
+
+    # vslI_sol[:, i] = quaternion.as_float_array(vslI_quat)[1:]
+    vclCB = vP_cl_sol[:, i] + PC_skew @ om_cl_sol[:, i]
+    vclCI_sol[:, i] = quaternion.as_rotation_matrix(quat_cl_sol[i]) @ vclCB
+
+    e1I_sol[:, i] = quaternion.as_rotation_matrix(quat_cl_sol[i]) @ np.array([L_coupler, 0, 0])
+    vslI_sol[:, i] = quaternion.as_rotation_matrix(quat_cl_sol[i]) @ er_sl_sol[:, i]
+
+    rP_cl[:, i] = np.array([0, -L_crank * np.sin(omega_cr*t_ev[i]), offset_cr + L_crank * np.cos(omega_cr*t_ev[i])])
+
+
+vslI_int = interp1d(t_ev, vslI_sol, kind='linear')
+vclCI_int = interp1d(t_ev, vclCI_sol, kind='linear')
+
+def sys(t, y):
+
+    dydt_sl = vslI_int(t)
+    dydt_cl = vclCI_int(t)
+
+    return np.concatenate((dydt_sl, dydt_cl))
+
+
+r_sol = solve_ivp(sys, [0, t_final], np.concatenate((r0C_I, r0C_I)), method='RK45', t_eval=t_ev)
 
 
 n_ev = len(t_sol)
 dt_vec = np.diff(t_sol)
 
+xP_sl = r_sol.y[0, :]
+yP_sl = r_sol.y[1, :]
+zP_sl = r_sol.y[2, :]
+
+xC_cl = r_sol.y[3, :]
+yC_cl = r_sol.y[4, :]
+zC_cl = r_sol.y[5, :]
+
+# rC_cl = rP_cl + e1I_sol
+# xC_cl = rC_cl[0]
+# yC_cl = rC_cl[1]
+# zC_cl = rC_cl[2]
+
+data = np.array([[rP_cl[0], rP_cl[1], rP_cl[2]], [xC_cl, yC_cl, zC_cl], [xP_sl, yP_sl, zP_sl]])
+print(data.shape)
 
 fntsize = 16
 
-fig = plt.figure()
-plt.plot(omega_cr*t_ev*180/pi, euler_angles[:,0], 'r-', label="angle z")
-plt.plot(omega_cr*t_ev*180/pi, euler_angles[:,1], 'b', label="angle y")
-plt.plot(omega_cr*t_ev*180/pi, euler_angles[:,2], 'g-', label="angle x")
-plt.legend(loc='upper left')
-axes = plt.gca()
-plt.xlabel(r'Crank angle [deg]', fontsize = fntsize)
-plt.ylabel(r'Angles', fontsize = fntsize)
-plt.title(r"ZYX", fontsize=fntsize)
-
+anim = animate_line3d(data, t_ev)
 plt.show()
-

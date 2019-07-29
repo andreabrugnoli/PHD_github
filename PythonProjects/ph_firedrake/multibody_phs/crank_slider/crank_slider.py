@@ -91,6 +91,7 @@ def dae_closed_phs(t, y, yd):
     vC_cr = omega_cr * L_crank * np.array([-np.sin(omega_cr * t), np.cos(omega_cr * t)])
 
     res_sys = M_sys @ yd_sys - J_sys @ y_sys - G_coupler @ lmd_cl - G_mass * lmd_mass
+
     res_cl = - G_coupler.T @ y_sys + R_th.T @ vC_cr
     res_mass = np.reshape(G_mass, (1, -1)) @ y_sys
     res_th = np.reshape(yd[-1] - omega_cl, (1, ))

@@ -46,11 +46,13 @@ def skew_flex(al_u, al_v, al_w, al_udis, al_vdis, al_wdis):
     return skew_mat_flex
 
 
-L_crank = 0.15
+L_crank = 0.08
 L_coupler = 0.3
 d = 0.006
 
 ecc = 0.1
+offset_cr = 0.12
+
 rho_coupler = 7.87 * 10 ** 3
 E_coupler = 200 * 10**9
 A_coupler = pi * d**2 / 4
@@ -62,7 +64,7 @@ omega_cr = 150
 
 nr_coupler = 6
 nr_slider = 3
-nr_tot = nr_coupler + nr_slider
+# nr_tot = nr_coupler + nr_slider
 
 
 coupler = SpatialBeam(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler, Jxx_coupler)
@@ -86,9 +88,11 @@ n_p = sys.n_p
 n_pu = int(n_p/5)
 n_pv = 2*n_pu
 n_pw = 2*n_pu
+nr_tot = sys.n_r
 
-E_sys = sys.E
-M_sys = E_sys[:n_e, :n_e]
+
+# E_sys = sys.E
+M_sys = sys.M_e
 invM_sys = la.inv(M_sys)
 J_e = sys.J_e
 
@@ -102,7 +106,7 @@ order = []
 
 dx = L_coupler/n_elem
 
-t_final = 8/150
+t_final = 8/omega_cr
 
 
 def dae_closed_phs(t, y, yd):
@@ -119,7 +123,7 @@ def dae_closed_phs(t, y, yd):
 
     lmd_sys = y[n_e:n_sys]
     lmd_cl = y[n_sys:n_sys + 3]
-    lmd_mass = y[n_sys + 3: n_sys + 5]
+    lmd_mass = y[n_sys + 3: -4]
 
     quat_cl = y[-4:]/np.linalg.norm(y[-4:])
 
@@ -153,8 +157,6 @@ def dae_closed_phs(t, y, yd):
 
     act_quat = np.quaternion(quat_cl[0], quat_cl[1], quat_cl[2], quat_cl[3])
     Rot_cl = quaternion.as_rotation_matrix(act_quat)
-    # Rot_cl = Rotation.from_quat(quat_cl).as_dcm()
-    # print(Rotation.from_dcm(Rot_cl).as_euler('ZYX', degrees=True))
 
     G_slider[nr_coupler:nr_tot, :] = Rot_cl[[1, 2], :].T
 
@@ -165,11 +167,13 @@ def dae_closed_phs(t, y, yd):
     deE_sys = invM_sys @ (J_e @ e_sys + G_coupler @ lmd_cl + G_slider @ lmd_mass + G_e @ lmd_sys)
 
     dres_lmb = G_e.T @ deE_sys
-    dres_cl = - G_coupler.T @ deE_sys - skew(omega_cl) @ Rot_cl.T @ vP_cl + Rot_cl.T @ dvP_cl
+    # dres_cl = - G_coupler.T @ deE_sys - skew(omega_cl) @ Rot_cl.T @ vP_cl + Rot_cl.T @ dvP_cl
+    dres_cl = - Rot_cl @ deE_sys[:3] - Rot_cl @ skew(omega_cl) @ e_sys[:3] + dvP_cl
+
     dres_slider = Rot_cl[[1, 2], :] @ skew(omega_cl) @ e_sys[nr_coupler:nr_tot] + Rot_cl[[1, 2], :] @ deE_sys[nr_coupler:nr_tot]
 
     # res_lmb = G_e.T @ e_sys
-    # res_cl = - G_coupler.T @ e_sys + Rot_cl.T @ vP_cl
+    # res_cl = - Rot_cl @ e_sys[:3] + vP_cl
     # res_slider = Rot_cl[[1, 2], :] @ e_sys[nr_coupler:nr_tot]
 
     Omegacl_mat = np.array([[0, -omega_cl[0], -omega_cl[1], -omega_cl[2]],
@@ -179,6 +183,7 @@ def dae_closed_phs(t, y, yd):
 
     res_quat = dquat_cl - 0.5 * Omegacl_mat @ quat_cl
 
+    # res = np.concatenate((res_sys, res_lmb, res_cl, res_slider, res_quat), axis=0)
     res = np.concatenate((res_sys, dres_lmb, dres_cl, dres_slider, res_quat), axis=0)
 
     return res
@@ -193,21 +198,9 @@ def handle_result(solver, t, y, yd):
     solver.yd_sol.extend([yd])
 
 
-# alpha1 = np.arctan2(L_crank, ecc)
-# alpha2 = np.arcsin(np.sqrt(ecc**2 + L_crank**2)/L_coupler)
-#
-# Rot_alpha1 = np.array([[1, 0, 0],
-#                        [0, np.cos(alpha1), -np.sin(alpha1)],
-#                        [0, np.sin(alpha1), np.cos(alpha1)]])
-#
-# Rot_alpha2 = np.array([[np.cos(alpha2), -np.sin(alpha2), 0],
-#                        [np.sin(alpha2), +np.cos(alpha2), 0],
-#                        [0, 0, 1]])
-#
-# T_I2B = Rot_alpha2 @ Rot_alpha1.T
-
-theta1 = np.arcsin(ecc/np.sqrt(L_coupler**2 - L_crank**2))
-theta2 = np.arcsin(L_crank/L_coupler)
+z0_cr = L_crank + offset_cr
+theta1 = np.arcsin(ecc/np.sqrt(L_coupler**2 - z0_cr**2))
+theta2 = np.arcsin(z0_cr/L_coupler)
 
 Rot_theta1 = np.array([[np.cos(theta1), -np.sin(theta1), 0],
                        [np.sin(theta1), +np.cos(theta1), 0],
@@ -218,17 +211,18 @@ Rot_theta2 = np.array([[np.cos(theta2), 0,  np.sin(theta2)],
                        [-np.sin(theta2), 0, np.cos(theta2)]])
 
 T_I2B = Rot_theta2.T @ Rot_theta1
+R_B2I = T_I2B.T
 
-print(theta1*180/pi, theta2*180/pi)
-print(Rotation.from_dcm(T_I2B.T).as_euler('ZYX', degrees=True))
+# print(theta1*180/pi, theta2*180/pi)
+# print(Rotation.from_dcm(T_I2B.T).as_euler('ZYX', degrees=True))
 
 y0 = np.zeros(n_tot)  # Initial conditions
 yd0 = np.zeros(n_tot)  # Initial conditions
 
 v0P_I = np.array([0, -omega_cr * L_crank, 0])
-rP_I = np.array([0, 0, L_crank])
+rP_I = np.array([0, 0, z0_cr])
 
-xC_I = np.sqrt(L_coupler**2 - L_crank**2 - ecc**2)
+xC_I = np.sqrt(L_coupler**2 - z0_cr**2 - ecc**2)
 rC_I = np.array([xC_I, -ecc, 0])
 
 dir_couplerI = rP_I - rC_I
@@ -241,7 +235,7 @@ om_clI = om_cl_norm * dir_om_cl
 
 y0[:3] = T_I2B @ v0P_I
 y0[3:6] = T_I2B @ om_clI
-y0[-4:] = quaternion.as_float_array(quaternion.from_rotation_matrix(T_I2B.T))
+y0[-4:] = quaternion.as_float_array(quaternion.from_rotation_matrix(R_B2I))
 
 # y0[-4:] = Rotation.from_dcm(T_I2B.T).as_quat()
 
@@ -319,12 +313,12 @@ eM_B = np.column_stack((euM_B, evM_B, ewM_B)).T
 # evM_B_int = interp1d(t_ev, evM_B, kind='linear')
 # ewM_B_int = interp1d(t_ev, ewM_B, kind='linear')
 
-omega_cr_int = interp1d(t_ev, om_cl_sol, kind='linear')
+omega_cl_int = interp1d(t_ev, om_cl_sol, kind='linear')
 eM_B_int = interp1d(t_ev, eM_B, kind='linear')
 
 def sys(t,y):
 
-    dydt = eM_B_int(t) # - skew(omega_cr_int(t)) @ y
+    dydt = eM_B_int(t) - skew(omega_cl_int(t)) @ y
 
     return dydt
 
@@ -340,15 +334,15 @@ wM_B = r_sol.y[2, :]
 
 fntsize = 16
 
-fig = plt.figure()
-plt.plot(omega_cr*t_ev*180/pi, euler_angles[:,0], 'r-', label="angle z")
-plt.plot(omega_cr*t_ev*180/pi, euler_angles[:,1], 'b', label="angle y")
-plt.plot(omega_cr*t_ev*180/pi, euler_angles[:,2], 'g-', label="angle x")
-plt.legend(loc='upper left')
-axes = plt.gca()
-plt.xlabel(r'Crank angle [deg]', fontsize = fntsize)
-plt.ylabel(r'Angles', fontsize = fntsize)
-plt.title(r"ZYX", fontsize=fntsize)
+# fig = plt.figure()
+# plt.plot(omega_cr*t_ev*180/pi, euler_angles[:,0], 'r-', label="angle z")
+# plt.plot(omega_cr*t_ev*180/pi, euler_angles[:,1], 'b', label="angle y")
+# plt.plot(omega_cr*t_ev*180/pi, euler_angles[:,2], 'g-', label="angle x")
+# plt.legend(loc='upper left')
+# axes = plt.gca()
+# plt.xlabel(r'Crank angle [deg]', fontsize = fntsize)
+# plt.ylabel(r'Angles', fontsize = fntsize)
+# plt.title(r"ZYX", fontsize=fntsize)
 #
 fig = plt.figure()
 plt.plot(omega_cr*t_ev, -vM_B/L_coupler, 'r-', label="y midpoint")
