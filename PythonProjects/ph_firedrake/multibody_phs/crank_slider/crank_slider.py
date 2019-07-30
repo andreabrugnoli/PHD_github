@@ -136,7 +136,7 @@ imp_sim.report_continuously = True
 # imp_sim.maxh = 1e-6
 
 # Let Sundials find consistent initial conditions by use of 'IDA_YA_YDP_INIT'
-imp_sim.make_consistent('IDA_YA_YDP_INIT')
+# imp_sim.make_consistent('IDA_YA_YDP_INIT')
 
 # Simulate
 t_final = 8/150
@@ -184,8 +184,8 @@ ewM_B_int = interp1d(t_ev, ewM_B, kind='linear')
 
 def sys(t,y):
 
-    dudt = euM_B_int(t) # + omega_cr_int(t) * y[1]
-    dwdt = ewM_B_int(t) # - omega_cr_int(t) * y[0]
+    dudt = euM_B_int(t) + omega_cr_int(t) * y[1]
+    dwdt = ewM_B_int(t) - omega_cr_int(t) * y[0]
 
     dydt = np.array([dudt, dwdt])
     return dydt

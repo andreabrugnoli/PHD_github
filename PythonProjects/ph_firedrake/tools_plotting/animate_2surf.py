@@ -49,14 +49,14 @@ def animate2D(minSol, maxSol, solPl1_list, solPl2_list, t, xlabel = None, ylabel
 
     lab = 'Time =' + '{0:.2e}'.format(t[0])
 
-    surf_opts1 = {'cmap': cm.winter, 'linewidth': 0, 'antialiased': False, 'vmin': minSol, 'vmax': maxSol}
-    surf_opts2 = {'cmap': cm.inferno, 'linewidth': 0, 'antialiased': False, 'vmin': minSol, 'vmax': maxSol}
+    surf_opts1 = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False, 'vmin': minSol, 'vmax': maxSol}
+    surf_opts2 = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False, 'vmin': minSol, 'vmax': maxSol}
 
     triangulation1, Z1 = _two_dimension_triangle_func_val(solPl1_list[0], 10)
     plot = ax.plot_trisurf(triangulation1, Z1, label=lab, **surf_opts1)
 
     triangulation2, Z2 = _two_dimension_triangle_func_val(solPl2_list[0], 10)
-    triangulation2.x = triangulation2.x + 1.
+    # triangulation2.x = triangulation2.x + 1.
     ax.plot_trisurf(triangulation2, Z2, label=lab, **surf_opts2)
 
     anim = animation.FuncAnimation(fig, update_plot, frames=len(t),\

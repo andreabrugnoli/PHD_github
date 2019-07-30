@@ -17,6 +17,78 @@ from mpl_toolkits.mplot3d import Axes3D
 from math import pi
 plt.rc('text', usetex=True)
 
+def print_modes(sys, Vp1, Vp2, n_modes):
+
+    eigenvalues, eigvectors = la.eig(sys.J_f, sys.M_f)
+    omega_all = np.imag(eigenvalues)
+
+    index = omega_all > 0
+
+    omega = omega_all[index]
+    eigvec_omega = eigvectors[:, index]
+    perm = np.argsort(omega)
+    eigvec_omega = eigvec_omega[:, perm]
+
+    omega.sort()
+
+    fntsize = 15
+
+    n_Vp1 = Vp1.dim()
+    n_Vp2 = Vp2.dim()
+
+    for i in range(int(n_modes)):
+        print("Eigenvalue num " + str(i+1) + ":" + str(omega[i]))
+        eig_real_p1 = Function(Vp1)
+        eig_imag_p1 = Function(Vp1)
+
+        eig_real_p1.vector()[:] = np.real(eigvec_omega[:n_Vp1, i])
+        eig_imag_p1.vector()[:] = np.imag(eigvec_omega[:n_Vp1, i])
+
+        eig_real_p2 = Function(Vp2)
+        eig_imag_p2 = Function(Vp2)
+
+        eig_real_p2.vector()[:] = np.real(eigvec_omega[n_Vp1:n_Vp1 + n_Vp2, i])
+        eig_imag_p2.vector()[:] = np.imag(eigvec_omega[n_Vp1:n_Vp1 + n_Vp2, i])
+
+        norm_real_eig = np.linalg.norm(np.real(eigvec_omega[:n_Vp1+n_Vp2, i]))
+        norm_imag_eig = np.linalg.norm(np.imag(eigvec_omega[:n_Vp1+n_Vp2, i]))
+
+        figure = plt.figure()
+        ax = figure.add_subplot(111, projection="3d")
+
+        if norm_imag_eig > norm_real_eig:
+            # plot(eig_imag_p1, axes=ax, plot3d=True)
+            # plot(eig_imag_p2, axes=ax, plot3d=True)
+            triangulation1, z1_goodeig = _two_dimension_triangle_func_val(eig_imag_p1, 10)
+            triangulation2, z2_goodeig = _two_dimension_triangle_func_val(eig_imag_p2, 10)
+        else:
+            # plot(eig_real_p1, axes=ax, plot3d=True)
+            # plot(eig_real_p2, axes=ax, plot3d=True)
+            triangulation1, z1_goodeig = _two_dimension_triangle_func_val(eig_real_p1, 10)
+            triangulation2, z2_goodeig = _two_dimension_triangle_func_val(eig_real_p2, 10)
+
+        ax.set_xlabel('$x [m]$', fontsize=fntsize)
+        ax.set_ylabel('$y [m]$', fontsize=fntsize)
+        ax.set_title('Eigenvector num ' + str(i + 1), fontsize=fntsize)
+
+        ax.w_zaxis.set_major_locator(LinearLocator(10))
+        ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
+
+        plot_eig1 = ax.plot_trisurf(triangulation1, z1_goodeig, cmap=cm.jet)
+        plot_eig1._facecolors2d = plot_eig1._facecolors3d
+        plot_eig1._edgecolors2d = plot_eig1._edgecolors3d
+
+        plot_eig2 = ax.plot_trisurf(triangulation2, z2_goodeig, cmap=cm.jet)
+        plot_eig2._facecolors2d = plot_eig2._facecolors3d
+        plot_eig2._edgecolors2d = plot_eig2._edgecolors3d
+
+        ax.legend(("mesh 1", "mesh2"))
+
+        path_figs = "/home/a.brugnoli/Plots_Videos/Python/Plots/Waves/"
+        # plt.savefig(path_figs + "Eig_n" + str(i) + ".eps")
+
+    plt.show()
+
 
 def create_sys(mesh1, mesh2, deg_p1, deg_q1, deg_p2, deg_q2):
     x1, y1 = SpatialCoordinate(mesh1)
@@ -194,80 +266,7 @@ def create_sys(mesh1, mesh2, deg_p1, deg_q1, deg_p2, deg_q2):
     return sys_DN, Vp1, Vp2, ep_0, eq_0
 
 
-def print_modes(sys, Vp1, Vp2, n_modes):
-
-    eigenvalues, eigvectors = la.eig(sys.J_f, sys.M_f)
-    omega_all = np.imag(eigenvalues)
-
-    index = omega_all > 0
-
-    omega = omega_all[index]
-    eigvec_omega = eigvectors[:, index]
-    perm = np.argsort(omega)
-    eigvec_omega = eigvec_omega[:, perm]
-
-    omega.sort()
-
-    fntsize = 15
-
-    n_Vp1 = Vp1.dim()
-    n_Vp2 = Vp2.dim()
-
-    for i in range(int(n_modes)):
-        print("Eigenvalue num " + str(i+1) + ":" + str(omega[i]))
-        eig_real_p1 = Function(Vp1)
-        eig_imag_p1 = Function(Vp1)
-
-        eig_real_p1.vector()[:] = np.real(eigvec_omega[:n_Vp1, i])
-        eig_imag_p1.vector()[:] = np.imag(eigvec_omega[:n_Vp1, i])
-
-        eig_real_p2 = Function(Vp2)
-        eig_imag_p2 = Function(Vp2)
-
-        eig_real_p2.vector()[:] = np.real(eigvec_omega[n_Vp1:n_Vp1 + n_Vp2, i])
-        eig_imag_p2.vector()[:] = np.imag(eigvec_omega[n_Vp1:n_Vp1 + n_Vp2, i])
-
-        norm_real_eig = np.linalg.norm(np.real(eigvec_omega[:n_Vp1+n_Vp2, i]))
-        norm_imag_eig = np.linalg.norm(np.imag(eigvec_omega[:n_Vp1+n_Vp2, i]))
-
-        figure = plt.figure()
-        ax = figure.add_subplot(111, projection="3d")
-
-        if norm_imag_eig > norm_real_eig:
-            # plot(eig_imag_p1, axes=ax, plot3d=True)
-            # plot(eig_imag_p2, axes=ax, plot3d=True)
-            triangulation1, z1_goodeig = _two_dimension_triangle_func_val(eig_imag_p1, 10)
-            triangulation2, z2_goodeig = _two_dimension_triangle_func_val(eig_imag_p2, 10)
-        else:
-            # plot(eig_real_p1, axes=ax, plot3d=True)
-            # plot(eig_real_p2, axes=ax, plot3d=True)
-            triangulation1, z1_goodeig = _two_dimension_triangle_func_val(eig_real_p1, 10)
-            triangulation2, z2_goodeig = _two_dimension_triangle_func_val(eig_real_p2, 10)
-
-        ax.set_xlabel('$x [m]$', fontsize=fntsize)
-        ax.set_ylabel('$y [m]$', fontsize=fntsize)
-        ax.set_title('Eigenvector num ' + str(i + 1), fontsize=fntsize)
-
-        ax.w_zaxis.set_major_locator(LinearLocator(10))
-        ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
-
-        plot_eig1 = ax.plot_trisurf(triangulation1, z1_goodeig, cmap=cm.jet)
-        plot_eig1._facecolors2d = plot_eig1._facecolors3d
-        plot_eig1._edgecolors2d = plot_eig1._edgecolors3d
-
-        plot_eig2 = ax.plot_trisurf(triangulation2, z2_goodeig, cmap=cm.jet)
-        plot_eig2._facecolors2d = plot_eig2._facecolors3d
-        plot_eig2._edgecolors2d = plot_eig2._edgecolors3d
-
-        ax.legend(("mesh 1", "mesh2"))
-
-        path_figs = "/home/a.brugnoli/Plots_Videos/Python/Plots/Waves/"
-        # plt.savefig(path_figs + "Eig_n" + str(i) + ".eps")
-
-    plt.show()
-
-
-ind = 15
+ind = 9
 path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/waves/meshes/"
 mesh1 = Mesh(path_mesh + "circle1_" + str(ind) + ".msh")
 mesh2 = Mesh(path_mesh + "circle2_" + str(ind) + ".msh")
@@ -369,6 +368,21 @@ ep_sol = y_sol[:n_p1+n_p2, :]
 
 e_sol = y_sol
 
+H_vec = np.zeros((n_ev,))
+for i in range(n_ev):
+    H_vec[i] = 0.5 * (e_sol[:, i].T @ MM @ e_sol[:, i])
+
+# np.save("t_ode.npy", t_sol)
+# np.save("H_ode.npy", H_vec)
+
+fig = plt.figure()
+plt.plot(t_ev, H_vec, 'b-')
+plt.xlabel(r'{Time} (s)', fontsize=16)
+plt.ylabel(r'{Hamiltonian} (J)', fontsize=16)
+plt.title(r"Hamiltonian trend",
+          fontsize=16)
+plt.legend(loc='upper left')
+
 w1_sol = np.zeros(ep1_sol.shape)
 w0_1 = np.zeros((n_p1,))
 w1_sol[:, 0] = w0_1
@@ -403,26 +417,14 @@ for i in range(n_ev):
     w2_fun.vector()[:] = ep2_sol[:, i]
     w2fun_vec.append(interpolate(w2_fun, Vp2))
 
-H_vec = np.zeros((n_ev,))
-for i in range(n_ev):
-    H_vec[i] = 0.5 * (e_sol[:, i].T @ MM @ e_sol[:, i])
-
-fig = plt.figure()
-plt.plot(t_ev, H_vec, 'b-')
-plt.xlabel(r'{Time} (s)', fontsize=16)
-plt.ylabel(r'{Hamiltonian} (J)', fontsize=16)
-plt.title(r"Hamiltonian trend",
-          fontsize=16)
-# plt.legend(loc='upper left')
-
 anim = animate2D(minZ, maxZ, w1fun_vec, w2fun_vec, t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \
                          zlabel = '$w [mm]$', title = 'Vertical Displacement')
 
 plt.show()
 
-# Writer = animation.writers['ffmpeg']
-# writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
-# pathout = './'
-# anim.save(pathout + 'wave_ode.mp4', writer=writer)
+Writer = animation.writers['ffmpeg']
+writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
+pathout = './'
+anim.save(pathout + 'wave_ode.mp4', writer=writer)
 
 

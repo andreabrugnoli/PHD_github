@@ -51,7 +51,7 @@ class SysPhode:
 
 class SysPhdae:
     def __init__(self, n, n_lmb, E=None, J=None, R=None, Q=None, B=None):
-        """General phdae clasnp.linalg.matrix_rank(M) == n_tot:s. Only the size of the system is needed"""
+        """General phdae class. Only the size of the system is needed"""
         assert n > 0 and isinstance(n, int)
         assert n_lmb >= 0 and isinstance(n_lmb, int)
 
@@ -62,6 +62,8 @@ class SysPhdae:
 
         if E is not None:
             assert E.shape == matr_shape
+            M = E[:n - n_lmb, :n - n_lmb]
+            # assert check_positive_matrix(M)
             if not np.linalg.matrix_rank(E) == n - n_lmb:
                 warnings.warn("Matrix E does not have the expected rank. Possible singular mass matrix")
             self.E = E

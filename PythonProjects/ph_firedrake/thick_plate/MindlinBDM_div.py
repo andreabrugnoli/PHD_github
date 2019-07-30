@@ -15,9 +15,9 @@ from math import pi
 plt.rc('text', usetex=True)
 
 
-n_el = 5 #int(input("Number of elements for side: "))
+n_el = 4 #int(input("Number of elements for side: "))
 deg = 1 #int(input('Degree for FE: '))
-nreq = 10
+nreq = 5
 
 E = 1
 nu = 0.3
@@ -25,7 +25,7 @@ nu = 0.3
 rho = 1
 k = 0.8601
 L = 1
-h = 0.1
+h = 0.01
 
 plot_eigenvector = 'y'
 
@@ -72,9 +72,14 @@ def bending_curv(momenta):
 V_pw = FunctionSpace(mesh, "DG", deg)
 V_skw = FunctionSpace(mesh, "DG", deg)
 V_pth = VectorFunctionSpace(mesh, "DG", deg)
+
 V_qth1 = FunctionSpace(mesh, "BDM", deg+1)
 V_qth2 = FunctionSpace(mesh, "BDM", deg+1)
 V_qw = FunctionSpace(mesh, "BDM", deg+1)
+
+# V_qth1 = FunctionSpace(mesh, "RT", deg+1)
+# V_qth2 = FunctionSpace(mesh, "RT", deg+1)
+# V_qw = FunctionSpace(mesh, "RT", deg+1)
 
 V = MixedFunctionSpace([V_pw, V_skw, V_pth, V_qth1, V_qth2, V_qw])
 
@@ -156,13 +161,9 @@ v_qn = dot(v_qw, n_ver)
 v_Mnn = inner(v_qth, outer(n_ver, n_ver))
 v_Mns = inner(v_qth, outer(n_ver, s_ver))
 
-# V_wt = FunctionSpace(mesh, "DG", deg)
-# V_omn = FunctionSpace(mesh, "DG", deg)
-# V_oms = FunctionSpace(mesh, "DG", deg)
-
-V_wt = FunctionSpace(mesh, "CG", deg+1)
-V_omn = FunctionSpace(mesh, "CG", deg+1)
-V_oms = FunctionSpace(mesh, "CG", deg+1)
+V_wt = FunctionSpace(mesh, "DG", deg)
+V_omn = FunctionSpace(mesh, "DG", deg)
+V_oms = FunctionSpace(mesh, "DG", deg)
 
 Vu = MixedFunctionSpace([V_wt, V_omn, V_oms])
 
@@ -236,7 +237,7 @@ n_fig = nreq
 n_Vpw = V_pw.dim()
 fntsize = 15
 for i in range(n_fig):
-    print("Eigenvalue num " + str(i + 1) + ":" + str(omega_tilde[i]))
+    # print("Eigenvalue num " + str(i + 1) + ":" + str(omega_tilde[i]))
     eig_real_w = Function(V_pw)
     eig_imag_w = Function(V_pw)
 

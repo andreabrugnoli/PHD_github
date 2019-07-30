@@ -208,12 +208,15 @@ for i in range(1, n_ev):
 
 n_plot = 30
 w_plot = np.zeros((n_plot, n_ev))
+e_plot = np.zeros((n_plot, n_ev))
+
 x_plot = np.linspace(0, L, n_plot)
 t_plot = t_sol
 
 for i in range(n_ev):
-    w_i = draw_allbending(n_plot, [0,0,0], ep_sol[:, i], L)[2]
-    w_plot[:, i] = w_i
+    e_plot[:, i] = draw_allbending(n_plot, [0,0,0], ep_sol[:, i], L)[2]
+    if i > 1:
+        w_plot[:, i] = w_plot[:, i-1] + 0.5 * (e_plot[:, i-1] + e_plot[:, i]) * dt_vec[i-1]
 
 # Hpl_vec = np.zeros((n_ev,))
 # for i in range(n_ev):

@@ -1,7 +1,7 @@
 import scipy.linalg as la
 from system_components.beams import FloatingPlanarEB
 from scipy.io import savemat
-from system_components.manipulator.manipulator_constants import n_el, rho1, EI1, L1, J_joint1, m_joint1
+from multibody_phs.manipulator.manipulator_constants import n_el, rho1, EI1, L1, J_joint1, m_joint1
 
 beam = FloatingPlanarEB(n_el, L1, rho1, 1, EI1, 1,  m_joint=m_joint1, J_joint=J_joint1)
 

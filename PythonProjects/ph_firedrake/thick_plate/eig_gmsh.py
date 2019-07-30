@@ -11,7 +11,7 @@ from firedrake.plot import _two_dimension_triangle_func_val
 from mpl_toolkits.mplot3d import Axes3D
 plt.rc('text', usetex=True)
 
-deg = 2
+deg = 1
 
 rho = 3000
 E = 7e10
@@ -150,7 +150,7 @@ omega.sort()
 
 omega_fr = omega/(2*pi)
 
-for i in range(8):
+for i in range(5):
     print(omega_fr[i])
 
 n_fig = 5

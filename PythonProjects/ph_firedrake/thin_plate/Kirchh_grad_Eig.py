@@ -20,7 +20,7 @@ L = 1
 l_x = L
 l_y = L
 
-n = 5 #int(input("N element on each side: "))
+n = 4 #int(input("N element on each side: "))
 
 # Plate bending stiffness :math:`D=\dfrac{Eh^3}{12(1-\nu^2)}` and shear stiffness :math:`F = \kappa Gh`
 # with a shear correction factor :math:`\kappa = 5/6` for a homogeneous plate
@@ -75,7 +75,8 @@ mesh = UnitSquareMesh(n_x, n_y, quadrilateral=False)
 # plt.show()
 
 name_FEp = 'Bell'
-name_FEq = 'Bell'
+name_FEq = 'DG'
+deg_q = 3
 
 if name_FEp == 'Morley':
     deg_p = 2
@@ -219,7 +220,7 @@ omega.sort()
 
 # NonDimensional China Paper
 
-n_om = 5
+n_om = 6
 
 omega_tilde = L**2*sqrt(rho*h/D)*omega
 for i in range(n_om):

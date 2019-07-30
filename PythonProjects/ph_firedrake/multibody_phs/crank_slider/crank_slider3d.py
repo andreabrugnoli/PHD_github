@@ -29,10 +29,6 @@ def skew_flex(al_u, al_v, al_w, al_udis, al_vdis, al_wdis):
     nv = len(al_v)
     nw = len(al_w)
 
-    # assert len(al_u)/2 == nu_dis
-    # assert nv/2 == len(al_vdis)
-    # assert nw/2 == len(al_wdis)
-
     n_rows = len(al_udis) + len(al_v) + len(al_w)
     skew_mat_flex = np.zeros((n_rows, 3))
 
@@ -42,16 +38,15 @@ def skew_flex(al_u, al_v, al_w, al_udis, al_vdis, al_wdis):
     skew_mat_flex[nu_dis:nv_end, :] = np.column_stack((al_w, np.zeros((nv,)), -al_u))
     skew_mat_flex[nv_end: nw_end, :] = np.column_stack((-al_v, al_u, np.zeros((nw, ))))
 
-    # print(skew_mat_flex)
     return skew_mat_flex
 
 
-L_crank = 0.08
+L_crank = 0.15
 L_coupler = 0.3
 d = 0.006
 
 ecc = 0.1
-offset_cr = 0.12
+offset_cr = 0
 
 rho_coupler = 7.87 * 10 ** 3
 E_coupler = 200 * 10**9
@@ -92,10 +87,12 @@ nr_tot = sys.n_r
 
 
 # E_sys = sys.E
-M_sys = sys.M_e
-invM_sys = la.inv(M_sys)
+M_e = sys.M_e
+invM_e = la.inv(M_e)
 J_e = sys.J_e
 
+# E_sys = sys.E
+# J_sys = sys.J
 
 G_e = sys.G_e
 G_coupler = sys.B_e[:, [0, 1, 2]]
@@ -129,20 +126,20 @@ def dae_closed_phs(t, y, yd):
 
     omega_cl = y[3:6]
 
-    p_coupler = M_sys[:3, :] @ e_sys
-    pi_coupler = M_sys[3:6, :] @ e_sys
+    p_coupler = M_e[:3, :] @ e_sys
+    pi_coupler = M_e[3:6, :] @ e_sys
 
-    p_slider = M_sys[nr_coupler:nr_tot, :] @ e_sys
+    p_slider = M_e[nr_coupler:nr_tot, :] @ e_sys
 
-    p_v = M_sys[nr_tot+n_pu:nr_tot+n_pu+n_pv, :] @ e_sys
+    p_v = M_e[nr_tot+n_pu:nr_tot+n_pu+n_pv, :] @ e_sys
     p_v[1::2] = 0
     p_vdis = np.array([p_v[i] for i in range(len(p_v)) if i % 2 == 0])
 
-    p_w = M_sys[nr_tot+n_pu+n_pv:nr_tot + n_p, :] @ e_sys
+    p_w = M_e[nr_tot+n_pu+n_pv:nr_tot + n_p, :] @ e_sys
     p_w[1::2] = 0
     p_wdis = np.array([p_w[i] for i in range(len(p_w)) if i % 2 == 0])
 
-    p_udis = M_sys[nr_tot:nr_tot + n_pu, :] @ e_sys
+    p_udis = M_e[nr_tot:nr_tot + n_pu, :] @ e_sys
     p_u = np.zeros_like(p_w)
     p_u[::2] = p_udis
 
@@ -163,17 +160,19 @@ def dae_closed_phs(t, y, yd):
     vP_cl = omega_cr * L_crank * np.array([0, -np.cos(omega_cr * t), -np.sin(omega_cr * t)])
     dvP_cl = omega_cr**2 * L_crank * np.array([0, np.sin(omega_cr * t), -np.cos(omega_cr * t)])
 
-    res_sys = M_sys @ de_sys - J_e @ e_sys - G_coupler @ lmd_cl - G_slider @ lmd_mass - G_e @ lmd_sys
-    deE_sys = invM_sys @ (J_e @ e_sys + G_coupler @ lmd_cl + G_slider @ lmd_mass + G_e @ lmd_sys)
+    # res_sys = E_sys @ dy_sys - J_sys @ y_sys - G_coupler @ lmd_cl - G_slider @ lmd_mass
 
+    res_e = M_e @ de_sys - J_e @ e_sys - G_coupler @ lmd_cl - G_slider @ lmd_mass - G_e @ lmd_sys
+
+    deE_sys = invM_e @ (J_e @ e_sys + G_coupler @ lmd_cl + G_slider @ lmd_mass + G_e @ lmd_sys)
     dres_lmb = G_e.T @ deE_sys
-    # dres_cl = - G_coupler.T @ deE_sys - skew(omega_cl) @ Rot_cl.T @ vP_cl + Rot_cl.T @ dvP_cl
-    dres_cl = - Rot_cl @ deE_sys[:3] - Rot_cl @ skew(omega_cl) @ e_sys[:3] + dvP_cl
-
+    dres_cl = - G_coupler.T @ deE_sys - skew(omega_cl) @ Rot_cl.T @ vP_cl + Rot_cl.T @ dvP_cl
+    # dres_cl = - Rot_cl @ deE_sys[:3] - Rot_cl @ skew(omega_cl) @ e_sys[:3] + dvP_cl
     dres_slider = Rot_cl[[1, 2], :] @ skew(omega_cl) @ e_sys[nr_coupler:nr_tot] + Rot_cl[[1, 2], :] @ deE_sys[nr_coupler:nr_tot]
 
     # res_lmb = G_e.T @ e_sys
-    # res_cl = - Rot_cl @ e_sys[:3] + vP_cl
+    # # res_cl = - Rot_cl @ e_sys[:3] + vP_cl
+    # res_cl = - G_coupler.T @ e_sys + Rot_cl.T @ vP_cl
     # res_slider = Rot_cl[[1, 2], :] @ e_sys[nr_coupler:nr_tot]
 
     Omegacl_mat = np.array([[0, -omega_cl[0], -omega_cl[1], -omega_cl[2]],
@@ -183,8 +182,8 @@ def dae_closed_phs(t, y, yd):
 
     res_quat = dquat_cl - 0.5 * Omegacl_mat @ quat_cl
 
-    # res = np.concatenate((res_sys, res_lmb, res_cl, res_slider, res_quat), axis=0)
-    res = np.concatenate((res_sys, dres_lmb, dres_cl, dres_slider, res_quat), axis=0)
+    # res = np.concatenate((res_e, res_lmb, res_cl, res_slider, res_quat), axis=0)
+    res = np.concatenate((res_e, dres_lmb, dres_cl, dres_slider, res_quat), axis=0)
 
     return res
 
@@ -213,34 +212,99 @@ Rot_theta2 = np.array([[np.cos(theta2), 0,  np.sin(theta2)],
 T_I2B = Rot_theta2.T @ Rot_theta1
 R_B2I = T_I2B.T
 
-# print(theta1*180/pi, theta2*180/pi)
-# print(Rotation.from_dcm(T_I2B.T).as_euler('ZYX', degrees=True))
-
 y0 = np.zeros(n_tot)  # Initial conditions
 yd0 = np.zeros(n_tot)  # Initial conditions
 
 v0P_I = np.array([0, -omega_cr * L_crank, 0])
-rP_I = np.array([0, 0, z0_cr])
+dv0P_I = omega_cr**2 * L_crank * np.array([0, 0, -1])
+ddv0P_I = omega_cr**3 * L_crank * np.array([0, 1, 0])
 
-xC_I = np.sqrt(L_coupler**2 - z0_cr**2 - ecc**2)
-rC_I = np.array([xC_I, -ecc, 0])
+r0P_I = np.array([0, 0, z0_cr])
+x0C_I = np.sqrt(L_coupler**2 - z0_cr**2 - ecc**2)
+r0C_I = np.array([x0C_I, -ecc, 0])
 
-dir_couplerI = rP_I - rC_I
+rCP_I = r0P_I - r0C_I
+assert L_coupler == np.linalg.norm(rCP_I)
 
-dir_om_cl = np.cross(dir_couplerI, v0P_I)
-dir_om_cl = dir_om_cl/np.linalg.norm(dir_om_cl)
+A_com = np.concatenate((skew(rCP_I), np.array([-1, 0, 0]).reshape((-1, 1))), axis=1)
+om_vx = np.linalg.lstsq(A_com, -v0P_I)[0]
 
-om_cl_norm = omega_cr * L_crank / L_coupler
-om_clI = om_cl_norm * dir_om_cl
+om0_clI = om_vx[:3]
+vx0C_I = om_vx[-1]
 
-y0[:3] = T_I2B @ v0P_I
-y0[3:6] = T_I2B @ om_clI
-y0[-4:] = quaternion.as_float_array(quaternion.from_rotation_matrix(R_B2I))
+v0C_I = v0P_I + skew(rCP_I) @ om0_clI
+assert v0C_I[1] < 1e-14 and v0C_I[2] < 1e-14
 
-# y0[-4:] = Rotation.from_dcm(T_I2B.T).as_quat()
+v0P_B = T_I2B @ v0P_I
+om0_clB = T_I2B @ om0_clI
 
-y0[-9:-6] = T_I2B @ np.array([0, 0, - mass_coupler * omega_cr ** 2 * L_crank])
-yd0[:3] = T_I2B @ np.array([0, 0, - omega_cr ** 2 * L_crank])
+e0_cl = np.concatenate((v0P_B, om0_clB))
+e0_sl = T_I2B @ v0C_I
+e0_fl = np.zeros((sys.n_f, ))
+
+e0_sys = np.concatenate((e0_cl, e0_sl, e0_fl))
+quat0_sys = quaternion.as_float_array(quaternion.from_rotation_matrix(R_B2I))
+
+def find_initial_condition(e0, quat0):
+    G0_slider = np.zeros((n_e, 2))
+    G0_slider[nr_coupler:nr_tot, :] = R_B2I[[1, 2], :].T
+
+    dG0_slider = np.zeros((n_e, 2))
+    dG0_slider[nr_coupler:nr_tot, :] = (R_B2I[[1, 2], :] @ skew(om0_clB)).T
+
+    G0_lmb = np.concatenate((G_e, G_coupler, G0_slider), axis=1)
+    dG0_lmb = np.concatenate((G_e, G_coupler, dG0_slider), axis=1)
+
+    e0_sl = e0[nr_coupler:nr_tot]
+
+    b_e = np.zeros((3, ))
+    b_cl = T_I2B @ dv0P_I - skew(om0_clB) @ T_I2B @ v0P_I
+    b_sl = R_B2I[[1, 2], :] @ skew(om0_clB) @ e0_sl
+
+    b_ext = np.concatenate((b_e, b_cl, b_sl), axis=0)
+    b_sys = G0_lmb.T @ invM_e @ J_e @ e0
+
+    A_lmb = G0_lmb.T @ invM_e @ G0_lmb
+
+    lmb0 = np.linalg.solve(A_lmb, b_ext - b_sys)
+    de0 = invM_e @ (J_e @ e0 + G0_lmb @ lmb0)
+
+    dA_lmb = dG0_lmb.T @ invM_e @ G0_lmb + G0_lmb.T @ invM_e @ dG0_lmb
+
+    dom0_cl = de0[3:6]
+    de0_sl = de0[6:9]
+
+    db_e = np.zeros((3,))
+    db_cl = - skew(om0_clB) @ T_I2B @ dv0P_I + T_I2B @ ddv0P_I - skew(dom0_cl) @ T_I2B @ v0P_I + \
+        skew(om0_clB) @ skew(om0_clB) @ T_I2B @ v0P_I - skew(om0_clB) @ T_I2B @ dv0P_I
+    db_sl = R_B2I[[1, 2], :] @ skew(om0_clB) @ skew(om0_clB) @ e0_sl + \
+            R_B2I[[1, 2], :] @ skew(dom0_cl) @ e0_sl + R_B2I[[1, 2], :] @ skew(om0_clB) @ de0_sl
+
+    db_ext = np.concatenate((db_e, db_cl, db_sl), axis=0)
+
+    db_sys = G0_lmb.T @ invM_e @ J_e @ de0 + dG0_lmb.T @ invM_e @ J_e @ e0
+
+    dlmb0 = np.linalg.solve(A_lmb, db_ext - db_sys - dA_lmb @ lmb0)
+
+    Om0_cl_mat = np.array([[          0, -om0_clB[0], -om0_clB[1], -om0_clB[2]],
+                            [om0_clB[0],           0,  om0_clB[2], -om0_clB[1]],
+                            [om0_clB[1], -om0_clB[2],           0,  om0_clB[0]],
+                            [om0_clB[2],  om0_clB[1], -om0_clB[0],          0]])
+
+    dquat0 = 0.5 * Om0_cl_mat @ quat0
+
+    return lmb0, de0, dlmb0, dquat0
+
+
+lmb0_sys, de0_sys, dlmb0_sys, dquat0_sys = find_initial_condition(e0_sys, quat0_sys)
+
+y0[:n_e] = e0_sys
+y0[n_e:-4] = lmb0_sys
+y0[-4:] = quat0_sys
+
+yd0[:n_e] = de0_sys
+y0[n_e:-4] = dlmb0_sys
+yd0[-4:] = dquat0_sys
 
 # Create an Assimulo implicit problem
 imp_mod = Implicit_Problem(dae_closed_phs, y0, yd0, name='dae_closed_pHs')
@@ -254,7 +318,7 @@ imp_sim = IDA(imp_mod)  # Create a IDA solver
 # Sets the paramters
 imp_sim.atol = 1e-6  # Default 1e-6
 imp_sim.rtol = 1e-6  # Default 1e-6
-imp_sim.suppress_alg = True  # Suppress the algebraic variables on the error test
+# imp_sim.suppress_alg = True  # Suppress the algebraic variables on the error test
 imp_sim.report_continuously = True
 imp_sim.verbosity = 10
 # imp_sim.maxh = 1e-6
@@ -288,7 +352,7 @@ wp_sol = ep_sol[nu + nv:n_p, :]
 n_ev = len(t_sol)
 dt_vec = np.diff(t_sol)
 
-n_plot = 11
+n_plot = 21
 eu_plot = np.zeros((n_plot, n_ev))
 ev_plot = np.zeros((n_plot, n_ev))
 ew_plot = np.zeros((n_plot, n_ev))
@@ -319,8 +383,13 @@ eM_B_int = interp1d(t_ev, eM_B, kind='linear')
 def sys(t,y):
 
     dydt = eM_B_int(t) - skew(omega_cl_int(t)) @ y
-
+    # dudt = euM_B_int(t)
+    # dvdt = evM_B_int(t)
+    # dwdt = ewM_B_int(t)
+    #
+    # dydt = np.array([dudt, dvdt, dwdt])
     return dydt
+
 
 uM0 = 0
 vM0 = 0
@@ -332,33 +401,42 @@ uM_B = r_sol.y[0, :]
 vM_B = r_sol.y[1, :]
 wM_B = r_sol.y[2, :]
 
+
+def smooth(y, box_pts):
+    box = np.ones(box_pts)/box_pts
+    y_smooth = np.convolve(y, box, mode='same')
+    return y_smooth
+
+
+pts = 10
+vM_B_smooth = smooth(vM_B, pts)
+wM_B_smooth = smooth(wM_B, pts)
+
+
 fntsize = 16
 
+min_angle = 0*pi/180
+max_angle = 0*pi/180
+n_fig = 1
+th_rot_vec = np.linspace(min_angle, max_angle, n_fig)
+
+for i in range(n_fig):
+    fig = plt.figure()
+    th_rot = th_rot_vec[i]
+    plt.plot(omega_cr*t_ev, (vM_B_smooth*np.cos(th_rot) + wM_B_smooth*np.sin(th_rot))/L_coupler, 'r-', label="theta midpoint " + str(th_rot*180/pi))
+    plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
+    plt.ylabel(r'v normalized', fontsize = fntsize)
+    plt.title(r"Midpoint deflection", fontsize=fntsize)
+    plt.legend(loc='upper left')
+
+#
 # fig = plt.figure()
-# plt.plot(omega_cr*t_ev*180/pi, euler_angles[:,0], 'r-', label="angle z")
-# plt.plot(omega_cr*t_ev*180/pi, euler_angles[:,1], 'b', label="angle y")
-# plt.plot(omega_cr*t_ev*180/pi, euler_angles[:,2], 'g-', label="angle x")
+# plt.plot(omega_cr*t_ev, vM_B/L_coupler, 'b-', label="y midpoint")
+# plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
+# plt.ylabel(r'w normalized', fontsize = fntsize)
+# plt.title(r"Midpoint deflection", fontsize=fntsize)
 # plt.legend(loc='upper left')
 # axes = plt.gca()
-# plt.xlabel(r'Crank angle [deg]', fontsize = fntsize)
-# plt.ylabel(r'Angles', fontsize = fntsize)
-# plt.title(r"ZYX", fontsize=fntsize)
-#
-fig = plt.figure()
-plt.plot(omega_cr*t_ev, -vM_B/L_coupler, 'r-', label="y midpoint")
-plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
-plt.ylabel(r'v normalized', fontsize = fntsize)
-plt.title(r"Midpoint deflection", fontsize=fntsize)
-plt.legend(loc='upper left')
-
-
-fig = plt.figure()
-plt.plot(omega_cr*t_ev, -wM_B/L_coupler, 'b-', label="z midpoint")
-plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
-plt.ylabel(r'w normalized', fontsize = fntsize)
-plt.title(r"Midpoint deflection", fontsize=fntsize)
-plt.legend(loc='upper left')
-axes = plt.gca()
 
 plt.show()
 

@@ -11,7 +11,7 @@ plt.rc('text', usetex=True)
 # Finite element defition
 
 # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
-ind = 15
+ind = 9
 path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/waves/meshes/"
 mesh = Mesh(path_mesh + "circle_" + str(ind) + ".msh")
 
@@ -206,6 +206,8 @@ H_vec = np.zeros((n_ev,))
 for i in range(n_ev):
     H_vec[i] = 0.5 * (e_sol[:, i].T @ MM @ e_sol[:, i])
 
+np.save("t_dae.npy", t_sol)
+np.save("H_dae.npy", H_vec)
 fntsize = 16
 
 fig = plt.figure()
