@@ -19,7 +19,9 @@ L_coupler = 0.3
 d = 0.006
 A_coupler = pi * d**2 / 4
 I_coupler = pi * d**4 / 64
-n_elem = 2
+
+n_elem = 8
+
 rho_coupler = 7.87 * 10 ** 3
 E_coupler = 200 * 10**9
 omega_cr = 150
@@ -184,8 +186,8 @@ ewM_B_int = interp1d(t_ev, ewM_B, kind='linear')
 
 def sys(t,y):
 
-    dudt = euM_B_int(t) + omega_cr_int(t) * y[1]
-    dwdt = ewM_B_int(t) - omega_cr_int(t) * y[0]
+    dudt = euM_B_int(t) #+ omega_cr_int(t) * y[1]
+    dwdt = ewM_B_int(t) #- omega_cr_int(t) * y[0]
 
     dydt = np.array([dudt, dwdt])
     return dydt

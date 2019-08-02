@@ -35,7 +35,7 @@ A_coupler = pi * d**2 / 4
 I_coupler = pi * d**4 / 64
 mass_coupler = rho_coupler * A_coupler * L_coupler
 mass_slider = 0.5 * mass_coupler
-Jxx_coupler = 2 * I_coupler * rho_coupler
+Jxx_coupler = 2 * I_coupler * rho_coupler * L_coupler
 Jyy_coupler = 1 / 3 * mass_coupler * L_coupler ** 2
 Jzz_coupler = 1 / 3 * mass_coupler * L_coupler ** 2
 n_elem = 2
@@ -92,7 +92,7 @@ order = []
 
 dx = L_coupler/n_elem
 
-t_final = 8/omega_cr
+t_final = 50/omega_cr
 
 
 def dae_closed_phs(t, y, yd):
@@ -273,10 +273,9 @@ y0[:n_e] = e0_sys
 y0[n_e:-4] = lmb0_sys
 y0[-4:] = quat0_sys
 
-
-
-# y0[-9:-6] = T_I2B @ np.array([0, 0, - mass_coupler * omega_cr ** 2 * L_crank])
-# yd0[:3] = T_I2B @ np.array([0, 0, - omega_cr ** 2 * L_crank])
+yd0[:n_e] = de0_sys
+y0[n_e:-4] = dlmb0_sys
+yd0[-4:] = dquat0_sys
 
 # Create an Assimulo implicit problem
 imp_mod = Implicit_Problem(dae_closed_phs, y0, yd0, name='dae_closed_pHs')
@@ -337,9 +336,7 @@ for i in range(n_ev):
 
     rP_cl[:, i] = np.array([0, -L_crank * np.sin(omega_cr*t_ev[i]), offset_cr + L_crank * np.cos(omega_cr*t_ev[i])])
 
-
-# plt.plot(t_ev, (vclCB_sol - vslB_sol)[0], 'r', t_ev, (vclCB_sol - vslB_sol)[1], 'b', t_ev, (vclCB_sol - vslB_sol)[2], 'g')
-plt.plot(t_ev, (G_e.T @ e_sol)[0], 'r', t_ev, (G_e.T @ e_sol)[1], 'b', t_ev, (G_e.T @ e_sol)[2], 'g')
+# plt.plot(t_ev, (G_e.T @ e_sol)[0], 'r', t_ev, (G_e.T @ e_sol)[1], 'b', t_ev, (G_e.T @ e_sol)[2], 'g')
 
 plt.show()
 
