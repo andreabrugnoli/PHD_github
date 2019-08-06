@@ -35,9 +35,13 @@ def skew_flex(al_u, al_v, al_w, al_udis, al_vdis, al_wdis):
 
     nv_end = nu_dis + nv
     nw_end = nu_dis + nv + nw
+    # skew_mat_flex[:nu_dis, :] = np.column_stack((np.zeros((nu_dis,)), - al_wdis, al_vdis))
+    # skew_mat_flex[nu_dis:nv_end, :] = np.column_stack((al_w, np.zeros((nv,)), -al_u))
+    # skew_mat_flex[nv_end: nw_end, :] = np.column_stack((-al_v, al_u, np.zeros((nw, ))))
+
     skew_mat_flex[:nu_dis, :] = np.column_stack((np.zeros((nu_dis,)), - al_wdis, al_vdis))
-    skew_mat_flex[nu_dis:nv_end, :] = np.column_stack((al_w, np.zeros((nv,)), -al_u))
-    skew_mat_flex[nv_end: nw_end, :] = np.column_stack((-al_v, al_u, np.zeros((nw, ))))
+    skew_mat_flex[nu_dis:nv_end, :] = np.column_stack((np.zeros((nv,)), np.zeros((nv,)), -al_u))
+    skew_mat_flex[nv_end: nw_end, :] = np.column_stack((np.zeros((nw,)), al_u, np.zeros((nw,))))
 
     return skew_mat_flex
 
@@ -340,7 +344,7 @@ imp_sim.rtol = 1e-6  # Default 1e-6
 imp_sim.suppress_alg = True  # Suppress the algebraic variables on the error test
 imp_sim.report_continuously = True
 imp_sim.verbosity = 10
-imp_sim.maxh = 1e-7
+# imp_sim.maxh = 1e-6
 
 # Let Sundials find consistent initial conditions by use of 'IDA_YA_YDP_INIT'
 imp_sim.make_consistent('IDA_YA_YDP_INIT')
