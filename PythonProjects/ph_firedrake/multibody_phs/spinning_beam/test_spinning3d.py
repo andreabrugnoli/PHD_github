@@ -36,29 +36,35 @@ def skew_flex(al_u, al_v, al_w, al_udis, al_vdis, al_wdis):
     skew_mat_flex[nu_dis:nv_end, :] = np.column_stack((al_w, np.zeros((nv,)), -al_u))
     skew_mat_flex[nv_end: nw_end, :] = np.column_stack((-al_v, al_u, np.zeros((nw, ))))
 
+    # skew_mat_flex[:nu_dis, :] = np.column_stack((np.zeros((nu_dis,)),np.zeros((nu_dis,)), al_vdis))
+    # skew_mat_flex[nu_dis:nv_end, :] = np.column_stack((np.zeros((nv,)), np.zeros((nv,)), -al_u))
+    # skew_mat_flex[nv_end: nw_end, :] = np.column_stack((np.zeros((nw,)), np.zeros((nw,)), np.zeros((nw,))))
+
     return skew_mat_flex
 
 
-L_beam = 0.14142
-rho_beam = 7.8 * 10 ** 3
-E_beam = 210 * 10**9
-A_beam = 9 * 10**(-6)
-I_beam = 6.75 * 10**(-12)
+L_beam = 141.42
+rho_beam = 7.8 * 10 ** (-3)
+E_beam = 2.10 * 10**6
+A_beam = 9
+I_beam = 6.75
+Mz_max = 200
+
+
+Fz_max = 100
 Jxx_beam = 2 * I_beam * rho_beam * L_beam
-n_elem = 2
+n_elem = 6
 
 beam = SpatialBeam(n_elem, L_beam, rho_beam, A_beam, E_beam, I_beam, Jxx_beam)
 
-dofs2dump = list([0, 1, 2])
-dofs2keep = list(set(range(beam.n)).difference(set(dofs2dump)))
+# dofs2dump = list([0, 1, 2])
+# dofs2keep = list(set(range(beam.n)).difference(set(dofs2dump)))
 
-E_hinged = beam.E[dofs2keep, :]
-E_hinged = E_hinged[:, dofs2keep]
+E_hinged = beam.E[3:, 3:]
 
-J_hinged = beam.J[dofs2keep, :]
-J_hinged = J_hinged[:, dofs2keep]
+J_hinged = beam.J[3:, 3:]
 
-B_hinged = beam.B[dofs2keep, :]
+B_hinged = beam.B[3:, :]
 beam_hinged = SysPhdaeRig(len(E_hinged), 0, 3, beam.n_p, beam.n_q,
                            E=E_hinged, J=J_hinged, B=B_hinged)
 
@@ -81,6 +87,9 @@ J = beam_hinged.J
 B_Mz0 = beam_hinged.B[:, 5]
 B_FzL = beam_hinged.B[:, 8]
 
+B_FxyzL = beam_hinged.B[:, 6:9]
+
+
 t_load = 0.2
 t1 = 10
 t2 = t1 + t_load
@@ -91,37 +100,37 @@ t5 = t4 + t_load
 t_0 = 0
 t_fin = 50
 
-Mz_max = 0.2
-Fz_max = 100
 
 def sys(t,y):
 
     print(t/t_fin*100)
 
-
-    Mz_0 = 0
-    Fz_L = 0
-
     if t <= t_load:
         Mz_0 = Mz_max*t/t_load
 
-    if t>t_load and t<t1:
+    elif t>t_load and t<t1:
         Mz_0 = Mz_max
 
-    if t>=t1 and t<=t2:
+    elif t>=t1 and t<=t2:
         Mz_0 = Mz_max*(1 - (t-t1)/t_load)
+
+    else:
+        Mz_0 = 0
 
     if t>=t3 and t<t4:
         Fz_L = Fz_max * (t-t3) / t_load
 
-    if t>=t4 and t<=t5:
+    elif t>=t4 and t<=t5:
         Fz_L = Fz_max * (1 - (t - t4) / t_load)
+
+    else:
+        Fz_L = 0
 
     y_e = y[:n_e]
     omega = y[:n_r]
     y_quat = y[-n_quat:]
 
-    pi_beam = M[:3, :] @ y_e
+    pi_beam = M[:n_r, :] @ y_e
     J[:n_r, :n_r] = skew(pi_beam)
 
     p_v = M[n_r + n_pu:n_r + n_pu + n_pv, :] @ y_e
@@ -137,15 +146,19 @@ def sys(t,y):
     p_u[::2] = p_udis
 
     alflex_cross = skew_flex(p_u, p_v, p_w, p_udis, p_vdis, p_wdis)
-    J[n_r:n_r+ n_p, :n_r] = alflex_cross
+    J[n_r:n_r + n_p, :n_r] = alflex_cross
     J[:n_r, n_r:n_r + n_p] = -alflex_cross.T
 
-    dedt = invM @ (J @ y_e + B_Mz0 * Mz_0 + B_FzL * Fz_L)
+    # dedt = invM @ (J @ y_e + B_Mz0 * Mz_0 + B_FzL * Fz_L)
+
+    act_quat = np.quaternion(y_quat[0], y_quat[1], y_quat[2], y_quat[3])
+    Rot_mat = quaternion.as_rotation_matrix(act_quat)
+    dedt = invM @ (J @ y_e + B_Mz0 * Mz_0 + B_FxyzL @ Rot_mat.T[:, 2] * Fz_L)
 
     Omega_mat = np.array([[0, -omega[0], -omega[1], -omega[2]],
-                            [omega[0], 0, omega[2], -omega[1]],
-                            [omega[1], -omega[2], 0, omega[0]],
-                            [omega[2], omega[1], -omega[0], 0]])
+                         [omega[0], 0, omega[2], -omega[1]],
+                         [omega[1], -omega[2], 0, omega[0]],
+                         [omega[2], omega[1], -omega[0], 0]])
 
     dquat = 0.5 * Omega_mat @ y_quat
 
@@ -161,14 +174,49 @@ y0[-n_quat:] = quat0
 t_ev = np.linspace(t_0, t_fin, num=500)
 t_span = [t_0, t_fin]
 
-sol = solve_ivp(sys, t_span, y0, method='RK45', vectorized=False, t_eval=t_ev)
+sol = solve_ivp(sys, t_span, y0, method='RK45', vectorized=False, t_eval=t_ev, max_step=0.02)
 
 t_sol = sol.t
 y_sol = sol.y
-om_sol = y_sol[:n_r, :]
+omB_sol = y_sol[:n_r, :]
+quat_sol = quaternion.as_quat_array(y_sol[-4:, :].T)
 
-plt.plot(t_sol, om_sol[2], 'r')
+n_ev = len(t_sol)
+omI_sol = np.zeros((3, n_ev))
+
+
+for i in range(n_ev):
+    omI_sol[:, i] = quaternion.as_rotation_matrix(quat_sol[i]) @ omB_sol[:, i]
+
+plt.figure()
+plt.plot(t_sol, omI_sol[0], 'r')
 plt.xlabel("Time $s$", fontsize=fntsize)
 plt.ylabel("$\omega_z$", fontsize=fntsize)
-plt.title("Angular velocity along z", fontsize=fntsize)
+plt.title("Angular velocity along x in I", fontsize=fntsize)
+
+plt.figure()
+plt.plot(t_sol, omI_sol[1], 'r')
+plt.xlabel("Time $s$", fontsize=fntsize)
+plt.ylabel("$\omega_z$", fontsize=fntsize)
+plt.title("Angular velocity along y in I", fontsize=fntsize)
+
+plt.figure()
+plt.plot(t_sol, omI_sol[2], 'r')
+plt.xlabel("Time $s$", fontsize=fntsize)
+plt.ylabel("$\omega_z$", fontsize=fntsize)
+plt.title("Angular velocity along z in I", fontsize=fntsize)
+
+
+plt.figure()
+plt.plot(t_sol, omB_sol[0], 'r')
+plt.xlabel("Time $s$", fontsize=fntsize)
+plt.ylabel("$\omega_z$", fontsize=fntsize)
+plt.title("Angular velocity along x in B", fontsize=fntsize)
+plt.show()
+
+plt.figure()
+plt.plot(t_sol, omB_sol[2], 'r')
+plt.xlabel("Time $s$", fontsize=fntsize)
+plt.ylabel("$\omega_z$", fontsize=fntsize)
+plt.title("Angular velocity along z in B", fontsize=fntsize)
 plt.show()

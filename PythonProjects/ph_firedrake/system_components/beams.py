@@ -236,11 +236,12 @@ class SpatialBeam(SysPhdaeRig):
 
         # Finite element defition
         Vp_x = FunctionSpace(mesh, "CG", 1)
-        Vp_y = FunctionSpace(mesh, "Hermite", 3)
-        Vp_z = FunctionSpace(mesh, "Hermite", 3)
-
         Vq_x = FunctionSpace(mesh, "CG", 1)
+
+        Vp_y = FunctionSpace(mesh, "Hermite", 3)
         Vq_y = FunctionSpace(mesh, "Hermite", 3)
+
+        Vp_z = FunctionSpace(mesh, "Hermite", 3)
         Vq_z = FunctionSpace(mesh, "Hermite", 3)
 
         V = Vp_x * Vp_y * Vp_z * Vq_x * Vq_y * Vq_z
@@ -304,10 +305,10 @@ class SpatialBeam(SysPhdaeRig):
         M_fr = np.zeros((n_fl, n_rig))
         M_fr[:, 0] = assemble(vp_x * rho * A * dx).vector().get_local()[dofs2keep]
         M_fr[:, 1] = assemble(vp_y * rho * A * dx).vector().get_local()[dofs2keep]
-        M_fr[:, 5] = assemble(vp_y * rho * A * x[0] * dx).vector().get_local()[dofs2keep]
-
         M_fr[:, 2] = assemble(vp_z * rho * A * dx).vector().get_local()[dofs2keep]
+
         M_fr[:, 4] = assemble(- vp_z * rho * A * x[0] * dx).vector().get_local()[dofs2keep]
+        M_fr[:, 5] = assemble(vp_y * rho * A * x[0] * dx).vector().get_local()[dofs2keep]
 
         M_r = np.zeros((n_rig, n_rig))
 
@@ -329,13 +330,6 @@ class SpatialBeam(SysPhdaeRig):
         M = la.block_diag(M_r, M_f)
         M[n_rig:, :n_rig] = M_fr
         M[:n_rig, n_rig:] = M_fr.T
-
-        # # plt.spy(M); plt.show()
-        # ind_planar = [0, 1, 5]
-        # print(ind_planar)
-        # M_planar = M[ind_planar, :]
-        # M_planar = M_planar[:, ind_planar]
-        # print(M_planar)
 
         assert check_positive_matrix(M_r)
         assert check_positive_matrix(M_f)
