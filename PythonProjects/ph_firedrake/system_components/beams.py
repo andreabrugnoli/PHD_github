@@ -237,12 +237,17 @@ class SpatialBeam(SysPhdaeRig):
         # Finite element defition
         Vp_x = FunctionSpace(mesh, "CG", 1)
         Vq_x = FunctionSpace(mesh, "CG", 1)
+        # Vq_x = FunctionSpace(mesh, "DG", 0)
+
 
         Vp_y = FunctionSpace(mesh, "Hermite", 3)
         Vq_y = FunctionSpace(mesh, "Hermite", 3)
+        # Vq_y = FunctionSpace(mesh, "DG", 1)
 
         Vp_z = FunctionSpace(mesh, "Hermite", 3)
         Vq_z = FunctionSpace(mesh, "Hermite", 3)
+        # Vq_z = FunctionSpace(mesh, "DG", 1)
+
 
         V = Vp_x * Vp_y * Vp_z * Vq_x * Vq_y * Vq_z
 
