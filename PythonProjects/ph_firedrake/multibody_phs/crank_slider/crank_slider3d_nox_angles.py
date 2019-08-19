@@ -198,11 +198,11 @@ def dae_closed_phs(t, y, yd):
 
     res_e = M_e @ de_sys - J_e @ e_sys - G_coupler @ lmd_cl - G_slider @ lmd_mass - G_e @ lmd_sys
 
-    # deE_sys = invM_e @ (J_e @ e_sys + G_coupler @ lmd_cl + G_slider @ lmd_mass + G_e @ lmd_sys)
-    # dres_lmb = G_e.T @ deE_sys
-    # dres_cl_v = - deE_sys[:3] - skew_nox(omega_cl) @ Rot_cl.T @ vP_cl + Rot_cl.T @ dvP_cl
-    # # dres_cl_v = - Rot_cl @ deE_sys[:3] - Rot_cl @ skew_nox(omega_cl) @ e_sys[:3] + dvP_cl
-    # dres_slider = Rot_cl[[1, 2], :] @ skew_nox(omega_cl) @ e_sys[nr_coupler:nr_tot] + Rot_cl[[1, 2], :] @ deE_sys[nr_coupler:nr_tot]
+    deE_sys = invM_e @ (J_e @ e_sys + G_coupler @ lmd_cl + G_slider @ lmd_mass + G_e @ lmd_sys)
+    dres_lmb = G_e.T @ deE_sys
+    dres_cl_v = - deE_sys[:3] - skew_nox(omega_cl) @ Rot_cl.T @ vP_cl + Rot_cl.T @ dvP_cl
+    # dres_cl_v = - Rot_cl @ deE_sys[:3] - Rot_cl @ skew_nox(omega_cl) @ e_sys[:3] + dvP_cl
+    dres_slider = Rot_cl[[1, 2], :] @ skew_nox(omega_cl) @ e_sys[nr_coupler:nr_tot] + Rot_cl[[1, 2], :] @ deE_sys[nr_coupler:nr_tot]
 
     res_lmb = G_e.T @ e_sys
     res_cl_v = - Rot_cl @ e_sys[:3] + vP_cl
@@ -345,12 +345,12 @@ def find_initial_condition(e0, ang0_sys):
 lmb0_sys, de0_sys, dlmb0_sys, dang0_sys = find_initial_condition(e0_sys, ang0_sys)
 
 y0[:n_e] = e0_sys
-y0[n_e:-nang] = lmb0_sys
+# y0[n_e:-nang] = lmb0_sys
 y0[-nang:] = ang0_sys
 
-yd0[:n_e] = de0_sys
-y0[n_e:-nang] = dlmb0_sys
-yd0[-nang:] = dang0_sys
+# yd0[:n_e] = de0_sys
+# y0[n_e:-nang] = dlmb0_sys
+# yd0[-nang:] = dang0_sys
 
 # Create an Assimulo implicit problem
 imp_mod = Implicit_Problem(dae_closed_phs, y0, yd0, name='dae_closed_pHs')
@@ -452,7 +452,7 @@ vclCI_sol = np.zeros((3, n_ev))
 vclCB_sol = np.zeros((3, n_ev))
 
 for i in range(n_ev):
-    vclCB_sol[:, i] = coupler_nox.B[:, [5,6,7]].T @ erf_cl_sol[:, i]
+    vclCB_sol[:, i] = coupler_nox.B[:, [6,7,8]].T @ erf_cl_sol[:, i]
 
     Rot_th1 = np.array([[np.cos(th1_sol[i]), -np.sin(th1_sol[i]), 0],
                         [np.sin(th1_sol[i]), +np.cos(th1_sol[i]), 0],

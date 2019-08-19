@@ -140,12 +140,12 @@ def dae_closed_phs(t, y, yd):
     res_cl = - Rot_cl @ e_sys[:3] + vP_cl
     res_slider = Rot_cl[[1, 2], :] @ e_sys[nr_coupler:nr_tot]
 
-    dres_lmb = G_e.T @ deE_sys
-    dres_cl = - G_coupler.T @ deE_sys - skew(omega_cl) @ Rot_cl.T @ vP_cl + Rot_cl.T @ dvP_cl
-    # dres_cl = - Rot_cl @ deE_sys[:3] - Rot_cl @ skew(omega_cl) @ e_sys[:3] + dvP_cl
-
-    dres_slider = Rot_cl[[1, 2], :] @ skew(omega_cl) @ e_sys[nr_coupler:nr_tot] +\
-                  Rot_cl[[1, 2], :] @ deE_sys[nr_coupler:nr_tot]
+    # dres_lmb = G_e.T @ deE_sys
+    # dres_cl = - G_coupler.T @ deE_sys - skew(omega_cl) @ Rot_cl.T @ vP_cl + Rot_cl.T @ dvP_cl
+    # # dres_cl = - Rot_cl @ deE_sys[:3] - Rot_cl @ skew(omega_cl) @ e_sys[:3] + dvP_cl
+    #
+    # dres_slider = Rot_cl[[1, 2], :] @ skew(omega_cl) @ e_sys[nr_coupler:nr_tot] +\
+    #               Rot_cl[[1, 2], :] @ deE_sys[nr_coupler:nr_tot]
 
     Omegacl_mat = np.array([[0, -omega_cl[0], -omega_cl[1], -omega_cl[2]],
                             [omega_cl[0],   0, omega_cl[2], -omega_cl[1]],

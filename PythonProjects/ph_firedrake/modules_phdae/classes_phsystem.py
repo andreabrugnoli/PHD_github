@@ -493,7 +493,7 @@ def permute_rows_columns(mat, ind_perm):
 
 def permute_rows(mat, ind_perm):
     assert len(ind_perm) == len(mat)
-    mat = mat[ind_perm, :]
+    mat = mat[ind_perm]
     return mat
 
 

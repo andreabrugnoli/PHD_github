@@ -176,24 +176,24 @@ def dae_closed_phs(t, y, yd):
 
     res_e = M_e @ de_sys - J_e @ e_sys - G_coupler @ lmd_cl - G_slider @ lmd_mass - G_e @ lmd_sys
 
-    deE_sys = invM_e @ (J_e @ e_sys + G_coupler @ lmd_cl + G_slider @ lmd_mass + G_e @ lmd_sys)
-    dres_lmb = G_e.T @ deE_sys
-    dres_cl_v = - deE_sys[:3] - skew(omega_cl) @ Rot_cl.T @ vP_cl + Rot_cl.T @ dvP_cl
-    # dres_cl_v = - Rot_cl @ deE_sys[:3] - Rot_cl @ skew(omega_cl) @ e_sys[:3] + dvP_cl
-    dres_slider = Rot_cl[[1, 2], :] @ skew(omega_cl) @ e_sys[nr_coupler:nr_tot] + Rot_cl[[1, 2], :] @ deE_sys[nr_coupler:nr_tot]
+    # deE_sys = invM_e @ (J_e @ e_sys + G_coupler @ lmd_cl + G_slider @ lmd_mass + G_e @ lmd_sys)
+    # dres_lmb = G_e.T @ deE_sys
+    # dres_cl_v = - deE_sys[:3] - skew(omega_cl) @ Rot_cl.T @ vP_cl + Rot_cl.T @ dvP_cl
+    # # dres_cl_v = - Rot_cl @ deE_sys[:3] - Rot_cl @ skew(omega_cl) @ e_sys[:3] + dvP_cl
+    # dres_slider = Rot_cl[[1, 2], :] @ skew(omega_cl) @ e_sys[nr_coupler:nr_tot] + Rot_cl[[1, 2], :] @ deE_sys[nr_coupler:nr_tot]
 
-    # res_lmb = G_e.T @ e_sys
-    # res_cl_v = - Rot_cl @ e_sys[:3] + vP_cl
-    # # res_cl_v = - e_sys[:3] + Rot_cl.T @ vP_cl
-    # res_slider = Rot_cl[[1, 2], :] @ e_sys[nr_coupler:nr_tot]
+    res_lmb = G_e.T @ e_sys
+    res_cl_v = - Rot_cl @ e_sys[:3] + vP_cl
+    # res_cl_v = - e_sys[:3] + Rot_cl.T @ vP_cl
+    res_slider = Rot_cl[[1, 2], :] @ e_sys[nr_coupler:nr_tot]
 
     res_th1 = np.cos(th2)*dth1 + omz_cl
     res_th2 = dth2 - omy_cl
 
     res_th = np.array([res_th1, res_th2])
 
-    # res = np.concatenate((res_e, res_lmb, res_cl_v, res_slider, res_th), axis=0)
-    res = np.concatenate((res_e, dres_lmb, dres_cl_v, dres_slider, res_th), axis=0)
+    res = np.concatenate((res_e, res_lmb, res_cl_v, res_slider, res_th), axis=0)
+    # res = np.concatenate((res_e, dres_lmb, dres_cl_v, dres_slider, res_th), axis=0)
 
     return res
 
@@ -431,15 +431,18 @@ vclCI_sol = np.zeros((3, n_ev))
 vclCB_sol = np.zeros((3, n_ev))
 
 for i in range(n_ev):
-    vclCB_sol[:, i] = coupler_nox.B[:, [5,6,7]].T @ erf_cl_sol[:, i]
+    vclCB_sol[:, i] = coupler.B[:, [6,7,8]].T @ erf_cl_sol[:, i]
 
-    Rot_th1 = np.array([[np.cos(th1_sol), -np.sin(th1_sol), 0],
-                        [np.sin(th1_sol), +np.cos(th1_sol), 0],
+    th1_i = th1_sol[i]
+    th2_i = th2_sol[i]
+
+    Rot_th1 = np.array([[np.cos(th1_i), -np.sin(th1_i), 0],
+                        [np.sin(th1_i), +np.cos(th1_i), 0],
                         [0, 0, 1]])
 
-    Rot_th2 = np.array([[np.cos(th2_sol), 0, np.sin(th2_sol)],
+    Rot_th2 = np.array([[+np.cos(th2_i), 0, np.sin(th2_i)],
                         [0, 1, 0],
-                        [-np.sin(th2_sol), 0, np.cos(th2_sol)]])
+                        [-np.sin(th2_i), 0, np.cos(th2_i)]])
 
     Rot_cl = Rot_th1.T @ Rot_th2
 
@@ -480,7 +483,7 @@ data = np.array([[rP_cl[0], rP_cl[1], rP_cl[2]], [xC_cl, yC_cl, zC_cl], [xP_sl, 
 
 def sys(t,y):
 
-    dydt = eM_B_int(t) - skew_nox(omega_cl_int(t)) @ y
+    dydt = eM_B_int(t) - skew(omega_cl_int(t)) @ y
     # dudt = euM_B_int(t)
     # dvdt = evM_B_int(t)
     # dwdt = ewM_B_int(t)

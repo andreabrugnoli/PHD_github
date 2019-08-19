@@ -20,16 +20,27 @@ d = 0.006
 A_coupler = pi * d**2 / 4
 I_coupler = pi * d**4 / 64
 
-n_elem = 8
 
 rho_coupler = 7.87 * 10 ** 3
 E_coupler = 200 * 10**9
+
+# L_crank = 150
+# L_coupler = 300
+# d = 6
+# A_coupler = pi * d**2 / 4
+# I_coupler = pi * d**4 / 64
+#
+#
+# rho_coupler = 7.87 * 10 ** (-6)
+# E_coupler = 200 * 10**3
+
 omega_cr = 150
 
 nr_coupler = 3
 nr_mass = 2
 nr_tot = nr_coupler + nr_mass
 
+n_elem = 2
 coupler = FloatFlexBeam(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler)
 
 mass_coupler = rho_coupler * A_coupler * L_coupler
@@ -55,8 +66,6 @@ n_pw = n_p - n_pu
 
 n_tot = n_sys + 4  # 3 lambda et theta
 order = []
-
-dx = L_coupler/n_elem
 
 
 def dae_closed_phs(t, y, yd):
@@ -138,7 +147,7 @@ imp_sim.report_continuously = True
 # imp_sim.maxh = 1e-6
 
 # Let Sundials find consistent initial conditions by use of 'IDA_YA_YDP_INIT'
-# imp_sim.make_consistent('IDA_YA_YDP_INIT')
+imp_sim.make_consistent('IDA_YA_YDP_INIT')
 
 # Simulate
 t_final = 8/150

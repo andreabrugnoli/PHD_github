@@ -39,6 +39,13 @@ def skew_flex(al_u, al_v, al_w, al_udis, al_vdis, al_wdis):
     return skew_mat_flex
 
 
+# L_beam = 0.14142
+# rho_beam = 7.8 * 10 ** (6)
+# E_beam = 2.10 * 10**12
+# A_beam = 9 * 10**(-6)
+# I_beam = 6.75 * 10**(-12)
+# Mz_max = 0.200
+
 L_beam = 141.42
 rho_beam = 7.8 * 10 ** (-3)
 E_beam = 2.10 * 10**6
@@ -127,11 +134,11 @@ def sys(t,y):
     J[:n_r, :n_r] = skew(pi_beam)
 
     p_v = M[n_r + n_pu:n_r + n_pu + n_pv, :] @ y_e
-    p_v[1::2] = 0
+    # p_v[1::2] = 0
     p_vdis = np.array([p_v[i] for i in range(len(p_v)) if i % 2 == 0])
 
     p_w = M[n_r + n_pu + n_pv:n_r + n_p, :] @ y_e
-    p_w[1::2] = 0
+    # p_w[1::2] = 0
     p_wdis = np.array([p_w[i] for i in range(len(p_w)) if i % 2 == 0])
 
     p_udis = M[n_r:n_r + n_pu, :] @ y_e
@@ -139,14 +146,19 @@ def sys(t,y):
     p_u[::2] = p_udis
 
     alflex_cross = skew_flex(p_u, p_v, p_w, p_udis, p_vdis, p_wdis)
+
+    p_v[1::2] = 0
+    p_w[1::2] = 0
+    alflex_cross_noang = skew_flex(p_u, p_v, p_w, p_udis, p_vdis, p_wdis)
+
     J[n_r:n_r + n_p, :n_r] = alflex_cross
-    J[:n_r, n_r:n_r + n_p] = -alflex_cross.T
+    J[:n_r, n_r:n_r + n_p] = -alflex_cross_noang.T
 
-    dedt = invM @ (J @ y_e + B_Mz0 * Mz_0 + B_FzL * Fz_L)
+    # dedt = invM @ (J @ y_e + B_Mz0 * Mz_0 + B_FzL * Fz_L)
 
-    # act_quat = np.quaternion(y_quat[0], y_quat[1], y_quat[2], y_quat[3])
-    # Rot_mat = quaternion.as_rotation_matrix(act_quat)
-    # dedt = invM @ (J @ y_e + B_Mz0 * Mz_0 + B_FxyzL @ Rot_mat.T[:, 2] * Fz_L)
+    act_quat = np.quaternion(y_quat[0], y_quat[1], y_quat[2], y_quat[3])
+    Rot_mat = quaternion.as_rotation_matrix(act_quat)
+    dedt = invM @ (J @ y_e + B_Mz0 * Mz_0 + B_FxyzL @ Rot_mat.T[:, 2] * Fz_L)
 
     Omega_mat = np.array([[0, -omega[0], -omega[1], -omega[2]],
                          [omega[0], 0, omega[2], -omega[1]],
@@ -181,17 +193,17 @@ omI_sol = np.zeros((3, n_ev))
 for i in range(n_ev):
     omI_sol[:, i] = quaternion.as_rotation_matrix(quat_sol[i]) @ omB_sol[:, i]
 
-# plt.figure()
-# plt.plot(t_sol, omI_sol[0], 'r')
-# plt.xlabel("Time $s$", fontsize=fntsize)
-# plt.ylabel("$\omega_x$", fontsize=fntsize)
-# plt.title("Angular velocity along x in I", fontsize=fntsize)
-#
-# plt.figure()
-# plt.plot(t_sol, omI_sol[1], 'r')
-# plt.xlabel("Time $s$", fontsize=fntsize)
-# plt.ylabel("$\omega_y$", fontsize=fntsize)
-# plt.title("Angular velocity along y in I", fontsize=fntsize)
+plt.figure()
+plt.plot(t_sol, omI_sol[0], 'r')
+plt.xlabel("Time $s$", fontsize=fntsize)
+plt.ylabel("$\omega_x$", fontsize=fntsize)
+plt.title("Angular velocity along x in I", fontsize=fntsize)
+
+plt.figure()
+plt.plot(t_sol, omI_sol[1], 'r')
+plt.xlabel("Time $s$", fontsize=fntsize)
+plt.ylabel("$\omega_y$", fontsize=fntsize)
+plt.title("Angular velocity along y in I", fontsize=fntsize)
 
 plt.figure()
 plt.plot(t_sol, omI_sol[2], 'r')

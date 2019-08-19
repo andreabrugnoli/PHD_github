@@ -3,7 +3,8 @@
 from firedrake import *
 import numpy as np
 import scipy.linalg as la
-from modules_phdae.classes_phsystem import SysPhdaeRig, check_positive_matrix, check_skew_symmetry
+from modules_phdae.classes_phsystem import SysPhdaeRig, check_positive_matrix,\
+    check_skew_symmetry, permute_rows_columns, permute_rows
 import warnings
 import matplotlib.pyplot as plt
 np.set_printoptions(threshold=np.inf)
@@ -168,10 +169,13 @@ class FloatFlexBeam(SysPhdaeRig):
 
         assert len(M_f) == n_fl
 
-        M_fr = np.zeros((n_fl, n_rig))
-        M_fr[:, 0] = assemble(vp_x * rho * A * dx).vector().get_local()[dofs2keep]
-        M_fr[:, 1] = assemble(vp_y * rho * A * dx).vector().get_local()[dofs2keep]
-        M_fr[:, 2] = assemble(vp_y * rho * A * x[0] * dx).vector().get_local()[dofs2keep]
+        M_fr = np.zeros((n_V, n_rig))
+        M_fr[:, 0] = assemble(vp_x * rho * A * dx).vector().get_local()
+        M_fr[:, 1] = assemble(vp_y * rho * A * dx).vector().get_local()
+        M_fr[:, 2] = assemble(vp_y * rho * A * x[0] * dx).vector().get_local()
+
+        M_fr = M_fr[dofs2keep, :]
+        plt.spy(M_fr); plt.show()
 
         M_r = np.zeros((n_rig, n_rig))
         m_beam = rho * L * A
@@ -338,8 +342,8 @@ class SpatialBeam(SysPhdaeRig):
 
         assert check_positive_matrix(M_r)
         assert check_positive_matrix(M_f)
-        assert np.linalg.det(M) != 0
         assert check_positive_matrix(M)
+        # assert np.linalg.det(M) != 0
 
         j_grad_x = vq_x * ep_x.dx(0) * dx
         j_gradIP_x = -vp_x.dx(0) * eq_x * dx
@@ -386,6 +390,215 @@ class SpatialBeam(SysPhdaeRig):
         B[n_rig:, n_rig:n_rig+3] = np.concatenate((B_Fx, B_Fy, B_Fz), axis=1)
         B[n_rig:, n_rig+4:n_rig + 6] = np.concatenate((B_My, B_Mz), axis=1)
 
+
+        SysPhdaeRig.__init__(self, n_tot, 0, n_rig, n_p, n_q, E=M, J=J, B=B)
+
+
+class SpatialBeamTorsion(SysPhdaeRig):
+
+    def __init__(self, n_el, L, rho, A, E, G, I, Ir, m_joint=0.0, J_joint=np.zeros((3, 3))):
+
+        mesh = IntervalMesh(n_el, L)
+        x = SpatialCoordinate(mesh)
+
+        # Finite element defition
+        Vp_ux = FunctionSpace(mesh, "CG", 1)
+        Vq_ux = FunctionSpace(mesh, "CG", 1)
+
+        Vp_thx = FunctionSpace(mesh, "CG", 1)
+        Vq_thx = FunctionSpace(mesh, "CG", 1)
+
+        Vp_y = FunctionSpace(mesh, "Hermite", 3)
+        Vq_y = FunctionSpace(mesh, "Hermite", 3)
+
+        Vp_z = FunctionSpace(mesh, "Hermite", 3)
+        Vq_z = FunctionSpace(mesh, "Hermite", 3)
+
+        V = Vp_ux * Vp_thx * Vp_y * Vp_z * Vq_ux * Vq_thx * Vq_y * Vq_z
+
+        n_V = V.dim()
+
+        np_ux = Vp_ux.dim()
+        np_thx = Vp_thx.dim()
+        np_x = np_ux + np_thx
+        np_y = Vp_y.dim()
+        np_z = Vp_z.dim()
+
+        nq_ux = Vq_ux.dim()
+        nq_thx = Vq_thx.dim()
+        nq_x = nq_ux + nq_thx
+        nq_y = Vq_y.dim()
+        nq_z = Vq_z.dim()
+
+        n_p = np_x + np_y + np_z
+        n_q = nq_x + nq_y + nq_z
+
+        assert n_V == n_p + n_q
+
+        v = TestFunction(V)
+        vp_ux, vp_thx, vp_y, vp_z, vq_ux, vq_thx, vq_y, vq_z = split(v)
+
+        e = TrialFunction(V)
+        ep_ux, ep_thx, ep_y, ep_z, eq_ux, eq_thx, eq_y, eq_z = split(e)
+
+        alp_ux = rho * A * ep_ux
+        alq_ux = 1./(E*A) * eq_ux
+
+        alp_thx = rho * Ir * ep_thx
+        alq_thx = 1. / (G * Ir) * eq_thx
+
+        alp_y = rho * A * ep_y
+        alq_y = 1./(E*I) * eq_y
+
+        alp_z = rho * A * ep_z
+        alq_z = 1. / (E * I) * eq_z
+
+        dx = Measure('dx')
+        ds = Measure('ds')
+
+        mp_form = vp_ux * alp_ux * dx + vp_thx * alp_thx * dx +\
+                  vp_y * alp_y * dx + vp_z * alp_z * dx
+
+        mq_form = vq_ux * alq_ux * dx + vq_thx * alq_thx * dx +\
+                  vq_y * alq_y * dx + vq_z * alq_z * dx
+
+        m_form = mp_form + mq_form
+
+        petsc_m = assemble(m_form, mat_type='aij').M.handle
+        M_FEM = np.array(petsc_m.convert("dense").getDenseArray())
+
+        j_grad_ux = vq_ux * ep_ux.dx(0) * dx
+        j_gradIP_ux = -vp_ux.dx(0) * eq_ux * dx
+
+        j_grad_thx = vq_thx * ep_thx.dx(0) * dx
+        j_gradIP_thx = -vp_thx.dx(0) * eq_thx * dx
+
+        j_gradgrad_y = vq_y * ep_y.dx(0).dx(0) * dx
+        j_gradgradIP_y = -vp_y.dx(0).dx(0) * eq_y * dx
+
+        j_gradgrad_z = vq_z * ep_z.dx(0).dx(0) * dx
+        j_gradgradIP_z = -vp_z.dx(0).dx(0) * eq_z * dx
+
+        j_form = j_grad_ux + j_gradIP_ux + \
+                 j_grad_thx + j_gradIP_thx + \
+                 j_gradgrad_y + j_gradgradIP_y + \
+                 j_gradgrad_z + j_gradgradIP_z
+
+        petcs_j = assemble(j_form, mat_type='aij').M.handle
+        J_FEM = np.array(petcs_j.convert("dense").getDenseArray())
+
+        b_Fx = vp_ux * ds(2)
+        b_Fy = vp_y * ds(2)
+        b_Fz = vp_z * ds(2)
+
+        b_Mx = vp_thx * ds(2)
+        b_My = - vp_z.dx(0) * ds(2)
+        b_Mz = vp_y.dx(0) * ds(2)
+
+        B_Fx = assemble(b_Fx).vector().get_local()
+        B_Fy = assemble(b_Fy).vector().get_local()
+        B_Fz = assemble(b_Fz).vector().get_local()
+
+        B_Mx = assemble(b_Mx).vector().get_local()
+        B_My = assemble(b_My).vector().get_local()
+        B_Mz = assemble(b_Mz).vector().get_local()
+
+        B_FEM = np.column_stack((B_Fx, B_Fy, B_Fz, B_Mx, B_My, B_Mz))
+
+        n_rig = 6  # Spatial motion
+        M_fr = np.zeros((n_V, n_rig))
+        M_fr[:np_ux, 0] = assemble(vp_ux * rho * A * dx).vector().get_local()[:np_ux]
+        # M_fr[np_ux:np_x, 0] = assemble(vp_thx * rho * A * dx).vector().get_local()[np_ux:np_x]
+        M_fr[:, 1] = assemble(vp_y * rho * A * dx).vector().get_local()
+        M_fr[:, 2] = assemble(vp_z * rho * A * dx).vector().get_local()
+
+        M_fr[:, 4] = assemble(- vp_z * rho * A * x[0] * dx).vector().get_local()
+        M_fr[:, 5] = assemble(vp_y * rho * A * x[0] * dx).vector().get_local()
+
+        ind_pu = list(range(np_ux))
+        ind_pth = list(range(np_ux, np_x))
+
+        ind_perm_x = [None]*np_x
+        ind_perm_x[0::2] = ind_pu
+        ind_perm_x[1::2] = ind_pth
+
+        ind_perm = ind_perm_x + list(range(np_x, n_V))
+
+        print(ind_perm)
+
+        M_f = permute_rows_columns(M_FEM, ind_perm)
+        J_f = permute_rows_columns(J_FEM, ind_perm)
+        B_f = permute_rows(B_FEM, ind_perm)
+        M_fr = permute_rows(M_fr, ind_perm)
+
+        plt.figure()
+        plt.spy(M_FEM)
+        plt.show()
+        plt.figure()
+        plt.spy(M_f)
+        plt.show()
+
+        dofs2dump = list([0, 1, np_x, np_x + 1, np_x + np_y, np_x + np_y + 1])
+        dofs2keep = list(set(range(n_V)).difference(set(dofs2dump)))
+        # print(dofs2keep)
+
+        n_fl = n_V - len(dofs2dump)
+        n_p = n_p - len(dofs2dump)
+        n_tot = n_rig + n_fl
+
+        M_f = M_f[:, dofs2keep]
+        M_f = M_f[dofs2keep, :]
+
+        J_f = J_f[:, dofs2keep]
+        J_f = J_f[dofs2keep, :]
+
+        M_fr = M_fr[dofs2keep]
+        B_f = B_f[dofs2keep]
+
+        plt.figure()
+        plt.spy(M_f); plt.show()
+
+
+        assert len(M_f) == n_fl
+
+        M_r = np.zeros((n_rig, n_rig))
+
+        m_beam = rho * L * A
+
+        Jxx = Ir*rho*L
+        Jyy = 1 / 3 * m_beam * L ** 2
+        Jzz = 1 / 3 * m_beam * L ** 2
+        J_beam = np.diag([Jxx, Jyy, Jzz])
+        M_r[:3, :3] = (m_beam + m_joint)* np.eye(3)
+        M_r[3:6, 3:6] = J_beam + J_joint
+
+        s = m_beam * L/2 * np.array([[0, 0, 0],
+                                    [0,  0, 1],
+                                    [0, -1, 0]])
+
+        M_r[:3, 3:6] = s
+        M_r[3:6, :3] = s.T
+
+        M = la.block_diag(M_r, M_f)
+        M[n_rig:, :n_rig] = M_fr
+        M[:n_rig, n_rig:] = M_fr.T
+
+        assert check_positive_matrix(M_r)
+        assert check_positive_matrix(M_f)
+        assert check_positive_matrix(M)
+        assert np.linalg.det(M) != 0
+
+        J = np.zeros((n_tot, n_tot))
+        J[n_rig:, n_rig:] = J_f
+
+        tau_CP = np.eye(n_rig)
+        tau_CP[1, 5] = L
+        tau_CP[2, 4] = - L
+
+        B = np.zeros((n_tot, n_rig*2))
+        B[:n_rig, :n_rig] = np.eye(n_rig)
+        B[:n_rig, n_rig:] = tau_CP.T
+        B[n_rig:, n_rig:2*n_rig] = B_f
 
         SysPhdaeRig.__init__(self, n_tot, 0, n_rig, n_p, n_q, E=M, J=J, B=B)
 
@@ -950,3 +1163,5 @@ def draw_allbending(n_draw, v_rig, v_fl, L):
     w_tot = w_r + w_fl
 
     return x_coord, u_tot, w_tot
+
+
