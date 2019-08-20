@@ -169,16 +169,29 @@ def handle_result(solver, t, y, yd):
 
 
 z0_cr = L_crank + offset_cr
-theta1 = np.arcsin(ecc/np.sqrt(L_coupler**2 - z0_cr**2))
-theta2 = np.arcsin(z0_cr/L_coupler)
+theta_cr = pi/2
+theta1_cl = np.arcsin(ecc/np.sqrt(L_coupler**2 - z0_cr**2))
+theta2_cl = np.arcsin(z0_cr/L_coupler)
 
-Rot_theta1 = np.array([[np.cos(theta1), -np.sin(theta1), 0],
-                       [np.sin(theta1), +np.cos(theta1), 0],
+A_vel = np.array([[L_coupler*np.cos(theta2_cl)*np.sin(theta1_cl), L_coupler*np.sin(theta2_cl)*np.cos(theta1_cl), 1],
+                  [-L_coupler*np.cos(theta2_cl)*np.cos(theta1_cl), L_coupler*np.sin(theta2_cl)*np.sin(theta1_cl), 0],
+                  [0, L_coupler*np.cos(theta2_cl), 0]])
+
+b_vel = np.array([0, L_crank*np.sin(theta_cr)*omega_cr, L_crank*np.cos(theta_cr)*omega_cr])
+
+dtheta1_cl, dtheta2_cl, dx_sl = la.solve(A_vel, b_vel)
+
+omx_B = np.sin(theta2_cl) * dtheta1_cl
+omy_B = dtheta2_cl
+omz_B = -np.cos(theta2_cl) * dtheta1_cl
+
+Rot_theta1 = np.array([[np.cos(theta1_cl), -np.sin(theta1_cl), 0],
+                       [np.sin(theta1_cl), +np.cos(theta1_cl), 0],
                        [0, 0, 1]])
 
-Rot_theta2 = np.array([[np.cos(theta2), 0,  np.sin(theta2)],
+Rot_theta2 = np.array([[np.cos(theta2_cl), 0,  np.sin(theta2_cl)],
                        [0, 1, 0],
-                       [-np.sin(theta2), 0, np.cos(theta2)]])
+                       [-np.sin(theta2_cl), 0, np.cos(theta2_cl)]])
 
 T_I2B = Rot_theta2.T @ Rot_theta1
 R_B2I = T_I2B.T
@@ -196,26 +209,29 @@ r0C_I = np.array([x0C_I, -ecc, 0])
 
 rCP_I = r0P_I - r0C_I
 assert L_coupler == np.linalg.norm(rCP_I)
-# om0_clI = skew(rCP_I) @ v0P_I/L_coupler**2
-
-A_com = np.concatenate((skew(rCP_I), np.array([-1, 0, 0]).reshape((-1, 1))), axis=1)
-om_vx = np.linalg.lstsq(A_com, -v0P_I)[0]
-
-om0_clI = om_vx[:3]
-vx0C_I = om_vx[-1]
-
-v0C_I = v0P_I + skew(rCP_I) @ om0_clI
-# assert v0C_I.all() == 0
 
 v0P_B = T_I2B @ v0P_I
-om0_clB = T_I2B @ om0_clI
+rCP_B = T_I2B @ rCP_I
+
+om0_clB = np.array([omx_B, omy_B, omz_B])
+om0_clI = R_B2I @ om0_clB
+
+v0C_I = v0P_I + skew(rCP_I) @ om0_clI
+
+tol = 1e-14
+assert abs(v0C_I[0] - dx_sl) < tol
+assert abs(v0C_I[1]) < tol
+assert abs(v0C_I[2]) < tol
+
+
+v0P_B = T_I2B @ v0P_I
 
 e0_cl = np.concatenate((v0P_B, om0_clB))
-e0_sl = T_I2B @ np.array([v0C_I[0], 0, 0])
+e0_sl = T_I2B @ np.array([dx_sl, 0, 0])
+e0_fl = np.zeros((sys.n_f, ))
 
-e0_sys = np.concatenate((e0_cl, e0_sl))
+e0_sys = np.concatenate((e0_cl, e0_sl, e0_fl))
 quat0_sys = quaternion.as_float_array(quaternion.from_rotation_matrix(R_B2I))
-
 
 def find_initial_condition(e0, quat0):
     G0_slider = np.zeros((n_e, 2))

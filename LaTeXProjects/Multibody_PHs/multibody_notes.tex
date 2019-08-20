@@ -1,0 +1,97 @@
+\documentclass[11t]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[cyr]{aeguill}
+\usepackage[english]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\usepackage{graphicx}
+
+\usepackage{authblk}	
+\usepackage{geometry}
+\geometry{top=3cm,bottom=3cm,left=2.5cm,right=2.5cm}
+
+\usepackage{mathrsfs}
+
+\usepackage{multirow}
+\usepackage[justification=centering]{caption}
+\usepackage{subfig}
+\usepackage{xcolor,colortbl}
+\usepackage{diffcoeff}
+
+\usepackage[colorlinks=true,linkcolor=black, citecolor=blue, urlcolor=blue]{hyperref}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\division}{\div}
+
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator*{\grad}{grad}
+\DeclareMathOperator*{\Grad}{Grad}
+\DeclareMathOperator*{\Div}{Div}
+\renewcommand{\div}{\operatorname{div}}
+\DeclareMathOperator*{\Hess}{Hess}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{remark}{Remark}
+\newtheorem{proposition}{Proposition}
+\newtheorem{definition}{Definition}
+\newtheorem{corollary}{Corollary}
+
+\graphicspath{{./Figures/}}
+
+\def\onedot{$\mathsurround0pt\ldotp$}
+\def\cddot{% two dots stacked vertically
+	\mathbin{\vcenter{\baselineskip.67ex
+			\hbox{\onedot}\hbox{\onedot}}%
+}}
+
+\makeatletter \renewcommand\d[1]{\ensuremath{%
+		\;\mathrm{d}#1\@ifnextchar\d{\!}{}}}
+\makeatother
+
+\title{Port-Hamiltonian formulation of multibody flexible systems}	
+
+\author[1]{Andrea Brugnoli\thanks{andrea.brugnoli@isae.fr}}
+\author[1]{Daniel Alazard\thanks{daniel.alazard@isae.fr}}
+\author[1]{Val\'erie Pommier-Budinger \thanks{valerie.budinger@isae.fr}}
+\author[1]{Denis Matignon \thanks{denis.matignon@isae.fr}}
+\affil[1]{ISAE-SUPAERO, Universit\'e de Toulouse, France. \\
+	10 Avenue Edouard Belin, BP-54032, 31055 Toulouse Cedex 4.}
+
+\begin{document}
+\maketitle
+
+\section{Lagrangian Multibody Dynamics}
+The model for the classical equations can be found in \cite{MB_Daepde}. The small difference with respect to the derivation therein is that it is the equation for the translation is now written in the body frame (i.e. the first equation is multiplied by $A^T$). The dynamics is compututed at a generic point $P$, that is not necessarily the center of mass: 
+
+\begin{equation}
+	\begin{aligned}
+	m (\dot{{v}}_P + \widetilde{\omega} v_P) - \int_{\Omega} \rho (\widetilde{x} + \widetilde{u}) \d{x} \, \dot{{\omega}}_P + \widetilde{\omega} \widetilde{\omega} \int_{\Omega} \rho (\widetilde{x} + \widetilde{u}) \d{x} + \int_{\Omega} (\rho (2 \widetilde{\omega} \dot{u} + \ddot{u})) \d{x} = \int_{\Omega} \beta \d{x} + \int_{\partial \Omega} \tau \d{S}, \\
+	\int_{\Omega} \rho (\widetilde{x} + \widetilde{u}) \d{x} (\dot{{v}}_P + \widetilde{\omega} v_P) + J \dot{\omega}_P + \widetilde{\omega}_P J \omega_P + \int_{\Omega} \rho (\widetilde{x} + \widetilde{u}) \ddot{u} \d{x} + \int_{\Omega} 2\rho (\widetilde{x} + \widetilde{u}) \widetilde{\omega} \dot{u} \d{x} = \\
+	\int_{\Omega}(\widetilde{x} + \widetilde{u}) \beta \d{x} + \int_{\partial \Omega}(\widetilde{x} + \widetilde{u}) \tau \d{S} \\
+	\rho (\dot{{v}}_P + \widetilde{\omega} v_P) + \rho (\widetilde{\dot{{\omega}}}_P + \widetilde{\omega}\widetilde{\omega})(x + u) + \rho (2 \widetilde{\omega} \dot{u} + \ddot{u}) = - \div{\Sigma} + \beta
+	\end{aligned}
+\end{equation}
+
+where $ J= - \int_{\Omega} \rho (\widetilde{x} + \widetilde{u})(\widetilde{x} + \widetilde{u}) \d{x}$. 
+If the absolute flexible velocity computed in the body frame is introduced $v_f = \dot{u} + \widetilde{\omega}_P u$ the equations may be rewritten as follows
+
+\begin{equation}
+\begin{aligned}
+m (\dot{{v}}_P + \widetilde{\omega} v_P) - \int_{\Omega} \rho \widetilde{x} \d{x} \, \dot{{\omega}}_P + \widetilde{\omega} \widetilde{\omega} \int_{\Omega} \rho \widetilde{x} \d{x} + \int_{\Omega} \rho \dot{v}_f + \widetilde{\omega} \int_{\Omega} \rho v_f  = \int_{\Omega} \beta \d{x} + \int_{\partial \Omega} \tau \d{S}, \\
+\int_{\Omega} \rho (\widetilde{x} + \widetilde{u}) \d{x} (\dot{{v}}_P + \widetilde{\omega} v_P) + J \dot{\omega}_P + \widetilde{\omega}_P J \omega_P + \int_{\Omega} \rho (\widetilde{x} + \widetilde{u}) \ddot{u} \d{x} + \int_{\Omega} 2\rho (\widetilde{x} + \widetilde{u}) \widetilde{\omega} \dot{u} \d{x} = \\
+\int_{\Omega}(\widetilde{x} + \widetilde{u}) \beta \d{x} + \int_{\partial \Omega}(\widetilde{x} + \widetilde{u}) \tau \d{S} \\
+\rho (\dot{{v}}_P + \widetilde{\omega} v_P) + \rho (\widetilde{\dot{{\omega}}}_P + \widetilde{\omega}\widetilde{\omega})x + \rho \dot{v}_f + \rho \widetilde{\omega} v_f = - \div{\Sigma} + \beta
+\end{aligned}
+\end{equation}
+
+
+
+
+
+\bibliographystyle{unsrt}
+\bibliography{multibody} 
+
+\end{document}
+\endinput

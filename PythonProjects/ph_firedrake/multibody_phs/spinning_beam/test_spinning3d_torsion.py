@@ -132,12 +132,10 @@ def sys(t,y):
     p_v = M[n_r + n_pu:n_r + n_pu + n_pv, :] @ y_e
     p_w = M[n_r + n_pu + n_pv:n_r + n_p, :] @ y_e
 
+    p_u[1::2] = 0
+    p_v[1::2] = 0
+    p_w[1::2] = 0
     alflex_cross = skew_flex(p_u, p_v, p_w)
-
-    # p_u[1::2] = 0
-    # p_v[1::2] = 0
-    # p_w[1::2] = 0
-    # alflex_cross_noang = skew_flex(p_u, p_v, p_w)
 
     J[n_r:n_r + n_p, :n_r] = alflex_cross
     J[:n_r, n_r:n_r + n_p] = -alflex_cross.T

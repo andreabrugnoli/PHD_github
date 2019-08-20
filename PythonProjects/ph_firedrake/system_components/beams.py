@@ -175,7 +175,6 @@ class FloatFlexBeam(SysPhdaeRig):
         M_fr[:, 2] = assemble(vp_y * rho * A * x[0] * dx).vector().get_local()
 
         M_fr = M_fr[dofs2keep, :]
-        plt.spy(M_fr); plt.show()
 
         M_r = np.zeros((n_rig, n_rig))
         m_beam = rho * L * A
@@ -509,6 +508,7 @@ class SpatialBeamTorsion(SysPhdaeRig):
         M_fr = np.zeros((n_V, n_rig))
         M_fr[:np_ux, 0] = assemble(vp_ux * rho * A * dx).vector().get_local()[:np_ux]
         # M_fr[np_ux:np_x, 0] = assemble(vp_thx * rho * A * dx).vector().get_local()[np_ux:np_x]
+
         M_fr[:, 1] = assemble(vp_y * rho * A * dx).vector().get_local()
         M_fr[:, 2] = assemble(vp_z * rho * A * dx).vector().get_local()
 
@@ -524,19 +524,18 @@ class SpatialBeamTorsion(SysPhdaeRig):
 
         ind_perm = ind_perm_x + list(range(np_x, n_V))
 
-        print(ind_perm)
 
         M_f = permute_rows_columns(M_FEM, ind_perm)
         J_f = permute_rows_columns(J_FEM, ind_perm)
         B_f = permute_rows(B_FEM, ind_perm)
         M_fr = permute_rows(M_fr, ind_perm)
 
-        plt.figure()
-        plt.spy(M_FEM)
-        plt.show()
-        plt.figure()
-        plt.spy(M_f)
-        plt.show()
+        # plt.figure()
+        # plt.spy(M_FEM)
+        # plt.show()
+        # plt.figure()
+        # plt.spy(M_f)
+        # plt.show()
 
         dofs2dump = list([0, 1, np_x, np_x + 1, np_x + np_y, np_x + np_y + 1])
         dofs2keep = list(set(range(n_V)).difference(set(dofs2dump)))
@@ -554,10 +553,6 @@ class SpatialBeamTorsion(SysPhdaeRig):
 
         M_fr = M_fr[dofs2keep]
         B_f = B_f[dofs2keep]
-
-        plt.figure()
-        plt.spy(M_f); plt.show()
-
 
         assert len(M_f) == n_fl
 
@@ -1061,6 +1056,78 @@ def draw_deformation3D(n_draw, v_rig, v_fl, L):
 
     return x_coord, u_tot, v_tot, w_tot
 
+
+def draw_deformation3D_torsion(n_draw, v_rig, v_fl, L):
+    # Suppose no displacement in zero
+    assert len(v_rig) == 6
+    assert len(v_fl) % 6 == 0
+    n_el = int(len(v_fl)/6)
+
+    ufl_dofs = v_fl[:n_el]
+    vfl_dofs = v_fl[2*n_el:4*n_el]
+    wfl_dofs = v_fl[4* n_el:]
+
+    dx_el = L/n_el
+
+    u_P = v_rig[0]
+    v_P = v_rig[1]
+    w_P = v_rig[2]
+
+    omx_P = v_rig[3]
+    omy_P = v_rig[4]
+    omz_P = v_rig[5]
+
+    x_coord = np.linspace(0, L, num=n_draw)
+
+    u_r = u_P*np.ones_like(x_coord)
+    v_r = v_P * np.ones_like(x_coord) + x_coord * omz_P
+    w_r = w_P*np.ones_like(x_coord) - x_coord*omy_P
+
+    u_fl = np.zeros_like(x_coord)
+    v_fl = np.zeros_like(x_coord)
+    w_fl = np.zeros_like(x_coord)
+
+    i_el = 0
+    xin_elem = i_el * dx_el
+
+    for i in range(n_draw):
+
+        x_til = (x_coord[i] - xin_elem) / dx_el
+
+        if x_til > 1:
+            i_el = i_el + 1
+            if i_el == n_el:
+                i_el = i_el - 1
+
+            xin_elem = i_el * dx_el
+            x_til = (x_coord[i] - xin_elem) / dx_el
+
+        phi1_u = (1 - x_til)
+        phi2_u = x_til
+
+        phi1_w = 1 - 3 * x_til ** 2 + 2 * x_til ** 3
+        phi2_w = x_til - 2 * x_til ** 2 + x_til ** 3
+        phi3_w = + 3 * x_til ** 2 - 2 * x_til ** 3
+        phi4_w = + x_til ** 3 - x_til ** 2
+
+        if i_el == 0:
+            u_fl[i] = phi2_u * ufl_dofs[i_el]
+            v_fl[i] = phi3_w * vfl_dofs[2 * i_el] + phi4_w * vfl_dofs[2 * i_el + 1]
+            w_fl[i] = phi3_w * wfl_dofs[2 * i_el] + phi4_w * wfl_dofs[2 * i_el + 1]
+        else:
+            u_fl[i] = phi1_u * ufl_dofs[i_el-1] + phi2_u * ufl_dofs[i_el]
+
+            v_fl[i] = phi1_w * vfl_dofs[2 * (i_el - 1)] + phi2_w * vfl_dofs[2 * i_el - 1] + \
+                      phi3_w * vfl_dofs[2 * i_el] + phi4_w * vfl_dofs[2 * i_el + 1]
+
+            w_fl[i] = phi1_w * wfl_dofs[2 * (i_el - 1)] + phi2_w * wfl_dofs[2 * i_el - 1] + \
+                        phi3_w * wfl_dofs[2 * i_el] + phi4_w * wfl_dofs[2 * i_el + 1]
+
+    u_tot = u_r + u_fl
+    v_tot = v_r + v_fl
+    w_tot = w_r + w_fl
+
+    return x_coord, u_tot, v_tot, w_tot
 
 def draw_bending(n_draw, v_rig, v_fl, L):
     # Suppose no displacement in zero

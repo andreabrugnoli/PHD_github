@@ -8,7 +8,7 @@ from scipy.integrate import solve_ivp
 from scipy.interpolate import interp1d
 
 from modules_phdae.classes_phsystem import SysPhdaeRig
-from system_components.beams import FloatFlexBeam, draw_deformation
+from system_components.beams import FloatingPlanarEB, draw_bending
 from math import pi
 
 from assimulo.solvers import IDA
@@ -36,12 +36,12 @@ E_coupler = 200 * 10**9
 
 omega_cr = 150
 
-nr_coupler = 2
+nr_coupler = 3
 nr_mass = 2
 nr_tot = nr_coupler + nr_mass
 
-n_elem = 1
-coupler = FloatFlexBeam(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler)
+n_elem = 6
+coupler = FloatingPlanarEB(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler)
 
 mass_coupler = rho_coupler * A_coupler * L_coupler
 M_mass = 0.5 * la.block_diag(mass_coupler, mass_coupler)
@@ -61,8 +61,6 @@ G_coupler = sys.B[:, [0, 1]]
 n_sys = sys.n
 n_e = sys.n_e
 n_p = sys.n_p
-n_pu = int(n_p/3)
-n_pw = n_p - n_pu
 
 n_tot = n_sys + 4  # 3 lambda et theta
 order = []
@@ -80,18 +78,9 @@ def dae_closed_phs(t, y, yd):
     p_coupler = M_sys[:2, :n_e] @ y_sys[:n_e]
     p_mass = M_sys[nr_coupler:nr_tot, :n_e] @ y_sys[:n_e]
 
-    p_u = M_sys[nr_tot:nr_tot+n_pu, :n_e] @ y_sys[:n_e]
-    p_w = M_sys[nr_tot+n_pu:nr_tot+n_p, :n_e] @ y_sys[:n_e]
-
-    p_wdis = np.array([p_w[i] for i in range(len(p_w)) if i % 2 == 0])
-    p_udis = np.zeros_like(p_w)
-    p_udis[::2] = p_u
-
     J_sys[:2, 2] = [+p_coupler[1], -p_coupler[0]]
     J_sys[2, :2] = [-p_coupler[1], +p_coupler[0]]
     J_sys[3:5, 2] = [+p_mass[1], -p_mass[0]]
-    J_sys[nr_tot:nr_tot+n_p, 2] = np.concatenate((p_wdis, -p_udis))
-    J_sys[2, nr_tot:nr_tot+n_p] = np.concatenate((-p_wdis, +p_udis))
 
     R_th = np.array([[np.cos(theta_cl), -np.sin(theta_cl)],
                     [np.sin(theta_cl), np.cos(theta_cl)]])
@@ -129,6 +118,7 @@ y0[1] = omega_cr * L_crank
 y0[2] = - omega_cr * L_crank / L_coupler
 y0[-4] = - mass_coupler * omega_cr ** 2 * L_crank
 yd0[0] = - omega_cr ** 2 * L_crank
+
 # Create an Assimulo implicit problem
 imp_mod = Implicit_Problem(dae_closed_phs, y0, yd0, name='dae_closed_pHs')
 imp_mod.handle_result = handle_result
@@ -151,7 +141,7 @@ imp_sim.make_consistent('IDA_YA_YDP_INIT')
 
 # Simulate
 t_final = 8/omega_cr
-n_ev = 2000
+n_ev = 1000
 t_ev = np.linspace(0, t_final, n_ev)
 t_sol, y_sol, yd_sol = imp_sim.simulate(t_final, 0, t_ev)
 e_sol = y_sol[:, :n_e].T
@@ -162,12 +152,7 @@ er_cl_sol = e_sol[:nr_coupler, :]
 ep_sol = e_sol[nr_tot:nr_tot + n_p, :]
 om_cl_sol = er_cl_sol[2, :]
 
-
-nw = int(2*n_p/3)
-nu = int(n_p/3)
-
-up_sol = ep_sol[:nu, :]
-wp_sol = ep_sol[nu:, :]
+wp_sol = ep_sol
 
 n_ev = len(t_sol)
 dt_vec = np.diff(t_sol)
@@ -182,30 +167,27 @@ w_plot = np.zeros((n_plot, n_ev))
 t_plot = t_sol
 
 for i in range(n_ev):
-    eu_plot[:, i], ew_plot[:, i] = draw_deformation(n_plot, [0, 0, 0], ep_sol[:, i], L_coupler)[1:3]
+    eu_plot[:, i], ew_plot[:, i] = draw_bending(n_plot, [0, 0, 0], ep_sol[:, i], L_coupler)[1:3]
 
 ind_midpoint = int((n_plot-1)/2)
 
-euM_B = eu_plot[ind_midpoint, :]
 ewM_B = ew_plot[ind_midpoint, :]
 
 omega_cr_int = interp1d(t_ev, om_cl_sol, kind='linear')
-euM_B_int = interp1d(t_ev, euM_B, kind='linear')
 ewM_B_int = interp1d(t_ev, ewM_B, kind='linear')
 
 def sys(t,y):
 
-    dudt = euM_B_int(t) #+ omega_cr_int(t) * y[1]
-    dwdt = ewM_B_int(t) #- omega_cr_int(t) * y[0]
+    dwdt = ewM_B_int(t)
 
-    dydt = np.array([dudt, dwdt])
+    dydt = np.array([dwdt])
     return dydt
 
 
 wM0 = 0
 uM0 = 0
 
-r_sol = solve_ivp(sys, [0, t_final], [uM0, wM0], method='RK45', t_eval=t_ev)
+r_sol = solve_ivp(sys, [0, t_final], [wM0], method='RK45', t_eval=t_ev)
 
 uM_B = r_sol.y[0, :]
 wM_B = r_sol.y[1, :]

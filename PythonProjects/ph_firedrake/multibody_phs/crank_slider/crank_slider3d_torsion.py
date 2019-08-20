@@ -10,7 +10,7 @@ import scipy.linalg as la
 from scipy.sparse.linalg import lsqr
 
 from modules_phdae.classes_phsystem import SysPhdaeRig
-from system_components.beams import SpatialBeam, draw_deformation3D
+from system_components.beams import SpatialBeamTorsion, draw_deformation3D_torsion
 from math import pi
 
 from tools_plotting.animate_lines import animate_line3d
@@ -24,20 +24,19 @@ def skew(x):
                      [-x[1], x[0], 0]])
 
 
-def skew_flex(al_u, al_v, al_w, al_udis, al_vdis, al_wdis):
+def skew_flex(al_u, al_v, al_w):
 
-    nu_dis = len(al_udis)
+    nu = len(al_u)
     nv = len(al_v)
     nw = len(al_w)
 
-    n_rows = len(al_udis) + len(al_v) + len(al_w)
+    n_rows = nu + nv + nw
     skew_mat_flex = np.zeros((n_rows, 3))
 
-    nv_end = nu_dis + nv
-    nw_end = nu_dis + nv + nw
-    skew_mat_flex[:nu_dis, :] = np.column_stack((np.zeros((nu_dis,)), - al_wdis, al_vdis))
-    skew_mat_flex[nu_dis:nv_end, :] = np.column_stack((al_w, np.zeros((nv,)), -al_u))
-    skew_mat_flex[nv_end: nw_end, :] = np.column_stack((-al_v, al_u, np.zeros((nw, ))))
+    nv_end = nu + nv
+    skew_mat_flex[:nu, :] = np.column_stack((np.zeros((nu,)), - al_w, al_v))
+    skew_mat_flex[nu:nv_end, :] = np.column_stack((al_w, np.zeros((nv,)), -al_u))
+    skew_mat_flex[nv_end:, :] = np.column_stack((-al_v, al_u, np.zeros((nw, ))))
 
     return skew_mat_flex
 
@@ -51,8 +50,11 @@ offset_cr = 0
 
 rho_coupler = 7.87 * 10 ** 3
 E_coupler = 200 * 10**9
+nu_coupler = 0.3
+G_coupler = E_coupler/(2*(1+nu_coupler))
 A_coupler = pi * d**2 / 4
 I_coupler = pi * d**4 / 64
+Ir_coupler = pi * d**4 / 32
 
 
 Jxx_coupler = 2 * I_coupler * rho_coupler * L_coupler
@@ -64,7 +66,7 @@ nr_slider = 3
 
 n_elem = 2
 
-coupler = SpatialBeam(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler, Jxx_coupler)
+coupler = SpatialBeamTorsion(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, G_coupler, I_coupler, Ir_coupler)
 
 
 mass_coupler = rho_coupler * A_coupler * L_coupler
@@ -81,9 +83,7 @@ sys = SysPhdaeRig.transformer_ordered(coupler, slider, [6, 7, 8], [0, 1, 2], np.
 n_sys = sys.n
 n_e = sys.n_e
 n_p = sys.n_p
-n_pu = int(n_p/5)
-n_pv = 2*n_pu
-n_pw = 2*n_pu
+n_pu, n_pv, n_pw = int(n_p/3), int(n_p/3), int(n_p/3)
 n_f = coupler.n_f
 nr_tot = sys.n_r
 
@@ -137,24 +137,19 @@ def dae_closed_phs(t, y, yd):
 
     p_slider = M_e[nr_coupler:nr_tot, :] @ e_sys
 
+    p_u = M_e[nr_tot:nr_tot + n_pu, :] @ e_sys
     p_v = M_e[nr_tot+n_pu:nr_tot+n_pu+n_pv, :] @ e_sys
-    p_vdis = np.array([p_v[i] for i in range(len(p_v)) if i % 2 == 0])
-
     p_w = M_e[nr_tot+n_pu+n_pv:nr_tot + n_p, :] @ e_sys
-    p_wdis = np.array([p_w[i] for i in range(len(p_w)) if i % 2 == 0])
-
-    p_udis = M_e[nr_tot:nr_tot + n_pu, :] @ e_sys
-    p_u = np.zeros_like(p_w)
-    p_u[::2] = p_udis
 
     J_e[:3, 3:6] = skew(p_coupler)
     J_e[3:6, :3] = skew(p_coupler)
     J_e[3:6, 3:6] = skew(pi_coupler)
     J_e[nr_coupler:nr_tot, 3:6] = skew(p_slider)
 
+    # p_u[1::2] = 0
     # p_v[1::2] = 0
     # p_w[1::2] = 0
-    alflex_cross = skew_flex(p_u, p_v, p_w, p_udis, p_vdis, p_wdis)
+    alflex_cross = skew_flex(p_u, p_v, p_w)
 
     J_e[nr_tot:nr_tot+n_p, 3:6] = alflex_cross
     J_e[3:6, nr_tot:nr_tot+n_p] = -alflex_cross.T
@@ -391,7 +386,7 @@ t_plot = t_sol
 
 zeros_rig = [0,0,0,0,0,0]
 for i in range(n_ev):
-    eu_plot[:, i], ev_plot[:, i], ew_plot[:, i] = draw_deformation3D(n_plot, zeros_rig, ep_sol[:, i], L_coupler)[1:4]
+    eu_plot[:, i], ev_plot[:, i], ew_plot[:, i] = draw_deformation3D_torsion(n_plot, zeros_rig, ep_sol[:, i], L_coupler)[1:4]
 
 ind_midpoint = int((n_plot-1)/2)
 
@@ -465,12 +460,12 @@ data = np.array([[rP_cl[0], rP_cl[1], rP_cl[2]], [xC_cl, yC_cl, zC_cl], [xP_sl, 
 
 def sys(t,y):
 
-    # dydt = eM_B_int(t) - skew(omega_cl_int(t)) @ y
-    dudt = euM_B_int(t)
-    dvdt = evM_B_int(t)
-    dwdt = ewM_B_int(t)
-
-    dydt = np.array([dudt, dvdt, dwdt])
+    dydt = eM_B_int(t) - skew(omega_cl_int(t)) @ y
+    # dudt = euM_B_int(t)
+    # dvdt = evM_B_int(t)
+    # dwdt = ewM_B_int(t)
+    #
+    # dydt = np.array([dudt, dvdt, dwdt])
     return dydt
 
 
