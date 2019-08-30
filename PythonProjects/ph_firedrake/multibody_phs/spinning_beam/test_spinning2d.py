@@ -8,7 +8,7 @@ from scipy.interpolate import interp1d
 import scipy.linalg as la
 
 from modules_phdae.classes_phsystem import SysPhdaeRig
-from system_components.beams import FloatFlexBeam
+from system_components.beams import FloatFlexBeam, matrices_j2d
 
 
 L_beam = 141.42
@@ -19,7 +19,7 @@ I_beam = 6.75
 Mz_max = 10000
 
 
-n_elem = 6
+n_elem = 2
 
 beam = FloatFlexBeam(n_elem, L_beam, rho_beam, A_beam, E_beam, I_beam)
 
@@ -51,6 +51,9 @@ M = beam_hinged.M_e
 invM = la.inv(M)
 J = beam_hinged.J
 B_Mz0 = beam_hinged.B[:, 2]
+
+Jf_rz, Jf_fx, Jf_fy = matrices_j2d(n_elem, L_beam, rho_beam, A_beam)[2:]
+
 
 t_load = 0.2
 t1 = 10
@@ -84,15 +87,24 @@ def sys(t, y):
     omega = y[0]
     theta = y[-1]
 
-    p_u = M[n_r:n_r + n_pu, :] @ y_e
-    p_w = M[n_r + n_pu:n_r + n_p, :] @ y_e
+    # p_u = M[n_r:n_r + n_pu, :] @ y_e
+    # p_w = M[n_r + n_pu:n_r + n_p, :] @ y_e
+    #
+    # p_wdis = np.array([p_w[i] for i in range(len(p_w)) if i % 2 == 0])
+    # p_udis = np.zeros_like(p_w)
+    # p_udis[::2] = p_u
+    #
+    # J[n_r:n_r + n_p, 0] = np.concatenate((p_wdis, -p_udis))
+    # J[0, n_r:n_r + n_p] = np.concatenate((-p_wdis, +p_udis))
 
-    p_wdis = np.array([p_w[i] for i in range(len(p_w)) if i % 2 == 0])
-    p_udis = np.zeros_like(p_w)
-    p_udis[::2] = p_u
+    eu_beam = y[n_r:n_r + n_pu]
+    ew_beam = y[n_r + n_pu:n_r+ n_p]
 
-    J[n_r:n_r + n_p, 0] = np.concatenate((p_wdis, -p_udis))
-    J[0, n_r:n_r + n_p] = np.concatenate((-p_wdis, +p_udis))
+    jf_u = Jf_fx @ eu_beam
+    jf_w = Jf_rz * omega + Jf_fy @ ew_beam
+
+    J[n_r:n_r + n_p, 0] = np.concatenate((+jf_w, -jf_u))
+    J[0, n_r:n_r + n_p] = np.concatenate((-jf_w, +jf_u))
 
     dedt = invM @ (J @ y_e + B_Mz0 * Mz_0)
     dth = np.array([omega])

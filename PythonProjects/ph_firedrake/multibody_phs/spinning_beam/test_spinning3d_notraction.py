@@ -21,6 +21,23 @@ def skew(x):
                      [-x[1], x[0], 0]])
 
 
+def skew_flex(al_u, al_v, al_w, al_udis, al_vdis, al_wdis):
+
+    nu_dis = len(al_udis)
+    nv = len(al_v)
+    nw = len(al_w)
+
+    n_rows = len(al_udis) + len(al_v) + len(al_w)
+    skew_mat_flex = np.zeros((n_rows, 3))
+
+    nv_end = nu_dis + nv
+    nw_end = nu_dis + nv + nw
+    skew_mat_flex[:nu_dis, :] = np.column_stack((np.zeros((nu_dis,)), - al_wdis, al_vdis))
+    skew_mat_flex[nu_dis:nv_end, :] = np.column_stack((al_w, np.zeros((nv,)), -al_u))
+    skew_mat_flex[nv_end: nw_end, :] = np.column_stack((-al_v, al_u, np.zeros((nw, ))))
+
+    return skew_mat_flex
+
 
 # L_beam = 0.14142
 # rho_beam = 7.8 * 10 ** (6)
@@ -79,7 +96,7 @@ B_FxyzL = beam_hinged.B[:, 6:9]
 
 Jf_tx, Jf_ty, Jf_tz, Jf_ry, Jf_rz, Jf_fx, Jf_fy, Jf_fz = matrices_j3d(n_elem, L_beam, rho_beam, A_beam)
 
-print(np.linalg.cond(Jf_fx), np.linalg.cond(Jf_fy), np.linalg.cond(Jf_fz))
+
 t_load = 0.2
 t1 = 10
 t2 = t1 + t_load
@@ -122,17 +139,21 @@ def sys(t,y):
     pi_beam = M[:n_r, :] @ y_e
     J[:n_r, :n_r] = skew(pi_beam)
 
+    efx = y_e[n_r:n_r + n_pu]
+    efy = y_e[n_r + n_pu:n_r + n_pu + n_pv]
+    efz = y_e[n_r + n_pu + n_pv:n_r + n_p]
 
-    Jf_om = Jf_ry * omega[1] + Jf_rz * omega[2] \
-            + Jf_fy @ efy + Jf_fz @ efz + Jf_fx @ efx
+    Jf_om = Jf_ry * omega[1] + Jf_rz * omega[2] + \
+            Jf_fy @ efy + Jf_fz @ efz # + Jf_fx @ efx +
 
     J[n_r:n_r + n_p, :n_r] = Jf_om
     J[:n_r, n_r:n_r + n_p] = -Jf_om.T
 
+
     dedt = invM @ (J @ y_e + B_Mz0 * Mz_0 + B_FzL * Fz_L)
 
     # act_quat = np.quaternion(y_quat[0], y_quat[1], y_quat[2], y_quat[3])
-    # Rot_mat = quaterRK45nion.as_rotation_matrix(act_quat)
+    # Rot_mat = quaternion.as_rotation_matrix(act_quat)
     # dedt = invM @ (J @ y_e + B_Mz0 * Mz_0 + B_FxyzL @ Rot_mat.T[:, 2] * Fz_L)
 
     Omega_mat = np.array([[0, -omega[0], -omega[1], -omega[2]],
@@ -154,7 +175,7 @@ y0[-n_quat:] = quat0
 t_ev = np.linspace(t_0, t_fin, num=500)
 t_span = [t_0, t_fin]
 
-sol = solve_ivp(sys, t_span, y0, method='Radau', vectorized=False, t_eval=t_ev)
+sol = solve_ivp(sys, t_span, y0, method='RK45', vectorized=False, t_eval=t_ev)
 
 t_sol = sol.t
 y_sol = sol.y

@@ -8,11 +8,12 @@ from scipy.integrate import solve_ivp
 from scipy.interpolate import interp1d
 
 from modules_phdae.classes_phsystem import SysPhdaeRig
-from system_components.beams import FloatFlexBeam, draw_deformation
+from system_components.beams import FloatFlexBeam, draw_deformation, matrices_j2d
 from math import pi
-
 from assimulo.solvers import IDA
 from assimulo.implicit_ode import Implicit_Problem
+
+n_elem = 2
 
 L_crank = 0.15
 L_coupler = 0.3
@@ -36,11 +37,10 @@ E_coupler = 200 * 10**9
 
 omega_cr = 150
 
-nr_coupler = 2
+nr_coupler = 3
 nr_mass = 2
 nr_tot = nr_coupler + nr_mass
 
-n_elem = 1
 coupler = FloatFlexBeam(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler)
 
 mass_coupler = rho_coupler * A_coupler * L_coupler
@@ -52,7 +52,10 @@ mass = SysPhdaeRig(nr_mass, 0, nr_mass, 0, 0, E=M_mass, J=J_mass, B=B_mass)
 
 sys = SysPhdaeRig.transformer_ordered(coupler, mass, [3, 4], [0, 1], np.eye(2))
 
-# plt.spy(sys.E); plt.show()
+Jf_tx, Jf_ty, Jf_rz, Jf_fx, Jf_fy = matrices_j2d(n_elem, L_coupler, rho_coupler, A_coupler)
+
+print(np.linalg.cond(Jf_tx), np.linalg.cond(Jf_ty), np.linalg.cond(Jf_rz), \
+      np.linalg.cond(Jf_fx), np.linalg.cond(Jf_fy))
 
 M_sys = sys.E
 J_sys = sys.J
@@ -66,9 +69,12 @@ n_pw = n_p - n_pu
 
 n_tot = n_sys + 4  # 3 lambda et theta
 order = []
+t_final = 8/omega_cr
 
 
 def dae_closed_phs(t, y, yd):
+
+    print(t/t_final*100)
 
     yd_sys = yd[:n_sys]
     y_sys = y[:n_sys]
@@ -80,18 +86,31 @@ def dae_closed_phs(t, y, yd):
     p_coupler = M_sys[:2, :n_e] @ y_sys[:n_e]
     p_mass = M_sys[nr_coupler:nr_tot, :n_e] @ y_sys[:n_e]
 
-    p_u = M_sys[nr_tot:nr_tot+n_pu, :n_e] @ y_sys[:n_e]
-    p_w = M_sys[nr_tot+n_pu:nr_tot+n_p, :n_e] @ y_sys[:n_e]
+    # p_u = M_sys[nr_tot:nr_tot+n_pu, :n_e] @ y_sys[:n_e]
+    # p_w = M_sys[nr_tot+n_pu:nr_tot+n_p, :n_e] @ y_sys[:n_e]
+    #
+    # p_wdis = np.array([p_w[i] for i in range(len(p_w)) if i % 2 == 0])
+    # p_udis = np.zeros_like(p_w)
+    # p_udis[::2] = p_u
 
-    p_wdis = np.array([p_w[i] for i in range(len(p_w)) if i % 2 == 0])
-    p_udis = np.zeros_like(p_w)
-    p_udis[::2] = p_u
+    vxP_coupler = y_sys[0]
+    vyP_coupler = y_sys[1]
+    omzP_coupler = y_sys[2]
+
+    eu_coupler = y_sys[nr_tot:nr_tot+n_pu]
+    ew_coupler = y_sys[nr_tot+n_pu:nr_tot+n_p]
+
+    jf_u = Jf_tx * vxP_coupler + Jf_fx @ eu_coupler
+    jf_w = Jf_ty * vyP_coupler + Jf_rz * omzP_coupler + Jf_fy @ ew_coupler
 
     J_sys[:2, 2] = [+p_coupler[1], -p_coupler[0]]
     J_sys[2, :2] = [-p_coupler[1], +p_coupler[0]]
     J_sys[3:5, 2] = [+p_mass[1], -p_mass[0]]
-    J_sys[nr_tot:nr_tot+n_p, 2] = np.concatenate((p_wdis, -p_udis))
-    J_sys[2, nr_tot:nr_tot+n_p] = np.concatenate((-p_wdis, +p_udis))
+    # J_sys[nr_tot:nr_tot+n_p, 2] = np.concatenate((p_wdis, -p_udis))
+    # J_sys[2, nr_tot:nr_tot+n_p] = np.concatenate((-p_wdis, +p_udis))
+
+    J_sys[nr_tot:nr_tot + n_p, 2] = np.concatenate((jf_w, -jf_u))
+    J_sys[2, nr_tot:nr_tot + n_p] = np.concatenate((-jf_w, +jf_u))
 
     R_th = np.array([[np.cos(theta_cl), -np.sin(theta_cl)],
                     [np.sin(theta_cl), np.cos(theta_cl)]])
@@ -150,7 +169,6 @@ imp_sim.report_continuously = True
 imp_sim.make_consistent('IDA_YA_YDP_INIT')
 
 # Simulate
-t_final = 8/omega_cr
 n_ev = 2000
 t_ev = np.linspace(0, t_final, n_ev)
 t_sol, y_sol, yd_sol = imp_sim.simulate(t_final, 0, t_ev)
@@ -217,7 +235,7 @@ plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
 plt.ylabel(r'w normalized', fontsize = fntsize)
 plt.title(r"Midpoint deflection", fontsize=fntsize)
 axes = plt.gca()
-# axes.set_ylim([-0.015, 0.02])
+axes.set_ylim([-0.015, 0.02])
 
 plt.show()
 # plt.legend(loc='upper left')
