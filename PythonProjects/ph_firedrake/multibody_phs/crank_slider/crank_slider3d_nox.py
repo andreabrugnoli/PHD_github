@@ -10,7 +10,7 @@ from scipy.interpolate import interp1d
 import scipy.linalg as la
 
 from modules_phdae.classes_phsystem import SysPhdaeRig
-from system_components.beams import SpatialBeamNoTraction, draw_bending
+from system_components.beams import SpatialBeam, draw_deformation3D, matrices_j3d
 from math import pi
 
 from tools_plotting.animate_lines import animate_line3d
@@ -36,23 +36,6 @@ def skew_yz(x):
                      [x[0], 0]])
 
 
-def skew_flex_yz(al_u, al_v, al_w, al_udis, al_vdis, al_wdis):
-
-    nu_dis = len(al_udis)
-    nv = len(al_v)
-    nw = len(al_w)
-
-    n_rows = len(al_udis) + len(al_v) + len(al_w)
-    skew_mat_flex = np.zeros((n_rows, 2))
-
-    nv_end = nu_dis + nv
-    nw_end = nu_dis + nv + nw
-    skew_mat_flex[:nu_dis, :] = np.column_stack((- al_wdis, al_vdis))
-    skew_mat_flex[nu_dis:nv_end, :] = np.column_stack((np.zeros((nv,)), -al_u))
-    skew_mat_flex[nv_end: nw_end, :] = np.column_stack((al_u, np.zeros((nw, ))))
-
-    return skew_mat_flex
-
 
 L_crank = 0.15
 L_coupler = 0.3
@@ -73,8 +56,8 @@ omega_cr = 150
 
 # nr_tot = nr_coupler + nr_slider
 
-n_elem = 2
-coupler = SpatialBeamNoTraction(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler, Jxx_coupler)
+n_elem = 6
+coupler = SpatialBeam(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler, Jxx_coupler)
 dofs2dump = list([3])
 dofs2keep = list(set(range(coupler.n)).difference(set(dofs2dump)))
 
@@ -106,9 +89,9 @@ sys = SysPhdaeRig.transformer_ordered(coupler_nox, slider, [6, 7, 8], [0, 1, 2],
 n_sys = sys.n
 n_e = sys.n_e
 n_p = sys.n_p
-n_pu = 0
-n_pv = int(n_p/2)
-n_pw = int(n_p/2)
+n_pu = int(n_p/5)
+n_pv = 2*n_pu
+n_pw = 2*n_pu
 n_f = coupler.n_f
 nr_tot = sys.n_r
 
@@ -131,6 +114,19 @@ G_coupler = np.zeros((n_e, nlmd_cl))
 G_coupler[:nlmd_cl, :nlmd_cl] = np.eye(nlmd_cl)
 G_slider = np.zeros((n_e, nlmd_sl))
 
+Jf_tx, Jf_ty, Jf_tz, Jf_ry, Jf_rz, Jf_fx, Jf_fy, Jf_fz = matrices_j3d(n_elem, L_coupler, rho_coupler, A_coupler)
+
+Jf_tx = Jf_tx[:, 1:]
+Jf_ty = Jf_ty[:, 1:]
+Jf_tz = Jf_tz[:, 1:]
+
+Jf_ry = Jf_ry[:, 1:]
+Jf_rz = Jf_rz[:, 1:]
+
+Jf_fx = Jf_fx[:, 1:, :]
+Jf_fy = Jf_fy[:, 1:, :]
+Jf_fz = Jf_fz[:, 1:, :]
+
 n_tot = n_e + nlmd_cl + nlmd_sys + nlmd_sl + nquat # 4 coupler, 2 slider, 3 coupler-slider and quaternions
 dx = L_coupler/n_elem
 
@@ -149,6 +145,17 @@ def dae_closed_phs(t, y, yd):
 
     e_sys = y[:n_e]
 
+    vx_coupler = e_sys[0]
+    vy_coupler = e_sys[1]
+    vz_coupler = e_sys[2]
+
+    omy_coupler = e_sys[3]
+    omz_coupler = e_sys[4]
+
+    efx_coupler = e_sys[nr_tot:nr_tot + n_pu]
+    efy_coupler = e_sys[nr_tot + n_pu:nr_tot + n_pu + n_pv]
+    efz_coupler = e_sys[nr_tot + n_pu + n_pv:nr_tot + n_p]
+
     lmd_sys = y[n_e:n_sys]
     lmd_cl = y[n_sys:n_sys + nlmd_cl]
     lmd_mass = y[n_sys + nlmd_cl: -4]
@@ -160,26 +167,16 @@ def dae_closed_phs(t, y, yd):
     p_coupler = M_e[:3, :] @ e_sys
     p_slider = M_e[nr_coupler:nr_tot, :] @ e_sys
 
-
     J_e[:3, 3:nr_coupler] = skew_yz(p_coupler)
     J_e[3:nr_coupler, :3] = -skew_yz(p_coupler).T
     J_e[nr_coupler:nr_tot, 3:nr_coupler] = skew_yz(p_slider)
 
-    # p_v = M_e[nr_tot+n_pu:nr_tot+n_pu+n_pv, :] @ e_sys
-    # p_v[1::2] = 0
-    # p_vdis = np.array([p_v[i] for i in range(len(p_v)) if i % 2 == 0])
+    Jf_om = + Jf_tx * vx_coupler + Jf_ty * vy_coupler + Jf_tz * vz_coupler \
+            + Jf_ry * omy_coupler + Jf_rz * omz_coupler \
+            + Jf_fy @ efy_coupler + Jf_fz @ efz_coupler + Jf_fx @ efx_coupler
 
-    # p_w = M_e[nr_tot+n_pu+n_pv:nr_tot + n_p, :] @ e_sys
-    # p_w[1::2] = 0
-    # p_wdis = np.array([p_w[i] for i in range(len(p_w)) if i % 2 == 0])
-
-    # p_udis = M_e[nr_tot:nr_tot + n_pu, :] @ e_sys
-    # p_u = np.zeros_like(p_w)
-    # p_u[::2] = p_udis
-
-    # alflex_cross = skew_flex_yz(p_u, p_v, p_w, p_udis, p_vdis, p_wdis)
-    # J_e[nr_tot:nr_tot+n_p, 3:nr_coupler] = alflex_cross
-    # J_e[3:nr_coupler, nr_tot:nr_tot+n_p] = -alflex_cross.T
+    J_e[nr_tot:nr_tot + n_p, 3:5] = Jf_om
+    J_e[3:5, nr_tot:nr_tot + n_p] = -Jf_om.T
 
     act_quat = np.quaternion(quat_cl[0], quat_cl[1], quat_cl[2], quat_cl[3])
     Rot_cl = quaternion.as_rotation_matrix(act_quat)
@@ -377,19 +374,16 @@ quat_cl_sol = quaternion.as_quat_array(y_sol[:, -nquat:])
 er_cl_sol = e_sol[:nr_coupler, :]
 ep_sol = e_sol[nr_tot:nr_tot + n_p, :]
 om_cl_sol = er_cl_sol[3:nr_coupler, :]
-#
-# plt.plot(t_ev, om_cl_sol[0], 'b', t_ev, om_cl_sol[1], 'g')
-# plt.show()
-#
+
+plt.plot(t_ev, om_cl_sol[0], 'b', t_ev, om_cl_sol[1], 'g')
+
 # plt.plot(t_ev, G_e.T[0, :] @ e_sol, 'b', t_ev, G_e.T[1, :] @ e_sol, 'r', t_ev, G_e.T[2, :] @ e_sol, 'g')
 # plt.show()
 
-nu = 0
-nv = int(n_p/2)
-nw = int(n_p/2)
 
-vp_sol = ep_sol[nu:nu + nv, :]
-wp_sol = ep_sol[nu + nv:n_p, :]
+up_sol = ep_sol[:n_pu, :]
+vp_sol = ep_sol[n_pu:n_pu + n_pv, :]
+wp_sol = ep_sol[n_pu + n_pv:n_p, :]
 
 n_ev = len(t_sol)
 dt_vec = np.diff(t_sol)
@@ -403,25 +397,24 @@ x_plot = np.linspace(0, L_coupler, n_plot)
 
 t_plot = t_sol
 
-zeros_rig = [0,0,0]
+zeros_rig = [0,0,0,0,0,0]
 for i in range(n_ev):
-    ev_plot[:, i] = draw_bending(n_plot, zeros_rig, vp_sol[:, i], L_coupler)[2]
-    ew_plot[:, i] = draw_bending(n_plot, zeros_rig, wp_sol[:, i], L_coupler)[2]
+    eu_plot[:, i], ev_plot[:, i], ew_plot[:, i] = draw_deformation3D(n_plot, zeros_rig, ep_sol[:, i], L_coupler)[1:4]
 
 ind_midpoint = int((n_plot-1)/2)
 
-# euM_B = eu_plot[ind_midpoint, :]
+euM_B = eu_plot[ind_midpoint, :]
 evM_B = ev_plot[ind_midpoint, :]
 ewM_B = ew_plot[ind_midpoint, :]
 
-# eM_B = np.column_stack((euM_B, evM_B, ewM_B)).T
+eM_B = np.column_stack((euM_B, evM_B, ewM_B)).T
 
-# euM_B_int = interp1d(t_ev, euM_B, kind='linear')
+euM_B_int = interp1d(t_ev, euM_B, kind='linear')
 evM_B_int = interp1d(t_ev, evM_B, kind='linear')
 ewM_B_int = interp1d(t_ev, ewM_B, kind='linear')
 
 omega_cl_int = interp1d(t_ev, om_cl_sol, kind='linear')
-# eM_B_int = interp1d(t_ev, eM_B, kind='linear')
+eM_B_int = interp1d(t_ev, eM_B, kind='linear')
 
 er_cl_sol = e_sol[:nr_coupler, :]
 ef_cl_sol = e_sol[nr_tot:nr_tot +n_f, :]
@@ -475,15 +468,17 @@ zC_cl = r_sol.y[5, :]
 
 data = np.array([[rP_cl[0], rP_cl[1], rP_cl[2]], [xC_cl, yC_cl, zC_cl], [xP_sl, yP_sl, zP_sl]])
 
+data = np.array([[rP_cl[0], rP_cl[1], rP_cl[2]], [xC_cl, yC_cl, zC_cl], [xP_sl, yP_sl, zP_sl]])
+
 
 def sys(t,y):
 
-    # dydt = eM_B_int(t) - skew_nox(omega_cl_int(t)) @ y
+    dydt = eM_B_int(t) #- skew(omega_cl_int(t)) @ y
     # dudt = euM_B_int(t)
-    dvdt = evM_B_int(t)
-    dwdt = ewM_B_int(t)
-
-    dydt = np.array([dvdt, dwdt])
+    # dvdt = evM_B_int(t)
+    # dwdt = ewM_B_int(t)
+    #
+    # dydt = np.array([dudt, dvdt, dwdt])
     return dydt
 
 
@@ -491,10 +486,11 @@ uM0 = 0
 vM0 = 0
 wM0 = 0
 
-r_sol = solve_ivp(sys, [0, t_final], [vM0, wM0], method='RK45', t_eval=t_ev)
+r_sol = solve_ivp(sys, [0, t_final], [uM0, vM0, wM0], method='RK45', t_eval=t_ev)
 
-vM_B = r_sol.y[0, :]
-wM_B = r_sol.y[1, :]
+uM_B = r_sol.y[0, :]
+vM_B = r_sol.y[1, :]
+wM_B = r_sol.y[2, :]
 
 
 uM_I = np.zeros(n_ev)
@@ -512,31 +508,38 @@ for i in range(n_ev):
 
 fntsize = 16
 
+# fig = plt.figure()
+# plt.plot(omega_cr*t_ev, uM_I/L_coupler, 'b-', label="u midpoint")
+# plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
+# plt.ylabel(r'w normalized', fontsize = fntsize)
+# plt.title(r"Midpoint deflection", fontsize=fntsize)
+# plt.legend(loc='upper left')
+#
+# fig = plt.figure()
+# plt.plot(omega_cr*t_ev, vM_I/L_coupler, 'b-', label="y midpoint")
+# plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
+# plt.ylabel(r'w normalized', fontsize = fntsize)
+# plt.title(r"Midpoint deflection", fontsize=fntsize)
+# plt.legend(loc='upper left')
+#
+# fig = plt.figure()
+# plt.plot(omega_cr*t_ev, wM_I/L_coupler, 'b-', label="z midpoint")
+# plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
+# plt.ylabel(r'w normalized', fontsize = fntsize)
+# plt.title(r"Midpoint deflection", fontsize=fntsize)
+# plt.legend(loc='upper left')
+#
+# plt.show()
+
 fig = plt.figure()
-plt.plot(omega_cr*t_ev, uM_I/L_coupler, 'b-', label="u midpoint")
+plt.plot(omega_cr*t_ev, uM_B/L_coupler, 'b-', label="x midpoint")
 plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
-plt.ylabel(r'w normalized', fontsize = fntsize)
+plt.ylabel(r'u normalized', fontsize = fntsize)
 plt.title(r"Midpoint deflection", fontsize=fntsize)
 plt.legend(loc='upper left')
 
 fig = plt.figure()
-plt.plot(omega_cr*t_ev, vM_I/L_coupler, 'b-', label="y midpoint")
-plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
-plt.ylabel(r'w normalized', fontsize = fntsize)
-plt.title(r"Midpoint deflection", fontsize=fntsize)
-plt.legend(loc='upper left')
-
-fig = plt.figure()
-plt.plot(omega_cr*t_ev, wM_I/L_coupler, 'b-', label="z midpoint")
-plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
-plt.ylabel(r'w normalized', fontsize = fntsize)
-plt.title(r"Midpoint deflection", fontsize=fntsize)
-plt.legend(loc='upper left')
-
-plt.show()
-
-fig = plt.figure()
-plt.plot(omega_cr*t_ev, vM_B/L_coupler, 'b-', label="y midpoint")
+plt.plot(omega_cr*t_ev, -vM_B/L_coupler, 'b-', label="y midpoint")
 plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
 plt.ylabel(r'w normalized', fontsize = fntsize)
 plt.title(r"Midpoint deflection", fontsize=fntsize)

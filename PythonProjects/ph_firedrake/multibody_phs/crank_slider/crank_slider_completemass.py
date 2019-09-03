@@ -8,13 +8,12 @@ from scipy.integrate import solve_ivp
 from scipy.interpolate import interp1d
 
 from modules_phdae.classes_phsystem import SysPhdaeRig
-from system_components.beams import FloatFlexBeam, draw_deformation, matrices_j2d
+from system_components.beams import FloatFlexBeam, draw_deformation, matrices_j2d, massmatrices_j3d
 from math import pi
-# from assimulo.solvers import IDA
-from assimulo.solvers import Radau5DAE
+from assimulo.solvers import IDA
 from assimulo.implicit_ode import Implicit_Problem
 
-n_elem = 6
+n_elem = 2
 
 L_crank = 0.15
 L_coupler = 0.3
@@ -25,16 +24,6 @@ I_coupler = pi * d**4 / 64
 
 rho_coupler = 7.87 * 10 ** 3
 E_coupler = 200 * 10**9
-
-# L_crank = 150
-# L_coupler = 300
-# d = 6
-# A_coupler = pi * d**2 / 4
-# I_coupler = pi * d**4 / 64
-#
-#
-# rho_coupler = 7.87 * 10 ** (-6)
-# E_coupler = 200 * 10**3
 
 omega_cr = 150
 
@@ -53,7 +42,7 @@ mass = SysPhdaeRig(nr_mass, 0, nr_mass, 0, 0, E=M_mass, J=J_mass, B=B_mass)
 
 sys = SysPhdaeRig.transformer_ordered(coupler, mass, [3, 4], [0, 1], np.eye(2))
 
-Jf_tx, Jf_ty, Jf_rz, Jf_fx, Jf_fy = matrices_j2d(n_elem, L_coupler, rho_coupler, A_coupler)
+
 
 M_sys = sys.E
 J_sys = sys.J
@@ -65,7 +54,18 @@ n_p = sys.n_p
 n_pu = int(n_p/3)
 n_pw = n_p - n_pu
 
-n_tot = n_sys + 4  # 3 lambda et theta
+Jf_tx, Jf_ty, Jf_rz, Jf_fx, Jf_fy = matrices_j2d(n_elem, L_coupler, rho_coupler, A_coupler)
+s_u, J_xu, J_uu = massmatrices_j3d(n_elem, L_coupler, rho_coupler, A_coupler)
+
+s_u = s_u[2, :2, :n_p]
+J_xu = J_xu[2, 2, :n_p]
+J_uu = J_uu[2, 2, :n_p, :n_p]
+
+nlmb_sys = sys.n_lmb
+nlmb_cl = 2
+nlmb_sl = 1
+nlmb_tot = nlmb_sys + nlmb_cl + nlmb_sl
+n_tot = n_e + nlmb_tot + 1 + n_p  # 3 lambda et theta
 order = []
 t_final = 8/omega_cr
 
@@ -75,21 +75,40 @@ def dae_closed_phs(t, y, yd):
     print(t/t_final*100)
 
     yd_sys = yd[:n_sys]
-    y_sys = y[:n_sys]
-    lmd_cl = y[n_sys:-2]
-    lmd_mass = y[-2]
-    theta_cl = y[-1]
-    omega_cl = y[2]
+    dtheta = yd[-1-n_p]
+    du_el = yd[-n_p:]
 
-    p_coupler = M_sys[:2, :n_e] @ y_sys[:n_e]
-    p_mass = M_sys[nr_coupler:nr_tot, :n_e] @ y_sys[:n_e]
+    y_sys = y[:n_sys]
+    lmd_cl = y[n_sys:-2-n_p]
+    lmd_mass = y[-2-n_p]
+    theta_cl = y[-1-n_p]
+    omega_cl = y[2]
+    u_el = y[-n_p:]
+
+    ux_el = u_el[:n_pu]
+    uy_el = u_el[n_pu:]
 
     vxP_coupler = y_sys[0]
     vyP_coupler = y_sys[1]
     omzP_coupler = y_sys[2]
 
-    eu_coupler = y_sys[nr_tot:nr_tot+n_pu]
-    ew_coupler = y_sys[nr_tot+n_pu:nr_tot+n_p]
+    ep_coupler = y_sys[nr_tot:nr_tot+n_p]
+
+    eu_coupler = ep_coupler[:n_pu]
+    ew_coupler = ep_coupler[n_pu:]
+
+    M_sys[2, :2] = M_sys[2, :2] + s_u @ u_el
+    M_sys[:2, 2] = M_sys[:2, 2] + s_u @ u_el
+    M_sys[2, 2] = M_sys[2, 2] + (J_uu @ u_el) @ u_el + J_xu @ u_el
+
+    mf_u = + Jf_fx @ ux_el
+    mf_w = + Jf_fy @ uy_el
+
+    M_sys[nr_tot:nr_tot + n_p, 2] = M_sys[nr_tot:nr_tot + n_p, 2] + np.concatenate((mf_w, -mf_u))
+    M_sys[2, nr_tot:nr_tot + n_p] = M_sys[2, nr_tot:nr_tot + n_p] + np.concatenate((mf_w, -mf_u))
+
+    p_coupler = M_sys[:2, :n_e] @ y_sys[:n_e]
+    p_mass = M_sys[nr_coupler:nr_tot, :n_e] @ y_sys[:n_e]
 
     jf_u = Jf_tx * vxP_coupler + Jf_fx @ eu_coupler
     jf_w = Jf_ty * vyP_coupler + Jf_rz * omzP_coupler + Jf_fy @ ew_coupler
@@ -97,8 +116,6 @@ def dae_closed_phs(t, y, yd):
     J_sys[:2, 2] = [+p_coupler[1], -p_coupler[0]]
     J_sys[2, :2] = [-p_coupler[1], +p_coupler[0]]
     J_sys[3:5, 2] = [+p_mass[1], -p_mass[0]]
-    # J_sys[nr_tot:nr_tot+n_p, 2] = np.concatenate((p_wdis, -p_udis))
-    # J_sys[2, nr_tot:nr_tot+n_p] = np.concatenate((-p_wdis, +p_udis))
 
     J_sys[nr_tot:nr_tot + n_p, 2] = np.concatenate((jf_w, -jf_u))
     J_sys[2, nr_tot:nr_tot + n_p] = np.concatenate((-jf_w, +jf_u))
@@ -115,9 +132,10 @@ def dae_closed_phs(t, y, yd):
 
     res_cl = - G_coupler.T @ y_sys + R_th.T @ vC_cr
     res_mass = np.reshape(G_mass, (1, -1)) @ y_sys
-    res_th = np.reshape(yd[-1] - omega_cl, (1, ))
+    res_th = np.reshape(dtheta - omega_cl, (1, ))
+    res_u = du_el - ep_coupler
 
-    res = np.concatenate((res_sys, res_cl, res_mass, res_th), axis=0)
+    res = np.concatenate((res_sys, res_cl, res_mass, res_th, res_u), axis=0)
     return res
 
 
@@ -137,20 +155,17 @@ yd0 = np.zeros(n_tot)  # Initial conditions
 
 y0[1] = omega_cr * L_crank
 y0[2] = - omega_cr * L_crank / L_coupler
-
-# y0[nr_tot:nr_tot + n_pu] = 2.2*10**(-5) * np.array(list(range(1, n_elem+1)))
-y0[-4] = - mass_coupler * omega_cr ** 2 * L_crank
+y0[-4-n_p] = - mass_coupler * omega_cr ** 2 * L_crank
 yd0[0] = - omega_cr ** 2 * L_crank
 # Create an Assimulo implicit problem
 imp_mod = Implicit_Problem(dae_closed_phs, y0, yd0, name='dae_closed_pHs')
 imp_mod.handle_result = handle_result
 
 # Set the algebraic components
-imp_mod.algvar = list(np.concatenate((np.ones(n_e), np.zeros(n_tot - n_e - 1), np.ones(1))))
+imp_mod.algvar = list(np.concatenate((np.ones(n_e), np.zeros(nlmb_tot), np.ones(1+n_p))))
 
 # Create an Assimulo implicit solver (IDA)
-# imp_sim = IDA(imp_mod)  # Create a IDA solver
-imp_sim = Radau5DAE(imp_mod)  # Create a IDA solver
+imp_sim = IDA(imp_mod)  # Create a IDA solver
 
 # Sets the paramters
 imp_sim.atol = 1e-6  # Default 1e-6
@@ -163,12 +178,14 @@ imp_sim.report_continuously = True
 imp_sim.make_consistent('IDA_YA_YDP_INIT')
 
 # Simulate
-n_ev = 2000
+n_ev = 500
 t_ev = np.linspace(0, t_final, n_ev)
 t_sol, y_sol, yd_sol = imp_sim.simulate(t_final, 0, t_ev)
 e_sol = y_sol[:, :n_e].T
-lmb_sol = y_sol[:, n_e:-1].T
-th_cl_sol = y_sol[:, -1]
+dis_sol = y_sol[:, -n_p:].T
+
+lmb_sol = y_sol[:, n_e:-1-n_p].T
+th_cl_sol = y_sol[:, -1-n_p]
 
 er_cl_sol = e_sol[:nr_coupler, :]
 ep_sol = e_sol[nr_tot:nr_tot + n_p, :]
@@ -185,8 +202,8 @@ n_ev = len(t_sol)
 dt_vec = np.diff(t_sol)
 
 n_plot = 11
-eu_plot = np.zeros((n_plot, n_ev))
-ew_plot = np.zeros((n_plot, n_ev))
+u_plot = np.zeros((n_plot, n_ev))
+w_plot = np.zeros((n_plot, n_ev))
 
 x_plot = np.linspace(0, L_coupler, n_plot)
 w_plot = np.zeros((n_plot, n_ev))
@@ -194,41 +211,14 @@ w_plot = np.zeros((n_plot, n_ev))
 t_plot = t_sol
 
 for i in range(n_ev):
-    eu_plot[:, i], ew_plot[:, i] = draw_deformation(n_plot, [0, 0, 0], ep_sol[:, i], L_coupler)[1:3]
+    u_plot[:, i], w_plot[:, i] = draw_deformation(n_plot, [0, 0, 0], dis_sol[:, i], L_coupler)[1:3]
 
 ind_midpoint = int((n_plot-1)/2)
 
-euM_B = eu_plot[ind_midpoint, :]
-ewM_B = ew_plot[ind_midpoint, :]
-
-omega_cr_int = interp1d(t_ev, om_cl_sol, kind='linear')
-euM_B_int = interp1d(t_ev, euM_B, kind='linear')
-ewM_B_int = interp1d(t_ev, ewM_B, kind='linear')
-
-def sys(t,y):
-
-    dudt = euM_B_int(t) #+ omega_cr_int(t) * y[1]
-    dwdt = ewM_B_int(t) #- omega_cr_int(t) * y[0]
-
-    dydt = np.array([dudt, dwdt])
-    return dydt
-
-
-wM0 = 0
-uM0 = 0
-
-r_sol = solve_ivp(sys, [0, t_final], [uM0, wM0], method='RK45', t_eval=t_ev)
-
-uM_B = r_sol.y[0, :]
-wM_B = r_sol.y[1, :]
+uM_B = u_plot[ind_midpoint, :]
+wM_B = w_plot[ind_midpoint, :]
 
 fntsize = 16
-fig = plt.figure()
-plt.plot(omega_cr*t_ev, -uM_B/L_coupler, 'b-')
-plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
-plt.ylabel(r'w normalized', fontsize = fntsize)
-plt.title(r"Midpoint deflection", fontsize=fntsize)
-
 fig = plt.figure()
 plt.plot(omega_cr*t_ev, -wM_B/L_coupler, 'b-')
 plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)

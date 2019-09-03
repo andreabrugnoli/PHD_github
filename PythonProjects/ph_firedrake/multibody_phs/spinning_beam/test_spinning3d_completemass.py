@@ -10,7 +10,7 @@ from scipy.interpolate import interp1d
 import scipy.linalg as la
 
 from modules_phdae.classes_phsystem import SysPhdaeRig
-from system_components.beams import SpatialBeam, draw_deformation3D, matrices_j3d
+from system_components.beams import SpatialBeam, draw_deformation3D, matrices_j3d, massmatrices_j3d
 from math import pi
 
 from tools_plotting.animate_lines import animate_line3d
@@ -41,7 +41,7 @@ Fz_max = 100
 mass_beam = rho_beam * A_beam * L_beam
 Jxx_beam = 2 * I_beam * rho_beam * L_beam
 
-n_elem = 6
+n_elem = 2
 
 beam = SpatialBeam(n_elem, L_beam, rho_beam, A_beam, E_beam, I_beam, Jxx_beam)
 
@@ -66,7 +66,7 @@ n_pu = int(n_p/5)
 n_pv = 2*n_pu
 n_pw = 2*n_pu
 n_f = beam_hinged.n_f
-n_tot = n_e + n_quat
+n_tot = n_e + n_quat + n_p
 
 
 M = beam_hinged.M_e
@@ -78,8 +78,8 @@ B_FzL = beam_hinged.B[:, 8]
 B_FxyzL = beam_hinged.B[:, 6:9]
 
 Jf_tx, Jf_ty, Jf_tz, Jf_ry, Jf_rz, Jf_fx, Jf_fy, Jf_fz = matrices_j3d(n_elem, L_beam, rho_beam, A_beam)
+s_u, J_xu, J_uu = massmatrices_j3d(n_elem, L_beam, rho_beam, A_beam)
 
-print(np.linalg.cond(Jf_fx), np.linalg.cond(Jf_fy), np.linalg.cond(Jf_fz))
 t_load = 0.2
 t1 = 10
 t2 = t1 + t_load
@@ -113,11 +113,26 @@ def sys(t,y):
 
     y_e = y[:n_e]
     omega = y[:n_r]
-    y_quat = y[-n_quat:]
+    y_quat = y[n_e:n_e+n_quat]
 
-    efx = y_e[n_r:n_r + n_pu]
-    efy = y_e[n_r + n_pu:n_r + n_pu + n_pv]
-    efz = y_e[n_r + n_pu + n_pv:n_r + n_p]
+    u_el = y[-n_p:]
+
+    ux_el = u_el[:n_pu]
+    uy_el = u_el[n_pu:n_pu + n_pv]
+    uz_el = u_el[n_pu + n_pv:n_p]
+
+    ep_el = y_e[n_r:n_r + n_p]
+
+    efx = ep_el[:n_pu]
+    efy = ep_el[n_pu:n_pu + n_pv]
+    efz = ep_el[n_pu + n_pv:n_p]
+
+    M[:n_r, :n_r] = M[:n_r, :n_r] + J_xu @ u_el + (J_uu @ u_el) @ u_el
+
+    # Mf_u = Jf_fx @ ux_el + Jf_fy @ uy_el + Jf_fz @ uz_el
+    #
+    # M[n_r:n_r + n_p, :n_r] = M[n_r:n_r + n_p, :n_r] + Mf_u
+    # M[:n_r, n_r:n_r + n_p] = M[:n_r, n_r:n_r + n_p] + Mf_u.T
 
     pi_beam = M[:n_r, :] @ y_e
     J[:n_r, :n_r] = skew(pi_beam)
@@ -140,25 +155,26 @@ def sys(t,y):
                          [omega[2], omega[1], -omega[0], 0]])
 
     dquat = 0.5 * Omega_mat @ y_quat
+    du_el = ep_el
 
-    dydt = np.concatenate((dedt, dquat))
+    dydt = np.concatenate((dedt, dquat, du_el))
     return dydt
 
 
 y0 = np.zeros(n_tot,)
 
 quat0 = quaternion.as_float_array(quaternion.from_rotation_matrix(np.eye(3)))
-y0[-n_quat:] = quat0
+y0[n_e:n_e+n_quat] = quat0
 
-t_ev = np.linspace(t_0, t_fin, num=500)
+t_ev = np.linspace(t_0, t_fin, num=1000)
 t_span = [t_0, t_fin]
 
-sol = solve_ivp(sys, t_span, y0, method='Radau', vectorized=False, t_eval=t_ev)
+sol = solve_ivp(sys, t_span, y0, method='RK45', vectorized=False, t_eval=t_ev)
 
 t_sol = sol.t
 y_sol = sol.y
 omB_sol = y_sol[:n_r, :]
-quat_sol = quaternion.as_quat_array(y_sol[-4:, :].T)
+quat_sol = quaternion.as_quat_array(y_sol[n_e:n_e+n_quat, :].T)
 
 n_ev = len(t_sol)
 omI_sol = np.zeros((3, n_ev))
