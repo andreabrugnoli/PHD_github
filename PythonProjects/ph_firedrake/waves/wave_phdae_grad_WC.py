@@ -28,11 +28,8 @@ q_2 = 1.4161 * 10**5  # Pa   1/xsi
 xi_s = 1/q_2
 # c_0 = 340  # 340 m/s
 
-# rho = 0.1
-# T = as_tensor([[10, 0], [0, 10]])
-
-deg_p = 2
-deg_q = 1
+deg_p = 1
+deg_q = 2
 Vp = FunctionSpace(mesh, "CG", deg_p)
 Vq = FunctionSpace(mesh, "RT", deg_q)
 
@@ -53,6 +50,10 @@ al_q = mu_0 * e_q
 x, r = SpatialCoordinate(mesh)
 R_ext = 1
 L_duct = 2
+tab_coord = mesh.coordinates.dat.data
+x_cor = tab_coord[:, 0]
+r_cor = tab_coord[:, 1]
+
 
 dx = Measure('dx')
 ds = Measure('ds')
@@ -87,6 +88,8 @@ b_Nt = dot(v_q, n_ver) * is_uN * r * ds
 B_Nxy = assemble(b_Nxy).vector().get_local()
 B_Nt = assemble(b_Nt).vector().get_local()
 
+# controlN_dofs = np.where(B_Nxy)[0]
+
 # B matrices based on Lagrange
 V_bc = FunctionSpace(mesh, 'CG', 1)
 lmb_D = TrialFunction(V_bc)
@@ -112,6 +115,11 @@ controlD_dofs = np.where(B_D.any(axis=0))[0]
 B_D = B_D[:, controlD_dofs]
 B_D = B_D[dirichlet_dofs, :]
 
+plt.plot(x_cor[:], r_cor[:], 'bo')
+plt.plot(x_cor[dirichlet_dofs], r_cor[dirichlet_dofs], 'r*')
+plt.plot(x_cor[controlD_dofs], r_cor[controlD_dofs], 'g*')
+plt.show()
+
 n_lmb = G_D.shape[1]
 n_uD = B_D.shape[1]
 t_final = 0.01
@@ -119,6 +127,7 @@ t_final = 0.01
 Z = 1000
 Amp_uNxy = 0.1
 t_diss = 0.05*t_final
+
 
 def dae_closed_phs(t, y, yd):
 
@@ -128,7 +137,7 @@ def dae_closed_phs(t, y, yd):
     lmb_var = y[n_e:]
     ed_var = yd[:n_e]
 
-    res_e = MM @ ed_var - JJ @ e_var - G_D @ lmb_var - B_Nxy * Amp_uNxy * np.sin(pi*t/t_diss) * (t<t_diss)
+    res_e = MM @ ed_var - JJ @ e_var - G_D @ lmb_var - B_Nxy * Amp_uNxy * (1 - np.cos(pi*t/t_diss)) # * (t<t_diss)
     res_lmb = - G_D.T @ e_var - Z * B_D @ B_D.T @ lmb_var * (t>t_diss)
 
     return np.concatenate((res_e, res_lmb))

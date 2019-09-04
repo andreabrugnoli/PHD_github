@@ -15,10 +15,10 @@ plt.rc('text', usetex=True)
 path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/waves/meshes_ifacwc/"
 mesh = Mesh(path_mesh + "duct_test" + ".msh")
 
-# figure = plt.figure()
-# ax = figure.add_subplot(111)
-# plot(mesh, axes=ax)
-# plt.show()
+figure = plt.figure()
+ax = figure.add_subplot(111)
+plot(mesh, axes=ax)
+plt.show()
 
 q_1 = 0.8163  # m^3 kg ^-1   1/mu_0
 mu_0 = 1/q_1
@@ -128,7 +128,7 @@ def dae_closed_phs(t, y, yd):
     ed_var = yd[:n_e]
 
     res_e = MM @ ed_var - JJ @ e_var - G_N @ lmb_var + Z * B_D @ B_D.T @ e_var * (t>t_diss)
-    res_lmb = - G_N.T @ e_var + B_N * Amp_uNxy * np.sin(pi*t/t_diss) *(t<t_diss)
+    res_lmb = - G_N.T @ e_var + B_N * Amp_uNxy * (1 - np.cos(pi*t/t_diss)) # *(t<t_diss)
 
     return np.concatenate((res_e, res_lmb))
 

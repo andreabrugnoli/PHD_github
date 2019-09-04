@@ -91,11 +91,14 @@ def print_modes(sys, Vp1, Vp2, n_modes):
 
 
 def create_sys(mesh1, mesh2, deg_p1, deg_q1, deg_p2, deg_q2):
-    x1, y1 = SpatialCoordinate(mesh1)
+    x1, r1 = SpatialCoordinate(mesh1)
+    R_ext = 1
+    L_duct = 2
+    tol_geo = 1e-9
 
     tab_coord1 = mesh1.coordinates.dat.data
     x1_cor = tab_coord1[:, 0]
-    y1_cor = tab_coord1[:, 1]
+    r1_cor = tab_coord1[:, 1]
 
     Vp1 = FunctionSpace(mesh1, "CG", deg_p1)
     Vq1 = FunctionSpace(mesh1, "RT", deg_q1)
@@ -112,22 +115,26 @@ def create_sys(mesh1, mesh2, deg_p1, deg_q1, deg_p2, deg_q2):
     e1 = TrialFunction(V1)
     e_p1, e_q1 = split(e1)
 
-    rho = 0.1
-    T = as_tensor([[10, 0], [0, 10]])
+    q_1 = 0.8163  # m^3 kg ^-1   1/mu_0
+    mu_0 = 1 / q_1
 
-    al_p1 = rho * e_p1
-    al_q1 = dot(inv(T), e_q1)
+    q_2 = 1.4161 * 10 ** 5  # Pa   1/xsi
+    xi_s = 1 / q_2
+    # c_0 = 340  # 340 m/s
+
+    al_p1 = xi_s * e_p1
+    al_q1 = mu_0 * e_q1
 
     dx1 = Measure('dx', domain=mesh1)
     ds1 = Measure('ds', domain=mesh1)
 
-    m_p1 = v_p1 * al_p1 * dx1
-    m_q1 = dot(v_q1, al_q1) * dx1
+    m_p1 = v_p1 * al_p1 * r1 * dx1
+    m_q1 = dot(v_q1, al_q1) * r1 * dx1
 
     m_form1 = m_p1 + m_q1
 
-    j_div = dot(v_p1, div(e_q1)) * dx1
-    j_divIP = -dot(div(v_q1), e_p1) * dx1
+    j_div = v_p1 * (div(e_q1) + e_q1[1]/r1) * r1 * dx1
+    j_divIP = -(div(v_q1) + v_q1[1]/r1) * e_p1 * r1 * dx1
 
     j_form1 = j_div + j_divIP
     petsc_j1 = assemble(j_form1, mat_type='aij').M.handle
@@ -139,38 +146,42 @@ def create_sys(mesh1, mesh2, deg_p1, deg_q1, deg_p2, deg_q2):
     Vf1 = FunctionSpace(mesh1, "CG", 1)
     f_D = TrialFunction(Vf1)
     v_D = TestFunction(Vf1)
+    u_D = TrialFunction(Vf1)
 
     m_delta = v_D * f_D * ds1
 
     petsc_md = assemble(m_delta, mat_type='aij').M.handle
     Mdelta = np.array(petsc_md.convert("dense").getDenseArray())
 
-    n_ver = FacetNormal(mesh1)
+    n_ver1 = FacetNormal(mesh1)
 
-    u_Dxy1 = pow(x1, 2) - pow(y1, 2)
-    u_N1 = pow(x1, 2) + pow(y1, 2)
+    is_D = conditional(gt(r1, R_ext - tol_geo), 1, 0)
+    is_int1 = conditional(lt(r1, R_ext - tol_geo), 1, 0)
+    # is_int1 = conditional(ne(r1, R_ext), 1, 0)
 
-    ray1 = sqrt(pow(x1, 2) + pow(y1, 2))
-    is_D = conditional(lt(ray1, 1.25), 1, 0)
-    is_int1 = conditional(gt(ray1, 1.25), 1, 0)
+    is_uD = conditional(And(gt(r1, R_ext - tol_geo), And(gt(x1, L_duct / 3), lt(x1, 2 * L_duct / 3))), 1, 0)
 
-    b_Dxy = dot(v_q1, n_ver) * u_Dxy1 * is_D * ds1
-    b_Dt = dot(v_q1, n_ver) * is_D * ds1
+    b_D = dot(v_q1, n_ver1) * u_D * is_uD * ds1
 
-    B_Dxy = np.reshape(assemble(b_Dxy).vector().get_local(), (-1, 1))
-    B_Dt = np.reshape(assemble(b_Dt).vector().get_local(), (-1, 1))
+    petsc_bD = assemble(b_D, mat_type='aij').M.handle
 
-    b_int1 = dot(v_q1, n_ver) * f_D * is_int1 * ds1
+    B_D = np.array(petsc_bD.convert("dense").getDenseArray())
+    controlD_dofs = np.where(B_D.any(axis=0))[0]
+
+    B_D = B_D[:, controlD_dofs]
+
+    nu_D = len(controlD_dofs)
+
+    b_int1 = dot(v_q1, n_ver1) * f_D * is_int1 * ds1
 
     petsc_bint1 = assemble(b_int1, mat_type='aij').M.handle
     B_int1 = np.array(petsc_bint1.convert("dense").getDenseArray())
 
-    th_cor = np.arctan2(y1_cor, x1_cor)
-    perm_th = np.argsort(th_cor)
-    B_int1 = B_int1[:, perm_th]
+    perm_x1 = np.argsort(x1_cor)
+    B_int1 = B_int1[:, perm_x1]
 
-    Mdelta = Mdelta[:, perm_th]
-    Mdelta = Mdelta[perm_th, :]
+    Mdelta = Mdelta[:, perm_x1]
+    Mdelta = Mdelta[perm_x1, :]
 
     int_dofs1 = np.where(B_int1.any(axis=0))[0]
 
@@ -179,13 +190,15 @@ def create_sys(mesh1, mesh2, deg_p1, deg_q1, deg_p2, deg_q2):
 
     B_int1 = B_int1[:, int_dofs1]
 
-    sys1 = SysPhdaeRig(n_1, 0, 0, np_1, nq_1, E=M1, J=J1, B=np.concatenate((B_int1, B_Dxy, B_Dt), axis=1))
+    nint_1 = len(int_dofs1)
 
-    x2, y2 = SpatialCoordinate(mesh2)
+    sys1 = SysPhdaeRig(n_1, 0, 0, np_1, nq_1, E=M1, J=J1, B=np.concatenate((B_int1, B_D), axis=1))
+
+    x2, r2 = SpatialCoordinate(mesh2)
 
     tab_coord2 = mesh2.coordinates.dat.data
     x2_cor = tab_coord2[:, 0]
-    y2_cor = tab_coord2[:, 1]
+    r2_cor = tab_coord2[:, 1]
 
     Vp2 = FunctionSpace(mesh2, "CG", deg_p2)
     Vq2 = FunctionSpace(mesh2, "RT", deg_q2)
@@ -202,18 +215,18 @@ def create_sys(mesh1, mesh2, deg_p1, deg_q1, deg_p2, deg_q2):
     e2 = TrialFunction(V2)
     e_p2, e_q2 = split(e2)
 
-    al_p2 = rho * e_p2
-    al_q2 = dot(inv(T), e_q2)
+    al_p2 = xi_s * e_p2
+    al_q2 = mu_0 * e_q2
 
     dx2 = Measure('dx', domain=mesh2)
     ds2 = Measure('ds', domain=mesh2)
 
-    m_p2 = v_p2 * al_p2 * dx2
-    m_q2 = dot(v_q2, al_q2) * dx2
+    m_p2 = v_p2 * al_p2 * r2 * dx2
+    m_q2 = dot(v_q2, al_q2) * r2 * dx2
     m_form2 = m_p2 + m_q2
 
-    j_grad = dot(v_q2, grad(e_p2)) * dx2
-    j_gradIP = -dot(grad(v_p2), e_q2) * dx2
+    j_grad = dot(v_q2, grad(e_p2)) * r2 * dx2
+    j_gradIP = -dot(grad(v_p2), e_q2) * r2 * dx2
     j_form2 = j_grad + j_gradIP
 
     petsc_j2 = assemble(j_form2, mat_type='aij').M.handle
@@ -223,15 +236,15 @@ def create_sys(mesh1, mesh2, deg_p1, deg_q1, deg_p2, deg_q2):
 
     Vf2 = FunctionSpace(mesh2, "CG", 1)
     f_N = TrialFunction(Vf2)
+    v_N = TestFunction(Vf1)
+    u_N = TrialFunction(Vf1)
 
-    ray2 = sqrt(pow(x2, 2) + pow(y2, 2))
-    is_N = conditional(gt(ray2, 1.75), 1, 0)
-    is_int2 = conditional(lt(ray2, 1.75), 1, 0)
+    is_uN = conditional(lt(x2, tol_geo), 1, 0)
+    is_N = conditional(Or(Or(lt(x2, tol_geo), gt(x2, L_duct - tol_geo)), lt(r2, tol_geo)), 1, 0)
+    is_int2 = conditional(And(And(gt(x2, tol_geo), lt(x2, L_duct-tol_geo)), gt(r2, R_ext/2-tol_geo)), 1, 0)
 
-    u_Dxy2 = pow(x2, 2) - pow(y2, 2)
-    u_N2 = pow(x2, 2) + pow(y2, 2)
-
-    b_N = v_p2 * u_N2 * is_N * ds2
+    u_Nxy = sin(pi * r2 / R_ext)
+    b_N = v_p2 * u_Nxy * is_uN * ds2
 
     B_N = np.reshape(assemble(b_N).vector().get_local(), (-1, 1))
 
@@ -240,25 +253,41 @@ def create_sys(mesh1, mesh2, deg_p1, deg_q1, deg_p2, deg_q2):
     petsc_bint2 = assemble(b_int2, mat_type='aij').M.handle
     B_int2 = np.array(petsc_bint2.convert("dense").getDenseArray())
 
-    th_cor = np.arctan2(y2_cor, x2_cor)
-    perm_th = np.argsort(th_cor)
-    B_int2 = B_int2[:, perm_th]
+    perm_x2 = np.argsort(x2_cor)
+    B_int2 = B_int2[:, perm_x2]
 
     int_dofs2 = np.where(B_int2.any(axis=0))[0]
 
     B_int2 = B_int2[:, int_dofs2]
+    #
+    # x1_cor = x1_cor[perm_x1]
+    # r1_cor = r1_cor[perm_x1]
+    # x2_cor = x2_cor[perm_x2]
+    # r2_cor = r2_cor[perm_x2]
+    #
+    # plt.plot(x1_cor[:], r1_cor[:], 'bo')
+    # plt.plot(x1_cor[int_dofs1], r1_cor[int_dofs1], 'r*')
+    # plt.show()
+    #
+    # plt.plot(x2_cor[:], r2_cor[:], 'bo')
+    # plt.plot(x2_cor[int_dofs2], r2_cor[int_dofs2], 'r*')
+    # plt.show()
+
+    nint_2 = len(int_dofs2)
+
+    print(nint_1, nint_2)
 
     sys2 = SysPhdaeRig(n_2, 0, 0, np_2, nq_2, E=M2, J=J2, B=np.concatenate((B_int2, B_N), axis=1))
 
     m1 = sys1.m
     m2 = sys2.m
-    sys_DN = SysPhdaeRig.gyrator_ordered(sys1, sys2, list(range(m1 - 2)), list(range(m2 - 1)), la.inv(Mdelta))
+    sys_DN = SysPhdaeRig.gyrator_ordered(sys1, sys2, list(range(nint_1)), list(range(nint_2)), la.inv(Mdelta))
 
-    ep1_0 = project(u_Dxy1, Vp1).vector().get_local()
-    eq1_0 = project(as_vector([u_N1 * x1 / ray1, u_N1 * y1 / ray1]), Vq1).vector().get_local()
+    ep1_0 = project(Constant(0), Vp1).vector().get_local()
+    eq1_0 = project(as_vector([Constant(0), Constant(0)]), Vq1).vector().get_local()
 
-    ep2_0 = project(u_Dxy2, Vp2).vector().get_local()
-    eq2_0 = project(as_vector([u_N2 * x2 / ray2, u_N2 * y2 / ray2]), Vq2).vector().get_local()
+    ep2_0 = project(Constant(0), Vp2).vector().get_local()
+    eq2_0 = project(as_vector([Constant(0), Constant(0)]), Vq2).vector().get_local()
 
     ep_0 = np.concatenate((ep1_0, ep2_0))
     eq_0 = np.concatenate((eq1_0, eq2_0))
@@ -267,46 +296,51 @@ def create_sys(mesh1, mesh2, deg_p1, deg_q1, deg_p2, deg_q2):
 
 
 ind = 9
-path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/waves/meshes/"
-mesh1 = Mesh(path_mesh + "circle1_" + str(ind) + ".msh")
-mesh2 = Mesh(path_mesh + "circle2_" + str(ind) + ".msh")
+path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/waves/meshes_ifacwc/"
+mesh1 = Mesh(path_mesh + "duct_dom1" + ".msh")
+mesh2 = Mesh(path_mesh + "duct_dom2" + ".msh")
 
 
-figure = plt.figure()
-ax = figure.add_subplot(111)
-plot(mesh1, axes=ax)
-plot(mesh2, axes=ax)
-plt.show()
+# figure = plt.figure()
+# ax = figure.add_subplot(111)
+# plot(mesh1, axes=ax)
+# plot(mesh2, axes=ax)
+# plt.show()
 
 degp1 = 1
 degq1 = 2
 
-degp2 = 1
-degq2 = 2
+degp2 = 2
+degq2 = 1
 
 sys_DN, Vp1, Vp2, ep_0, eq_0 = create_sys(mesh1, mesh2, degp1, degq1, degp2, degq2)
 JJ = sys_DN.J
 MM = sys_DN.E
 BB = sys_DN.B
 
+m_sysDN = sys_DN.m
 n_p = len(ep_0)
 n_q = len(eq_0)
 n_e = n_p + n_q
 print(n_e)
 
 
-B_Dxy = np.reshape(BB[:, 0], (-1, ))
-B_Dt = np.reshape(BB[:, 1], (-1, ))
-B_N = np.reshape(BB[:, 2], (-1, ))
+B_D = BB[:, :-1]
+B_N = BB[:, -1]
+print(m_sysDN, B_D.shape, B_N.shape)
 
-t_final = 1
-om_D = 2*pi/t_final
-om_N = om_D/8
+t_final = 0.01
+Z = 1000
+Amp_uNxy = 0.1
+t_diss = 0.05*t_final
 
 
 def ode_closed_phs(t, y, yd):
 
-    res = MM @ yd - JJ @ y - B_Dxy - B_Dt * np.sin(om_D*t) - B_N * (1 + np.sin(om_N * t))
+    print(t/t_final*100)
+
+    res = MM @ yd - (JJ - Z * B_D @ B_D.T * (t>t_diss)) @ y \
+          - B_N * Amp_uNxy * (1 - np.cos(pi*t/t_diss))
 
     return res
 
@@ -325,7 +359,7 @@ def handle_result(solver, t, y, yd):
 
 y0 = np.concatenate((ep_0, eq_0))
 
-yd0 = la.solve(MM, JJ @ y0 + B_Dxy + B_N) # Initial conditions
+yd0 = la.solve(MM, JJ @ y0) # Initial conditions
 
 # Create an Assimulo implicit problem
 imp_mod = Implicit_Problem(ode_closed_phs, y0, yd0, name='dae_closed_pHs')
@@ -348,7 +382,7 @@ imp_sim.report_continuously = True
 imp_sim.make_consistent('IDA_YA_YDP_INIT')
 
 # Simulate
-n_ev = 100
+n_ev = 500
 t_ev = np.linspace(0, t_final, n_ev)
 t_sol, y_sol, yd_sol = imp_sim.simulate(t_final, 0, t_ev)
 
@@ -383,24 +417,7 @@ plt.title(r"Hamiltonian trend",
           fontsize=16)
 plt.legend(loc='upper left')
 
-w1_sol = np.zeros(ep1_sol.shape)
-w0_1 = np.zeros((n_p1,))
-w1_sol[:, 0] = w0_1
-w1_old = w0_1
-
-w2_sol = np.zeros(ep2_sol.shape)
-w0_2 = np.zeros((n_p2,))
-w2_sol[:, 0] = w0_2
-w2_old = w0_2
-
 dt_vec = np.diff(t_ev)
-
-for i in range(1, n_ev):
-    w1_sol[:, i] = w1_old + 0.5 * (ep1_sol[:, i - 1] + ep1_sol[:, i]) * dt_vec[i-1]
-    w_pl1_old = w1_sol[:, i]
-
-    w2_sol[:, i] = w2_old + 0.5 * (ep2_sol[:, i - 1] + ep2_sol[:, i]) * dt_vec[i-1]
-    w2_old = w2_sol[:, i]
 
 w1_fun = Function(Vp1)
 w2_fun = Function(Vp2)
@@ -422,9 +439,9 @@ anim = animate2D(minZ, maxZ, w1fun_vec, w2fun_vec, t_ev, xlabel = '$x[m]$', ylab
 
 plt.show()
 
-Writer = animation.writers['ffmpeg']
-writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
-pathout = './'
-anim.save(pathout + 'wave_ode.mp4', writer=writer)
+# Writer = animation.writers['ffmpeg']
+# writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
+# pathout = './'
+# anim.save(pathout + 'wave_ode.mp4', writer=writer)
 
 
