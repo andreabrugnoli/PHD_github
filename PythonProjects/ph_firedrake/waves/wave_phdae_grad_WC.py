@@ -1,32 +1,82 @@
 from firedrake import *
 import numpy as np
-import scipy.linalg as la
+from scipy import linalg as la
 np.set_printoptions(threshold=np.inf)
 from matplotlib import pyplot as plt
 from tools_plotting.animate_surf import animate2D
 from assimulo.solvers import IDA
 from assimulo.implicit_ode import Implicit_Problem
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from matplotlib import animation
 plt.rc('text', usetex=True)
 # Finite element defition
 
 
+def print_modes(Mmat, Jmat, Vp, n_modes):
+
+    eigenvalues, eigvectors = la.eig(Jmat, Mmat)
+    omega_all = np.imag(eigenvalues)
+
+    index = omega_all > 0
+
+    omega = omega_all[index]
+    eigvec_omega = eigvectors[:, index]
+    perm = np.argsort(omega)
+    eigvec_omega = eigvec_omega[:, perm]
+
+    omega.sort()
+
+    fntsize = 15
+
+    n_Vp= Vp.dim()
+
+    for i in range(int(n_modes)):
+        print("Eigenvalue num " + str(i+1) + ":" + str(omega[i]))
+        eig_real_p = Function(Vp)
+        eig_imag_p = Function(Vp)
+
+        eig_real_p.vector()[:] = np.real(eigvec_omega[:n_Vp, i])
+        eig_imag_p.vector()[:] = np.imag(eigvec_omega[:n_Vp, i])
+
+        norm_real_eig = np.linalg.norm(np.real(eigvec_omega[:n_Vp, i]))
+        norm_imag_eig = np.linalg.norm(np.imag(eigvec_omega[:n_Vp, i]))
+
+        figure = plt.figure()
+        ax = figure.add_subplot(111, projection="3d")
+
+        if norm_imag_eig > norm_real_eig:
+            plot_eig = plot(eig_imag_p, axes=ax, plot3d=True)
+        else:
+            plot_eig = plot(eig_real_p, axes=ax, plot3d=True)
+
+        ax.set_xlabel('$x [m]$', fontsize=fntsize)
+        ax.set_ylabel('$y [m]$', fontsize=fntsize)
+        ax.set_title('Eigenvector num ' + str(i + 1), fontsize=fntsize)
+
+        ax.w_zaxis.set_major_locator(LinearLocator(10))
+        ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
+
+        path_figs = "/home/a.brugnoli/Plots_Videos/Python/Plots/Waves/"
+        # plt.savefig(path_figs + "Eig_n" + str(i) + ".eps")
+
+    plt.show()
+
 # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
-# ind = 9
+ind = 2
 path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/waves/meshes_ifacwc/"
-mesh = Mesh(path_mesh + "duct_test" + ".msh")
+mesh = Mesh(path_mesh + "duct_" + str(ind) + ".msh")
 
 # figure = plt.figure()
 # ax = figure.add_subplot(111)
 # plot(mesh, axes=ax)
 # plt.show()
 
-q_1 = 0.8163  # m^3 kg ^-1   1/mu_0
-mu_0 = 1/q_1
+q_1 = 0.8163  #   1/mu_0
+mu_0 = 1/q_1  # m^3 kg ^-1
 
 q_2 = 1.4161 * 10**5  # Pa   1/xsi
 xi_s = 1/q_2
-# c_0 = 340  # 340 m/s
+c_0 = 340  # 340 m/s
 
 deg_p = 1
 deg_q = 2
@@ -48,12 +98,15 @@ al_p = xi_s * e_p
 al_q = mu_0 * e_q
 
 x, r = SpatialCoordinate(mesh)
+tol_geo = 1e-9
 R_ext = 1
 L_duct = 2
 tab_coord = mesh.coordinates.dat.data
 x_cor = tab_coord[:, 0]
 r_cor = tab_coord[:, 1]
 
+ind_x = np.where(np.logical_and(np.isclose(x_cor, 0),\
+                                np.isclose(r_cor, 0, rtol=1e-2)))[0][0]
 
 dx = Measure('dx')
 ds = Measure('ds')
@@ -65,6 +118,7 @@ j_grad = dot(v_q, grad(e_p)) * r * dx
 j_gradIP = -dot(grad(v_p), e_q) * r * dx
 
 j_form = j_grad + j_gradIP
+
 petsc_j = assemble(j_form, mat_type='aij').M.handle
 petsc_m = assemble(m_form, mat_type='aij').M.handle
 
@@ -78,17 +132,17 @@ n_e = V.dim()
 
 n_ver = FacetNormal(mesh)
 
-tol_geo =1e-6
 
-is_uN = conditional(lt(x, tol_geo), 1, 0)
-u_Nxy = sin(pi*r/R_ext)
-b_Nxy = v_p * is_uN * u_Nxy * r * ds
-b_Nt = dot(v_q, n_ver) * is_uN * r * ds
+isL_uN = conditional(lt(x, tol_geo), 1, 0)
+isR_uN = conditional(gt(x, L_duct - tol_geo), 1, 0)
+isLR_uN = conditional(Or(lt(x, tol_geo), gt(x, L_duct - tol_geo)), 1, 0)
 
-B_Nxy = assemble(b_Nxy).vector().get_local()
-B_Nt = assemble(b_Nt).vector().get_local()
+u_N = (1 - cos(pi*r/R_ext))# * cos(pi*x/(2*L_duct))
+b_N = v_p * isL_uN * u_N * r * ds - v_p * isR_uN * u_N * r * ds
 
-# controlN_dofs = np.where(B_Nxy)[0]
+B_N = assemble(b_N).vector().get_local()
+
+# controlN_dofs = np.where(B_N)[0]
 
 # B matrices based on Lagrange
 V_bc = FunctionSpace(mesh, 'CG', 1)
@@ -97,10 +151,10 @@ v_D = TestFunction(V_bc)
 u_D = TrialFunction(V_bc)
 
 is_lmbD = conditional(gt(r, R_ext - tol_geo), 1, 0)
-g_D = v_p * lmb_D * is_lmbD * ds
+g_D = v_p * lmb_D * is_lmbD * r * ds
 
 is_uD = conditional(And(gt(r, R_ext - tol_geo), And(gt(x, L_duct/3), lt(x, 2*L_duct/3))), 1, 0)
-b_D = v_D * u_D * is_uD * ds
+b_D = v_D * u_D * is_uD * r * ds
 
 petsc_gD = assemble(g_D, mat_type='aij').M.handle
 G_D = np.array(petsc_gD.convert("dense").getDenseArray())
@@ -115,18 +169,19 @@ controlD_dofs = np.where(B_D.any(axis=0))[0]
 B_D = B_D[:, controlD_dofs]
 B_D = B_D[dirichlet_dofs, :]
 
-plt.plot(x_cor[:], r_cor[:], 'bo')
-plt.plot(x_cor[dirichlet_dofs], r_cor[dirichlet_dofs], 'r*')
-plt.plot(x_cor[controlD_dofs], r_cor[controlD_dofs], 'g*')
-plt.show()
+# plt.plot(x_cor[:], r_cor[:], 'bo')
+# plt.plot(x_cor[dirichlet_dofs], r_cor[dirichlet_dofs], 'r*')
+# plt.plot(x_cor[controlD_dofs], r_cor[controlD_dofs], 'g*')
+# plt.show()
 
 n_lmb = G_D.shape[1]
 n_uD = B_D.shape[1]
-t_final = 0.01
+t_final = 10
 
-Z = 1000
-Amp_uNxy = 0.1
-t_diss = 0.05*t_final
+Z = mu_0 * c_0
+t_diss = 0.1*t_final
+
+tau_imp = t_final/10
 
 
 def dae_closed_phs(t, y, yd):
@@ -137,8 +192,10 @@ def dae_closed_phs(t, y, yd):
     lmb_var = y[n_e:]
     ed_var = yd[:n_e]
 
-    res_e = MM @ ed_var - JJ @ e_var - G_D @ lmb_var - B_Nxy * Amp_uNxy * (1 - np.cos(pi*t/t_diss)) # * (t<t_diss)
-    res_lmb = - G_D.T @ e_var - Z * B_D @ B_D.T @ lmb_var * (t>t_diss)
+    ft_imp = (t>t_diss) # * (1 - np.exp((t - t_diss)/tau_imp))
+    ft_ctrl = (t<t_diss)
+    res_e = MM @ ed_var - JJ @ e_var - G_D @ lmb_var - B_N * ft_ctrl
+    res_lmb = - G_D.T @ e_var - Z * B_D @ B_D.T @ lmb_var * ft_imp
 
     return np.concatenate((res_e, res_lmb))
 
@@ -156,23 +213,31 @@ def handle_result(solver, t, y, yd):
 
 
 ep_0 = np.zeros(n_p)
-eq_0 = np.zeros(n_q)
+eq_0 = project(as_vector([-u_N, Constant(0)]), Vq).vector().get_local()
 
 e_0 = np.concatenate((ep_0, eq_0))
-# lmb_0 = la.solve(- G_N.T @ invMM @ G_N, G_N.T @ invMM @ (JJ @ e_0 + B_Dxy))
+
+lmb_0 = la.solve(- G_D.T @ la.solve(MM, G_D), G_D.T @ la.solve(MM, JJ @ e_0 + B_N))
 
 y0 = np.zeros(n_e + n_lmb)  # Initial conditions
 
-# de_0 = invMM @ (JJ @ e_0 + G_N @ lmb_0 + B_Dxy)
-# dlmb_0 = la.solve(- G_N.T @ invMM @ G_N, G_N.T @ invMM @ (JJ @ de_0 + B_Dt))
+de_0 = la.solve(MM, JJ @ e_0 + G_D @ lmb_0 + B_N)
+dlmb_0 = la.solve(- G_D.T @ la.solve(MM, G_D), G_D.T @ la.solve(MM, JJ @ de_0))
 
 y0[:n_p] = ep_0
 y0[n_p:n_V] = eq_0
-# y0[n_V:] = lmb_0
+y0[n_V:] = lmb_0
 
 yd0 = np.zeros(n_e + n_lmb)  # Initial conditions
-# yd0[:n_V] = de_0
-# yd0[n_V:] = dlmb_0
+yd0[:n_V] = de_0
+yd0[n_V:] = dlmb_0
+
+# Maug = la.block_diag(MM, np.zeros((n_lmb, n_lmb)))
+# Jaug = la.block_diag(JJ, np.zeros((n_lmb, n_lmb)))
+# Jaug[:n_e, n_e:] = G_D
+# Jaug[n_e:, :n_e] = -G_D.T
+
+# print_modes(Maug, Jaug, Vp, 10)
 
 # Create an Assimulo implicit problem
 imp_mod = Implicit_Problem(dae_closed_phs, y0, yd0, name='dae_closed_pHs')
@@ -227,11 +292,17 @@ plt.xlabel(r'{Time} (s)', fontsize=fntsize)
 plt.ylabel(r'{Hamiltonian} (J)', fontsize=fntsize)
 plt.title(r"Hamiltonian trend",
           fontsize=fntsize)
-# plt.legend(loc='upper left')
+plt.legend(loc='upper left')
 
+fig = plt.figure()
+plt.plot(t_ev, ep_sol[ind_x, :], 'b-')
+plt.xlabel(r'{Time} (s)', fontsize=fntsize)
+plt.ylabel(r'p(0,0) Pa', fontsize=fntsize)
+plt.title(r"Pressure at 0",
+          fontsize=fntsize)
 
-anim = animate2D(minZ, maxZ, wfun_vec, t_ev, xlabel = '$x[m]$', ylabel = '$r [m]$', \
-                          zlabel='$p$', title='pressure')
+# anim = animate2D(minZ, maxZ, wfun_vec, t_ev, xlabel = '$x[m]$', ylabel = '$r [m]$', \
+#                           zlabel='$p$', title='pressure')
 
 plt.show()
 
