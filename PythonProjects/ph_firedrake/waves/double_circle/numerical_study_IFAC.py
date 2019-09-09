@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from waves.wavedae_func import computeH_dae
-from waves.waveode_func import computeH_ode
+from waves.double_circle.wavedae_func import computeH_dae
+from waves.double_circle.waveode_func import computeH_ode
 from math import pi
 plt.rc('text', usetex=True)
 

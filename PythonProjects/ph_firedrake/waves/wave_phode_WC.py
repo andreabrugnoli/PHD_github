@@ -23,6 +23,7 @@ mu_0 = 1 / q_1
 q_2 = 1.4161 * 10 ** 5  # Pa   1/xsi
 xi_s = 1 / q_2
 c_0 = 340  # 340 m/s
+ind = 2
 
 
 def print_modes(sys, Vp1, Vp2, n_modes):
@@ -255,10 +256,13 @@ def create_sys(mesh1, mesh2, deg_p1, deg_q1, deg_p2, deg_q2):
     is_N = conditional(Or(Or(lt(x2, tol_geo), gt(x2, L_duct - tol_geo)), lt(r2, tol_geo)), 1, 0)
     is_int2 = conditional(And(And(gt(x2, tol_geo), lt(x2, L_duct-tol_geo)), gt(r2, R_ext/2-tol_geo)), 1, 0)
 
-    u_N1 = (1 - cos(pi*r1/R_ext))#*cos(pi*x1/(2*L_duct))
-    u_N2 = (1 - cos(pi*r2/R_ext))#*cos(pi*x2/(2*L_duct))
-    # b_N = v_p2 * u_N2 * is_uN * r2 * ds2
-    b_N = v_p2 * u_N2 * isL_uN * r2 * ds2  - v_p2 * u_N2 * isR_uN * r2 * ds2
+    ux_N1 = 1 - r1**2/R_ext**2
+    ux_N2 = 1 - r2**2/R_ext**2
+
+    uy_N1 = 16*r1**2*(R_ext-r1)**2
+    uy_N2 = 16*r2**2*(R_ext-r2)**2
+
+    b_N = -v_p2 * ux_N2 * isL_uN * r2 * ds2 + v_p2 * ux_N2 * isR_uN * r2 * ds2
 
     B_N = np.reshape(assemble(b_N).vector().get_local(), (-1, 1))
 
@@ -297,10 +301,10 @@ def create_sys(mesh1, mesh2, deg_p1, deg_q1, deg_p2, deg_q2):
     sys_DN = SysPhdaeRig.gyrator_ordered(sys1, sys2, list(range(nint_1)), list(range(nint_2)), la.inv(Mdelta))
 
     ep1_0 = project(Constant(0), Vp1).vector().get_local()
-    eq1_0 = project(as_vector([-u_N1, Constant(0)]), Vq1).vector().get_local()
+    eq1_0 = project(as_vector([ux_N1, uy_N1]), Vq1).vector().get_local()
 
     ep2_0 = project(Constant(0), Vp2).vector().get_local()
-    eq2_0 = project(as_vector([-u_N2, Constant(0)]), Vq2).vector().get_local()
+    eq2_0 = project(as_vector([ux_N2, uy_N2]), Vq2).vector().get_local()
 
     ep_0 = np.concatenate((ep1_0, ep2_0))
     eq_0 = np.concatenate((eq1_0, eq2_0))
@@ -309,16 +313,14 @@ def create_sys(mesh1, mesh2, deg_p1, deg_q1, deg_p2, deg_q2):
 
 
 path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/waves/meshes_ifacwc/"
-ind = 2
 mesh1 = Mesh(path_mesh + "duct_dom1_" + str(ind) + ".msh")
 mesh2 = Mesh(path_mesh + "duct_dom2_" + str(ind) + ".msh")
 
-
-figure = plt.figure()
-ax = figure.add_subplot(111)
-plot(mesh1, axes=ax)
-plot(mesh2, axes=ax)
-plt.show()
+# figure = plt.figure()
+# ax = figure.add_subplot(111)
+# plot(mesh1, axes=ax)
+# plot(mesh2, axes=ax)
+# plt.show()
 
 degp1 = 1
 degq1 = 2
@@ -344,10 +346,12 @@ B_D = BB[:, :-1]
 B_N = BB[:, -1]
 print(m_sysDN, B_D.shape, B_N.shape)
 
-t_final = 10
+t_final = 1
 Z = c_0 * mu_0
-t_diss = 0.1*t_final
-# tau_imp = t_final/10
+t_diss = 0.2*t_final
+tau_imp = t_final/100
+
+invMM = la.inv(MM)
 
 
 def ode_closed_phs(t, y, yd):
@@ -355,8 +359,8 @@ def ode_closed_phs(t, y, yd):
     print(t/t_final*100)
 
     ft_imp = (t>t_diss) # * (1 - np.exp((t - t_diss)/tau_imp))
-    ft_ctrl = (t<t_diss)
-    res = MM @ yd - (JJ - Z * B_D @ B_D.T * ft_imp) @ y - B_N * ft_ctrl
+    ft_ctrl = 1 # (t<t_diss)
+    res = yd - invMM @ ((JJ - Z * B_D @ B_D.T * ft_imp) @ y + B_N * ft_ctrl)
 
     return res
 
@@ -412,32 +416,46 @@ dt_vec = np.diff(t_sol)
 n_p1 = Vp1.dim()
 n_p2 = Vp2.dim()
 
-ep1_sol = y_sol[:n_p1, :]
-ep2_sol = y_sol[n_p1:n_p1+n_p2, :]
-ep_sol = y_sol[:n_p1+n_p2, :]
-
 e_sol = y_sol
 
+ep_sol = e_sol[:n_p1+n_p2, :]
+eq_sol = e_sol[n_p1+n_p2:, :]
+ep1_sol = ep_sol[:n_p1, :]
+ep2_sol = ep_sol[n_p1:, :]
+
+MMp = MM[:n_p1 + n_p2, :n_p1 + n_p2]
+MMq = MM[n_p1 + n_p2:, n_p1 + n_p2:]
+
 H_vec = np.zeros((n_ev,))
+Hp_vec = np.zeros((n_ev,))
+Hq_vec = np.zeros((n_ev,))
+
 for i in range(n_ev):
     H_vec[i] = 0.5 * (e_sol[:, i].T @ MM @ e_sol[:, i])
+    Hp_vec[i] = 0.5 * (ep_sol[:, i].T @ MMp @ ep_sol[:, i])
+    Hq_vec[i] = 0.5 * (eq_sol[:, i].T @ MMq @ eq_sol[:, i])
 
-# np.save("t_ode.npy", t_sol)
-# np.save("H_ode.npy", H_vec)
+path_results = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/waves/results_ifacwc/"
+np.save(path_results + "t_ode_" + str(ind) + ".npy", t_sol)
+np.save(path_results + "H_ode_" + str(ind) + ".npy", H_vec)
+np.save(path_results + "Hp_ode_" + str(ind) + ".npy", Hp_vec)
+np.save(path_results + "Hq_ode_" + str(ind) + ".npy", Hq_vec)
+
+fntsize = 16
 
 fig = plt.figure()
-plt.plot(t_ev, H_vec, 'b-')
-plt.xlabel(r'{Time} (s)', fontsize=16)
-plt.ylabel(r'{Hamiltonian} (J)', fontsize=16)
+plt.plot(t_ev, H_vec, 'b-', label= "H")
+plt.plot(t_ev, Hp_vec, 'r-', label= "Hp")
+plt.plot(t_ev, Hq_vec, 'g-', label= "Hq")
+
+plt.xlabel(r'{Time} (s)', fontsize=fntsize)
+plt.ylabel(r'{Hamiltonian} (J)', fontsize=fntsize)
 plt.title(r"Hamiltonian trend",
-          fontsize=16)
+          fontsize=fntsize)
 plt.legend(loc='upper left')
 
-# fig = plt.figure()
-# plt.plot(t_ev, e_sol[ind_x, :], 'b-')
-# plt.xlabel(r'{Time} (s)', fontsize=16)
-# plt.ylabel(r'p(0, 0)', fontsize=16)
-# plt.title(r"Pressure at 0", fontsize=16)
+path_figs = "/home/a.brugnoli/Plots_Videos/Python/Plots/Waves/IFAC_WC2020/"
+plt.savefig(path_figs + "H_ode" + str(ind) + ".eps", format="eps")
 
 dt_vec = np.diff(t_ev)
 
@@ -459,11 +477,10 @@ for i in range(n_ev):
 anim = animate2D(minZ, maxZ, w1fun_vec, w2fun_vec, t_ev, xlabel = '$x[m]$', ylabel = '$r [m]$', \
                          zlabel = '$p [Pa]$', title = 'Pressure')
 
+Writer = animation.writers['ffmpeg']
+writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
+path_videos = "/home/a.brugnoli/Plots_Videos/Python/Videos/Waves/IFAC_WC2020/"
+anim.save(path_videos + 'wave_ode' + str(ind) + '.mp4', writer=writer)
+
 plt.show()
-
-# Writer = animation.writers['ffmpeg']
-# writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
-# pathout = './'
-# anim.save(pathout + 'wave_ode.mp4', writer=writer)
-
 

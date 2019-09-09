@@ -64,8 +64,8 @@ def computeH_ode(ind):
 
         m_form1 = m_p1 + m_q1
 
-        j_div = v_p1 * (div(e_q1) + e_q1[1]/r1) * r1 * dx1
-        j_divIP = -(div(v_q1) + v_q1[1]/r1) * e_p1 * r1 * dx1
+        j_div = v_p1 * (div(e_q1) + e_q1[1] / r1) * r1 * dx1
+        j_divIP = -(div(v_q1) + v_q1[1] / r1) * e_p1 * r1 * dx1
 
         j_form1 = j_div + j_divIP
 
@@ -136,8 +136,8 @@ def computeH_ode(ind):
         # print(ind_x, x2_cor[ind_x], r2_cor[ind_x])
         # x12_cor = np.concatenate((x1_cor, x2_cor))
         # r12_cor = np.concatenate((r1_cor, r2_cor))
-        ind_x = np_1 + np.where(np.logical_and(np.isclose(x2_cor, 1), \
-                                               np.isclose(r2_cor, 0.3167, rtol=1e-2)))[0][0]
+        ind_x = np_1 + np.where(np.logical_and(np.isclose(x2_cor, 0), \
+                                               np.isclose(r2_cor, 0)))[0][0]
         # print(x12_cor[ind_x], r12_cor[ind_x])
 
         Vp2 = FunctionSpace(mesh2, "CG", deg_p2)
@@ -183,12 +183,15 @@ def computeH_ode(ind):
         isR_uN = conditional(gt(x2, L_duct - tol_geo), 1, 0)
 
         is_N = conditional(Or(Or(lt(x2, tol_geo), gt(x2, L_duct - tol_geo)), lt(r2, tol_geo)), 1, 0)
-        is_int2 = conditional(And(And(gt(x2, tol_geo), lt(x2, L_duct-tol_geo)), gt(r2, R_ext/2-tol_geo)), 1, 0)
+        is_int2 = conditional(And(And(gt(x2, tol_geo), lt(x2, L_duct - tol_geo)), gt(r2, R_ext / 2 - tol_geo)), 1, 0)
 
-        u_N1 = (1 - cos(pi*r1/R_ext))#*cos(pi*x1/(2*L_duct))
-        u_N2 = (1 - cos(pi*r2/R_ext))#*cos(pi*x2/(2*L_duct))
-        # b_N = v_p2 * u_N2 * is_uN * r2 * ds2
-        b_N = v_p2 * u_N2 * isL_uN * r2 * ds2 - v_p2 * u_N2 * isR_uN * r2 * ds2
+        ux_N1 = 1 - r1 ** 2 / R_ext ** 2
+        ux_N2 = 1 - r2 ** 2 / R_ext ** 2
+
+        uy_N1 = 16 * r1 ** 2 * (R_ext - r1) ** 2
+        uy_N2 = 16 * r2 ** 2 * (R_ext - r2) ** 2
+
+        b_N = -v_p2 * ux_N2 * isL_uN * r2 * ds2 + v_p2 * ux_N2 * isR_uN * r2 * ds2
 
         B_N = np.reshape(assemble(b_N).vector().get_local(), (-1, 1))
 
@@ -203,6 +206,19 @@ def computeH_ode(ind):
         int_dofs2 = np.where(B_int2.any(axis=0))[0]
 
         B_int2 = B_int2[:, int_dofs2]
+        #
+        # x1_cor = x1_cor[perm_x1]
+        # r1_cor = r1_cor[perm_x1]
+        # x2_cor = x2_cor[perm_x2]
+        # r2_cor = r2_cor[perm_x2]
+        #
+        # plt.plot(x1_cor[:], r1_cor[:], 'bo')
+        # plt.plot(x1_cor[int_dofs1], r1_cor[int_dofs1], 'r*')
+        # plt.show()
+        #
+        # plt.plot(x2_cor[:], r2_cor[:], 'bo')
+        # plt.plot(x2_cor[int_dofs2], r2_cor[int_dofs2], 'r*')
+        # plt.show()
 
         nint_2 = len(int_dofs2)
         # print(nint_1, nint_2)
@@ -214,16 +230,15 @@ def computeH_ode(ind):
         sys_DN = SysPhdaeRig.gyrator_ordered(sys1, sys2, list(range(nint_1)), list(range(nint_2)), la.inv(Mdelta))
 
         ep1_0 = project(Constant(0), Vp1).vector().get_local()
-        eq1_0 = project(as_vector([-u_N1, Constant(0)]), Vq1).vector().get_local()
+        eq1_0 = project(as_vector([ux_N1, uy_N1]), Vq1).vector().get_local()
 
         ep2_0 = project(Constant(0), Vp2).vector().get_local()
-        eq2_0 = project(as_vector([-u_N2, Constant(0)]), Vq2).vector().get_local()
+        eq2_0 = project(as_vector([ux_N2, uy_N2]), Vq2).vector().get_local()
 
         ep_0 = np.concatenate((ep1_0, ep2_0))
         eq_0 = np.concatenate((eq1_0, eq2_0))
 
         return sys_DN, Vp1, Vp2, ep_0, eq_0, ind_x
-
 
     path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/waves/meshes_ifacwc/"
     mesh1 = Mesh(path_mesh + "duct_dom1_" + str(ind) + ".msh")
@@ -254,23 +269,24 @@ def computeH_ode(ind):
     n_e = n_p + n_q
     print(n_e)
 
-
     B_D = BB[:, :-1]
     B_N = BB[:, -1]
     print(m_sysDN, B_D.shape, B_N.shape)
 
     t_final = 1
-    Z = mu_0 * c_0
-    t_diss = 0.25*t_final
-    # tau_imp = t_final/10
+    Z = c_0 * mu_0
+    t_diss = 0.2 * t_final
+    tau_imp = t_final / 100
 
+    invMM = la.inv(MM)
 
     def ode_closed_phs(t, y, yd):
 
-        print(t/t_final*100)
+        print(t / t_final * 100)
 
-        ft_imp = (t>t_diss) # * (1 - np.exp((t - t_diss)/tau_imp))
-        res = MM @ yd - (JJ - Z * B_D @ B_D.T * ft_imp) @ y - B_N
+        ft_imp = (t > t_diss)  # * (1 - np.exp((t - t_diss)/tau_imp))
+        ft_ctrl = 1  # (t<t_diss)
+        res = yd - invMM @ ((JJ - Z * B_D @ B_D.T * ft_imp) @ y + B_N * ft_ctrl)
 
         return res
 
@@ -286,7 +302,7 @@ def computeH_ode(ind):
 
     y0 = np.concatenate((ep_0, eq_0))
 
-    yd0 = la.solve(MM, JJ @ y0 + B_N) # Initial conditions
+    yd0 = la.solve(MM, JJ @ y0 + B_N)  # Initial conditions
 
     # Create an Assimulo implicit problem
     imp_mod = Implicit_Problem(ode_closed_phs, y0, yd0, name='dae_closed_pHs')
@@ -313,6 +329,7 @@ def computeH_ode(ind):
     t_ev = np.linspace(0, t_final, n_ev)
     t_sol, y_sol, yd_sol = imp_sim.simulate(t_final, 0, t_ev)
 
+    t_sol = np.array(t_sol)
     y_sol = y_sol.T
     yd_sol = yd_sol.T
 
@@ -322,32 +339,30 @@ def computeH_ode(ind):
     n_p1 = Vp1.dim()
     n_p2 = Vp2.dim()
 
-    ep1_sol = y_sol[:n_p1, :]
-    ep2_sol = y_sol[n_p1:n_p1+n_p2, :]
-    ep_sol = y_sol[:n_p1+n_p2, :]
-
     e_sol = y_sol
 
+    ep_sol = e_sol[:n_p1 + n_p2, :]
+    eq_sol = e_sol[n_p1 + n_p2:, :]
+    ep1_sol = ep_sol[:n_p1, :]
+    ep2_sol = ep_sol[n_p1:, :]
+
+    MMp = MM[:n_p1 + n_p2, :n_p1 + n_p2]
+    MMq = MM[n_p1 + n_p2:, n_p1 + n_p2:]
+
     H_vec = np.zeros((n_ev,))
+    Hp_vec = np.zeros((n_ev,))
+    Hq_vec = np.zeros((n_ev,))
+
     for i in range(n_ev):
         H_vec[i] = 0.5 * (e_sol[:, i].T @ MM @ e_sol[:, i])
+        Hp_vec[i] = 0.5 * (ep_sol[:, i].T @ MMp @ ep_sol[:, i])
+        Hq_vec[i] = 0.5 * (eq_sol[:, i].T @ MMq @ eq_sol[:, i])
 
-    dt_vec = np.diff(t_ev)
-
-    w1_fun = Function(Vp1)
-    w2_fun = Function(Vp2)
-    w1fun_vec = []
-    w2fun_vec = []
-
-    maxZ = np.max(ep_sol)
-    minZ = np.min(ep_sol)
-
-    for i in range(n_ev):
-        w1_fun.vector()[:] = ep1_sol[:, i]
-        w1fun_vec.append(interpolate(w1_fun, Vp1))
-
-        w2_fun.vector()[:] = ep2_sol[:, i]
-        w2fun_vec.append(interpolate(w2_fun, Vp2))
+    path_results = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/waves/results_ifacwc/"
+    np.save(path_results + "t_ode_" + str(ind) + ".npy", t_sol)
+    np.save(path_results + "H_ode_" + str(ind) + ".npy", H_vec)
+    np.save(path_results + "Hp_ode_" + str(ind) + ".npy", Hp_vec)
+    np.save(path_results + "Hq_ode_" + str(ind) + ".npy", Hq_vec)
 
     return H_vec, t_sol
 

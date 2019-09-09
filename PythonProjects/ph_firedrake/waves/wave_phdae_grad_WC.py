@@ -62,7 +62,7 @@ def print_modes(Mmat, Jmat, Vp, n_modes):
     plt.show()
 
 # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
-ind = 2
+ind = 5
 path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/waves/meshes_ifacwc/"
 mesh = Mesh(path_mesh + "duct_" + str(ind) + ".msh")
 
@@ -105,6 +105,8 @@ tab_coord = mesh.coordinates.dat.data
 x_cor = tab_coord[:, 0]
 r_cor = tab_coord[:, 1]
 
+assert max(x_cor) == L_duct
+
 ind_x = np.where(np.logical_and(np.isclose(x_cor, 0),\
                                 np.isclose(r_cor, 0, rtol=1e-2)))[0][0]
 
@@ -137,8 +139,11 @@ isL_uN = conditional(lt(x, tol_geo), 1, 0)
 isR_uN = conditional(gt(x, L_duct - tol_geo), 1, 0)
 isLR_uN = conditional(Or(lt(x, tol_geo), gt(x, L_duct - tol_geo)), 1, 0)
 
-u_N = (1 - cos(pi*r/R_ext))# * cos(pi*x/(2*L_duct))
-b_N = v_p * isL_uN * u_N * r * ds - v_p * isR_uN * u_N * r * ds
+# u_N = (1 - cos(pi*r/R_ext)) * cos(pi*x/(2*L_duct))
+ux_N = 1 - r**2/R_ext**2
+uy_N = 16*r**2*(R_ext-r)**2
+
+b_N = -v_p * isL_uN * ux_N * r * ds + v_p * isR_uN * ux_N * r * ds
 
 B_N = assemble(b_N).vector().get_local()
 
@@ -176,12 +181,13 @@ B_D = B_D[dirichlet_dofs, :]
 
 n_lmb = G_D.shape[1]
 n_uD = B_D.shape[1]
-t_final = 10
+t_final = 1
 
 Z = mu_0 * c_0
-t_diss = 0.1*t_final
+t_diss = 0.2*t_final
 
-tau_imp = t_final/10
+tau_imp = t_final/100
+invMM = la.inv(MM)
 
 
 def dae_closed_phs(t, y, yd):
@@ -193,8 +199,8 @@ def dae_closed_phs(t, y, yd):
     ed_var = yd[:n_e]
 
     ft_imp = (t>t_diss) # * (1 - np.exp((t - t_diss)/tau_imp))
-    ft_ctrl = (t<t_diss)
-    res_e = MM @ ed_var - JJ @ e_var - G_D @ lmb_var - B_N * ft_ctrl
+    ft_ctrl = 1  #  (t<t_diss)
+    res_e = ed_var - invMM @ (JJ @ e_var + G_D @ lmb_var + B_N * ft_ctrl)
     res_lmb = - G_D.T @ e_var - Z * B_D @ B_D.T @ lmb_var * ft_imp
 
     return np.concatenate((res_e, res_lmb))
@@ -213,7 +219,7 @@ def handle_result(solver, t, y, yd):
 
 
 ep_0 = np.zeros(n_p)
-eq_0 = project(as_vector([-u_N, Constant(0)]), Vq).vector().get_local()
+eq_0 = project(as_vector([ux_N, uy_N]), Vq).vector().get_local()
 
 e_0 = np.concatenate((ep_0, eq_0))
 
@@ -267,6 +273,9 @@ e_sol = y_sol[:, :n_e].T
 lmb_sol = y_sol[:, n_e:].T
 
 ep_sol = e_sol[:n_p, :]
+eq_sol = e_sol[n_p:, :]
+MMp = MM[:n_p, :n_p]
+MMq = MM[n_p:, n_p:]
 
 maxZ = np.max(ep_sol)
 minZ = np.min(ep_sol)
@@ -278,38 +287,44 @@ for i in range(n_ev):
     wfun_vec.append(interpolate(w_fun, Vp))
 
 H_vec = np.zeros((n_ev,))
+Hp_vec = np.zeros((n_ev,))
+Hq_vec = np.zeros((n_ev,))
 
 for i in range(n_ev):
     H_vec[i] = 0.5 * (e_sol[:, i].T @ MM @ e_sol[:, i])
+    Hp_vec[i] = 0.5 * (ep_sol[:, i].T @ MMp @ ep_sol[:, i])
+    Hq_vec[i] = 0.5 * (eq_sol[:, i].T @ MMq @ eq_sol[:, i])
 
-# np.save("t_dae.npy", t_sol)
-# np.save("H_dae.npy", H_vec)
+path_results = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/waves/results_ifacwc/"
+np.save(path_results + "t_dae_" + str(ind) + ".npy", t_sol)
+np.save(path_results + "H_dae_" + str(ind) + ".npy", H_vec)
+np.save(path_results + "Hp_dae_" + str(ind) + ".npy", Hp_vec)
+np.save(path_results + "Hq_dae_" + str(ind) + ".npy", Hq_vec)
+
 fntsize = 16
 
 fig = plt.figure()
-plt.plot(t_ev, H_vec, 'b-')
+plt.plot(t_ev, H_vec, 'b-', label= "H")
+plt.plot(t_ev, Hp_vec, 'r-', label= "Hp")
+plt.plot(t_ev, Hq_vec, 'g-', label= "Hq")
+
 plt.xlabel(r'{Time} (s)', fontsize=fntsize)
 plt.ylabel(r'{Hamiltonian} (J)', fontsize=fntsize)
 plt.title(r"Hamiltonian trend",
           fontsize=fntsize)
 plt.legend(loc='upper left')
 
-fig = plt.figure()
-plt.plot(t_ev, ep_sol[ind_x, :], 'b-')
-plt.xlabel(r'{Time} (s)', fontsize=fntsize)
-plt.ylabel(r'p(0,0) Pa', fontsize=fntsize)
-plt.title(r"Pressure at 0",
-          fontsize=fntsize)
+path_figs = "/home/a.brugnoli/Plots_Videos/Python/Plots/Waves/IFAC_WC2020/"
+plt.savefig(path_figs + "H_dae" + str(ind) + ".eps", format="eps")
 
-# anim = animate2D(minZ, maxZ, wfun_vec, t_ev, xlabel = '$x[m]$', ylabel = '$r [m]$', \
-#                           zlabel='$p$', title='pressure')
+anim = animate2D(minZ, maxZ, wfun_vec, t_ev, xlabel = '$x[m]$', ylabel = '$r [m]$', \
+                          zlabel='$p$', title='pressure')
+
+rallenty = 10
+fps = 20
+Writer = animation.writers['ffmpeg']
+writer = Writer(fps=fps, metadata=dict(artist='Me'), bitrate=1800)
+path_videos = "/home/a.brugnoli/Plots_Videos/Python/Videos/Waves/IFAC_WC2020/"
+anim.save(path_videos + 'wave_dae' + str(ind) + '.mp4', writer=writer)
 
 plt.show()
-
-# rallenty = 10
-# fps = 20
-# Writer = animation.writers['ffmpeg']
-# writer = Writer(fps=fps, metadata=dict(artist='Me'), bitrate=1800)
-# path_out = "./"
-# anim.save(path_out + 'wave_dae.mp4', writer=writer)
-
