@@ -67,7 +67,7 @@ plt.savefig(path_figs + "Hode_diff.eps", format="eps")
 
 fig = plt.figure()
 plt.plot(h_vec, errHode, 'b-', label="ODE")
-plt.plot(h_vec, errHdae, 'b-', label="DAE")
+plt.plot(h_vec, errHdae, 'r-', label="DAE")
 plt.xlabel(r'Mesh size', fontsize=fntsize)
 plt.ylabel(r'$||H_{ref} - H_{ode}||_{L^2}$', fontsize=fntsize)
 plt.title(r"$L^2$ norm Hamiltonian difference", fontsize=fntsize)

@@ -62,8 +62,10 @@ def print_modes(Mmat, Jmat, Vp, n_modes):
     plt.show()
 
 # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
-ind = 5
+ind = 15
 path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/waves/meshes_ifacwc/"
+# path_mesh = "./meshes_ifacwc/"
+
 mesh = Mesh(path_mesh + "duct_" + str(ind) + ".msh")
 
 # figure = plt.figure()
@@ -181,13 +183,13 @@ B_D = B_D[dirichlet_dofs, :]
 
 n_lmb = G_D.shape[1]
 n_uD = B_D.shape[1]
-t_final = 1
+t_final = 0.1
 
 Z = mu_0 * c_0
 t_diss = 0.2*t_final
 
 tau_imp = t_final/100
-invMM = la.inv(MM)
+# invMM = la.inv(MM)
 
 
 def dae_closed_phs(t, y, yd):
@@ -200,7 +202,7 @@ def dae_closed_phs(t, y, yd):
 
     ft_imp = (t>t_diss) # * (1 - np.exp((t - t_diss)/tau_imp))
     ft_ctrl = 1  #  (t<t_diss)
-    res_e = ed_var - invMM @ (JJ @ e_var + G_D @ lmb_var + B_N * ft_ctrl)
+    res_e = MM @ ed_var - (JJ @ e_var + G_D @ lmb_var + B_N * ft_ctrl)
     res_lmb = - G_D.T @ e_var - Z * B_D @ B_D.T @ lmb_var * ft_imp
 
     return np.concatenate((res_e, res_lmb))
@@ -232,11 +234,11 @@ dlmb_0 = la.solve(- G_D.T @ la.solve(MM, G_D), G_D.T @ la.solve(MM, JJ @ de_0))
 
 y0[:n_p] = ep_0
 y0[n_p:n_V] = eq_0
-y0[n_V:] = lmb_0
-
+# y0[n_V:] = lmb_0
+#
 yd0 = np.zeros(n_e + n_lmb)  # Initial conditions
-yd0[:n_V] = de_0
-yd0[n_V:] = dlmb_0
+# yd0[:n_V] = de_0
+# yd0[n_V:] = dlmb_0
 
 # Maug = la.block_diag(MM, np.zeros((n_lmb, n_lmb)))
 # Jaug = la.block_diag(JJ, np.zeros((n_lmb, n_lmb)))
@@ -295,7 +297,7 @@ for i in range(n_ev):
     Hp_vec[i] = 0.5 * (ep_sol[:, i].T @ MMp @ ep_sol[:, i])
     Hq_vec[i] = 0.5 * (eq_sol[:, i].T @ MMq @ eq_sol[:, i])
 
-path_results = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/waves/results_ifacwc/"
+path_results = "./results_ifacwc/"
 np.save(path_results + "t_dae_" + str(ind) + ".npy", t_sol)
 np.save(path_results + "H_dae_" + str(ind) + ".npy", H_vec)
 np.save(path_results + "Hp_dae_" + str(ind) + ".npy", Hp_vec)
@@ -304,15 +306,15 @@ np.save(path_results + "Hq_dae_" + str(ind) + ".npy", Hq_vec)
 fntsize = 16
 
 fig = plt.figure()
-plt.plot(t_ev, H_vec, 'b-', label= "H")
-plt.plot(t_ev, Hp_vec, 'r-', label= "Hp")
-plt.plot(t_ev, Hq_vec, 'g-', label= "Hq")
+plt.plot(t_ev, H_vec, 'b-', label= "$H$")
+plt.plot(t_ev, Hp_vec, 'r-', label= "$H_p$")
+plt.plot(t_ev, Hq_vec, 'g-', label= "$H_q$")
 
 plt.xlabel(r'{Time} (s)', fontsize=fntsize)
 plt.ylabel(r'{Hamiltonian} (J)', fontsize=fntsize)
 plt.title(r"Hamiltonian trend",
           fontsize=fntsize)
-plt.legend(loc='upper left')
+plt.legend(loc='upper right')
 
 path_figs = "/home/a.brugnoli/Plots_Videos/Python/Plots/Waves/IFAC_WC2020/"
 plt.savefig(path_figs + "H_dae" + str(ind) + ".eps", format="eps")

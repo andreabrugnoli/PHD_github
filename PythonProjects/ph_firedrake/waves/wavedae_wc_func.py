@@ -132,7 +132,7 @@ def computeH_dae(ind):
 
     n_lmb = G_D.shape[1]
     n_uD = B_D.shape[1]
-    t_final = 1
+    t_final = 0.1
 
     Z = mu_0 * c_0
     t_diss = 0.2 * t_final

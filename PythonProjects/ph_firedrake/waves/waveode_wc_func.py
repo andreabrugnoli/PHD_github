@@ -273,7 +273,7 @@ def computeH_ode(ind):
     B_N = BB[:, -1]
     print(m_sysDN, B_D.shape, B_N.shape)
 
-    t_final = 1
+    t_final = 0.1
     Z = c_0 * mu_0
     t_diss = 0.2 * t_final
     tau_imp = t_final / 100

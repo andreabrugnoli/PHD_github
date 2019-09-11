@@ -23,7 +23,7 @@ mu_0 = 1 / q_1
 q_2 = 1.4161 * 10 ** 5  # Pa   1/xsi
 xi_s = 1 / q_2
 c_0 = 340  # 340 m/s
-ind = 2
+ind = 3
 
 
 def print_modes(sys, Vp1, Vp2, n_modes):
@@ -346,7 +346,7 @@ B_D = BB[:, :-1]
 B_N = BB[:, -1]
 print(m_sysDN, B_D.shape, B_N.shape)
 
-t_final = 1
+t_final = 0.1
 Z = c_0 * mu_0
 t_diss = 0.2*t_final
 tau_imp = t_final/100
@@ -452,7 +452,7 @@ plt.xlabel(r'{Time} (s)', fontsize=fntsize)
 plt.ylabel(r'{Hamiltonian} (J)', fontsize=fntsize)
 plt.title(r"Hamiltonian trend",
           fontsize=fntsize)
-plt.legend(loc='upper left')
+plt.legend(loc='upper right')
 
 path_figs = "/home/a.brugnoli/Plots_Videos/Python/Plots/Waves/IFAC_WC2020/"
 plt.savefig(path_figs + "H_ode" + str(ind) + ".eps", format="eps")
@@ -477,10 +477,10 @@ for i in range(n_ev):
 anim = animate2D(minZ, maxZ, w1fun_vec, w2fun_vec, t_ev, xlabel = '$x[m]$', ylabel = '$r [m]$', \
                          zlabel = '$p [Pa]$', title = 'Pressure')
 
-Writer = animation.writers['ffmpeg']
-writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
-path_videos = "/home/a.brugnoli/Plots_Videos/Python/Videos/Waves/IFAC_WC2020/"
-anim.save(path_videos + 'wave_ode' + str(ind) + '.mp4', writer=writer)
+# Writer = animation.writers['ffmpeg']
+# writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
+# path_videos = "/home/a.brugnoli/Plots_Videos/Python/Videos/Waves/IFAC_WC2020/"
+# anim.save(path_videos + 'wave_ode' + str(ind) + '.mp4', writer=writer)
 
 plt.show()
 
