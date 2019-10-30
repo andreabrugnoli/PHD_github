@@ -44,7 +44,7 @@ n_p = beam_hinged.n_p
 n_pu = int(n_p/3)
 n_pw = 2*n_pu
 n_f = beam_hinged.n_f
-n_tot = n_e + n_r
+n_tot = n_e + n_th
 
 
 M = beam_hinged.M_e

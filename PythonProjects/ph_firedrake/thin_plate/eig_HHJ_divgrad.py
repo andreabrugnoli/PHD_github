@@ -95,13 +95,14 @@ e_mns = inner(e_q, outer(n_ver, s_ver))
 v_mns = inner(v_q, outer(n_ver, s_ver))
 
 j_1 = + inner(grad(v_p), div(e_q)) * dx \
-      - dot(grad(v_p('+')), s_ver('+')) * dot(dot(e_q('+'), s_ver('+')), n_ver('+')) * dS \
       - dot(grad(v_p), s_ver) * dot(dot(e_q, s_ver), n_ver) * ds \
-
+      - dot(grad(v_p('+')), s_ver('+')) * jump(dot(e_q, s_ver), n_ver) * dS
+      # - dot(grad(v_p('+')), s_ver('+')) * dot(dot(e_q('+'), s_ver('+')), n_ver('+')) * dS
 
 j_2 = - inner(div(v_q), grad(e_p)) * dx \
-      + dot(dot(v_q('+'), s_ver('+')), n_ver('+')) * dot(grad(e_p('+')), s_ver('+')) * dS \
-      + dot(dot(v_q, s_ver), n_ver) * dot(grad(e_p), s_ver) * ds \
+  + dot(dot(v_q, s_ver), n_ver) * dot(grad(e_p), s_ver) * ds \
+  + jump(dot(v_q, s_ver), n_ver) * dot(grad(e_p('+')), s_ver('+')) * dS
+  #  + dot(dot(v_q('+'), s_ver('+')), n_ver('+')) * dot(grad(e_p('+')), s_ver('+')) * dS
 
 j_form = j_1 + j_2
 

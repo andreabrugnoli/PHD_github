@@ -73,7 +73,7 @@ def print_modes(Mmat, Jmat, Vp, n_modes):
     plt.show()
 
 # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
-ind = 4
+ind = 10
 path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_fenics/Wave_fenics/meshes_ifacwc/"
 # path_mesh = "./meshes_ifacwc/"
 
@@ -197,6 +197,7 @@ B_D = B_D[:, controlD_dofs]
 M_D = B_D[controlD_dofs, :]
 B_D = B_D[dirichlet_dofs, :]
 
+print(np.linalg.norm(la.inv(M_D)))
 # plt.plot(x_cor[:], r_cor[:], 'bo')
 # plt.plot(x_cor[dirichlet_dofs], r_cor[dirichlet_dofs], 'r*')
 # plt.plot(x_cor[controlD_dofs], r_cor[controlD_dofs], 'g*')
@@ -214,7 +215,7 @@ tau_imp = t_final/100
 if ind != 15:
     invMM = la.inv(MM)
     
-RR = Z * B_D @ B_D.T
+RR = Z * B_D @ la.inv(M_D) @ B_D.T
 
 def dae_closed_phs(t, y, yd):
 

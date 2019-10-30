@@ -39,17 +39,15 @@ I_coupler = pi * d**4 / 64
 
 
 Jxx_coupler = 2 * I_coupler * rho_coupler * L_coupler
-# Jxx_coupler = Jxx_coupler*10
 omega_cr = 150
 
 nr_coupler = 6
 nr_slider = 3
 # nr_tot = nr_coupler + nr_slider
 
-n_elem = 6
-
-coupler = SpatialBeam(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler, Jxx_coupler)
-
+n_elem = 2
+bc = 'SS'
+coupler = SpatialBeam(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler, Jxx_coupler, bc=bc)
 
 mass_coupler = rho_coupler * A_coupler * L_coupler
 mass_slider = 0.5 * mass_coupler
@@ -93,11 +91,10 @@ n_tot = n_e + nlmd_cl + nlmd_sys + nlmd_sl + nquat  # 4 coupler, 2 slider, 3 cou
 dx = L_coupler/n_elem
 
 
-t_final = abs(0.5/omega_cr)
+t_final = abs(8/omega_cr)
 
 
-Jf_tx, Jf_ty, Jf_tz, Jf_ry, Jf_rz, Jf_fx, Jf_fy, Jf_fz = matrices_j3d(n_elem, L_coupler, rho_coupler, A_coupler)
-print(Jf_tx.shape, Jf_ty.shape, Jf_tz.shape, Jf_ry.shape, Jf_rz.shape, Jf_fx.shape, Jf_fy.shape, Jf_fz.shape)
+Jf_tx, Jf_ty, Jf_tz, Jf_ry, Jf_rz, Jf_fx, Jf_fy, Jf_fz = matrices_j3d(n_elem, L_coupler, rho_coupler, A_coupler, bc=bc)
 
 def dae_closed_phs(t, y, yd):
 
@@ -184,16 +181,16 @@ def dae_closed_phs(t, y, yd):
     return res
 
 
-# order = []
-#
-#
-# def handle_result(solver, t, y, yd):
-#
-#     order.append(solver.get_last_order())
-#
-#     solver.t_sol.extend([t])
-#     solver.y_sol.extend([y])
-#     solver.yd_sol.extend([yd])
+order = []
+
+
+def handle_result(solver, t, y, yd):
+
+    order.append(solver.get_last_order())
+
+    solver.t_sol.extend([t])
+    solver.y_sol.extend([y])
+    solver.yd_sol.extend([yd])
 
 
 z0_cr = L_crank + offset_cr
@@ -210,7 +207,7 @@ b_vel = np.array([0, L_crank*np.sin(theta_cr)*omega_cr, L_crank*np.cos(theta_cr)
 dtheta1_cl, dtheta2_cl, dx_sl = la.solve(A_vel, b_vel)
 
 omx_B = np.sin(theta2_cl) * dtheta1_cl
-# omx_B = 0
+# omx_B = -15
 
 omy_B = dtheta2_cl
 omz_B = -np.cos(theta2_cl) * dtheta1_cl
@@ -259,7 +256,6 @@ v0P_B = T_I2B @ v0P_I
 e0_cl = np.concatenate((v0P_B, om0_clB))
 e0_sl = T_I2B @ np.array([dx_sl, 0, 0])
 e0_fl = np.zeros((sys.n_f, ))
-# e0_fl[:n_pu] = 2.2*10**(-6) * np.array(list(range(1, n_elem+1)))
 e0_sys = np.concatenate((e0_cl, e0_sl, e0_fl))
 quat0_sys = quaternion.as_float_array(quaternion.from_rotation_matrix(R_B2I))
 
@@ -321,19 +317,19 @@ y0[:n_e] = e0_sys
 y0[n_e:-nquat] = lmb0_sys
 y0[-nquat:] = quat0_sys
 
-yd0[:n_e] = de0_sys
-y0[n_e:-nquat] = dlmb0_sys
+# yd0[:n_e] = de0_sys
+# y0[n_e:-nquat] = dlmb0_sys
 yd0[-nquat:] = dquat0_sys
 
 # Create an Assimulo implicit problem
 imp_mod = Implicit_Problem(dae_closed_phs, y0, yd0, name='dae_closed_pHs')
-# imp_mod.handle_result = handle_result
+imp_mod.handle_result = handle_result
 
 # Set the algebraic components
 imp_mod.algvar = list(np.concatenate((np.ones(n_e), np.zeros(n_tot - n_e - nquat), np.ones(nquat))))
 # Create an Assimulo implicit solver
 # imp_sim = IDA(imp_mod)  # Create a IDA solver
-imp_sim = Radau5DAE(imp_mod)  # Create a IDA solver
+imp_sim = IDA(imp_mod)  # Create a IDA solver
 
 # Sets the paramters
 imp_sim.atol = 1e-6  # Default 1e-6
@@ -344,17 +340,17 @@ imp_sim.verbosity = 10
 imp_sim.maxh = 1e-6
 
 # Let Sundials find consistent initial conditions by use of 'IDA_YA_YDP_INIT'
-# imp_sim.make_consistent('IDA_YA_YDP_INIT')
+imp_sim.make_consistent('IDA_YA_YDP_INIT')
 
 # Simulate
-n_ev = 500
+n_ev = 5000
 t_ev = np.linspace(0, t_final, n_ev)
-# t_sol, y_sol, yd_sol = imp_sim.simulate(t_final, 0, t_ev)
-t_sol, y_sol, yd_sol = imp_sim.simulate(t_final)
-print(t_sol)
-t_sol = t_sol[1:]
-y_sol = y_sol[1:]
-yd_sol = yd_sol[1:]
+t_sol, y_sol, yd_sol = imp_sim.simulate(t_final, 0, t_ev)
+t_sol = np.array(t_sol)
+# t_sol, y_sol, yd_sol = imp_sim.simulate(t_final)
+# t_sol = t_sol[0:]
+# y_sol = y_sol[0:]
+# yd_sol = yd_sol[0:]
 e_sol = y_sol[:, :n_e].T
 lmb_sol = y_sol[:, n_e:-nquat].T
 quat_cl_sol = quaternion.as_quat_array(y_sol[:, -nquat:])
@@ -363,7 +359,10 @@ er_cl_sol = e_sol[:nr_coupler, :]
 ep_sol = e_sol[nr_tot:nr_tot + n_p, :]
 om_cl_sol = er_cl_sol[3:6, :]
 
-plt.plot(t_sol, om_cl_sol[0], 'r', t_sol, om_cl_sol[1], 'b', t_sol, om_cl_sol[2], 'g')
+plt.figure()
+plt.plot(t_sol, om_cl_sol.T)
+plt.xlabel(r"Time")
+plt.ylabel(r"Omega")
 
 nu = int(n_p/5)
 nv = int(2*n_p/5)
@@ -373,29 +372,39 @@ up_sol = ep_sol[:nu, :]
 vp_sol = ep_sol[nu:nu + nv, :]
 wp_sol = ep_sol[nu + nv:n_p, :]
 
-n_ev = len(t_sol)
-dt_vec = np.diff(t_sol)
+if bc == 'CF':
+    euM_B = up_sol[int(n_elem / 2) - 1, :]
+    evM_B = vp_sol[n_elem - 2, :]
+    ewM_B = wp_sol[n_elem - 2, :]
+else:
+    euM_B = up_sol[int(n_elem / 2) - 1, :]
+    evM_B = vp_sol[n_elem - 1, :]
+    ewM_B = wp_sol[n_elem - 1, :]
 
-n_plot = 11
-eu_plot = np.zeros((n_plot, n_ev))
-ev_plot = np.zeros((n_plot, n_ev))
-ew_plot = np.zeros((n_plot, n_ev))
 
-x_plot = np.linspace(0, L_coupler, n_plot)
+# n_ev = len(t_sol)
+# dt_vec = np.diff(t_sol)
+#
+# n_plot = 11
+# eu_plot = np.zeros((n_plot, n_ev))
+# ev_plot = np.zeros((n_plot, n_ev))
+# ew_plot = np.zeros((n_plot, n_ev))
+#
+# x_plot = np.linspace(0, L_coupler, n_plot)
 
 
-zeros_rig = [0,0,0,0,0,0]
-for i in range(n_ev):
-    eu_plot[:, i], ev_plot[:, i], ew_plot[:, i] = draw_deformation3D(n_plot, zeros_rig, ep_sol[:, i], L_coupler)[1:4]
-
-ind_midpoint = int((n_plot-1)/2)
-
-euM_B = eu_plot[ind_midpoint, :]
-evM_B = ev_plot[ind_midpoint, :]
-ewM_B = ew_plot[ind_midpoint, :]
-
-print(euM_B.shape, evM_B.shape, ewM_B.shape)
-
+# zeros_rig = [0,0,0,0,0,0]
+# for i in range(n_ev):
+#     eu_plot[:, i], ev_plot[:, i], ew_plot[:, i] = draw_deformation3D(n_plot, zeros_rig, ep_sol[:, i], L_coupler)[1:4]
+#
+# ind_midpoint = int((n_plot-1)/2)
+#
+# euM_B = eu_plot[ind_midpoint, :]
+# evM_B = ev_plot[ind_midpoint, :]
+# ewM_B = ew_plot[ind_midpoint, :]
+#
+# print(euM_B.shape, evM_B.shape, ewM_B.shape)
+#
 eM_B = np.column_stack((euM_B, evM_B, ewM_B)).T
 
 euM_B_int = interp1d(t_sol, euM_B, kind='linear')
@@ -405,64 +414,64 @@ ewM_B_int = interp1d(t_sol, ewM_B, kind='linear')
 omega_cl_int = interp1d(t_sol, om_cl_sol, kind='linear')
 eM_B_int = interp1d(t_sol, eM_B, kind='linear')
 
-er_cl_sol = e_sol[:nr_coupler, :]
-ef_cl_sol = e_sol[nr_tot:nr_tot + n_f, :]
-erf_cl_sol = np.concatenate((er_cl_sol, ef_cl_sol), axis=0)
+# er_cl_sol = e_sol[:nr_coupler, :]
+# ef_cl_sol = e_sol[nr_tot:nr_tot + n_f, :]
+# erf_cl_sol = np.concatenate((er_cl_sol, ef_cl_sol), axis=0)
+#
+# vP_cl_sol = er_cl_sol[:3, :]
+# om_cl_sol = er_cl_sol[3:6, :]
+# vslB_sol = e_sol[nr_coupler:nr_tot, :]
+#
+# e1I_sol = np.zeros((3, n_ev))
+# rP_cl = np.zeros((3, n_ev))
+#
+#
+# vslI_sol = np.zeros((3, n_ev))
+# vclCI_sol = np.zeros((3, n_ev))
+# vclCB_sol = np.zeros((3, n_ev))
+#
+# PC_skew = skew([-L_coupler, 0, 0])
 
-vP_cl_sol = er_cl_sol[:3, :]
-om_cl_sol = er_cl_sol[3:6, :]
-vslB_sol = e_sol[nr_coupler:nr_tot, :]
-
-e1I_sol = np.zeros((3, n_ev))
-rP_cl = np.zeros((3, n_ev))
-
-
-vslI_sol = np.zeros((3, n_ev))
-vclCI_sol = np.zeros((3, n_ev))
-vclCB_sol = np.zeros((3, n_ev))
-
-PC_skew = skew([-L_coupler, 0, 0])
-
-for i in range(n_ev):
-    vclCB_sol[:, i] = coupler.B[:, [6,7,8]].T @ erf_cl_sol[:, i]
-    vclCI_sol[:, i] = quaternion.as_rotation_matrix(quat_cl_sol[i]) @ vclCB_sol[:, i]
-
-    vslI_sol[:, i] = quaternion.as_rotation_matrix(quat_cl_sol[i]) @ vslB_sol[:, i]
-
-    rP_cl[:, i] = np.array([0, -L_crank * np.sin(omega_cr*t_sol[i]), offset_cr + L_crank * np.cos(omega_cr*t_sol[i])])
-
-
-vslI_int = interp1d(t_sol, vslI_sol, kind='linear')
-vclCI_int = interp1d(t_sol, vclCI_sol, kind='linear')
-
-def sys(t, y):
-
-    dydt_sl = vslI_int(t)
-    dydt_cl = vclCI_int(t)
-
-    return np.concatenate((dydt_sl, dydt_cl))
-
-
-r_sol = solve_ivp(sys, [0, t_final], np.concatenate((r0C_I, r0C_I)), method='RK45', t_eval=t_ev)
-
-
-n_ev = len(t_sol)
-dt_vec = np.diff(t_sol)
-
-xP_sl = r_sol.y[0, :]
-yP_sl = r_sol.y[1, :]
-zP_sl = r_sol.y[2, :]
-
-xC_cl = r_sol.y[3, :]
-yC_cl = r_sol.y[4, :]
-zC_cl = r_sol.y[5, :]
-
-data = np.array([[rP_cl[0], rP_cl[1], rP_cl[2]], [xC_cl, yC_cl, zC_cl], [xP_sl, yP_sl, zP_sl]])
+# for i in range(n_ev):
+#     vclCB_sol[:, i] = coupler.B[:, [6,7,8]].T @ erf_cl_sol[:, i]
+#     vclCI_sol[:, i] = quaternion.as_rotation_matrix(quat_cl_sol[i]) @ vclCB_sol[:, i]
+#
+#     vslI_sol[:, i] = quaternion.as_rotation_matrix(quat_cl_sol[i]) @ vslB_sol[:, i]
+#
+#     rP_cl[:, i] = np.array([0, -L_crank * np.sin(omega_cr*t_sol[i]), offset_cr + L_crank * np.cos(omega_cr*t_sol[i])])
+#
+#
+# vslI_int = interp1d(t_sol, vslI_sol, kind='linear')
+# vclCI_int = interp1d(t_sol, vclCI_sol, kind='linear')
+#
+# def sys(t, y):
+#
+#     dydt_sl = vslI_int(t)
+#     dydt_cl = vclCI_int(t)
+#
+#     return np.concatenate((dydt_sl, dydt_cl))
+#
+#
+# r_sol = solve_ivp(sys, [0, t_final], np.concatenate((r0C_I, r0C_I)), method='RK45', t_eval=t_ev)
+#
+#
+# n_ev = len(t_sol)
+# dt_vec = np.diff(t_sol)
+#
+# xP_sl = r_sol.y[0, :]
+# yP_sl = r_sol.y[1, :]
+# zP_sl = r_sol.y[2, :]
+#
+# xC_cl = r_sol.y[3, :]
+# yC_cl = r_sol.y[4, :]
+# zC_cl = r_sol.y[5, :]
+#
+# data = np.array([[rP_cl[0], rP_cl[1], rP_cl[2]], [xC_cl, yC_cl, zC_cl], [xP_sl, yP_sl, zP_sl]])
 
 
 def sys(t,y):
 
-    dydt = eM_B_int(t) #- skew(omega_cl_int(t)) @ y
+    dydt = eM_B_int(t) - skew(omega_cl_int(t)) @ y
     # dudt = euM_B_int(t)
     # dvdt = evM_B_int(t)
     # dwdt = ewM_B_int(t)
@@ -475,24 +484,24 @@ uM0 = 0
 vM0 = 0
 wM0 = 0
 
-r_sol = solve_ivp(sys, [0, t_final], [uM0, vM0, wM0], method='RK45', t_eval=t_ev)
+r_sol = solve_ivp(sys, [0, t_final], [uM0, vM0, wM0], method='RK45', t_eval=t_sol)
 
 uM_B = r_sol.y[0, :]
 vM_B = r_sol.y[1, :]
 wM_B = r_sol.y[2, :]
 
-uM_I = np.zeros(n_ev)
-vM_I = np.zeros(n_ev)
-wM_I = np.zeros(n_ev)
-
-
-for i in range(n_ev):
-
-    vecM_b = np.array([uM_B[i], vM_B[i], wM_B[i]])
-    Rot_i = quaternion.as_rotation_matrix(quat_cl_sol[i])
-    uM_I[i] = Rot_i[0, :] @ vecM_b
-    vM_I[i] = Rot_i[1, :] @ vecM_b
-    wM_I[i] = Rot_i[2, :] @ vecM_b
+# uM_I = np.zeros(n_ev)
+# vM_I = np.zeros(n_ev)
+# wM_I = np.zeros(n_ev)
+#
+#
+# for i in range(n_ev):
+#
+#     vecM_b = np.array([uM_B[i], vM_B[i], wM_B[i]])
+#     Rot_i = quaternion.as_rotation_matrix(quat_cl_sol[i])
+#     uM_I[i] = Rot_i[0, :] @ vecM_b
+#     vM_I[i] = Rot_i[1, :] @ vecM_b
+#     wM_I[i] = Rot_i[2, :] @ vecM_b
 
 
 fntsize = 16
@@ -520,22 +529,22 @@ fntsize = 16
 
 # plt.show()
 
+# fig = plt.figure()
+# plt.plot(omega_cr*t_sol, uM_B/L_coupler, 'b-', label="u midpoint")
+# plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
+# plt.ylabel(r'w normalized', fontsize = fntsize)
+# plt.title(r"Midpoint deflection in B", fontsize=fntsize)
+# plt.legend(loc='upper left')
+
 fig = plt.figure()
-plt.plot(omega_cr*t_sol, uM_B/L_coupler, 'b-', label="u midpoint")
+plt.plot(omega_cr*t_sol, vM_B/L_coupler, 'b-', label="y midpoint")
 plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
 plt.ylabel(r'w normalized', fontsize = fntsize)
 plt.title(r"Midpoint deflection in B", fontsize=fntsize)
 plt.legend(loc='upper left')
 
 fig = plt.figure()
-plt.plot(omega_cr*t_sol, -vM_B/L_coupler, 'b-', label="y midpoint")
-plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
-plt.ylabel(r'w normalized', fontsize = fntsize)
-plt.title(r"Midpoint deflection in B", fontsize=fntsize)
-plt.legend(loc='upper left')
-
-fig = plt.figure()
-plt.plot(omega_cr*t_sol, -wM_B/L_coupler, 'b-', label="z midpoint")
+plt.plot(omega_cr*t_sol, wM_B/L_coupler, 'b-', label="z midpoint")
 plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
 plt.ylabel(r'w normalized', fontsize = fntsize)
 plt.title(r"Midpoint deflection in B", fontsize=fntsize)

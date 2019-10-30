@@ -41,7 +41,8 @@ nr_mass = 2
 nr_tot = nr_coupler + nr_mass
 
 n_elem = 6
-coupler = FloatingPlanarEB(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler)
+bc = 'SS'
+coupler = FloatingPlanarEB(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler, bc=bc)
 
 mass_coupler = rho_coupler * A_coupler * L_coupler
 M_mass = 0.5 * la.block_diag(mass_coupler, mass_coupler)
@@ -67,6 +68,8 @@ order = []
 
 
 def dae_closed_phs(t, y, yd):
+
+    print(t/t_final*100)
 
     yd_sys = yd[:n_sys]
     y_sys = y[:n_sys]
@@ -154,24 +157,32 @@ om_cl_sol = er_cl_sol[2, :]
 
 wp_sol = ep_sol
 
-n_ev = len(t_sol)
-dt_vec = np.diff(t_sol)
+assert n_elem % 2 == 0
 
-n_plot = 11
-eu_plot = np.zeros((n_plot, n_ev))
-ew_plot = np.zeros((n_plot, n_ev))
+if bc=='CF':
+    ewM_B = wp_sol[n_elem - 2, :]
+else:
+    # ewM_B = wp_sol[n_elem - 1, :]
+    ewM_B = wp_sol[n_elem - 2, :]
 
-x_plot = np.linspace(0, L_coupler, n_plot)
-w_plot = np.zeros((n_plot, n_ev))
-
-t_plot = t_sol
-
-for i in range(n_ev):
-    eu_plot[:, i], ew_plot[:, i] = draw_bending(n_plot, [0, 0, 0], ep_sol[:, i], L_coupler)[1:3]
-
-ind_midpoint = int((n_plot-1)/2)
-
-ewM_B = ew_plot[ind_midpoint, :]
+# n_ev = len(t_sol)
+# dt_vec = np.diff(t_sol)
+#
+# n_plot = 11
+# eu_plot = np.zeros((n_plot, n_ev))
+# ew_plot = np.zeros((n_plot, n_ev))
+#
+# x_plot = np.linspace(0, L_coupler, n_plot)
+# w_plot = np.zeros((n_plot, n_ev))
+#
+# t_plot = t_sol
+#
+# for i in range(n_ev):
+#     eu_plot[:, i], ew_plot[:, i] = draw_bending(n_plot, [0, 0, 0], ep_sol[:, i], L_coupler)[1:3]
+#
+# ind_midpoint = int((n_plot-1)/2)
+#
+# ewM_B = ew_plot[ind_midpoint, :]
 
 omega_cr_int = interp1d(t_ev, om_cl_sol, kind='linear')
 ewM_B_int = interp1d(t_ev, ewM_B, kind='linear')
@@ -189,12 +200,18 @@ uM0 = 0
 
 r_sol = solve_ivp(sys, [0, t_final], [wM0], method='RK45', t_eval=t_ev)
 
-uM_B = r_sol.y[0, :]
-wM_B = r_sol.y[1, :]
+wM_B = r_sol.y[0, :]
 
 fntsize = 16
 fig = plt.figure()
-plt.plot(omega_cr*t_ev, -wM_B/L_coupler, 'b-')
+plt.plot(omega_cr*t_ev, om_cl_sol, 'b-')
+plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
+plt.ylabel(r'Omega coupler [rad/s]', fontsize = fntsize)
+plt.title(r"Omega coupler", fontsize=fntsize)
+
+
+fig = plt.figure()
+plt.plot(omega_cr*t_ev, wM_B/L_coupler, 'b-')
 plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
 plt.ylabel(r'w normalized', fontsize = fntsize)
 plt.title(r"Midpoint deflection", fontsize=fntsize)

@@ -55,9 +55,9 @@ Jxx_coupler = 2 * I_coupler * rho_coupler * L_coupler
 omega_cr = 150
 
 # nr_tot = nr_coupler + nr_slider
-
-n_elem = 6
-coupler = SpatialBeam(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler, Jxx_coupler)
+n_elem = 2
+bc='SS'
+coupler = SpatialBeam(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler, Jxx_coupler, bc=bc)
 dofs2dump = list([3])
 dofs2keep = list(set(range(coupler.n)).difference(set(dofs2dump)))
 
@@ -114,7 +114,7 @@ G_coupler = np.zeros((n_e, nlmd_cl))
 G_coupler[:nlmd_cl, :nlmd_cl] = np.eye(nlmd_cl)
 G_slider = np.zeros((n_e, nlmd_sl))
 
-Jf_tx, Jf_ty, Jf_tz, Jf_ry, Jf_rz, Jf_fx, Jf_fy, Jf_fz = matrices_j3d(n_elem, L_coupler, rho_coupler, A_coupler)
+Jf_tx, Jf_ty, Jf_tz, Jf_ry, Jf_rz, Jf_fx, Jf_fy, Jf_fz = matrices_j3d(n_elem, L_coupler, rho_coupler, A_coupler, bc='SS')
 
 Jf_tx = Jf_tx[:, 1:]
 Jf_ty = Jf_ty[:, 1:]
@@ -385,27 +385,36 @@ up_sol = ep_sol[:n_pu, :]
 vp_sol = ep_sol[n_pu:n_pu + n_pv, :]
 wp_sol = ep_sol[n_pu + n_pv:n_p, :]
 
-n_ev = len(t_sol)
-dt_vec = np.diff(t_sol)
+if bc == 'CF':
+    euM_B = up_sol[int(n_elem / 2) - 1, :]
+    evM_B = vp_sol[n_elem - 2, :]
+    ewM_B = wp_sol[n_elem - 2, :]
+else:
+    euM_B = up_sol[int(n_elem / 2) - 1, :]
+    evM_B = vp_sol[n_elem - 1, :]
+    ewM_B = wp_sol[n_elem - 1, :]
 
-n_plot = 11
-eu_plot = np.zeros((n_plot, n_ev))
-ev_plot = np.zeros((n_plot, n_ev))
-ew_plot = np.zeros((n_plot, n_ev))
-
-x_plot = np.linspace(0, L_coupler, n_plot)
-
-t_plot = t_sol
-
-zeros_rig = [0,0,0,0,0,0]
-for i in range(n_ev):
-    eu_plot[:, i], ev_plot[:, i], ew_plot[:, i] = draw_deformation3D(n_plot, zeros_rig, ep_sol[:, i], L_coupler)[1:4]
-
-ind_midpoint = int((n_plot-1)/2)
-
-euM_B = eu_plot[ind_midpoint, :]
-evM_B = ev_plot[ind_midpoint, :]
-ewM_B = ew_plot[ind_midpoint, :]
+# n_ev = len(t_sol)
+# dt_vec = np.diff(t_sol)
+#
+# n_plot = 11
+# eu_plot = np.zeros((n_plot, n_ev))
+# ev_plot = np.zeros((n_plot, n_ev))
+# ew_plot = np.zeros((n_plot, n_ev))
+#
+# x_plot = np.linspace(0, L_coupler, n_plot)
+#
+# t_plot = t_sol
+#
+# zeros_rig = [0,0,0,0,0,0]
+# for i in range(n_ev):
+#     eu_plot[:, i], ev_plot[:, i], ew_plot[:, i] = draw_deformation3D(n_plot, zeros_rig, ep_sol[:, i], L_coupler)[1:4]
+#
+# ind_midpoint = int((n_plot-1)/2)
+#
+# euM_B = eu_plot[ind_midpoint, :]
+# evM_B = ev_plot[ind_midpoint, :]
+# ewM_B = ew_plot[ind_midpoint, :]
 
 eM_B = np.column_stack((euM_B, evM_B, ewM_B)).T
 
@@ -416,59 +425,59 @@ ewM_B_int = interp1d(t_ev, ewM_B, kind='linear')
 omega_cl_int = interp1d(t_ev, om_cl_sol, kind='linear')
 eM_B_int = interp1d(t_ev, eM_B, kind='linear')
 
-er_cl_sol = e_sol[:nr_coupler, :]
-ef_cl_sol = e_sol[nr_tot:nr_tot +n_f, :]
-erf_cl_sol = np.concatenate((er_cl_sol, ef_cl_sol), axis=0)
-
-vP_cl_sol = er_cl_sol[:3, :]
-om_cl_sol = er_cl_sol[3:nr_coupler, :]
-vslB_sol = e_sol[nr_coupler:nr_tot, :]
-
-e1I_sol = np.zeros((3, n_ev))
-rP_cl = np.zeros((3, n_ev))
-
-
-vslI_sol = np.zeros((3, n_ev))
-vclCI_sol = np.zeros((3, n_ev))
-vclCB_sol = np.zeros((3, n_ev))
-
-for i in range(n_ev):
-    vclCB_sol[:, i] = coupler_nox.B[:, [6,7,8]].T @ erf_cl_sol[:, i]
-    vclCI_sol[:, i] = quaternion.as_rotation_matrix(quat_cl_sol[i]) @ vclCB_sol[:, i]
-
-    vslI_sol[:, i] = quaternion.as_rotation_matrix(quat_cl_sol[i]) @ vslB_sol[:, i]
-
-    rP_cl[:, i] = np.array([0, -L_crank * np.sin(omega_cr*t_ev[i]), offset_cr + L_crank * np.cos(omega_cr*t_ev[i])])
-
-
-vslI_int = interp1d(t_ev, vslI_sol, kind='linear')
-vclCI_int = interp1d(t_ev, vclCI_sol, kind='linear')
-
-def sys(t, y):
-
-    dydt_sl = vslI_int(t)
-    dydt_cl = vclCI_int(t)
-
-    return np.concatenate((dydt_sl, dydt_cl))
-
-
-r_sol = solve_ivp(sys, [0, t_final], np.concatenate((r0C_I, r0C_I)), method='RK45', t_eval=t_ev)
-
-
-n_ev = len(t_sol)
-dt_vec = np.diff(t_sol)
-
-xP_sl = r_sol.y[0, :]
-yP_sl = r_sol.y[1, :]
-zP_sl = r_sol.y[2, :]
-
-xC_cl = r_sol.y[3, :]
-yC_cl = r_sol.y[4, :]
-zC_cl = r_sol.y[5, :]
-
-data = np.array([[rP_cl[0], rP_cl[1], rP_cl[2]], [xC_cl, yC_cl, zC_cl], [xP_sl, yP_sl, zP_sl]])
-
-data = np.array([[rP_cl[0], rP_cl[1], rP_cl[2]], [xC_cl, yC_cl, zC_cl], [xP_sl, yP_sl, zP_sl]])
+# er_cl_sol = e_sol[:nr_coupler, :]
+# ef_cl_sol = e_sol[nr_tot:nr_tot +n_f, :]
+# erf_cl_sol = np.concatenate((er_cl_sol, ef_cl_sol), axis=0)
+#
+# vP_cl_sol = er_cl_sol[:3, :]
+# om_cl_sol = er_cl_sol[3:nr_coupler, :]
+# vslB_sol = e_sol[nr_coupler:nr_tot, :]
+#
+# e1I_sol = np.zeros((3, n_ev))
+# rP_cl = np.zeros((3, n_ev))
+#
+#
+# vslI_sol = np.zeros((3, n_ev))
+# vclCI_sol = np.zeros((3, n_ev))
+# vclCB_sol = np.zeros((3, n_ev))
+#
+# for i in range(n_ev):
+#     vclCB_sol[:, i] = coupler_nox.B[:, [6,7,8]].T @ erf_cl_sol[:, i]
+#     vclCI_sol[:, i] = quaternion.as_rotation_matrix(quat_cl_sol[i]) @ vclCB_sol[:, i]
+#
+#     vslI_sol[:, i] = quaternion.as_rotation_matrix(quat_cl_sol[i]) @ vslB_sol[:, i]
+#
+#     rP_cl[:, i] = np.array([0, -L_crank * np.sin(omega_cr*t_ev[i]), offset_cr + L_crank * np.cos(omega_cr*t_ev[i])])
+#
+#
+# vslI_int = interp1d(t_ev, vslI_sol, kind='linear')
+# vclCI_int = interp1d(t_ev, vclCI_sol, kind='linear')
+#
+# def sys(t, y):
+#
+#     dydt_sl = vslI_int(t)
+#     dydt_cl = vclCI_int(t)
+#
+#     return np.concatenate((dydt_sl, dydt_cl))
+#
+#
+# r_sol = solve_ivp(sys, [0, t_final], np.concatenate((r0C_I, r0C_I)), method='RK45', t_eval=t_ev)
+#
+#
+# n_ev = len(t_sol)
+# dt_vec = np.diff(t_sol)
+#
+# xP_sl = r_sol.y[0, :]
+# yP_sl = r_sol.y[1, :]
+# zP_sl = r_sol.y[2, :]
+#
+# xC_cl = r_sol.y[3, :]
+# yC_cl = r_sol.y[4, :]
+# zC_cl = r_sol.y[5, :]
+#
+# data = np.array([[rP_cl[0], rP_cl[1], rP_cl[2]], [xC_cl, yC_cl, zC_cl], [xP_sl, yP_sl, zP_sl]])
+#
+# data = np.array([[rP_cl[0], rP_cl[1], rP_cl[2]], [xC_cl, yC_cl, zC_cl], [xP_sl, yP_sl, zP_sl]])
 
 
 def sys(t,y):
@@ -539,7 +548,7 @@ plt.title(r"Midpoint deflection", fontsize=fntsize)
 plt.legend(loc='upper left')
 
 fig = plt.figure()
-plt.plot(omega_cr*t_ev, -vM_B/L_coupler, 'b-', label="y midpoint")
+plt.plot(omega_cr*t_ev, vM_B/L_coupler, 'b-', label="y midpoint")
 plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
 plt.ylabel(r'w normalized', fontsize = fntsize)
 plt.title(r"Midpoint deflection", fontsize=fntsize)

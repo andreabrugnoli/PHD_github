@@ -41,9 +41,9 @@ Fz_max = 100
 mass_beam = rho_beam * A_beam * L_beam
 Jxx_beam = 2 * I_beam * rho_beam * L_beam
 
-n_elem = 6
-
-beam = SpatialBeam(n_elem, L_beam, rho_beam, A_beam, E_beam, I_beam, Jxx_beam)
+n_elem = 2
+bc='CF'
+beam = SpatialBeam(n_elem, L_beam, rho_beam, A_beam, E_beam, I_beam, Jxx_beam, bc=bc)
 
 # dofs2dump = list([0, 1, 2])
 # dofs2keep = list(set(range(beam.n)).difference(set(dofs2dump)))
@@ -77,7 +77,7 @@ B_FzL = beam_hinged.B[:, 8]
 
 B_FxyzL = beam_hinged.B[:, 6:9]
 
-Jf_tx, Jf_ty, Jf_tz, Jf_ry, Jf_rz, Jf_fx, Jf_fy, Jf_fz = matrices_j3d(n_elem, L_beam, rho_beam, A_beam)
+Jf_tx, Jf_ty, Jf_tz, Jf_ry, Jf_rz, Jf_fx, Jf_fy, Jf_fz = matrices_j3d(n_elem, L_beam, rho_beam, A_beam, bc=bc)
 
 print(np.linalg.cond(Jf_fx), np.linalg.cond(Jf_fy), np.linalg.cond(Jf_fz))
 t_load = 0.2
@@ -89,6 +89,7 @@ t5 = t4 + t_load
 
 t_0 = 0
 t_fin = 50
+
 
 
 def sys(t,y):
@@ -128,11 +129,11 @@ def sys(t,y):
     J[n_r:n_r + n_p, :n_r] = Jf_om
     J[:n_r, n_r:n_r + n_p] = -Jf_om.T
 
-    dedt = invM @ (J @ y_e + B_Mz0 * Mz_0 + B_FzL * Fz_L)
+    # dedt = invM @ (J @ y_e + B_Mz0 * Mz_0 + B_FzL * Fz_L)
 
-    # act_quat = np.quaternion(y_quat[0], y_quat[1], y_quat[2], y_quat[3])
-    # Rot_mat = quaterRK45nion.as_rotation_matrix(act_quat)
-    # dedt = invM @ (J @ y_e + B_Mz0 * Mz_0 + B_FxyzL @ Rot_mat.T[:, 2] * Fz_L)
+    act_quat = np.quaternion(y_quat[0], y_quat[1], y_quat[2], y_quat[3])
+    Rot_mat = quaternion.as_rotation_matrix(act_quat)
+    dedt = invM @ (J @ y_e + B_Mz0 * Mz_0 + B_FxyzL @ Rot_mat.T[:, 2] * Fz_L)
 
     Omega_mat = np.array([[0, -omega[0], -omega[1], -omega[2]],
                          [omega[0], 0, omega[2], -omega[1]],
@@ -150,22 +151,77 @@ y0 = np.zeros(n_tot,)
 quat0 = quaternion.as_float_array(quaternion.from_rotation_matrix(np.eye(3)))
 y0[-n_quat:] = quat0
 
-t_ev = np.linspace(t_0, t_fin, num=500)
+n_t = 500
+t_ev = np.linspace(t_0, t_fin, num=n_t)
 t_span = [t_0, t_fin]
+
+# Mz_vec = np.zeros(n_t)
+# Fz_vec = np.zeros(n_t)
+#
+# for i in range(n_t):
+#
+#     t = t_ev[i]
+#     if t <= t_load:
+#         Mz_vec[i] = Mz_max * t / t_load
+#     elif t > t_load and t < t1:
+#         Mz_vec[i] = Mz_max
+#     elif t >= t1 and t <= t2:
+#         Mz_vec[i] = Mz_max * (1 - (t - t1) / t_load)
+#     else:
+#         Mz_vec[i] = 0
+#
+#     if t >= t3 and t < t4:
+#         Fz_vec[i] = Fz_max * (t - t3) / t_load
+#     elif t >= t4 and t <= t5:
+#         Fz_vec[i] = Fz_max * (1 - (t - t4) / t_load)
+#     else:
+#         Fz_vec[i] = 0
+
+path_fig = "/home/a.brugnoli/Plots_Videos/Python/Plots/Multibody_PH/FlBeam_joint/"
+
+# plt.figure()
+# plt.plot(t_ev, Mz_vec, 'r')
+# plt.xlabel("Time $[\mathrm{s}]$", fontsize=fntsize)
+# plt.ylabel("$M_z \ [\mathrm{N/mm}]$", fontsize=fntsize)
+# plt.title("Torque", fontsize=fntsize)
+# # plt.savefig(path_fig + 'Mz.eps', format="eps")
+#
+# plt.figure()
+# plt.plot(t_ev, Fz_vec, 'r')
+# plt.xlabel("Time $[\mathrm{s}]$", fontsize=fntsize)
+# plt.ylabel("$F_z \ [\mathrm{N}]$", fontsize=fntsize)
+# plt.title("Tip force", fontsize=fntsize)
+# # plt.savefig(path_fig + 'omega_zI.eps', format="eps")
+#
+# plt.show()
 
 sol = solve_ivp(sys, t_span, y0, method='Radau', vectorized=False, t_eval=t_ev)
 
 t_sol = sol.t
 y_sol = sol.y
 omB_sol = y_sol[:n_r, :]
+e_sol = y_sol[:-4, :]
 quat_sol = quaternion.as_quat_array(y_sol[-4:, :].T)
 
 n_ev = len(t_sol)
 omI_sol = np.zeros((3, n_ev))
 
+H_vec = np.zeros((n_ev,))
+for i in range(n_ev):
+    H_vec[i] = 0.5 * (e_sol[:, i].T @ M @ e_sol[:, i])
+
+fig = plt.figure()
+plt.plot(t_ev, H_vec, 'b-')
+plt.xlabel(r'{Time} (s)', fontsize=fntsize)
+plt.ylabel(r'{Hamiltonian} (J)', fontsize=fntsize)
+plt.title(r"Hamiltonian spinning beam",
+          fontsize=fntsize)
+plt.savefig(path_fig + 'Hamiltonian.eps', format="eps")
+
 
 for i in range(n_ev):
     omI_sol[:, i] = quaternion.as_rotation_matrix(quat_sol[i]) @ omB_sol[:, i]
+
 #
 # plt.figure()
 # plt.plot(t_sol, omI_sol[0], 'r')
@@ -181,11 +237,13 @@ for i in range(n_ev):
 
 plt.figure()
 plt.plot(t_sol, omI_sol[2], 'r')
-plt.xlabel("Time $t$", fontsize=fntsize)
-plt.ylabel("$\omega_z$", fontsize=fntsize)
+plt.xlabel("Time $[\mathrm{s}]$", fontsize=fntsize)
+plt.ylabel("$\omega_z \ [\mathrm{rad/s}]$", fontsize=fntsize)
 plt.title("Angular velocity along z in I", fontsize=fntsize)
 axes = plt.gca()
 axes.set_ylim([-0.04, 0.1])
+plt.savefig(path_fig + 'omega_zI.eps', format="eps")
+
 
 plt.show()
 

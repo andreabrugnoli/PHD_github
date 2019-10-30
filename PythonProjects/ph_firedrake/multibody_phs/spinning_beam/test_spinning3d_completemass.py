@@ -90,6 +90,7 @@ t5 = t4 + t_load
 t_0 = 0
 t_fin = 50
 
+M_u = M
 
 def sys(t,y):
 
@@ -127,12 +128,12 @@ def sys(t,y):
     efy = ep_el[n_pu:n_pu + n_pv]
     efz = ep_el[n_pu + n_pv:n_p]
 
-    M[:n_r, :n_r] = M[:n_r, :n_r] + J_xu @ u_el + (J_uu @ u_el) @ u_el
+    M_u[:n_r, :n_r] = M[:n_r, :n_r] + J_xu @ u_el + (J_uu @ u_el) @ u_el
 
-    # Mf_u = Jf_fx @ ux_el + Jf_fy @ uy_el + Jf_fz @ uz_el
-    #
-    # M[n_r:n_r + n_p, :n_r] = M[n_r:n_r + n_p, :n_r] + Mf_u
-    # M[:n_r, n_r:n_r + n_p] = M[:n_r, n_r:n_r + n_p] + Mf_u.T
+    Mf_u = Jf_fx @ ux_el + Jf_fy @ uy_el + Jf_fz @ uz_el
+
+    M_u[n_r:n_r + n_p, :n_r] = M[n_r:n_r + n_p, :n_r] + Mf_u
+    M_u[:n_r, n_r:n_r + n_p] = M[:n_r, n_r:n_r + n_p] + Mf_u.T
 
     pi_beam = M[:n_r, :] @ y_e
     J[:n_r, :n_r] = skew(pi_beam)
@@ -143,7 +144,7 @@ def sys(t,y):
     J[n_r:n_r + n_p, :n_r] = Jf_om
     J[:n_r, n_r:n_r + n_p] = -Jf_om.T
 
-    dedt = invM @ (J @ y_e + B_Mz0 * Mz_0 + B_FzL * Fz_L)
+    dedt = la.solve(M_u, J @ y_e + B_Mz0 * Mz_0 + B_FzL * Fz_L, sym_pos=True)
 
     # act_quat = np.quaternion(y_quat[0], y_quat[1], y_quat[2], y_quat[3])
     # Rot_mat = quaterRK45nion.as_rotation_matrix(act_quat)
@@ -169,7 +170,7 @@ y0[n_e:n_e+n_quat] = quat0
 t_ev = np.linspace(t_0, t_fin, num=1000)
 t_span = [t_0, t_fin]
 
-sol = solve_ivp(sys, t_span, y0, method='RK45', vectorized=False, t_eval=t_ev)
+sol = solve_ivp(sys, t_span, y0, method='BDF', vectorized=False, t_eval=t_ev)
 
 t_sol = sol.t
 y_sol = sol.y

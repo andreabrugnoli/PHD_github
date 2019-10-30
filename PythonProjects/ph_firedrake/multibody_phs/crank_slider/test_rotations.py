@@ -107,11 +107,11 @@ omy_B2 = skew_omB[0,2]
 omz_B2 = skew_omB[1,0]
 
 assert omx_B1 == omx_B2
-assert abs(omy_B1- omy_B2)<1e-14
+assert abs(omy_B1 - omy_B2)<1e-14
 assert omz_B1 == omz_B2
 
-print(omy_B1, omy_B3)
-print(omz_B1, omz_B3)
+print(omy_B1, omy_B2, omy_B3)
+print(omz_B1, omz_B2, omz_B3)
 print(dx_sl, dx_sl2)
 
 

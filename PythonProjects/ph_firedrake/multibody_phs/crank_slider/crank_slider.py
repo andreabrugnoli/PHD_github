@@ -10,11 +10,11 @@ from scipy.interpolate import interp1d
 from modules_phdae.classes_phsystem import SysPhdaeRig
 from system_components.beams import FloatFlexBeam, draw_deformation, matrices_j2d
 from math import pi
-# from assimulo.solvers import IDA
+from assimulo.solvers import IDA
 from assimulo.solvers import Radau5DAE
 from assimulo.implicit_ode import Implicit_Problem
 
-n_elem = 6
+n_elem = 2
 
 L_crank = 0.15
 L_coupler = 0.3
@@ -24,7 +24,7 @@ I_coupler = pi * d**4 / 64
 
 
 rho_coupler = 7.87 * 10 ** 3
-E_coupler = 200 * 10**9
+E_coupler = 0.2 * 10**12
 
 # L_crank = 150
 # L_coupler = 300
@@ -42,7 +42,8 @@ nr_coupler = 3
 nr_mass = 2
 nr_tot = nr_coupler + nr_mass
 
-coupler = FloatFlexBeam(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler)
+bc = 'SS'
+coupler = FloatFlexBeam(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler, bc=bc)
 
 mass_coupler = rho_coupler * A_coupler * L_coupler
 M_mass = 0.5 * la.block_diag(mass_coupler, mass_coupler)
@@ -53,7 +54,7 @@ mass = SysPhdaeRig(nr_mass, 0, nr_mass, 0, 0, E=M_mass, J=J_mass, B=B_mass)
 
 sys = SysPhdaeRig.transformer_ordered(coupler, mass, [3, 4], [0, 1], np.eye(2))
 
-Jf_tx, Jf_ty, Jf_rz, Jf_fx, Jf_fy = matrices_j2d(n_elem, L_coupler, rho_coupler, A_coupler)
+Jf_tx, Jf_ty, Jf_rz, Jf_fx, Jf_fy = matrices_j2d(n_elem, L_coupler, rho_coupler, A_coupler, bc=bc)
 
 M_sys = sys.E
 J_sys = sys.J
@@ -97,8 +98,6 @@ def dae_closed_phs(t, y, yd):
     J_sys[:2, 2] = [+p_coupler[1], -p_coupler[0]]
     J_sys[2, :2] = [-p_coupler[1], +p_coupler[0]]
     J_sys[3:5, 2] = [+p_mass[1], -p_mass[0]]
-    # J_sys[nr_tot:nr_tot+n_p, 2] = np.concatenate((p_wdis, -p_udis))
-    # J_sys[2, nr_tot:nr_tot+n_p] = np.concatenate((-p_wdis, +p_udis))
 
     J_sys[nr_tot:nr_tot + n_p, 2] = np.concatenate((jf_w, -jf_u))
     J_sys[2, nr_tot:nr_tot + n_p] = np.concatenate((-jf_w, +jf_u))
@@ -141,6 +140,7 @@ y0[2] = - omega_cr * L_crank / L_coupler
 # y0[nr_tot:nr_tot + n_pu] = 2.2*10**(-5) * np.array(list(range(1, n_elem+1)))
 y0[-4] = - mass_coupler * omega_cr ** 2 * L_crank
 yd0[0] = - omega_cr ** 2 * L_crank
+
 # Create an Assimulo implicit problem
 imp_mod = Implicit_Problem(dae_closed_phs, y0, yd0, name='dae_closed_pHs')
 imp_mod.handle_result = handle_result
@@ -149,21 +149,21 @@ imp_mod.handle_result = handle_result
 imp_mod.algvar = list(np.concatenate((np.ones(n_e), np.zeros(n_tot - n_e - 1), np.ones(1))))
 
 # Create an Assimulo implicit solver (IDA)
-# imp_sim = IDA(imp_mod)  # Create a IDA solver
-imp_sim = Radau5DAE(imp_mod)  # Create a IDA solver
+imp_sim = IDA(imp_mod)  # Create a IDA solver
+# imp_sim = Radau5DAE(imp_mod)  # Create a IDA solver
 
 # Sets the paramters
 imp_sim.atol = 1e-6  # Default 1e-6
 imp_sim.rtol = 1e-6  # Default 1e-6
 imp_sim.suppress_alg = True  # Suppress the algebraic variables on the error test
 imp_sim.report_continuously = True
-# imp_sim.maxh = 1e-6
+imp_sim.maxh = 1e-6
 
 # Let Sundials find consistent initial conditions by use of 'IDA_YA_YDP_INIT'
 imp_sim.make_consistent('IDA_YA_YDP_INIT')
 
 # Simulate
-n_ev = 2000
+n_ev = 5000
 t_ev = np.linspace(0, t_final, n_ev)
 t_sol, y_sol, yd_sol = imp_sim.simulate(t_final, 0, t_ev)
 e_sol = y_sol[:, :n_e].T
@@ -174,32 +174,56 @@ er_cl_sol = e_sol[:nr_coupler, :]
 ep_sol = e_sol[nr_tot:nr_tot + n_p, :]
 om_cl_sol = er_cl_sol[2, :]
 
-
 nw = int(2*n_p/3)
 nu = int(n_p/3)
 
 up_sol = ep_sol[:nu, :]
 wp_sol = ep_sol[nu:, :]
 
-n_ev = len(t_sol)
-dt_vec = np.diff(t_sol)
+assert n_elem % 2 == 0
 
-n_plot = 11
-eu_plot = np.zeros((n_plot, n_ev))
-ew_plot = np.zeros((n_plot, n_ev))
+if bc == 'CF':
+    euM_B = up_sol[int(n_elem / 2) - 1, :]
+    ewM_B = wp_sol[n_elem - 2, :]
+else:
+    euM_B = up_sol[int(n_elem / 2) - 1, :]
+    ewM_B = wp_sol[n_elem - 1, :]
 
-x_plot = np.linspace(0, L_coupler, n_plot)
-w_plot = np.zeros((n_plot, n_ev))
 
-t_plot = t_sol
+path_fig = "/home/a.brugnoli/Plots_Videos/Python/Plots/Multibody_PH/CrankSlider/"
+fntsize = 16
 
+H_vec = np.zeros((n_ev,))
 for i in range(n_ev):
-    eu_plot[:, i], ew_plot[:, i] = draw_deformation(n_plot, [0, 0, 0], ep_sol[:, i], L_coupler)[1:3]
+    H_vec[i] = 0.5 * (e_sol[:, i].T @ M_sys[:n_e, :n_e] @ e_sol[:, i])
 
-ind_midpoint = int((n_plot-1)/2)
+fig = plt.figure()
+plt.plot(t_ev, H_vec, 'b-')
+plt.xlabel(r'{Time} (s)', fontsize=fntsize)
+plt.ylabel(r'{Hamiltonian} (J)', fontsize=fntsize)
+plt.title(r"Hamiltonian spinning beam",
+          fontsize=fntsize)
+# plt.savefig(path_fig + 'Hamiltonian.eps', format="eps")
 
-euM_B = eu_plot[ind_midpoint, :]
-ewM_B = ew_plot[ind_midpoint, :]
+# n_ev = len(t_sol)
+# dt_vec = np.diff(t_sol)
+#
+# n_plot = 21
+# eu_plot = np.zeros((n_plot, n_ev))
+# ew_plot = np.zeros((n_plot, n_ev))
+#
+# x_plot = np.linspace(0, L_coupler, n_plot)
+# w_plot = np.zeros((n_plot, n_ev))
+#
+# t_plot = t_sol
+#
+# for i in range(n_ev):
+#     eu_plot[:, i], ew_plot[:, i] = draw_deformation(n_plot, [0, 0, 0], ep_sol[:, i], L_coupler)[1:3]
+#
+# ind_midpoint = int((n_plot-1)/2)
+#
+# euM_B = eu_plot[ind_midpoint, :]
+# ewM_B = ew_plot[ind_midpoint, :]
 
 omega_cr_int = interp1d(t_ev, om_cl_sol, kind='linear')
 euM_B_int = interp1d(t_ev, euM_B, kind='linear')
@@ -217,25 +241,33 @@ def sys(t,y):
 wM0 = 0
 uM0 = 0
 
-r_sol = solve_ivp(sys, [0, t_final], [uM0, wM0], method='RK45', t_eval=t_ev)
+r_sol = solve_ivp(sys, [0, t_final], [uM0, wM0], method='RK45', t_eval=t_sol)
 
 uM_B = r_sol.y[0, :]
 wM_B = r_sol.y[1, :]
 
-fntsize = 16
-fig = plt.figure()
-plt.plot(omega_cr*t_ev, -uM_B/L_coupler, 'b-')
-plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
-plt.ylabel(r'w normalized', fontsize = fntsize)
-plt.title(r"Midpoint deflection", fontsize=fntsize)
 
 fig = plt.figure()
-plt.plot(omega_cr*t_ev, -wM_B/L_coupler, 'b-')
+plt.plot(omega_cr*t_ev, om_cl_sol, 'b-')
 plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
-plt.ylabel(r'w normalized', fontsize = fntsize)
-plt.title(r"Midpoint deflection", fontsize=fntsize)
+plt.ylabel(r'$\omega^z_{cl}$ [rad/s]', fontsize = fntsize)
+plt.title(r"Angular velocity coupler", fontsize=fntsize)
+
+fig = plt.figure()
+plt.plot(omega_cr*t_ev, uM_B/L_coupler, 'b-')
+plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
+plt.ylabel(r'$u_f/L_{cl}$ along $x$', fontsize = fntsize)
+plt.title(r"Midpoint horizontal deflection", fontsize=fntsize)
+# plt.savefig(path_fig + 'uM_disp.eps', format="eps")
+
+fig = plt.figure()
+plt.plot(omega_cr*t_ev, wM_B/L_coupler, 'b-')
+plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
+plt.ylabel(r'$u_f/L_{cl}$ along $y$', fontsize = fntsize)
+plt.title(r"Midpoint vertical deflection", fontsize=fntsize)
 axes = plt.gca()
 axes.set_ylim([-0.015, 0.02])
+# plt.savefig(path_fig + 'wM_disp.eps', format="eps")
 
 plt.show()
 # plt.legend(loc='upper left')

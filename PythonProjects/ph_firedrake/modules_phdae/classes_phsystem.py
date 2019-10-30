@@ -246,7 +246,7 @@ class SysPhdaeRig(SysPhdae):
     Variables for the rigid motion and constraints might not be present
     """
 
-    def __init__(self, n, n_lmb, n_r, n_p, n_q, E, J, B, R=None):
+    def __init__(self, n, n_lmb, n_r, n_p, n_q, E, J, B, R=None, Q=None):
 
         assert n_r >= 0 and isinstance(n_r, int)
         assert n_lmb >= 0 and isinstance(n_lmb, int)
@@ -256,6 +256,8 @@ class SysPhdaeRig(SysPhdae):
 
         if R is None:
             R = np.zeros((n, n))
+        if Q is None:
+            Q = np.eye(n)
 
         n_e = n_p + n_q + n_r
         # assert np.linalg.matrix_rank(E) == n_e
@@ -296,7 +298,7 @@ class SysPhdaeRig(SysPhdae):
 
         self.B_lmb = B[n_e:]
 
-        SysPhdae.__init__(self, n, n_lmb, E=E, J=J, B=B, R=R)
+        SysPhdae.__init__(self, n, n_lmb, E=E, J=J, B=B, R=R, Q=Q)
 
     def transformer_ordered(self, sys2, ind1, ind2, C):
 

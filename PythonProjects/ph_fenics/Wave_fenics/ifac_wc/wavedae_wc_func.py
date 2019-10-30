@@ -137,6 +137,8 @@ def computeH_dae(ind):
     
     controlD_dofs = np.where(B_D.any(axis=0))[0]
     B_D = B_D[:, controlD_dofs]
+    M_D = B_D[controlD_dofs, :]
+
     B_D = B_D[dirichlet_dofs, :]
     
     # plt.plot(x_cor[:], r_cor[:], 'bo')
@@ -156,7 +158,7 @@ def computeH_dae(ind):
     if ind != 15:
         invMM = la.inv(MM)
         
-    RR = Z * B_D @ B_D.T
+    RR = Z * B_D @ la.inv(M_D) @ B_D.T
     
     def dae_closed_phs(t, y, yd):
     

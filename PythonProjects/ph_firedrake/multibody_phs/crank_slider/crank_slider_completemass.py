@@ -31,7 +31,8 @@ nr_coupler = 3
 nr_mass = 2
 nr_tot = nr_coupler + nr_mass
 
-coupler = FloatFlexBeam(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler)
+bc = 'SS'
+coupler = FloatFlexBeam(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler, bc=bc)
 
 mass_coupler = rho_coupler * A_coupler * L_coupler
 M_mass = 0.5 * la.block_diag(mass_coupler, mass_coupler)
@@ -54,8 +55,9 @@ n_p = sys.n_p
 n_pu = int(n_p/3)
 n_pw = n_p - n_pu
 
-Jf_tx, Jf_ty, Jf_rz, Jf_fx, Jf_fy = matrices_j2d(n_elem, L_coupler, rho_coupler, A_coupler)
-s_u, J_xu, J_uu = massmatrices_j3d(n_elem, L_coupler, rho_coupler, A_coupler)
+
+Jf_tx, Jf_ty, Jf_rz, Jf_fx, Jf_fy = matrices_j2d(n_elem, L_coupler, rho_coupler, A_coupler, bc=bc)
+s_u, J_xu, J_uu = massmatrices_j3d(n_elem, L_coupler, rho_coupler, A_coupler, bc=bc)
 
 s_u = s_u[2, :2, :n_p]
 J_xu = J_xu[2, 2, :n_p]
@@ -69,6 +71,7 @@ n_tot = n_e + nlmb_tot + 1 + n_p  # 3 lambda et theta
 order = []
 t_final = 8/omega_cr
 
+M_u = M_sys
 
 def dae_closed_phs(t, y, yd):
 
@@ -97,15 +100,15 @@ def dae_closed_phs(t, y, yd):
     eu_coupler = ep_coupler[:n_pu]
     ew_coupler = ep_coupler[n_pu:]
 
-    M_sys[2, :2] = M_sys[2, :2] + s_u @ u_el
-    M_sys[:2, 2] = M_sys[:2, 2] + s_u @ u_el
-    M_sys[2, 2] = M_sys[2, 2] + (J_uu @ u_el) @ u_el + J_xu @ u_el
+    M_u[2, :2] = M_sys[2, :2] + s_u @ u_el
+    M_u[:2, 2] = M_sys[:2, 2] + s_u @ u_el
+    M_u[2, 2] = M_sys[2, 2] + (J_uu @ u_el) @ u_el + J_xu @ u_el
 
     mf_u = + Jf_fx @ ux_el
     mf_w = + Jf_fy @ uy_el
 
-    M_sys[nr_tot:nr_tot + n_p, 2] = M_sys[nr_tot:nr_tot + n_p, 2] + np.concatenate((mf_w, -mf_u))
-    M_sys[2, nr_tot:nr_tot + n_p] = M_sys[2, nr_tot:nr_tot + n_p] + np.concatenate((mf_w, -mf_u))
+    M_u[nr_tot:nr_tot + n_p, 2] = M_sys[nr_tot:nr_tot + n_p, 2] + np.concatenate((mf_w, -mf_u))
+    M_u[2, nr_tot:nr_tot + n_p] = M_sys[2, nr_tot:nr_tot + n_p] + np.concatenate((mf_w, -mf_u))
 
     p_coupler = M_sys[:2, :n_e] @ y_sys[:n_e]
     p_mass = M_sys[nr_coupler:nr_tot, :n_e] @ y_sys[:n_e]
@@ -128,7 +131,7 @@ def dae_closed_phs(t, y, yd):
 
     vC_cr = omega_cr * L_crank * np.array([-np.sin(omega_cr * t), np.cos(omega_cr * t)])
 
-    res_sys = M_sys @ yd_sys - J_sys @ y_sys - G_coupler @ lmd_cl - G_mass * lmd_mass
+    res_sys = M_u @ yd_sys - J_sys @ y_sys - G_coupler @ lmd_cl - G_mass * lmd_mass
 
     res_cl = - G_coupler.T @ y_sys + R_th.T @ vC_cr
     res_mass = np.reshape(G_mass, (1, -1)) @ y_sys
@@ -198,29 +201,39 @@ nu = int(n_p/3)
 up_sol = ep_sol[:nu, :]
 wp_sol = ep_sol[nu:, :]
 
-n_ev = len(t_sol)
-dt_vec = np.diff(t_sol)
+uq_sol = dis_sol[:nu, :]
+wq_sol = dis_sol[nu:, :]
 
-n_plot = 11
-u_plot = np.zeros((n_plot, n_ev))
-w_plot = np.zeros((n_plot, n_ev))
+if bc == 'CF':
+    uM_B = up_sol[int(n_elem / 2) - 1, :]
+    wM_B = wp_sol[n_elem - 2, :]
+else:
+    uM_B = up_sol[int(n_elem / 2) - 1, :]
+    wM_B = wp_sol[n_elem - 1, :]
 
-x_plot = np.linspace(0, L_coupler, n_plot)
-w_plot = np.zeros((n_plot, n_ev))
-
-t_plot = t_sol
-
-for i in range(n_ev):
-    u_plot[:, i], w_plot[:, i] = draw_deformation(n_plot, [0, 0, 0], dis_sol[:, i], L_coupler)[1:3]
-
-ind_midpoint = int((n_plot-1)/2)
-
-uM_B = u_plot[ind_midpoint, :]
-wM_B = w_plot[ind_midpoint, :]
+# n_ev = len(t_sol)
+# dt_vec = np.diff(t_sol)
+#
+# n_plot = 11
+# u_plot = np.zeros((n_plot, n_ev))
+# w_plot = np.zeros((n_plot, n_ev))
+#
+# x_plot = np.linspace(0, L_coupler, n_plot)
+# w_plot = np.zeros((n_plot, n_ev))
+#
+# t_plot = t_sol
+#
+# for i in range(n_ev):
+#     u_plot[:, i], w_plot[:, i] = draw_deformation(n_plot, [0, 0, 0], dis_sol[:, i], L_coupler)[1:3]
+#
+# ind_midpoint = int((n_plot-1)/2)
+#
+# uM_B = u_plot[ind_midpoint, :]
+# wM_B = w_plot[ind_midpoint, :]
 
 fntsize = 16
 fig = plt.figure()
-plt.plot(omega_cr*t_ev, -wM_B/L_coupler, 'b-')
+plt.plot(omega_cr*t_ev, wM_B/L_coupler, 'b-')
 plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
 plt.ylabel(r'w normalized', fontsize = fntsize)
 plt.title(r"Midpoint deflection", fontsize=fntsize)

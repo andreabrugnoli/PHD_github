@@ -44,9 +44,9 @@ nr_coupler = 6
 nr_slider = 3
 # nr_tot = nr_coupler + nr_slider
 
-n_elem = 6
-
-coupler = SpatialBeamNoTraction(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler, Jxx_coupler)
+n_elem = 2
+bc='SS'
+coupler = SpatialBeamNoTraction(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler, Jxx_coupler, bc=bc)
 
 
 mass_coupler = rho_coupler * A_coupler * L_coupler
@@ -93,7 +93,7 @@ dx = L_coupler/n_elem
 
 t_final = abs(8/omega_cr)
 
-Jf_ty, Jf_tz, Jf_ry, Jf_rz, Jf_fy, Jf_fz = matrices_j3d_notraction(n_elem, L_coupler, rho_coupler, A_coupler)
+Jf_ty, Jf_tz, Jf_ry, Jf_rz, Jf_fy, Jf_fz = matrices_j3d_notraction(n_elem, L_coupler, rho_coupler, A_coupler,bc=bc)
 
 
 def dae_closed_phs(t, y, yd):
@@ -208,6 +208,8 @@ b_vel = np.array([0, L_crank*np.sin(theta_cr)*omega_cr, L_crank*np.cos(theta_cr)
 dtheta1_cl, dtheta2_cl, dx_sl = la.solve(A_vel, b_vel)
 
 omx_B = np.sin(theta2_cl) * dtheta1_cl
+# omx_B = 0
+
 omy_B = dtheta2_cl
 omz_B = -np.cos(theta2_cl) * dtheta1_cl
 
@@ -353,8 +355,10 @@ er_cl_sol = e_sol[:nr_coupler, :]
 ep_sol = e_sol[nr_tot:nr_tot + n_p, :]
 om_cl_sol = er_cl_sol[3:6, :]
 
-plt.plot(t_ev, om_cl_sol[0], 'r', t_ev, om_cl_sol[1], 'b', t_ev, om_cl_sol[2], 'g')
-plt.show()
+plt.figure()
+plt.plot(t_sol, om_cl_sol.T)
+plt.xlabel(r"Time")
+plt.ylabel(r"Omega")
 
 nv = int(n_p/2)
 nw = int(n_p/2)
@@ -362,27 +366,35 @@ nw = int(n_p/2)
 vp_sol = ep_sol[:nv, :]
 wp_sol = ep_sol[nv:n_p, :]
 
-n_ev = len(t_sol)
-dt_vec = np.diff(t_sol)
+if bc == 'CF':
+    evM_B = vp_sol[n_elem - 2, :]
+    ewM_B = wp_sol[n_elem - 2, :]
+else:
+    evM_B = vp_sol[n_elem - 1, :]
+    ewM_B = wp_sol[n_elem - 1, :]
 
-n_plot = 11
-eu_plot = np.zeros((n_plot, n_ev))
-ev_plot = np.zeros((n_plot, n_ev))
-ew_plot = np.zeros((n_plot, n_ev))
 
-x_plot = np.linspace(0, L_coupler, n_plot)
-
-t_plot = t_sol
-
-zeros_rig = [0,0,0]
-for i in range(n_ev):
-    ev_plot[:, i] = draw_bending(n_plot, zeros_rig, vp_sol[:, i], L_coupler)[2]
-    ew_plot[:, i] = draw_bending(n_plot, zeros_rig, wp_sol[:, i], L_coupler)[2]
-
-ind_midpoint = int((n_plot - 1) / 2)
-
-evM_B = ev_plot[ind_midpoint, :]
-ewM_B = ew_plot[ind_midpoint, :]
+# n_ev = len(t_sol)
+# dt_vec = np.diff(t_sol)
+#
+# n_plot = 11
+# eu_plot = np.zeros((n_plot, n_ev))
+# ev_plot = np.zeros((n_plot, n_ev))
+# ew_plot = np.zeros((n_plot, n_ev))
+#
+# x_plot = np.linspace(0, L_coupler, n_plot)
+#
+# t_plot = t_sol
+#
+# zeros_rig = [0,0,0]
+# for i in range(n_ev):
+#     ev_plot[:, i] = draw_bending(n_plot, zeros_rig, vp_sol[:, i], L_coupler)[2]
+#     ew_plot[:, i] = draw_bending(n_plot, zeros_rig, wp_sol[:, i], L_coupler)[2]
+#
+# ind_midpoint = int((n_plot - 1) / 2)
+#
+# evM_B = ev_plot[ind_midpoint, :]
+# ewM_B = ew_plot[ind_midpoint, :]
 
 
 evM_B_int = interp1d(t_ev, evM_B, kind='linear')
@@ -390,59 +402,59 @@ ewM_B_int = interp1d(t_ev, ewM_B, kind='linear')
 
 omega_cl_int = interp1d(t_ev, om_cl_sol, kind='linear')
 
-er_cl_sol = e_sol[:nr_coupler, :]
-ef_cl_sol = e_sol[nr_tot:nr_tot + n_f, :]
-erf_cl_sol = np.concatenate((er_cl_sol, ef_cl_sol), axis=0)
-
-vP_cl_sol = er_cl_sol[:3, :]
-om_cl_sol = er_cl_sol[3:6, :]
-vslB_sol = e_sol[nr_coupler:nr_tot, :]
-
-e1I_sol = np.zeros((3, n_ev))
-rP_cl = np.zeros((3, n_ev))
-
-
-vslI_sol = np.zeros((3, n_ev))
-vclCI_sol = np.zeros((3, n_ev))
-vclCB_sol = np.zeros((3, n_ev))
-
-PC_skew = skew([-L_coupler, 0, 0])
-
-for i in range(n_ev):
-    vclCB_sol[:, i] = coupler.B[:, [6,7,8]].T @ erf_cl_sol[:, i]
-    vclCI_sol[:, i] = quaternion.as_rotation_matrix(quat_cl_sol[i]) @ vclCB_sol[:, i]
-
-    vslI_sol[:, i] = quaternion.as_rotation_matrix(quat_cl_sol[i]) @ vslB_sol[:, i]
-
-    rP_cl[:, i] = np.array([0, -L_crank * np.sin(omega_cr*t_ev[i]), offset_cr + L_crank * np.cos(omega_cr*t_ev[i])])
-
-
-vslI_int = interp1d(t_ev, vslI_sol, kind='linear')
-vclCI_int = interp1d(t_ev, vclCI_sol, kind='linear')
-
-def sys(t, y):
-
-    dydt_sl = vslI_int(t)
-    dydt_cl = vclCI_int(t)
-
-    return np.concatenate((dydt_sl, dydt_cl))
-
-
-r_sol = solve_ivp(sys, [0, t_final], np.concatenate((r0C_I, r0C_I)), method='RK45', t_eval=t_ev)
-
-
-n_ev = len(t_sol)
-dt_vec = np.diff(t_sol)
-
-xP_sl = r_sol.y[0, :]
-yP_sl = r_sol.y[1, :]
-zP_sl = r_sol.y[2, :]
-
-xC_cl = r_sol.y[3, :]
-yC_cl = r_sol.y[4, :]
-zC_cl = r_sol.y[5, :]
-
-data = np.array([[rP_cl[0], rP_cl[1], rP_cl[2]], [xC_cl, yC_cl, zC_cl], [xP_sl, yP_sl, zP_sl]])
+# er_cl_sol = e_sol[:nr_coupler, :]
+# ef_cl_sol = e_sol[nr_tot:nr_tot + n_f, :]
+# erf_cl_sol = np.concatenate((er_cl_sol, ef_cl_sol), axis=0)
+#
+# vP_cl_sol = er_cl_sol[:3, :]
+# om_cl_sol = er_cl_sol[3:6, :]
+# vslB_sol = e_sol[nr_coupler:nr_tot, :]
+#
+# e1I_sol = np.zeros((3, n_ev))
+# rP_cl = np.zeros((3, n_ev))
+#
+#
+# vslI_sol = np.zeros((3, n_ev))
+# vclCI_sol = np.zeros((3, n_ev))
+# vclCB_sol = np.zeros((3, n_ev))
+#
+# PC_skew = skew([-L_coupler, 0, 0])
+#
+# for i in range(n_ev):
+#     vclCB_sol[:, i] = coupler.B[:, [6,7,8]].T @ erf_cl_sol[:, i]
+#     vclCI_sol[:, i] = quaternion.as_rotation_matrix(quat_cl_sol[i]) @ vclCB_sol[:, i]
+#
+#     vslI_sol[:, i] = quaternion.as_rotation_matrix(quat_cl_sol[i]) @ vslB_sol[:, i]
+#
+#     rP_cl[:, i] = np.array([0, -L_crank * np.sin(omega_cr*t_ev[i]), offset_cr + L_crank * np.cos(omega_cr*t_ev[i])])
+#
+#
+# vslI_int = interp1d(t_ev, vslI_sol, kind='linear')
+# vclCI_int = interp1d(t_ev, vclCI_sol, kind='linear')
+#
+# def sys(t, y):
+#
+#     dydt_sl = vslI_int(t)
+#     dydt_cl = vclCI_int(t)
+#
+#     return np.concatenate((dydt_sl, dydt_cl))
+#
+#
+# r_sol = solve_ivp(sys, [0, t_final], np.concatenate((r0C_I, r0C_I)), method='RK45', t_eval=t_ev)
+#
+#
+# n_ev = len(t_sol)
+# dt_vec = np.diff(t_sol)
+#
+# xP_sl = r_sol.y[0, :]
+# yP_sl = r_sol.y[1, :]
+# zP_sl = r_sol.y[2, :]
+#
+# xC_cl = r_sol.y[3, :]
+# yC_cl = r_sol.y[4, :]
+# zC_cl = r_sol.y[5, :]
+#
+# data = np.array([[rP_cl[0], rP_cl[1], rP_cl[2]], [xC_cl, yC_cl, zC_cl], [xP_sl, yP_sl, zP_sl]])
 
 
 def sys(t,y):
@@ -481,14 +493,14 @@ fntsize = 16
 fig = plt.figure()
 plt.plot(omega_cr*t_ev, vM_B/L_coupler, 'b-', label="y midpoint")
 plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
-plt.ylabel(r'w normalized', fontsize = fntsize)
+plt.ylabel(r'$v_f^y$ normalized', fontsize = fntsize)
 plt.title(r"Midpoint deflection in B", fontsize=fntsize)
 plt.legend(loc='upper left')
 
 fig = plt.figure()
 plt.plot(omega_cr*t_ev, wM_B/L_coupler, 'b-', label="z midpoint")
 plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
-plt.ylabel(r'w normalized', fontsize = fntsize)
+plt.ylabel(r'$v_f^z$ normalized', fontsize = fntsize)
 plt.title(r"Midpoint deflection in B", fontsize=fntsize)
 plt.legend(loc='upper left')
 

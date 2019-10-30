@@ -11,12 +11,14 @@ from math import pi
 from assimulo.solvers import IDA
 from assimulo.implicit_ode import Implicit_Problem
 
-L_crank = 0.2
-L_coupler = 0.5
+# L_crank = 0.2
+# L_coupler = 0.5
 
-rpm = 60
-omega_cr = rpm * 2*pi/60
-# omega_cr = 150
+# rpm = 60
+# omega_cr = rpm * 2*pi/60
+L_crank = 0.15
+L_coupler = 0.3
+omega_cr = 150
 
 mass_coupler = 3
 mass_slider = 2
@@ -44,7 +46,7 @@ mass = SysPhdaeRig(nr_slider, 0, nr_slider, 0, 0, E=M_slider, J=J_slider, B=B_sl
 
 sys = SysPhdaeRig.transformer_ordered(coupler, mass, [3, 4], [0, 1], np.eye(2))
 
-plt.spy(sys.E); plt.show()
+# plt.spy(sys.E); plt.show()
 
 M_sys = sys.E
 J_sys = sys.J
@@ -128,8 +130,8 @@ imp_sim.report_continuously = True
 imp_sim.make_consistent('IDA_YA_YDP_INIT')
 
 # Simulate
-t_final = 0.08
-n_ev = 100
+t_final = 8/omega_cr
+n_ev = 1000
 t_ev = np.linspace(0, t_final, n_ev)
 t_sol, y_sol, yd_sol = imp_sim.simulate(t_final, 0, t_ev)
 e_sol = y_sol[:, :n_e].T
@@ -138,6 +140,7 @@ lmb_sol = y_sol[:, n_e:-1].T
 th_cl_sol = y_sol[:, -1]
 ercl_sol = e_sol[:nr_coupler, :]
 ersl_sol = e_sol[nr_coupler:nr_tot, :]
+om_cl_sol = ercl_sol[2, :]
 
 n_ev = len(t_sol)
 dt_vec = np.diff(t_sol)
@@ -156,17 +159,24 @@ for i in range(n_ev):
         wsl_I[:, i] = wsl_I[:, i-1] + 0.5 * (ersl_I[:, i] + ersl_I[:, i-1]) * dt_vec[i-1]
 
 fntsize = 16
-fig = plt.figure()
-plt.plot(t_ev, ersl_I[0,:], 'b-', t_ev, ersl_I[1,:], 'r-')
-plt.xlabel(r'{Time} (s)', fontsize = fntsize)
-plt.ylabel(r'$v$ slider', fontsize = fntsize)
-plt.title(r"Velocity slider", fontsize=fntsize)
 
 fig = plt.figure()
-plt.plot(t_ev, wsl_I[0,:], 'b-', t_ev, wsl_I[1,:], 'r-')
-plt.xlabel(r'{Time} (s)', fontsize = fntsize)
-plt.ylabel(r'$w$ slider', fontsize = fntsize)
-plt.title(r"Displacement slider", fontsize=fntsize)
+plt.plot(omega_cr*t_ev, om_cl_sol, 'b-')
+plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
+plt.ylabel(r'Omega coupler [rad/s]', fontsize = fntsize)
+plt.title(r"Omega coupler", fontsize=fntsize)
+
+# fig = plt.figure()
+# plt.plot(t_ev, ersl_I[0,:], 'b-', t_ev, ersl_I[1,:], 'r-')
+# plt.xlabel(r'{Time} (s)', fontsize = fntsize)
+# plt.ylabel(r'$v$ slider', fontsize = fntsize)
+# plt.title(r"Velocity slider", fontsize=fntsize)
+#
+# fig = plt.figure()
+# plt.plot(t_ev, wsl_I[0,:], 'b-', t_ev, wsl_I[1,:], 'r-')
+# plt.xlabel(r'{Time} (s)', fontsize = fntsize)
+# plt.ylabel(r'$w$ slider', fontsize = fntsize)
+# plt.title(r"Displacement slider", fontsize=fntsize)
 
 plt.show()
 # plt.legend(loc='upper left')
