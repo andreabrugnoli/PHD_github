@@ -16,8 +16,8 @@ from matplotlib import cm
 
 matplotlib.rcParams['text.usetex'] = True
 
-n = 5
-r = 2 #int(input('Degree for FE: '))
+n = 15
+r = 0 #int(input('Degree for FE: '))
 nreq = 10
 
 E = 2e11 # Pa
