@@ -10,7 +10,7 @@ from scipy.interpolate import interp1d
 import scipy.linalg as la
 
 from modules_phdae.classes_phsystem import SysPhdaeRig
-from system_components.beams import SpatialBeam, draw_deformation3D
+from system_components.beams import SpatialBeam, draw_deformation3D, matrices_j3d
 from math import pi
 
 from tools_plotting.animate_lines import animate_line3d
@@ -101,6 +101,18 @@ t5 = t4 + t_load
 t_0 = 0
 t_fin = 50
 
+Jf_tx, Jf_ty, Jf_tz, Jf_ry, Jf_rz, Jf_fx, Jf_fy, Jf_fz = matrices_j3d(n_elem, L_beam, rho_beam, A_beam)
+Jf_tx = Jf_tx[:, 1:]
+Jf_ty = Jf_ty[:, 1:]
+Jf_tz = Jf_tz[:, 1:]
+
+Jf_ry = Jf_ry[:, 1:]
+Jf_rz = Jf_rz[:, 1:]
+
+Jf_fx = Jf_fx[:, 1:, :]
+Jf_fy = Jf_fy[:, 1:, :]
+Jf_fz = Jf_fz[:, 1:, :]
+
 
 def sys(t,y):
 
@@ -131,21 +143,17 @@ def sys(t,y):
     omega = y[:n_r]
     y_quat = y[-n_quat:]
 
-    p_v = M[n_r + n_pu:n_r + n_pu + n_pv, :] @ y_e
-    # p_v[1::2] = 0
-    p_vdis = np.array([p_v[i] for i in range(len(p_v)) if i % 2 == 0])
+    efx = y_e[n_r:n_r + n_pu]
+    efy = y_e[n_r + n_pu:n_r + n_pu + n_pv]
+    efz = y_e[n_r + n_pu + n_pv:n_r + n_p]
 
-    p_w = M[n_r + n_pu + n_pv:n_r + n_p, :] @ y_e
-    # p_w[1::2] = 0
-    p_wdis = np.array([p_w[i] for i in range(len(p_w)) if i % 2 == 0])
+    Jf_om = Jf_ry * omega[0] + Jf_rz * omega[1] \
+            + Jf_fy @ efy + Jf_fz @ efz + Jf_fx @ efx
 
-    p_udis = M[n_r:n_r + n_pu, :] @ y_e
-    p_u = np.zeros_like(p_w)
-    p_u[::2] = p_udis
+    Jf_om_cor = Jf_fy @ efy + Jf_fz @ efz + Jf_fx @ efx
 
-    alflex_cross = skew_flex_yz(p_u, p_v, p_w, p_udis, p_vdis, p_wdis)
-    J[n_r:n_r + n_p, :n_r] = alflex_cross
-    J[:n_r, n_r:n_r + n_p] = -alflex_cross.T
+    J[n_r:n_r + n_p, :n_r] = Jf_om + Jf_om_cor
+    J[:n_r, n_r:n_r + n_p] = -2 * Jf_om.T
 
     # dedt = invM @ (J @ y_e + B_Mz0 * Mz_0 + B_FzL * Fz_L)
 

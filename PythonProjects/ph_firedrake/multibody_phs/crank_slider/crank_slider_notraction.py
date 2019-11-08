@@ -81,9 +81,11 @@ def dae_closed_phs(t, y, yd):
     p_coupler = M_sys[:2, :n_e] @ y_sys[:n_e]
     p_mass = M_sys[nr_coupler:nr_tot, :n_e] @ y_sys[:n_e]
 
-    J_sys[:2, 2] = [+p_coupler[1], -p_coupler[0]]
-    J_sys[2, :2] = [-p_coupler[1], +p_coupler[0]]
-    J_sys[3:5, 2] = [+p_mass[1], -p_mass[0]]
+    pt_f = + M_sys[:2, nr_tot:n_e] @ y_sys[nr_tot:n_e]
+
+    # J_sys[:2, 2] = [+(p_coupler[1] + pt_f[1]), -(p_coupler[0] + pt_f[0])]
+    # J_sys[2, :2] = [-(p_coupler[1] - pt_f[1]), +(p_coupler[0] - pt_f[0])]
+    # J_sys[3:5, 2] = [+p_mass[1], -p_mass[0]]
 
     R_th = np.array([[np.cos(theta_cl), -np.sin(theta_cl)],
                     [np.sin(theta_cl), np.cos(theta_cl)]])

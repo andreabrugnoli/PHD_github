@@ -103,8 +103,11 @@ def sys(t, y):
     jf_u = Jf_fx @ eu_beam
     jf_w = Jf_rz * omega + Jf_fy @ ew_beam
 
-    J[n_r:n_r + n_p, 0] = np.concatenate((+jf_w, -jf_u))
-    J[0, n_r:n_r + n_p] = np.concatenate((-jf_w, +jf_u))
+    jf_u_cor = Jf_fx @ eu_beam
+    jf_w_cor = Jf_fy @ ew_beam
+
+    J[n_r:n_r + n_p, 0] = np.concatenate((+jf_w, -jf_u)) + np.concatenate((jf_w_cor, -jf_u_cor))
+    J[0, n_r:n_r + n_p] = 2*np.concatenate((-jf_w, +jf_u))
 
     dedt = invM @ (J @ y_e + B_Mz0 * Mz_0)
     dth = np.array([omega])

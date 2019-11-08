@@ -81,8 +81,8 @@ def dae_closed_phs(t, y, yd):
     theta_cl = y[-1]
     omega_cl = y[2]
 
-    p_coupler = M_sys[:2, :n_e] @ y_sys[:n_e]
-    p_mass = M_sys[nr_coupler:nr_tot-1, :n_e] @ y_sys[:n_e]
+    p_coupler = M_sys[:2, :n_e] @ y_sys[:n_e] + M_sys[:2, nr_tot:n_e] @ y_sys[nr_tot:n_e]
+    p_mass = M_sys[nr_coupler:nr_tot, :n_e] @ y_sys[:n_e]
 
     vxP_coupler = y_sys[0]
     vyP_coupler = y_sys[1]
@@ -97,11 +97,11 @@ def dae_closed_phs(t, y, yd):
     J_sys[:2, 2] = [+p_coupler[1], -p_coupler[0]]
     J_sys[2, :2] = [-p_coupler[1], +p_coupler[0]]
 
-    # J_sys[3:5, 5] = [+p_mass[1], -p_mass[0]]
-    # J_sys[5, 3:5] = [-p_mass[1], +p_mass[0]]
+    J_sys[3:5, 5] = [+p_mass[1], -p_mass[0]]
+    J_sys[5, 3:5] = [-p_mass[1], +p_mass[0]]
 
     J_sys[nr_tot:nr_tot + n_p, 2] = np.concatenate((jf_w, -jf_u))
-    J_sys[2, nr_tot:nr_tot + n_p] = np.concatenate((-jf_w, +jf_u))
+    J_sys[2, nr_tot:nr_tot + n_p] = 2*np.concatenate((-jf_w, +jf_u))
 
     R_th = np.array([[np.cos(theta_cl), -np.sin(theta_cl)],
                     [np.sin(theta_cl), np.cos(theta_cl)]])

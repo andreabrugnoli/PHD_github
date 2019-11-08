@@ -10,7 +10,7 @@ import scipy.linalg as la
 from scipy.sparse.linalg import lsqr
 
 from modules_phdae.classes_phsystem import SysPhdaeRig
-from system_components.beams import SpatialBeam, draw_deformation3D, matrices_j3d
+from system_components.beams import SpatialBeamNoTraction, draw_deformation3D, matrices_j3d_notraction
 from math import pi
 
 from tools_plotting.animate_lines import animate_line3d
@@ -47,7 +47,7 @@ nr_slider = 3
 
 n_elem = 2
 bc = 'SS'
-coupler = SpatialBeam(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler, Jxx_coupler, bc=bc)
+coupler = SpatialBeamNoTraction(n_elem, L_coupler, rho_coupler, A_coupler, E_coupler, I_coupler, Jxx_coupler, bc=bc)
 
 mass_coupler = rho_coupler * A_coupler * L_coupler
 mass_slider = 0.5 * mass_coupler
@@ -63,11 +63,12 @@ sys = SysPhdaeRig.transformer_ordered(coupler, slider, [6, 7, 8], [0, 1, 2], np.
 n_sys = sys.n
 n_e = sys.n_e
 n_p = sys.n_p
-n_pu = int(n_p/5)
-n_pv = 2*n_pu
-n_pw = 2*n_pu
+
+n_pv = int(n_p/2)
+n_pw = int(n_p/2)
 n_f = coupler.n_f
 nr_tot = sys.n_r
+
 
 # E_sys = sys.E
 M_e = sys.M_e
@@ -90,11 +91,9 @@ G_slider = np.zeros((n_e, nlmd_sl))
 n_tot = n_e + nlmd_cl + nlmd_sys + nlmd_sl + nquat  # 4 coupler, 2 slider, 3 coupler-slider and quaternions
 dx = L_coupler/n_elem
 
-
 t_final = abs(8/omega_cr)
 
-
-Jf_tx, Jf_ty, Jf_tz, Jf_ry, Jf_rz, Jf_fx, Jf_fy, Jf_fz = matrices_j3d(n_elem, L_coupler, rho_coupler, A_coupler, bc=bc)
+Jf_ty, Jf_tz, Jf_ry, Jf_rz, Jf_fy, Jf_fz = matrices_j3d_notraction(n_elem, L_coupler, rho_coupler, A_coupler,bc=bc)
 
 def dae_closed_phs(t, y, yd):
 
@@ -138,9 +137,9 @@ def dae_closed_phs(t, y, yd):
     J_e[3:6, 3:6] = skew(pi_coupler)
     J_e[nr_coupler:nr_tot, 3:6] = skew(p_slider)
 
-    Jf_om = + Jf_tx * vx_coupler + Jf_ty * vy_coupler + Jf_tz * vz_coupler \
+    Jf_om = Jf_ty * vy_coupler + Jf_tz * vz_coupler \
             + Jf_ry * omy_coupler + Jf_rz * omz_coupler  \
-            + Jf_fy @ efy_coupler + Jf_fz @ efz_coupler + Jf_fx @ efx_coupler
+            + Jf_fy @ efy_coupler + Jf_fz @ efz_coupler
 
     Jf_om_cor = Jf_fy @ efy_coupler + Jf_fz @ efz_coupler + Jf_fx @ efx_coupler
 

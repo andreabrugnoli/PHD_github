@@ -92,13 +92,14 @@ def sys(t, y):
     ep_el = y[n_r:n_r+n_p]
     eu_beam = ep_el[:n_pu]
     ew_beam = ep_el[n_pu:]
-    u_el = y[-n_p:]
 
     jf_u = Jf_fx @ eu_beam
     jf_w = Jf_rz * omega + Jf_fy @ ew_beam
+    jf_u_cor = Jf_fx @ eu_beam
+    jf_w_cor = Jf_fy @ ew_beam
 
-    J[n_r:n_r + n_p, 0] = np.concatenate((+jf_w, -jf_u))
-    J[0, n_r:n_r + n_p] = np.concatenate((-jf_w, +jf_u))
+    J[n_r:n_r + n_p, 0] = np.concatenate((+jf_w, -jf_u)) + np.concatenate((jf_w_cor, -jf_u_cor))
+    J[0, n_r:n_r + n_p] = 2*np.concatenate((-jf_w, +jf_u))
 
     Om_mat = np.eye(n_e)
     Om_mat[-nq_cen:, -nq_cen:] = omega**2*np.eye(nq_cen)
@@ -123,9 +124,10 @@ sol = solve_ivp(sys, t_span, y0, method='BDF', vectorized=False, t_eval=t_ev)
 
 t_sol = sol.t
 y_sol = sol.y
-e_sol = y_sol[:-1-n_p, :]
+e_sol = y_sol[:-1, :]
 om_sol = y_sol[0, :]
 
+print(M.shape, e_sol.shape)
 
 ep_sol = y_sol[n_r:n_r + n_p, :]
 

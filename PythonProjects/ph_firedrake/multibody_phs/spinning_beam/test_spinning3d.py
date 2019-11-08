@@ -120,14 +120,16 @@ def sys(t,y):
     efy = y_e[n_r + n_pu:n_r + n_pu + n_pv]
     efz = y_e[n_r + n_pu + n_pv:n_r + n_p]
 
-    pi_beam = M[:n_r, :] @ y_e
+    pi_beam = M[:n_r, :] @ y_e + M[:n_r, n_r:n_r + n_p] @ y_e[n_r: n_r + n_p]
     J[:n_r, :n_r] = skew(pi_beam)
 
     Jf_om = Jf_ry * omega[1] + Jf_rz * omega[2] \
             + Jf_fy @ efy + Jf_fz @ efz + Jf_fx @ efx
 
-    J[n_r:n_r + n_p, :n_r] = Jf_om
-    J[:n_r, n_r:n_r + n_p] = -Jf_om.T
+    Jf_om_cor = Jf_fy @ efy + Jf_fz @ efz + Jf_fx @ efx
+
+    J[n_r:n_r + n_p, :n_r] = Jf_om + Jf_om_cor
+    J[:n_r, n_r:n_r + n_p] = -2 * Jf_om.T
 
     # dedt = invM @ (J @ y_e + B_Mz0 * Mz_0 + B_FzL * Fz_L)
 

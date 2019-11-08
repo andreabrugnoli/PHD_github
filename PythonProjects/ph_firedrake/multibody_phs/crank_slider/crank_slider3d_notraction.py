@@ -142,9 +142,10 @@ def dae_closed_phs(t, y, yd):
             Jf_ry * omy_coupler + Jf_rz * omz_coupler + \
             Jf_fy @ efy_coupler + Jf_fz @ efz_coupler
 
-    J_e[nr_tot:nr_tot + n_p, 3:6] = Jf_om
-    J_e[3:6, nr_tot:nr_tot + n_p] = -Jf_om.T
+    Jf_om_cor = + Jf_fy @ efy_coupler + Jf_fz @ efz_coupler
 
+    J_e[nr_tot:nr_tot + n_p, 3:6] = Jf_om + Jf_om_cor
+    J_e[3:6, nr_tot:nr_tot + n_p] = -2*Jf_om.T
 
     act_quat = np.quaternion(quat_cl[0], quat_cl[1], quat_cl[2], quat_cl[3])
     Rot_cl = quaternion.as_rotation_matrix(act_quat)
@@ -207,8 +208,8 @@ b_vel = np.array([0, L_crank*np.sin(theta_cr)*omega_cr, L_crank*np.cos(theta_cr)
 
 dtheta1_cl, dtheta2_cl, dx_sl = la.solve(A_vel, b_vel)
 
-omx_B = np.sin(theta2_cl) * dtheta1_cl
-# omx_B = 0
+# omx_B = np.sin(theta2_cl) * dtheta1_cl
+omx_B = 0
 
 omy_B = dtheta2_cl
 omz_B = -np.cos(theta2_cl) * dtheta1_cl

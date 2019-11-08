@@ -119,10 +119,10 @@ def dae_closed_phs(t, y, yd):
     pi_coupler = M_sys[3:6, :] @ e_sys
     p_slider = M_sys[nr_coupler:nr_tot, :] @ e_sys
 
-    J_e[:3, 3:6] = skew(p_coupler)
-    J_e[3:6, :3] = skew(p_coupler)
-    J_e[3:6, 3:6] = skew(pi_coupler)
-    J_e[nr_coupler:nr_tot, 3:6] = skew(p_slider)
+    # J_e[:3, 3:6] = skew(p_coupler)
+    # J_e[3:6, :3] = skew(p_coupler)
+    # J_e[3:6, 3:6] = skew(pi_coupler)
+    # J_e[nr_coupler:nr_tot, 3:6] = skew(p_slider)
 
     act_quat = np.quaternion(quat_cl[0], quat_cl[1], quat_cl[2], quat_cl[3])
     Rot_cl = quaternion.as_rotation_matrix(act_quat)
@@ -333,70 +333,70 @@ plt.plot(t_sol, om_cl_sol.T)
 plt.xlabel(r"Time")
 plt.ylabel(r"Omega")
 
-# e1I_sol = np.zeros((3, n_ev))
-# rP_cl = np.zeros((3, n_ev))
-#
-# vslI_sol = np.zeros((3, n_ev))
-# vclCI_sol = np.zeros((3, n_ev))
-# vclCB_sol = np.zeros((3, n_ev))
-#
-# PC_skew = skew([-L_coupler, 0, 0])
-#
-# for i in range(n_ev):
-#     # e1I_quat = np.multiply(quat_cl_sol[i], np.multiply(e1B_quat, np.conjugate(quat_cl_sol[i])))
-#     # e1I_sol[:, i] = L_coupler * quaternion.as_float_array(e1I_quat)[1:]
-#     #
-#     # vslB_quat = np.quaternion(0, er_sl_sol[0, i], er_sl_sol[1, i], er_sl_sol[2, i])
-#     # vslI_quat = np.multiply(quat_cl_sol[i], np.multiply(vslB_quat, np.conjugate(quat_cl_sol[i])))
-#
-#     # vslI_sol[:, i] = quaternion.as_float_array(vslI_quat)[1:]
-#     vclCB_sol[:, i] = vP_cl_sol[:, i] + PC_skew @ om_cl_sol[:, i]
-#     vclCI_sol[:, i] = quaternion.as_rotation_matrix(quat_cl_sol[i]) @ vclCB_sol[:, i]
-#
-#     e1I_sol[:, i] = quaternion.as_rotation_matrix(quat_cl_sol[i]) @ np.array([L_coupler, 0, 0])
-#     vslI_sol[:, i] = quaternion.as_rotation_matrix(quat_cl_sol[i]) @ vslB_sol[:, i]
-#
-#     rP_cl[:, i] = np.array([0, -L_crank * np.sin(omega_cr*t_ev[i]), offset_cr + L_crank * np.cos(omega_cr*t_ev[i])])
-#
-# # plt.plot(t_ev, (G_e.T @ e_sol)[0], 'r', t_ev, (G_e.T @ e_sol)[1], 'b', t_ev, (G_e.T @ e_sol)[2], 'g')
-#
-# plt.show()
-#
-# vslI_int = interp1d(t_ev, vslI_sol, kind='linear')
-# vclCI_int = interp1d(t_ev, vclCI_sol, kind='linear')
-#
-# def sys(t, y):
-#
-#     dydt_sl = vslI_int(t)
-#     dydt_cl = vclCI_int(t)
-#
-#     return np.concatenate((dydt_sl, dydt_cl))
-#
-#
-# r_sol = solve_ivp(sys, [0, t_final], np.concatenate((r0C_I, r0C_I)), method='RK45', t_eval=t_ev)
-#
-#
-# n_ev = len(t_sol)
-# dt_vec = np.diff(t_sol)
-#
-# xP_sl = r_sol.y[0, :]
-# yP_sl = r_sol.y[1, :]
-# zP_sl = r_sol.y[2, :]
-#
-# xC_cl = r_sol.y[3, :]
-# yC_cl = r_sol.y[4, :]
-# zC_cl = r_sol.y[5, :]
-#
-# # rC_cl = rP_cl + e1I_sol
-# # xC_cl = rC_cl[0]
-# # yC_cl = rC_cl[1]
-# # zC_cl = rC_cl[2]
-#
-# data = np.array([[rP_cl[0], rP_cl[1], rP_cl[2]], [xC_cl, yC_cl, zC_cl], [xP_sl, yP_sl, zP_sl]])
-# print(data.shape)
-#
-# fntsize = 16
-#
-# anim = animate_line3d(data, t_ev)
+e1I_sol = np.zeros((3, n_ev))
+rP_cl = np.zeros((3, n_ev))
+
+vslI_sol = np.zeros((3, n_ev))
+vclCI_sol = np.zeros((3, n_ev))
+vclCB_sol = np.zeros((3, n_ev))
+
+PC_skew = skew([-L_coupler, 0, 0])
+
+for i in range(n_ev):
+    # e1I_quat = np.multiply(quat_cl_sol[i], np.multiply(e1B_quat, np.conjugate(quat_cl_sol[i])))
+    # e1I_sol[:, i] = L_coupler * quaternion.as_float_array(e1I_quat)[1:]
+    #
+    # vslB_quat = np.quaternion(0, er_sl_sol[0, i], er_sl_sol[1, i], er_sl_sol[2, i])
+    # vslI_quat = np.multiply(quat_cl_sol[i], np.multiply(vslB_quat, np.conjugate(quat_cl_sol[i])))
+
+    # vslI_sol[:, i] = quaternion.as_float_array(vslI_quat)[1:]
+    vclCB_sol[:, i] = vP_cl_sol[:, i] + PC_skew @ om_cl_sol[:, i]
+    vclCI_sol[:, i] = quaternion.as_rotation_matrix(quat_cl_sol[i]) @ vclCB_sol[:, i]
+
+    e1I_sol[:, i] = quaternion.as_rotation_matrix(quat_cl_sol[i]) @ np.array([L_coupler, 0, 0])
+    vslI_sol[:, i] = quaternion.as_rotation_matrix(quat_cl_sol[i]) @ vslB_sol[:, i]
+
+    rP_cl[:, i] = np.array([0, -L_crank * np.sin(omega_cr*t_ev[i]), offset_cr + L_crank * np.cos(omega_cr*t_ev[i])])
+
+# plt.plot(t_ev, (G_e.T @ e_sol)[0], 'r', t_ev, (G_e.T @ e_sol)[1], 'b', t_ev, (G_e.T @ e_sol)[2], 'g')
+
+plt.show()
+
+vslI_int = interp1d(t_ev, vslI_sol, kind='linear')
+vclCI_int = interp1d(t_ev, vclCI_sol, kind='linear')
+
+def sys(t, y):
+
+    dydt_sl = vslI_int(t)
+    dydt_cl = vclCI_int(t)
+
+    return np.concatenate((dydt_sl, dydt_cl))
+
+
+r_sol = solve_ivp(sys, [0, t_final], np.concatenate((r0C_I, r0C_I)), method='RK45', t_eval=t_ev)
+
+
+n_ev = len(t_sol)
+dt_vec = np.diff(t_sol)
+
+xP_sl = r_sol.y[0, :]
+yP_sl = r_sol.y[1, :]
+zP_sl = r_sol.y[2, :]
+
+xC_cl = r_sol.y[3, :]
+yC_cl = r_sol.y[4, :]
+zC_cl = r_sol.y[5, :]
+
+# rC_cl = rP_cl + e1I_sol
+# xC_cl = rC_cl[0]
+# yC_cl = rC_cl[1]
+# zC_cl = rC_cl[2]
+
+data = np.array([[rP_cl[0], rP_cl[1], rP_cl[2]], [xC_cl, yC_cl, zC_cl], [xP_sl, yP_sl, zP_sl]])
+print(data.shape)
+
+fntsize = 16
+
+anim = animate_line3d(data, t_ev)
 
 plt.show()

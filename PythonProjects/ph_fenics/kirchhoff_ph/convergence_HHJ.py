@@ -140,21 +140,22 @@ def compute_err(n, r):
     bcs.append(DirichletBC(V.sub(0), Constant(0.0), boundary))
     bcs.append(DirichletBC(V.sub(1), Constant(((0.0, 0.0), (0.0, 0.0))), boundary))
 
+    degr = 4
     t = 0
     t_fin = 1        # total simulation time
 
     beta = 4*pi/t_fin
-    w_exact = Expression("sin(pi*x[0]/a)*sin(pi*x[1]/b)*sin(beta*t)", degree=2, beta=beta, a=Lx, b=Ly, t=t)
+    w_exact = Expression("sin(pi*x[0]/a)*sin(pi*x[1]/b)*sin(beta*t)", degree=degr, beta=beta, a=Lx, b=Ly, t=t)
     grad_wex = Expression(('pi/a*cos(pi*x[0]/a)*sin(pi*x[1]/b)*sin(beta*t)',
-                           'pi/b*sin(pi*x[0]/a)*cos(pi*x[1]/b)*sin(beta*t)'), degree=2, beta=beta, a=Lx, b=Ly, t=t)
+                           'pi/b*sin(pi*x[0]/a)*cos(pi*x[1]/b)*sin(beta*t)'), degree=degr, beta=beta, a=Lx, b=Ly, t=t)
 
-    v_exact = Expression("beta * sin(pi*x[0]/a)*sin(pi*x[1]/b)*cos(beta*t)", degree=2, beta=beta, a=Lx, b=Ly, t=t)
+    v_exact = Expression("beta * sin(pi*x[0]/a)*sin(pi*x[1]/b)*cos(beta*t)", degree=degr, beta=beta, a=Lx, b=Ly, t=t)
     grad_vex = Expression(('beta*pi/a*cos(pi*x[0]/a)*sin(pi*x[1]/b)*cos(beta*t)',
-                           'beta*pi/b*sin(pi*x[0]/a)*cos(pi*x[1]/b)*cos(beta*t)'), degree=2, beta=beta, a=Lx, b=Ly, t=t)
+                           'beta*pi/b*sin(pi*x[0]/a)*cos(pi*x[1]/b)*cos(beta*t)'), degree=degr, beta=beta, a=Lx, b=Ly, t=t)
 
     force = Expression("sin(pi*x[0]/a)*sin(pi*x[1]/b)*sin(beta*t)*"
                        "(D*pow( pow(pi/a, 2) + pow(pi/b, 2) , 2) - pow(beta,2)*rho*h)",
-                       degree=2, beta=beta, a=Lx, b=Ly, t=t, D=D, rho=rho, h=h)
+                       degree=degr, beta=beta, a=Lx, b=Ly, t=t, D=D, rho=rho, h=h)
 
     b_form = v_p*force*dx
 
@@ -177,7 +178,7 @@ def compute_err(n, r):
     w_n = Function(Vp)
 
     e_n.assign(Expression(('beta*sin(pi*x[0]/a)*sin(pi*x[1]/b)*cos(beta*t)', '0', '0', '0', '0'),
-                          degree=2, beta=beta, a=Lx, b=Ly, t=t))
+                          degree=degr, beta=beta, a=Lx, b=Ly, t=t))
 
     ep_n, eq_n = e_n.split(True)
 
@@ -248,37 +249,43 @@ def compute_err(n, r):
     err_quad = np.sqrt(np.sum(dt*np.power(err_L2, 2)))
     err_max = max(err_L2)
     err_last = err_L2[-1]
-    return err_last
+    return err_last, err_max
 
 
 n_h = 5
-n_vec = np.array([2**(i+1) for i in range(n_h)])
-h_vec = 1./n_vec
+n1_vec = np.array([2**(i+1) for i in range(n_h)])
+n2_vec = np.array([2**(i) for i in range(n_h)])
+h1_vec = 1./n1_vec
+h2_vec = 1./n2_vec
 err_vec_r1 = np.zeros((n_h,))
 err_vec_r2 = np.zeros((n_h,))
+errInf_vec_r1 = np.zeros((n_h,))
+errInf_vec_r2 = np.zeros((n_h,))
 
 r1_ext = np.zeros((n_h-1,))
 r2_ext = np.zeros((n_h-1,))
 
 for i in range(n_h):
-    err_vec_r1[i] = compute_err(n_vec[i], 1)
-    err_vec_r2[i] = compute_err(n_vec[i], 2)
+    err_vec_r1[i], errInf_vec_r1[i] = compute_err(n1_vec[i], 1)
+    err_vec_r2[i], errInf_vec_r2[i] = compute_err(n2_vec[i], 2)
 
     if i>0:
-        r1_ext[i-1] = np.log(err_vec_r1[i]/err_vec_r1[i-1])/np.log(h_vec[i]/h_vec[i-1])
-        r2_ext[i-1] = np.log(err_vec_r2[i]/err_vec_r2[i-1])/np.log(h_vec[i]/h_vec[i-1])
+        r1_ext[i-1] = np.log(err_vec_r1[i]/err_vec_r1[i-1])/np.log(h1_vec[i]/h1_vec[i-1])
+        r2_ext[i-1] = np.log(err_vec_r2[i]/err_vec_r2[i-1])/np.log(h2_vec[i]/h2_vec[i-1])
 
-order_r1 = np.polyfit(np.log(h_vec), np.log(err_vec_r1), 1)[0]
-order_r2 = np.polyfit(np.log(h_vec), np.log(err_vec_r2), 1)[0]
+order_r1 = np.polyfit(np.log(h1_vec), np.log(err_vec_r1), 1)[0]
+order_r2 = np.polyfit(np.log(h1_vec), np.log(err_vec_r2), 1)[0]
 print("Estimated order of convergence: " + str(r1_ext))
 print("Estimated order of convergence: " + str(r2_ext))
 print("Interpolated order of convergence: " + str(order_r1))
 print("Interpolated order of convergence: " + str(order_r2))
 plt.figure()
-plt.plot(np.log(h_vec), np.log(err_vec_r1), '-m', label='HHJ 1')
-plt.plot(np.log(h_vec), np.log(err_vec_r2), '-r', label='HHJ 2')
-plt.plot(np.log(h_vec), np.log(h_vec), '-g', label=r'$h$')
-plt.plot(np.log(h_vec), np.log(h_vec**2), '-b', label=r'$h^2$')
+plt.plot(np.log(h1_vec), np.log(err_vec_r1), '-m', label='HHJ 1')
+plt.plot(np.log(h2_vec), np.log(err_vec_r2), '-r', label='HHJ 2')
+# plt.plot(np.log(h1_vec), np.log(errInf_vec_r1), '-y', label='HHJ 1 $L^\infty$')
+# plt.plot(np.log(h2_vec), np.log(errInf_vec_r2), '-o', label='HHJ 2 $L^\infty$')
+plt.plot(np.log(h1_vec), np.log(h1_vec), '-g', label=r'$h$')
+plt.plot(np.log(h2_vec), np.log(h2_vec**2), '-b', label=r'$h^2$')
 plt.xlabel(r'Mesh size')
 plt.title(r'Error at $T_f$')
 plt.legend()

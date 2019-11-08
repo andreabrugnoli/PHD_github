@@ -66,6 +66,24 @@ n_p = sys.n_p
 n_pu = int(n_p/3)
 n_pw = n_p - n_pu
 
+# Mxx = M_sys[nr_tot:nr_tot+n_pu, nr_tot:nr_tot+n_pu]
+# Myy = M_sys[nr_tot+n_pu:nr_tot+n_p, nr_tot+n_pu:nr_tot+n_p]
+#
+# M_gyro = np.zeros((n_sys, n_pw + n_pu))
+# M_gyro[0, :n_pw] = Jf_tx
+# M_gyro[0, n_pw:] = Jf_ty
+# M_gyro[1, :n_pw] = Jf_tx
+# M_gyro[1, n_pw:] = Jf_ty
+#
+# M_gyro[2, :n_pw] = M_sys[nr_tot + n_pu:nr_tot + n_p, 2]
+# M_gyro[2, n_pw:] = Jf_rz
+#
+# M_gyro[nr_tot:nr_tot + n_pu, :n_pw] = Jf_fy
+# M_gyro[nr_tot:nr_tot + n_pu, n_pw:] = Mxx
+#
+# M_gyro[nr_tot + n_pu:nr_tot + n_p, :n_pw] = Myy
+# M_gyro[nr_tot + n_pu:nr_tot + n_p, n_pw:] = Jf_fx
+
 n_tot = n_sys + 4  # 3 lambda et theta
 order = []
 t_final = 8/omega_cr
@@ -82,7 +100,7 @@ def dae_closed_phs(t, y, yd):
     theta_cl = y[-1]
     omega_cl = y[2]
 
-    p_coupler = M_sys[:2, :n_e] @ y_sys[:n_e]
+    p_coupler = M_sys[:2, :n_e] @ y_sys[:n_e] + M_sys[:2, nr_tot:n_e] @ y_sys[nr_tot:n_e]
     p_mass = M_sys[nr_coupler:nr_tot, :n_e] @ y_sys[:n_e]
 
     vxP_coupler = y_sys[0]
@@ -92,15 +110,18 @@ def dae_closed_phs(t, y, yd):
     eu_coupler = y_sys[nr_tot:nr_tot+n_pu]
     ew_coupler = y_sys[nr_tot+n_pu:nr_tot+n_p]
 
-    jf_u = Jf_tx * vxP_coupler + Jf_fx @ eu_coupler
+    jf_u = (Jf_tx * vxP_coupler + Jf_fx @ eu_coupler)
     jf_w = Jf_ty * vyP_coupler + Jf_rz * omzP_coupler + Jf_fy @ ew_coupler
+
+    jf_u_cor = Jf_fx @ eu_coupler
+    jf_w_cor = Jf_fy @ ew_coupler
 
     J_sys[:2, 2] = [+p_coupler[1], -p_coupler[0]]
     J_sys[2, :2] = [-p_coupler[1], +p_coupler[0]]
     J_sys[3:5, 2] = [+p_mass[1], -p_mass[0]]
 
-    J_sys[nr_tot:nr_tot + n_p, 2] = np.concatenate((jf_w, -jf_u))
-    J_sys[2, nr_tot:nr_tot + n_p] = np.concatenate((-jf_w, +jf_u))
+    J_sys[nr_tot:nr_tot + n_p, 2] = np.concatenate((jf_w, -jf_u)) + np.concatenate((jf_w_cor, -jf_u_cor))
+    J_sys[2, nr_tot:nr_tot + n_p] = 2*np.concatenate((-jf_w, +jf_u))
 
     R_th = np.array([[np.cos(theta_cl), -np.sin(theta_cl)],
                     [np.sin(theta_cl), np.cos(theta_cl)]])
@@ -258,7 +279,7 @@ plt.plot(omega_cr*t_ev, uM_B/L_coupler, 'b-')
 plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
 plt.ylabel(r'$u_f/L_{cl}$ along $x$', fontsize = fntsize)
 plt.title(r"Midpoint horizontal deflection", fontsize=fntsize)
-# plt.savefig(path_fig + 'uM_disp.eps', format="eps")
+plt.savefig(path_fig + 'uM_disp.eps', format="eps")
 
 fig = plt.figure()
 plt.plot(omega_cr*t_ev, wM_B/L_coupler, 'b-')
@@ -267,7 +288,7 @@ plt.ylabel(r'$u_f/L_{cl}$ along $y$', fontsize = fntsize)
 plt.title(r"Midpoint vertical deflection", fontsize=fntsize)
 axes = plt.gca()
 axes.set_ylim([-0.015, 0.02])
-# plt.savefig(path_fig + 'wM_disp.eps', format="eps")
+plt.savefig(path_fig + 'wM_disp.eps', format="eps")
 
 plt.show()
 # plt.legend(loc='upper left')
