@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 from firedrake.plot import _two_dimension_triangle_func_val
 
 import scipy.linalg as la
+import scipy.sparse as spa
+import scipy.sparse.linalg as sp_la
 
 E = 2e11
 nu = 0.3
@@ -20,7 +22,7 @@ L = 1
 l_x = L
 l_y = L
 
-n = 5 #int(input("N element on each side: "))
+n = 3 #int(input("N element on each side: "))
 
 # Plate bending stiffness :math:`D=\dfrac{Eh^3}{12(1-\nu^2)}` and shear stiffness :math:`F = \kappa Gh`
 # with a shear correction factor :math:`\kappa = 5/6` for a homogeneous plate
@@ -138,7 +140,7 @@ j = j_gradgrad + j_gradgradIP  #
 # 3: plane y == 0
 # 4: plane y == 1
 
-bc_input = input('Select Boundary Condition:')   #'SSSS'
+bc_input = 'SSSS' # input('Select Boundary Condition:')
 
 bc_1, bc_3, bc_2, bc_4 = bc_input
 
@@ -173,40 +175,36 @@ M = assemble(m, mat_type='aij')
 petsc_j = J.M.handle
 petsc_m = M.M.handle
 
-JJ = np.array(petsc_j.convert("dense").getDenseArray())
-MM = np.array(petsc_m.convert("dense").getDenseArray())
-
-N_al = V.dim()
+JJ = spa.csr_matrix(petsc_j.getValuesCSR()[::-1])
+MM = spa.csr_matrix(petsc_m.getValuesCSR()[::-1])
 
 if b_u:
     B_u = assemble(b_u, mat_type='aij')
     petsc_b_u = B_u.M.handle
-    B_in = np.array(petsc_b_u.convert("dense").getDenseArray())
-    boundary_dofs = np.where(B_in.any(axis=0))[0]  # np.where(~np.all(B_in == 0, axis=0) == True) #
-    B_in = B_in[:, boundary_dofs]
-else:
-    B_in = np.empty((N_al, 0))
+    B_in = spa.csr_matrix(petsc_b_u.getValuesCSR()[::-1])
 
-N_u = len(B_in.T)
-# print(N_u)
+    rows, cols = spa.csr_matrix.nonzero(B_in)
+    set_cols = np.array(list(set(cols)))
 
-Z_u = np.zeros((N_u, N_u))
+    n_lmb = len(set_cols)
+    G = np.zeros((n_V, n_lmb))
+    for r, c in zip(rows, cols):
+        ind_col = np.where(set_cols == c)[0]
+        G[r, ind_col] = B_in[r, c]
 
-J_aug = np.vstack([np.hstack([JJ, B_in]),
-                   np.hstack([-B_in.T, Z_u])
-                   ])
+G_ortho = la.null_space(G.T).T
 
-Z_al_u = np.zeros((N_al, N_u))
-Z_u_al = np.zeros((N_u, N_al))
+G_ortho = spa.csr_matrix(G_ortho)
 
-M_aug = np.vstack([np.hstack([MM, Z_al_u]),
-                   np.hstack([Z_u_al, Z_u])
-                   ])
-
+J_til = G_ortho.dot(JJ.dot(G_ortho.transpose()))
+M_til = G_ortho.dot(MM.dot(G_ortho.transpose()))
 
 tol = 10 ** (-6)
 
-eigenvalues, eigvectors = la.eig(J_aug, M_aug)
+n_om = 20
+
+eigenvalues, eigvectors = sp_la.eigs(J_til, k=2*n_om, M=M_til, sigma=1e-6, which='LM', tol=1e-2, maxiter=5000)
+print(eigenvalues)
 omega_all = np.imag(eigenvalues)
 
 index = omega_all >= tol
@@ -220,7 +218,6 @@ omega.sort()
 
 # NonDimensional China Paper
 
-n_om = 6
 
 omega_tilde = L**2*sqrt(rho*h/D)*omega
 for i in range(n_om):

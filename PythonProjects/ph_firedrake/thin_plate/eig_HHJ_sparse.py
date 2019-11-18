@@ -14,6 +14,10 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from matplotlib import cm
 
+import scipy.linalg as la
+import scipy.sparse as spa
+import scipy.sparse.linalg as sp_la
+
 matplotlib.rcParams['text.usetex'] = True
 
 n = 5
@@ -148,9 +152,17 @@ for key, val in bc_dict.items():
 boundary_dofs = sorted(boundary_dofs)
 n_lmb = len(boundary_dofs)
 
+
 G = np.zeros((n_V, n_lmb))
 for (i, j) in enumerate(boundary_dofs):
     G[j, i] = 1
+
+if n_lmb == 0:
+    G_ortho = spa.eye(n_V)
+else:
+    G_ortho = la.null_space(G.T).T
+    G_ortho = spa.csr_matrix(G_ortho)
+
 
 J = assemble(j_form, mat_type='aij')
 M = assemble(m_form, mat_type='aij')
@@ -158,22 +170,19 @@ M = assemble(m_form, mat_type='aij')
 petsc_j = J.M.handle
 petsc_m = M.M.handle
 
-JJ = np.array(petsc_j.convert("dense").getDenseArray())
-MM = np.array(petsc_m.convert("dense").getDenseArray())
+JJ = spa.csr_matrix(petsc_j.getValuesCSR()[::-1])
+MM = spa.csr_matrix(petsc_m.getValuesCSR()[::-1])
 
-Z_lmb = np.zeros((n_lmb, n_lmb))
+J_til = G_ortho.dot(JJ.dot(G_ortho.transpose()))
+M_til = G_ortho.dot(MM.dot(G_ortho.transpose()))
 
-J_aug = np.vstack([np.hstack([JJ, G]),
-                   np.hstack([-G.T, Z_lmb])
-                ])
+n_om = 40
 
-M_aug = la.block_diag(MM, Z_lmb)
-tol = 10**(-9)
-
-eigenvalues, eigvectors = la.eig(J_aug, M_aug)
+eigenvalues, eigvectors = sp_la.eigs(J_til, k=2*n_om, M=M_til, sigma=1e-6, which='LM', tol=1e-2)
+print(eigenvalues)
 omega_all = np.imag(eigenvalues)
 
-tol = 10**(-9)
+tol = 1e-9
 index = omega_all >= tol
 
 omega = omega_all[index]
@@ -183,13 +192,13 @@ eigvec_omega = eigvec_omega[:, perm]
 
 omega.sort()
 
-omega_tilde = omega * norm_coeff
-n_om = 10
+# NonDimensional China Paper
 
-for i in range(n_om):
+
+omega_tilde = L**2*sqrt(rho*h/D)*omega
+for i in range(len(omega)):
     print(omega_tilde[i])
 
-n_fig = 5
 
 
 plot_eigenvectors = False

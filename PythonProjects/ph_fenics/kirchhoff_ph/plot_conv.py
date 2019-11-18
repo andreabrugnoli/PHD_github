@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 path_res = "./convergence_results/"
-bc= "S_"
+bc= "SSSS_"
 
 h1_vec = np.load(path_res + bc + "h1.npy")
 h2_vec = np.load(path_res + bc + "h3.npy")

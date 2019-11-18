@@ -26,7 +26,8 @@ def compute_err(n, r):
     D = E * h ** 3 / (1 - nu ** 2) / 12
     fl_rot = 12 / (E * h ** 3)
 
-    Lx, Ly = 1, 1
+    Lx = 1
+    Ly = 1
 
     # Useful Matrices
 
@@ -136,34 +137,88 @@ def compute_err(n, r):
     beta = 1 # 4*pi/t_fin
     w_0 = 1
 
-    str_per = '*'
-    str_plus = '+'
-    str_fx = 'pow(x[0], 2)*pow(Lx/2-x[0], 2)'
-    str_gy = 'pow(Ly/2-x[1], 4)'
-    str_ht = 'sin(t)'
+    fx = 'pow(x[0], 2)*pow(Lx/2-x[0], 2)*'
+    gy = 'pow(Ly/2-x[1], 4)*'
+    ht = 'sin(t)'
 
-    w_exact = Expression('w_0/(pow(Lx*Ly, 4))*pow(x[0]*(Lx/2-x[0]), 2)**sin(beta*t)', \
+    dx_fx = '(pow(Lx, 2)/2*x[0] - 3*Lx*pow(x[0], 2) + 4*pow(x[0], 3))*'
+    dxx_fx = '(pow(Lx, 2)/2 - 6*Lx*x[0] + 12*pow(x[0], 2))*'
+    dxxx_fx = '(-6*Lx + 24*x[0])*'
+    dxxxx_fx = '24*'
+
+    dy_gy = '(-4*pow(Ly/2-x[1], 3))*'
+    dyy_gy = '(12*pow(Ly/2-x[1], 2))*'
+    dyyy_gy = '(-24*(Ly/2-x[1]))*'
+    dyyyy_gy = '24*'
+
+    dt_ht = 'cos(t)'
+    dtt_ht = '(-sin(t))'
+
+    str_w = fx + gy + ht
+    str_wx = dx_fx + gy + ht
+    str_wy = fx + dy_gy + ht
+
+    str_v = fx + gy + dt_ht
+    str_vx = dx_fx + gy + dt_ht
+    str_vy = fx + dy_gy + dt_ht
+
+    str_wxx = dxx_fx + gy + ht
+    str_wyy = fx + dyy_gy + ht
+    str_wxy = dx_fx + dy_gy + ht
+
+    str_wtt = fx + gy + dtt_ht
+
+    str_wxxxx = dxxxx_fx + gy + ht
+    str_wyyyy = fx + dyyyy_gy + ht
+    str_wxxyy = dxx_fx + dyy_gy + ht
+
+    str_sxx = 'D*' + str_wxx + '+ D*nu*' + str_wyy
+    str_syy = 'D*' + str_wyy + '+ D*nu*' + str_wxx
+    str_sxy = 'D*(1-nu)*' + str_wxy
+
+    str_f = 'rho*h*' + str_wtt + ' + D*' + str_wxxxx + ' + 2*D*' + str_wxxyy + '+ D*' + str_wyyyy
+
+    w_exact = Expression(str_w, \
                          degree=degr, w_0=w_0, Lx=Lx, Ly=Ly, beta=beta, t=t)
 
+    v_exact = Expression(str_v, \
+                         degree=degr, w_0=w_0, Lx=Lx, Ly=Ly, beta=beta, t=t)
 
-    force = rho*h*dtt_wex + D*(dxxxx_wex + 2*dxxyy_wex + dyyyy_wex)
-    force1 = rho*h*dtt_wex1 + D*(dxxxx_wex1 + 2*dxxyy_wex1 + dyyyy_wex1)
+    grad_wex = Expression((str_wx, str_wy), \
+                         degree=degr, w_0=w_0, Lx=Lx, Ly=Ly, beta=beta, t=t)
+
+    grad_vex = Expression((str_vx, str_vy), \
+                          degree=degr, w_0=w_0, Lx=Lx, Ly=Ly, beta=beta, t=t)
+
+    sig_exact = Expression(((str_sxx, str_sxy),
+                           (str_sxy, str_syy)),
+                          degree=degr, w_0=w_0, Lx=Lx, Ly=Ly, beta=beta, D=D, nu=nu, t=t)
+
+
+    force = Expression(str_f, \
+                          degree=degr, w_0=w_0, Lx=Lx, Ly=Ly, beta=beta, D=D, rho=rho, h=h, t=t)
+    force1 = Expression(str_f, \
+                          degree=degr, w_0=w_0, Lx=Lx, Ly=Ly, beta=beta, D=D, rho=rho, h=h, t=t)
 
     bc_1, bc_2, bc_3, bc_4 = bc_input
 
     bc_dict = {1: bc_1, 2: bc_2, 3: bc_3, 4: bc_4}
     loc_dict = {1: left, 2: lower, 3: right, 4: upper}
 
-    bcs = []
-    for key, val in bc_dict.items():
+    # bcs = []
+    # for key, val in bc_dict.items():
+    #
+    #     if val == 'C':
+    #         bcs.append(DirichletBC(V.sub(0), Constant(0.0), loc_dict[key]))
+    #     elif val == 'S':
+    #         bcs.append(DirichletBC(V.sub(0), v_exact, loc_dict[key]))
+    #         bcs.append(DirichletBC(V.sub(1), sig_exact, loc_dict[key]))
+    #     elif val == 'F':
+    #         bcs.append(DirichletBC(V.sub(1), sig_exact, loc_dict[key]))
 
-        if val == 'C':
-            bcs.append(DirichletBC(V.sub(0), Constant(0.0), loc_dict[key]))
-        elif val == 'S':
-            bcs.append(DirichletBC(V.sub(0), v_exact, loc_dict[key]))
-            bcs.append(DirichletBC(V.sub(1), Exsigma_ex, loc_dict[key]))
-        elif val == 'F':
-            bcs.append(DirichletBC(V.sub(1), Exsigma_ex, loc_dict[key]))
+    bcs = []
+    bcs.append(DirichletBC(V.sub(0), v_exact, boundary))
+    bcs.append(DirichletBC(V.sub(1), sig_exact, boundary))
 
     f_form = v_p*force*dx
     f_form1 = v_p*force1*dx
@@ -173,7 +228,7 @@ def compute_err(n, r):
     J = assemble(j_form)
     M = assemble(m_form)
 
-    dt = 0.1*h_mesh
+    dt = 0.01*h_mesh
     theta = 0.5
 
     A = M - dt * theta * J
@@ -183,7 +238,7 @@ def compute_err(n, r):
     w_n1 = Function(Vp)
     w_n = Function(Vp)
 
-    e_n.assign(Expression(("w_0*beta/(pow(Lx*Ly, 4))*pow(x[0]*(Lx/2-x[0]), 2)*pow(Ly/2-x[1], 4)*cos(beta*t)", '0', '0', '0', '0'),
+    e_n.assign(Expression((str_v, '0', '0', '0', '0'),
                           degree=degr, w_0=w_0, Lx=Lx, Ly=Ly, beta=beta, t=t))
 
     ep_n, eq_n = e_n.split(True)
@@ -206,16 +261,14 @@ def compute_err(n, r):
     v_exact.t = t
     grad_vex.t = t
 
-    dxx_wex.t = t
-    dyy_wex.t = t
-    dxy_wex.t = t
+    sig_exact.t = t
 
     # err_H1[0] = np.sqrt(assemble(dot(w_n-w_exact, w_n-w_exact) *dx
     #                      + dot(grad(w_n) - grad_wex, grad(w_n) - grad_wex) * dx))
     v_err_H1[0] = np.sqrt(assemble(dot(ep_n - v_exact, ep_n - v_exact) * dx
                        + dot(grad(ep_n) - grad_vex, grad(ep_n) - grad_vex) * dx))
 
-    sig_err_L2[0] = np.sqrt(assemble(inner(eq_n - sigma_ex, eq_n - sigma_ex) * dx))
+    sig_err_L2[0] = np.sqrt(assemble(inner(eq_n - sig_exact, eq_n - sig_exact) * dx))
 
     t_vec = np.linspace(0, t_fin, num=n_t)
 
@@ -238,15 +291,8 @@ def compute_err(n, r):
         #
         # b = (M + dt*(1-theta)*J)*e_n.vector() + dt*(theta*f_n1 + (1-theta)*f_n)
 
-        dtt_wex.t = t
-        dxxxx_wex.t = t
-        dyyyy_wex.t = t
-        dxxyy_wex.t = t
-
-        dtt_wex1.t = t + dt
-        dxxxx_wex1.t = t + dt
-        dyyyy_wex1.t = t + dt
-        dxxyy_wex1.t = t + dt
+        force.t = t
+        force1.t = t + dt
 
         ep_n, eq_n = e_n.split()
         alp_n = rho * h * ep_n
@@ -268,7 +314,7 @@ def compute_err(n, r):
         b = assemble(rhs)
 
         v_exact.t = t
-        Exsigma_ex.t = t
+        sig_exact.t = t
 
         [bc.apply(A, b) for bc in bcs]
         # [bc.apply(A) for bc in bcs]
@@ -298,7 +344,7 @@ def compute_err(n, r):
         # dyy_wex.t = t
         # dxy_wex.t = t
 
-        Exsigma_ex.t = t
+        sig_exact.t = t
 
 
         # v_err_H1[i] = np.sqrt(assemble(dot(w_n1-w_exact, w_n1-w_exact) * dx
@@ -306,15 +352,15 @@ def compute_err(n, r):
         v_err_H1[i] = np.sqrt(assemble(dot(ep_n1 - v_exact, ep_n1 - v_exact) * dx
                          + dot(grad(ep_n1) - grad_vex, grad(ep_n1) - grad_vex) * dx))
 
-        sig_err_L2[i] = np.sqrt(assemble(inner(eq_n1 - Exsigma_ex, eq_n1 - Exsigma_ex) * dx))
+        sig_err_L2[i] = np.sqrt(assemble(inner(eq_n1 - sig_exact, eq_n1 - sig_exact) * dx))
 
     plt.figure()
     # plt.plot(t_vec, w_atP, 'r-', label=r'approx $w$')
     # plt.plot(t_vec, w_0/(Lx*Ly)**4*(Ppoint[0]*(Lx/2-Ppoint[0]))**2*(Ly/2-Ppoint[1])**4*np.sin(beta*t), 'b-', label=r'exact $v$')
     plt.plot(t_vec, v_atP, 'r-', label=r'approx $v$')
-    plt.plot(t_vec, w_0*beta/(Lx*Ly)**4*(Ppoint[0]*(Lx/2-Ppoint[0]))**2*(Ly/2-Ppoint[1])**4*np.cos(beta*t_vec), 'b-', label=r'exact $v$')
+    plt.plot(t_vec, (Ppoint[0]*(Lx/2-Ppoint[0]))**2*(Ly/2-Ppoint[1])**4*np.cos(t_vec), 'b-', label=r'exact $v$')
     plt.xlabel(r'Time [s]')
-    plt.title(r'Displacement at $(L_x/2, L_y/2)$')
+    plt.title(r'Displacement at ' + str(Ppoint))
     plt.legend()
     plt.show()
 

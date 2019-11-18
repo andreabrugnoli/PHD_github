@@ -12,7 +12,7 @@ matplotlib.rcParams['text.usetex'] = True
 
 bc_input = 'C'
 save_res = False
-
+path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/thin_plate/circle_meshes/"
 
 def compute_err(n, r):
 
@@ -49,23 +49,17 @@ def compute_err(n, r):
 
     # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
 
-    mesh = CircleManifoldMesh(n, radius=R)
+    mesh = Mesh(path_mesh + "circle_n" + str(n) + ".msh")
 
     # plot(mesh);
     # plt.show()
 
-    # Domain, Subdomains, Boundary, Suboundaries
-    def boundary(x, on_boundary):
-        return on_boundary
-
 
     # Finite element defition
 
-    CG = FiniteElement('CG', mesh.ufl_cell(), r)
-    HHJ = FiniteElement('HHJ', mesh.ufl_cell(), r-1)
-
-    Vp = FunctionSpace(mesh, CG)
-    V = FunctionSpace(mesh, CG * HHJ)
+    Vp = FunctionSpace(mesh, 'CG', r)
+    Vq = FunctionSpace(mesh, 'HHJ', r - 1)
+    V = Vp * Vq
     n_V = V.dim()
     print(n_V)
 
@@ -105,7 +99,7 @@ def compute_err(n, r):
     j_form = j_1 + j_2
 
     bcs = []
-    bcs.append(DirichletBC(V.sub(0), Constant(0.0), boundary))
+    bcs.append(DirichletBC(V.sub(0), Constant(0.0), "on_boundary"))
 
     degr = 4
     t = 0
@@ -167,9 +161,9 @@ def compute_err(n, r):
     w_atP = np.zeros((n_t,))
     v_atP = np.zeros((n_t,))
     Ppoint = (R/3, R/7)
-    v_atP[0] = ep_n(Ppoint[0], Ppoint[1])
+    v_atP[0] = ep_n.at(Ppoint[0], Ppoint[1])
 
-    # err_H1[0] = np.sqrt(assemble(dot(w_n-w_exact, w_n-w_exact) *dx
+    # w_err_H1[0] = np.sqrt(assemble(dot(w_n-w_exact, w_n-w_exact) *dx
     #                      + dot(grad(w_n) - grad_wex, grad(w_n) - grad_wex) * dx))
     v_err_H1[0] = np.sqrt(assemble(dot(ep_n - v_exact, ep_n - v_exact) * dx
                          + dot(grad(ep_n) - grad_vex, grad(ep_n) - grad_vex) * dx))
@@ -202,28 +196,27 @@ def compute_err(n, r):
               + dt * (1 - theta) * j_operator(v_p, v_q, ep_n, eq_n) \
               + dt * ((1 - theta) * f_form + theta * f_form1)
 
-        b = assemble(rhs)
-        [bc.apply(b) for bc in bcs]
+        b = assemble(rhs, bcs=bcs)
 
-        solve(A, e_n1.vector(), b, solver_parameters=param)
+        solve(A, e_n1, b, solver_parameters=param)
 
         t += dt
 
         ep_n, eq_n = e_n.split()
         ep_n1, eq_n1 = e_n1.split()
 
-        w_n1.vector()[:] = w_n.vector() + dt/2*(ep_n.vector() + ep_n1.vector())
+        w_n1.assign(w_n + dt / 2 * (ep_n + ep_n1))
         w_n.assign(w_n1)
 
         e_n.assign(e_n1)
 
-        w_atP[i] = w_n1(Ppoint[0], Ppoint[1])
-        v_atP[i] = ep_n1(Ppoint[0], Ppoint[1])
+        w_atP[i] = w_n1.at(Ppoint[0], Ppoint[1])
+        v_atP[i] = ep_n1.at(Ppoint[0], Ppoint[1])
 
         t_.assign(t)
 
 
-        # v_err_H1[i] = np.sqrt(assemble(dot(w_n1-w_exact, w_n1-w_exact) * dx
+        # w_err_H1[i] = np.sqrt(assemble(dot(w_n1-w_exact, w_n1-w_exact) * dx
         #                      + dot(grad(w_n1)-grad_wex, grad(w_n1)-grad_wex) * dx))
         v_err_H1[i] = np.sqrt(assemble(dot(ep_n1 - v_exact, ep_n1 - v_exact) * dx
                          + dot(grad(ep_n1) - grad_vex, grad(ep_n1) - grad_vex) * dx))
@@ -238,7 +231,6 @@ def compute_err(n, r):
     plt.xlabel(r'Time [s]')
     plt.title(r'Displacement at ' +  str(Ppoint))
     plt.legend()
-    plt.show()
 
     v_err_last = v_err_H1[-1]
     v_err_max = max(v_err_H1)
@@ -251,7 +243,7 @@ def compute_err(n, r):
     return v_err_last, v_err_max, v_err_quad, sig_err_last, sig_err_max, sig_err_quad
 
 
-n_h = 5
+n_h = 3
 n1_vec = np.array([2**(i+2) for i in range(n_h)])
 n2_vec = np.array([2**(i+1) for i in range(n_h)])
 h1_vec = 1./n1_vec

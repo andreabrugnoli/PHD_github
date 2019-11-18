@@ -310,8 +310,8 @@ def compute_err(n, r):
 
 
 n_h = 2
-n1_vec = np.array([2**(i) for i in range(n_h)])
-n2_vec = np.array([2**(i+1) for i in range(n_h)])
+n1_vec = np.array([2**(i+1) for i in range(n_h)])
+n2_vec = np.array([2**(i) for i in range(n_h)])
 h1_vec = 1./n1_vec
 h2_vec = 1./n2_vec
 
@@ -482,7 +482,7 @@ plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log(Error Velocity)')
 plt.title(r'Velocity Error vs Mesh size')
 plt.legend()
-path_fig = "/home/a.brugnoli/Plots_Videos/Python/Plots/Kirchhoff_plots/Convergence/"
+path_fig = "/home/a.brugnoli/Plots_Videos/Python/Plots/Kirchhoff_plots/Convergence/fenics/"
 plt.savefig(path_fig  + bc_input + "_vel.eps", format="eps")
 
 sig_r1int_atF = np.polyfit(np.log(h1_vec), np.log(sig_err_r1), 1)[0]

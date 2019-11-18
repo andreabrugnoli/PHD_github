@@ -115,6 +115,7 @@ def compute_err(n, r):
 
     beta = 1 # 4*pi/t_fin
     f_0 = 1
+    R = 1
     w_exact = Expression("f_0/(64*D)*pow(pow(R,2)-(pow(x[0],2)+pow(x[1],2)), 2)*sin(beta*t)",\
                          degree=degr, f_0=f_0, R=1, D=D, beta=beta, t=t)
     grad_wex = Expression(('-f_0/(16*D)*(pow(R,2)-(pow(x[0],2)+pow(x[1],2)))*sin(beta*t)*x[0]',
@@ -176,10 +177,10 @@ def compute_err(n, r):
     v_err_H1 = np.zeros((n_t,))
     sig_err_L2 = np.zeros((n_t,))
 
-    # w_atP = np.zeros((n_t,))
-    # v_atP = np.zeros((n_t,))
-    # Ppoint = (Lx/3, Ly/3)
-    # v_atP[0] = ep_n(Ppoint[0], Ppoint[1])
+    w_atP = np.zeros((n_t,))
+    v_atP = np.zeros((n_t,))
+    Ppoint = (R/3, R/7)
+    v_atP[0] = ep_n(Ppoint[0], Ppoint[1])
 
     w_exact.t = t
     grad_wex.t = t
@@ -246,8 +247,8 @@ def compute_err(n, r):
 
         e_n.assign(e_n1)
 
-        # w_atP[i] = w_n1(Ppoint[0], Ppoint[1])
-        # v_atP[i] = ep_n1(Ppoint[0], Ppoint[1])
+        w_atP[i] = w_n1(Ppoint[0], Ppoint[1])
+        v_atP[i] = ep_n1(Ppoint[0], Ppoint[1])
 
         w_exact.t = t
         grad_wex.t = t
@@ -266,15 +267,15 @@ def compute_err(n, r):
 
         sig_err_L2[i] = np.sqrt(assemble(inner(eq_n1 - sigma_ex, eq_n1 - sigma_ex) * dx))
 
-    # plt.figure()
-    # # plt.plot(t_vec, w_atP, 'r-', label=r'approx $w$')
-    # # plt.plot(t_vec, f_0/(64*D)*(R**2-(Ppoint[0]**2+Ppoint[1]**2))**2*sin(beta*t_vec), 'b-', label=r'exact $w$')
-    # plt.plot(t_vec, v_atP, 'r-', label=r'approx $v$')
-    # plt.plot(t_vec, f_0*beta/(64*D)*(R**2-(Ppoint[0]**2+Ppoint[1]**2))**2*cos(beta*t_vec), 'b-', label=r'exact $v$')
-    # plt.xlabel(r'Time [s]')
-    # plt.title(r'Displacement at $(L_x/2, L_y/2)$')
-    # plt.legend()
-    # plt.show()
+    plt.figure()
+    # plt.plot(t_vec, w_atP, 'r-', label=r'approx $w$')
+    # plt.plot(t_vec, f_0/(64*D)*(R**2-(Ppoint[0]**2+Ppoint[1]**2))**2*np.sin(beta*t_vec), 'b-', label=r'exact $w$')
+    plt.plot(t_vec, v_atP, 'r-', label=r'approx $v$')
+    plt.plot(t_vec, f_0*beta/(64*D)*(R**2-(Ppoint[0]**2+Ppoint[1]**2))**2*np.cos(beta*t_vec), 'b-', label=r'exact $v$')
+    plt.xlabel(r'Time [s]')
+    plt.title(r'Displacement at ' +  str(Ppoint))
+    plt.legend()
+    plt.show()
 
     v_err_last = v_err_H1[-1]
     v_err_max = max(v_err_H1)
@@ -376,33 +377,33 @@ for i in range(n_h):
         sig_r3_max[i - 1] = np.log(sig_errInf_r3[i] / sig_errInf_r3[i - 1]) / np.log(h2_vec[i] / h2_vec[i - 1])
         sig_r3_L2[i - 1] = np.log(sig_errQuad_r3[i] / sig_errQuad_r3[i - 1]) / np.log(h2_vec[i] / h2_vec[i - 1])
 
-np.save("./convergence_results/" + bc_input + "_h1", h1_vec)
-np.save("./convergence_results/" + bc_input + "_h2", h1_vec)
-np.save("./convergence_results/" + bc_input + "_h3", h2_vec)
-
-np.save("./convergence_results/" + bc_input + "_v_errF_r1", v_err_r1)
-np.save("./convergence_results/" + bc_input + "_v_errInf_r1", v_errInf_r1)
-np.save("./convergence_results/" + bc_input + "_v_errQuad_r1", v_errQuad_r1)
-
-np.save("./convergence_results/" + bc_input + "_v_errF_r2", v_err_r2)
-np.save("./convergence_results/" + bc_input + "_v_errInf_r2", v_errInf_r2)
-np.save("./convergence_results/" + bc_input + "_v_errQuad_r2", v_errQuad_r2)
-
-np.save("./convergence_results/" + bc_input + "_v_errF_r3", v_err_r3)
-np.save("./convergence_results/" + bc_input + "_v_errInf_r3", v_errInf_r3)
-np.save("./convergence_results/" + bc_input + "_v_errQuad_r3", v_errQuad_r3)
-
-np.save("./convergence_results/" + bc_input + "_sig_errF_r1", sig_err_r1)
-np.save("./convergence_results/" + bc_input + "_sig_errInf_r1", sig_errInf_r1)
-np.save("./convergence_results/" + bc_input + "_sig_errQuad_r1", sig_errQuad_r1)
-
-np.save("./convergence_results/" + bc_input + "_sig_errF_r2", sig_err_r2)
-np.save("./convergence_results/" + bc_input + "_sig_errInf_r2", sig_errInf_r2)
-np.save("./convergence_results/" + bc_input + "_sig_errQuad_r2", sig_errQuad_r2)
-
-np.save("./convergence_results/" + bc_input + "_sig_errF_r3", sig_err_r3)
-np.save("./convergence_results/" + bc_input + "_sig_errInf_r3", sig_errInf_r3)
-np.save("./convergence_results/" + bc_input + "_sig_errQuad_r3", sig_errQuad_r3)
+# np.save("./convergence_results/" + bc_input + "_h1", h1_vec)
+# np.save("./convergence_results/" + bc_input + "_h2", h1_vec)
+# np.save("./convergence_results/" + bc_input + "_h3", h2_vec)
+#
+# np.save("./convergence_results/" + bc_input + "_v_errF_r1", v_err_r1)
+# np.save("./convergence_results/" + bc_input + "_v_errInf_r1", v_errInf_r1)
+# np.save("./convergence_results/" + bc_input + "_v_errQuad_r1", v_errQuad_r1)
+#
+# np.save("./convergence_results/" + bc_input + "_v_errF_r2", v_err_r2)
+# np.save("./convergence_results/" + bc_input + "_v_errInf_r2", v_errInf_r2)
+# np.save("./convergence_results/" + bc_input + "_v_errQuad_r2", v_errQuad_r2)
+#
+# np.save("./convergence_results/" + bc_input + "_v_errF_r3", v_err_r3)
+# np.save("./convergence_results/" + bc_input + "_v_errInf_r3", v_errInf_r3)
+# np.save("./convergence_results/" + bc_input + "_v_errQuad_r3", v_errQuad_r3)
+#
+# np.save("./convergence_results/" + bc_input + "_sig_errF_r1", sig_err_r1)
+# np.save("./convergence_results/" + bc_input + "_sig_errInf_r1", sig_errInf_r1)
+# np.save("./convergence_results/" + bc_input + "_sig_errQuad_r1", sig_errQuad_r1)
+#
+# np.save("./convergence_results/" + bc_input + "_sig_errF_r2", sig_err_r2)
+# np.save("./convergence_results/" + bc_input + "_sig_errInf_r2", sig_errInf_r2)
+# np.save("./convergence_results/" + bc_input + "_sig_errQuad_r2", sig_errQuad_r2)
+#
+# np.save("./convergence_results/" + bc_input + "_sig_errF_r3", sig_err_r3)
+# np.save("./convergence_results/" + bc_input + "_sig_errInf_r3", sig_errInf_r3)
+# np.save("./convergence_results/" + bc_input + "_sig_errQuad_r3", sig_errQuad_r3)
 
 v_r1int_atF = np.polyfit(np.log(h1_vec), np.log(v_err_r1), 1)[0]
 v_r1int_max = np.polyfit(np.log(h1_vec), np.log(v_errInf_r1), 1)[0]
@@ -462,7 +463,7 @@ plt.ylabel(r'log(Error Velocity)')
 plt.title(r'Velocity Error vs Mesh size')
 plt.legend()
 path_fig = "/home/a.brugnoli/Plots_Videos/Python/Plots/Kirchhoff_plots/Convergence/"
-plt.savefig(path_fig  + bc_input + "_vel.eps", format="eps")
+# plt.savefig(path_fig  + bc_input + "_vel.eps", format="eps")
 
 sig_r1int_atF = np.polyfit(np.log(h1_vec), np.log(sig_err_r1), 1)[0]
 sig_r1int_max = np.polyfit(np.log(h1_vec), np.log(sig_errInf_r1), 1)[0]
@@ -521,5 +522,5 @@ plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log(Error Stress)')
 plt.title(r'Stress Error vs Mesh size')
 plt.legend()
-plt.savefig(path_fig + bc_input + "_sigma.eps", format="eps")
+# plt.savefig(path_fig + bc_input + "_sigma.eps", format="eps")
 plt.show()
