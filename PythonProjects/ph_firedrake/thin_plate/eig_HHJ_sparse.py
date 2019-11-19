@@ -178,7 +178,7 @@ M_til = G_ortho.dot(MM.dot(G_ortho.transpose()))
 
 n_om = 40
 
-eigenvalues, eigvectors = sp_la.eigs(J_til, k=2*n_om, M=M_til, sigma=1e-6, which='LM', tol=1e-2)
+eigenvalues, eigvectors = sp_la.eigs(J_til, k=2*n_om, M=M_til, sigma=1e-9, which='LM', tol=1e-2)
 print(eigenvalues)
 omega_all = np.imag(eigenvalues)
 

@@ -58,7 +58,7 @@ def compute_err(n, r):
     # Finite element defition
 
     name_FEp = 'Bell'
-    name_FEq = 'DG'
+    name_FEq = 'Bell'
     deg_q = 3
 
     if name_FEp == 'Morley':
@@ -79,10 +79,6 @@ def compute_err(n, r):
     Vq = VectorFunctionSpace(mesh, name_FEq, deg_q, dim=3)
     V = Vp * Vq
 
-    # Vgradp = VectorFunctionSpace(mesh, 'CG', r)
-
-    n_Vp = V.sub(0).dim()
-    n_Vq = V.sub(1).dim()
     n_V = V.dim()
     print(n_V)
 
@@ -155,10 +151,23 @@ def compute_err(n, r):
         ind_col = np.where(set_cols == c)[0]
         G[r, ind_col] = G_lmb[r, c]
 
+    G_ortho = la.null_space(G.T).T
+    G_ortho = spa.csr_matrix(G_ortho)
+
+    dt = 0.1 * h_mesh
+    theta = 0.5
+
+    A_form = m_form - dt * theta * j_form
+    A = sp.sparse.csr_matrix(assemble(A_form, mat_type='aij').M.handle.getValuesCSR()[::-1])
+
+    B_form = m_form + dt * (1 - theta) * j_form
+    B = sp.sparse.csr_matrix(assemble(B_form, mat_type='aij').M.handle.getValuesCSR()[::-1])
+
+    A_til = G_ortho.dot(A.dot(G_ortho.transpose()))
+    B_til = G_ortho.dot(B.dot(G_ortho.transpose()))
 
     t = 0.
     t_ = Constant(t)
-    t_1 = Constant(t)
     t_fin = 1        # total simulation time
     x = mesh.coordinates
 
@@ -180,32 +189,23 @@ def compute_err(n, r):
 
     force_xy = sin(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*(D *((pi/Lx)**2 + (pi/Ly)**2)**2 - rho*h*beta**2)
 
-    f_form = v_p*force_xy*dx
-
-    # J = assemble(j_form)
-    # M = assemble(m_form)
-
-    # Apply boundary conditions to M, J
-    # [bc.apply(J) for bc in bcs]
-    # [bc.apply(M) for bc in bcs]
-
-    dt = 0.1*h_mesh
-    theta = 0.5
-
-    lhs = m_form - dt*theta*j_form
+    f_xy = assemble(v_p*force_xy*dx).vector().get_local()
+    fxy_til = G_ortho.dot(f_xy)
 
     e_n1 = Function(V, name="e next")
     e_n = Function(V,  name="e old")
     w_n1 = Function(Vp, name="w old")
     w_n = Function(Vp, name="w next")
 
-    e_n.sub(0).assign(interpolate(v_exact, Vp))
+    e_n.sub(0).assign(project(v_exact, Vp))
 
     ep_n, eq_vec_n = e_n.split()
     eq_n = as_tensor([[eq_vec_n[0], eq_vec_n[1]],
-                     [eq_vec_n[1], eq_vec_n[2]]])
+                      [eq_vec_n[1], eq_vec_n[2]]])
 
     w_n.assign(Constant(0.0))
+
+    en_til = sp_la.lsqr(G_ortho.transpose(), e_n.vector().get_local())[0]
 
     n_t = int(floor(t_fin/dt) + 1)
 
@@ -213,10 +213,10 @@ def compute_err(n, r):
     v_err_H1 = np.zeros((n_t,))
     sig_err_L2 = np.zeros((n_t,))
 
-    w_atP = np.zeros((n_t,))
-    v_atP = np.zeros((n_t,))
-    Ppoint = (Lx/14, Ly/3)
-    v_atP[0] = ep_n.at(Ppoint)
+    # Ppoint = (Lx/14, Ly/3)
+    # w_atP = np.zeros((n_t,))
+    # v_atP = np.zeros((n_t,))
+    # v_atP[0] = ep_n.at(Ppoint)
 
     # w_err_H1[0] = np.sqrt(assemble(dot(w_n-w_exact, w_n-w_exact) *dx
     #                      + dot(grad(w_n) - grad_wex, grad(w_n) - grad_wex) * dx))
@@ -227,47 +227,33 @@ def compute_err(n, r):
 
     t_vec = np.linspace(0, t_fin, num=n_t)
 
-    A = assemble(lhs, bcs=bcs, mat_type='aij')
-
-    # param = {'ksp_converged_reason': None,
-    #                      'ksp_monitor_true_residual': None,
-    #                      'ksp_view': None}
-
     param = {"ksp_type": "preonly", "pc_type": "lu"}
 
     # print(e_n.vector().get_local())
     for i in range(1, n_t):
 
-        t_.assign(t)
-        t_1.assign(t+dt)
-
-        ep_n, eq_n = e_n.split()
-        alp_n = rho * h * ep_n
-        alq_n = bending_curv(eq_n)
-
-        rhs = inner(v_p, alp_n) * dx + inner(v_q, alq_n) * dx \
-              + dt * (1 - theta) * j_operator(v_p, v_q, ep_n, eq_n) \
-              + dt * ((1 - theta) * f_form + theta * f_form1)
-
-        b = assemble(rhs, bcs=bcs)
+        # t_.assign(t)
+        b_til = B_til.dot(en_til) + dt*fxy_til*((1-theta)*np.sin(t) + theta*np.sin(t+dt))
 
         t += dt
-        solve(A, e_n1, b, solver_parameters=param)
+        en1_til = sp_la.spsolve(A_til, b_til)
+
+        e_n1.vector().set_local((G_ortho.transpose()).dot(en1_til))
         ep_n1, eq_vec_n1 = e_n1.split()
 
         eq_n1 = as_tensor([[eq_vec_n1[0], eq_vec_n1[1]],
                           [eq_vec_n1[1], eq_vec_n1[2]]])
 
         w_n1.assign(w_n + dt/2*(ep_n + ep_n1))
-
-        e_n.assign(e_n1)
         w_n.assign(w_n1)
 
-        w_atP[i] = w_n1.at(Ppoint)
-        v_atP[i] = ep_n1.at(Ppoint)
-        t_.assign(t)
+        e_n.assign(e_n1)
 
-        ep_n, eq_n = e_n.split()
+        en_til = en1_til
+
+        # w_atP[i] = w_n1.at(Ppoint)
+        # v_atP[i] = ep_n1.at(Ppoint)
+        t_.assign(t)
 
         # w_err_H1[i] = np.sqrt(assemble(dot(w_n1-w_exact, w_n1-w_exact) * dx
         #                      + dot(grad(w_n1)-grad_wex, grad(w_n1)-grad_wex) * dx))
@@ -276,14 +262,14 @@ def compute_err(n, r):
 
         sig_err_L2[i] = np.sqrt(assemble(inner(eq_n1 - sigma_ex, eq_n1 - sigma_ex) * dx))
 
-    plt.figure()
-    plt.plot(t_vec, w_atP, 'r-', label=r'approx $w$')
-    plt.plot(t_vec, np.sin(pi*Ppoint[0]/Lx)*np.sin(pi*Ppoint[1]/Ly)*np.sin(beta*t_vec), 'b-', label=r'exact $w$')
+    # plt.figure()
+    # # plt.plot(t_vec, w_atP, 'r-', label=r'approx $w$')
+    # # plt.plot(t_vec, np.sin(pi*Ppoint[0]/Lx)*np.sin(pi*Ppoint[1]/Ly)*np.sin(beta*t_vec), 'b-', label=r'exact $w$')
     # plt.plot(t_vec, v_atP, 'r-', label=r'approx $v$')
     # plt.plot(t_vec, beta * np.sin(pi*Ppoint[0]/Lx)*np.sin(pi*Ppoint[1]/Ly) * np.cos(beta * t_vec), 'b-', label=r'exact $v$')
-    plt.xlabel(r'Time [s]')
-    plt.title(r'Displacement at' + str(Ppoint))
-    plt.legend()
+    # plt.xlabel(r'Time [s]')
+    # plt.title(r'Displacement at' + str(Ppoint))
+    # plt.legend()
     # plt.show()
 
     # v_err_last = w_err_H1[-1]
@@ -301,7 +287,7 @@ def compute_err(n, r):
     return v_err_last, v_err_max, v_err_quad, sig_err_last, sig_err_max, sig_err_quad
 
 
-n_h = 2
+n_h = 5
 n1_vec = np.array([2**(i) for i in range(n_h)])
 n2_vec = np.array([2**(i) for i in range(n_h)])
 h1_vec = 1./n1_vec
