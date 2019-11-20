@@ -131,6 +131,12 @@ class SysPhdae:
         assert isinstance(sys2, SysPhdae)
         assert C.shape == (len(ind1), len(ind2))
 
+        if len(self.B.shape) == 1:
+            self.B = self.B.reshape((-1, 1))
+
+        if len(sys2.B.shape) == 1:
+            sys2.B = sys2.B.reshape((-1, 1))
+
         J_int = la.block_diag(self.J, sys2.J)
         R_int = la.block_diag(self.R, sys2.R)
         Q_int = la.block_diag(self.Q, sys2.Q)
@@ -157,6 +163,8 @@ class SysPhdae:
 
         G_lmb = np.concatenate((-B1int @ C.T, B2int))
 
+        np_int = self.n_p + sys2.n_p
+        nq_int = self.n_q + sys2.n_q
         n_int = self.n + sys2.n
         n_aug = n_int + nlmb_int
 
@@ -174,7 +182,7 @@ class SysPhdae:
 
         ntot_lmb = self.n_lmb + sys2.n_lmb + m2int
 
-        sys_int = SysPhdae(n_aug, ntot_lmb, E=E_aug, J=J_aug, Q=Q_aug, R=R_aug, B=B_aug)
+        sys_int = SysPhdae(n_aug, ntot_lmb, n_p=np_int, n_q=nq_int, E=E_aug, J=J_aug, Q=Q_aug, R=R_aug, B=B_aug)
 
         return sys_int
 
@@ -259,7 +267,7 @@ class SysPhdaeRig(SysPhdae):
     Variables for the rigid motion and constraints might not be present
     """
 
-    def __init__(self, n, n_lmb, n_r, n_p, n_q, E, J, B, R=None, Q=None):
+    def __init__(self, n, n_lmb, n_r, n_p, n_q, E, B, J=None, R=None, Q=None):
 
         assert n_r >= 0 and isinstance(n_r, int)
         assert n_lmb >= 0 and isinstance(n_lmb, int)
@@ -267,6 +275,8 @@ class SysPhdaeRig(SysPhdae):
         assert n_q >= 0 and isinstance(n_q, int)
         assert n_r + n_p + n_q + n_lmb == n
 
+        if J is None:
+            J = np.zeros((n, n))
         if R is None:
             R = np.zeros((n, n))
         if Q is None:

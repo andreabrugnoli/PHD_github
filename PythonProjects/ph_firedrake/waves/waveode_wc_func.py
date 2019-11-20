@@ -278,6 +278,8 @@ def computeH_ode(ind):
     t_diss = 0.2 * t_final
     tau_imp = t_final / 100
 
+    RR = Z * B_D @ B_D.T
+
     invMM = la.inv(MM)
 
     def ode_closed_phs(t, y, yd):
@@ -286,7 +288,7 @@ def computeH_ode(ind):
 
         ft_imp = (t > t_diss)  # * (1 - np.exp((t - t_diss)/tau_imp))
         ft_ctrl = 1  # (t<t_diss)
-        res = yd - invMM @ ((JJ - Z * B_D @ B_D.T * ft_imp) @ y + B_N * ft_ctrl)
+        res = yd - invMM @ ((JJ - RR * ft_imp) @ y + B_N * ft_ctrl)
 
         return res
 

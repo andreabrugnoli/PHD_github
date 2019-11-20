@@ -10,7 +10,7 @@ from scipy import integrate
 import matplotlib.pyplot as plt
 import matplotlib
 from matplotlib.ticker import FormatStrFormatter
-from AnimateSurfFiredrake import animate2D
+from tools_plotting.animate_surf import animate2D
 import matplotlib.animation as animation
 
 
