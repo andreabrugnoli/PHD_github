@@ -58,7 +58,7 @@ def compute_err(n, r):
     # Finite element defition
 
     name_FEp = 'Bell'
-    name_FEq = 'Bell'
+    name_FEq = 'Hermite'
     deg_q = 3
 
     if name_FEp == 'Morley':
@@ -287,10 +287,11 @@ def compute_err(n, r):
     return v_err_last, v_err_max, v_err_quad, sig_err_last, sig_err_max, sig_err_quad
 
 
-n_h = 5
-n1_vec = np.array([2**(i) for i in range(n_h)])
-n2_vec = np.array([2**(i) for i in range(n_h)])
+n_h = 4
+n1_vec = np.array([2**(i+1) for i in range(n_h)])
 h1_vec = 1./n1_vec
+
+n2_vec = np.array([2**(i) for i in range(n_h)])
 h2_vec = 1./n2_vec
 
 v_err_r1 = np.zeros((n_h,))

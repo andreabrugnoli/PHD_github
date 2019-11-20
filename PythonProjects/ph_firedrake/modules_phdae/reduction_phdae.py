@@ -61,6 +61,7 @@ def krylov(E, A, B, s0, L, tol):
     m = B.shape[1]
     W = np.zeros((n, m * L))
     r = np.linalg.solve((s0 * E - A), B)
+
     r = ortho(r, np.zeros((0, 0)), E, tol)
     W[:, :m] = r
 

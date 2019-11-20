@@ -6,11 +6,13 @@ import warnings
 
 
 class SysPhode:
-    def __init__(self, n, J=None, R=None, Q=None, B=None):
+    def __init__(self, n, n_p, n_q, J=None, M=None, R=None, Q=None, B=None):
         """General phdae class. Only the size of the system is needed"""
         assert n > 0 and isinstance(n, int)
 
         self.n = n
+        self.n_p = n_p
+        self.n_q = n_q
         matr_shape = (n, n)
 
         if J is not None:
@@ -19,6 +21,16 @@ class SysPhode:
             self.J = J
         else:
             self.J = np.zeros(matr_shape)
+
+        if M is not None:
+            assert M.shape == matr_shape
+            if not check_symmetry(M):
+                warnings.warn("M matrix is not symmetric according to tol. Mass matrix ill condiitioned")
+
+            assert check_positive_matrix(M)
+            self.M = M
+        else:
+            self.M = np.eye(n)
 
         if Q is not None:
             assert Q.shape == matr_shape
@@ -48,14 +60,15 @@ class SysPhode:
         except IndexError:
             self.m = 1
 
-
 class SysPhdae:
-    def __init__(self, n, n_lmb, E=None, J=None, R=None, Q=None, B=None):
+    def __init__(self, n, n_lmb, n_p, n_q, E=None, J=None, R=None, Q=None, B=None):
         """General phdae class. Only the size of the system is needed"""
         assert n > 0 and isinstance(n, int)
         assert n_lmb >= 0 and isinstance(n_lmb, int)
 
         self.n = n
+        self.n_p = n_p
+        self.n_q = n_q
         self.n_lmb = n_lmb
         self.n_x = n - n_lmb
         matr_shape = (n, n)
@@ -298,7 +311,7 @@ class SysPhdaeRig(SysPhdae):
 
         self.B_lmb = B[n_e:]
 
-        SysPhdae.__init__(self, n, n_lmb, E=E, J=J, B=B, R=R, Q=Q)
+        SysPhdae.__init__(self, n, n_lmb, n_p, n_q, E=E, J=J, B=B, R=R, Q=Q)
 
     def transformer_ordered(self, sys2, ind1, ind2, C):
 
@@ -421,8 +434,17 @@ class SysPhdaeRig(SysPhdae):
         T_ode2dae = T.T @ np.concatenate((np.eye(n_ode), np.zeros((self.n_lmb, n_ode)))) @ Q_ode
         return sysOde, T_ode2dae
 
-    def dae_to_odeCE(self):
+    def dae_to_odeCE(self, mass=False):
+
         G = self.G_e
+        Gp = G[:self.n_p, :]
+        np_lmb = len(np.where(Gp.any(axis=0))[0])
+
+        Gq = G[self.n_p:, :]
+        nq_lmb = len(np.where(Gq.any(axis=0))[0])
+
+        assert self.n_lmb == np_lmb + nq_lmb
+
         GannL = la.null_space(G.T).T
 
         T = GannL
@@ -433,10 +455,15 @@ class SysPhdaeRig(SysPhdae):
         B_ode = T @ self.B_e
 
         n_ode = self.n_e - self.n_lmb
+        np_ode = self.n_p - np_lmb
+        nq_ode = self.n_q - nq_lmb
 
-        Q_ode = la.inv(M_ode)
+        if not mass:
+            Q_ode = la.inv(M_ode)
+            sysOde = SysPhode(n_ode, np_ode, nq_ode, J=J_ode, R=R_ode, Q=Q_ode, B=B_ode)
 
-        sysOde = SysPhode(n_ode, J=J_ode, R=R_ode, Q=Q_ode, B=B_ode)
+        if mass:
+            sysOde = SysPhdaeRig(n_ode, 0, self.n_r, np_ode, nq_ode, J=J_ode, R=R_ode, E=M_ode, B=B_ode)
 
         T_ode2dae = T.T
         return sysOde, T_ode2dae, M_ode
