@@ -8,7 +8,7 @@ np.set_printoptions(threshold=np.inf)
 import sys
 sys.path.append('/home/a.brugnoli/GitProjects/PythonProjects/modules_pHDAE')
 
-from modules_phdae.reduction_phdae import proj_matrices
+from modules_ph.reduction_phdae import proj_matrices
 
 import scipy.linalg as la
 import matplotlib.pyplot as plt

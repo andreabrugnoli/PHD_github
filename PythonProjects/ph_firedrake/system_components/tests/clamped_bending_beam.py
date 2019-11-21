@@ -1,6 +1,6 @@
 # EB beam written with the port Hamiltonian approach
 import numpy as np
-from modules_phdae.classes_phsystem import SysPhdaeRig
+from modules_ph.classes_phsystem import SysPhdaeRig
 from system_components.beams import FloatingPlanarEB
 from scipy.io import savemat
 from multibody_phs.manipulator.manipulator_constants import n_el, rho1, EI1, L1, n_rig, J_joint1, m_joint1

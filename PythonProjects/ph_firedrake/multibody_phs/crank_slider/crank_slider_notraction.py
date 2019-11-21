@@ -7,7 +7,7 @@ import scipy.linalg as la
 from scipy.integrate import solve_ivp
 from scipy.interpolate import interp1d
 
-from modules_phdae.classes_phsystem import SysPhdaeRig
+from modules_ph.classes_phsystem import SysPhdaeRig
 from system_components.beams import FloatingPlanarEB, draw_bending
 from math import pi
 

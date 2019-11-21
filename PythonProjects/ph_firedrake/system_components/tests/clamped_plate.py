@@ -5,7 +5,7 @@ from math import pi
 import numpy as np
 import scipy.linalg as la
 from scipy.io import savemat
-from modules_phdae.classes_phsystem import SysPhdaeRig, check_positive_matrix
+from modules_ph.classes_phsystem import SysPhdaeRig, check_positive_matrix
 
 
 pointP = np.array([0.1, 0])

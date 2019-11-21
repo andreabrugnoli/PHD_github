@@ -7,7 +7,7 @@ np.set_printoptions(threshold=np.inf)
 from math import floor, sqrt, pi
 import matplotlib.pyplot as plt
 from firedrake.plot import _two_dimension_triangle_func_val
-from modules_phdae.classes_phsystem import SysPhdaeRig
+from modules_ph.classes_phsystem import SysPhdaeRig
 import scipy.linalg as la
 import matplotlib
 from matplotlib import pyplot as plt

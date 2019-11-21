@@ -9,7 +9,7 @@ from scipy.interpolate import interp1d
 import scipy.linalg as la
 from scipy.sparse.linalg import lsqr
 
-from modules_phdae.classes_phsystem import SysPhdaeRig
+from modules_ph.classes_phsystem import SysPhdaeRig
 from system_components.beams import SpatialBeamNoZ, draw_bending, matrices_j3d
 from math import pi
 

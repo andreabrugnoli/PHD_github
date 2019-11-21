@@ -8,7 +8,7 @@ from math import pi, floor
 import scipy.linalg as la
 
 from ufl import algebra as ufl_alg
-from modules_phdae.classes_phsystem import SysPhdaeRig
+from modules_ph.classes_phsystem import SysPhdaeRig
 
 import matplotlib
 from matplotlib import pyplot as plt
@@ -25,8 +25,11 @@ from scipy.io import savemat
 Lx = 0.04
 Ly = 0.3
 
-r_EL = 0.01 * np.array([0, 1.44, 0.81])  # m
-r_PA = 0.01 * np.array([0, 0, 1.35])  # m
+r_EL = 0.01 * np.array([0, 0, 0.81])  # m
+r_PA = 0.01 * np.array([0, 0, 3.08])  # m
+
+# r_EL = 0.01 * np.array([0, 1.44, 0.81])  # m
+# r_PA = 0.01 * np.array([0, 0, 1.35])  # m
 
 x_P1 = 0.01  # m
 y_P1 = 0.25  # m
@@ -48,24 +51,27 @@ def mirror_model():
 
     n_mirror = 3
 
-    m_mirror = 24.3 * 1e-3  # kg
+    m_mirror = 23.4 * 1e-3  # kg
     Jx_mirror = 8 * 1e-6  # kg/m^2
     Jy_mirror = 58 * 1e-6  # kg/m^2
 
-    s_x = - 0.3 *1e-3 # kg/m^3
+    # m_mirror = 24.3 * 1e-3  # kg
+    # Jx_mirror = 1.96 * 1e-6  # kg/m^2
+    # Jy_mirror = 56.266 * 1e-6  # kg/m^2
 
     M_mirror = np.diag([m_mirror, Jx_mirror, Jy_mirror])
+
+    s_x = - 0.338 * 1e-3  # kg/m^3
+    M_mirror[0, 1] = s_x
+    M_mirror[1, 0] = s_x
+
     J_mirror = np.zeros((n_mirror, n_mirror))
 
-    # B_mirror = np.array([[1,        0, 0],
-    #                      [-r_EL[1], 1, 0],
-    #                      [+r_EL[0], 0, 1]])
+    B_mirror = np.array([[1,        0, 0],
+                         [-r_EL[1], 1, 0],
+                         [+r_EL[0], 0, 1]])
 
-    B_mirror = np.array([[1, 0, 0],
-                         [0, 1, 0],
-                         [0, 0, 1]])
-
-    mirror = SysPhdaeRig(n_mirror, 0, 0, n_mirror, 0, E=M_mirror, J=J_mirror, B=B_mirror[:, 0])
+    mirror = SysPhdaeRig(n_mirror, 0, 0, n_mirror, 0, E=M_mirror, J=J_mirror, B=B_mirror)
 
     return mirror
 
@@ -73,18 +79,24 @@ def mirror_model():
 def actuator_model():
 
     n_actuator = 5
-    m_actuator = 4
+    mB_actuator = 4
 
-    m_mov = 23.6 * 1e-3  # kg
-    m_case = 96.5 * 1e-3  # kg
+    m_mov = 23.5 * 1e-3  # kg
+    m_case = 182.7 * 1e-3  # kg
 
-    Jx_case = 114.04 * 1e-6  # kg/m^2
-    Jy_case = 114.04 * 1e-6  # kg/m^2
+    Jx_case = 0.3 * 1e-3  # kg/m^2
+    Jy_case = 0.3 * 1e-3  # kg/m^2
 
-    a = 1.5  # N/V
+    # m_mov = 23.6 * 1e-3  # kg
+    # m_case = 96.5 * 1e-3  # kg
+    #
+    # Jx_case = 114.04 * 1e-6  # kg/m^2
+    # Jy_case = 114.04 * 1e-6  # kg/m^2
 
-    k_mov = 26  # N/m
-    c_mov = 0 # 10  # Ns/s
+    a = 30  # N/V
+
+    k_mov = 26  * (2*pi)**2  # N/m
+    c_mov = 10  # Ns/s
 
     M_actuator = np.diag([k_mov, m_mov, m_case, Jx_case, Jy_case])
 
@@ -96,46 +108,19 @@ def actuator_model():
     R_actuator[1:3, 1:3] = np.array([[c_mov, -c_mov],
                                      [-c_mov, c_mov]])
 
-    B_actuator = np.zeros((n_actuator, 3))
+    B_actuator = np.zeros((n_actuator, mB_actuator))
 
     tau_PA = np.array([[1,        0, 0],
                        [-r_PA[1], 1, 0],
                        [+r_PA[0], 0, 1]])
 
-    B_actuator[2:] = tau_PA
+    B_actuator[2:, :3] = tau_PA
+    B_actuator[[1, 2], 3] = np.array([-a, a])
 
-    # n_actuator = 3
-    # m_actuator = 3
-    #
-    # m_mov = 23.5 * 1e-3  # kg
-    # m_case = 96.5 * 1e-3  # kg
-    #
-    # Jx_case = 114.04 * 1e-6  # kg/m^2
-    # Jy_case = 114.04 * 1e-6  # kg/m^2
-    #
-    # k_mov = 26  # N/m
-    # c_mov = 0  # 10  # Ns/s
-    #
-    # M_actuator = np.diag([m_case, Jx_case, Jy_case])
-    #
-    # J_actuator = np.zeros((n_actuator, n_actuator))
-    # # J_actuator[0, 1:3] = np.array([k_mov, -k_mov])
-    # # J_actuator[1:3, 0] = np.array([-k_mov, k_mov])
-    #
-    # R_actuator = np.zeros((n_actuator, n_actuator))
-    # # R_actuator[1:3, 1:3] = np.array([[c_mov, -c_mov],
-    # #                                  [-c_mov, c_mov]])
-    #
-    # B_actuator = np.zeros((n_actuator, 3))
-    #
-    # tau_PA = np.array([[1, 0, 0],
-    #                    [-r_PA[1], 1, 0],
-    #                    [+r_PA[0], 0, 1]])
-    #
-    # B_actuator = tau_PA
+    # print(B_actuator)
 
     actuator = SysPhdaeRig(n_actuator, 0, 0, n_actuator, 0,\
-                           E=M_actuator, J=J_actuator, R=R_actuator, B=B_actuator[:, 0])
+                           E=M_actuator, J=J_actuator, R=R_actuator, B=B_actuator)
 
     return actuator
 
@@ -169,7 +154,7 @@ def plate_model(nx, ny, r):
     def delta_app(P0):
         x_0, y_0 = P0
 
-        n_h = 2
+        n_h = 1
 
         tol_x = hx_mesh/n_h
         tol_y = hy_mesh/n_h
@@ -177,6 +162,9 @@ def plate_model(nx, ny, r):
         set_x = conditional(le(ufl_alg.Abs(x-x_0), tol_x), 1, 0)
         set_y = conditional(le(ufl_alg.Abs(y-y_0), tol_y), 1, 0)
         area = 4*tol_x*tol_y
+
+        # if y_0 == y_E:
+        #     area = area/2
 
         delta = set_x*set_y/area
         # delta = 1./(eps*2*pi)*exp(-0.5*((x - x_0)**2 + (y - y_0)**2)/eps**2)
@@ -307,6 +295,10 @@ def plate_model(nx, ny, r):
     Mx_E = assemble(mx_E).vector().get_local().reshape((-1, 1))
     My_E = assemble(my_E).vector().get_local().reshape((-1, 1))
 
+    # print('sum Fz_P1: ' + str(sum(Fz_P1[:, 0])))
+    # print('sum Fz_P2: ' + str(sum(Fz_P2[:, 0])))
+    # print('sum Fz_E: ' + str(sum(Fz_E[:, 0])))
+
     # tab_coord = mesh.coordinates.dat.data
     # x_cor = tab_coord[:, 0]
     # y_cor = tab_coord[:, 1]
@@ -357,30 +349,33 @@ def plate_model(nx, ny, r):
     return plate, Vp
 
 
-plate, Vp = plate_model(4, 60, 1)
+plate, Vp = plate_model(8, 30, 1)
 np_plate = Vp.dim()
 
 print(plate.n)
 mirror = mirror_model()
-actuator1 = actuator_model()
-actuator2 = actuator_model()
+actuator = actuator_model()
 
 np_mir = mirror.n_p
-np_act2 = actuator2.n_p
-np_act1 = actuator1.n_p
-
-print(np_mir, np_act1, np_act2)
+np_act = actuator.n_p
 
 pl_mir = SysPhdaeRig.transformer_ordered(plate, mirror, [6, 7, 8], [0, 1, 2], np.eye(3))
-plmir_act2 = SysPhdaeRig.transformer_ordered(pl_mir, actuator2, [3, 4, 5], [0, 1, 2], np.eye(3))
-model_all = SysPhdaeRig.transformer_ordered(plmir_act2, actuator1, [0, 1, 2], [0, 1, 2], np.eye(3))
-
-# pl_mir = SysPhdaeRig.transformer_ordered(plate, mirror, [2], [0], np.eye(1))
-# plmir_act2 = SysPhdaeRig.transformer_ordered(pl_mir, actuator2, [1], [0], np.eye(1))
-# model_all = SysPhdaeRig.transformer_ordered(plmir_act2, actuator1, [0], [0], np.eye(1))
+plmir_act2 = SysPhdaeRig.transformer_ordered(pl_mir, actuator, [3, 4, 5], [0, 1, 2], np.eye(3))
+model_all = SysPhdaeRig.transformer_ordered(plmir_act2, actuator, [0, 1, 2], [0, 1, 2], np.eye(3))
 
 J_sys = model_all.J
 M_sys = model_all.E
+R_sys = model_all.R
+
+# print(model_all.B[np_plate:model_all.n_p])
+
+# J_act = J_sys[np_plate+np_mir:np_plate+np_mir+np_act, np_plate+np_mir:np_plate+np_mir+np_act]
+# R_act = R_sys[np_plate+np_mir:np_plate+np_mir+np_act, np_plate+np_mir:np_plate+np_mir+np_act]
+# M_act = M_sys[np_plate+np_mir:np_plate+np_mir+np_act, np_plate+np_mir:np_plate+np_mir+np_act]
+#
+# eigenvalues, eigvectors = la.eig(J_act-R_act, M_act)
+# print(eigenvalues/(2*3.14))
+
 eigenvalues, eigvectors = la.eig(J_sys, M_sys)
 omega_all = np.imag(eigenvalues)
 
@@ -397,10 +392,73 @@ omega.sort()
 n_om = 6
 
 for i in range(n_om):
-    print(omega[i]/(2*pi))
+    print('Omega full lambda ' + str(i+1) + ': ' + str(omega[i]/(2*pi)))
 
 
-plot_eig = True
+model_ode, T = model_all.dae_to_odeCE(mass=True)[:2]
+
+print(model_ode.n)
+
+
+M_full = model_ode.E
+J_full = model_ode.J
+B_full = model_ode.B
+
+eigenvalues, eigvectors = la.eig(J_full, M_full)
+omega_all = np.imag(eigenvalues)
+
+tol = 10 ** (-9)
+index = omega_all >= tol
+
+omega = omega_all[index]
+eigvec_omega = eigvectors[:, index]
+perm = np.argsort(omega)
+eigvec_omega = eigvec_omega[:, perm]
+
+omega.sort()
+
+n_om = 6
+
+for i in range(n_om):
+    print('Omega full ' + str(i+1) + ': ' + str(omega[i]/(2*pi)))
+
+model_red, V_f = model_ode.reduce_system(1, 20)
+print(model_red.n)
+
+M_red = model_red.E
+J_red = model_red.J
+B_red = model_red.B
+
+eigenvalues, eigvectors = la.eig(J_red, M_red)
+omega_all = np.imag(eigenvalues)
+
+tol = 10 ** (-9)
+index = omega_all >= tol
+
+omega = omega_all[index]
+eigvec_omega = eigvectors[:, index]
+perm = np.argsort(omega)
+eigvec_omega = eigvec_omega[:, perm]
+
+omega.sort()
+
+n_om = 6
+
+for i in range(n_om):
+    print('Omega red ' + str(i + 1) + ': ' + str(omega[i] / (2 * pi)))
+
+# pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/ReductionPHDAE/KP_Experiment/'
+# # M_file = 'M'; Q_file = 'Q'; J_file = 'J'; B_file = 'B'
+# # savemat(pathout + M_file, mdict={M_file: M_full})
+# # savemat(pathout + J_file, mdict={J_file: J_full})
+# # savemat(pathout + B_file, mdict={B_file: B_full})
+#
+# Mr_file = 'Mr'; Qr_file = 'Qr'; Jr_file = 'Jr'; Br_file = 'Br'
+# savemat(pathout + Mr_file, mdict={Mr_file: M_red})
+# savemat(pathout + Jr_file, mdict={Jr_file: J_red})
+# savemat(pathout + Br_file, mdict={Br_file: B_red})
+
+plot_eig = False
 
 if plot_eig:
 
@@ -447,7 +505,7 @@ if plot_eig:
 
         r_L = r_E + r_EL
         x_L, y_L, z_L = r_L
-        z_L=0
+        # z_L=0
 
         ind_v_mir = np_plate
 
@@ -467,7 +525,7 @@ if plot_eig:
                 linewidth=linewidth, linestyle='--', label='Mirror', color='blue')
 
         x_A2, y_A2, z_A2 = r_A2
-        z_A2 = 0
+        # z_A2 = 0
         ind_v_act2 = np_plate + np_mir + 2
 
         eig_real_act2 = np.real(eigvec_omega[ind_v_act2, i])
@@ -486,8 +544,8 @@ if plot_eig:
                 linewidth=linewidth, linestyle='--', label='Act 2', color='black')
 
         x_A1, y_A1, z_A1 = r_A1
-        z_A1 = 0
-        ind_v_act1 = np_plate + np_mir + np_act2 + 2
+        # z_A1 = 0
+        ind_v_act1 = np_plate + np_mir + np_act + 2
 
 
         eig_real_act1 = np.real(eigvec_omega[ind_v_act1, i])
@@ -525,7 +583,7 @@ if plot_eig:
                 linewidth=linewidth, linestyle='-.', label='Mov 2', color='red')
 
         z_mov1 = z_A1 + off_mov
-        ind_v_mov1 = np_plate + np_mir + np_act2 + 1
+        ind_v_mov1 = np_plate + np_mir + np_act + 1
 
         eig_real_mov1 = np.real(eigvec_omega[ind_v_mov1, i])
         eig_imag_mov1 = np.imag(eigvec_omega[ind_v_mov1, i])
@@ -542,11 +600,11 @@ if plot_eig:
         ax.plot([x_A1, x_A1], [y_A1, y_A1], [z_mov1, z_mov1 + eig_mov1], \
                 linewidth=linewidth, linestyle='-.', label='Mov 1', color='red')
 
-        print('Eig mir: ' + str(eig_mir))
-        print('Eig act2: ' + str(eig_act2))
-        print('Eig act1: ' + str(eig_act1))
-        print('Eig mov2: ' + str(eig_mov2))
-        print('Eig mov1: ' + str(eig_mov1))
+        # print('Eig mir: ' + str(eig_mir))
+        # print('Eig act2: ' + str(eig_act2))
+        # print('Eig act1: ' + str(eig_act1))
+        # print('Eig mov2: ' + str(eig_mov2))
+        # print('Eig mov1: ' + str(eig_mov1))
 
         # ind_diffz2 = np_plate + np_mir
         #
@@ -592,33 +650,4 @@ if plot_eig:
         plt.legend()
 
 plt.show()
-
-# plate_ode, T = plate.dae_to_odeCE(mass=True)[:2]
-#
-# print(plate_ode.n)
-#
-# plate_red, V_f = plate_ode.reduce_system(1e-6, 3)
-#
-# print(plate_red.n)
-#
-# M_full = plate_ode.E
-# J_full = plate_ode.J
-# B_full = plate_ode.B
-#
-# M_red = plate_red.E
-# J_red = plate_red.J
-# B_red = plate_red.B
-#
-# pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/ReductionPHDAE/KP_Experiment/'
-# M_file = 'M'; Q_file = 'Q'; J_file = 'J'; B_file = 'B'
-# savemat(pathout + M_file, mdict={M_file: M_full})
-# savemat(pathout + J_file, mdict={J_file: J_full})
-# savemat(pathout + B_file, mdict={B_file: B_full})
-#
-# Mr_file = 'Mr'; Qr_file = 'Qr'; Jr_file = 'Jr'; Br_file = 'Br'
-# savemat(pathout + Mr_file, mdict={Mr_file: M_red})
-# savemat(pathout + Jr_file, mdict={Jr_file: J_red})
-# savemat(pathout + Br_file, mdict={Br_file: B_red})
-
-
 

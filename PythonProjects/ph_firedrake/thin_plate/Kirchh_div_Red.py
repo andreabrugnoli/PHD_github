@@ -12,7 +12,7 @@ from matplotlib import cm
 from firedrake.plot import _two_dimension_triangle_func_val
 from mpl_toolkits.mplot3d import Axes3D
 from math import pi
-from modules_phdae.classes_phsystem import SysPhdaeRig
+from modules_ph.classes_phsystem import SysPhdaeRig
 
 E = 2e11
 nu = 0.3

@@ -7,7 +7,7 @@ plt.rc('text', usetex=True)
 fntsize = 15
 from mpl_toolkits.mplot3d import Axes3D
 from math import pi
-from modules_phdae.classes_phsystem import check_skew_symmetry
+from modules_ph.classes_phsystem import check_skew_symmetry
 from scipy.optimize import fsolve
 
 

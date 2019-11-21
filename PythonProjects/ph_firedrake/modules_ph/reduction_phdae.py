@@ -4,7 +4,7 @@ from scipy.linalg import null_space
 import pygsvd
 
 
-def proj_matrices(E, A, B, s0, L, n1, n2, oper="grad", tol=1e-14):
+def proj_matrices_phdae(E, A, B, s0, L, n1, n2, oper="grad", tol=1e-14):
     """Reduction of pHDAE based on the article
     On structure preserving model reduction for damped wave propagation in transport network
     Matrices are supposed to have the structure
@@ -45,7 +45,7 @@ def proj_matrices(E, A, B, s0, L, n1, n2, oper="grad", tol=1e-14):
         N = A[n2:, n1:n2]
         x_L = r[n1:n2, :]
 
-
+    print(N.shape)
     if s0 == 0.0:
         V1, V2 = modifyAt0(W1, W2, M1, M2, G, N, x_L, oper, tol)
     else:

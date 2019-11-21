@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from matplotlib import cm
 from firedrake.plot import _two_dimension_triangle_func_val
-from modules_phdae.classes_phsystem import SysPhdaeRig
+from modules_ph.classes_phsystem import SysPhdaeRig
 from mpl_toolkits.mplot3d import Axes3D
 plt.rc('text', usetex=True)
 

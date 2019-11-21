@@ -3,7 +3,7 @@
 from firedrake import *
 import numpy as np
 import scipy.linalg as la
-from modules_phdae.classes_phsystem import SysPhdaeRig, check_positive_matrix,\
+from modules_ph.classes_phsystem import SysPhdaeRig, check_positive_matrix,\
     check_skew_symmetry, permute_rows_columns, permute_rows
 import warnings
 import matplotlib.pyplot as plt

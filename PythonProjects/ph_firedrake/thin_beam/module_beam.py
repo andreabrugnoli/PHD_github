@@ -3,7 +3,7 @@
 from firedrake import *
 import numpy as np
 import scipy.linalg as la
-from modules_phdae.classes_phsystem import SysPhdae
+from modules_ph.classes_phsystem import SysPhdae
 
 
 class FloatingEB(SystemPHDAE):

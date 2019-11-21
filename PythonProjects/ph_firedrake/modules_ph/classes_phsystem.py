@@ -1,7 +1,8 @@
 # General PHDAE
 import numpy as np
 import scipy.linalg as la
-from modules_phdae.reduction_phdae import proj_matrices
+from modules_ph.reduction_phdae import proj_matrices_phdae
+from modules_ph.reduction_phode import proj_matrices_phode
 import warnings
 
 
@@ -59,6 +60,49 @@ class SysPhode:
             self.m = B.shape[1]
         except IndexError:
             self.m = 1
+
+    def reduce_system(self, s0, n_red):
+        E_red = self.E
+        A_red = self.J - self.R[n_rig:, n_rig:]
+        B_red = self.B[n_rig:, n_rig:]
+
+        Vp, Vq = proj_matrices(E_red, A_red, B_red, s0, n_red, self.n_p, self.n_f, oper)
+
+        V_f = la.block_diag(Vp, Vq)
+
+        n_p = len(Vp.T)
+        n_q = len(Vq.T)
+        n_lmb = self.n_lmb
+
+        Z_rig = np.zeros((n_rig, n_rig))
+        Z_lmb = np.zeros((n_lmb, n_lmb))
+
+        M_f = V_f.T @ self.M_f @ V_f
+        M_fr = V_f.T @ self.M_fr
+        J_f = V_f.T @ self.J_f @ V_f
+        R_f = V_f.T @ self.R_f @ V_f
+        B_f = V_f.T @ self.B_f
+        G_f = V_f.T @ self.G_f
+
+        n_e = n_rig + n_p + n_q
+        G_e = np.concatenate((self.G_r, G_f))
+        B_e = np.concatenate((self.B_r, B_f))
+        M_e = la.block_diag(self.M_r, M_f)
+        M_e[n_rig:, :n_rig] = M_fr
+        M_e[:n_rig, n_rig:] = M_fr.T
+        J_e = la.block_diag(Z_rig, J_f)
+        R_e = la.block_diag(Z_rig, R_f)
+
+        n = n_e + n_lmb
+        E = la.block_diag(M_e, Z_lmb)
+        J = la.block_diag(J_e, Z_lmb)
+        J[:n_e, n_e:] = G_e
+        J[n_e:, :n_e] = -G_e.T
+        R = la.block_diag(R_e, Z_lmb)
+        B = np.concatenate((B_e, self.B_lmb))
+
+        sys_red = SysPhdaeRig(n, n_lmb, n_rig, n_p, n_q, E=E, J=J, B=B, R=R)
+        return sys_red, V_f
 
 class SysPhdae:
     def __init__(self, n, n_lmb, n_p, n_q, E=None, J=None, R=None, Q=None, B=None):

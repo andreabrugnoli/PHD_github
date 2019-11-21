@@ -5,7 +5,7 @@ fntsize = 15
 import numpy as np
 import scipy.linalg as la
 
-from modules_phdae.classes_phsystem import SysPhdaeRig
+from modules_ph.classes_phsystem import SysPhdaeRig
 from system_components.beams import FloatFlexBeam, draw_deformation
 from multibody_phs.four_bars.fourbars_constants import *
 from math import pi

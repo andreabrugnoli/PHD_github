@@ -7,7 +7,7 @@ import scipy.linalg as la
 from scipy.integrate import solve_ivp
 from scipy.interpolate import interp1d
 
-from modules_phdae.classes_phsystem import SysPhdaeRig
+from modules_ph.classes_phsystem import SysPhdaeRig
 from system_components.beams import FloatFlexBeam, draw_deformation, matrices_j2d, massmatrices_j3d
 from math import pi
 from assimulo.solvers import IDA

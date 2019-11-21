@@ -1,7 +1,7 @@
 from firedrake import *
 import numpy as np
 import scipy.linalg as la
-from modules_phdae.classes_phsystem import SysPhdaeRig, check_positive_matrix
+from modules_ph.classes_phsystem import SysPhdaeRig, check_positive_matrix
 import warnings
 np.set_printoptions(threshold=np.inf)
 from matplotlib import pyplot as plt

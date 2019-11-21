@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.linalg as la
 from system_components.beams import FreeEB, ClampedEB, draw_allbending
-from modules_phdae.classes_phsystem import SysPhdaeRig
+from modules_ph.classes_phsystem import SysPhdaeRig
 import matplotlib.pyplot as plt
 plt.rc('text', usetex=True)
 

@@ -5,7 +5,7 @@ fntsize = 15
 import numpy as np
 import scipy.linalg as la
 
-from modules_phdae.classes_phsystem import SysPhdaeRig
+from modules_ph.classes_phsystem import SysPhdaeRig
 from math import pi
 
 from assimulo.solvers import IDA

@@ -6,7 +6,7 @@ np.set_printoptions(threshold=np.inf)
 import matplotlib.pyplot as plt
 
 import scipy.linalg as la
-from modules_phdae.classes_phsystem import SysPhdaeRig
+from modules_ph.classes_phsystem import SysPhdaeRig
 
 import matplotlib
 import matplotlib.pyplot as plt
