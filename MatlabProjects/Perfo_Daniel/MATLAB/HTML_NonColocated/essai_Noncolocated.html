@@ -1,0 +1,583 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    "HTML-CSS": { fonts: ["TeX"] }
+  });
+</script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script><!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>On colocated control and non-colocated control to achieve performance requirements.</title><meta name="generator" content="MATLAB 9.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-09-18"><meta name="DC.source" content="essai_Noncolocated.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>On colocated control and non-colocated control to achieve performance requirements.</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Problem statement</a></li><li><a href="#3">Dynamic Model</a></li><li><a href="#8">Colocated control</a></li><li><a href="#12">Noncolocated control</a></li><li><a href="#19">Questions and remarks:</a></li><li><a href="#20">SPILLOVER</a></li><li><a href="#31">Colacated-noncolocated control</a></li></ul></div><p>Fisrt, clean workspace and give access to librairies:</p><pre class="codeinput">clear <span class="string">all</span>
+close <span class="string">all</span>
+format <span class="string">short</span> <span class="string">e</span>
+bdclose(<span class="string">'all'</span>)
+path(path,<span class="string">'bib1'</span>);
+path(path,<span class="string">'bib2'</span>);
+warning(<span class="string">'off'</span>)
+</pre><h2 id="2">Problem statement</h2><p>Let us considers an Euler bernouilli beam <script type="math/tex">PC</script> (see following Figure) with the following boundary conditions:</p><div><ul><li>the beam is pinned at <script type="math/tex">P</script> but loaded with a local inertia <script type="math/tex">I</script>,</li><li>the beam is free at <script type="math/tex">C</script>.</li></ul></div><p>The revolute joint at <script type="math/tex">P</script> is fitted with an actuator applying a torque <script type="math/tex">u\;(Nm)</script> around <script type="math/tex">(P,\mathbf{z})</script> axis.</p><p><img vspace="5" hspace="5" src="../beamPC.png" alt=""> </p><p><b>Objectives:</b> Considering the following disturbances:</p><div><ul><li>a torque around <script type="math/tex">(P,\mathbf{z})</script>-axis: <script type="math/tex">T^p_{z,./P}\;(Nm)</script>,</li><li>a torque around <script type="math/tex">(C,\mathbf{z})</script>-axis: <script type="math/tex">T^p_{z,./C}\,(Nm)</script>,</li><li>a force along <script type="math/tex">(C,\mathbf{y})</script>-axis: <script type="math/tex">F^p_{y,./C}\;(N)</script>,</li></ul></div><p>the objective is to reject (in all the frequency-domain) these disturbances on the angular acceleration <script type="math/tex">\ddot{\theta}_C</script> at <script type="math/tex">C</script> (assuming here is a massless optical payload at <script type="math/tex">C</script>).</p><p>Thus the performance index is defined as:</p><p><script type="math/tex">\|\mathrm{T_f}_{\left[\begin{array}{c}F^p_{y,./C}\\ T^p_{z,./C} \\ T^p_{z,./P} \end{array}\right]\to\ddot{\theta}_C}(\mathrm{s})\|_\infty=\max_{\omega}\bar{\sigma}\Big(\mathrm{T_f}_{\left[\begin{array}{c}F^p_{y,./C}\\ T^p_{z,./C} \\ T^p_{z,./P} \end{array}\right]\to\ddot{\theta}_C}(\mathrm{j\omega})\Big)\;.</script></p><h2 id="3">Dynamic Model</h2><p>Applying the TITOP (Two-Input Two-Output Port) model approach and the channel inversion operation (see also: <a href="http://oatao.univ-toulouse.fr/16559/">MBS</a>, <i>Linear dynamics of flexible multibody systems : a system-based approach</i>, C. Jawhar <i>t al.</i>), the design model <script type="math/tex">\mathbf G(\mathrm{s})</script>, depicted in the following Figure can be easily derived by the following procedure:</p><div><ul><li>first, compute the cantilever-free model of the beam using   one "superlement" thanks to the function <tt>TwoPortBeamTyRz</tt> (see the   <tt>help</tt>). All the parameters of this academic example are normalize to   <script type="math/tex">1</script>. A damping ratio (<script type="math/tex">0.003</script>) is chosen for the flexible modes:</li></ul></div><pre class="codeinput">L=1;  <span class="comment">% Length of the beam</span>
+Mod=TwoPortBeamTyRz(1,1,L,1,1,0.003);
+</pre><div><ul><li>then inverse the last channel to model pinned-free boundary conditions:</li></ul></div><pre class="codeinput">Mpf=invio(Mod,4);
+</pre><div><ul><li>then feedback the local inertia <script type="math/tex">I</script> at point <script type="math/tex">P</script>:</li></ul></div><pre class="codeinput">I=1;
+</pre><p>The model <script type="math/tex">\mathbf{G}(\mathrm{s})</script>:</p><pre class="codeinput">open_system(<span class="string">'OLmodel'</span>,<span class="string">'force'</span>)
+
+[a,b,c,d]=linmod(<span class="string">'OLmodel'</span>);
+G=ss(a,b,c,d);
+</pre><pre class="codeoutput">Found algebraic loop containing: 
+&lt;a href="matlab:open_and_hilite_hyperlink ('OLmodel/pinned-free beam: Mpf/LTI System/Internal','error')"&gt;OLmodel/pinned-free beam: Mpf/LTI System/Internal&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('OLmodel/pinned-free beam: Mpf/LTI System/Internal','error')"&gt;OLmodel/pinned-free beam: Mpf/LTI System/Internal&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('OLmodel/Gain','error')"&gt;OLmodel/Gain&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('OLmodel/Sum1','error')"&gt;OLmodel/Sum1&lt;/a&gt; (algebraic variable)
+</pre><img vspace="5" hspace="5" src="essai_Noncolocated_01.png" alt=""> <pre class="codeinput"><span class="comment">%This model if a 8-th order model with 4 flexible modes:</span>
+damp(G)
+</pre><pre class="codeoutput">                                                                       
+         Pole              Damping       Frequency      Time Constant  
+                                       (rad/seconds)      (seconds)    
+                                                                       
+ -1.39e-02 + 4.04e+00i     3.45e-03       4.04e+00         7.18e+01    
+ -1.39e-02 - 4.04e+00i     3.45e-03       4.04e+00         7.18e+01    
+ -6.71e-02 + 2.23e+01i     3.01e-03       2.23e+01         1.49e+01    
+ -6.71e-02 - 2.23e+01i     3.01e-03       2.23e+01         1.49e+01    
+ -1.90e-01 + 6.34e+01i     3.00e-03       6.34e+01         5.26e+00    
+ -1.90e-01 - 6.34e+01i     3.00e-03       6.34e+01         5.26e+00    
+ -8.45e-01 + 2.82e+02i     3.00e-03       2.82e+02         1.18e+00    
+ -8.45e-01 - 2.82e+02i     3.00e-03       2.82e+02         1.18e+00    
+</pre><h2 id="8">Colocated control</h2><p>It is well-known that the control law <script type="math/tex">u=-K_v\dot{\theta}_p</script> is stabilizing for any positive value of <script type="math/tex">K_v</script>. Although increasing <script type="math/tex">K_v</script> up to <script type="math/tex">+\infty</script> would allow to reject perfectly the disturbance <script type="math/tex">T^p_{z,./P}</script>, the rejection of distrubances from <script type="math/tex">F^p_{y,./C}</script> and <script type="math/tex">T^p_{z,./C}</script> cannot be improved by such a colocated control and is limited by the open-loop rejection properties of the cantilevered-free beam.</p><p>That is highlighted by the following analyse (in the case <script type="math/tex">K_v=-3\;Nms/rd)</script>.</p><pre class="codeinput">CLco=feedback(G,3*tf(1,[1 0]),4,4);
+figure
+sigma(G(2,[1:3]),CLco(2,[1:3]),Mod(2,[1:2]))
+title(<span class="string">'Disturbance rejection'</span>)
+legend(<span class="string">'open-loop'</span>,<span class="string">'colocated control'</span>,<span class="string">'cantilever-free beam'</span>,<span class="string">'Location'</span>,<span class="string">'southeast'</span>);
+</pre><img vspace="5" hspace="5" src="essai_Noncolocated_02.png" alt=""> <p>Performance indexes:</p><pre class="codeinput">norm(G(2,[1:3]),<span class="string">'inf'</span>)    <span class="comment">% open-loop</span>
+</pre><pre class="codeoutput">
+ans =
+
+   1.6377e+06
+
+</pre><pre class="codeinput">norm(CLco(2,[1:3]),<span class="string">'inf'</span>) <span class="comment">% colocated control</span>
+</pre><pre class="codeoutput">
+ans =
+
+   1.6372e+06
+
+</pre><pre class="codeinput">norm(Mod(2,[1:2]),<span class="string">'inf'</span>)  <span class="comment">%  cantilever-free beam.</span>
+</pre><pre class="codeoutput">
+ans =
+
+   1.6376e+06
+
+</pre><h2 id="12">Noncolocated control</h2><p>A non colacted control law <script type="math/tex">u=-K  \dot{\theta_C}</script> cannot be used to increase the damping of all the flexible modes. Indeed:</p><pre class="codeinput">figure
+rlocusp(tf(1,[1 0])*G(2,4));
+axis([-10 10 -10 400])
+</pre><img vspace="5" hspace="5" src="essai_Noncolocated_03.png" alt=""> <p>A dynamic controller <script type="math/tex">K\to K(\mathrm{s})</script> is thus required and its design is a complex task.</p><p>Now we assume that an angular accelerometer can measure <script type="math/tex">\ddot{\theta}_C</script>. We propose a simple procedure to design a dynamic controller allowing to damp all the flexible modes and thus to increase the disturbance rejection property. Such a control law is depicted in the following block diagram. It involves:</p><div><ul><li>a gain <script type="math/tex">I_{f,C}\;(Kg\,m^2)</script> corresponding to the fictitious inertia to be included at point <script type="math/tex">C</script> to increase disturbance rejection,</li><li>a reference model <script type="math/tex">G_{ref}(\mathrm{s})</script> between the desired torque <script type="math/tex">T_{z,./C}^{ref}=-I_{f,C}\ddot{\theta}_C</script> at <script type="math/tex">C</script> and the desired acceleration <script type="math/tex">\ddot{\theta}_P^{ref}</script> at <script type="math/tex">P</script> . This reference model corresponds to the transfer from <script type="math/tex">T_{z,./C}</script> to <script type="math/tex">\ddot{\theta}_P</script>, i.e. <script type="math/tex">\mathbf{G}_{(4,2)}(\mathrm{s})</script> where the flexible mode damping ratio is prescribed to a given value <script type="math/tex">\xi_{ref}</script>,</li><li>the total inertia <script type="math/tex">I_{tot,P}\;(Kg\,m^2)</script> of the system seen from the point <script type="math/tex">P</script> to transform the desired angular acceleration <script type="math/tex">\ddot{\theta}_P^{ref}</script> at <script type="math/tex">P</script> to the torque <script type="math/tex">u=-I_{tot,P}\ddot{\theta}_P^{ref}</script> to be applied by the actuator.</li></ul></div><p>This control law has 2 tuning parameters: <script type="math/tex">I_{f,C}</script> and <script type="math/tex">\xi_{ref}</script>. In the following sequence: <script type="math/tex">I_{f,C}=0.05\,I_{tot,P}</script> and <script type="math/tex">\xi_{ref}=0.3</script>.</p><pre class="codeinput">I_tot_P=inv(dcgain(G(4,4)));
+I_f_C=0.05*I_tot_P;
+Gref=G(4,2);             <span class="comment">% Transfer from Tz_./C to ddot_theta_P</span>
+[V,D]=eig(Gref.a(5:8,1:4));
+xi_ref=0.3;
+Gref.a(5:8,5:8)=V*(-2*xi_ref*sqrt(-D))*inv(V);
+
+<span class="comment">%</span>
+<span class="comment">% Root locus:</span>
+figure
+rlocusp(-I_tot_P*I_f_C*Gref*G(2,4))
+axis([-100 10 -10 400])
+</pre><img vspace="5" hspace="5" src="essai_Noncolocated_04.png" alt=""> <p>Closed-loop model:</p><pre class="codeinput">open_system(<span class="string">'CLmodel'</span>,<span class="string">'force'</span>)
+</pre><img vspace="5" hspace="5" src="essai_Noncolocated_05.png" alt=""> <pre class="codeinput">[a,b,c,d]=linmod(<span class="string">'CLmodel'</span>);
+CLnoc=ss(a,b,c,d);
+</pre><pre class="codeoutput">Found algebraic loop containing: 
+&lt;a href="matlab:open_and_hilite_hyperlink ('CLmodel/pinned-free beam: Mpf/LTI System/Internal','error')"&gt;CLmodel/pinned-free beam: Mpf/LTI System/Internal&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('CLmodel/pinned-free beam: Mpf/LTI System/Internal','error')"&gt;CLmodel/pinned-free beam: Mpf/LTI System/Internal&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('CLmodel/Gain','error')"&gt;CLmodel/Gain&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('CLmodel/Gain1','error')"&gt;CLmodel/Gain1&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('CLmodel/LTI System/Internal','error')"&gt;CLmodel/LTI System/Internal&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('CLmodel/Gain2','error')"&gt;CLmodel/Gain2&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('CLmodel/Sum1','error')"&gt;CLmodel/Sum1&lt;/a&gt; (algebraic variable)
+</pre><p>Disturbance rejection:</p><pre class="codeinput">figure
+sigma(G(2,[1:3]),CLco(2,[1:3]),CLnoc(2,[1:3]))
+title(<span class="string">'Disturbance rejection'</span>)
+legend(<span class="string">'open-loop'</span>,<span class="string">'colocated control'</span>,<span class="string">'non-colocated control'</span>,<span class="string">'Location'</span>,<span class="string">'southeast'</span>);
+</pre><img vspace="5" hspace="5" src="essai_Noncolocated_06.png" alt=""> <p>Performance index:</p><pre class="codeinput">norm(CLnoc(2,[1:3]),<span class="string">'inf'</span>)
+</pre><pre class="codeoutput">
+ans =
+
+   5.9144e+04
+
+</pre><p>Thus the perfornance index of the non-colocated control is significantly better than the colocated control's one.</p><h2 id="19">Questions and remarks:</h2><div><ul><li><b>Q1:</b> stability proof of such an approach in the infinite dimension case ?</li><li><b>Q2:</b> tuning of the 2 parameters: <script type="math/tex">I_{f,C}</script> and <script type="math/tex">\xi_{ref}</script> ?</li><li><b>R1:</b> the same approach could be used if an accelerometer measures <script type="math/tex">\ddot y_c</script>. Then the reference model is <script type="math/tex">1\times 2</script> built from <script type="math/tex">\mathbf{G}_{(4,1:2)}(\mathrm{s})</script>.</li></ul></div><h2 id="20">SPILLOVER</h2><p>From a practical point of view and beyond the stability proof in the infinite-dimension case, such a controller must be designed from a finite order reference model <script type="math/tex">G_{ref}(\mathrm{s})</script>. Therfore, the problem of spillover (i.e. the stability of flexible modes which are taken into account in <script type="math/tex">G_{ref}(\mathrm{s})</script>) must be addressed. So let us a consider a 16-th order validation model <script type="math/tex">G_f(\mathrm{s})</script> composed 2 superelements of half lenght:</p><pre class="codeinput">Modval=TwoPortBeamTyRz(1,1,L/2,1,1,0.003);
+Modval=lft(Modval,Modval,2,2);
+Mpf=invio(Modval,4);
+[a,b,c,d]=linmod(<span class="string">'OLmodel'</span>);
+Gf=ss(a,b,c,d);
+</pre><pre class="codeoutput">Found algebraic loop containing: 
+&lt;a href="matlab:open_and_hilite_hyperlink ('OLmodel/pinned-free beam: Mpf/LTI System/Internal','error')"&gt;OLmodel/pinned-free beam: Mpf/LTI System/Internal&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('OLmodel/pinned-free beam: Mpf/LTI System/Internal','error')"&gt;OLmodel/pinned-free beam: Mpf/LTI System/Internal&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('OLmodel/Gain','error')"&gt;OLmodel/Gain&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('OLmodel/Sum1','error')"&gt;OLmodel/Sum1&lt;/a&gt; (algebraic variable)
+</pre><p>The previous controller is not stabilizing: the 5-th flexible mode of the validation model <script type="math/tex">G_f</script> is unstable. Indeed:</p><pre class="codeinput">figure
+rlocusp(-I_tot_P*I_f_C*Gref*Gf(2,4))
+axis([-100 10 -10 400])
+</pre><img vspace="5" hspace="5" src="essai_Noncolocated_07.png" alt=""> <p>So we propose to build <script type="math/tex">G_{ref}(\mathrm{s})</script> from a 8-th order reduced model <script type="math/tex">G_r(\mathrm{s})</script>. This model is obtained from a modal reduction of <script type="math/tex">G_f(\mathrm{s})</script> to catch the first 4 low frequency flexible modes. That can be done using the function <tt>red_fast.m</tt> (see the <tt>help</tt>).</p><pre class="codeinput">damp(Gf)
+Gr=red_fast(Gf,-1);
+</pre><pre class="codeoutput">                                                                       
+         Pole              Damping       Frequency      Time Constant  
+                                       (rad/seconds)      (seconds)    
+                                                                       
+ -3.03e-03 + 4.04e+00i     7.51e-04       4.04e+00         3.30e+02    
+ -3.03e-03 - 4.04e+00i     7.51e-04       4.04e+00         3.30e+02    
+ -6.74e-02 + 2.21e+01i     3.05e-03       2.21e+01         1.48e+01    
+ -6.74e-02 - 2.21e+01i     3.05e-03       2.21e+01         1.48e+01    
+ -3.32e-01 + 6.18e+01i     5.37e-03       6.18e+01         3.01e+00    
+ -3.32e-01 - 6.18e+01i     5.37e-03       6.18e+01         3.01e+00    
+ -4.19e-01 + 1.23e+02i     3.42e-03       1.23e+02         2.39e+00    
+ -4.19e-01 - 1.23e+02i     3.42e-03       1.23e+02         2.39e+00    
+ -1.30e+00 + 2.04e+02i     6.39e-03       2.04e+02         7.67e-01    
+ -1.30e+00 - 2.04e+02i     6.39e-03       2.04e+02         7.67e-01    
+ -1.13e+00 + 3.21e+02i     3.53e-03       3.21e+02         8.84e-01    
+ -1.13e+00 - 3.21e+02i     3.53e-03       3.21e+02         8.84e-01    
+ -1.65e+01 + 6.86e+02i     2.40e-02       6.86e+02         6.08e-02    
+ -1.65e+01 - 6.86e+02i     2.40e-02       6.86e+02         6.08e-02    
+ -1.40e+01 + 1.35e+03i     1.04e-02       1.35e+03         7.14e-02    
+ -1.40e+01 - 1.35e+03i     1.04e-02       1.35e+03         7.14e-02    
+</pre><p>Reference model <script type="math/tex">G_{ref}(\mathrm{s})</script>:</p><pre class="codeinput">Gref=Gr(4,2);
+</pre><p>The damping ratio <script type="math/tex">\xi_{ref}</script> is prescribed in the modal representation of <script type="math/tex">G_r(\mathrm{s})</script>:</p><pre class="codeinput"><span class="keyword">for</span> ii=1:length(Gref.a)/2,
+    wii=damp(Gref.a(2*ii-1:2*ii,2*ii-1:2*ii));
+    wii=wii(1);
+    Gref.a(2*ii-1:2*ii,2*ii-1:2*ii)=[-xi_ref sqrt(1-xi_ref^2);-sqrt(1-xi_ref^2) -xi_ref]*wii;
+<span class="keyword">end</span>
+damp(Gref)
+</pre><pre class="codeoutput">                                                                       
+         Pole              Damping       Frequency      Time Constant  
+                                       (rad/seconds)      (seconds)    
+                                                                       
+ -1.21e+00 + 3.85e+00i     3.00e-01       4.04e+00         8.25e-01    
+ -1.21e+00 - 3.85e+00i     3.00e-01       4.04e+00         8.25e-01    
+ -6.64e+00 + 2.11e+01i     3.00e-01       2.21e+01         1.51e-01    
+ -6.64e+00 - 2.11e+01i     3.00e-01       2.21e+01         1.51e-01    
+ -1.85e+01 + 5.90e+01i     3.00e-01       6.18e+01         5.39e-02    
+ -1.85e+01 - 5.90e+01i     3.00e-01       6.18e+01         5.39e-02    
+ -3.68e+01 + 1.17e+02i     3.00e-01       1.23e+02         2.72e-02    
+ -3.68e+01 - 1.17e+02i     3.00e-01       1.23e+02         2.72e-02    
+</pre><p>Validation on the model <script type="math/tex">G_f</script>:</p><pre class="codeinput">figure
+rlocusp(-I_tot_P*I_f_C*Gref*Gf(2,4))
+axis([-100 10 -10 1500])
+</pre><img vspace="5" hspace="5" src="essai_Noncolocated_08.png" alt=""> <p>The closed-loop system is stable. One can also illustrate that:</p><div><ul><li>the 4 first flexible modes are phase-controlled,</li><li>the 4 last flexible modes are gain-controlled</li></ul></div><p>on the Nichols plot:</p><pre class="codeinput">figure
+nichols(-I_tot_P*I_f_C*Gref*Gf(2,4))
+ngrid
+</pre><img vspace="5" hspace="5" src="essai_Noncolocated_09.png" alt=""> <p>From the spillover point of view, better results are obtained by cancelling the direct feedthrough in <script type="math/tex">G_{ref}</script>:</p><pre class="codeinput">Gref=ss(Gref.a,Gref.b,Gref.c,0);
+figure
+nichols(-I_tot_P*I_f_C*Gref*Gf(2,4))
+ngrid
+</pre><img vspace="5" hspace="5" src="essai_Noncolocated_10.png" alt=""> <p>Closed-loop model:</p><pre class="codeinput">[a,b,c,d]=linmod(<span class="string">'CLmodel'</span>);
+CLnoc=ss(a,b,c,d);
+</pre><pre class="codeoutput">Found algebraic loop containing: 
+&lt;a href="matlab:open_and_hilite_hyperlink ('CLmodel/pinned-free beam: Mpf/LTI System/Internal','error')"&gt;CLmodel/pinned-free beam: Mpf/LTI System/Internal&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('CLmodel/pinned-free beam: Mpf/LTI System/Internal','error')"&gt;CLmodel/pinned-free beam: Mpf/LTI System/Internal&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('CLmodel/Gain','error')"&gt;CLmodel/Gain&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('CLmodel/Sum1','error')"&gt;CLmodel/Sum1&lt;/a&gt; (algebraic variable)
+</pre><p>Disturbance rejection:</p><pre class="codeinput">CLco=feedback(Gf,3*tf(1,[1 0]),4,4);
+figure
+sigma(Gf(2,[1:3]),CLco(2,[1:3]),CLnoc(2,[1:3]))
+title(<span class="string">'Disturbance rejection'</span>)
+legend(<span class="string">'open-loop'</span>,<span class="string">'colocated control'</span>,<span class="string">'non-colocated control'</span>,<span class="string">'Location'</span>,<span class="string">'southeast'</span>);
+</pre><img vspace="5" hspace="5" src="essai_Noncolocated_11.png" alt=""> <p>The high frequency flexible modes, which are not controlled, degrade consequently the performance. The conclusion is : the non-collocated control has better performance rejection than the colocated control in the <script type="math/tex">[0 200]\;(rad/s)</script> frequency-band.</p><h2 id="31">Colacated-noncolocated control</h2><p>If we consider the distrubance rejection on <script type="math/tex">\theta_C</script> (instead of <script type="math/tex">\ddot{\theta}_C</script>), the colocated control (for the rigid mode) and the noncolocated control (for the flexible modes) can be mixed according to the following control structure:</p><pre class="codeinput">Kv=3;Kp=3.5;
+open_system(<span class="string">'CLmodelMix'</span>,<span class="string">'force'</span>)
+</pre><img vspace="5" hspace="5" src="essai_Noncolocated_12.png" alt=""> <p>Closed-loop model:</p><pre class="codeinput">[a,b,c,d]=linmod(<span class="string">'CLmodelMix'</span>);
+CL=minreal(ss(a,b,c,d));
+</pre><pre class="codeoutput">Found algebraic loop containing: 
+&lt;a href="matlab:open_and_hilite_hyperlink ('CLmodelMix/Sum1','error')"&gt;CLmodelMix/Sum1&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('CLmodelMix/pinned-free beam: Mpf/LTI System/Internal','error')"&gt;CLmodelMix/pinned-free beam: Mpf/LTI System/Internal&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('CLmodelMix/pinned-free beam: Mpf/LTI System/Internal','error')"&gt;CLmodelMix/pinned-free beam: Mpf/LTI System/Internal&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('CLmodelMix/Gain','error')"&gt;CLmodelMix/Gain&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('CLmodelMix/Sum2','error')"&gt;CLmodelMix/Sum2&lt;/a&gt; (algebraic variable)
+2 states removed.
+</pre><p>Closed-loop model in the pure colocated control case</p><pre class="codeinput">I_f_C=0;
+[a,b,c,d]=linmod(<span class="string">'CLmodelMix'</span>);
+CLco=minreal(ss(a,b,c,d));
+</pre><pre class="codeoutput">Found algebraic loop containing: 
+&lt;a href="matlab:open_and_hilite_hyperlink ('CLmodelMix/Sum1','error')"&gt;CLmodelMix/Sum1&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('CLmodelMix/pinned-free beam: Mpf/LTI System/Internal','error')"&gt;CLmodelMix/pinned-free beam: Mpf/LTI System/Internal&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('CLmodelMix/pinned-free beam: Mpf/LTI System/Internal','error')"&gt;CLmodelMix/pinned-free beam: Mpf/LTI System/Internal&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('CLmodelMix/Gain','error')"&gt;CLmodelMix/Gain&lt;/a&gt;
+&lt;a href="matlab:open_and_hilite_hyperlink ('CLmodelMix/Sum2','error')"&gt;CLmodelMix/Sum2&lt;/a&gt; (algebraic variable)
+10 states removed.
+</pre><p>Disturbance rejection:</p><pre class="codeinput">figure
+sigma(tf(1,[1 0 0])*Gf(2,[1:3]),CLco(2,[1:3]),CL(2,[1:3]))
+grid
+title(<span class="string">'Disturbance rejection'</span>)
+legend(<span class="string">'open-loop'</span>,<span class="string">'colocated only control'</span>,<span class="string">'colocated-noncolocated control'</span>,<span class="string">'Location'</span>,<span class="string">'southeast'</span>);
+</pre><img vspace="5" hspace="5" src="essai_Noncolocated_13.png" alt=""> <p>Performance indexes:</p><pre class="codeinput">norm(CLco(2,[1:3]),<span class="string">'inf'</span>)
+norm(CL(2,[1:3]),<span class="string">'inf'</span>)
+</pre><pre class="codeoutput">
+ans =
+
+   2.6409e+01
+
+
+ans =
+
+   2.6198e+00
+
+</pre><p><b>From the performance index, the benefit of the non-colocated loop is quite obvious (a factor 10 is won on the performance index).</b></p><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2018b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% On colocated control and non-colocated control to achieve performance requirements.
+
+%%
+% Fisrt, clean workspace and give access to librairies:
+clear all
+close all
+format short e
+bdclose('all')
+path(path,'bib1');
+path(path,'bib2');
+warning('off')
+%% Problem statement
+%
+% Let us considers an Euler bernouilli beam $PC$ (see following Figure) with the 
+% following boundary conditions:
+%
+% * the beam is pinned at $P$ but loaded with a local inertia $I$,
+% * the beam is free at $C$.
+%
+% The revolute joint at $P$ is fitted with an actuator applying a torque
+% $u\;(Nm)$ around $(P,\mathbf{z})$ axis.
+% 
+% <<../beamPC.png>>
+%
+% *Objectives:* Considering the following disturbances:
+%
+% * a torque around $(P,\mathbf{z})$-axis: $T^p_{z,./P}\;(Nm)$,
+% * a torque around $(C,\mathbf{z})$-axis: $T^p_{z,./C}\,(Nm)$,
+% * a force along $(C,\mathbf{y})$-axis: $F^p_{y,./C}\;(N)$,
+%
+% the objective is to reject (in all the frequency-domain) these disturbances on the angular 
+% acceleration $\ddot{\theta}_C$ at $C$ (assuming here is a massless optical payload at $C$).
+% 
+% Thus the performance index is defined as:
+%
+% $$\|\mathrm{T_f}_{\left[\begin{array}{c}F^p_{y,./C}\\ T^p_{z,./C} \\ T^p_{z,./P} \end{array}\right]\to\ddot{\theta}_C}(\mathrm{s})\|_\infty=\max_{\omega}\bar{\sigma}\Big(\mathrm{T_f}_{\left[\begin{array}{c}F^p_{y,./C}\\ T^p_{z,./C} \\ T^p_{z,./P} \end{array}\right]\to\ddot{\theta}_C}(\mathrm{j\omega})\Big)\;.$$
+%
+%% Dynamic Model
+%
+% Applying the TITOP (Two-Input Two-Output Port) model approach and the
+% channel inversion operation (see also: <http://oatao.univ-toulouse.fr/16559/  MBS>, _Linear dynamics of flexible
+% multibody systems : a system-based approach_, C. Jawhar _t al._), the
+% design model $\mathbf G(\mathrm{s})$, depicted in the following Figure can be
+% easily derived by the following procedure:
+%
+% * first, compute the cantilever-free model of the beam using
+%   one "superlement" thanks to the function |TwoPortBeamTyRz| (see the
+%   |help|). All the parameters of this academic example are normalize to
+%   $1$. A damping ratio ($0.003$) is chosen for the flexible modes:
+
+L=1;  % Length of the beam
+Mod=TwoPortBeamTyRz(1,1,L,1,1,0.003);
+
+%%
+% * then inverse the last channel to model pinned-free boundary conditions:
+
+Mpf=invio(Mod,4);
+
+%%
+% * then feedback the local inertia $I$ at point $P$:
+
+I=1;   
+
+%%
+% The model $\mathbf{G}(\mathrm{s})$:
+open_system('OLmodel','force')
+
+[a,b,c,d]=linmod('OLmodel');
+G=ss(a,b,c,d);
+
+%% 
+%This model if a 8-th order model with 4 flexible modes:
+damp(G)
+
+%% Colocated control
+% It is well-known that the control law $u=-K_v\dot{\theta}_p$ is
+% stabilizing for any positive value of $K_v$. Although increasing $K_v$ up
+% to $+\infty$ would allow to reject perfectly the disturbance
+% $T^p_{z,./P}$, the rejection of distrubances from $F^p_{y,./C}$ and
+% $T^p_{z,./C}$ cannot be improved by such a colocated control and is limited
+% by the open-loop rejection properties of the cantilevered-free beam.
+%
+% That is highlighted by the following analyse (in the case $K_v=-3\;Nms/rd)$.
+
+CLco=feedback(G,3*tf(1,[1 0]),4,4);
+figure
+sigma(G(2,[1:3]),CLco(2,[1:3]),Mod(2,[1:2]))
+title('Disturbance rejection')
+legend('open-loop','colocated control','cantilever-free beam','Location','southeast');
+%%
+% Performance indexes:
+norm(G(2,[1:3]),'inf')    % open-loop
+%%
+norm(CLco(2,[1:3]),'inf') % colocated control
+%%
+norm(Mod(2,[1:2]),'inf')  %  cantilever-free beam.
+
+%% Noncolocated control
+% A non colacted control law $u=-K  \dot{\theta_C}$ cannot be used to increase the damping 
+% of all the flexible modes. Indeed:
+figure
+rlocusp(tf(1,[1 0])*G(2,4));
+axis([-10 10 -10 400])
+%% 
+% A dynamic controller $K\to K(\mathrm{s})$ is thus required and its design is
+% a complex task.
+%
+% Now we assume that an angular accelerometer can measure
+% $\ddot{\theta}_C$. We propose a simple procedure to design a dynamic
+% controller allowing to damp all the flexible modes and thus to increase the
+% disturbance rejection property. Such a control law is depicted in the
+% following block diagram. It involves:
+%
+% * a gain $I_{f,C}\;(Kg\,m^2)$ corresponding to the fictitious inertia
+% to be included at point $C$ to increase disturbance rejection,
+% * a reference model $G_{ref}(\mathrm{s})$ between the desired torque $T_{z,./C}^{ref}=-I_{f,C}\ddot{\theta}_C$ at $C$ and the 
+% desired acceleration $\ddot{\theta}_P^{ref}$ at $P$ . This reference model corresponds to the transfer
+% from $T_{z,./C}$ to $\ddot{\theta}_P$, i.e. $\mathbf{G}_{(4,2)}(\mathrm{s})$
+% where the flexible mode damping ratio is prescribed to a given value
+% $\xi_{ref}$,
+% * the total inertia $I_{tot,P}\;(Kg\,m^2)$ of the system seen from the point $P$ to
+% transform the desired angular
+% acceleration $\ddot{\theta}_P^{ref}$ at $P$ to the torque $u=-I_{tot,P}\ddot{\theta}_P^{ref}$ to be applied
+% by the actuator.
+%
+% This control law has 2 tuning parameters: $I_{f,C}$ and $\xi_{ref}$. In
+% the following sequence: $I_{f,C}=0.05\,I_{tot,P}$ and $\xi_{ref}=0.3$.
+I_tot_P=inv(dcgain(G(4,4)));
+I_f_C=0.05*I_tot_P;
+Gref=G(4,2);             % Transfer from Tz_./C to ddot_theta_P
+[V,D]=eig(Gref.a(5:8,1:4));
+xi_ref=0.3; 
+Gref.a(5:8,5:8)=V*(-2*xi_ref*sqrt(-D))*inv(V);
+
+%
+% Root locus:
+figure
+rlocusp(-I_tot_P*I_f_C*Gref*G(2,4))
+axis([-100 10 -10 400])
+
+%%
+% Closed-loop model:
+open_system('CLmodel','force')
+
+%%
+[a,b,c,d]=linmod('CLmodel');
+CLnoc=ss(a,b,c,d);
+
+%%
+% Disturbance rejection:
+figure
+sigma(G(2,[1:3]),CLco(2,[1:3]),CLnoc(2,[1:3]))
+title('Disturbance rejection')
+legend('open-loop','colocated control','non-colocated control','Location','southeast');
+%%
+% Performance index:
+norm(CLnoc(2,[1:3]),'inf')
+
+%%
+% Thus the perfornance index of the non-colocated control is
+% significantly better than the colocated control's one.
+
+%% Questions and remarks:
+%
+% * *Q1:* stability proof of such an approach in the infinite dimension case ?
+% * *Q2:* tuning of the 2 parameters: $I_{f,C}$ and $\xi_{ref}$ ?
+% * *R1:* the same approach could be used if an accelerometer measures
+% $\ddot y_c$. Then the reference model is $1\times 2$ built from
+% $\mathbf{G}_{(4,1:2)}(\mathrm{s})$.
+
+%% SPILLOVER
+% From a practical point of view and beyond the stability proof in the
+% infinite-dimension case, such a controller must be designed from a finite
+% order reference model $G_{ref}(\mathrm{s})$. Therfore, the problem of
+% spillover (i.e. the stability of flexible modes which are taken into
+% account in $G_{ref}(\mathrm{s})$) must be addressed. So let us a consider
+% a 16-th order validation model $G_f(\mathrm{s})$ composed 2 superelements of half
+% lenght:
+Modval=TwoPortBeamTyRz(1,1,L/2,1,1,0.003);
+Modval=lft(Modval,Modval,2,2);
+Mpf=invio(Modval,4);
+[a,b,c,d]=linmod('OLmodel');
+Gf=ss(a,b,c,d);
+
+%%
+% The previous controller is not stabilizing: the 5-th flexible mode
+% of the validation model $G_f$ is unstable. Indeed:
+figure
+rlocusp(-I_tot_P*I_f_C*Gref*Gf(2,4))
+axis([-100 10 -10 400])
+
+%%
+% So we propose to build $G_{ref}(\mathrm{s})$ from a 8-th order reduced
+% model $G_r(\mathrm{s})$. This model is obtained from a modal reduction of
+% $G_f(\mathrm{s})$ to catch the first 4 low frequency flexible modes.
+% That can be done using the function |red_fast.m| (see the |help|).
+damp(Gf)
+Gr=red_fast(Gf,-1);
+
+%%
+% Reference model $G_{ref}(\mathrm{s})$:
+Gref=Gr(4,2);
+
+%%
+% The damping ratio $\xi_{ref}$ is prescribed in the modal representation
+% of $G_r(\mathrm{s})$:
+for ii=1:length(Gref.a)/2,
+    wii=damp(Gref.a(2*ii-1:2*ii,2*ii-1:2*ii));
+    wii=wii(1);
+    Gref.a(2*ii-1:2*ii,2*ii-1:2*ii)=[-xi_ref sqrt(1-xi_ref^2);-sqrt(1-xi_ref^2) -xi_ref]*wii;
+end
+damp(Gref)
+
+%%
+% Validation on the model $G_f$:
+figure
+rlocusp(-I_tot_P*I_f_C*Gref*Gf(2,4))
+axis([-100 10 -10 1500])
+
+%%
+% The closed-loop system is stable. One can also illustrate that:
+%
+% * the 4 first flexible modes are phase-controlled,
+% * the 4 last flexible modes are gain-controlled
+%
+% on the Nichols plot:
+figure
+nichols(-I_tot_P*I_f_C*Gref*Gf(2,4))
+ngrid
+
+%%
+% From the spillover point of view, better results are obtained by
+% cancelling the direct feedthrough in $G_{ref}$:
+Gref=ss(Gref.a,Gref.b,Gref.c,0);
+figure
+nichols(-I_tot_P*I_f_C*Gref*Gf(2,4))
+ngrid
+
+%%
+% Closed-loop model:
+[a,b,c,d]=linmod('CLmodel');
+CLnoc=ss(a,b,c,d);
+
+%%
+% Disturbance rejection:
+CLco=feedback(Gf,3*tf(1,[1 0]),4,4);
+figure
+sigma(Gf(2,[1:3]),CLco(2,[1:3]),CLnoc(2,[1:3]))
+title('Disturbance rejection')
+legend('open-loop','colocated control','non-colocated control','Location','southeast');
+
+%%
+% The high frequency flexible modes, which are not controlled, degrade
+% consequently the performance. The conclusion is : the non-collocated
+% control has better performance rejection than the colocated control in
+% the $[0 200]\;(rad/s)$ frequency-band.
+
+%% Colacated-noncolocated control
+% If we consider the distrubance rejection on $\theta_C$ (instead of
+% $\ddot{\theta}_C$), the colocated control (for the rigid mode) and the
+% noncolocated control (for the flexible modes) can be mixed according to
+% the following control structure:
+Kv=3;Kp=3.5;
+open_system('CLmodelMix','force')
+
+%%
+% Closed-loop model:
+[a,b,c,d]=linmod('CLmodelMix');
+CL=minreal(ss(a,b,c,d));
+
+%%
+% Closed-loop model in the pure colocated control case
+I_f_C=0;
+[a,b,c,d]=linmod('CLmodelMix');
+CLco=minreal(ss(a,b,c,d));
+
+%%
+% Disturbance rejection:
+figure
+sigma(tf(1,[1 0 0])*Gf(2,[1:3]),CLco(2,[1:3]),CL(2,[1:3]))
+grid
+title('Disturbance rejection')
+legend('open-loop','colocated only control','colocated-noncolocated control','Location','southeast');
+
+%%
+% Performance indexes:
+norm(CLco(2,[1:3]),'inf')
+norm(CL(2,[1:3]),'inf')
+
+%%
+% *From the performance index, the benefit of the non-colocated loop is
+% quite obvious (a factor 10 is won on the performance index).*
+
+##### SOURCE END #####
+--></body></html>

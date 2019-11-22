@@ -2,20 +2,53 @@ clc
 close all
 clear all
 
-addpath('./KP_Matrices/')
+addpath('./KP_Experiment/')
+addpath('/home/a.brugnoli/GitProjects/MatlabProjects/PH/Settings/')
 
-load M; load J; load B; 
-load Mr; load Jr; load Br;
+% load('M.mat'); load J.mat; load B.mat; load C.mat; 
+% load Mr.mat; load Jr.mat; load Br.mat; load Cr.mat;
 
-sys_full = dss(J,B,B',0,M);
-sys_full = minreal(sys_full);
+load M; load J; load R; load B; load C; 
+load Mr; load Jr; load Rr; load Br; load Cr;
+sys_full = dss(J-R,B,C,[0, 0],M);
+% sys_full = minreal(sys_full);
 
 
-sys_red = dss(Jr,Br,Br',0,Mr);
-sys_red = minreal(sys_red);
+sys_red = dss(Jr-Rr,Br,Cr,[0, 0],Mr);
+% sys_red = minreal(sys_red);
 
-for i=1:6
-    figure(i); sigma(sys_full(i,i), 'b', sys_red(i,i), 'r')
-    legend('EB full', 'EB n = 30')
-end
+fntsize = 15;
+figure()
+
+sigma(sys_red(1, 1)*tf(1, [1 0]), '-*r', sys_full(1, 1)*tf(1, [1 0]), '-b', {5*2*pi, 150*2*pi})
+% set_graphics_sigma(gca, fntsize)
+set(gca,...
+'Units','normalized',...
+'FontWeight','normal',...
+'FontUnits','points',...
+'FontSize',fntsize,...
+'FontName','Times')
+ylabel('$\sigma$',...
+'FontUnits','points',...
+'interpreter', 'latex',...
+'FontSize',fntsize,...
+'FontName','Times')
+xlabel('Frequency',...
+'FontUnits','points',...
+'interpreter', 'latex',...
+'FontWeight','normal',...
+'FontSize',fntsize,...
+'FontName','Times')
+legend({'KP red', 'KP red'},...
+'FontSize',fntsize,...
+'interpreter', 'latex',...
+'FontName','Times',...
+'Location','NorthEast')
+
+% for i=1:6
+%     figure(i); 
+% %     sigma(sys_full(i,i), 'b', sys_red(i,i), 'r')
+%     bode(sys_red, 'b', sys_full, 'r',{1/(2*pi), 150/(2*pi)})
+%     legend('KP full', 'KP n = 3')
+% end
 

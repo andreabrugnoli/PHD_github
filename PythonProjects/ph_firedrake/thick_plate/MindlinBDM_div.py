@@ -25,7 +25,7 @@ nu = 0.3
 rho = 1
 k = 0.8601
 L = 1
-h = 0.01
+h = 0.1
 
 plot_eigenvector = 'y'
 
@@ -72,6 +72,10 @@ def bending_curv(momenta):
 V_pw = FunctionSpace(mesh, "DG", deg)
 V_skw = FunctionSpace(mesh, "DG", deg)
 V_pth = VectorFunctionSpace(mesh, "DG", deg)
+
+# V_qth1 = FunctionSpace(mesh, "BDM", deg)
+# V_qth2 = FunctionSpace(mesh, "BDM", deg)
+# V_qw = FunctionSpace(mesh, "BDM", deg)
 
 V_qth1 = FunctionSpace(mesh, "BDM", deg+1)
 V_qth2 = FunctionSpace(mesh, "BDM", deg+1)

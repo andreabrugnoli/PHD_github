@@ -15,7 +15,7 @@ from math import pi
 plt.rc('text', usetex=True)
 
 
-n_el = 5 #int(input("Number of elements for side: "))
+n_el = 8  #int(input("Number of elements for side: "))
 deg = 1 #int(input('Degree for FE: '))
 nreq = 10
 
@@ -270,7 +270,9 @@ B_aug = np.concatenate((B_f, np.zeros(n_u, )), axis=0).reshape((-1, 1))
 n_Vp = V_pw.dim() + V_pth.dim()
 n_Vq = V_qw.dim() + V_qth12.dim() + V_qthD.dim()
 
-plate_full = SysPhdaeRig(n_V+n_u, n_u, 0, n_Vp, n_Vq, E_aug, J_aug, B_aug)
+print(J_aug.shape, n_V+n_u)
+
+plate_full = SysPhdaeRig(n_V+n_u, n_u, 0, n_Vp, n_Vq, E=E_aug, J=J_aug, B=B_aug)
 
 # plate_full = SysPhdaeRig(n_V, 0, 0, n_Vp, n_Vq, MM, JJ, B_in)
 

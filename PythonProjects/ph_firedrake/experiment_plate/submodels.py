@@ -6,6 +6,7 @@ np.set_printoptions(threshold=np.inf)
 from math import pi, floor
 
 import scipy.linalg as la
+from scipy import signal
 
 from ufl import algebra as ufl_alg
 from modules_ph.classes_phsystem import SysPhdaeRig
@@ -271,6 +272,10 @@ def plate_model(nx, ny, r):
     JJ = np.array(petsc_j.convert("dense").getDenseArray())
     MM = np.array(petsc_m.convert("dense").getDenseArray())
 
+    beta_M = 0.1
+    RR = np.zeros(MM.shape)
+    RR[:n_p, :n_p] = beta_M * MM[:n_p, :n_p]
+
     fz_P1 = v_p*delta_app(pos_P1)*dx
     mx_P1 = v_p.dx(1)*delta_app(pos_P1)*dx
     my_P1 = -v_p.dx(0)*delta_app(pos_P1)*dx
@@ -328,12 +333,6 @@ def plate_model(nx, ny, r):
     # Fz_E[ind_E] = 1
 
     B = np.hstack((Fz_P1, Mx_P1, My_P1, Fz_P2, Mx_P2, My_P2, Fz_E, Mx_E, My_E))
-    # B = np.hstack((Fz_P1, Fz_P2, Fz_E))
-
-    # print(max(abs(B)))
-    # print(B)
-    # print(np.where(B == max(B))[0])
-    # print(ind_P1)
 
     Z_lmb = np.zeros((n_lmb, n_lmb))
     J_aug = np.vstack([np.hstack([JJ, G]),
@@ -341,18 +340,18 @@ def plate_model(nx, ny, r):
                        ])
 
     M_aug = la.block_diag(MM, Z_lmb)
+    R_aug = la.block_diag(RR, Z_lmb)
 
     B_aug = np.concatenate((B, np.zeros((n_lmb, B.shape[1]))))
 
-    plate = SysPhdaeRig(n_V+n_lmb, n_lmb, 0, n_p, n_q, E=M_aug, J=J_aug, B=B_aug)
+    plate = SysPhdaeRig(n_V+n_lmb, n_lmb, 0, n_p, n_q, E=M_aug, R=R_aug, J=J_aug, B=B_aug)
 
     return plate, Vp
 
 
-plate, Vp = plate_model(8, 30, 1)
+plate, Vp = plate_model(4, 8, 1)
 np_plate = Vp.dim()
 
-print(plate.n)
 mirror = mirror_model()
 actuator = actuator_model()
 
@@ -363,18 +362,13 @@ pl_mir = SysPhdaeRig.transformer_ordered(plate, mirror, [6, 7, 8], [0, 1, 2], np
 plmir_act2 = SysPhdaeRig.transformer_ordered(pl_mir, actuator, [3, 4, 5], [0, 1, 2], np.eye(3))
 model_all = SysPhdaeRig.transformer_ordered(plmir_act2, actuator, [0, 1, 2], [0, 1, 2], np.eye(3))
 
+print(model_all.n)
+C_model_all = np.zeros((1, model_all.n_e))
+C_model_all[0, np_plate] = 1
+
 J_sys = model_all.J
 M_sys = model_all.E
 R_sys = model_all.R
-
-# print(model_all.B[np_plate:model_all.n_p])
-
-# J_act = J_sys[np_plate+np_mir:np_plate+np_mir+np_act, np_plate+np_mir:np_plate+np_mir+np_act]
-# R_act = R_sys[np_plate+np_mir:np_plate+np_mir+np_act, np_plate+np_mir:np_plate+np_mir+np_act]
-# M_act = M_sys[np_plate+np_mir:np_plate+np_mir+np_act, np_plate+np_mir:np_plate+np_mir+np_act]
-#
-# eigenvalues, eigvectors = la.eig(J_act-R_act, M_act)
-# print(eigenvalues/(2*3.14))
 
 eigenvalues, eigvectors = la.eig(J_sys, M_sys)
 omega_all = np.imag(eigenvalues)
@@ -397,12 +391,16 @@ for i in range(n_om):
 
 model_ode, T = model_all.dae_to_odeCE(mass=True)[:2]
 
-print(model_ode.n)
+print(T.shape)
 
 
-M_full = model_ode.E
+M_full = model_ode.M
 J_full = model_ode.J
+R_full = model_ode.R
 B_full = model_ode.B
+R_full = model_ode.R
+C_full = C_model_all @ T
+
 
 eigenvalues, eigvectors = la.eig(J_full, M_full)
 omega_all = np.imag(eigenvalues)
@@ -422,12 +420,14 @@ n_om = 6
 for i in range(n_om):
     print('Omega full ' + str(i+1) + ': ' + str(omega[i]/(2*pi)))
 
-model_red, V_f = model_ode.reduce_system(1, 20)
+model_red, V = model_ode.reduce_system(1, 5)
 print(model_red.n)
 
-M_red = model_red.E
+M_red = model_red.M
 J_red = model_red.J
+R_red = model_red.R
 B_red = model_red.B
+C_red = C_full @ V
 
 eigenvalues, eigvectors = la.eig(J_red, M_red)
 omega_all = np.imag(eigenvalues)
@@ -442,21 +442,43 @@ eigvec_omega = eigvec_omega[:, perm]
 
 omega.sort()
 
-n_om = 6
+n_om = 2
 
 for i in range(n_om):
     print('Omega red ' + str(i + 1) + ': ' + str(omega[i] / (2 * pi)))
 
-# pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/ReductionPHDAE/KP_Experiment/'
-# # M_file = 'M'; Q_file = 'Q'; J_file = 'J'; B_file = 'B'
-# # savemat(pathout + M_file, mdict={M_file: M_full})
-# # savemat(pathout + J_file, mdict={J_file: J_full})
-# # savemat(pathout + B_file, mdict={B_file: B_full})
-#
-# Mr_file = 'Mr'; Qr_file = 'Qr'; Jr_file = 'Jr'; Br_file = 'Br'
-# savemat(pathout + Mr_file, mdict={Mr_file: M_red})
-# savemat(pathout + Jr_file, mdict={Jr_file: J_red})
-# savemat(pathout + Br_file, mdict={Br_file: B_red})
+# sys_red = signal.lti((J_red) @ la.inv(M_red), B_red[:, 0].reshape((-1,1)), C_red, 0)
+# w, mag, phase = signal.bode(sys_red, w=np.linspace(1*2*pi, 120*2*pi, 1000))
+sys_full = signal.lti(J_full @ la.inv(M_full), B_full[:, 0].reshape((-1,1)), C_full, 0)
+w, mag, phase = signal.bode(sys_full, w=np.linspace(1*2*pi, 120*2*pi, 1000))
+
+fntsize=16
+plt.figure()
+plt.semilogx(w/(2*pi), mag)    # Bode magnitude plot
+plt.xlabel(r'{Frequency} (Hz)', fontsize=fntsize)
+plt.ylabel(r'{Magnitude} (dB)', fontsize=fntsize)
+
+# plt.figure()
+# plt.semilogx(w, phase)  # Bode phase plot
+# plt.show()
+
+
+
+
+pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/ReductionPHDAE/KP_Experiment/'
+M_file = 'M'; R_file = 'R'; J_file = 'J'; B_file = 'B'; C_file = 'C'
+savemat(pathout + M_file, mdict={M_file: np.array(M_full)})
+savemat(pathout + J_file, mdict={J_file: np.array(J_full)})
+savemat(pathout + R_file, mdict={R_file: np.array(R_full)})
+savemat(pathout + B_file, mdict={B_file: np.array(B_full)})
+savemat(pathout + C_file, mdict={C_file: np.array(C_full)})
+
+Mr_file = 'Mr'; Rr_file = 'Rr'; Jr_file = 'Jr'; Br_file = 'Br'; Cr_file = 'Cr'
+savemat(pathout + Mr_file, mdict={Mr_file: np.array(M_red)})
+savemat(pathout + Jr_file, mdict={Jr_file: np.array(J_red)})
+savemat(pathout + Rr_file, mdict={Rr_file: np.array(R_red)})
+savemat(pathout + Br_file, mdict={Br_file: np.array(B_red)})
+savemat(pathout + Cr_file, mdict={Cr_file: np.array(C_red)})
 
 plot_eig = False
 

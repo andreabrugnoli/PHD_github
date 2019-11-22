@@ -239,7 +239,6 @@ b_u = sum(b_vec)
 M = assemble(m_form, mat_type='aij')
 J = assemble(j_form, mat_type='aij')
 
-
 petsc_j = J.M.handle
 petsc_m = M.M.handle
 

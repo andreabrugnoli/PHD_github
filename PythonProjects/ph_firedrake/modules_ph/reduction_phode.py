@@ -9,33 +9,29 @@ def proj_matrices_phode(E, A, B, s0, L, n1, n2, tol=1e-14):
     On structure preserving model reduction for damped wave propagation in transport network
     Matrices are supposed to have the structure
 
-    if grad
-    A = [-D1 -G^T -N^T
-          G  -D2    0
-          N    0    0];
+    A = [-D1    G
+         -G^T  -D2];
 
-    or if div
-    A = [-D1    G   0
-         -G^T  -D2 -N^T
-          0     N   0];
-
-    E = [M1   0  0
-          0  M2  0
-          0   0  0];
+    E = [M1   0
+          0  M2];
 
     B = [B1
-          0
           0];
 
     """
     M1 = E[:n1, :n1]; M2 = E[n1:n2, n1:n2]
     W, r = krylov(E, A, B, s0, L, tol)
 
-    W1 = W[:n1, :]; W2 = W[n1:n2, :]
+    return W
+    # W1 = W[:n1, :]; W2 = W[n1:n2, :]
+    #
+    # W1, W2 = splitting(W1, W2, M1, M2, tol)
 
-    W1, W2 = splitting(W1, W2, M1, M2, tol)
-
-    return W1, W2
+    # G = A[:n1, n1:n2]
+    #
+    # V1, V2 = modify(W1, W2, M1, M2, G, tol)
+    #
+    # return V1, V2
 
 
 def krylov(E, A, B, s0, L, tol):
@@ -107,11 +103,11 @@ def splitting(W1, W2, M1, M2, tol):
 
     C, S, X, U1, U2 = pygsvd.gsvd(R1 @ W1, R2 @ W2, extras='uv')
 
-    kc = np.logical_and(C > tol, S < 1 - tol)
-    ks = np.logical_and(S > tol, C < 1 - tol)
+    # kc = np.logical_and(C > tol, S < 1 - tol)
+    # ks = np.logical_and(S > tol, C < 1 - tol)
 
-    # kc = np.square(C) > tol
-    # ks = np.square(S) > tol
+    kc = np.square(C) > tol
+    ks = np.square(S) > tol
 
     W1 = solve_triangular(R1, U1)
     W2 = solve_triangular(R2, U2)
@@ -120,3 +116,14 @@ def splitting(W1, W2, M1, M2, tol):
     W2 = W2[:, ks]
 
     return W1, W2
+
+
+def modify(W1, W2, M1, M2, G, tol):
+
+    nullG = null_space(G)
+    nullGT = null_space(G.T)
+
+    V1 = ortho(np.concatenate((W1, nullGT), axis=1), np.zeros((0, 0)), M1, tol)
+    V2 = ortho(np.concatenate((W2, nullG), axis=1), np.zeros((0, 0)), M2, tol)
+
+    return V1, V2

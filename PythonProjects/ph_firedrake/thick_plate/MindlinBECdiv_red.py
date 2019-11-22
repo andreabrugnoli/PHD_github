@@ -211,6 +211,10 @@ w_t, om_n, om_s = TrialFunction(Vu)
 # om_n = dot(e_pth, n_ver)
 # om_s = dot(e_pth, s_ver)
 
+bcs = []
+
+bc = DirichletBC(V.sub(2), Constant((0.0, 0.0)), "on_boundary")
+
 b_vec = []
 for key,val in bc_dict.items():
     if val == 'F':
@@ -269,7 +273,7 @@ B_aug = np.concatenate((B_f, np.zeros(n_u, )), axis=0).reshape((-1, 1))
 n_Vp = V_pw.dim() + V_pth.dim()
 n_Vq = V_qw.dim() + V_qth12.dim() + V_qthD.dim()
 
-plate_full = SysPhdaeRig(n_V+n_u, n_u, 0, n_Vp, n_Vq, E_aug, J_aug, B_aug)
+plate_full = SysPhdaeRig(n_V+n_u, n_u, 0, n_Vp, n_Vq, E=E_aug, J=J_aug, B=B_aug)
 
 # plate_full = SysPhdaeRig(n_V, 0, 0, n_Vp, n_Vq, MM, JJ, B_in)
 
