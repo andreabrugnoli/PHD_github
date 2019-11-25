@@ -7,25 +7,27 @@ from math import pi, floor
 
 import matplotlib
 import matplotlib.pyplot as plt
+import petsc4py
 
 matplotlib.rcParams['text.usetex'] = True
-
-bc_input = 'C'
 save_res = False
-path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/thin_plate/circle_meshes/"
+bc_input = 'SSSS'
+
 
 def compute_err(n, r):
 
     h_mesh = 1/n
 
-    E = 136 * 10**9 # Pa
-    rho = 5600  # kg/m^3
-    nu = 0.3
-    h = 0.001
+    E = Constant(136 * 10**9) # Pa
+    rho = Constant(5600)  # kg/m^3
+    nu = Constant(0.3)
+    h = Constant(0.001)
 
-    D = E * h ** 3 / (1 - nu ** 2) / 12
-    fl_rot = 12 / (E * h ** 3)
-    R = 1
+    Lx = 1
+    Ly = 1
+
+    D = Constant(E * h ** 3 / (1 - nu ** 2) / 12)
+    fl_rot = Constant(12 / (E * h ** 3))
     # Useful Matrices
 
     # Operators and functions
@@ -38,28 +40,32 @@ def compute_err(n, r):
         return kappa
 
     def j_operator(v_p, v_q, e_p, e_q):
+
         j_form = - inner(grad(grad(v_p)), e_q) * dx \
-                 + jump(grad(v_p), n_ver) * dot(dot(e_q('+'), n_ver('+')), n_ver('+')) * dS \
-                 + dot(grad(v_p), n_ver) * dot(dot(e_q, n_ver), n_ver) * ds \
-                 + inner(v_q, grad(grad(e_p))) * dx \
-                 - dot(dot(v_q('+'), n_ver('+')), n_ver('+')) * jump(grad(e_p), n_ver) * dS \
-                 - dot(dot(v_q, n_ver), n_ver) * dot(grad(e_p), n_ver) * ds
+        + jump(grad(v_p), n_ver) * dot(dot(e_q('+'), n_ver('+')), n_ver('+')) * dS \
+        + dot(grad(v_p), n_ver) * dot(dot(e_q, n_ver), n_ver) * ds \
+        + inner(v_q, grad(grad(e_p))) * dx \
+        - dot(dot(v_q('+'), n_ver('+')), n_ver('+')) * jump(grad(e_p), n_ver) * dS \
+        - dot(dot(v_q, n_ver), n_ver) * dot(grad(e_p), n_ver) * ds
 
         return j_form
 
     # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
 
-    mesh = Mesh(path_mesh + "circle_n" + str(n) + ".msh")
+    mesh = RectangleMesh(n, n, Lx, Lx, quadrilateral=False)
 
-    # plot(mesh);
-    # plt.show()
-
+    # Domain, Subdomains, Boundary, Suboundaries
 
     # Finite element defition
 
     Vp = FunctionSpace(mesh, 'CG', r)
-    Vq = FunctionSpace(mesh, 'HHJ', r - 1)
+    Vq = FunctionSpace(mesh, 'HHJ', r-1)
     V = Vp * Vq
+
+    # Vgradp = VectorFunctionSpace(mesh, 'CG', r)
+
+    n_Vp = V.sub(0).dim()
+    n_Vq = V.sub(1).dim()
     n_V = V.dim()
     print(n_V)
 
@@ -87,65 +93,59 @@ def compute_err(n, r):
     # e_mns = inner(e_q, outer(n_ver, s_ver))
     # v_mns = inner(v_q, outer(n_ver, s_ver))
 
-    j_1 = - inner(grad(grad(v_p)), e_q) * dx \
-          + jump(grad(v_p), n_ver) * dot(dot(e_q('+'), n_ver('+')), n_ver('+')) * dS \
-          + dot(grad(v_p), n_ver) * dot(dot(e_q, n_ver), n_ver) * ds
-
-    j_2 = + inner(v_q, grad(grad(e_p))) * dx \
-          - dot(dot(v_q('+'), n_ver('+')), n_ver('+')) * jump(grad(e_p), n_ver) * dS \
-          - dot(dot(v_q, n_ver), n_ver) * dot(grad(e_p), n_ver) * ds
-
-
-    j_form = j_1 + j_2
+    j_form = j_operator(v_p, v_q, e_p, e_q)
 
     bcs = []
-    bcs.append(DirichletBC(V.sub(0), Constant(0.0), "on_boundary"))
 
-    degr = 4
-    t = 0
-    t_fin = 1        # total simulation time
+    bc_p = DirichletBC(V.sub(0), Constant(0.0), "on_boundary")
+    bc_q = DirichletBC(V.sub(1), Constant(((0.0, 0.0), (0.0, 0.0))), "on_boundary")
+    bcs.append(bc_p)
+    bcs.append(bc_q)
 
+    t = 0.
     t_ = Constant(t)
     t_1 = Constant(t)
-
-    beta = 1 # 4*pi/t_fin
-    f_0 = 1
-    R = 1
+    t_fin = 1        # total simulation time
     x = mesh.coordinates
 
-    w_exact = f_0/(64*D)*(R**2-(x[0]**2+x[1]**2))**2*sin(beta*t_)
-    grad_wex = as_vector([-f_0/(16*D)*(R**2-(x[0]**2+x[1]**2))*sin(beta*t_)*x[0],
-                          -f_0/(16*D)*(R**2-(x[0]**2+x[1]**2))*sin(beta*t_)*x[1]])
+    beta = 1
+    w_exact = sin(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*sin(beta*t_)
+    grad_wex = as_vector([pi/Lx*cos(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*sin(beta*t_),
+                           pi/Ly*sin(pi*x[0]/Lx)*cos(pi*x[1]/Ly)*sin(beta*t_)])
 
-    v_exact = f_0*beta/(64*D)*(R**2-(x[0]**2+x[1]**2))**2*cos(beta*t_)
-    grad_vex = as_vector([-f_0*beta/(16*D)*(R**2-(x[0]**2+x[1]**2))*cos(beta*t_)*x[0],
-                          -f_0*beta/(16*D)*(R**2-(x[0]**2+x[1]**2))*cos(beta*t_)*x[1]])
+    v_exact = beta * sin(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*cos(beta*t_)
+    grad_vex = as_vector([beta * pi / Lx * cos(pi * x[0] / Lx) * sin(pi * x[1] / Ly) * cos(beta * t_),
+                          beta * pi / Ly * sin(pi * x[0] / Lx) * cos(pi * x[1] / Ly) * cos(beta * t_)])
 
-    dxx_wex = -f_0/(16*D)*(R**2-(3*x[0]**2+x[1]**2) )*sin(beta*t_)
-    dyy_wex = -f_0/(16*D)*(R**2-(x[0]**2+3*x[1]**2) )*sin(beta*t_)
-    dxy_wex = f_0/(8*D)*x[0]*x[1]*sin(beta*t_)
-    sigma_ex = as_tensor([[D*(dxx_wex + nu*dyy_wex), D*(1-nu)*dxy_wex],
-                         [D*(1-nu)*dxy_wex, D*(dyy_wex + nu*dxx_wex)]])
+    dxx_wex = - (pi/Lx)**2*sin(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*sin(beta*t_)
+    dyy_wex = - (pi/Ly)**2*sin(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*sin(beta*t_)
+    dxy_wex = pi**2/(Lx*Ly)*cos(pi*x[0]/Lx)*cos(pi*x[1]/Ly)*sin(beta*t_)
 
-    force = f_0*sin(beta*t_)*(1 - rho*h*beta**2/(64*D)*(R**2-(x[0]**2+x[1]**2))**2)
+    sigma_ex = as_tensor([[D * (dxx_wex + nu * dyy_wex), D * (1 - nu) * dxy_wex],
+                          [D * (1 - nu) * dxy_wex, D * (dyy_wex + nu * dxx_wex)]])
 
-    force1 = f_0*sin(beta*t_1)*(1 - rho*h*beta**2/(64*D)*(R**2-(x[0]**2+x[1]**2))**2)
+    force = sin(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*sin(beta*t_)*(D *((pi/Lx)**2 + (pi/Ly)**2)**2 - rho*h*beta**2)
+    force1 = sin(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*sin(beta*t_1)*(D *((pi/Lx)**2 + (pi/Ly)**2)**2 - rho*h*beta**2)
 
     f_form = v_p*force*dx
     f_form1 = v_p*force1*dx
 
-    # J, M = PETScMatrix(), PETScMatrix()
+    # J = assemble(j_form)
+    # M = assemble(m_form)
+
+    # Apply boundary conditions to M, J
+    # [bc.apply(J) for bc in bcs]
+    # [bc.apply(M) for bc in bcs]
 
     dt = 0.1*h_mesh
     theta = 0.5
 
     lhs = m_form - dt*theta*j_form
-    A = assemble(lhs, bcs=bcs, mat_type='aij')
 
-    e_n1 = Function(V)
-    e_n = Function(V)
-    w_n1 = Function(Vp)
-    w_n = Function(Vp)
+    e_n1 = Function(V, name="e next")
+    e_n = Function(V,  name="e old")
+    w_n1 = Function(Vp, name="w old")
+    w_n = Function(Vp, name="w next")
 
     e_n.sub(0).assign(interpolate(v_exact, Vp))
 
@@ -155,29 +155,37 @@ def compute_err(n, r):
 
     n_t = int(floor(t_fin/dt) + 1)
 
+    w_err_H1 = np.zeros((n_t,))
     v_err_H1 = np.zeros((n_t,))
     sig_err_L2 = np.zeros((n_t,))
 
     w_atP = np.zeros((n_t,))
     v_atP = np.zeros((n_t,))
-    Ppoint = (R/3, R/7)
-    v_atP[0] = ep_n.at(Ppoint[0], Ppoint[1])
+    Ppoint = (Lx/14, Ly/3)
+    v_atP[0] = ep_n.at(Ppoint)
 
     # w_err_H1[0] = np.sqrt(assemble(dot(w_n-w_exact, w_n-w_exact) *dx
     #                      + dot(grad(w_n) - grad_wex, grad(w_n) - grad_wex) * dx))
     v_err_H1[0] = np.sqrt(assemble(dot(ep_n - v_exact, ep_n - v_exact) * dx
-                         + dot(grad(ep_n) - grad_vex, grad(ep_n) - grad_vex) * dx))
+                                   + dot(grad(ep_n) - grad_vex, grad(ep_n) - grad_vex) * dx))
 
     sig_err_L2[0] = np.sqrt(assemble(inner(eq_n - sigma_ex, eq_n - sigma_ex) * dx))
 
     t_vec = np.linspace(0, t_fin, num=n_t)
 
+    A = assemble(lhs, bcs=bcs, mat_type='aij')
+
+    # param = {'ksp_converged_reason': None,
+    #                      'ksp_monitor_true_residual': None,
+    #                      'ksp_view': None}
+
     param = {"ksp_type": "preonly", "pc_type": "lu"}
 
+    # print(e_n.vector().get_local())
     for i in range(1, n_t):
 
         t_.assign(t)
-        t_1.assign(t + dt)
+        t_1.assign(t+dt)
 
         ep_n, eq_n = e_n.split()
         alp_n = rho * h * ep_n
@@ -198,38 +206,41 @@ def compute_err(n, r):
 
         b = assemble(rhs, bcs=bcs)
 
-        solve(A, e_n1, b, solver_parameters=param)
-
         t += dt
-
+        solve(A, e_n1, b, solver_parameters=param)
         ep_n1, eq_n1 = e_n1.split()
 
-        w_n1.assign(w_n + dt / 2 * (ep_n + ep_n1))
-        w_n.assign(w_n1)
+        w_n1.assign(w_n + dt/2*(ep_n + ep_n1))
 
         e_n.assign(e_n1)
+        w_n.assign(w_n1)
 
-        w_atP[i] = w_n1.at(Ppoint[0], Ppoint[1])
-        v_atP[i] = ep_n1.at(Ppoint[0], Ppoint[1])
-
+        w_atP[i] = w_n1.at(Ppoint)
+        v_atP[i] = ep_n1.at(Ppoint)
         t_.assign(t)
 
+        ep_n, eq_n = e_n.split()
 
         # w_err_H1[i] = np.sqrt(assemble(dot(w_n1-w_exact, w_n1-w_exact) * dx
         #                      + dot(grad(w_n1)-grad_wex, grad(w_n1)-grad_wex) * dx))
         v_err_H1[i] = np.sqrt(assemble(dot(ep_n1 - v_exact, ep_n1 - v_exact) * dx
-                         + dot(grad(ep_n1) - grad_vex, grad(ep_n1) - grad_vex) * dx))
+                                       + dot(grad(ep_n1) - grad_vex, grad(ep_n1) - grad_vex) * dx))
 
         sig_err_L2[i] = np.sqrt(assemble(inner(eq_n1 - sigma_ex, eq_n1 - sigma_ex) * dx))
 
     plt.figure()
-    # plt.plot(t_vec, w_atP, 'r-', label=r'approx $w$')
-    # plt.plot(t_vec, f_0/(64*D)*(R**2-(Ppoint[0]**2+Ppoint[1]**2))**2*np.sin(beta*t_vec), 'b-', label=r'exact $w$')
-    plt.plot(t_vec, v_atP, 'r-', label=r'approx $v$')
-    plt.plot(t_vec, f_0*beta/(64*D)*(R**2-(Ppoint[0]**2+Ppoint[1]**2))**2*np.cos(beta*t_vec), 'b-', label=r'exact $v$')
+    plt.plot(t_vec, w_atP, 'r-', label=r'approx $w$')
+    plt.plot(t_vec, np.sin(pi*Ppoint[0]/Lx)*np.sin(pi*Ppoint[1]/Ly)*np.sin(beta*t_vec), 'b-', label=r'exact $w$')
+    # plt.plot(t_vec, v_atP, 'r-', label=r'approx $v$')
+    # plt.plot(t_vec, beta * np.sin(pi*Ppoint[0]/Lx)*np.sin(pi*Ppoint[1]/Ly) * np.cos(beta * t_vec), 'b-', label=r'exact $v$')
     plt.xlabel(r'Time [s]')
-    plt.title(r'Displacement at ' +  str(Ppoint))
+    plt.title(r'Displacement at' + str(Ppoint))
     plt.legend()
+    # plt.show()
+
+    # v_err_last = w_err_H1[-1]
+    # v_err_max = max(w_err_H1)
+    # v_err_quad = np.sqrt(np.sum(dt * np.power(w_err_H1, 2)))
 
     v_err_last = v_err_H1[-1]
     v_err_max = max(v_err_H1)

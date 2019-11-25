@@ -104,6 +104,14 @@ e_qth = as_tensor([[e_qth1[0], e_qth1[1]],
                     [e_qth2[0], e_qth2[1]]
                    ])
 
+# v_qth = as_tensor([[v_qth1[0], v_qth2[0]],
+#                    [v_qth1[1], v_qth2[1]]
+#                    ])
+#
+# e_qth = as_tensor([[e_qth1[0], e_qth2[0]],
+#                    [e_qth1[1], e_qth2[1]]
+#                    ])
+
 al_pw = rho * h * e_pw
 al_pth = (rho * h ** 3) / 12. * e_pth
 al_qth = bending_curv(e_qth)
