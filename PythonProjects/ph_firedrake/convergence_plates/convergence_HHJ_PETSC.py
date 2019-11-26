@@ -386,33 +386,33 @@ for i in range(n_h):
         sig_r3_L2[i - 1] = np.log(sig_errQuad_r3[i] / sig_errQuad_r3[i - 1]) / np.log(h2_vec[i] / h2_vec[i - 1])
 
 if save_res:
-    np.save("./convergence_results/" + case + "_h1", h1_vec)
-    np.save("./convergence_results/" + case + "_h2", h1_vec)
-    np.save("./convergence_results/" + case + "_h3", h2_vec)
+    np.save("./convergence_results_kirchhoff/" + bc_input + "_h1", h1_vec)
+    np.save("./convergence_results_kirchhoff/" + bc_input + "_h2", h1_vec)
+    np.save("./convergence_results_kirchhoff/" + bc_input + "_h3", h2_vec)
 
-    np.save("./convergence_results/" + case + "_v_errF_r1", v_err_r1)
-    np.save("./convergence_results/" + case + "_v_errInf_r1", v_errInf_r1)
-    np.save("./convergence_results/" + case + "_v_errQuad_r1", v_errQuad_r1)
+    np.save("./convergence_results_kirchhoff/" + bc_input + "_v_errF_r1", v_err_r1)
+    np.save("./convergence_results_kirchhoff/" + bc_input + "_v_errInf_r1", v_errInf_r1)
+    np.save("./convergence_results_kirchhoff/" + bc_input + "_v_errQuad_r1", v_errQuad_r1)
 
-    np.save("./convergence_results/" + case + "_v_errF_r2", v_err_r2)
-    np.save("./convergence_results/" + case + "_v_errInf_r2", v_errInf_r2)
-    np.save("./convergence_results/" + case + "_v_errQuad_r2", v_errQuad_r2)
+    np.save("./convergence_results_kirchhoff/" + bc_input + "_v_errF_r2", v_err_r2)
+    np.save("./convergence_results_kirchhoff/" + bc_input + "_v_errInf_r2", v_errInf_r2)
+    np.save("./convergence_results_kirchhoff/" + bc_input + "_v_errQuad_r2", v_errQuad_r2)
 
-    np.save("./convergence_results/" + case + "_v_errF_r3", v_err_r3)
-    np.save("./convergence_results/" + case + "_v_errInf_r3", v_errInf_r3)
-    np.save("./convergence_results/" + case + "_v_errQuad_r3", v_errQuad_r3)
+    np.save("./convergence_results_kirchhoff/" + bc_input + "_v_errF_r3", v_err_r3)
+    np.save("./convergence_results_kirchhoff/" + bc_input + "_v_errInf_r3", v_errInf_r3)
+    np.save("./convergence_results_kirchhoff/" + bc_input + "_v_errQuad_r3", v_errQuad_r3)
 
-    np.save("./convergence_results/" + case + "_sig_errF_r1", sig_err_r1)
-    np.save("./convergence_results/" + case + "_sig_errInf_r1", sig_errInf_r1)
-    np.save("./convergence_results/" + case + "_sig_errQuad_r1", sig_errQuad_r1)
+    np.save("./convergence_results_kirchhoff/" + bc_input + "_sig_errF_r1", sig_err_r1)
+    np.save("./convergence_results_kirchhoff/" + bc_input + "_sig_errInf_r1", sig_errInf_r1)
+    np.save("./convergence_results_kirchhoff/" + bc_input + "_sig_errQuad_r1", sig_errQuad_r1)
 
-    np.save("./convergence_results/" + case + "_sig_errF_r2", sig_err_r2)
-    np.save("./convergence_results/" + case + "_sig_errInf_r2", sig_errInf_r2)
-    np.save("./convergence_results/" + case + "_sig_errQuad_r2", sig_errQuad_r2)
+    np.save("./convergence_results_kirchhoff/" + bc_input + "_sig_errF_r2", sig_err_r2)
+    np.save("./convergence_results_kirchhoff/" + bc_input + "_sig_errInf_r2", sig_errInf_r2)
+    np.save("./convergence_results_kirchhoff/" + bc_input + "_sig_errQuad_r2", sig_errQuad_r2)
 
-    np.save("./convergence_results/" + case + "_sig_errF_r3", sig_err_r3)
-    np.save("./convergence_results/" + case + "_sig_errInf_r3", sig_errInf_r3)
-    np.save("./convergence_results/" + case + "_sig_errQuad_r3", sig_errQuad_r3)
+    np.save("./convergence_results_kirchhoff/" + bc_input + "_sig_errF_r3", sig_err_r3)
+    np.save("./convergence_results_kirchhoff/" + bc_input + "_sig_errInf_r3", sig_errInf_r3)
+    np.save("./convergence_results_kirchhoff/" + bc_input + "_sig_errQuad_r3", sig_errQuad_r3)
 
 v_r1int_atF = np.polyfit(np.log(h1_vec), np.log(v_err_r1), 1)[0]
 v_r1int_max = np.polyfit(np.log(h1_vec), np.log(v_errInf_r1), 1)[0]
