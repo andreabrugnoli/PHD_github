@@ -1,0 +1,505 @@
+\documentclass[aspectratio=169]{ISAE-Beamer}
+\usefonttheme[onlymath]{serif}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{diffcoeff}
+\usepackage{dsfont}
+\usepackage{mathrsfs}
+\usepackage{tcolorbox}
+
+\usepackage{multimedia}
+
+\usepackage[backend=bibtex]{biblatex}
+
+\graphicspath{{../Figures/}}
+
+\bibliography{bib_pres_sxs}
+
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator*{\grad}{grad}
+\DeclareMathOperator*{\Grad}{Grad}
+\DeclareMathOperator*{\Div}{Div}
+\renewcommand{\div}{\operatorname{div}}
+\DeclareMathOperator*{\Hess}{Hess}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\def\onedot{$\mathsurround0pt\ldotp$}
+\def\cddot{% two dots stacked vertically
+	\mathbin{\vcenter{\baselineskip.67ex
+			\hbox{\onedot}\hbox{\onedot}}%
+}}
+
+\makeatletter \renewcommand\d[1]{\ensuremath{%
+		\;\mathrm{d}#1\@ifnextchar\d{\!}{}}}
+\makeatother
+
+\title[CDC Annual conference]{Interconnection of the Kirchhoff plate within the port-Hamiltonian framework}
+
+\institute[ISAE]
+{\inst{1}ISAE-SUPAERO, Toulouse}
+
+\author[Andrea Brugnoli]{Andrea Brugnoli\inst{1}}
+
+\date[CDC Nice, 13/12/19]{December, the 13th, 2019}
+
+%\thanks{}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}{Outline}
+
+\tableofcontents
+
+\end{frame}
+
+\section{The Kirchhoff plate as a port-Hamiltonian system}
+	
+\subsection{Classical formulation}
+
+\begin{frame}{The classical Kirchhoff model}
+\only<1>{\begin{block}{Classical bilaplacian formulation}
+	For an homogeneous isotropic material
+	\begin{equation*}
+	\rho h \diffp[2]{w}{t} + D \Delta^2 w = p, \quad \bm{x} \in \Omega \subset \mathbb{R}^2.
+	\end{equation*}
+	$\Delta^2 = \partial_{xxxx} + 2 \partial_{xxyy} + \partial_{yyyy}$ is the bilaplacian operator
+\end{block}}
+\only<2>{
+\begin{block}{Bending moment formulation}
+
+	\begin{equation*}
+	\rho h \diffp[2]{w}{t} + \div\Div(\bm{M}) = p, \quad \bm{x} \in \Omega \subset \mathbb{R}^2.
+	\end{equation*}
+	Where $\bm{M} = \mathbb{D} \nabla^2 w \in \mathbb{R}^{2\times 2}_{\text{sym}}$ is the bending moment tensor and $\nabla^2 = \Grad \circ \grad$ the Hessian. 
+	\[\div\Div(\bm{M}) = \partial_{xx} M_{11} + 2 \partial_{xy} M_{12} + \partial_{yy} M_{22} \]
+\end{block}}
+\begin{itemize}
+	\item $\rho \; [\mathrm{kg/m^3}]$ is the mass density;
+	\item $h \; [\mathrm{m}]$ is the plate thickness;
+	\item $p \; [\mathrm{N/m^2}]$ is an external distributed force; 
+	\only<1>{\item $D \; [\mathrm{Pa \, m}]$ is the bending stiffness;}
+	\only<2>{\item $\mathbb{D}$ is the bending rigidity tensor (symmetric, positive). 	For an homogeneous isotropic material
+	\begin{equation*}
+		\mathbb{D} \bm{A} = D \left\{(1-\nu) \bm{A} + \nu \Tr(\bm{A}) \bm{I}\right\};
+	\end{equation*}}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Boundary conditions}
+For the boundary variables consider the definitions
+\begin{align*}
+\text{Flexural moment} \quad M_{nn} &= \bm{M} \cddot (\bm{n}\otimes\bm{n}), \\
+\text{Torsional moment} \quad M_{ns} &= \bm{M} \cddot (\bm{n}\otimes\bm{s}), \\
+\text{Effective shear force} \quad \widetilde{q}_n &= -(\Div \bm{M}) \cdot \bm{n} - \partial_{\bm{s}} M_{ns}, 
+\end{align*}
+where $\bm{n}, \, \bm{s}$ are the normal and tangential versors along the boundary $\partial \Omega$. \\
+$\bm{A} \cddot \bm{B} = \sum_{i, j} A_{ij} B_{ij}$ is the tensor contraction and $\bm{a} \otimes \bm{b} = \bm{a} \bm{b}^\top \in \mathbb{R}^{2\times 2}$ is the dyadic product between vectors. \\
+Consider a partition of the boundary: $\partial \Omega = \Gamma_c \cup \Gamma_s \cup \Gamma_f$.
+\begin{itemize}
+	\item $\Gamma_c$ is the clamped part, i.e. $w, \; \partial_{\bm{n}}w$ known;
+	\item $\Gamma_s$ is the simply supported part, i.e. $w, \; M_{nn}$ known;
+	\item $\Gamma_f$ is the free part, i.e. $M_{nn}, \; q_n$ known;
+\end{itemize}
+\end{frame}
+
+\subsection{Port-Hamiltonian formulation}
+
+\begin{frame}{Hamiltonian and energy variables}
+The total energy of the system is given by the sum of kinetic and deformation energy
+\[
+H = \frac{1}{2} \int_{\Omega} \left\{\rho \left(\partial_t w\right)^2 + \mathbb{D} \nabla^2 w \cddot \nabla^2 w \right\} \d{\Omega}
+\] 
+Consider the following choice for the energy variables
+\begin{align*}
+	\alpha_1 &:= \rho \partial_t w, \quad \text{Linear momentum} \\
+	\bm{A}_2 &:=  \nabla^2 w, \quad \text{Curvature}
+\end{align*}
+This leads to the following co-energy variables
+\begin{align*}
+e_1 &:= \diffd{H}{\alpha_1} =  \partial_t w = (\rho h)^{-1} \alpha_1, \quad \text{Velocity} \\
+\bm{E}_2 &:= \diffd{H}{\bm{A}_2} = \bm{M} = \mathbb{D} \bm{A}_2, \quad \text{Bending moment}
+\end{align*}
+\end{frame}
+
+\begin{frame}{Port Hamiltonian formulation}
+\begin{tcolorbox}
+The system
+\begin{equation*}
+\diffp{}{t} \begin{pmatrix}
+\alpha_1 \\ \bm{A}_2
+\end{pmatrix} =
+\underbrace{\begin{bmatrix}
+0 & -\div\Div \\
+\nabla^2 & 0 \\
+\end{bmatrix}}_{\mathcal{J}} \begin{pmatrix}
+{e}_1 \\ \bm{E}_2
+\end{pmatrix}, \quad \begin{pmatrix}
+{e}_1 \\ \bm{E}_2
+\end{pmatrix} = \underbrace{\begin{bmatrix}
+(\rho h)^{-1} & 0 \\
+0 & \mathbb{D} \\
+\end{bmatrix}}_{\mathcal{Q}}
+\begin{pmatrix}
+\alpha_1 \\ \bm{A}_2
+\end{pmatrix}
+\end{equation*}
+with homogeneous boundary conditions 
+\[w\vert_{\Gamma_c} = \partial_{\bm{n}}w \vert_{\Gamma_c}=0, \quad w\vert_{\Gamma_s} = M_{nn}\vert_{\Gamma_s} = 0, \quad q_n\vert_{\Gamma_f} = M_{nn}\vert_{\Gamma_f} = 0
+\]
+defines a Stokes-Dirac structure. 
+\end{tcolorbox}
+Notice that $D(\mathcal{J}) = H^2(\Omega) \times H^{\div\Div}(\Omega)$:
+\begin{align*}
+H^2(\Omega) &:= \left\{v \in L^2(\Omega) \vert \, \nabla^2 v \in L^2(\Omega, \, \mathbb{R}^{2 \times 2}_{\text{sym}}) \right\}, \\
+H^{\div\Div}(\Omega) &:= \left\{ \bm{V} \in L^2(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}})) \vert \, \div\Div \bm{V} \in L^2(\Omega) \right\}
+\end{align*}
+
+\end{frame}
+
+\begin{frame}{}
+Consider the bond space $\mathcal{B} = \mathcal{F} \times \mathcal{E}$,
+\begin{equation*}
+\begin{aligned}
+\mathcal{F} = \mathcal{E} := L^2(\Omega) \times L^2(\Omega, \, \mathbb{R}^{2 \times 2}_{\text{sym}}), \qquad (\partial_t \alpha_1, \; \partial_t \bm{A}_2) = \bm{f} \in \mathcal{F}, \quad
+(e_1, \; \bm{E}_2) = \bm{e} \in \mathcal{E}
+\end{aligned} 
+\end{equation*}
+It is necessary to show that the set 
+\[
+\mathcal{D}_{\mathcal{J}} := \left\{ (\bm{f}, \bm{e}) \in \text{Graph}(\mathcal{J} ) \vert \; \bm{e} \in D(\mathcal{J})  \right\} \subset \mathcal{B}
+\] 
+equals its orthogonal complement
+\[\mathcal{D}_{\mathcal{J}}^\perp = \left\{ b \in \mathcal{B} \vert \;  \langle \bm{b}, \bm{b}' \rangle_{+} = 0, \; \forall \; \bm{b}' \in \mathcal{D}_{\mathcal{J}} \right\} \]
+with respect to the canonical symmetrical pairing 
+\[
+\langle \bm{b}^1, \bm{b}^2 \rangle_{+} = \langle \bm{f}^1, \bm{e}^2 \rangle_{L^2} + \langle \bm{e}^1, \bm{f}^2 \rangle_{L^2}, \quad \bm{b}^i = (\bm{f}^i, \bm{e}^i) \in \mathcal{B}, \quad i= 1,2
+\]
+\end{frame}
+
+\begin{frame}{}
+	The proof is readily obtained considering that the following holds
+	\[ (\div \Div)^* = \nabla^2\]
+	This means that the operator $\mathcal{J}$ is formally skew-adjoint. By application of the Stokes theorem it is obtained $\mathcal{D}_{\mathcal{J}} = \mathcal{D}_{\mathcal{J}}^\perp$. \\
+	\vspace{.5cm}
+	 Inhomogeneous boundary conditions can be considered as well, but the definition of $\mathcal{D}_{\mathcal{J}}$ requires additional care. \\
+	\vspace{.5cm}
+	It is worth noticing that the boundary variables are defined by the power balance
+	\[
+	\dot{H} = \int_{\partial \Omega} \left\{ \textcolor{blue}{\partial_t w} \, \textcolor{red}{\widetilde{q}_n} + \textcolor{blue}{\partial_{\bm{n}} (\partial_t w)} \, \textcolor{red}{M_{nn}} \right\}  \d{s}.
+	\]
+	
+\end{frame}
+
+\section{Structure preserving discretization}
+
+\subsection{The partitioned finite element method}
+
+\begin{frame}{How to discretize pH systems?}
+\begin{columns}[T]
+	\setlength{\abovedisplayskip}{1pt}
+	\setlength{\belowdisplayskip}{1pt}
+	\begin{column}{.4\textwidth}
+		\begin{block}{Infinite dimensional pHs}
+			PDE:
+			\begin{align*}
+			\partial_t{x}(z, t) &= \mathcal{J} \delta_x {H} + B \textcolor{red}{u(z, t)}, \\
+			\textcolor{red}{y(z, t)} &= B^* \delta_x {H}.
+			\end{align*}
+			Boundary conditions: 
+			\[\textcolor{blue}{u_\partial} = \mathcal{B}\ \delta_x {H}, \quad \textcolor{blue}{y_\partial} = \mathcal{C}\ \delta_x {H} \]
+			Power balance: 
+			\[ \dot{H} = \displaystyle \textcolor{blue}{u_\partial^T y_\partial} +  \int_{\Omega} \textcolor{red}{u(z, t) y(z, t)} \d{\Omega}
+			\]
+		\end{block}
+	\end{column}
+	\begin{column}{.4\textwidth}
+		\begin{block}{Finite dimensional pHs}
+			ODE:
+			\begin{align*}
+			\dot{x} &= J \partial_x {H} + B_d \textcolor{red}{u_d} + B_\partial \textcolor{blue}{u_\partial}, \\
+			\textcolor{red}{y_d} &= B_d^T \partial_x {H}, \\
+			\textcolor{blue}{y_\partial} &= B_\partial^T \partial_x {H}
+			\end{align*}
+			Power balance: 
+			\[ \dot{H} = \textcolor{blue}{u_\partial^T y_\partial} +  \textcolor{red}{u_d^T y_d}
+			\]
+		\end{block}
+	\end{column}
+\end{columns}
+\begin{exampleblock}{Available methods}
+	\begin{itemize}
+		\item Spectral methods (Moulla 2012);
+		\item Finite differences (Trenchant 2018);
+		\item Finite elements based (Golo 2004, Kotyczka 2018, \textcolor{blue}{Cardoso-Riberio 2019});
+	\end{itemize}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}{General idea of PFEM}
+General form of a linear pH system in co-energy variables
+\begin{equation*}
+\mathcal{M} \diffp{e}{t} = \mathcal{J} e, \qquad \mathcal{M} = \mathcal{Q}^{-1}
+\end{equation*}
+
+\begin{block}{General procedure for PFEM}
+	\setlength{\abovedisplayskip}{1pt}
+	\setlength{\belowdisplayskip}{1pt}
+	\begin{enumerate}
+		\item Put the system into weak form:
+		\begin{equation*}
+		\left(v, \mathcal{M} \diffp{e}{t} \right)_{\Omega} = \left(v, \mathcal{J} e \right)_{\Omega}.
+		\end{equation*}
+		\item Apply integration by part on a partition of $\mathcal{J}$:
+		\begin{equation*}
+		\left(v, \mathcal{J} e \right)_{\Omega} \overbrace{=}^{i.b.p.} j(v, e)_{\Omega} + b(v, u_\partial)_{\partial \Omega},
+		\end{equation*}
+		so that $j(v, e)_{\Omega}$ is a skew-symmetric bilinear form.
+		\item Discretization by Galerkin method (same basis function for test and co-energy variables)
+	\end{enumerate}
+\end{block}
+\end{frame}
+
+\subsection{Application to the Kirchhoff plate}
+
+\begin{frame}{The Kirchhoff plate case}
+For the Kirchhoff plate
+\[
+\mathcal{M} = \text{Diag}(\rho,\; \mathbb{D}^{-1}), \quad 
+\mathcal{J} = \begin{pmatrix}
+0 & -\div\Div \\
+\nabla^2 & 0  \\
+\end{pmatrix}
+\]
+\only<1>{Either the first line of the operator is integrated by parts
+\begin{align*}
+	\left(v, \mathcal{J}e \right) &= \int_{\Omega} \left\{ - v_1 \div\Div \bm{E}_2 + \bm{V}_2 \cddot \nabla^2 e_1 \right\} \d{\Omega} \\
+	&= \underbrace{\int_{\Omega} \left\{ - \nabla^2 v_1 \cddot \bm{E}_2 + \bm{V}_2 \cddot \nabla^2 e_1 \right\} \d{\Omega}}_{j_{\text{Hess}}(\bm{v}, \bm{e})} + \underbrace{\int_{\partial \Omega} \left\{ v_1 q_n + \partial_{\bm{n}}v_1 M_{nn} \right\} \d{s}}_{b_N(\bm{v}, \bm{u}_\partial)_{\partial \Omega}}
+\end{align*}
+}
+\only<2>{Either the second line of the operator is integrated by parts
+	\begin{align*}
+	\left(v, \mathcal{J}e \right) &= \int_{\Omega} \left\{ - v_1 \div\Div \bm{E}_2 + \bm{V}_2 \cddot \nabla^2 e_1 \right\} \d{\Omega} \\
+	&= \underbrace{\int_{\Omega} \left\{ - v_1 \div\Div \bm{E}_2 + \div\Div \bm{V}_2 \, e_1 \right\} \d{\Omega}}_{j_{\nabla^2}(\bm{v}, \bm{e})} + \underbrace{\int_{\partial \Omega} \left\{ v_1 q_n + \partial_{\bm{n}}v_1 M_{nn} \right\} \d{s}}_{b_N(\bm{v}, \bm{u}_\partial)_{\partial \Omega}}
+	\end{align*}
+}
+\end{frame}
+
+\begin{frame}
+	\setlength{\abovedisplayskip}{0pt}
+	\setlength{\belowdisplayskip}{0pt}
+\end{frame}
+
+
+\section{Interconnection with rigid elements}
+
+\begin{frame}{Boundary interconnection of the Kirchhoff plate}
+The system is composed by a cantilever plate connected to a rigid rod. The interconnection is given by a compact operator.
+\begin{equation*}
+\small \text{dpH} \left\{ 
+\begin{aligned}
+\diffp{x_1}{t} &= \mathcal{J} \diffd{H_1}{x_1} \\
+u_{\partial, 1}  &= \mathcal{B} \diffd{H_1}{x_1} \\
+y_{\partial, 1} &= \mathcal{C} \diffd{H_1}{x_1} 
+\end{aligned}
+\right. \qquad
+\text{pH} \left\{ 
+\begin{aligned}
+\diff{{x}_2}{t} &= {J} \diffp{H_2}{{x}_2} + {B} {u}_2 \\
+{y}_{2} &= {B}^T \diffp{H_2}{{x}_2} + {D} {u}_2 \\
+\end{aligned}, \qquad 
+\right. 
+\end{equation*} %
+
+where $x_1 \in \mathscr{X}$,  $u_{\partial, 1}  \in \mathscr{U}, \, y_{\partial, 1} \in  \mathscr{Y} = \mathscr{U}^\prime$ belong to some Hilbert spaces (the prime denotes the topological dual of a space) and ${x}_2 \in \mathbb{R}^n, {u}, {y} \in \mathbb{R}^m$. The duality pairings for the boundary ports are denoted by
+\[
+\left\langle u_{\partial, 1}, \; y_{\partial, 1} \right\rangle_{\mathscr{U} \times \mathscr{Y}},  \qquad
+\left\langle {u}_{2}, \; {y}_{2} \right\rangle_{\mathbb{R}^m}.
+\]
+For the interconnection, consider the compact operator $\mathcal{W}: \mathscr{Y} \rightarrow \mathbb{R}^m$ and the following power preserving interconnection
+\begin{equation*}
+\label{eq:int_inf}
+{u}_2 = -\mathcal{W} \, y_{\partial, 1},  \qquad u_{\partial, 1} = \mathcal{W}^* \, {y}_2,
+\end{equation*}
+\end{frame}
+
+\begin{frame}{Boundary interconnection of the Kirchhoff plate}
+\begin{equation*}\small
+\begin{aligned}
+\text{Kirchhoff plate} \\
+\begin{bmatrix}
+\rho h & 0 \\ 0 & \mathbb{D}^{-1} \\
+\end{bmatrix}
+\diffp{}{t}
+\begin{bmatrix}
+\partial_t w \\ \bm{M} \\
+\end{bmatrix} &= 
+\begin{bmatrix}
+0 & -\div\Div \\ \Grad\grad & 0 \\
+\end{bmatrix}
+\begin{bmatrix}
+\partial_t w \\ \bm{M} \\
+\end{bmatrix} \\
+u_{\partial, \text{pl}} &= \partial_t w (x = L_x, y), \\
+y_{\partial, \text{pl}} &= \widetilde{q}_n(x = L_x, y).
+\end{aligned} \qquad 
+\begin{aligned}
+\text{Rigid rod} \\
+\begin{bmatrix}
+M & 0 \\
+0   & J_G \\
+\end{bmatrix} 
+\displaystyle \diff{}{t}
+\begin{pmatrix}
+v_G \\ \omega_G \\
+\end{pmatrix} & = \begin{pmatrix}
+F_z \\ T_x \\
+\end{pmatrix} = \bm{u}_{\text{rod}}\vspace{1mm}, \\
+\bm{y}_{\text{rod}} &= \begin{pmatrix}
+v_G \\ \omega_{G} \\
+\end{pmatrix},
+\end{aligned}
+\end{equation*}
+Space $\mathscr{Y}$ is the space of square-integrable functions with support on $\Gamma_{\text{int}} = \left\{ (x,y) \vert \; x=L_x, 0 \le y \le L_y  \right\}$.
+ The compact interconnection operator then reads
+\begin{equation*}
+\mathcal{W} y_{\partial, \text{pl}} = \begin{pmatrix}
+\int_{\Gamma_{\text{int}}} y_{\partial, \text{pl}} \d{s} \\
+\int_{\Gamma_{\text{int}}} \left( y - L_y/2 \right) y_{\partial, \text{pl}} \d{s} \\
+\end{pmatrix}.
+\end{equation*}
+The adjoint operator is then obtained considering that $\bm{u}_{\text{rod}} = \mathcal{W} y_{\partial, \text{pl}}$ and that the inner product of $\mathbb{R}^m$ is easily converted to an inner product on the space $L^2(\Gamma_{\text{int}})$
+\begin{align*}
+\left\langle \mathcal{W} y_{\partial, \text{pl}}, \; \bm{y}_{\text{rod}} \right\rangle_{\mathbb{R}^m} &= \left\langle y_{\partial, \text{pl}}, \, \mathcal{W}^* \bm{y}_{\text{rod}}\right\rangle_{L^2(\Gamma_{\text{int}})}, \\
+\mathcal{W}^* {y}_{\text{rod}} &= v_G + \omega_{G} \left( y - L_y/2 \right).
+\end{align*}
+\end{frame}
+
+\begin{frame}{Results}
+\begin{center}
+	\onslide*<1>{
+		\movie[width=0.8\textwidth, height=0.6\textheight]{Plate and rod}{../Videos/Comparison_RodNoRod.mp4}	
+	}
+		\onslide*<2>{
+			\includegraphics[width=0.42\textwidth]{InterconnectionRod/HamiltonianRod_cropped.eps}
+			\includegraphics[width=0.44\textwidth]{InterconnectionRod/HamiltonianNoRod_cropped.eps}
+		}
+	\end{center}
+\end{frame}
+
+\section{Stabilization by boundary injection}
+
+\begin{frame}{Boundary stabilization of the Kirchhoff plate}
+\only<1>{Consider the problem
+	\begin{equation*}\small
+	\begin{bmatrix}
+	\rho h & 0 \\ 0 & \mathbb{D}^{-1} \\
+	\end{bmatrix}
+	\diffp{}{t}
+	\begin{bmatrix}
+	\partial_t w \\ \bm{M} \\
+	\end{bmatrix} = 
+	\begin{bmatrix}
+	0 & -\div\Div \\ \nabla^2 & 0 \\
+	\end{bmatrix}
+	\begin{bmatrix}
+	\partial_t w \\ \bm{M} \\
+	\end{bmatrix} \quad (x, y) \in \Omega = [0, 1]\times[0,1]
+	\end{equation*}
+	subjected to the following boundary conditions
+	\begin{align*}
+	\begin{aligned}
+	\partial_t w|\Gamma_D &= 0, \\
+	\partial_x \partial_t w|\Gamma_D &= 0, \\
+	\end{aligned} \qquad  \Gamma_D &= \left\{x = 0 \right\}\\
+	\begin{aligned}
+	\bm{M} \cddot (n \otimes n)|\Gamma_N &= u_M, \; \\
+	\mathcal{D} \bm{M}|\Gamma_N := \widetilde{q}|\Gamma_N &= u_F,\\
+	\end{aligned} \qquad \Gamma_N &= \left\{x = 0,\, x=1,\, y=1 \right\}
+	\end{align*}
+	
+	with initial conditions (compatible with the constraints):
+	\[
+	w_t(x,y,0) = x^2; \qquad \Sigma(x,y,0) ={0}.
+	\]
+}
+\only<2>{ Obtain a finite-dimensional uncontrolled system
+	\begin{equation*}
+	\begin{aligned}
+	\begin{bmatrix}
+	{M} & {0} \\
+	{0} & {0} \\
+	\end{bmatrix}\frac{d}{d t}
+	\begin{pmatrix}
+	{e}\\
+	{\lambda} \\
+	\end{pmatrix}
+	&= \begin{bmatrix}
+	{J} & {G} \\
+	-{G}^T & {0} \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	{e} \\
+	{\lambda} \\
+	\end{pmatrix} + \begin{bmatrix}
+	{B} \\
+	0 \\
+	\end{bmatrix} {u}, \\
+	{y} &= \begin{bmatrix}
+	{B}^T & {0} \\
+	\end{bmatrix} \begin{pmatrix}
+	{e}\\
+	{\lambda} \\
+	\end{pmatrix},
+	\end{aligned} 
+	\end{equation*}
+	Apply the control law $u = -Ky, \ K>0$
+	\begin{equation*}
+	\begin{bmatrix}
+	M & {0} \\
+	{0} & {0} \\
+	\end{bmatrix}
+	\frac{d}{d t}
+	\begin{pmatrix}
+	{e}\\
+	{\lambda} \\
+	\end{pmatrix}
+	= \begin{bmatrix}
+	{J} - {R} & {G} \\
+	-{G}^T & {0} \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	e\\
+	{\lambda} \\
+	\end{pmatrix},
+	\end{equation*}
+	with ${R} = {B} {K} {B}^T \succeq 0$. \\
+	The Hamiltonian $\dot{H} = - e^T R e \le 0$ is a non increasing function and by La~Salle principle the equilibrium point $e = 0$ is asymptotically stable.	
+}
+
+
+\begin{center}
+	\only<3>{
+		\movie[width=0.42\textwidth, height = 0.7 \textheight]{Damping Kirchhoff Plate}{../Videos/Kirchh_Damped_4faster.mp4}			
+	}
+	\only<4>{
+		\includegraphics[height=0.9\textheight]{DampingInjection/HamiltonianDamped_cropped.eps}
+	}
+\end{center}
+\end{frame}
+
+\begin{frame}{Thank you}
+\centering
+\Huge Questions
+\end{frame}
+
+\begin{frame}[allowframebreaks]{References}
+\printbibliography
+\nocite{*}
+\end{frame}
+
+\end{document}
