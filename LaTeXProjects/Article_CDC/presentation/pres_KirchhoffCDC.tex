@@ -8,13 +8,13 @@
 \usepackage{mathrsfs}
 \usepackage{tcolorbox}
 
-\usepackage{multimedia}
-
+%\usepackage{multimedia}
+\usepackage{media9}
 \usepackage[backend=bibtex]{biblatex}
 
 \graphicspath{{../Figures/}}
 
-\bibliography{bib_pres_sxs}
+\bibliography{bib_pres_CDC}
 
 \DeclareMathOperator{\Tr}{Tr}
 \DeclareMathOperator*{\grad}{grad}
@@ -153,10 +153,10 @@ with homogeneous boundary conditions
 \]
 defines a Stokes-Dirac structure. 
 \end{tcolorbox}
-Notice that $D(\mathcal{J}) = H^2(\Omega) \times H^{\div\Div}(\Omega)$:
+Notice that $D(\mathcal{J}) = H^2_{\Gamma_c \cup \Gamma_s}(\Omega) \times H^{\div\Div}_{\Gamma_f \cup \Gamma_s}(\Omega)$:
 \begin{align*}
-H^2(\Omega) &:= \left\{v \in L^2(\Omega) \vert \, \nabla^2 v \in L^2(\Omega, \, \mathbb{R}^{2 \times 2}_{\text{sym}}) \right\}, \\
-H^{\div\Div}(\Omega) &:= \left\{ \bm{V} \in L^2(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}})) \vert \, \div\Div \bm{V} \in L^2(\Omega) \right\}
+H^2_{\Gamma_c \cup \Gamma_s}(\Omega) &:= \left\{w \in L^2(\Omega) \vert \; \nabla^2 w \in L^2(\Omega, \, \mathbb{R}^{2 \times 2}_{\text{sym}}), \, w\vert_{\Gamma_c \cup \Gamma_s} = \partial_{\bm{n}}w\vert_{\Gamma_c} = 0 \right\}, \\
+H^{\div\Div}_{\Gamma_f \cup \Gamma_s}(\Omega) &:= \left\{ \bm{M} \in L^2(\Omega, \mathbb{R}^{2 \times 2}_{\text{sym}})) \vert \; \div\Div \bm{M} \in L^2(\Omega), \, M_{nn}\vert_{\Gamma_f \cup \Gamma_s} = \widetilde{q}_n\vert_{\Gamma_f} = 0 \right\}
 \end{align*}
 
 \end{frame}
@@ -186,7 +186,7 @@ with respect to the canonical symmetrical pairing
 	\[ (\div \Div)^* = \nabla^2\]
 	This means that the operator $\mathcal{J}$ is formally skew-adjoint. By application of the Stokes theorem it is obtained $\mathcal{D}_{\mathcal{J}} = \mathcal{D}_{\mathcal{J}}^\perp$. \\
 	\vspace{.5cm}
-	 Inhomogeneous boundary conditions can be considered as well, but the definition of $\mathcal{D}_{\mathcal{J}}$ requires additional care. \\
+	 Inhomogeneous boundary conditions can be considered as well, but boundary variables have to be included in $\mathcal{D}_{\mathcal{J}}$. \\
 	\vspace{.5cm}
 	It is worth noticing that the boundary variables are defined by the power balance
 	\[
@@ -240,7 +240,7 @@ with respect to the canonical symmetrical pairing
 \end{exampleblock}
 \end{frame}
 
-\begin{frame}{General idea of PFEM}
+\begin{frame}{The partitioned finite element method}
 General form of a linear pH system in co-energy variables
 \begin{equation*}
 \mathcal{M} \diffp{e}{t} = \mathcal{J} e, \qquad \mathcal{M} = \mathcal{Q}^{-1}
@@ -266,33 +266,72 @@ General form of a linear pH system in co-energy variables
 
 \subsection{Application to the Kirchhoff plate}
 
-\begin{frame}{The Kirchhoff plate case}
-For the Kirchhoff plate
+\begin{frame}{Application to the Kirchhoff plate}
+\begin{overlayarea}{\textwidth}{\textheight}
+	\vspace{1cm}
+Consider the Kirchhoff plate operators
 \[
 \mathcal{M} = \text{Diag}(\rho,\; \mathbb{D}^{-1}), \quad 
 \mathcal{J} = \begin{pmatrix}
-0 & -\div\Div \\
-\nabla^2 & 0  \\
+0 & \only<2,4>{\textcolor{red}{-\div\Div}} \only<1,3>{-\div\Div}\\
+\only<1,2>{\nabla^2} \only<3,4>{\textcolor{blue}{\nabla^2}} & 0  \\
 \end{pmatrix}
 \]
-\only<1>{Either the first line of the operator is integrated by parts
+\only<2>{Either the \textcolor{red}{first line of the operator $\mathcal{J}$} is integrated by parts
 \begin{align*}
-	\left(v, \mathcal{J}e \right) &= \int_{\Omega} \left\{ - v_1 \div\Div \bm{E}_2 + \bm{V}_2 \cddot \nabla^2 e_1 \right\} \d{\Omega} \\
-	&= \underbrace{\int_{\Omega} \left\{ - \nabla^2 v_1 \cddot \bm{E}_2 + \bm{V}_2 \cddot \nabla^2 e_1 \right\} \d{\Omega}}_{j_{\text{Hess}}(\bm{v}, \bm{e})} + \underbrace{\int_{\partial \Omega} \left\{ v_1 q_n + \partial_{\bm{n}}v_1 M_{nn} \right\} \d{s}}_{b_N(\bm{v}, \bm{u}_\partial)_{\partial \Omega}}
+	\left(v, \mathcal{J}e \right)_{\Omega} &= \int_{\Omega} \left\{ - v_1 \textcolor{red}{\div\Div} \bm{E}_2 + \bm{V}_2 \cddot \nabla^2 e_1 \right\} \d{\Omega} \\
+	&= \underbrace{\int_{\Omega} \left\{ - \nabla^2 v_1 \cddot \bm{E}_2 + \bm{V}_2 \cddot \nabla^2 e_1 \right\} \d{\Omega}}_{j_{\text{Hess}}(\bm{v}, \bm{e})} + \underbrace{\int_{\partial \Omega} \left\{ v_1 \textcolor{red}{q_n} + \partial_{\bm{n}}v_1 \textcolor{red}{M_{nn}} \right\} \d{s}}_{b_N(\bm{v}, \bm{u}_\partial)_{\partial \Omega}}
 \end{align*}
 }
-\only<2>{Either the second line of the operator is integrated by parts
+\only<3>{Either the \textcolor{blue}{second line of the operator $\mathcal{J}$} is integrated by parts
 	\begin{align*}
-	\left(v, \mathcal{J}e \right) &= \int_{\Omega} \left\{ - v_1 \div\Div \bm{E}_2 + \bm{V}_2 \cddot \nabla^2 e_1 \right\} \d{\Omega} \\
-	&= \underbrace{\int_{\Omega} \left\{ - v_1 \div\Div \bm{E}_2 + \div\Div \bm{V}_2 \, e_1 \right\} \d{\Omega}}_{j_{\nabla^2}(\bm{v}, \bm{e})} + \underbrace{\int_{\partial \Omega} \left\{ v_1 q_n + \partial_{\bm{n}}v_1 M_{nn} \right\} \d{s}}_{b_N(\bm{v}, \bm{u}_\partial)_{\partial \Omega}}
+	\left(v, \mathcal{J}e \right)_{\Omega} &= \int_{\Omega} \left\{ - v_1 \div\Div \bm{E}_2 + \bm{V}_2 \cddot \textcolor{blue}{\nabla^2} e_1 \right\} \d{\Omega} \\
+	&= \underbrace{\int_{\Omega} \left\{ - v_1 \div\Div \bm{E}_2 + \div\Div \bm{V}_2 \; e_1 \right\} \d{\Omega}}_{j_{\div\Div}(\bm{v}, \bm{e})} + \underbrace{\int_{\partial \Omega} \left\{ v_{q_n} \textcolor{blue}{\partial_t w} + v_{m_{n}} \textcolor{blue}{\partial_{\bm{n}} \partial_t w} \right\} \d{s}}_{b_D(\bm{v}, \bm{u}_\partial)_{\partial \Omega}},
 	\end{align*}
+	where $v_{q_n} = - (\Div \bm{V}_2) \cdot \bm{n} - \partial_{\bm{s}} v_{m_s}, \;  v_{m_s} = \bm{V}_2 \cddot (\bm{n} \otimes \bm{s}), \; v_{m_n} = \bm{V}_2 \cddot (\bm{n} \otimes \bm{n})$
 }
+\only<4>{
+	\center
+	The selection depends on the control variables. For \textcolor{red}{Neumann} control the first line is integrated by parts. For \textcolor{blue}{Dirichlet control} the second.}
+\end{overlayarea}
 \end{frame}
 
-\begin{frame}
-	\setlength{\abovedisplayskip}{0pt}
-	\setlength{\belowdisplayskip}{0pt}
+\begin{frame}{Finite element choice}
+Selecting as control variables the forces and torques (Neumann boundary conditions), the followng weak form is obtained:
+\[ m(\bm{v}, \partial_t \bm{e}) = j_{\text{Hess}}(\bm{v}, \bm{e}) + b_N(\bm{v}, \bm{u}_\partial)_{\partial \Omega}
+\]
+For both $\bm{e}_1, \bm{E}_2$ the $H^2$ conforming Bell elements are selected. For the boundary variables Lagrange polynomials of order two are selected. Dirichlet boundary conditions are enforced by Lagrange multipliers
+\begin{equation*}
+\begin{aligned}
+\begin{bmatrix}
+{M} & {0} \\
+{0} & {0} \\
+\end{bmatrix}\frac{d}{d t}
+\begin{pmatrix}
+{e}\\
+{\lambda} \\
+\end{pmatrix}
+&= \begin{bmatrix}
+{J} & {G} \\
+-{G}^T & {0} \\
+\end{bmatrix}
+\begin{pmatrix}
+{e} \\
+{\lambda} \\
+\end{pmatrix} + \begin{bmatrix}
+{B} \\
+0 \\
+\end{bmatrix} {u}, \\
+{y} &= \begin{bmatrix}
+{B}^T & {0} \\
+\end{bmatrix} \begin{pmatrix}
+{e}\\
+{\lambda} \\
+\end{pmatrix},
+\end{aligned} 
+\end{equation*}
 \end{frame}
+
 
 
 \section{Interconnection with rigid elements}
@@ -330,7 +369,7 @@ For the interconnection, consider the compact operator $\mathcal{W}: \mathscr{Y}
 \begin{frame}{Boundary interconnection of the Kirchhoff plate}
 \begin{equation*}\small
 \begin{aligned}
-\text{Kirchhoff plate} \\
+\text{Plate} \; (\Omega &= [0, L_x] \times [0, L_y]) \\
 \begin{bmatrix}
 \rho h & 0 \\ 0 & \mathbb{D}^{-1} \\
 \end{bmatrix}
@@ -339,14 +378,14 @@ For the interconnection, consider the compact operator $\mathcal{W}: \mathscr{Y}
 \partial_t w \\ \bm{M} \\
 \end{bmatrix} &= 
 \begin{bmatrix}
-0 & -\div\Div \\ \Grad\grad & 0 \\
+0 & -\div\Div \\ \nabla^2 & 0 \\
 \end{bmatrix}
 \begin{bmatrix}
 \partial_t w \\ \bm{M} \\
 \end{bmatrix} \\
 u_{\partial, \text{pl}} &= \partial_t w (x = L_x, y), \\
 y_{\partial, \text{pl}} &= \widetilde{q}_n(x = L_x, y).
-\end{aligned} \qquad 
+\end{aligned} \qquad \quad
 \begin{aligned}
 \text{Rigid rod} \\
 \begin{bmatrix}
@@ -382,7 +421,16 @@ The adjoint operator is then obtained considering that $\bm{u}_{\text{rod}} = \m
 \begin{frame}{Results}
 \begin{center}
 	\onslide*<1>{
-		\movie[width=0.8\textwidth, height=0.6\textheight]{Plate and rod}{../Videos/Comparison_RodNoRod.mp4}	
+		\setlength{\abovedisplayskip}{0pt}
+		\setlength{\belowdisplayskip}{0pt}
+		Distributed load ($t_{\text{end}} = 10 [\mathrm{ms}]$)
+		\begin{equation*}
+		p = \begin{cases}
+		10^5 \left[ y + 10 \left( y - L_y/2 \right)^2 \right] [Pa], \quad &\forall \, t < 0.2 \, t_{\text{end}}, \\
+		0, \quad &\forall \, t \ge 0.2 \, t_{\text{end}},
+		\end{cases}
+		\end{equation*}
+		%\movie[width=0.8\textwidth, height=0.6\textheight]{Plate and rod}{../Videos/Comparison_RodNoRod.mp4}	
 	}
 		\onslide*<2>{
 			\includegraphics[width=0.42\textwidth]{InterconnectionRod/HamiltonianRod_cropped.eps}
@@ -435,25 +483,25 @@ The adjoint operator is then obtained considering that $\bm{u}_{\text{rod}} = \m
 	{0} & {0} \\
 	\end{bmatrix}\frac{d}{d t}
 	\begin{pmatrix}
-	{e}\\
-	{\lambda} \\
+	\bm{e}\\
+	\bm{\lambda} \\
 	\end{pmatrix}
 	&= \begin{bmatrix}
 	{J} & {G} \\
 	-{G}^T & {0} \\
 	\end{bmatrix}
 	\begin{pmatrix}
-	{e} \\
-	{\lambda} \\
+	\bm{e} \\
+	\bm{\lambda} \\
 	\end{pmatrix} + \begin{bmatrix}
 	{B} \\
 	0 \\
-	\end{bmatrix} {u}, \\
+	\end{bmatrix} \bm{u}, \\
 	{y} &= \begin{bmatrix}
 	{B}^T & {0} \\
 	\end{bmatrix} \begin{pmatrix}
-	{e}\\
-	{\lambda} \\
+	\bm{e}\\
+	\bm{\lambda} \\
 	\end{pmatrix},
 	\end{aligned} 
 	\end{equation*}
@@ -465,36 +513,70 @@ The adjoint operator is then obtained considering that $\bm{u}_{\text{rod}} = \m
 	\end{bmatrix}
 	\frac{d}{d t}
 	\begin{pmatrix}
-	{e}\\
-	{\lambda} \\
+	\bm{e}\\
+	\bm{\lambda} \\
 	\end{pmatrix}
 	= \begin{bmatrix}
 	{J} - {R} & {G} \\
 	-{G}^T & {0} \\
 	\end{bmatrix}
 	\begin{pmatrix}
-	e\\
-	{\lambda} \\
+	\bm{e}\\
+	\bm{\lambda} \\
 	\end{pmatrix},
 	\end{equation*}
 	with ${R} = {B} {K} {B}^T \succeq 0$. \\
 	The Hamiltonian $\dot{H} = - e^T R e \le 0$ is a non increasing function and by La~Salle principle the equilibrium point $e = 0$ is asymptotically stable.	
 }
 
-
+\end{frame}
+\begin{frame}
 \begin{center}
-	\only<3>{
-		\movie[width=0.42\textwidth, height = 0.7 \textheight]{Damping Kirchhoff Plate}{../Videos/Kirchh_Damped_4faster.mp4}			
+	\only<1>{
+		$K = 100$ \vspace{.1cm} \\
+		\includemedia[
+		label=damping,
+		addresource=../Videos/Kirchh_Damped_4faster.mp4,
+		activate=pageopen,
+		width=10cm, height=6cm,
+		flashvars={
+			source=../Videos/Kirchh_Damped_4faster.mp4
+			&loop=true
+		}
+		]{}{VPlayer.swf}
+		
+		\mediabutton[
+		mediacommand=damping:playPause,
+		]{\fbox{Play/Pause}}
+		
+		%\movie[width=0.42\textwidth, height = 0.7 \textheight]{Damped Kirchhoff Plate}{../Videos/Kirchh_Damped_4faster.mp4}			
 	}
-	\only<4>{
+	\only<2>{
 		\includegraphics[height=0.9\textheight]{DampingInjection/HamiltonianDamped_cropped.eps}
 	}
 \end{center}
 \end{frame}
 
-\begin{frame}{Thank you}
+\begin{frame}{Conclusion}
+The following has been presented:
+	\begin{itemize}
+		\item the Kirchhoff plate model as a port Hamiltonian system;
+		\item a structure preserving discretization method capable of dealing with generic interconnections;
+		\item interconnection with rigid elements (multibody framework);
+		\item a simple control application by damping injection;
+	\end{itemize}
+Still no rigorous proof of convergence for the finite elements. Existing solutions (only for static problems):
+\begin{itemize}
+	\item The Hellan-Herrmann-Johnson  method \footfullcite{Blum1990}, but difficulties when dealing with inhomogeneous bcs;
+	\item New discretization method capable that handles inhomogeneous bcs \footfullcite{RafetsederSIAM}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{}
 \centering
-\Huge Questions
+\Huge Thanks for your attention \\
+\Huge Questions?
 \end{frame}
 
 \begin{frame}[allowframebreaks]{References}
