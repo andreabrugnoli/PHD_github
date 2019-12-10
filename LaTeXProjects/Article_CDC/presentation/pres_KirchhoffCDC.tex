@@ -112,6 +112,7 @@
 \end{frame}
 
 \begin{frame}{Boundary conditions}
+\begin{overlayarea}{\textwidth}{\textheight}
 For the boundary variables consider the definitions
 \begin{equation*}
 \begin{aligned}
@@ -130,7 +131,7 @@ $\bm{A} \cddot \bm{B} = \sum_{i, j} A_{ij} B_{ij}$ is the tensor contraction and
 	\only<2>{\large{Cauchy Law} \\ \includegraphics[width=0.6\textwidth]{cauchy_law.pdf}}
 	\only<3>{\large{Boundary conditions} \\ \includegraphics[width=0.6\textwidth]{kirchh_plate_bcs.pdf}}
 \end{tcolorbox}
-
+\end{overlayarea}
 \end{frame}
 
 \subsection{Port-Hamiltonian formulation}
@@ -287,18 +288,19 @@ Consider the Kirchhoff plate operators
 \end{frame}
 
 \begin{frame}{Finite element choice}
+\begin{overlayarea}{\textwidth}{\textheight}
 Selecting as control variables the forces and torques (Neumann boundary conditions), the following weak form is obtained:
-\[ m(\bm{v}, \partial_t \bm{e}) = j_{\text{Hess}}(\bm{v}, \bm{e}) + b_N(\bm{v}, \bm{u}_\partial)_{\partial \Omega}
+\[ m(\bm{v}, \partial_t \bm{e}) = j_{\text{Hess}}(\bm{v}, \bm{e}) + b_N(\bm{v}, \bm{u}_\partial)_{\partial \Omega}.
 \]
-For both $\bm{e}_1, \bm{E}_2$ the $H^2$ conforming Bell elements are selected. For the boundary variables Lagrange polynomials of order two are selected.
+For both $\bm{e}_1, \bm{E}_2$ the $H^2$ conforming Bell elements are selected.  Dirichlet boundary conditions are enforced by Lagrange multipliers, i.e. $\bm{u}_\partial\vert_{\Gamma_D} = \bm{\lambda}$. Those are discretized using quadratic Lagrange polynomials.
 \only<1>{
-\begin{tcolorbox}
+	\begin{tcolorbox}
 	\centering
-	\includegraphics[width=0.6\textwidth]{elements.eps}
-\end{tcolorbox}
+	\includegraphics[width=0.5\textwidth]{elements.eps}
+	\end{tcolorbox}
 }
 \only<2>{
- Dirichlet boundary conditions are enforced by Lagrange multipliers
+
 \begin{equation*}
 \begin{aligned}
 \begin{bmatrix}
@@ -306,29 +308,30 @@ For both $\bm{e}_1, \bm{E}_2$ the $H^2$ conforming Bell elements are selected. F
 {0} & {0} \\
 \end{bmatrix}\frac{d}{d t}
 \begin{pmatrix}
-{e}\\
-{\lambda} \\
+\bm{e}\\
+\bm{\lambda} \\
 \end{pmatrix}
 &= \begin{bmatrix}
 {J} & {G} \\
 -{G}^T & {0} \\
 \end{bmatrix}
 \begin{pmatrix}
-{e} \\
-{\lambda} \\
+\bm{e} \\
+\bm{\lambda} \\
 \end{pmatrix} + \begin{bmatrix}
 {B} \\
 0 \\
-\end{bmatrix} {u}, \\
+\end{bmatrix} \bm{u}, \\
 {y} &= \begin{bmatrix}
 {B}^T & {0} \\
 \end{bmatrix} \begin{pmatrix}
-{e}\\
-{\lambda} \\
+\bm{e}\\
+\bm{\lambda} \\
 \end{pmatrix},
 \end{aligned} 
 \end{equation*}
 }
+\end{overlayarea}
 \end{frame}
 
 
@@ -529,7 +532,7 @@ The adjoint operator provides a rigid movement as the plate input at $\Gamma_{\t
 	
 	with initial conditions (compatible with the constraints):
 	\[
-	w_t(x,y,0) = x^2; \qquad \bm{M}(x,y,0) ={0}.
+	\partial_t w(x,y,0) = x^2; \qquad \bm{M}(x,y,0) ={0}.
 	\]
 }
 \only<2>{ Obtain a finite-dimensional uncontrolled system
