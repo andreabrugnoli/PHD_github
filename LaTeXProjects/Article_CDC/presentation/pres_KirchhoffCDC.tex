@@ -33,11 +33,14 @@
 			\hbox{\onedot}\hbox{\onedot}}%
 }}
 
+\renewcommand\bibfont{\scriptsize}
+
+
 \makeatletter \renewcommand\d[1]{\ensuremath{%
 		\;\mathrm{d}#1\@ifnextchar\d{\!}{}}}
 \makeatother
 
-\title[CDC Annual conference]{Interconnection of the Kirchhoff plate within the port-Hamiltonian framework}
+\title[58th CDC conference]{Interconnection of the Kirchhoff plate within the port-Hamiltonian framework}
 
 \institute[ISAE]
 {\inst{1}ISAE-SUPAERO, Toulouse}
@@ -58,7 +61,7 @@
 
 \end{frame}
 
-\section{The Kirchhoff plate as a port-Hamiltonian system}
+\section{Introduction: discretization of pH Systems}
 
 \begin{frame}{Infinite dimensional pH systems}
 \begin{block}{\only<1>{General}\only<2>{Linear} infinite dimensional pH system}
@@ -75,10 +78,84 @@
 		\item $x$ energy variables, $e = \delta_x H = \only<2>{\mathcal{Q} x}$: co-energy variables \only<2>{($\mathcal{Q}$ symmetric positive operator)};
 		\item $\mathcal{J}$: skew-symmetric differential operator;
 		\item $\mathcal{B}, \mathcal{C}$: boundary operator;
-		\item $u, y, B$: distributed input, output and control operator;
+		\item $u, y, B$: distributed input, output and control operator.
 	\end{itemize}
 \end{block}
+
 \end{frame}
+
+
+\begin{frame}{Structure preserving discretization}
+The main properties of the dpH (conservative, passive system) are preserved at a discrete level.
+\begin{columns}[T]
+	\setlength{\abovedisplayskip}{1pt}
+	\setlength{\belowdisplayskip}{1pt}
+	\begin{column}{.4\textwidth}
+		\begin{block}{Infinite dimensional pHs \only<2>{(linear case)}}
+			PDE:
+			\begin{align*}
+			\partial_t{x}(z, t) &= \mathcal{J} \only<1>{\displaystyle \diffd{H}{x}} \only<2>{\mathcal{Q} x} + B \textcolor{red}{u(z, t)}, \\
+			\textcolor{red}{y(z, t)} &= B^* \delta_x {H}.
+			\end{align*}
+			Boundary conditions: 
+			\[\textcolor{blue}{u_\partial} = \mathcal{B} \only<1>{\displaystyle \diffd{H}{x}} \only<2>{\mathcal{Q} x}, \quad \textcolor{blue}{y_\partial} = \mathcal{C} \only<1>{\displaystyle \diffd{H}{x}} \only<2>{\mathcal{Q} x} \]
+			Power balance (Stokes Theorem): 
+			\[ \dot{H} = \displaystyle \textcolor{blue}{u_\partial^T y_\partial} +  \int_{\Omega} \textcolor{red}{u(z, t) y(z, t)} \d{\Omega}
+			\]
+		\end{block}
+	\end{column}
+	\begin{column}{.4\textwidth}
+		\begin{block}{Finite dimensional pHs \only<2>{(linear case)}}
+			ODE:
+			\begin{align*}
+			\dot{x} &= J \only<1>{\displaystyle \partial_x {H}} \only<2>{Q x} + B_d \textcolor{red}{u_d} + B_\partial \textcolor{blue}{u_\partial}, \\
+			\textcolor{red}{y_d} &= B_d^T \only<1>{\displaystyle \partial_x {H}} \only<2>{Q x}, \\
+			\textcolor{blue}{y_\partial} &= B_\partial^T \only<1>{\displaystyle \partial_x {H}} \only<2>{Q x}
+			\end{align*}
+			Power balance: 
+			\[ \dot{H} = \textcolor{blue}{u_\partial^T y_\partial} +  \textcolor{red}{u_d^T y_d}
+			\]
+		\end{block}
+	\end{column}
+\end{columns}
+
+\end{frame}
+
+\begin{frame}{}
+\begin{exampleblock}{Available methods}
+	\begin{itemize}
+		\item Spectral methods (Moulla 2012):
+		\begin{itemize}
+			\item[\textcolor{green}{\checkmark}] Rapid spectral convergence;
+			\item[\textcolor{red}{$\times$}] Only for 1D problem;
+		\end{itemize}
+		\item Finite differences (Trenchant 2018);
+		\begin{itemize}
+			\item[\textcolor{green}{\checkmark}] Valid up to 2D geometries;
+			\item[\textcolor{red}{$\times$}] Requires \textit{ad hoc} implementation (staggered grids);
+		\end{itemize}
+		\item Finite elements based
+		\begin{itemize}
+			\item Golo 2004, Kotyczka 2018: the implementation requires exterior calculus knowledge and depends on the some parameters that ensure the preservation of power flow;		
+			\item \textcolor{blue}{Cardoso-Ribeiro 2018}:
+			\begin{itemize}
+				\item[\textcolor{green}{\checkmark}] Natural extension of the mixed finite element method to pH systems;
+				\item[\textcolor{green}{\checkmark}] Implementable using well-established libraries (Fenics, Firedrake);
+			\end{itemize}
+		\end{itemize}
+	\end{itemize}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}{Why structure preserving discretization?}
+A distributed pH system interconnected to a strictly positive real boundary controller  is asymptotically stable \footfullcite{villegasTAC}. \\
+\vspace{1cm}
+This allows the construction of observed based controller based on a finite dimensional discretization of the plant \footfullcite{toledo2019observerbased} that guarantees stability of the infinite dimensional system (no spillover effect).
+
+\end{frame}
+
+\section{The Kirchhoff plate as a port-Hamiltonian system}
+
 	
 \subsection{Classical formulation}
 
@@ -190,46 +267,7 @@ It is worth noticing that the boundary variables are defined by the power balanc
 
 \subsection{The partitioned finite element method}
 
-\begin{frame}{How to discretize pH systems?}
-\begin{columns}[T]
-	\setlength{\abovedisplayskip}{1pt}
-	\setlength{\belowdisplayskip}{1pt}
-	\begin{column}{.4\textwidth}
-		\begin{block}{Infinite dimensional pHs}
-			PDE:
-			\begin{align*}
-			\partial_t{x}(z, t) &= \mathcal{J} \delta_x {H} + B \textcolor{red}{u(z, t)}, \\
-			\textcolor{red}{y(z, t)} &= B^* \delta_x {H}.
-			\end{align*}
-			Boundary conditions: 
-			\[\textcolor{blue}{u_\partial} = \mathcal{B}\ \delta_x {H}, \quad \textcolor{blue}{y_\partial} = \mathcal{C}\ \delta_x {H} \]
-			Power balance: 
-			\[ \dot{H} = \displaystyle \textcolor{blue}{u_\partial^T y_\partial} +  \int_{\Omega} \textcolor{red}{u(z, t) y(z, t)} \d{\Omega}
-			\]
-		\end{block}
-	\end{column}
-	\begin{column}{.4\textwidth}
-		\begin{block}{Finite dimensional pHs}
-			ODE:
-			\begin{align*}
-			\dot{x} &= J \partial_x {H} + B_d \textcolor{red}{u_d} + B_\partial \textcolor{blue}{u_\partial}, \\
-			\textcolor{red}{y_d} &= B_d^T \partial_x {H}, \\
-			\textcolor{blue}{y_\partial} &= B_\partial^T \partial_x {H}
-			\end{align*}
-			Power balance: 
-			\[ \dot{H} = \textcolor{blue}{u_\partial^T y_\partial} +  \textcolor{red}{u_d^T y_d}
-			\]
-		\end{block}
-	\end{column}
-\end{columns}
-\begin{exampleblock}{Available methods}
-	\begin{itemize}
-		\item Spectral methods (Moulla 2012);
-		\item Finite differences (Trenchant 2018);
-		\item Finite elements based (Golo 2004, Kotyczka 2018, \textcolor{blue}{Cardoso-Ribeiro 2018});
-	\end{itemize}
-\end{exampleblock}
-\end{frame}
+
 
 \begin{frame}{The partitioned finite element method (PFEM)}
 General form of a linear pH system in co-energy variables
@@ -627,16 +665,16 @@ The adjoint operator provides a rigid movement as the plate input at $\Gamma_{\t
 \begin{frame}{Conclusion}
 The following has been presented:
 	\begin{itemize}
-		\item the Kirchhoff plate model as a port Hamiltonian system;
-		\item a structure preserving discretization method capable of dealing with generic interconnections;
-		\item interconnection with rigid elements (multibody framework);
-		\item a simple control application by damping injection;
+	\onslide<2->{\item the Kirchhoff plate model as a port Hamiltonian system;}
+	\onslide<3->{\item a structure preserving discretization method capable of dealing with generic bcs;}
+	\onslide<4->{\item interconnection with rigid elements (multibody framework);}
+		\onslide<5->{\item a simple control application by damping injection;}
 	\end{itemize}
-Still no rigorous proof of convergence for the finite elements. Existing solutions (only for static problems):
-\begin{itemize}
-	\item The Hellan-Herrmann-Johnson  method \footfullcite{Blum1990}, but difficulties when dealing with inhomogeneous bcs;
-	\item New discretization method capable that handles inhomogeneous bcs \footfullcite{RafetsederSIAM}
-\end{itemize}
+	\onslide<6->{Still no rigorous proof of convergence for the finite elements. Existing solutions (only for static problems):}
+	\begin{itemize}
+		\onslide<7->{\item The Hellan-Herrmann-Johnson  method \footfullcite{Blum1990}, but difficulties when dealing with inhomogeneous bcs;}
+		\onslide<8->{\item New discretization method capable that handles inhomogeneous bcs \footfullcite{RafetsederSIAM}.}
+	\end{itemize}
 \end{frame}
 
 
