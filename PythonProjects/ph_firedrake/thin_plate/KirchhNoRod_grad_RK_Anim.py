@@ -192,7 +192,7 @@ Fsys = P @ Bf_pl
 
 
 t0 = 0.0
-t_fin = 0.001
+t_fin = 0.01
 n_t = 100
 t_span = [t0, t_fin]
 
@@ -205,12 +205,12 @@ def sys(t,y):
 
 
 
-e_p0 = Function(Vp)
-e_p0.assign(project(0.001*x**2, Vp))
+# e_p0 = Function(Vp)
+# e_p0.assign(project(0.001*x**2, Vp))
 y0 = np.zeros(n_tot,)
 # y0[:n_Vp] = e_pl0.vector().get_local()
 
-t_ev = np.linspace(t0, t_fin, num = n_t)
+t_ev = np.linspace(t0, t_fin, num=n_t)
 
 sol = integrate.solve_ivp(sys, t_span, y0, method='RK45', vectorized=False, t_eval = t_ev)
 
@@ -254,25 +254,28 @@ for i in range(n_ev):
     minZvec[i] = min(wmm_CG.vector())
 
 maxZ = max(maxZvec)
+print(maxZ)
 minZ = min(minZvec)
 
 Hpl_vec = np.zeros((n_ev,))
 for i in range(n_ev):
     Hpl_vec[i] = 0.5 * (e_sol[:, i].T @ M_pl @ e_sol[:, i])
 
+print(max(Hpl_vec))
+
 fntsize = 16
 fig = plt.figure(0)
 plt.plot(t_ev, Hpl_vec, 'b-', label='Hamiltonian Plate (J)')
 plt.xlabel(r'{Time} (s)', fontsize = fntsize)
 plt.ylabel(r'{Hamiltonian} (J)', fontsize = fntsize)
-plt.title(r"Hamiltonian trend", fontsize=fntsize)
+plt.title(r"Plate only", fontsize=fntsize)
 # plt.legend(loc='upper left')
 
-path_out = "/home/a.brugnoli/Plots_Videos/Kirchhoff_plots/Simulations/Article_CDC/InterconnectionRod/"
+path_out = "/home/a.brugnoli/Plots/Python/Plots/Kirchhoff_plots/Simulations/Article_CDC/InterconnectionRod/"
+path_video = "/home/a.brugnoli/Videos/"
+plt.savefig(path_out + "HamiltonianNoRod.eps", format="eps")
 
-# plt.savefig(path_out + "HamiltonianNoRod.eps", format="eps")
-
-anim = animate2D(minZ, maxZ, wmm_CGvec, t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \
+anim = animate2D(minZ, maxZ, wmm_CGvec, t_ev, xlabel = '$x [m]$', ylabel = '$y [m]$', \
                          zlabel = '$w [mm]$', title = 'Vertical Displacement')
 
 rallenty = 10
@@ -281,7 +284,7 @@ Writer = animation.writers['ffmpeg']
 writer = Writer(fps= fps, metadata=dict(artist='Me'), bitrate=1800)
 
 
-# anim.save(path_out + 'Kirchh_NoRod.mp4', writer=writer)
+anim.save(path_out + 'Kirchh_NoRod.mp4', writer=writer)
 #
 plt.show()
 

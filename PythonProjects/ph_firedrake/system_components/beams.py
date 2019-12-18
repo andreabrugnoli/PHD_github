@@ -21,7 +21,7 @@ class FloatingPlanarEB(SysPhdaeRig):
         # Finite element defition
         deg = 3
         Vp = FunctionSpace(mesh, "Hermite", deg)
-        Vq = FunctionSpace(mesh, "Hermite", deg)
+        Vq = FunctionSpace(mesh, "DG", 1)
 
         V = Vp * Vq
         n_Vp = Vp.dim()
@@ -123,12 +123,12 @@ class FloatFlexBeam(SysPhdaeRig):
 
         # Finite element defition
         Vp_x = FunctionSpace(mesh, "Lagrange", 1)
-        Vq_x = FunctionSpace(mesh, "Lagrange", 1)
-        # Vq_x = FunctionSpace(mesh, "DG", 0)
+        # Vq_x = FunctionSpace(mesh, "Lagrange", 1)
+        Vq_x = FunctionSpace(mesh, "DG", 0)
 
         Vp_y = FunctionSpace(mesh, "Hermite", 3)
-        Vq_y = FunctionSpace(mesh, "Hermite", 3)
-        # Vq_y = FunctionSpace(mesh, "DG", 1)
+        # Vq_y = FunctionSpace(mesh, "Hermite", 3)
+        Vq_y = FunctionSpace(mesh, "DG", 1)
 
         V = Vp_x * Vp_y * Vq_x * Vq_y
 
@@ -254,12 +254,12 @@ class FloatCentBeam(SysPhdaeRig):
 
         # Finite element defition
         Vp_x = FunctionSpace(mesh, "Lagrange", 1)
-        Vq_x = FunctionSpace(mesh, "Lagrange", 1)
-        # Vq_x = FunctionSpace(mesh, "DG", 0)
+        # Vq_x = FunctionSpace(mesh, "Lagrange", 1)
+        Vq_x = FunctionSpace(mesh, "DG", 0)
 
         Vp_y = FunctionSpace(mesh, "Hermite", 3)
-        Vq_y = FunctionSpace(mesh, "Hermite", 3)
-        # Vq_y = FunctionSpace(mesh, "DG", 1)
+        # Vq_y = FunctionSpace(mesh, "Hermite", 3)
+        Vq_y = FunctionSpace(mesh, "DG", 1)
 
         Vq_cen = FunctionSpace(mesh, "Lagrange", 1)
 
@@ -410,8 +410,8 @@ class FloatCentBeamNoTr(SysPhdaeRig):
         x = SpatialCoordinate(mesh)
 
         Vp_y = FunctionSpace(mesh, "Hermite", 3)
-        Vq_y = FunctionSpace(mesh, "Hermite", 3)
-        # Vq_y = FunctionSpace(mesh, "DG", 1)
+        # Vq_y = FunctionSpace(mesh, "Hermite", 3)
+        Vq_y = FunctionSpace(mesh, "DG", 1)
 
         Vq_cen = FunctionSpace(mesh, "Lagrange", 1)
 
@@ -552,16 +552,16 @@ class SpatialBeam(SysPhdaeRig):
 
         # Finite element defition
         Vp_x = FunctionSpace(mesh, "CG", 1)
-        Vq_x = FunctionSpace(mesh, "CG", 1)
-        # Vq_x = FunctionSpace(mesh, "DG", 0)
+        # Vq_x = FunctionSpace(mesh, "CG", 1)
+        Vq_x = FunctionSpace(mesh, "DG", 0)
 
         Vp_y = FunctionSpace(mesh, "Hermite", 3)
-        Vq_y = FunctionSpace(mesh, "Hermite", 3)
-        # Vq_y = FunctionSpace(mesh, "DG", 1)
+        # Vq_y = FunctionSpace(mesh, "Hermite", 3)
+        Vq_y = FunctionSpace(mesh, "DG", 1)
 
         Vp_z = FunctionSpace(mesh, "Hermite", 3)
-        Vq_z = FunctionSpace(mesh, "Hermite", 3)
-        # Vq_z = FunctionSpace(mesh, "DG", 1)
+        # Vq_z = FunctionSpace(mesh, "Hermite", 3)
+        Vq_z = FunctionSpace(mesh, "DG", 1)
 
         V = Vp_x * Vp_y * Vp_z * Vq_x * Vq_y * Vq_z
 
@@ -1584,10 +1584,8 @@ def matrices_j2d(n_el, L, rho, A, bc='CF'):
 
     if bc == 'CF':
         dofs2dump_y = list([0, 1])
-        print("CF")
     else:
         dofs2dump_y = list([0, np_y-2])
-        print("SS")
 
     dofs2keep_y = list(set(range(np_y)).difference(set(dofs2dump_y)))
 

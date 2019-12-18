@@ -38,7 +38,7 @@ mesh = IntervalMesh(n, L)
 # Finite element defition
 
 V_p = FunctionSpace(mesh, "Hermite", deg)
-V_q = FunctionSpace(mesh, "Hermite", deg)
+V_q = FunctionSpace(mesh, "DG", 1)
 
 V = V_p * V_q
 
@@ -70,13 +70,13 @@ j_gradgradIP = -v_p.dx(0).dx(0) * al_q * dx
 
 j_form = j_gradgrad + j_gradgradIP
 
-J = assemble(j_form, mat_type='aij')
-M = assemble(m_form, mat_type='aij')
-Q = assemble(q_form, mat_type='aij')
+# J = assemble(j_form, mat_type='aij')
+# M = assemble(m_form, mat_type='aij')
+# Q = assemble(q_form, mat_type='aij')
 
-petsc_j = J.M.handle
-petsc_m = M.M.handle
-petsc_q = Q.M.handle
+petsc_j = assemble(j_form, mat_type='aij').M.handle
+petsc_m = assemble(m_form, mat_type='aij').M.handle
+petsc_q = assemble(q_form, mat_type='aij').M.handle
 
 JJ = np.array(petsc_j.convert("dense").getDenseArray())
 MM = np.array(petsc_m.convert("dense").getDenseArray())
@@ -120,29 +120,39 @@ n_lmb = G.shape[1]
 
 J_full = la.inv(MM) @ JJ @ la.inv(MM)
 B_full = la.inv(MM) @ B
-Q_full = Q
+Q_full = QQ
 
 GannL = la.null_space(G.T).T
 G_2 = la.inv(G.T @ G) @ G.T
 T = np.concatenate((GannL, G_2))
+invT = la.inv(T)
 
 J_til = T @ J_full @ T.T
+Q_til = invT.T @ Q_full @ invT
 B_til = T @ B
 
+J_sys = J_til[:-n_lmb, :-n_lmb]
+Q11 = Q_til[:-n_lmb, :-n_lmb]
+Q12 = Q_til[:-n_lmb, -n_lmb:]
+Q21 = Q_til[-n_lmb:, :-n_lmb]
+Q22 = Q_til[-n_lmb:, -n_lmb:]
+Q_sys = Q11 - Q12 @ la.inv(Q22) @ Q21
 
-# A_sys = J_sys @ Q_sys
-# C_sys = B_sys.T @ Q_sys
-#
-# Cmat = ctrb(A_sys, B_sys)
-# Omat = obsv(A_sys, C_sys)
-#
-# tol_r = 1e-40
-# rank_C = np.linalg.matrix_rank(Cmat)
-# rank_O = np.linalg.matrix_rank(Omat)
-#
-# print(Cmat.shape, Omat.shape)
-# print(rank_C, n_V)
-# print(rank_O, n_V)
+B_sys = B_til[:-n_lmb, ]
 
-# u, s, v = np.linalg.svd(Omat)
-# print(s)
+A_sys = J_sys @ Q_sys
+C_sys = B_sys.T @ Q_sys
+
+Cmat = ctrb(A_sys, B_sys)
+Omat = obsv(A_sys, C_sys)
+
+tol_r = 1e-40
+rank_C = np.linalg.matrix_rank(Cmat)
+rank_O = np.linalg.matrix_rank(Omat)
+
+print(Cmat.shape, Omat.shape)
+print(rank_C, n_V)
+print(rank_O, n_V)
+
+u, s, v = np.linalg.svd(Omat)
+print(s)

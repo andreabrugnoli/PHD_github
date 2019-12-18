@@ -254,12 +254,12 @@ Rsys = P @ Rint
 Fsys = P @ Bf_int
 
 t0 = 0.0
-t_fin = 0.001
+t_fin = 0.01
 n_t = 100
 t_span = [t0, t_fin]
 
 def sys(t,y):
-    if t< 0.2 * t_fin/100:
+    if t< 0.2 * t_fin:
         bool_f = 1
     else: bool_f = 0
     dydt = invMint @ ( (Jsys - Rsys) @ y + Fsys *bool_f)
@@ -349,18 +349,20 @@ plt.plot(t_ev, Hpl_vec, 'b-', label='Hamiltonian Plate (J)')
 plt.plot(t_ev, Hrod_vec, 'r-', label='Hamiltonian Rod (J)')
 plt.plot(t_ev, Hpl_vec + Hrod_vec, 'g-', label='Total Energy (J)')
 plt.xlabel(r'{Time} (s)', fontsize = fntsize)
-# plt.ylabel(r'{Hamiltonian} (J)', fontsize = fntsize)
-plt.title(r"Hamiltonian trend",
-          fontsize = fntsize)
-plt.legend(loc='upper left')
+plt.ylabel(r'{Hamiltonian} (J)', fontsize = fntsize)
+plt.title(r"Plate and Rod", fontsize=fntsize)
+axes = plt.gca()
+axes.set_ylim([0, 200])
 
-# path_out = "/home/a.brugnoli/Plots_Videos/Kirchhoff_plots/Simulations/Article_CDC/InterconnectionRod/"
-path_out = "./"
+plt.legend(loc='best')
 
-# plt.savefig(path_out + "HamiltonianRod.eps", format="eps")
+path_out = "/home/a.brugnoli/Plots/Python/Plots/Kirchhoff_plots/Simulations/Article_CDC/InterconnectionRod/"
+path_video = "/home/a.brugnoli/Videos/"
 
-anim = animateInt2D(minZ, maxZ, wmm_pl_CGvec, x_rod, y_rod, w_rod_mm, \
-             t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \
+plt.savefig(path_out + "HamiltonianRod.eps", format="eps")
+
+anim = animateInt2D(minZ, 13, wmm_pl_CGvec, x_rod, y_rod, w_rod_mm, \
+             t_ev, xlabel = '$x [m]$', ylabel = '$y [m]$', \
                          zlabel = '$w [mm]$', z2label = '$w [mm]$ Rod', title = 'Vertical Displacement')
 
 rallenty = 10
@@ -368,9 +370,9 @@ fps = 20
 Writer = animation.writers['ffmpeg']
 writer = Writer(fps= fps, metadata=dict(artist='Me'), bitrate=1800)
 
-anim.save(path_out + 'Kirchh_Rod.mp4', writer=writer)
+anim.save(path_video + 'Kirchh_Rod.mp4', writer=writer)
 
-# plt.show()
+plt.show()
 
 # save_solutions = True
 # if save_solutions:

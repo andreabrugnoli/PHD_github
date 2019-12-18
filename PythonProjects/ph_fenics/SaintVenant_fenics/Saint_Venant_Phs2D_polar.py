@@ -96,8 +96,6 @@ v_q = TestFunction(Vq)
 al_p = TrialFunction(Vp)
 al_q = TrialFunction(Vq)
 
-# r = Expression("x[0]", degree = 4)
-
 m_p = inner(v_p, al_p) * r * dx  # inner(v_p, al_p) * dx
 m_q = v_q * al_q * r * dx  # inner(v_q, al_q) * dx
 
@@ -140,8 +138,7 @@ Binput = Binput[:, boundary_dof]
 
 n_bd = len(boundary_dof)
 
-# r = Expression("sqrt(r*r+x[1]*x[1])", degree=2)
-# theta = Expression("atan2(x[1],r)", degree=2)
+
 #
 
 # Final Assemble
@@ -221,13 +218,12 @@ def e_p_mat(p, q):
 
 
 # reference for the control:
-init_p = Constant(('0', '0'))
-init_q = Constant(Hdes)
-al_p_.assign(interpolate(init_p, Vp))
-al_q_.assign(interpolate(init_q, Vq))
-e0_p = assemble(e_p_).get_local()
-e0_q = assemble(e_q_).get_local()
-e0 = np.concatenate((e0_p, e0_q), axis=0)
+# h_os = Hdes/10
+# init_p = Constant(('0', '0'))
+# init_q = Expression('Hdes + h_os*cos(x[0])*cos(x[1])', Hdes=Hdes, h_os=h_os)
+# al_p_.assign(interpolate(init_p, Vp))
+# al_q_.assign(interpolate(init_q, Vq))
+#
 
 # preparacao da dinâmica utilizando integrador IVP
 B = np.concatenate((np.zeros((n_Vp, n_bd)), Binput), axis=0)
@@ -244,7 +240,7 @@ def fun(t, y):
     e_q = e_q_fenics(al_p, al_q)
 
     e = np.concatenate((e_p, e_q), axis=0)
-    dydt = Jtilde @ e - 0.0 * Rr @ (e - e0) * (t > 0.5)
+    dydt = Jtilde @ e # - 0.0 * Rr @ (e - e0) * (t > 0.5)
 
     return dydt
 
@@ -271,6 +267,9 @@ al_p_.assign(interpolate(init_p, Vp))
 al_q_.assign(interpolate(init_q, Vq))
 alp_0 = al_p_.vector().get_local()
 alq_0 = al_q_.vector().get_local()
+e0_p = assemble(e_p_).get_local()
+e0_q = assemble(e_q_).get_local()
+e0 = np.concatenate((e0_p, e0_q), axis=0)
 
 t0 = 0.0
 t_fin = 3
@@ -321,13 +320,14 @@ def LyaFunc(p, q):
     al_q_.vector()[:] = 1. * q
     return assemble(Lyap)
 
-H_vec_int = np.zeros((n_ev,))
+
+H_vec_lin = np.zeros((n_ev,))
 H_vec = np.zeros((n_ev,3))
 V_vec = np.zeros((n_ev,))
 
 for i in range(n_ev):
     H_vec[i] = HamFunc(alp_sol[:, i], alq_sol[:, i])  # computed with fenics
-    # H_vec_lin[i] = HamFuncMat(alp_sol[:,i], alq_sol[:,i])
+    H_vec_lin[i] = HamFuncMat(alp_sol[:,i], alq_sol[:,i])
     V_vec[i] = LyaFunc(alp_sol[:, i], alq_sol[:, i])
 
 fntsize = 16
@@ -335,6 +335,7 @@ path_out = "./"
 
 plt.figure()
 plt.plot(t_ev, H_vec[:,0], 'r', t_ev, H_vec[:, 1], 'b', t_ev, H_vec[:, 2], 'g')
+# plt.plot(t_ev, H_vec[:,0], 'r', t_ev, H_vec[:, 1], 'b', t_ev, H_vec[:, 2], 'g')
 plt.xlabel(r'{Time} (s)', fontsize=fntsize)
 plt.ylabel('Total Energy (J)', fontsize=fntsize)
 
@@ -349,7 +350,7 @@ plt.ylabel('Lyapunov Function (J)', fontsize=fntsize)
 
 # make an animation
 import matplotlib.animation as animation
-from AnimateSurf import animate2D
+from SaintVenant_fenics.AnimateSurf import animate2D
 
 r_plot = dofVq_x[:, 0]
 th_plot = dofVq_x[:, 1]
@@ -357,7 +358,7 @@ th_plot = dofVq_x[:, 1]
 x_plot = r_plot * np.cos(th_plot)
 y_plot = r_plot * np.sin(th_plot)
 
-anim = animate2D(x_plot, y_plot, alq_sol, t_ev)
+anim = animate2D(x_plot, y_plot, alq_sol, t_ev, xlabel='x [m]', ylabel='y [m]', zlabel='h [m]', title='Fluid Height')
 
 plt.show()
 
@@ -369,7 +370,7 @@ plt.show()
 minZ = alq_sol.min()
 maxZ = alq_sol.max()
 
-save_figs = True
+save_figs = False
 if save_figs:
     n_fig = 7
     tol = 1e-6

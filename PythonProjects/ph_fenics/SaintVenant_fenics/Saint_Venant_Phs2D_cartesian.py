@@ -328,7 +328,7 @@ plt.savefig(path_out + "Lyapunov.eps", format="eps")
 
 # make an animation
 import matplotlib.animation as animation 
-from AnimateSurf import animate2D
+from SaintVenant_fenics.AnimateSurf import animate2D
 
 x_plot = dofVq_x[:,0]
 y_plot = dofVq_x[:,1]

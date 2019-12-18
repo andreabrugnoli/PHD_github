@@ -45,7 +45,8 @@ class SysPhode:
 
         if R is not None:
             assert R.shape == matr_shape
-            assert check_symmetry(R)
+            if not  check_symmetry(R):
+                warnings.warn("Matrix R is not symmetric")
             self.R = R
         else:
             self.R = np.zeros(matr_shape)
@@ -132,7 +133,8 @@ class SysPhdae:
 
         if R is not None:
             assert R.shape == matr_shape
-            assert check_symmetry(R)
+            if not check_symmetry(R):
+                warnings.warn("R is not symmetric")
             self.R = R
         else:
             self.R = np.zeros(matr_shape)
@@ -229,6 +231,14 @@ class SysPhdae:
         n2 = sys2.n
         n_int = n1 + n2
 
+        np_1 = self.n_p
+        np_2 = sys2.n_p
+        np_int = np_1 + np_2
+
+        nq_1 = self.n_q
+        nq_2 = sys2.n_q
+        nq_int = nq_1 + nq_2
+
         m1 = len(self.B.T)
         m2 = len(sys2.B.T)
 
@@ -256,7 +266,7 @@ class SysPhdae:
 
         nlmb_int = self.n_lmb + sys2.n_lmb
 
-        sys_int = SysPhdae(n_int, nlmb_int, E=E_int, J=J_int, Q=Q_int, R=R_int, B=Bext)
+        sys_int = SysPhdae(n_int, nlmb_int, n_p=np_int, n_q=nq_int, E=E_int, J=J_int, Q=Q_int, R=R_int, B=Bext)
 
         return sys_int
 

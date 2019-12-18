@@ -8,26 +8,27 @@ import matplotlib.pyplot as plt
 import scipy.linalg as la
 from modules_ph.classes_phsystem import SysPhdaeRig
 from control import lqr, ctrb, obsv
+from scipy.io import savemat
 
-# E = 2e11
-# rho = 7900  # kg/m^3
+E = 2e11
+rho = 7900  # kg/m^3
 
-# nu = 0.3
-#
-# b = 0.05
-# h = 0.01
-# A = b * h
-#
-# I = 1./12 * b * h**3
-#
-# EI = E * I
-# L = 1
+nu = 0.3
 
-L =0.3
-rho = 0.0643
-A = 1
-EI = 37.0116
-n = 5
+b = 0.05
+h = 0.01
+A = b * h
+
+I = 1./12 * b * h**3
+
+EI = E * I
+L = 1
+
+# L =0.3
+# rho = 0.0643
+# A = 1
+# EI = 37.0116
+n = 50
 deg = 3
 
 mesh = IntervalMesh(n, L)
@@ -136,17 +137,26 @@ B_sys = beam_ode.B
 
 A_sys = J_sys @ Q_sys
 C_sys = B_sys.T @ Q_sys
+D_sys = np.zeros((beam_ode.m, beam_ode.m))
 
-Cmat = ctrb(A_sys, B_sys)
-Omat = obsv(A_sys, C_sys)
+# Cmat = ctrb(A_sys, B_sys)
+# Omat = obsv(A_sys, C_sys)
 
-tol_r = 1e-40
-rank_C = np.linalg.matrix_rank(Cmat)
-rank_O = np.linalg.matrix_rank(Omat)
+pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/PH_Control/Matrices_EB/'
+A_file = 'A'; B_file = 'B'; C_file = 'C'; D_file = 'D';
+savemat(pathout + A_file, mdict={A_file: np.array(A_sys)}, appendmat=True)
+savemat(pathout + B_file, mdict={B_file: np.array(B_sys)}, appendmat=True)
+savemat(pathout + C_file, mdict={C_file: np.array(C_sys)}, appendmat=True)
+savemat(pathout + D_file, mdict={D_file: np.array(D_sys)}, appendmat=True)
 
-print(Cmat.shape, Omat.shape)
-print(rank_C, n_V)
-print(rank_O, n_V)
 
-u, s, v = np.linalg.svd(Omat)
-print(s)
+# tol_r = 1e-40
+# rank_C = np.linalg.matrix_rank(Cmat)
+# rank_O = np.linalg.matrix_rank(Omat)
+#
+# print(Cmat.shape, Omat.shape)
+# print(rank_C, n_V)
+# print(rank_O, n_V)
+#
+# u, s, v = np.linalg.svd(Omat)
+# print(s)

@@ -96,8 +96,8 @@ def actuator_model():
 
     a = 30  # N/V
 
-    k_mov = 26  * (2*pi)**2  # N/m
-    c_mov = 10  # Ns/s
+    k_mov = 26 * (2*pi)**2  # N/m
+    c_mov = 1 #10  # Ns/s
 
     M_actuator = np.diag([k_mov, m_mov, m_case, Jx_case, Jy_case])
 
@@ -272,9 +272,13 @@ def plate_model(nx, ny, r):
     JJ = np.array(petsc_j.convert("dense").getDenseArray())
     MM = np.array(petsc_m.convert("dense").getDenseArray())
 
+    DD = JJ[:n_p, n_p:]
+
     beta_M = 0.1
+    beta_K = 1e-5
     RR = np.zeros(MM.shape)
     RR[:n_p, :n_p] = beta_M * MM[:n_p, :n_p]
+    RR[:n_p, n_p:] = - beta_K * DD
 
     fz_P1 = v_p*delta_app(pos_P1)*dx
     mx_P1 = v_p.dx(1)*delta_app(pos_P1)*dx
@@ -349,7 +353,7 @@ def plate_model(nx, ny, r):
     return plate, Vp
 
 
-plate, Vp = plate_model(4, 8, 1)
+plate, Vp = plate_model(4, 60, 1)
 np_plate = Vp.dim()
 
 mirror = mirror_model()
@@ -391,15 +395,21 @@ for i in range(n_om):
 
 model_ode, T = model_all.dae_to_odeCE(mass=True)[:2]
 
-print(T.shape)
+# print(T.shape)
 
 
 M_full = model_ode.M
 J_full = model_ode.J
 R_full = model_ode.R
 B_full = model_ode.B
-R_full = model_ode.R
+
+Q_full = la.inv(M_full)
 C_full = C_model_all @ T
+
+# A_sys = (J_full - R_full) @ Q_full
+# B_sys = B_full
+# C_sys = C_full @ Q_full
+# D_sys = np.zeros((len(C_sys), len(C_sys)))
 
 
 eigenvalues, eigvectors = la.eig(J_full, M_full)
@@ -420,14 +430,27 @@ n_om = 6
 for i in range(n_om):
     print('Omega full ' + str(i+1) + ': ' + str(omega[i]/(2*pi)))
 
-model_red, V = model_ode.reduce_system(1, 5)
-print(model_red.n)
+model_red, V = model_ode.reduce_system(1, 22)
+# print(model_red.n)
 
 M_red = model_red.M
 J_red = model_red.J
 R_red = model_red.R
 B_red = model_red.B
 C_red = C_full @ V
+Q_red = la.inv(M_red)
+
+# A_sys = (J_red - R_red) @ Q_red
+# B_sys = B_red
+# C_sys = C_red @ Q_red
+# D_sys = np.zeros((len(C_sys), len(C_sys)))
+
+# pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/PH_Control/Matrices_EB/'
+# A_file = 'A'; B_file = 'B'; C_file = 'C'; D_file = 'D';
+# savemat(pathout + A_file, mdict={A_file: np.array(A_sys)}, appendmat=True)
+# savemat(pathout + B_file, mdict={B_file: np.array(B_sys)}, appendmat=True)
+# savemat(pathout + C_file, mdict={C_file: np.array(C_sys)}, appendmat=True)
+# savemat(pathout + D_file, mdict={D_file: np.array(D_sys)}, appendmat=True)
 
 eigenvalues, eigvectors = la.eig(J_red, M_red)
 omega_all = np.imag(eigenvalues)
@@ -442,22 +465,22 @@ eigvec_omega = eigvec_omega[:, perm]
 
 omega.sort()
 
-n_om = 2
+n_om = len(omega)
 
-for i in range(n_om):
+for i in range(min(n_om, 6)):
     print('Omega red ' + str(i + 1) + ': ' + str(omega[i] / (2 * pi)))
 
 # sys_red = signal.lti((J_red) @ la.inv(M_red), B_red[:, 0].reshape((-1,1)), C_red, 0)
 # w, mag, phase = signal.bode(sys_red, w=np.linspace(1*2*pi, 120*2*pi, 1000))
-sys_full = signal.lti(J_full @ la.inv(M_full), B_full[:, 0].reshape((-1,1)), C_full, 0)
-w, mag, phase = signal.bode(sys_full, w=np.linspace(1*2*pi, 120*2*pi, 1000))
-
-fntsize=16
-plt.figure()
-plt.semilogx(w/(2*pi), mag)    # Bode magnitude plot
-plt.xlabel(r'{Frequency} (Hz)', fontsize=fntsize)
-plt.ylabel(r'{Magnitude} (dB)', fontsize=fntsize)
-
+# sys_full = signal.lti(J_full @ la.inv(M_full), B_full[:, 0].reshape((-1,1)), C_full, 0)
+# w, mag, phase = signal.bode(sys_full, w=np.linspace(1*2*pi, 120*2*pi, 1000))
+#
+# fntsize=16
+# plt.figure()
+# plt.semilogx(w/(2*pi), mag)    # Bode magnitude plot
+# plt.xlabel(r'{Frequency} (Hz)', fontsize=fntsize)
+# plt.ylabel(r'{Magnitude} (dB)', fontsize=fntsize)
+#
 # plt.figure()
 # plt.semilogx(w, phase)  # Bode phase plot
 # plt.show()

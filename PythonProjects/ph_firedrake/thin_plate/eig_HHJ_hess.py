@@ -61,8 +61,8 @@ mesh = UnitSquareMesh(n_x, n_y, quadrilateral=False)
 
 # Finite element defition
 
-Vp = FunctionSpace(mesh, 'CG', r+1)
-Vq = FunctionSpace(mesh, 'HHJ', r)
+Vp = FunctionSpace(mesh, 'CG', r)
+Vq = FunctionSpace(mesh, 'HHJ', r-1)
 V = Vp * Vq
 
 n_Vp = V.sub(0).dim()
@@ -96,7 +96,8 @@ v_mns = inner(v_q, outer(n_ver, s_ver))
 
 j_1 = - inner(grad(grad(v_p)), e_q) * dx \
       + jump(grad(v_p), n_ver) * dot(dot(e_q('+'), n_ver('+')), n_ver('+')) * dS \
-      + dot(grad(v_p), n_ver) * dot(dot(e_q, n_ver), n_ver) * ds
+      + dot(grad(v_p), n_ver) * dot(dot(e_q, n_ver), n_ver) * ds \
+
 
 j_2 = + inner(v_q, grad(grad(e_p))) * dx \
       - dot(dot(v_q('+'), n_ver('+')), n_ver('+')) * jump(grad(e_p), n_ver) * dS \

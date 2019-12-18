@@ -7,7 +7,7 @@ from scipy import integrate
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
-from control import lqr
+from control import lqr, ctrb, obsv
 
 plt.rc('text', usetex=True)
 
@@ -52,42 +52,67 @@ n_p = beamCF.n_p
 n_p1 = beamFF.n_p
 n_p2 = beamCC.n_p
 
-x1 = SpatialCoordinate(mesh1)[0]
-x2 = SpatialCoordinate(mesh2)[0]
+J_sys = beamCF.J
+M_sys = beamCF.M_e
+Q_sys = la.inv(M_sys)
+print(np.linalg.norm(Q_sys))
+B_sys = beamCF.B[:, 2].reshape((-1, 1))
 
-omega_r = 4
-sqrom_r = np.sqrt(omega_r)
-exp_v1 = 0.5 * (cosh(sqrom_r * x1) + cos(sqrom_r * x1)) * omega_r
-exp_v2 = 0.5 * (cosh(sqrom_r * (L1 + x2)) + cos(sqrom_r * (L1 + x2))) * omega_r
+# plt.spy(B_sys); plt.show()
 
-v1_0 = Function(Vp1)
-v2_0 = Function(Vp2)
+A_sys = J_sys @ Q_sys
+C_sys = B_sys.T @ Q_sys
 
-v1_0.assign(project(exp_v1, Vp1))
-v2_0.assign(project(exp_v2, Vp2))
+Cmat = ctrb(A_sys, B_sys)
+Omat = obsv(A_sys, C_sys)
 
-Md = beamCF.E
-Jd = beamCF.J
-Bd = beamCF.B
+tol_r = 1e-40
+rank_C = np.linalg.matrix_rank(Cmat)
+rank_O = np.linalg.matrix_rank(Omat)
 
-Qd = la.inv(Md)
+print(Cmat.shape, Omat.shape)
+print(rank_C, n_e)
+print(rank_O, n_e)
 
-Ad = Jd @ Qd
-Cd = Bd.T @ Qd
+u, s, v = np.linalg.svd(Omat)
+print(s)
 
-Q0 = 20 * np.eye(n_e)
-R0 = np.eye(beamCF.m)
-
-K, S, Eig = lqr(Ad.T, Cd.T, Q0, R0)
-
-print(Eig)
-
-Bc = K.T
-
-alpha = 0
-beta = 400
-gamma = 0.006
-delta = 0.5
+# x1 = SpatialCoordinate(mesh1)[0]
+# x2 = SpatialCoordinate(mesh2)[0]
+#
+# omega_r = 4
+# sqrom_r = np.sqrt(omega_r)
+# exp_v1 = 0.5 * (cosh(sqrom_r * x1) + cos(sqrom_r * x1)) * omega_r
+# exp_v2 = 0.5 * (cosh(sqrom_r * (L1 + x2)) + cos(sqrom_r * (L1 + x2))) * omega_r
+#
+# v1_0 = Function(Vp1)
+# v2_0 = Function(Vp2)
+#
+# v1_0.assign(project(exp_v1, Vp1))
+# v2_0.assign(project(exp_v2, Vp2))
+#
+# Md = beamCF.E
+# Jd = beamCF.J
+# Bd = beamCF.B
+#
+# Qd = la.inv(Md)
+#
+# Ad = Jd @ Qd
+# Cd = Bd.T @ Qd
+#
+# Q0 = 20 * np.eye(n_e)
+# R0 = np.eye(beamCF.m)
+#
+# K, S, Eig = lqr(Ad.T, Cd.T, Q0, R0)
+#
+# print(Eig)
+#
+# Bc = K.T
+#
+# alpha = 0
+# beta = 400
+# gamma = 0.006
+# delta = 0.5
 
 # import cvxpy as cp
 # G = cp.Variable(10)
