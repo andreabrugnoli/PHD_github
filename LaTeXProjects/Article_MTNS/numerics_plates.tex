@@ -1,0 +1,287 @@
+%===============================================================================
+% $Id: ifacconf.tex 7 2007-11-21 12:50:23Z jpuente $
+% Template for IFAC meeting papers
+% Copyright (c) 2007 International Federation of Automatic Control
+%===============================================================================
+\documentclass{ifacconf}
+\usepackage[round]{natbib} % you should have natbib.sty
+\usepackage{graphicx}      % include this line if your document contains figures
+
+\usepackage{amsmath,amssymb}
+\usepackage{url}
+\usepackage{diffcoeff}
+\usepackage{bm}
+
+\usepackage{mathrsfs}
+\usepackage{multirow}
+
+\usepackage{caption, subfig}
+
+\usepackage{xcolor,colortbl}
+
+\newtheorem{remark}{Remark}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator{\Tr}{Tr}
+
+\def\onedot{$\mathsurround0pt\ldotp$}
+\def\cddot{% two dots stacked vertically
+	\mathbin{\vcenter{\baselineskip.67ex
+			\hbox{\onedot}\hbox{\onedot}}%
+}}
+
+\makeatletter \renewcommand\d[1]{\ensuremath{%
+		\;\mathrm{d}#1\@ifnextchar\d{\!}{}}}
+\makeatother
+
+\bibliographystyle{agsm}
+\graphicspath{{./Figures/}}
+%===============================================================================
+\begin{document}
+\begin{frontmatter}
+
+\title{Numerical discretization of port-Hamiltonian plate models \thanksref{footnoteinfo}} 
+% Title, preferably not more than 10 words.
+
+\thanks[footnoteinfo]{This work is  supported by the project ANR-16-CE92-0028,
+	entitled {\em Interconnected Infinite-Dimensional systems for Heterogeneous
+		Media}, INFIDHEM, financed by the French National
+	Research Agency (ANR) and the Deutsche Forschungsgemeinschaft (DFG). Further information is available at {\url{https://websites.isae-supaero.fr/infidhem/the-project}}.
+	}
+
+\author[ISAE]{Andrea Brugnoli}
+\author[ISAE]{Daniel Alazard} 
+\author[ISAE]{Val\'erie Pommier-Budinger}
+\author[ISAE]{Denis Matignon}
+
+\address[ISAE]{ISAE-SUPAERO, Universit\'e de Toulouse, France.\\
+	10 Avenue Edouard Belin, BP-54032, 31055 Toulouse Cedex 4. \\
+	Andrea.Brugnoli@isae.fr,  Daniel.Alazard@isae.fr, \\
+	Valerie.Budinger@isae.fr, Denis.Matignon@isae.fr}
+
+\begin{abstract}
+
+\end{abstract}
+
+\begin{keyword}
+Port-Hamiltonian systems, Kirchhoff Plate, Mindlin-Reissner Plate, Mixed Finite Element Method, Numerical convergence
+\end{keyword}
+
+\end{frontmatter}
+%===============================================================================
+
+\section{Introduction}
+
+
+\section{Problem statement}
+
+In this section the models under consideration are recalled. The details can be found in  \cite{BRUGNOLI2019961,BRUGNOLI2019940}. 
+
+\subsection{Notations}
+For a scalar field $u: \mathbb{R}^d \rightarrow \mathbb{R}$ the gradient is defined as 
+\begin{equation*}
+\mathrm{grad}(u) =  \nabla u := \begin{pmatrix}
+\partial_{x_1} u \dots \partial_{x_d} u \\
+\end{pmatrix}^\top.
+\end{equation*}
+For a vector field $\bm{u}: \mathbb{R}^d \rightarrow \mathbb{R}^d$, with components $u_j$, the gradient is defined as
+\begin{equation*}
+\mathrm{grad}(\bm{u})_{i j}:= (\nabla \bm{u})_{ij} = \partial_{x_i} u_j.
+\end{equation*}
+The symmetric part of the gradient operator $\mathrm{Grad}$ (i. e. the deformation gradient in continuum mechanics) is given by
+\begin{equation*}
+\mathrm{Grad}(\bm{u}) := \frac{1}{2} \left(\nabla \bm{u} + \nabla^\top \bm{u} \right).
+\end{equation*}
+The Hessian operator of $u$ is then computed as follows
+\begin{equation*}
+\mathrm{Hess}(u) = \nabla^2 u = \mathrm{Grad}(\mathrm{grad}(u)),
+\end{equation*}
+For a tensor field $\bm{U}: \mathbb{R}^d \rightarrow \mathbb{R}^{d \times d}$, with components $u_{ij}$, the divergence is a vector, defined column-wise as
+\begin{equation*}
+\mathrm{Div}(\bm U) = \nabla \cdot \bm{U} := \left( \sum_{i = 1}^d \partial_{x_i} u_{ij} \right)_{j = 1, \dots, d}.
+\end{equation*}
+The double divergence of a tensor field $\bm{U}$ is then a scalar field defined as
+\begin{equation*}
+\mathrm{div}(\mathrm{Div}(\bm U)):= \sum_{i, j = 1}^d \partial_{x_i} \partial_{x_j} u_{ij} \, .
+\end{equation*}
+
+\subsection{Plate models in port-Hamiltonian form}
+
+\paragraph{Mindlin-Reissner plate}
+The Mindlin model is a generalization to the 2D case of the Timoshenko beam model and is expressed by a system of three coupled PDEs (\cite{timoshenko1959theory})  
+\begin{equation}
+\begin{cases}
+\displaystyle \rho h \diffp[2]{w}{t} &= \mathrm{div}(\bm{q}),  \vspace{1mm}\\
+\displaystyle \frac{\rho h^3}{12} \diffp[2]{\bm \theta}{t} &= \bm{q} + \mathrm{Div}(\bm M), \\
+\end{cases}
+\end{equation}
+where $\rho$ is the mass density, $h$ the plate thickness, $w$ the vertical displacement, $\bm \theta = (\theta_x, \theta_y)^\top$ collects the deflection of the cross section along axes $x$ and $y$ respectively. Variables $\bm{M}, \bm{q}$ represent the momenta tensor and the shear stress. The Hooke law relates those to the curvature tensor and shear deformation vector
+\begin{equation*}
+\begin{aligned}
+\bm{M} &:= \mathcal{D} \bm{K}, \\ \bm{q} &:= \mathcal{C} \bm{\gamma},
+\end{aligned} \qquad
+\begin{aligned}
+\bm{K} &:= \mathrm{Grad}(\bm{\theta}), \\ \bm{\gamma} &:= \mathrm{grad}(w) - \bm{\theta}, 
+\end{aligned}
+\end{equation*}
+where $\mathcal{D}, \mathcal{C}$ are symmetric positive tensors. The kinetic and potential energy density $\mathcal{K}$ and $\mathcal{U}$ read
+\begin{equation}
+\begin{aligned}
+\mathcal{K} &=  \frac{1}{2} \left\{ \rho h \left(\diffp{w}{t} \right)^2 +  \frac{\rho h^3}{12} \diffp{\bm{\theta}}{t} \cdot \diffp{\bm{\theta}}{t}  \right\}, \\
+\mathcal{U} &= \frac{1}{2} \left\{ \bm{M} \cddot \bm{K} + \bm{q} \cdot \bm{\gamma}  \right\},
+\end{aligned}
+\end{equation} 
+where $\bm{M} \cddot \bm{K} := \sum_{i,j} m_{ij} \kappa_{ij}$ is the tensor contraction. The Hamiltonian  is easily written as
+\begin{equation} 
+H = \int_{\Omega} \left( \mathcal{K} + \mathcal{U} \right)   \d\Omega. 
+\end{equation}
+To get a port-Hamiltonian formulation suitable energy variables must be selected. The appropriate set is the following
+\begin{equation}
+\begin{aligned}
+\alpha_w &= \rho h \diffp{w}{t}, \\
+\bm{A}_{\kappa} &= \bm{K}, \\
+\end{aligned} \qquad
+\begin{aligned}
+\bm\alpha_{\theta} &= \frac{\rho h^3}{12} \diffp{\bm{\theta}}{t}, \\
+\bm\alpha_{\gamma} &= \bm{\gamma}. \\
+\end{aligned}
+\end{equation}
+The co-energy variables are found by computing the variational derivative of the Hamiltonian
+\begin{equation}
+\begin{aligned}
+e_w &:= \diffd{H}{\alpha_w} = \diffp{w}{t},  \\
+\bm{E}_{\kappa} &:= \diffd{H}{\bm{A}_{\kappa}} = \bm{M}, \\
+\end{aligned} \qquad
+\begin{aligned}
+\bm{e}_{\theta} &:= \diffd{H}{\bm\alpha_{\theta}} = \diffp{\bm{\theta}}{t}, \\
+\bm{e}_{\gamma} &:= \diffd{H}{\bm{\alpha}_{\bm{\gamma}}} = \bm{q}. \\
+\end{aligned}
+\end{equation}
+Energy and co-energy are relative by a positive symmetric operator $\bm{\alpha} = \mathcal{Q} \bm{e}$
+\[ \mathcal{Q} = \mathrm{diag}(\frac{1}{\rho h}, \; \frac{12}{\rho h^3} , \; \mathcal{D}, \; \mathcal{C})
+\]
+
+The port-Hamiltonian system is expressed as follows 
+\begin{equation}
+\label{eq:PH_sys_Min_Ten}
+\diffp{}{t}
+\begin{pmatrix}
+\alpha_w \\
+\bm\alpha_\theta \\
+\bm{A}_\kappa \\
+\bm\alpha_{\gamma} \\
+\end{pmatrix} = 
+\underbrace{\begin{bmatrix}
+	0  & 0  & 0  & \mathrm{div} \\
+	0 & 0 &  \mathrm{Div} & \bm{I}_{2 \times 2}\\
+	0  & \mathrm{Grad}  & 0  & 0\\
+	\mathrm{grad} & -\bm{I}_{2 \times 2} &  0 & 0  \\
+	\end{bmatrix}}_{J}
+\begin{pmatrix}
+e_w \\
+\bm{e}_{\theta} \\
+\bm{E}_{\kappa} \\
+\bm{e}_{\gamma} \\
+\end{pmatrix},
+\end{equation}
+This system defines a Stokes-Dirac structure, therefore, the boundary values can be found by evaluating the time derivative of the Hamiltonian. 
+
+\paragraph{Kirchhoff plate}
+The Kirchhoff Model is a generalization to the 2D case of the Euler-Bernoulli beam model. The classical equations for this model \cite{timoshenko1959theory} are 
+\begin{equation}
+\displaystyle \rho h \diffp[2]{w}{t} = -\mathrm{div}(\mathrm{Div}(\bm{M}))
+\end{equation}
+The bending moment tensor and the curvature are related as in the Mindlin model $\bm{M} = \bm{D} \bm{K}$. Following the Kirchhoff assumption the curvature tensor is the Hessian of the vertical displacement
+\begin{equation*}
+\bm{K} := \mathrm{Grad}(\mathrm{grad}(w)).
+\end{equation*}
+ The kinetic and potential energy densities $\mathcal{K}$ and $\mathcal{U}$ read
+\begin{equation}
+\mathcal{K} =  \frac{1}{2}\rho h \left(\diffp{w}{t} \right)^2, \quad
+\mathcal{U} = \frac{1}{2} \bm{M} \cddot \bm{K},
+\end{equation} 
+The Hamiltonian  is easily written as
+\begin{equation} 
+H = \int_{\Omega} \left( \mathcal{K} + \mathcal{U} \right)   \d\Omega. 
+\end{equation}
+Selecting as energy variables
+\begin{equation}
+\begin{aligned}
+\alpha_w &= \rho h \diffp{w}{t}, \quad &\text{Linear momentum}, \\
+\bm{A}_{\kappa} &= \bm{K}, \quad &\text{Curvature tensor}.\\
+\end{aligned}
+\end{equation}
+co-energy variables are found by computing the variational derivative of the Hamiltonian
+\begin{equation}
+\begin{aligned}
+e_w &:= \diffd{H}{\alpha_w} = w_t, \quad &\text{Vertical Velocity}, \\
+\bm{E}_{\kappa} &:= \diffd{H}{\bm{A}_{\kappa}} = \bm{M}, \quad &\text{Momenta tensor},\\
+\end{aligned} 
+\end{equation}
+where $w_t := \diffp{w}{t}$ for compactness. The coercive operator linking energy and co-energies reads
+\[
+\mathcal{Q} = \mathrm{diag}(\frac{1}{\rho h}, \mathcal{D})
+\] 
+The port-Hamiltonian system is expressed as follows 
+\begin{equation}
+\label{eq:PH_sys_Kir_Ten}
+\diffp{}{t}
+\begin{pmatrix}
+\alpha_w \\
+\bm{A}_\kappa \\
+\end{pmatrix} = 
+\underbrace{\begin{bmatrix}
+	0  & -\mathrm{div} \circ \mathrm{Div} \\
+	\mathrm{Grad} \circ \mathrm{grad}  & 0 \\
+	\end{bmatrix}}_{\mathcal{J}}
+\begin{pmatrix}
+e_w \\
+\bm{E}_{\kappa} \\
+\end{pmatrix},
+\end{equation}
+
+\section{Conclusion}
+
+\begin{ack}
+The authors would like to thank Michel Sala\"un from ISAE-SUPAERO for the fruitful and insightful discussions.
+\end{ack}
+
+\bibliography{biblio_MTNS}             % bib file to produce the bibliography
+                                                     % with bibtex (preferred)
+                                                   
+%\begin{thebibliography}{xx}  % you can also add the bibliography by hand
+
+%\bibitem[Able(1956)]{Abl:56}
+%B.C. Able.
+%\newblock Nucleic acid content of microscope.
+%\newblock \emph{Nature}, 135:\penalty0 7--9, 1956.
+
+%\bibitem[Able et~al.(1954)Able, Tagg, and Rush]{AbTaRu:54}
+%B.C. Able, R.A. Tagg, and M.~Rush.
+%\newblock Enzyme-catalyzed cellular transanimations.
+%\newblock In A.F. Round, editor, \emph{Advances in Enzymology}, volume~2, pages
+%  125--247. Academic Press, New York, 3rd edition, 1954.
+
+%\bibitem[Keohane(1958)]{Keo:58}
+%R.~Keohane.
+%\newblock \emph{Power and Interdependence: World Politics in Transitions}.
+%\newblock Little, Brown \& Co., Boston, 1958.
+
+%\bibitem[Powers(1985)]{Pow:85}
+%T.~Powers.
+%\newblock Is there a way out?
+%\newblock \emph{Harpers}, pages 35--47, June 1985.
+
+%\bibitem[Soukhanov(1992)]{Heritage:92}
+%A.~H. Soukhanov, editor.
+%\newblock \emph{{The American Heritage. Dictionary of the American Language}}.
+%\newblock Houghton Mifflin Company, 1992.
+
+%\end{thebibliography}
+
+\appendix
+
+      
+                                                          % in the appendices.
+\end{document}

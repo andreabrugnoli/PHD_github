@@ -24,6 +24,15 @@ def compute_constants():
 
     a, b, c, d = np.linalg.solve(A, b)
 
+    # aa = - (2 * (np.sinh(pi) - 3 * np.sinh(3*pi) + pi*(4*pi*np.sinh(pi)+7*np.cosh(pi) - 3*np.cosh(3*pi))))\
+    #      / (5 + 8*pi**2 + 3*np.cosh(4*pi))
+    #
+    # bb = - (8*pi*(2*pi*np.sinh(pi) + np.cosh(pi)))/(5 + 8*pi**2 + 3*np.cosh(4*pi))
+    #
+    # cc = (10*np.cosh(pi) + 6*np.cosh(3*pi) + 16*pi*(np.sinh(pi) + pi*np.cosh(pi)))/(5 + 8*pi**2 + 3*np.cosh(4*pi))
+    #
+    # dd = (2*pi*(5*np.sinh(pi) - 3*np.sinh(3*pi) + 4*pi*np.cosh(pi)))/(5 + 8*pi**2 + 3*np.cosh(4*pi))
+
     return a,b,c,d
 
 
