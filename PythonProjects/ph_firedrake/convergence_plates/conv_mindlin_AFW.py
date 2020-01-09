@@ -28,7 +28,7 @@ def compute_err(n, r):
 
     rho = Constant(1)
     k = Constant(5/6)
-    h = Constant(1)
+    h = Constant(0.1)
 
     D = E * h ** 3 / (1 - nu ** 2) / 12
     fl_rot = 12 / (E * h ** 3)

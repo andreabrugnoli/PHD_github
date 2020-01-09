@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 
 matplotlib.rcParams['text.usetex'] = True
 
-bc_input = 'CCCC_BEC'
+bc_input = 'CCCC_BEC_RT'
 save_res = True
 
 def compute_err(n, r):
@@ -110,7 +110,7 @@ def compute_err(n, r):
     V_pth = VectorFunctionSpace(mesh, "DG", r-1)
     V_qthD = FunctionSpace(mesh, BDM_quad)
     V_qth12 = FunctionSpace(mesh, "CG", r)
-    V_qw = FunctionSpace(mesh, BDM_quad)
+    V_qw = FunctionSpace(mesh, RT_quad)
 
     V = MixedFunctionSpace([V_pw, V_pth, V_qthD, V_qth12, V_qw])
 
@@ -551,7 +551,7 @@ plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log(Error Velocity)')
 plt.title(r'Velocity Error vs Mesh size')
 plt.legend()
-path_fig = "/home/a.brugnoli/Plots_Videos/Python/Plots/Mindlin_plots/Convergence/firedrake/"
+path_fig = "/home/a.brugnoli/Plots/Python/Plots/Mindlin_plots/Convergence/firedrake/"
 if save_res:
     plt.savefig(path_fig  + bc_input + "_vel.eps", format="eps")
 

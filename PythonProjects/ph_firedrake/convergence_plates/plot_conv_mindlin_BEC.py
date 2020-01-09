@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 path_res = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/convergence_plates/convergence_results_mindlin/"
-bc_input= "CCCC_BEC_"
-save_res = True
+bc_input= "CCCC_BEC_RT_"
+save_res = False
 
 h1_vec = np.load(path_res + bc_input + "h1.npy")
 h2_vec = np.load(path_res + bc_input + "h3.npy")

@@ -20,6 +20,7 @@
 \usepackage{xcolor,colortbl}
 
 \newtheorem{remark}{Remark}
+\newtheorem{conjecture}{Conjecture}
 
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
@@ -74,18 +75,18 @@ Port-Hamiltonian systems, Kirchhoff Plate, Mindlin-Reissner Plate, Mixed Finite 
 \section{Introduction}
 
 
-\section{Problem statement}
+\section{Plate models in port-Hamiltonian form}
 
 In this section the models under consideration are recalled. The details can be found in  \cite{BRUGNOLI2019961,BRUGNOLI2019940}. 
 
 \subsection{Notations}
-For a scalar field $u: \mathbb{R}^d \rightarrow \mathbb{R}$ the gradient is defined as 
+The space of all, symmetric and skew-symmetric $d\times d$ matrices are denoted by $\mathbb{M}, \mathbb{S}, \mathbb{K}$ respectively. The space of $\mathbb{R}^d$ vectors is denoted by $\mathbb{V}$. $\Omega \subset \mathbb{R}^d$ is an open connected set. The geometric dimension of interest in this paper is $d=2$. For a scalar field $u: \Omega \rightarrow \mathbb{R}$ the gradient is defined as 
 \begin{equation*}
 \mathrm{grad}(u) =  \nabla u := \begin{pmatrix}
 \partial_{x_1} u \dots \partial_{x_d} u \\
 \end{pmatrix}^\top.
 \end{equation*}
-For a vector field $\bm{u}: \mathbb{R}^d \rightarrow \mathbb{R}^d$, with components $u_j$, the gradient is defined as
+For a vector field $\bm{u}: \Omega \rightarrow \mathbb{V}$, with components $u_j$, the gradient is defined as
 \begin{equation*}
 \mathrm{grad}(\bm{u})_{i j}:= (\nabla \bm{u})_{ij} = \partial_{x_i} u_j.
 \end{equation*}
@@ -97,46 +98,70 @@ The Hessian operator of $u$ is then computed as follows
 \begin{equation*}
 \mathrm{Hess}(u) = \nabla^2 u = \mathrm{Grad}(\mathrm{grad}(u)),
 \end{equation*}
-For a tensor field $\bm{U}: \mathbb{R}^d \rightarrow \mathbb{R}^{d \times d}$, with components $u_{ij}$, the divergence is a vector, defined column-wise as
+For a tensor field $\bm{U}: \Omega \rightarrow \mathbb{M}$, with components $u_{ij}$, the divergence is a vector, defined column-wise as
 \begin{equation*}
 \mathrm{Div}(\bm U) = \nabla \cdot \bm{U} := \left( \sum_{i = 1}^d \partial_{x_i} u_{ij} \right)_{j = 1, \dots, d}.
 \end{equation*}
 The double divergence of a tensor field $\bm{U}$ is then a scalar field defined as
 \begin{equation*}
-\mathrm{div}(\mathrm{Div}(\bm U)):= \sum_{i, j = 1}^d \partial_{x_i} \partial_{x_j} u_{ij} \, .
+\mathrm{div}(\mathrm{Div}(\bm U)):= \sum_{i, j = 1}^d \partial_{x_i} \partial_{x_j} u_{ij}.
 \end{equation*}
-
-\subsection{Plate models in port-Hamiltonian form}
-
-\paragraph{Mindlin-Reissner plate}
-The Mindlin model is a generalization to the 2D case of the Timoshenko beam model and is expressed by a system of three coupled PDEs (\cite{timoshenko1959theory})  
-\begin{equation}
-\begin{cases}
-\displaystyle \rho h \diffp[2]{w}{t} &= \mathrm{div}(\bm{q}),  \vspace{1mm}\\
-\displaystyle \frac{\rho h^3}{12} \diffp[2]{\bm \theta}{t} &= \bm{q} + \mathrm{Div}(\bm M), \\
-\end{cases}
-\end{equation}
-where $\rho$ is the mass density, $h$ the plate thickness, $w$ the vertical displacement, $\bm \theta = (\theta_x, \theta_y)^\top$ collects the deflection of the cross section along axes $x$ and $y$ respectively. Variables $\bm{M}, \bm{q}$ represent the momenta tensor and the shear stress. The Hooke law relates those to the curvature tensor and shear deformation vector
+The $L^2$ inner products of scalar, vector and matrix field are defined as
+\begin{align*}
+	(u, v) &= \int_{\Omega} u \ v \d\Omega, \quad u, v : \Omega \rightarrow \mathbb{R}, \\
+	(\bm{u}, \bm{v}) &= \int_{\Omega} \bm{u} \cdot \bm{v} \d\Omega, \quad \bm{u}, \bm{v} : \Omega \rightarrow \mathbb{V}, \\
+	(\bm{U}, \bm{V}) &= \int_{\Omega} \bm{U} \cddot \bm{V} \d\Omega, \quad \bm{U}, \bm{V} : \Omega \rightarrow \mathbb{M}
+\end{align*}
+where $\bm{u} \cdot \bm{v} := \sum_{i} u_{i} v_{i}$ is the scalar product in $\mathbb{V}$ and $\bm{U} \cddot \bm{V} := \sum_{i,j} u_{ij} v_{ij}$ is the tensor contraction.
+For the tensor field $\bm{U}$, the skew-symmetric part of $\bm{U}$ is $\mathrm{skw}(\bm{U}) = (\bm{U} - \bm{U}^\top)/2$. The standard notation $H^m(\Omega)$ denotes the Sobolev space of $L^2$ integrable functions with  m$^\text{th}$ derivative in $L^2$ and norm $||\cdot||_m$. In particular $H^1_0(\Omega)$ is the space of weakly derivable functions with vanishing trace. For $\mathbb{X} \subseteq \mathbb{M}$, let
 \begin{equation*}
 \begin{aligned}
-\bm{M} &:= \mathcal{D} \bm{K}, \\ \bm{q} &:= \mathcal{C} \bm{\gamma},
-\end{aligned} \qquad
-\begin{aligned}
-\bm{K} &:= \mathrm{Grad}(\bm{\theta}), \\ \bm{\gamma} &:= \mathrm{grad}(w) - \bm{\theta}, 
+H(\mathrm{div}, \Omega) &= \{\bm{u} \in L^2(\Omega, \mathbb{V}) \vert \; \mathrm{div}(\bm{u}) \in L^2(\Omega) \}, \\
+H(\mathrm{Div}, \Omega; \mathbb{X}) &= \{\bm{U} \in L^2(\Omega, \mathbb{X}) \vert \; \mathrm{Div}(\bm{U}) \in L^2(\Omega; \mathbb{V}) \},
 \end{aligned}
 \end{equation*}
-where $\mathcal{D}, \mathcal{C}$ are symmetric positive tensors. The kinetic and potential energy density $\mathcal{K}$ and $\mathcal{U}$ read
+which are Hilbert space with the norm $||\bm{u}||^2_{\text{div}} = ||\bm{u}||^2 + ||\mathrm{div}(\bm{u})||^2, \; ||\bm{U}||^2_{\text{Div}} = ||\bm{U}||^2 + ||\mathrm{Div}(\bm{U})||^2$. The following abbreviations will be used
+\begin{equation*}
+\begin{aligned}
+M &= H(\mathrm{Div}, \Omega; \mathbb{M}), \\
+S &= H(\mathrm{Div}, \Omega; \mathbb{S}),
+\end{aligned} \qquad
+\begin{aligned}
+D &= H(\mathrm{div}, \Omega), \\
+L &= L^2(\Omega),
+\end{aligned} \qquad
+\begin{aligned}
+V &= L^2(\Omega; \mathbb{V}), \\
+K &= L^2(\Omega; \mathbb{K}).
+\end{aligned}
+\end{equation*}
+
+
+\subsection{Mindlin-Reissner plate}
+The Mindlin model is a generalization to the 2D case of the Timoshenko beam model and is expressed by a system of three coupled PDEs (\cite{timoshenko1959theory}) 
+\begin{equation}
+\begin{cases}
+\displaystyle \rho h \diffp[2]{w}{t} &= \mathrm{div}(\bm{q}) + f, \quad (\bm{x}, t) \in \Omega \times [0, t_f]  \vspace{1mm}\\
+\displaystyle \frac{\rho h^3}{12} \diffp[2]{\bm \theta}{t} &= \bm{q} + \mathrm{Div}(\bm M) + \bm{\tau}, \\
+\end{cases}
+\end{equation}
+where $\rho$ is the mass density, $h$ the plate thickness, $w$ the vertical displacement, $\bm \theta = (\theta_1, \theta_2)^\top$ collects the deflection of the cross section along axes $x$ and $y$ respectively. The fields $f, \bm{\tau}$ represent distributed forces and momenta. Variables $\bm{M}, \bm{q}$ represent the momenta tensor and the shear stress. The Hooke law relates those to the curvature tensor and shear deformation vector
+\begin{equation*}
+\begin{aligned}
+\bm{M} &:= \mathcal{D} \bm{K} \in \mathbb{S}, \\ \bm{q} &:= \mathcal{C} \bm{\gamma},
+\end{aligned} \qquad
+\begin{aligned}
+\bm{K} &:= \mathrm{Grad}(\bm{\theta}) \in \mathbb{S}, \\ \bm{\gamma} &:= \mathrm{grad}(w) - \bm{\theta}, 
+\end{aligned}
+\end{equation*}
+where $\mathcal{D}, \mathcal{C}$ are symmetric positive tensors. The kinetic and potential energy  $E_c, E_p$ read
 \begin{equation}
 \begin{aligned}
-\mathcal{K} &=  \frac{1}{2} \left\{ \rho h \left(\diffp{w}{t} \right)^2 +  \frac{\rho h^3}{12} \diffp{\bm{\theta}}{t} \cdot \diffp{\bm{\theta}}{t}  \right\}, \\
-\mathcal{U} &= \frac{1}{2} \left\{ \bm{M} \cddot \bm{K} + \bm{q} \cdot \bm{\gamma}  \right\},
+E_c &=  \frac{1}{2} \int_{\Omega} \left\{ \rho h \left(\diffp{w}{t} \right)^2 +  \frac{\rho h^3}{12} \diffp{\bm{\theta}}{t} \cdot \diffp{\bm{\theta}}{t}  \right\} \d\Omega, \\
+E_p &= \frac{1}{2} \int_{\Omega} \left\{ \bm{M} \cddot \bm{K} + \bm{q} \cdot \bm{\gamma}  \right\}\d\Omega.
 \end{aligned}
 \end{equation} 
-where $\bm{M} \cddot \bm{K} := \sum_{i,j} m_{ij} \kappa_{ij}$ is the tensor contraction. The Hamiltonian  is easily written as
-\begin{equation} 
-H = \int_{\Omega} \left( \mathcal{K} + \mathcal{U} \right)   \d\Omega. 
-\end{equation}
-To get a port-Hamiltonian formulation suitable energy variables must be selected. The appropriate set is the following
+The Hamiltonian  is easily written as $H = E_c + E_p$. To get a port-Hamiltonian formulation suitable energy variables must be selected. The appropriate set is the following
 \begin{equation}
 \begin{aligned}
 \alpha_w &= \rho h \diffp{w}{t}, \\
@@ -158,9 +183,10 @@ e_w &:= \diffd{H}{\alpha_w} = \diffp{w}{t},  \\
 \bm{e}_{\gamma} &:= \diffd{H}{\bm{\alpha}_{\bm{\gamma}}} = \bm{q}. \\
 \end{aligned}
 \end{equation}
-Energy and co-energy are relative by a positive symmetric operator $\bm{\alpha} = \mathcal{Q} \bm{e}$
-\[ \mathcal{Q} = \mathrm{diag}(\frac{1}{\rho h}, \; \frac{12}{\rho h^3} , \; \mathcal{D}, \; \mathcal{C})
-\]
+Energy and co-energy are relative by a positive symmetric operator $\bm{\alpha} = \mathcal{H} \bm{e}$
+\begin{equation}
+\mathcal{H} = \mathrm{diag}(\frac{1}{\rho h}, \; \frac{12}{\rho h^3} , \; \mathcal{D}, \; \mathcal{C})
+\end{equation}
 
 The port-Hamiltonian system is expressed as follows 
 \begin{equation}
@@ -177,52 +203,53 @@ The port-Hamiltonian system is expressed as follows
 	0 & 0 &  \mathrm{Div} & \bm{I}_{2 \times 2}\\
 	0  & \mathrm{Grad}  & 0  & 0\\
 	\mathrm{grad} & -\bm{I}_{2 \times 2} &  0 & 0  \\
-	\end{bmatrix}}_{J}
+	\end{bmatrix}}_{\mathcal{J}}
 \begin{pmatrix}
 e_w \\
 \bm{e}_{\theta} \\
 \bm{E}_{\kappa} \\
 \bm{e}_{\gamma} \\
-\end{pmatrix},
+\end{pmatrix} + 
+\begin{pmatrix}
+f \\
+\bm{\tau} \\
+0 \\
+0 \\
+\end{pmatrix}.
 \end{equation}
-This system defines a Stokes-Dirac structure, therefore, the boundary values can be found by evaluating the time derivative of the Hamiltonian. 
-
-\paragraph{Kirchhoff plate}
-The Kirchhoff Model is a generalization to the 2D case of the Euler-Bernoulli beam model. The classical equations for this model \cite{timoshenko1959theory} are 
-\begin{equation}
-\displaystyle \rho h \diffp[2]{w}{t} = -\mathrm{div}(\mathrm{Div}(\bm{M}))
-\end{equation}
-The bending moment tensor and the curvature are related as in the Mindlin model $\bm{M} = \bm{D} \bm{K}$. Following the Kirchhoff assumption the curvature tensor is the Hessian of the vertical displacement
-\begin{equation*}
-\bm{K} := \mathrm{Grad}(\mathrm{grad}(w)).
-\end{equation*}
- The kinetic and potential energy densities $\mathcal{K}$ and $\mathcal{U}$ read
-\begin{equation}
-\mathcal{K} =  \frac{1}{2}\rho h \left(\diffp{w}{t} \right)^2, \quad
-\mathcal{U} = \frac{1}{2} \bm{M} \cddot \bm{K},
-\end{equation} 
-The Hamiltonian  is easily written as
-\begin{equation} 
-H = \int_{\Omega} \left( \mathcal{K} + \mathcal{U} \right)   \d\Omega. 
-\end{equation}
-Selecting as energy variables
-\begin{equation}
-\begin{aligned}
-\alpha_w &= \rho h \diffp{w}{t}, \quad &\text{Linear momentum}, \\
-\bm{A}_{\kappa} &= \bm{K}, \quad &\text{Curvature tensor}.\\
-\end{aligned}
-\end{equation}
-co-energy variables are found by computing the variational derivative of the Hamiltonian
-\begin{equation}
-\begin{aligned}
-e_w &:= \diffd{H}{\alpha_w} = w_t, \quad &\text{Vertical Velocity}, \\
-\bm{E}_{\kappa} &:= \diffd{H}{\bm{A}_{\kappa}} = \bm{M}, \quad &\text{Momenta tensor},\\
-\end{aligned} 
-\end{equation}
-where $w_t := \diffp{w}{t}$ for compactness. The coercive operator linking energy and co-energies reads
+This system defines a Stokes-Dirac structure, therefore, the boundary values can be found by evaluating the time derivative of the Hamiltonian. In this paper we focus on clamped boundary condition, i.e.
 \[
-\mathcal{Q} = \mathrm{diag}(\frac{1}{\rho h}, \mathcal{D})
-\] 
+e_w|_{\partial \Omega} = 0, \qquad \bm{e}_{\theta}|_{\partial \Omega} = 0.
+\]
+More general boundary conditions may be treated as well.
+
+\subsection{Kirchhoff plate}
+The Kirchhoff plate model is a generalization to the 2D case of the Euler-Bernoulli beam model. The classical equations for this model are (\cite{timoshenko1959theory}) 
+\begin{equation}
+\displaystyle \rho h \diffp[2]{w}{t} = -\mathrm{div}(\mathrm{Div}(\bm{M})) + f, \quad (\bm{x}, t) \in \Omega \times [0, t_f].
+\end{equation}
+The bending moment tensor and the curvature are related as in the Mindlin model $\bm{M} = \mathcal{D} \bm{K} \in \mathbb{S}$. Following the Kirchhoff assumption the curvature tensor is the Hessian of the vertical displacement
+\begin{equation*}
+\bm{K} := \mathrm{Grad}(\mathrm{grad}(w)) \in \mathbb{S}.
+\end{equation*}
+ The kinetic and potential energy $E_c, E_p$ read
+\begin{equation}
+E_c =  \frac{1}{2}\rho h \left(\diffp{w}{t} \right)^2, \quad
+E_p = \frac{1}{2} \bm{M} \cddot \bm{K},
+\end{equation} 
+The Hamiltonian is then given by $H=E_c + E_p$. Selecting as energy variables
+\begin{equation}
+\alpha_w = \rho h \diffp{w}{t}, \quad \bm{A}_{\kappa} = \bm{K}, 
+\end{equation}
+the co-energy variables are found by computing the variational derivative of the Hamiltonian
+\begin{equation}
+e_w := \diffd{H}{\alpha_w} = \diffp{w}{t}, \quad \bm{E}_{\kappa} := \diffd{H}{\bm{A}_{\kappa}} = \bm{M}, \\
+\end{equation}
+The coercive operator linking energy and co-energies reads
+\begin{equation}
+\mathcal{H} = \mathrm{diag}(\frac{1}{\rho h}, \mathcal{D})
+\end{equation}
+ 
 The port-Hamiltonian system is expressed as follows 
 \begin{equation}
 \label{eq:PH_sys_Kir_Ten}
@@ -238,8 +265,157 @@ The port-Hamiltonian system is expressed as follows
 \begin{pmatrix}
 e_w \\
 \bm{E}_{\kappa} \\
-\end{pmatrix},
+\end{pmatrix}+ 
+\begin{pmatrix}
+f \\
+0 \\
+\end{pmatrix}.
 \end{equation}
+Again this system defines a Stokes-Dirac structure and so the boundary values define the power balance. In this paper simply supported boundary conditions are considered, i.e.
+\[
+e_w|_{\partial \Omega} = 0, \quad \bm{n}^\top \bm{E}_\kappa \bm{n}|_{\partial \Omega}:= m_{\text{nn}}|_{\partial \Omega} = 0.
+\]
+Differently from the Mindlin plate case, generic boundary conditions demands an accurate analysis, see for instance \cite{Blum1990,mixed_kirchhoff}.
+\section{Discretization and connection with existing mixed finite elements}
+
+In this section suitable semi-discretized are derived for the two models. For the Mindlin plate model two different formulation are presented: the first enforces the symmetry of the momenta tensor strongly, the second weakly. For the Kirchhoff plate, the formulation is based on the the non-conforming Hellan-Herrmann-Johnson method. 
+
+\begin{remark}
+System \eqref{eq:PH_sys_Min_Ten}, \eqref{eq:PH_sys_Kir_Ten} can be expressed using either the energy or the co-energy variables. The  most adapted formulation for existing mixed finite element literature is the co-energy based one, which reads
+\[
+\mathcal{H}^{-1} \partial_t \bm{e} = \mathcal{J} \bm{e}
+\]
+\end{remark}
+
+\subsection{Mindlin plate with strongly imposed symmetry}
+
+The weak formulation with strongly imposed symmetry seeks $(e_w, \bm{e}_{\bm{\theta}}, \bm{E}_{\kappa}, \bm{e}_{\gamma})$ in $L \times V \times S \times D$ so that 
+\begin{equation}
+\label{eq:weak_min_PH_strong}
+\begin{aligned}
+(v_w, \ \rho h \dot{e}_w) &= (v_w, \mathrm{div} \bm{e}_\gamma) + (v_w, f), \\ 
+(\bm{v}_\theta, \ \rho h^3/12  \dot{\bm{e}}_\theta) &= (\bm{v}_\theta, \mathrm{Div} \bm{E}_\kappa + \bm{e}_\gamma) + (\bm{v}_\theta, \bm{\tau}), \\  
+(\bm{V}_\kappa, \ \mathcal{D}^{-1} \dot{\bm{E}}_\kappa) &= -(\mathrm{Div} \bm{V}_\kappa,  \bm{e}_\theta), \\ 
+(\bm{v}_\gamma, \ \mathcal{C}^{-1} \dot{\bm{e}}_\gamma) &= -(\mathrm{div} \bm{v}_\gamma, e_w ) + (\bm{v}_\gamma, \bm{e}_{\theta}), \\ 
+\end{aligned} \quad
+\begin{aligned}
+v_w \in L, \\
+\bm{v}_\theta \in V, \\
+\bm{V}_\kappa \in S, \\
+\bm{v}_\gamma \in D.
+\end{aligned}
+\end{equation}
+This system is obtained by integrating by parts the last two lines of \eqref{eq:PH_sys_Min_Ten} and considering clamped boundary conditions. Obtaining stable finite element that embeds the symmetry of the stress tensor for the general elastodynamics problem has proven to be a difficult task. The easiest implementation manageable by the Firedrake library (\cite{rathgeber2017firedrake}) is the one presented in \cite{becacheWave,becacheElas}. The main disadvantage is that this scheme requires the domain to be given by union of rectangles, as the mesh elements have to be squared. This allows constructing a simple element for the momenta tensor. The polynomial spaces for the discretization are
+\[
+Q_{k} = \{p(x_1, x_2)| \; p(x_1, x_2) = \sum_{i\le k, j\le k} a_{ij} x_1^i x_2^j  \},
+\]
+Given a regular mesh $\mathcal{Q}_h$ with squared elements $Q$ the following spaces are introduced as discretization spaces
+\begin{equation*}
+	\begin{aligned}
+	L_h^{\text{BEC}} &= \{w_h \in L | \; \forall Q, \ w_h|_{Q} \in Q_k \}, \\
+	V_h^{\text{BEC}} &= \{\bm{\theta}_h \in V | \; \forall Q,\ \bm{\theta}_h|_{Q} \in (Q_k)^2 \}, \\
+	S_h^{\text{BEC}} &= \{m_{12} \in H^1(\Omega)| \; \forall Q,\ m_{12}|_{Q} \in Q_{k+1} \}  \\
+	&\cup \{(m_{11}, m_{22}) \in D| \; \forall Q,\ (m_{11}, m_{22})|_{Q} \in Q_{k+1} \}, \\
+	D_h^{\text{BEC}} &= \{\bm{q}_h \in D | \; \forall Q,\ \bm{q}_h|_{Q} \in Q_{k+1} \}. \\ 
+	\end{aligned}
+\end{equation*}
+Combining the results of \cite{becacheWave} and \cite{becacheElas}, the following error estimates are conjectured:
+\begin{conjecture}
+Assuming a smooth solution to problem \eqref{eq:weak_min_PH_strong}, the following error estimates hold 
+\begin{equation}
+\begin{aligned}
+||e_w - e_w^h||_{L^{\infty} L^2} &\lesssim h^{k+1}, \\
+||\bm{e}_\theta - \bm{e}_\theta^h||_{L^{\infty} L^2} &\lesssim h^{k+1}, \\
+\end{aligned} \quad
+\begin{aligned}
+||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty} L^2} &\lesssim  h^{k+1}, \\
+||\bm{e}_\gamma - \bm{e}_\gamma^ h||_{L^{\infty} L^2} &\lesssim  h^{k+1}, \\
+\end{aligned} 
+\end{equation}
+where the notation $A \lesssim B$ means $A \le C B$. The constant depends only on the true solution and on the final time.
+\end{conjecture}
+
+
+\subsection{Mindlin plate with weakly imposed symmetry}
+The formulation \eqref{eq:weak_min_PH_strong} has to be modifies to impose the symmetry of the momenta tensor weakly. Taking the weak form of the third equation in \eqref{eq:PH_sys_Min_Ten}
+\[
+(\bm{V}_\kappa, \ \mathcal{D}^{-1} \dot{\bm{E}}_\kappa) = (\bm{V}_\kappa, \mathrm{Grad}\bm{e}_\theta ). 
+\]
+The symmetric gradient can be rewritten as 
+\[
+\mathrm{Grad}\ \bm{\theta} = \mathrm{grad}\ \bm{\theta} - \mathrm{skw}\mathrm{grad}\ \bm{\theta},
+\]
+where $\mathrm{skw}(\bm{A})$ is the skew-symmetric part of matrix $\bm{A}$. Introducing the new variable $\bm{E}_r = \mathrm{skw}(\mathrm{grad}(\bm{\theta}))$ then $(\bm{e}_\theta, \bm{E}_\kappa, \bm{E}_r) \in V\times M\times K$ satisfy (reminding that $\bm{e}_\theta = \dot{\bm{\theta}}$)
+\begin{equation*}
+	\begin{aligned}
+	(\bm{V}_\kappa, \ \mathcal{D}^{-1} \dot{\bm{E}}_\kappa) &= (\bm{V}_\kappa, \mathrm{grad}(\bm{e}_\theta)) - (\bm{V}_\kappa, \ \dot{\bm{E}}_r), \\
+	&= -(\mathrm{Div}\bm{V}_\kappa, \bm{e}_\theta) - (\bm{V}_\kappa, \ \dot{\bm{E}}_r).
+	\end{aligned}
+\end{equation*}
+The momenta tensor is weakly symmetric if $\bm{V}_r, \ \bm{E}_{\kappa}$. The weak formulation then consists in finding $(e_w, \bm{e}_{\bm{\theta}}, \bm{E}_{\kappa}, \bm{e}_{\gamma})$ in $L \times V \times M \times D \times K$ so that 
+ \begin{equation}
+ \label{eq:weak_min_PH_weak}
+ \begin{aligned}
+ (v_w, \ \rho h \dot{e}_w) &= (v_w, \mathrm{div} \bm{e}_\gamma) + (v_w, f), \\ 
+ (\bm{v}_\theta, \ \rho h^3/12  \dot{\bm{e}}_\theta) &= (\bm{v}_\theta, \mathrm{Div} \bm{E}_\kappa + \bm{e}_\gamma) + (\bm{v}_\theta, \bm{\tau}), \\  
+ (\bm{V}_\kappa, \ \mathcal{D}^{-1} \dot{\bm{E}}_\kappa) &= -(\mathrm{Div} \bm{V}_\kappa,  \bm{e}_\theta) - (\bm{V}_\kappa, \ \dot{\bm{E}}_r), \\ 
+ (\bm{v}_\gamma, \ \mathcal{C}^{-1} \dot{\bm{e}}_\gamma) &= -(\mathrm{div} \bm{v}_\gamma, e_w ) + (\bm{v}_\gamma, \bm{e}_{\theta}), \\ 
+ (\bm{V}_r, \ \dot{\bm{E}}_\kappa) &= 0
+ \end{aligned} \quad
+ \begin{aligned}
+ v_w \in L, \\
+ \bm{v}_\theta \in V, \\
+ \bm{V}_\kappa \in S, \\
+ \bm{v}_\gamma \in D, \\
+ \bm{V}_r \in K, \\
+ \end{aligned}
+ \end{equation}
+Consider a regular triangulation $\mathcal{T}_h$ with elements $T$. The space of polynomials of order $k$ on a mesh cell is denoted by $P_k$. The following space are used as discretization spaces
+
+\begin{equation*}
+\begin{aligned}
+L_h^{\text{AFW}} &= \{w_h \in L | \; \forall T, \ w_h|_{T} \in P_k \}, \\
+V_h^{\text{AFW}} &= \{\bm{\theta}_h \in V | \; \forall T,\ \bm{\theta}_h|_{T} \in (P_k)^2 \}, \\
+S_h^{\text{AFW}} &= \{(m_{11}, m_{12}) \in D| \; \forall T,\ (m_{11}, m_{12})|_{T} \in BDM_{k+1} \}  \\
+&\cup \{(m_{21}, m_{22}) \in D| \; \forall T,\ (m_{21}, m_{22})|_{T} \in BDM_{k+1} \}, \\
+D_h^{\text{AFW}} &= \{\bm{q}_h \in D | \; \forall T,\ \bm{q}_h|_{T} \in RT_{[k]} \}. \\
+K_h^{\text{AFW}} &= \{\bm{R}_h \in K | \; \forall T, \ w_h|_{T} \in R_k \}, \\ 
+\end{aligned}
+\end{equation*}
+where $BDM$ is the Brezzi-Douglas-Marini element and $RT$ the Raviart-Thomas element. A convergence analysis for the general elastodynamics problem with weak symmetry is detailed \cite{ArnoldWeak}. A convergence study for the wave equation with mixed finite elements is presented in \cite{Geveci}. Combining the result of the two the following error estimate are conjectured:
+\begin{conjecture}
+	Assuming a smooth solution to problem \eqref{eq:weak_min_PH_strong}, the following error estimates hold 
+	\begin{equation}
+	\begin{aligned}
+	||e_w - e_w^h||_{L^{\infty} L^2} &\lesssim h^{k+1}, \\
+	||\bm{e}_\theta - \bm{e}_\theta^h||_{L^{\infty} L^2} &\lesssim h^{k+1}, \\
+	||\bm{E}_r - \bm{E}_r^h||_{L^{\infty} L^2} &\lesssim h^{k+1}. \\
+	\end{aligned} \quad
+	\begin{aligned}
+	||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty} L^2} &\lesssim  h^{k+1}, \\
+	||\bm{e}_\gamma - \bm{e}_\gamma^ h||_{L^{\infty} L^2} &\lesssim  h^{k+1}, \\
+	\end{aligned} 
+	\end{equation}
+\end{conjecture}
+
+\subsection{The HHJ scheme for the Kirchhoff plate}
+For the Kirchhoff plate, the HHJ scheme can be used to obtain a structure preserving discretization. Given the non conforming nature of this scheme, it is necessary to first introduce the discrete functional spaces and state the problem directly in discrete form. The vertical displacement is approximated using continuous Lagrange polynomials.
+\[
+W_h = \{w_h \in H^1_0(\Omega)| \; \forall T w_h|_{T} \in P_{k+1} \}
+\]
+The bending moment tensor is to be sought in the HHJ space
+\begin{equation*}
+\begin{aligned}
+U_h = &\{\bm{M}_h \in L^2(\Omega, \mathbb{S})| \; \forall T \bm{M}_h|_{T} \in P_{k}(\mathbb{S}) , \\ &\bm{M}_h \text{ is normal-normal continuos across elements}\}.
+\end{aligned}
+\end{equation*}
+The normal to normal continuous means that if two triangles $T_1, T_2$ share a common edge then $\bm{n}^\top (\bm{M}_h|_{T_1}) \bm{n} = \bm{n}^\top (\bm{M}_h|_{T_2}) \bm{n}$. Taking system \eqref{eq:PH_sys_Kir_Ten} and multiplying the first equation by $v_w \in W_h$ and integrating over a triangle
+\begin{equation*}
+	\begin{aligned}
+	& - (v_w, \ \mathrm{div}\mathrm{Div} \bm{E}_\kappa))_{T} = (\nabla v_w, \ \mathrm{Div} =  \bm{E}_\kappa))_{T}, \\
+	& -(\nabla^2 v_w, \ \bm{E}_\kappa)_T + (\partial_n v_w, \bm{n}^\top\bm{E}_\kappa \bm{n})_{\partial T} + (\partial_s v_w, \bm{s}^\top\bm{E}_\kappa \bm{n})_{\partial T}, \\
+	\end{aligned}
+\end{equation*}
 
 \section{Conclusion}
 
