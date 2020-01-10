@@ -120,7 +120,7 @@ H(\mathrm{div}, \Omega) &= \{\bm{u} \in L^2(\Omega, \mathbb{V}) \vert \; \mathrm
 H(\mathrm{Div}, \Omega; \mathbb{X}) &= \{\bm{U} \in L^2(\Omega, \mathbb{X}) \vert \; \mathrm{Div}(\bm{U}) \in L^2(\Omega; \mathbb{V}) \},
 \end{aligned}
 \end{equation*}
-which are Hilbert space with the norm $||\bm{u}||^2_{\text{div}} = ||\bm{u}||^2 + ||\mathrm{div}(\bm{u})||^2, \; ||\bm{U}||^2_{\text{Div}} = ||\bm{U}||^2 + ||\mathrm{Div}(\bm{U})||^2$. The following abbreviations will be used
+which are Hilbert spaces with the norm $||\bm{u}||^2_{\text{div}} = ||\bm{u}||^2 + ||\mathrm{div}(\bm{u})||^2, \; ||\bm{U}||^2_{\text{Div}} = ||\bm{U}||^2 + ||\mathrm{Div}(\bm{U})||^2$. The following abbreviations will be used
 \begin{equation*}
 \begin{aligned}
 M &= H(\mathrm{Div}, \Omega; \mathbb{M}), \\
@@ -145,7 +145,7 @@ The Mindlin model is a generalization to the 2D case of the Timoshenko beam mode
 \displaystyle \frac{\rho h^3}{12} \diffp[2]{\bm \theta}{t} &= \bm{q} + \mathrm{Div}(\bm M) + \bm{\tau}, \\
 \end{cases}
 \end{equation}
-where $\rho$ is the mass density, $h$ the plate thickness, $w$ the vertical displacement, $\bm \theta = (\theta_1, \theta_2)^\top$ collects the deflection of the cross section along axes $x$ and $y$ respectively. The fields $f, \bm{\tau}$ represent distributed forces and momenta. Variables $\bm{M}, \bm{q}$ represent the momenta tensor and the shear stress. The Hooke law relates those to the curvature tensor and shear deformation vector
+where $\rho$ is the mass density, $h$ the plate thickness, $w$ the vertical displacement, $\bm \theta = (\theta_x, \theta_y)^\top$ collects the deflection of the cross section along axes $x$ and $y$ respectively. The fields $f, \bm{\tau}$ represent distributed forces and momenta. Variables $\bm{M}, \bm{q}$ represent the momenta tensor and the shear stress. The Hooke law relates those to the curvature tensor and shear deformation vector
 \begin{equation*}
 \begin{aligned}
 \bm{M} &:= \mathcal{D} \bm{K} \in \mathbb{S}, \\ \bm{q} &:= \mathcal{C} \bm{\gamma},
@@ -154,7 +154,13 @@ where $\rho$ is the mass density, $h$ the plate thickness, $w$ the vertical disp
 \bm{K} &:= \mathrm{Grad}(\bm{\theta}) \in \mathbb{S}, \\ \bm{\gamma} &:= \mathrm{grad}(w) - \bm{\theta}, 
 \end{aligned}
 \end{equation*}
-where $\mathcal{D}, \mathcal{C}$ are symmetric positive tensors. The kinetic and potential energy  $E_c, E_p$ read
+where $\mathcal{D}, \mathcal{C}$ are symmetric positive tensors
+\begin{equation}
+\label{eq:bend_rig_tensor}
+	\mathcal{D} (\cdot) = \frac{E}{12 (1 - \nu)}[(1-\nu)(\cdot) + \nu \Tr(\cdot)], \quad \mathcal{C} (\cdot) = \frac{E k }{2(1+\nu)}(\cdot),
+\end{equation}
+where $E$ is the Young modulus, $\nu$ is the Poisson modulus, $k$ is the shear correction factor.
+ The kinetic and potential energy  $E_c, E_p$ read
 \begin{equation}
 \begin{aligned}
 E_c &=  \frac{1}{2} \int_{\Omega} \left\{ \rho h \left(\diffp{w}{t} \right)^2 +  \frac{\rho h^3}{12} \diffp{\bm{\theta}}{t} \cdot \diffp{\bm{\theta}}{t}  \right\} \d\Omega, \\
@@ -228,7 +234,7 @@ The Kirchhoff plate model is a generalization to the 2D case of the Euler-Bernou
 \begin{equation}
 \displaystyle \rho h \diffp[2]{w}{t} = -\mathrm{div}(\mathrm{Div}(\bm{M})) + f, \quad (\bm{x}, t) \in \Omega \times [0, t_f].
 \end{equation}
-The bending moment tensor and the curvature are related as in the Mindlin model $\bm{M} = \mathcal{D} \bm{K} \in \mathbb{S}$. Following the Kirchhoff assumption the curvature tensor is the Hessian of the vertical displacement
+The bending moment tensor and the curvature are related as in the Mindlin model $\bm{M} = \mathcal{D} \bm{K} \in \mathbb{S}$ (with $\mathcal{D}$ defined in \eqref{eq:bend_rig_tensor}). Following the Kirchhoff assumption the curvature tensor is the Hessian of the vertical displacement
 \begin{equation*}
 \bm{K} := \mathrm{Grad}(\mathrm{grad}(w)) \in \mathbb{S}.
 \end{equation*}
@@ -276,7 +282,8 @@ Again this system defines a Stokes-Dirac structure and so the boundary values de
 e_w|_{\partial \Omega} = 0, \quad \bm{n}^\top \bm{E}_\kappa \bm{n}|_{\partial \Omega}:= m_{\text{nn}}|_{\partial \Omega} = 0.
 \]
 Differently from the Mindlin plate case, generic boundary conditions demands an accurate analysis, see for instance \cite{Blum1990,mixed_kirchhoff}.
-\section{Discretization and connection with existing mixed finite elements}
+
+\section{Available mixed finite elements}
 
 In this section suitable semi-discretized are derived for the two models. For the Mindlin plate model two different formulation are presented: the first enforces the symmetry of the momenta tensor strongly, the second weakly. For the Kirchhoff plate, the formulation is based on the the non-conforming Hellan-Herrmann-Johnson method. 
 
@@ -307,19 +314,19 @@ v_w \in L, \\
 \end{equation}
 This system is obtained by integrating by parts the last two lines of \eqref{eq:PH_sys_Min_Ten} and considering clamped boundary conditions. Obtaining stable finite element that embeds the symmetry of the stress tensor for the general elastodynamics problem has proven to be a difficult task. The easiest implementation manageable by the Firedrake library (\cite{rathgeber2017firedrake}) is the one presented in \cite{becacheWave,becacheElas}. The main disadvantage is that this scheme requires the domain to be given by union of rectangles, as the mesh elements have to be squared. This allows constructing a simple element for the momenta tensor. The polynomial spaces for the discretization are
 \[
-Q_{k} = \{p(x_1, x_2)| \; p(x_1, x_2) = \sum_{i\le k, j\le k} a_{ij} x_1^i x_2^j  \},
+N_{k} = \{p(x, y)| \; p(x, y) = \sum_{i\le k, j\le k} a_{ij} x^i y^j  \},
 \]
 Given a regular mesh $\mathcal{Q}_h$ with squared elements $Q$ the following spaces are introduced as discretization spaces
 \begin{equation*}
 	\begin{aligned}
-	L_h^{\text{BEC}} &= \{w_h \in L | \; \forall Q, \ w_h|_{Q} \in Q_k \}, \\
-	V_h^{\text{BEC}} &= \{\bm{\theta}_h \in V | \; \forall Q,\ \bm{\theta}_h|_{Q} \in (Q_k)^2 \}, \\
-	S_h^{\text{BEC}} &= \{m_{12} \in H^1(\Omega)| \; \forall Q,\ m_{12}|_{Q} \in Q_{k+1} \}  \\
-	&\cup \{(m_{11}, m_{22}) \in D| \; \forall Q,\ (m_{11}, m_{22})|_{Q} \in Q_{k+1} \}, \\
-	D_h^{\text{BEC}} &= \{\bm{q}_h \in D | \; \forall Q,\ \bm{q}_h|_{Q} \in Q_{k+1} \}. \\ 
+	L_h^{\text{BEC}} &= \{w_h \in L | \ \forall Q, \ w_h|_{Q} \in N_k \}, \\
+	V_h^{\text{BEC}} &= \{\bm{\theta}_h \in V | \ \forall Q,\ \bm{\theta}_h|_{Q} \in (N_k)^2 \}, \\
+	S_h^{\text{BEC}} &= \{m_{12} \in H^1(\Omega)| \ \forall Q,\ m_{12}|_{Q} \in N_{k+1} \}  \\
+	&\cup \{(m_{11}, m_{22}) \in D| \; \forall Q,\ (m_{11}, m_{22})|_{Q} \in N_{k+1} \}, \\
+	D_h^{\text{BEC}} &= \{\bm{q}_h \in D | \ \forall Q,\ \bm{q}_h|_{Q} \in N_{k+1} \}. \\ 
 	\end{aligned}
 \end{equation*}
-Combining the results of \cite{becacheWave} and \cite{becacheElas}, the following error estimates are conjectured:
+Combining the results of \cite{becacheWave,becacheElas}, the following error estimates are conjectured:
 \begin{conjecture}
 Assuming a smooth solution to problem \eqref{eq:weak_min_PH_strong}, the following error estimates hold 
 \begin{equation}
@@ -352,7 +359,7 @@ where $\mathrm{skw}(\bm{A})$ is the skew-symmetric part of matrix $\bm{A}$. Intr
 	&= -(\mathrm{Div}\bm{V}_\kappa, \bm{e}_\theta) - (\bm{V}_\kappa, \ \dot{\bm{E}}_r).
 	\end{aligned}
 \end{equation*}
-The momenta tensor is weakly symmetric if $\bm{V}_r, \ \bm{E}_{\kappa}$. The weak formulation then consists in finding $(e_w, \bm{e}_{\bm{\theta}}, \bm{E}_{\kappa}, \bm{e}_{\gamma})$ in $L \times V \times M \times D \times K$ so that 
+The momenta tensor is weakly symmetric if $\bm{V}_r, \ \bm{E}_{\kappa}$. The weak formulation then consists in finding $(e_w, \bm{e}_{\bm{\theta}}, \bm{E}_{\kappa}, \bm{e}_{\gamma}, \bm{E}_{r})$ in $L \times V \times M \times D \times K$ so that 
  \begin{equation}
  \label{eq:weak_min_PH_weak}
  \begin{aligned}
@@ -374,12 +381,12 @@ Consider a regular triangulation $\mathcal{T}_h$ with elements $T$. The space of
 
 \begin{equation*}
 \begin{aligned}
-L_h^{\text{AFW}} &= \{w_h \in L | \; \forall T, \ w_h|_{T} \in P_k \}, \\
-V_h^{\text{AFW}} &= \{\bm{\theta}_h \in V | \; \forall T,\ \bm{\theta}_h|_{T} \in (P_k)^2 \}, \\
-S_h^{\text{AFW}} &= \{(m_{11}, m_{12}) \in D| \; \forall T,\ (m_{11}, m_{12})|_{T} \in BDM_{k+1} \}  \\
-&\cup \{(m_{21}, m_{22}) \in D| \; \forall T,\ (m_{21}, m_{22})|_{T} \in BDM_{k+1} \}, \\
-D_h^{\text{AFW}} &= \{\bm{q}_h \in D | \; \forall T,\ \bm{q}_h|_{T} \in RT_{[k]} \}. \\
-K_h^{\text{AFW}} &= \{\bm{R}_h \in K | \; \forall T, \ w_h|_{T} \in R_k \}, \\ 
+L_h^{\text{AFW}} &= \{w_h \in L | \ \forall T, \ w_h|_{T} \in P_k \}, \\
+V_h^{\text{AFW}} &= \{\bm{\theta}_h \in V | \ \forall T,\ \bm{\theta}_h|_{T} \in (P_k)^2 \}, \\
+S_h^{\text{AFW}} &= \{(m_{11}, m_{12}) \in D| \ \forall T,\ (m_{11}, m_{12})|_{T} \in BDM_{[k+1]} \}  \\
+& \cup \{(m_{21}, m_{22}) \in D| \ \forall T,\ (m_{21}, m_{22})|_{T} \in BDM_{[k+1]} \}, \\
+D_h^{\text{AFW}} &= \{\bm{q}_h \in D | \ \forall T,\ \bm{q}_h|_{T} \in RT_{[k]} \}, \\
+K_h^{\text{AFW}} &= \{\bm{R}_h \in K | \ \forall T, \ w_h|_{T} \in P_{[k]} \}, \\ 
 \end{aligned}
 \end{equation*}
 where $BDM$ is the Brezzi-Douglas-Marini element and $RT$ the Raviart-Thomas element. A convergence analysis for the general elastodynamics problem with weak symmetry is detailed \cite{ArnoldWeak}. A convergence study for the wave equation with mixed finite elements is presented in \cite{Geveci}. Combining the result of the two the following error estimate are conjectured:
@@ -399,25 +406,89 @@ where $BDM$ is the Brezzi-Douglas-Marini element and $RT$ the Raviart-Thomas ele
 \end{conjecture}
 
 \subsection{The HHJ scheme for the Kirchhoff plate}
-For the Kirchhoff plate, the HHJ scheme can be used to obtain a structure preserving discretization. Given the non conforming nature of this scheme, it is necessary to first introduce the discrete functional spaces and state the problem directly in discrete form. The vertical displacement is approximated using continuous Lagrange polynomials.
+For the Kirchhoff plate, the HHJ scheme can be used to obtain a structure preserving discretization. The discussion follows \cite{arnold2019hellan}. Given the non conforming nature of this scheme, it is necessary to first introduce the discrete functional spaces and state the problem directly in discrete form. The vertical displacement is approximated using continuous Lagrange polynomials
 \[
-W_h = \{w_h \in H^1_0(\Omega)| \; \forall T w_h|_{T} \in P_{k+1} \}
+W_h = \{w_h \in H^1_0(\Omega)| \; \forall T w_h|_{T} \in P_{k+1} \}.
 \]
-The bending moment tensor is to be sought in the HHJ space
+The momenta tensor is to be sought in the HHJ space
 \begin{equation*}
 \begin{aligned}
-U_h = &\{\bm{M}_h \in L^2(\Omega, \mathbb{S})| \; \forall T \bm{M}_h|_{T} \in P_{k}(\mathbb{S}) , \\ &\bm{M}_h \text{ is normal-normal continuos across elements}\}.
+U_h = &\{\bm{M}_h \in L^2(\Omega, \mathbb{S})| \; \forall T \bm{M}_h|_{T} \in P_{k}(\mathbb{S}) , \\ &\, \ \bm{M}_h \text{ is normal-normal continuos across elements}\}.
 \end{aligned}
 \end{equation*}
 The normal to normal continuous means that if two triangles $T_1, T_2$ share a common edge then $\bm{n}^\top (\bm{M}_h|_{T_1}) \bm{n} = \bm{n}^\top (\bm{M}_h|_{T_2}) \bm{n}$. Taking system \eqref{eq:PH_sys_Kir_Ten} and multiplying the first equation by $v_w \in W_h$ and integrating over a triangle
 \begin{equation*}
 	\begin{aligned}
-	& - (v_w, \ \mathrm{div}\mathrm{Div} \bm{E}_\kappa))_{T} = (\nabla v_w, \ \mathrm{Div} =  \bm{E}_\kappa))_{T}, \\
-	& -(\nabla^2 v_w, \ \bm{E}_\kappa)_T + (\partial_n v_w, \bm{n}^\top\bm{E}_\kappa \bm{n})_{\partial T} + (\partial_s v_w, \bm{s}^\top\bm{E}_\kappa \bm{n})_{\partial T}, \\
+	& - (v_w, \ \mathrm{div}\mathrm{Div} \bm{E}_\kappa))_{T} = (\nabla v_w, \ \mathrm{Div} \bm{E}_\kappa))_{T}=, \\
+	& -(\nabla^2 v_w, \ \bm{E}_\kappa)_T + (\partial_n v_w, \bm{n}^\top\bm{E}_\kappa \bm{n})_{\partial T} + (\partial_s v_w, \bm{s}^\top\bm{E}_\kappa \bm{n})_{\partial T}. \\
 	\end{aligned}
 \end{equation*}
+A double integration by parts is applied to get the final equation. Summing up over all triangles provides for the penultimate term
+\begin{equation*}
+\sum_{T \in \mathcal{T}_h} (\partial_n v_w, \bm{n}^\top\bm{E}_\kappa \bm{n})_{\partial T} = \sum_{E \in \mathcal{E}_h} ([\![\partial_n v_w]\!], m_{\text{nn}})_{E},
+\end{equation*} 
+where $[\![a]\!] = a|_{T_1} + a|_{T_2}$ denotes the jump of a function across share edges. For a boundary edge it is symply the value of the function. For the final term, it holds $(\partial_s v_w, \bm{s}^\top\bm{E}_\kappa \bm{n})_{\partial T}=0$, as $v_w$ is continuous across the edge boundaries and the normal switches sign. We are now in the position to state the final weak form. Given the definition
+\[
+b_h(v_w, \ \bm{E}_{\kappa}) := - \sum_{T \in \mathcal{T}_h} ( \nabla^2 v_w, \ \bm{E}_\kappa) + \sum_{E \in \mathcal{E}_h} ([\![\partial_n v_w]\!], m_{\text{nn}})_{E}, 
+\]
+find $(e_w, \bm{E}_\kappa) \in W_h \times U_h$ such that
+\begin{equation}
+\label{eq:weak_kir_PH}
+\begin{aligned}
+(v_w, \ \rho h \dot{e}_w) &= +b_h(v_w, \ \bm{E}_{\kappa}) + (v_w, f), \\ 
+(\bm{V}_\kappa, \ \mathcal{D}^{-1} \dot{\bm{E}}_\kappa) &= -b_h(e_w, \ \bm{V}_{\kappa}), \\ 
+\end{aligned} \quad
+\begin{aligned}
+v_w \in W_h, \\
+\bm{V}_\kappa \in U_h. \\
+\end{aligned}
+\end{equation}
 
-\section{Conclusion}
+For the associated static problem, under the hypothesis of smooth solutions optimal convergence of the order $O(k+1)$ for $w \in H^1$ and $\bm{M} \in L^2$ has been established. So, it is natural to conjecture the following result for the dynamic problem:
+\begin{conjecture}
+Assuming a smooth solution for problem \eqref{eq:weak_kir_PH}, the following error estimates hold
+\begin{equation}
+||e_w - e_w^h||_{L^{\infty} H^1} \lesssim h^{k+1}, \qquad
+||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty} L^2} \lesssim h^{k+1}.
+\end{equation}
+\end{conjecture}
+
+
+\section{Numerical experiment}
+In this section numerical test cases are used to verify the conjectured orders of convergence for the two problems. Upon discretization system \eqref{eq:weak_min_PH_strong}, \eqref{eq:weak_min_PH_weak}, \eqref{eq:weak_kir_PH} assumes the from 
+\[
+M \dot{\bm{e}} = J \bm{e}.
+\]
+Matrix $J$ is skew symmetric, matrix $M$ is symmetric and positive definite for \eqref{eq:weak_min_PH_strong}, \eqref{eq:weak_kir_PH} while it is symmetric and indefinite for \eqref{eq:weak_min_PH_weak}, because of the multiplier that enforces the symmetry.
+
+\subsection{Numerical test for the Mindlin plate}
+Constructing an analytical solution for a vibrating Mindlin plate is not trivial. Therefore, the solution for the static problem presented in \cite{mindlinVeiga} is exploited. Consider a distributed static force given by 
+\begin{equation*}
+\begin{aligned}
+f_s(x,y)=\frac{E}{12 (1-\nu^2)} \{12 y(y-1)(5x^2-5x+1)\\
+\times [2y^2(y-1)2+x(x-1)(5y^2-5y+1)] +12x(x-1)\\
+\times (5y^2-5y+1)[2x^2(x-1)2+y(y-1)(5x^2-5x+1)]\}.
+\end{aligned}
+\end{equation*}
+The static displacement and rotation are given by
+\begin{align*}
+	w_s(x,y) &= \frac{1}{3} x^3(x-1)^3 y^3 (y-1)3\\
+	&-\frac{2 h^2}{5(1-\nu)}[y^3(y-1)^3 x(x-1)(5 x^2-5x+1). \\
+	\theta_{x, s}(x,y) &= y^3(y-1)^3 x^2 (x-1)^2 (2x-1), \\
+	\theta_{y, s}(x,y) &= x^3(x-1)^3 y^2 (y-1)^2 (2y-1).
+\end{align*}
+
+\begin{equation}
+\begin{aligned}
+0 &= \mathrm{div} \ \bm{q}_s + f_s , \\
+0 &= \mathrm{Div} \bm{M}_s + \bm{q}_s, \\
+\mathcal{D}^{-1} \bm{M}_s &= \mathrm{Grad} \ \bm{\theta}_s, \\
+\mathcal{C}^{-1} \bm{q}_s &= \mathrm{grad} \ w_s - \bm{\theta}_s. \\
+\end{aligned}
+\end{equation}
+
+ 
+\subsection{Numerical test for the Kirchhoff plate}
 
 \begin{ack}
 The authors would like to thank Michel Sala\"un from ISAE-SUPAERO for the fruitful and insightful discussions.
