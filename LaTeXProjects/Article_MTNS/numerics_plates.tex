@@ -157,7 +157,7 @@ where $\rho$ is the mass density, $h$ the plate thickness, $w$ the vertical disp
 where $\mathcal{D}, \mathcal{C}$ are symmetric positive tensors
 \begin{equation}
 \label{eq:bend_rig_tensor}
-	\mathcal{D} (\cdot) = \frac{E}{12 (1 - \nu)}[(1-\nu)(\cdot) + \nu \Tr(\cdot)], \quad \mathcal{C} (\cdot) = \frac{E k }{2(1+\nu)}(\cdot),
+	\mathcal{D} (\cdot) = \frac{E h^3}{12 (1 - \nu)}[(1-\nu)(\cdot) + \nu \Tr(\cdot)], \quad \mathcal{C} (\cdot) = \frac{E k }{2(1+\nu)}(\cdot),
 \end{equation}
 where $E$ is the Young modulus, $\nu$ is the Poisson modulus, $k$ is the shear correction factor.
  The kinetic and potential energy  $E_c, E_p$ read
@@ -408,12 +408,12 @@ where $BDM$ is the Brezzi-Douglas-Marini element and $RT$ the Raviart-Thomas ele
 \subsection{The HHJ scheme for the Kirchhoff plate}
 For the Kirchhoff plate, the HHJ scheme can be used to obtain a structure preserving discretization. The discussion follows \cite{arnold2019hellan}. Given the non conforming nature of this scheme, it is necessary to first introduce the discrete functional spaces and state the problem directly in discrete form. The vertical displacement is approximated using continuous Lagrange polynomials
 \[
-W_h = \{w_h \in H^1_0(\Omega)| \; \forall T w_h|_{T} \in P_{k+1} \}.
+W_h = \{w_h \in H^1_0(\Omega)| \; \forall T, \; w_h|_{T} \in P_{k+1} \}.
 \]
 The momenta tensor is to be sought in the HHJ space
 \begin{equation*}
 \begin{aligned}
-U_h = &\{\bm{M}_h \in L^2(\Omega, \mathbb{S})| \; \forall T \bm{M}_h|_{T} \in P_{k}(\mathbb{S}) , \\ &\, \ \bm{M}_h \text{ is normal-normal continuos across elements}\}.
+U_h = &\{\bm{M}_h \in L^2(\Omega, \mathbb{S})| \; \forall T, \; \bm{M}_h|_{T} \in P_{k}(\mathbb{S}) , \\ &\, \ \bm{M}_h \text{ is normal-normal continuos across elements}\}.
 \end{aligned}
 \end{equation*}
 The normal to normal continuous means that if two triangles $T_1, T_2$ share a common edge then $\bm{n}^\top (\bm{M}_h|_{T_1}) \bm{n} = \bm{n}^\top (\bm{M}_h|_{T_2}) \bm{n}$. Taking system \eqref{eq:PH_sys_Kir_Ten} and multiplying the first equation by $v_w \in W_h$ and integrating over a triangle
@@ -455,14 +455,14 @@ Assuming a smooth solution for problem \eqref{eq:weak_kir_PH}, the following err
 
 
 \section{Numerical experiment}
-In this section numerical test cases are used to verify the conjectured orders of convergence for the two problems. Upon discretization system \eqref{eq:weak_min_PH_strong}, \eqref{eq:weak_min_PH_weak}, \eqref{eq:weak_kir_PH} assumes the from 
+In this section numerical test cases are used to verify the conjectured orders of convergence for the two problems. Upon discretization, system \eqref{eq:weak_min_PH_strong}, \eqref{eq:weak_min_PH_weak}, \eqref{eq:weak_kir_PH} assumes the from 
 \[
 M \dot{\bm{e}} = J \bm{e}.
 \]
 Matrix $J$ is skew symmetric, matrix $M$ is symmetric and positive definite for \eqref{eq:weak_min_PH_strong}, \eqref{eq:weak_kir_PH} while it is symmetric and indefinite for \eqref{eq:weak_min_PH_weak}, because of the multiplier that enforces the symmetry.
 
 \subsection{Numerical test for the Mindlin plate}
-Constructing an analytical solution for a vibrating Mindlin plate is not trivial. Therefore, the solution for the static problem presented in \cite{mindlinVeiga} is exploited. Consider a distributed static force given by 
+Constructing an analytical solution for a vibrating Mindlin plate is not trivial. Therefore, the solution for the static case presented in \cite{mindlinVeiga} is exploited. Consider a distributed static force given by 
 \begin{equation*}
 \begin{aligned}
 f_s(x,y)=\frac{E}{12 (1-\nu^2)} \{12 y(y-1)(5x^2-5x+1)\\
@@ -472,12 +472,15 @@ f_s(x,y)=\frac{E}{12 (1-\nu^2)} \{12 y(y-1)(5x^2-5x+1)\\
 \end{equation*}
 The static displacement and rotation are given by
 \begin{align*}
-	w_s(x,y) &= \frac{1}{3} x^3(x-1)^3 y^3 (y-1)3\\
+	w_s(x,y) &= \frac{1}{3} x^3(x-1)^3 y^3 (y-1)^3\\
 	&-\frac{2 h^2}{5(1-\nu)}[y^3(y-1)^3 x(x-1)(5 x^2-5x+1). \\
-	\theta_{x, s}(x,y) &= y^3(y-1)^3 x^2 (x-1)^2 (2x-1), \\
-	\theta_{y, s}(x,y) &= x^3(x-1)^3 y^2 (y-1)^2 (2y-1).
+	\bm{\theta}_{s}(x,y) &= 
+	\begin{pmatrix}
+	y^3(y-1)^3 \ x^2 (x-1)^2 (2x-1) \\
+	x^3(x-1)^3 \ y^2 (y-1)^2 (2y-1) \\
+	\end{pmatrix}
 \end{align*}
-
+The static solution solves the following problem defined on the squared domain $\Omega=(0,1)\times(0,1)$:
 \begin{equation}
 \begin{aligned}
 0 &= \mathrm{div} \ \bm{q}_s + f_s , \\
@@ -486,6 +489,22 @@ The static displacement and rotation are given by
 \mathcal{C}^{-1} \bm{q}_s &= \mathrm{grad} \ w_s - \bm{\theta}_s. \\
 \end{aligned}
 \end{equation}
+Given the linear nature of the system a solution for the dynamic problem is found by multiplying the static solution by a time dependent term. For simplicity a sinus function is chosen
+\[
+w_d(x,y,t) = w_s(x,y) \sin(\beta t), \quad \bm{\theta}_d(x,y,t) = \bm\theta_s(x,y) \sin(\beta t).
+\]
+The momenta and shear force are then defined by
+\[
+\bm{M}_d = \mathcal{D} \ \mathrm{Grad} \ \bm{\theta}_d, \quad \bm{q}_d = \mathcal{C}(\mathrm{grad} \ w_d - \bm{\theta}_d)
+\]
+Appropriate forcing terms have to be introduced. The force and torque in the dynamical case become
+\begin{equation*}
+f_d = f_s \sin(\beta t) + \rho h \partial_{tt} w_d, \qquad
+\bm{\tau}_d = \frac{\rho h^3}{12} \partial_{tt} \bm{\theta}_d
+\end{equation*}
+Variables $(w_d, \bm\theta_d, \bm{M}_d, \bm{q}_d)$ solve problem \eqref{eq:PH_sys_Min_Ten}. The solution being smooth, the conjectured error estimates should hold.
+
+
 
  
 \subsection{Numerical test for the Kirchhoff plate}
