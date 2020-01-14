@@ -1,13 +1,27 @@
 import numpy as np
 import matplotlib.pyplot as plt
+SMALL_SIZE = 14
+MEDIUM_SIZE = 16
+BIGGER_SIZE = 18
+
+plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
+plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
 import matplotlib
 matplotlib.rcParams["legend.loc"] = 'best'
 matplotlib.rcParams['text.usetex'] = True
+matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{amsmath}"]
+matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{bm}"]
 
 
 path_res = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/convergence_plates/convergence_results_mindlin/"
 bc_input= "CCCC_BEC_"
-save_res = False
+save_res = True
 
 coeff = 0.95
 h1_vec = np.load(path_res + bc_input + "h1.npy")
@@ -168,13 +182,13 @@ plt.plot(np.log(h2_vec), np.log(v_errInf_r3), '-.+', label='$k=3$')
 plt.plot(np.log(h2_vec), np.log(h2_vec**3) + coeff*(np.log(v_errInf_r3)[-1] - np.log(h2_vec**3)[-1]), '-v', label=r'$h^3$')
 
 plt.xlabel(r'log(Mesh size $h$)')
-plt.ylabel(r'log($L^\infty L^2$ error $e_w$)')
-plt.title(r'Velocity error BEC element')
+plt.ylabel(r'log($||e_w - e_w^h||_{L^\infty L^2}$)')
+plt.title(r'$e_w$ error (BJT element)')
 plt.legend()
-path_fig = "/home/a.brugnoli/Plots_Videos/Python/Plots/Mindlin_plots/Convergence/firedrake/"
+path_fig = "/home/a.brugnoli/Plots/Python/Plots/Mindlin_plots/Convergence/firedrake/"
 if save_res:
     plt.savefig(path_fig + bc_input + "_vel.eps", format="eps")
-
+#
 om_r1int_max = np.polyfit(np.log(h1_vec), np.log(om_errInf_r1), 1)[0]
 om_r1int_L2 = np.polyfit(np.log(h1_vec), np.log(om_errQuad_r1), 1)[0]
 
@@ -217,8 +231,8 @@ plt.plot(np.log(h2_vec), np.log(om_errInf_r3), '-.+', label='$k=3$')
 plt.plot(np.log(h2_vec), np.log(h2_vec**3) + coeff*(np.log(om_errInf_r3)[-1] - np.log(h2_vec**3)[-1]), '-v', label=r'$h^3$')
 
 plt.xlabel(r'log(Mesh size $h$)')
-plt.ylabel(r'log($L^\infty L^2$ error $\bm{e}_\theta$)')
-plt.title(r'Omega Error vs Mesh size')
+plt.ylabel(r'log($||\bm{e}_\theta - \bm{e}_\theta^h||_{L^\infty L^2}$)')
+plt.title(r'$\bm{e}_\theta$ error (BJT element)')
 plt.legend()
 if save_res:
     plt.savefig(path_fig + bc_input + "_om.eps", format="eps")
@@ -253,20 +267,20 @@ print("")
 plt.figure()
 
 # plt.plot(np.log(h1_vec), np.log(sig_r1_atF), ':o', label='BEC 1')
-plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+', label='BEC 1 $L^\infty$')
+plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+', label='$k=1$')
 plt.plot(np.log(h1_vec), np.log(h1_vec) + coeff*(np.log(sig_errInf_r1)[-1] - np.log(h1_vec)[-1]), '-v', label=r'$h$')
 
 # plt.plot(np.log(h1_vec), np.log(sig_r2_atF), ':o', label='BEC 2')
-plt.plot(np.log(h1_vec), np.log(sig_errInf_r2), '-.+', label='BEC 2 $L^\infty$')
+plt.plot(np.log(h1_vec), np.log(sig_errInf_r2), '-.+', label='$k=2$')
 plt.plot(np.log(h1_vec), np.log(h1_vec**2) + coeff*(np.log(sig_errInf_r2)[-1] - np.log(h1_vec**2)[-1]), '-v', label=r'$h^2$')
 
 # plt.plot(np.log(h2_vec), np.log(sig_r3_atF), ':o', label='BEC 3')
-plt.plot(np.log(h2_vec), np.log(sig_errInf_r3), '-.+', label='BEC 3 $L^\infty$')
+plt.plot(np.log(h2_vec), np.log(sig_errInf_r3), '-.+', label='$k=3$')
 plt.plot(np.log(h2_vec), np.log(h2_vec**3) + coeff*(np.log(sig_errInf_r3)[-1] - np.log(h2_vec**3)[-1]), '-v', label=r'$h^3$')
 
 plt.xlabel(r'log(Mesh size $h$)')
-plt.ylabel(r'log(Error sigma)')
-plt.title(r'Sigma Error vs Mesh size')
+plt.ylabel(r'log($||\bm{E}_{\kappa} - \bm{E}_{\kappa}^h||_{L^\infty L^2}$)')
+plt.title(r'$\bm{E}_\kappa$ error (BJT element)')
 plt.legend()
 if save_res:
     plt.savefig(path_fig + bc_input + "_sig.eps", format="eps")
@@ -302,20 +316,20 @@ print("")
 plt.figure()
 
 # plt.plot(np.log(h1_vec), np.log(q_r1_atF), ':o', label='BEC 1')
-plt.plot(np.log(h1_vec), np.log(q_errInf_r1), '-.+', label='BEC 1 $L^\infty$')
+plt.plot(np.log(h1_vec), np.log(q_errInf_r1), '-.+', label='$k=1$')
 plt.plot(np.log(h1_vec), np.log(h1_vec) + coeff*(np.log(q_errInf_r1)[-1] - np.log(h1_vec)[-1]), '-v', label=r'$h$')
 
 # plt.plot(np.log(h1_vec), np.log(q_r2_atF), ':o', label='BEC 2')
-plt.plot(np.log(h1_vec), np.log(q_errInf_r2), '-.+', label='BEC 2 $L^\infty$')
+plt.plot(np.log(h1_vec), np.log(q_errInf_r2), '-.+', label='$k=2$')
 plt.plot(np.log(h1_vec), np.log(h1_vec**2) + coeff*(np.log(q_errInf_r2)[-1] - np.log(h1_vec**2)[-1]), '-v', label=r'$h^2$')
 
 # plt.plot(np.log(h2_vec), np.log(q_r3_atF), ':o', label='BEC 3')
-plt.plot(np.log(h2_vec), np.log(q_errInf_r3), '-.+', label='BEC 3 $L^\infty$')
+plt.plot(np.log(h2_vec), np.log(q_errInf_r3), '-.+', label='$k=3$')
 plt.plot(np.log(h2_vec), np.log(h2_vec**3) + coeff*(np.log(q_errInf_r3)[-1] - np.log(h2_vec**3)[-1]), '-v', label=r'$h^3$')
 
 plt.xlabel(r'log(Mesh size $h$)')
-plt.ylabel(r'log(Error $\bm{e}_\gamma$)')
-plt.title(r'Error B\'{e}cache $\bm{e}_\gamma$')
+plt.ylabel(r'log($||\bm{e}_{\gamma} - \bm{e}_{\gamma}^h||_{L^\infty L^2}$)')
+plt.title(r'$\bm{e}_\gamma$ error (BJT element)')
 plt.legend()
 if save_res:
     plt.savefig(path_fig + bc_input + "_q.eps", format="eps")

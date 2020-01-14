@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 
 matplotlib.rcParams['text.usetex'] = True
 
-bc_input = 'CCCC_no_h'
+bc_input = 'CCCC_AFW'
 save_res = True
 
 def compute_err(n, r):
@@ -160,7 +160,7 @@ def compute_err(n, r):
 
     th_dyn = as_vector([thx_dyn, thy_dyn])
 
-    sigma_ex = bending_mom(gradSym(th_dyn))
+    sigma_ex = bending_mom(grad(th_dyn))
     q_ex = F*(grad(w_dyn) - th_dyn)
     r_ex = 0.5*(thx_dyn.dx(1) - thy_dyn.dx(0))
 
@@ -188,7 +188,7 @@ def compute_err(n, r):
 
     # J, M = PETScMatrix(), PETScMatrix()
 
-    dt = 0.1*h_mesh
+    dt = 0.01*h_mesh
     theta = 0.5
 
     m_form = m_operator(v_pw, al_pw, v_pth, al_pth, v_qth, al_qth, e_qth, v_qw, al_qw, v_skw, e_skw)
@@ -250,7 +250,7 @@ def compute_err(n, r):
 
     t_vec = np.linspace(0, t_fin, num=n_t)
 
-    param = {"ksp_type": "gmres", "ksp_gmres_restart":100, "ksp_atol":1e-30}
+    param = {"ksp_type": "gmres", "ksp_gmres_restart":100} #, "ksp_atol":1e-40}
     # param = {"ksp_type": "preonly", "pc_type": "lu"}
 
     for i in range(1, n_t):
@@ -302,7 +302,7 @@ def compute_err(n, r):
         #                                  + inner(div(eqw_n1 - q_ex), div(eqw_n1 - q_ex)) * dx))
         q_err_L2[i] = np.sqrt(assemble(inner(eqw_n1 - q_ex, eqw_n1 - q_ex) * dx))
 
-        r_err_L2[i] = np.sqrt(assemble(inner(eskw_n1 - r_ex,eskw_n1 - r_ex) * dx))
+        r_err_L2[i] = np.sqrt(assemble(inner(eskw_n1 - r_ex, eskw_n1 - r_ex) * dx))
 
     # plt.figure()
     # plt.plot(t_vec, v_atP, 'r-', label=r'approx $v$')
@@ -337,7 +337,7 @@ def compute_err(n, r):
 
 n_h = 4
 n1_vec = np.array([2**(i+2) for i in range(n_h)])
-n2_vec = np.array([2**(i+2) for i in range(n_h)])
+n2_vec = np.array([2**(i+1) for i in range(n_h)])
 h1_vec = 1./n1_vec
 h2_vec = 1./n2_vec
 
@@ -588,7 +588,7 @@ plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log(Error Velocity)')
 plt.title(r'Velocity Error vs Mesh size')
 plt.legend()
-path_fig = "/home/a.brugnoli/Plots_Videos/Python/Plots/Mindlin_plots/Convergence/firedrake/"
+path_fig = "/home/a.brugnoli/Plots/Python/Plots/Mindlin_plots/Convergence/firedrake/"
 if save_res:
     plt.savefig(path_fig  + bc_input + "_vel.eps", format="eps")
 
