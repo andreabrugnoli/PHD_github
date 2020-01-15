@@ -16,8 +16,8 @@ import matplotlib.pyplot as plt
 
 matplotlib.rcParams['text.usetex'] = True
 
-bc_input = 'CCCC_AFW'
-save_res = True
+bc_input = 'CCCC'
+save_res = False
 
 def compute_err(n, r):
 
@@ -146,8 +146,24 @@ def compute_err(n, r):
              (y**3*(y-1)**3*x*(x-1)*(5*x**2-5*x+1)
              +x**3*(x-1)**3*y*(y-1)*(5*y**2-5*y+1))
 
+    dx_w_st = -(2*h**2*(3*(y-1)*y*(5*y**2-5*y+1)*(x-1)**2*x**3+(y-1)**3*y**3*x*(5*x**2-5*x+1)\
+                        +(y-1)**3*y**3*(x-1)*(5*x**2-5*x+1)+3*(y-1)*y*(5*y**2-5*y+1)*(x-1)**3*x**2\
+                        +(y-1)**3*y**3*(x-1)*x*(10*x-5)))/(5*(1-nu))+(y-1)**3*y**3*(x-1)**2*x**3\
+                        +(y-1)**3*y**3*(x-1)**3*x**2
+
+    dy_w_st = -(2*h**2*(3*(x-1)*x*(5*x**2-5*x+1)*(y-1)**2*y**3+(x-1)**3*x**3*y*(5*y**2-5*y+1)\
+                        +(x-1)**3*x**3*(y-1)*(5*y**2-5*y+1)+3*(x-1)*x*(5*x**2-5*x+1)*(y-1)**3 * y**2\
+                        +(x-1)**3*x**3*(y-1)*y*(10*y-5)))/(5*(1-nu))+(x-1)**3*x**3*(y-1)**2*y**3\
+                        +(x-1)**3*x**3*(y-1)**3*y**2
+
     thx_st = y ** 3 * (y - 1) ** 3 * x ** 2 * (x - 1) ** 2 * (2 * x - 1)
     thy_st = x ** 3 * (x - 1) ** 3 * y ** 2 * (y - 1) ** 2 * (2 * y - 1)
+
+    dx_thx_st = 2 * (y - 1) ** 3 * y ** 3 * (x - 1) * x * (5 * x ** 2 - 5 * x + 1)
+    dy_thx_st = 3 * (x - 1) ** 2 * x ** 2 * (2 * x - 1) * (y - 1) ** 2 * y ** 2 * (2 * y - 1)
+
+    dx_thy_st = 3 * (y - 1) ** 2 * y ** 2 * (2 * y - 1) * (x - 1) ** 2 * x ** 2 * (2 * x - 1)
+    dy_thy_st = 2 * (x - 1) ** 3 * x ** 3 * (y - 1) * y * (5 * y ** 2 - 5 * y + 1)
 
     th_st = as_vector([thx_st, thy_st])
 
@@ -160,9 +176,24 @@ def compute_err(n, r):
 
     th_dyn = as_vector([thx_dyn, thy_dyn])
 
-    sigma_ex = bending_mom(grad(th_dyn))
+    dx_thx_dyn = dx_thx_st * sin(beta * t_)
+    dy_thx_dyn = dy_thx_st * sin(beta * t_)
+
+    dx_thy_dyn = dx_thy_st * sin(beta * t_)
+    dy_thy_dyn = dy_thy_st * sin(beta * t_)
+
+    # sigma_ex = bending_mom(grad(th_dyn))
+
+    kxx = dx_thx_dyn
+    kyy = dy_thy_dyn
+    kxy = 0.5*(dy_thx_dyn + dx_thy_dyn)
+
+    sigma_ex = as_tensor([[D * (kxx + nu * kyy), D * (1 - nu) * kxy],
+                          [D * (1 - nu) * kxy, D * (kyy + nu * kxx)]])
+
     q_ex = F*(grad(w_dyn) - th_dyn)
-    r_ex = 0.5*(thx_dyn.dx(1) - thy_dyn.dx(0))
+    # r_ex = 0.5*(thx_dyn.dx(1) - thy_dyn.dx(0))
+    r_ex = -0.5*(dy_thx_dyn - dx_thy_dyn)
 
     dt_w = beta * w_st * cos(beta*t_)
     dtt_w = -beta**2 * w_st * sin(beta*t_)
@@ -188,7 +219,7 @@ def compute_err(n, r):
 
     # J, M = PETScMatrix(), PETScMatrix()
 
-    dt = 0.01*h_mesh
+    dt = 0.1*h_mesh
     theta = 0.5
 
     m_form = m_operator(v_pw, al_pw, v_pth, al_pth, v_qth, al_qth, e_qth, v_qw, al_qw, v_skw, e_skw)
@@ -227,11 +258,14 @@ def compute_err(n, r):
     w_atP = np.zeros((n_t,))
     v_atP = np.zeros((n_t,))
 
+    r_atP = np.zeros((n_t,))
+
     th_atP = np.zeros((2, n_t))
     om_atP = np.zeros((2, n_t))
 
     Ppoint = (Lx/3, Ly/7)
     v_atP[0] = epw_n.at(Ppoint)
+    r_atP[0] = eskw_n.at(Ppoint)
 
     v_err_L2 = np.zeros((n_t,))
     om_err_L2 = np.zeros((n_t,))
@@ -292,6 +326,7 @@ def compute_err(n, r):
 
         w_atP[i] = w_n1.at(Ppoint)
         v_atP[i] = epw_n1.at(Ppoint)
+        r_atP[i] = eskw_n1.at(Ppoint)
 
         t_.assign(t)
 
@@ -313,6 +348,15 @@ def compute_err(n, r):
     # plt.title(r'Displacement at ' + str(Ppoint))
     # plt.legend()
 
+    plt.figure()
+    plt.plot(t_vec, r_atP, 'r-', label=r'approx $r$')
+    # wst_atP = interpolate(w_st, V_pw).at(Ppoint)
+    # vex_atP = wst_atP*beta*np.cos(beta*t_vec)
+    # plt.plot(t_vec, vex_atP, 'b-', label=r'exact $v$')
+    plt.xlabel(r'Time [s]')
+    plt.title(r'Displacement at ' + str(Ppoint))
+    plt.legend()
+
     v_err_max = max(v_err_L2)
     v_err_quad = np.sqrt(np.sum(dt * np.power(v_err_L2, 2)))
 
@@ -328,14 +372,14 @@ def compute_err(n, r):
     q_err_max = max(q_err_L2)
     q_err_quad = np.sqrt(np.sum(dt * np.power(q_err_L2, 2)))
 
-    r_err_max = max(sig_err_L2)
+    r_err_max = max(r_err_L2)
     r_err_quad = np.sqrt(np.sum(dt * np.power(r_err_L2, 2)))
 
     return v_err_max, v_err_quad, om_err_max, om_err_quad, sig_err_max, sig_err_quad, \
            q_err_max, q_err_quad, r_err_max, r_err_quad
 
 
-n_h = 4
+n_h = 2
 n1_vec = np.array([2**(i+2) for i in range(n_h)])
 n2_vec = np.array([2**(i+1) for i in range(n_h)])
 h1_vec = 1./n1_vec

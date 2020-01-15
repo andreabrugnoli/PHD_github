@@ -16,8 +16,8 @@ import matplotlib.pyplot as plt
 
 matplotlib.rcParams['text.usetex'] = True
 
-bc_input = 'CCCC_BEC_RT'
-save_res = True
+bc_input = 'CCCC_BEC'
+save_res = False
 
 def compute_err(n, r):
 
@@ -110,7 +110,7 @@ def compute_err(n, r):
     V_pth = VectorFunctionSpace(mesh, "DG", r-1)
     V_qthD = FunctionSpace(mesh, BDM_quad)
     V_qth12 = FunctionSpace(mesh, "CG", r)
-    V_qw = FunctionSpace(mesh, RT_quad)
+    V_qw = FunctionSpace(mesh, BDM_quad)
 
     V = MixedFunctionSpace([V_pw, V_pth, V_qthD, V_qth12, V_qw])
 
@@ -156,6 +156,7 @@ def compute_err(n, r):
 
     thx_st = y ** 3 * (y - 1) ** 3 * x ** 2 * (x - 1) ** 2 * (2 * x - 1)
     thy_st = x ** 3 * (x - 1) ** 3 * y ** 2 * (y - 1) ** 2 * (2 * y - 1)
+
 
     th_st = as_vector([thx_st, thy_st])
 
@@ -308,14 +309,14 @@ def compute_err(n, r):
         #                                  + inner(div(eqw_n1 - q_ex), div(eqw_n1 - q_ex)) * dx))
         q_err_L2[i] = np.sqrt(assemble(inner(eqw_n1 - q_ex, eqw_n1 - q_ex) * dx))
 
-    # plt.figure()
-    # plt.plot(t_vec, v_atP, 'r-', label=r'approx $v$')
-    # wst_atP = interpolate(w_st, V_pw).at(Ppoint)
-    # vex_atP = wst_atP*beta*np.cos(beta*t_vec)
-    # plt.plot(t_vec, vex_atP, 'b-', label=r'exact $v$')
-    # plt.xlabel(r'Time [s]')
-    # plt.title(r'Displacement at ' + str(Ppoint))
-    # plt.legend()
+    plt.figure()
+    plt.plot(t_vec, v_atP, 'r-', label=r'approx $v$')
+    wst_atP = interpolate(w_st, V_pw).at(Ppoint)
+    vex_atP = wst_atP*beta*np.cos(beta*t_vec)
+    plt.plot(t_vec, vex_atP, 'b-', label=r'exact $v$')
+    plt.xlabel(r'Time [s]')
+    plt.title(r'Displacement at ' + str(Ppoint))
+    plt.legend()
 
     v_err_max = max(v_err_L2)
     v_err_quad = np.sqrt(np.sum(dt * np.power(v_err_L2, 2)))
@@ -336,7 +337,7 @@ def compute_err(n, r):
            q_err_max, q_err_quad
 
 
-n_h = 5
+n_h = 2
 n1_vec = np.array([2**(i+2) for i in range(n_h)])
 n2_vec = np.array([2**(i+1) for i in range(n_h)])
 h1_vec = 1./n1_vec
