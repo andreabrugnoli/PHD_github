@@ -182,18 +182,18 @@ def compute_err(n, r):
     dx_thy_dyn = dx_thy_st * sin(beta * t_)
     dy_thy_dyn = dy_thy_st * sin(beta * t_)
 
-    # sigma_ex = bending_mom(grad(th_dyn))
+    sigma_ex = bending_mom(grad(th_dyn))
 
-    kxx = dx_thx_dyn
-    kyy = dy_thy_dyn
-    kxy = 0.5*(dy_thx_dyn + dx_thy_dyn)
-
-    sigma_ex = as_tensor([[D * (kxx + nu * kyy), D * (1 - nu) * kxy],
-                          [D * (1 - nu) * kxy, D * (kyy + nu * kxx)]])
+    # kxx = dx_thx_dyn
+    # kyy = dy_thy_dyn
+    # kxy = 0.5*(dy_thx_dyn + dx_thy_dyn)
+    #
+    # sigma_ex = as_tensor([[D * (kxx + nu * kyy), D * (1 - nu) * kxy],
+    #                       [D * (1 - nu) * kxy, D * (kyy + nu * kxx)]])
 
     q_ex = F*(grad(w_dyn) - th_dyn)
-    # r_ex = 0.5*(thx_dyn.dx(1) - thy_dyn.dx(0))
-    r_ex = -0.5*(dy_thx_dyn - dx_thy_dyn)
+    r_ex = 0.5*(thx_dyn.dx(1) - thy_dyn.dx(0))
+    # r_ex = -0.5*(dy_thx_dyn - dx_thy_dyn)
 
     dt_w = beta * w_st * cos(beta*t_)
     dtt_w = -beta**2 * w_st * sin(beta*t_)
@@ -263,9 +263,17 @@ def compute_err(n, r):
     th_atP = np.zeros((2, n_t))
     om_atP = np.zeros((2, n_t))
 
-    Ppoint = (Lx/3, Ly/7)
+    Ppoint = (Lx/2, Ly/7)
     v_atP[0] = epw_n.at(Ppoint)
-    r_atP[0] = eskw_n.at(Ppoint)
+
+    # r1_atP = interpolate(dx_thy_st, V_skw).at(Ppoint)
+    # print(r1_atP)
+    # r2_atP = interpolate(dy_thx_st, V_skw).at(Ppoint)
+    # print(r2_atP)
+    # rst_atP = interpolate(dy_thx_st-dx_thy_st, V_skw).at(Ppoint)
+    # print(rst_atP, r2_atP-r1_atP)
+
+    # r_atP[0] = eskw_n.at(Ppoint)
 
     v_err_L2 = np.zeros((n_t,))
     om_err_L2 = np.zeros((n_t,))
@@ -348,14 +356,14 @@ def compute_err(n, r):
     # plt.title(r'Displacement at ' + str(Ppoint))
     # plt.legend()
 
-    plt.figure()
-    plt.plot(t_vec, r_atP, 'r-', label=r'approx $r$')
-    # wst_atP = interpolate(w_st, V_pw).at(Ppoint)
-    # vex_atP = wst_atP*beta*np.cos(beta*t_vec)
-    # plt.plot(t_vec, vex_atP, 'b-', label=r'exact $v$')
-    plt.xlabel(r'Time [s]')
-    plt.title(r'Displacement at ' + str(Ppoint))
-    plt.legend()
+    # plt.figure()
+    # plt.plot(t_vec, r_atP, 'r-', label=r'approx $r$')
+    # rst_atP = interpolate(0.5*(dy_thx_st-dx_thy_st), V_skw).at(Ppoint)
+    # rex_atP = rst_atP*beta*np.cos(beta*t_vec)
+    # plt.plot(t_vec, rex_atP, 'b-', label=r'exact $r$')
+    # plt.xlabel(r'Time [s]')
+    # plt.title(r'Displacement at ' + str(Ppoint))
+    # plt.legend()
 
     v_err_max = max(v_err_L2)
     v_err_quad = np.sqrt(np.sum(dt * np.power(v_err_L2, 2)))

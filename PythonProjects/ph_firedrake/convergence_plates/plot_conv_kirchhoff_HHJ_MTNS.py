@@ -153,7 +153,7 @@ plt.plot(np.log(h2_vec), np.log(v_errInf_r3), '-.+', label='$k=3$')
 plt.plot(np.log(h2_vec), np.log(h2_vec**3) + coeff*(np.log(v_errInf_r3)[-1] - np.log(h2_vec**3)[-1]) + np.log(2), '-v', label=r'$h^3$')
 
 plt.xlabel(r'log(Mesh size)')
-plt.ylabel(r'log($||e_w - e_w^h||_{L^\infty L^2}$)')
+plt.ylabel(r'log($||e_w - e_w^h||_{L^\infty H^1}$)')
 plt.title(r'$e_w$ error (HHJ element)')
 plt.legend()
 path_fig = "/home/a.brugnoli/Plots/Python/Plots/Kirchhoff_plots/Convergence/firedrake/"
