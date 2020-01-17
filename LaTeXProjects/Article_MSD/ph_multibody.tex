@@ -148,18 +148,18 @@ The coupled ODE-PDE system representing the motion of a single flexible body are
 
 \subsection{Classical model}
 
-Consider an open connected set $\Omega \in \mathbb{R}^3$, representing a floating flexible body. The dynamics is computed at a generic point $P$, that is not necessarily the center of mass. The velocity of a generic point is expressed by considering a small flexible displacement superimposed to the rigid motion
+Consider an open connected set $\Omega \in \mathbb{R}^3$, representing a floating flexible body. The boundary $\partial \Omega = \Gamma_D \cup \Gamma_N$ is split into two subsets, one on which the surface traction is imposed ($\Gamma_N$ Neumann condition) and the other where the flexible displacement is known ($\Gamma_D$ Dirichlet condition).   The dynamics is computed at a generic point $P$, that is not necessarily the center of mass. The velocity of a generic point is expressed by considering a small flexible displacement superimposed to the rigid motion
 \[
 \bm{v} = \bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}+\bm{u}_f) + \bm{v}_f,
 \]
-where $\bm{v}_P, \bm{\omega}_P$ are the linear and angular velocities of point $P$  and $\bm{v}_f := \dot{\bm{u}}_f$ is the time derivative of the deformation displacement $\bm{u}_f$ (computed in the body frame). These quantities are evaluated in the body reference frame $\widehat{\bm{x}}, \widehat{\bm{y}}, \widehat{\bm{z}}$ (see Fig. \ref{fig:float_body}). The notation $\crmat{\bm{a}}$ denotes the skew-symmetric matrix associated to vector $\bm{a}$ (see Appendix A). The model for the classical equations derived using the principle of virtual work can be found in \cite{MB_Daepde,simeon2013computational}. The small difference with respect to the derivation therein is that the equation for the translation is now written in the body frame (see Appendix B). 
+where $\bm{v}_P, \bm{\omega}_P$ are the linear and angular velocities of point $P$  and $\bm{v}_f := \dot{\bm{u}}_f$ is the time derivative of the deformation displacement $\bm{u}_f$ (computed in the body frame). These quantities are evaluated in the body reference frame $\widehat{\bm{x}}, \widehat{\bm{y}}, \widehat{\bm{z}}$ (see Fig. \ref{fig:float_body}). The notation $\crmat{\bm{a}}$ (cross map) denotes the skew-symmetric matrix associated to vector $\bm{a}$ (see Appendix A). The model for the classical equations derived using the principle of virtual work can be found in \cite{MB_Daepde} and \cite[Chapter 4]{simeon2013computational}. The small difference with respect to the derivation therein is that the equation for the translation is now written in the body frame (see Appendix B). 
 \begin{itemize}
 	\item Linear momentum balance:
 	\begin{equation}
 	\label{eq:rig_tr1}
 	\begin{split}
 	&m (\dot{\bm{v}}_P + \crmat{\bm{\omega}_P} \bm{v}_P) + \crmat{\bm{s}_u}^\top \dot{\bm{\omega}}_P  + \int_{\Omega} \rho \ddot{\bm{u}}_f \d{\Omega} = \\
-	&\quad - \crmat{\bm{\omega}_P} \crmat{\bm{\omega}_P} \bm{s}_u - \int_{\Omega} 2 \rho \crmat{\bm{\omega}_P} \dot{\bm{u}}_f \d{\Omega} +  \int_{\Omega} \bm\beta \d{\Omega} + \int_{\partial \Omega} \bm\tau \d{\Gamma},
+	&\quad - \crmat{\bm{\omega}_P} \crmat{\bm{\omega}_P} \bm{s}_u - \int_{\Omega} 2 \rho \crmat{\bm{\omega}_P} \dot{\bm{u}}_f \d{\Omega} +  \int_{\Omega} \bm\beta \d{\Omega} + \int_{\Gamma_N} \bm\tau \d{\Gamma},
 	\end{split}
 	\end{equation}
 	where $\rho$ is the mass density, $m = \int_{\Omega} \rho \d{\Omega}$ the total mass,  $\bm{s}_u = \int_{\Omega} \rho (\bm{x}+\bm{u}_f) \d{\Omega}$ the static moment. Additionally, $\bm\beta$ is a density force and $\bm\tau$ is a surface traction, both expressed in the body reference frame.
@@ -168,16 +168,27 @@ where $\bm{v}_P, \bm{\omega}_P$ are the linear and angular velocities of point $
 	\label{eq:rig_rot1}
 	\begin{split}
 	\crmat{\bm{s}_u} (\dot{\bm{v}}_P + \crmat{\bm{\omega}_P} \bm{v}_P) + \bm{J}_u \dot{\bm\omega}_P + \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f} \ddot{\bm{u}}_f \d{\Omega} + \crmat{\bm{\omega}_P} \bm{J}_u \bm{\omega}_P = \\ 
-	- \int_{\Omega} 2\rho \crmat{\bm{x}+\bm{u}_f} \crmat{\bm\omega_P} \dot{\bm{u}}_f \d{\Omega} + \int_{\Omega}\crmat{\bm{x}+\bm{u}_f} \bm\beta \d{\Omega} + \int_{\partial \Omega}\crmat{\bm{x}+\bm{u}_f} \bm\tau \d{\Gamma}, \\
+	- \int_{\Omega} 2\rho \crmat{\bm{x}+\bm{u}_f} \crmat{\bm\omega_P} \dot{\bm{u}}_f \d{\Omega} + \int_{\Omega}\crmat{\bm{x}+\bm{u}_f} \bm\beta \d{\Omega} + \int_{\Gamma_N}\crmat{\bm{x}+\bm{u}_f} \bm\tau \d{\Gamma}, \\
 	\end{split}
 	\end{equation}
 	where $\bm{J}_u:= \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f}^\top\crmat{\bm{x}+\bm{u}_f} \d{\Omega}= - \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f}\crmat{\bm{x}+\bm{u}_f} \d{\Omega}$ is the inertia matrix.
 	\item Flexibility PDE:
 	\begin{equation}
 	\label{eq:flex1}
-	\rho (\dot{\bm{v}}_P + \crmat{\bm\omega_P} \bm{v}_P) + \rho (\crmat{\dot{\bm\omega}_P} + \crmat{\bm{\omega}_P}\crmat{\bm{\omega}_P})(\bm{x}+\bm{u}_f) + \rho (2 \crmat{\bm{\omega}_P} \dot{\bm{u}}_f + \ddot{\bm{u}}_f) = \Div{\bm\Sigma} + \bm\beta,
+	\begin{split}
+	\rho (\dot{\bm{v}}_P + \crmat{\bm\omega_P} \bm{v}_P) + \rho (\crmat{\dot{\bm\omega}_P} + \crmat{\bm{\omega}_P}\crmat{\bm{\omega}_P})(\bm{x}+\bm{u}_f) + \rho (2 \crmat{\bm{\omega}_P} \dot{\bm{u}}_f + \ddot{\bm{u}}_f) = \\
+	 \Div{\bm\Sigma} + \bm\beta,
+		\end{split}
 	\end{equation}
-	Variable $\bm\Sigma$ is the Cauchy stress tensor. From linear elasticity theory it is well known that the infinitesimal stress is given by $\bm\varepsilon = \Grad(\bm{u}_f)$, where $\Grad=~\frac{1}{2}[\nabla+\nabla^\top]$ is the symmetric gradient. The constitutive equation is expressed as $\bm\Sigma =  \bm{\mathcal{D}} \bm\varepsilon$, where $ \bm{\mathcal{D}}$ is the stiffness tensor. This PDE require the specifications of boundary conditions.  
+	Variable $\bm\Sigma$ is the Cauchy stress tensor. From linear elasticity theory it is well known that the infinitesimal stress is given by $\bm\varepsilon = \Grad(\bm{u}_f)$, where $\Grad=~\frac{1}{2}[\nabla+\nabla^\top]$ is the symmetric gradient. The constitutive equation is expressed as $\bm\Sigma =  \bm{\mathcal{D}} \bm\varepsilon$, where $ \bm{\mathcal{D}}$ is the stiffness tensor. This PDE require the specifications of boundary conditions.
+	\begin{equation}
+	\label{eq:bcPDE}
+	\begin{aligned}
+	\bm\Sigma \cdot \bm{n}|_{\Gamma_N} &= \bm\tau|_{\Gamma_N}, \quad \text{$\bm{n}$ is the outward normal,} \\
+	\bm{u}_f|_{\Gamma_D} &= \bm{\bar{u}}_f|_{\Gamma_D},
+	\end{aligned}
+	\end{equation}
+	
 \end{itemize}
 
 \subsection{Towards a pH formulation}
@@ -188,7 +199,7 @@ The gyroscopic term in Eqs. \eqref{eq:rig_tr1}, \eqref{eq:rig_rot1}, \eqref{eq:f
 \label{eq:rig_tr2}
 \begin{split}
 m\dot{\bm{v}}_P + \crmat{\bm{s}_u}^\top \dot{\bm{\omega}}_P +   \int_{\Omega} \rho \dot{\bm{v}}_f \d{\Omega}  = \\
-\left[m \bm{v}_P + \crmat{\bm{s}_u}^\top \bm\omega_P +2 \int_{\Omega} \rho \bm{v}_f \d{\Omega} \right]_\times \bm\omega_P +  \int_{\Omega} \bm\beta \d{\Omega} + \int_{\partial \Omega} \bm\tau \d{\Gamma}.
+\left[m \bm{v}_P + \crmat{\bm{s}_u}^\top \bm\omega_P +2 \int_{\Omega} \rho \bm{v}_f \d{\Omega} \right]_\times \bm\omega_P +  \int_{\Omega} \bm\beta \d{\Omega} + \int_{\Gamma_N} \bm\tau \d{\Gamma}.
 \end{split}
 \end{equation}
 \item Angular momentum balance:
@@ -198,7 +209,7 @@ m\dot{\bm{v}}_P + \crmat{\bm{s}_u}^\top \dot{\bm{\omega}}_P +   \int_{\Omega} \r
 \crmat{\bm{s}_u} \dot{\bm{v}}_P  + \bm{J}_u \dot{\bm\omega}_P + \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f} \dot{\bm{v}}_f \d{\Omega} = \\
 \left[\crmat{\bm{s}_u}^\top \bm\omega_P + 2 \int_{\Omega} \rho \bm{v}_f \d{\Omega} \right]_\times \bm{v}_P + \left[\crmat{\bm{s}_u} \bm{v}_P + \bm{J}_u \bm\omega_P + 2 \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f} {\bm{v}}_f \d{\Omega} \right]_\times \bm\omega_P + 
 \\
-2 \int_{\Omega} \left[\rho \bm{v}_P + \rho \crmat{\bm{x}+\bm{u}_f}^\top \, \bm\omega_P \right]_\times \bm{v}_f \d{\Omega} + \int_{\Omega}\crmat{\bm{x}+\bm{u}_f} \bm\beta \d{\Omega} + \int_{\partial \Omega}\crmat{\bm{x}+\bm{u}_f} \bm{\tau} \d{\Gamma}.
+2 \int_{\Omega} \left[\rho \bm{v}_P + \rho \crmat{\bm{x}+\bm{u}_f}^\top \, \bm\omega_P \right]_\times \bm{v}_f \d{\Omega} + \int_{\Omega}\crmat{\bm{x}+\bm{u}_f} \bm\beta \d{\Omega} + \int_{\Gamma_N}\crmat{\bm{x}+\bm{u}_f} \bm{\tau} \d{\Gamma}.
 \end{split}
 \end{equation}
 \item Flexibility PDE:
@@ -209,23 +220,17 @@ m\dot{\bm{v}}_P + \crmat{\bm{s}_u}^\top \dot{\bm{\omega}}_P +   \int_{\Omega} \r
 \left[\rho \bm{v}_P + \rho \crmat{\bm{x}+\bm{u}_f}^\top \bm\omega_P + 2 \rho \bm{v}_f \right]_\times \bm\omega_P + \Div{\bm\Sigma} + \bm\beta.
 \end{split}
 \end{equation}
-Equation \eqref{eq:flex2}  requires the specification of the boundary conditions
-\begin{equation}
-\begin{aligned}
-\bm\Sigma \cdot \bm{n}|_{\Gamma_N} &= \bm\tau|_{\Gamma_N}, \quad \text{$\bm{n}$ is the outward normal,} \\
-\bm{u}_f|_{\Gamma_D} &= \bm{\bar{u}}_f|_{\Gamma_D},
-\end{aligned}
-\end{equation}
-where the boundary $\partial \Omega = \Gamma_D \cup \Gamma_N$ has been split into two subset for the Neumann and Dirichlet boundary conditions.
+Again this equation requires the specification of the boundary conditions \eqref{eq:bcPDE}.
 \end{itemize}
 
- By introduction of the appropriate momenta this model can be reformulated as pH system as illustrated in the following section.
+ Introduction the appropriate momenta, this model can be reformulated as a pH system as illustrated in the following section.
 
-\section{PH formulation}
+\section{Elastic body under large rigid motion as a pH system}
 \label{sec:pH_fd}
-In this section the flexible dynamics of a floating body is written as a coupled system of ODEs and PDEs in pH form. The final form is a descriptor port-Hamiltonian system that fits and generalizes the framework detailed in \cite{mehrmann2019structurepreserving}.  
+In this section the flexible dynamics of a floating body is written as a coupled system of ODEs and PDEs in pH form. The final form is a descriptor port-Hamiltonian system that fits and generalizes the framework detailed in \cite{beattie2018linear,mehrmann2019structurepreserving}.  
 
-Consider the total energy (Hamiltonian), given by the sum of kinetic, elastic and potential energy:
+\subsection{Energies and canonical momenta}
+Consider the total energy (Hamiltonian), given by the sum of kinetic, deformation and potential energy:
 \begin{equation}
 \label{eq:H}
 \begin{aligned}
@@ -234,16 +239,17 @@ H &= H_{\text{kin}} + H_{\text{def}} + H_{\text{pot}} \\
 \end{aligned}
 \end{equation}
 The inner product $\bm{A} \cddot \bm{B} = \Tr(\bm{A} \bm{B}^T)$ is the tensor contraction.  
-The momenta (usually called energy variables in the pH framework) are then computed by derivation of the Hamiltonian. As the variables belong to finite- and infinite-dimensional spaces the derivative is either a classical gradient either a variational derivative:
+The momenta (usually called energy variables in the pH framework) are then computed by derivation of the Hamiltonian. As the variables belong to finite- and infinite-dimensional spaces the derivative is either a classical gradient or a variational derivative:
 \begin{equation}
 \label{eq:momenta}
 \begin{aligned}
 \bm{p}_t &:= \diffp{H}{\bm{v}_P} = m \bm{v}_P + \crmat{\bm{s}_u}^\top \, \bm\omega_P + \int_{\Omega} \rho \bm{v}_f \d{\Omega}, \\
 \bm{p}_r &:= \diffp{H}{\bm\omega_P} = \crmat{\bm{s}_u} \bm{v}_P + \bm{J}_u \bm\omega_P + \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f} \bm{v}_f \d{\Omega}, \\
 \bm{p}_f &:= \diffd{H}{\bm{v}_f} = \rho \bm{v}_P + \rho \crmat{\bm{x}+\bm{u}_f}^\top \, \bm\omega_P + \rho \bm{v}_f, \\
-\bm\varepsilon &:= \diffd{H}{\bm\Sigma} = \bm{\mathcal{D}}^{-1} \bm\Sigma.
+\bm\varepsilon &:= \diffd{H}{\bm\Sigma} = \bm{\mathcal{D}}^{-1} \bm\Sigma,
 \end{aligned}
 \end{equation}
+where the last derivative is computed with respect to a tensor \cite{BRUGNOLI2019940}.
 The relation between energy and co-energy variable is then given by
 \begin{equation}
 \label{eq:mass_op}
@@ -264,11 +270,11 @@ where $\bm{I}_{3\times 3}$ is the identity matrix in $\mathbb{R}^3$. and the ope
 \begin{equation*}
 \begin{aligned}
 \mathcal{I}_\rho^\Omega &:=\int_{\Omega} \rho (\cdot) \d{\Omega}, \\
-(\mathcal{I}_\rho^{\Omega})^* &:= \rho, \\
+(\mathcal{I}_\rho^{\Omega})^* &= \rho, \\
 \end{aligned} \qquad
 \begin{aligned} 
 \bm{\mathcal{I}}_{\rho x}^{\Omega} &:= \int_\Omega \rho \crmat{\bm{x}+\bm{u}_f} (\cdot) \d{\Omega}, \\
-(\bm{\mathcal{I}}_{\rho x}^{\Omega})^* &:= \rho \crmat{\bm{x}+\bm{u}_f}^\top. \\
+(\bm{\mathcal{I}}_{\rho x}^{\Omega})^* &= \rho \crmat{\bm{x}+\bm{u}_f}^\top= -\rho \crmat{\bm{x}+\bm{u}_f}. \\
 \end{aligned}
 \end{equation*}
 The superscript $*$ denotes the adjoint operator. The mass operator $\bm{\mathcal{M}}$ is a self-adjoint, positive operator. The kinetic and deformation energy can then be written as
@@ -279,15 +285,17 @@ where $\bm{e}_{\text{kd}} = [\bm{v}_P; \, \bm{\omega}_P; \, \bm{v}_f; \bm{\Sigma
 \[
 \diffd{H_{\text{kin}}}{\bm{u}_f} = \crmat{\bm{p}_f} \bm{\omega_{P}}
 \]
+This term is responsible for a coupling between the kinematic coordinates and the velocities, as it will be clear in the following section. 
 
-In order to get a complete formulation generalized coordinates are required. Those are:
+\subsection{PH formulation}
+In order to get a complete formulation generalized coordinates are required. It is natural to select the following variables:
 \begin{itemize}
 	\item $^i \bm{r}_P$: the position of point $P$ in the inertial frame of reference;
-	\item $\bm{R}$: the orientation matrix that transforms vectors from the body frame to the inertial frame (other attitude parametrization are possible, here the orientation matrix is considered for ease of presentation);
+	\item $\bm{R}$: the direction cosine matrix that transforms vectors from the body frame to the inertial frame (other attitude parametrization are possible, here the orientation matrix is considered for ease of presentation);
 	\item $\bm{u}_f$ the flexible displacement;
 \end{itemize}
 
-In particular, following \cite{attitude_ph}, the orientation matrix is converted in a vector by concatenating its rows
+In particular, following \cite{attitude_ph}, the direction cosine matrix matrix is converted in a vector by concatenating its rows
 \begin{equation*}
 \bm{R}_{\text{v}} = \text{vec}(\bm{R}^\top) = [\bm{R}_x \; \bm{R}_y \; \bm{R}_z]^\top,
 \end{equation*}
@@ -298,11 +306,11 @@ where $\bm{R}_{x}, \bm{R}_{y}, \bm{R}_{z}$ are the first, second and third row o
 \crmat{\bm{R}_x} \\
 \crmat{\bm{R}_y} \\
 \crmat{\bm{R}_z} \\
-\end{bmatrix} \qquad 
-\crmat{\bm{R}_{\text{v}}} : \mathbb{R}^9 \rightarrow \mathbb{R}^{9 \times 3}
+\end{bmatrix}, \qquad 
+\crmat{\bm{R}_{\text{v}}} : \mathbb{R}^9 \rightarrow \mathbb{R}^{9 \times 3}.
 \end{equation*}
 
-The overall port Hamiltonian formulation, equivalent to Eqs. \eqref{eq:rig_tr2}, \eqref{eq:rig_rot2}, \eqref{eq:flex2}, is then (omitting the external forces and torques)
+The overall port-Hamiltonian formulation, equivalent to Eqs. \eqref{eq:rig_tr2}, \eqref{eq:rig_rot2}, \eqref{eq:flex2}, is then (omitting the external forces and torques)
 \begin{equation}
 \label{eq:ph_mfd_all}
 \setlength{\dashlinegap}{2pt}
@@ -315,7 +323,7 @@ The overall port Hamiltonian formulation, equivalent to Eqs. \eqref{eq:rig_tr2},
 }_{\bm{\mathcal{E}}}
 \diff{}{t}
 \underbrace{\begin{bmatrix}
-	^i \bm{r}_P \\ \bm{R}_{\text{v}} \\ \bm{u}_f \\\hdashline  \bm{v}_P \\ \bm\omega_P  \\ \bm{v}_f  \\ \bm\Sigma \\
+	^i \mathbf{r}_P \\ \bm{R}_{\text{v}} \\ \bm{u}_f \\\hdashline  \bm{v}_P \\ \bm\omega_P  \\ \bm{v}_f  \\ \bm\Sigma \\
 	\end{bmatrix}}_{\bm{e}} = 
 \underbrace{
 	{\left[ \begin{array}{ccc:cccc}
@@ -331,7 +339,7 @@ The overall port Hamiltonian formulation, equivalent to Eqs. \eqref{eq:rig_tr2},
 }_{\bm{\mathcal{J}}}
 \underbrace{\begin{bmatrix}
 	\partial_{\bm{r}_P}H \\ \partial_{\bm{R}_\text{v}}H \\ \delta_{\bm{u}_f} H \\\hdashline  \bm{v}_P \\ \bm\omega_P  \\ \bm{v}_f  \\ \bm\Sigma \\
-	\end{bmatrix}}_{\bm{z}},
+	\end{bmatrix}}_{\bm{z}}.
 \end{equation} 
 
 Variables $\widetilde{\bm{p}}_t, \widetilde{\bm{p}}_r$ are defined as
@@ -349,55 +357,71 @@ The operator $\bm{\mathcal{I}}_{p_f}^\Omega$ is defined as
 \end{equation}
 Its  formal adjoint is given by
 \begin{equation*}
-(\bm{\mathcal{I}}_{p_f}^\Omega)^* = - \left\{2 \crmat{\bm{p}_f} + \rho \crmat{\bm{v}_f} \right\}(\cdot)
+(\bm{\mathcal{I}}_{p_f}^\Omega)^* = \left\{2 \crmat{\bm{p}_f}^\top + \rho \crmat{\bm{v}_f}^\top \right\}(\cdot) = - \left\{2 \crmat{\bm{p}_f} + \rho \crmat{\bm{v}_f} \right\}(\cdot)
 \end{equation*} 
-The 2 coefficient is required to compensate the contribution given by $\delta_{\bm{u}_f} H = \crmat{\bm{p}_f} \bm{\omega_{P}}$. The additional terms related to $\rho \bm{v}_f$ are associated to the coriolis accelerations that affect the deformation field. It is important to highlight that $\Div$ and $\Grad$ are formally skew-adjoint operators, i.e. for homogeneous boundary conditions (I.B.P. stays for integration by parts)
+The 2 coefficient is required to compensate the contribution given by $\delta_{\bm{u}_f} H$ 
+\[
+-\diffd{H}{\bm{u}_f} - (\bm{\mathcal{I}}_{p_f}^\Omega)^* \bm{\omega}_P = \left[\rho \bm{v}_P + \rho \crmat{\bm{x}+\bm{u}_f}^\top \bm\omega_P + 2 \rho \bm{v}_f \right]_\times \bm\omega_P.
+\]
+The additional terms related to $\rho \bm{v}_f$ are associated to the Coriolis accelerations that affect the deformation field. The reader may consult Appendix B for additional details. It is important to underline that $\Div$ and $\Grad$ are formally skew-adjoint operators, i.e. for homogeneous boundary conditions (I.B.P. stays for integration by parts)
 \begin{align*}
 \int_{\Omega} \bm\Sigma \cddot \Grad(\bm{v}_f) \d{\Omega} &\underbrace{=}_{\text{I.B.P.}} -\int_{\Omega} \Div(\bm\Sigma) \cdot \bm{v}_f \d{\Omega}, \\
 \left\langle \bm\Sigma, \, \Grad(\bm{v}_f) \right\rangle_{\mathscr{L}^2(\Omega, \mathbb{R}^{d\times d}_{\text{sym}})} &\underbrace{=}_{\text{I.B.P.}} -\left\langle\Div(\bm\Sigma), \, \bm{v}_f \right\rangle_{\mathscr{L}^2(\Omega, \mathbb{R}^d)}, 
 \end{align*}
 where $\left\langle ,  \right\rangle_\mathscr{H}$ denote an inner product over the Hilbert space $\mathscr{H}$. \\
 $\mathscr{L}^2(\Omega, \mathbb{R}^d), \; \mathscr{L}^2(\Omega, \mathbb{R}^{d\times d}_{\text{sym}})$ are the spaces of square integrable vector-valued or symmetric tensors-valued functions in a geometric domain of dimension $d$. \\
-For this reason operator $\bm{\mathcal{J}}$ is skew-symmetric $\bm{\mathcal{J}}_{}^* = - \bm{\mathcal{J}}$.
+For this reason the operator $\bm{\mathcal{J}}$ is skew-symmetric  $\bm{\mathcal{J}}_{}^*=-\bm{\mathcal{J}}$.
 
-The potential energy contribution accounts for possible conservative forces. For example if a gravity force is considered, the corresponding potential reads
-\begin{equation*}
-H_{\text{pot}} = \int_{\Omega} \rho g \, ^i r_z \d{\Omega} = \int_{\Omega} \rho g \left[ ^i r_{P, z} +\bm{R}_z (\bm{x} + \bm{u}_f) \right] \d{\Omega}.
-\end{equation*}
-The associated co-energy variables are easily obtained
-\begin{align*}
-\partial_{\bm{r}_P}H_{\text{pot}} &= m g \, \widehat{\bm{Z}}, \quad \text{$\widehat{\bm{Z}}$ is the inertial frame vertical direction}\\
-\partial_{\bm{R}_\text{v}}H_{\text{pot}} &= [\bm{0}_{(3, 1)}, \; \bm{0}_{(3, 1)}, \; \int_{\Omega} \rho g (\bm{x} + \bm{u}_f)^\top \d{\Omega}]^\top \\
-\delta_{\bm{u}_f} H_{\text{pot}} &= \rho g \, \bm{R}_z^\top
-\end{align*}
-These correspond to the forcing terms due to gravity.
-System \eqref{eq:ph_mfd_all} fits into the framework detailed in \cite{mehrmann2019structurepreserving} and extends it as a coupled system of ODEs and PDEs is considered. It can be rewritten compactly as follows
+
+System \eqref{eq:ph_mfd_all} fits into the framework detailed in \cite{mehrmann2019structurepreserving} and extends it since a coupled system of ODEs and PDEs is considered. It can be rewritten compactly as follows
 \begin{equation}
 \label{eq:MFD_pHDAE}
 \begin{aligned}
 \bm{\mathcal{E}}(\bm{e}) \diffp{\bm{e}}{t} &= \bm{\mathcal{J}}(\bm{e}) \bm{z}(\bm{e}) + \bm{\mathcal{B}}_d(\bm{e}) \bm{u}_d + \bm{\mathcal{B}}_r(\bm{e}) \bm{u}_\partial, \\
 \bm{y}_d &= \bm{\mathcal{B}}_d^*(\bm{e}) \bm{z}(\bm{e}), \\
+\bm{y}_r &= \bm{\mathcal{B}}_r^*(\bm{e}) \bm{z}(\bm{e}), \\
 \bm{u}_\partial &= \bm{\mathcal{B}}_{\partial} \bm{z}(\bm{e}) =  [\bm\Sigma \cdot \bm{n}|_{\Gamma_N}, \; \partial_t \bm{u}_f|_{\Gamma_D}], \\
 \bm{y}_\partial &= \bm{\mathcal{C}}_{\partial} \bm{z}(\bm{e}) = [\partial_t \bm{u}_f|_{\Gamma_N}, \; \bm\Sigma \cdot \bm{n}|_{\Gamma_D}],
 \end{aligned}
 \end{equation}
-where $\bm{u}_d = \bm\beta, \; \bm{u}_\partial = \bm\tau$. The control operators are expressed as
+where $\bm{u}_d = \bm\beta$. Using definitions  \eqref{eq:momenta} , it follows that the Hamiltonian  satisfies $\partial_{\bm{e}} H = \bm{\mathcal{E}}^* \bm{z}$. Adopting the same nomenclature as in \cite{mehrmann2019structurepreserving}, $\bm{e}$ contains the state and $\bm{z}$ contains the effort functions. The operators verify $\bm{\mathcal{E}} = \bm{\mathcal{E}}^*, \; \bm{\mathcal{J}} = -\bm{\mathcal{J}}^*$. The control operators are expressed as
 \begin{align*}
-	\bm{\mathcal{B}}_d &= [0; \ 0; \ 0; \ \mathcal{I}^\Omega; \ \bm{\mathcal{I}}_{x}^\Omega; \ \bm{I}; \ 0], \\
-	 \bm{\mathcal{B}}_r &= [0; \ 0; \ 0; \ \mathcal{I}^\Gamma; \ \bm{\mathcal{I}}_{x}^\Gamma; \ 0; \ 0].
+	\bm{\mathcal{B}}_d &= 
+	\begin{bmatrix}
+	0 & 0 & 0 & \mathcal{I}^\Omega & \bm{\mathcal{I}}_{x}^\Omega & \bm{I} & 0
+	\end{bmatrix}^\top, \\
+	 \bm{\mathcal{B}}_r &= 
+	 \begin{bmatrix}
+	0 & 0 & 0 & \mathcal{I}^{\Gamma_N} & \bm{\mathcal{I}}_{x}^{\Gamma_N} & 0 & 0 \\
+	0 & 0 & 0 & 0 & 0 & 0 & 0 \\ 
+	 \end{bmatrix}^\top,
 \end{align*}
-The control operators read
+where 
 \begin{equation*}
 \begin{aligned}
 \mathcal{I}^\Omega &:=\int_{\Omega} (\cdot) \d{\Omega}, \\
-\mathcal{I}^\Gamma &:= \int_{\partial \Omega} (\cdot) \d{\Gamma}, \\
+\mathcal{I}^{\Gamma_N} &:= \int_{\Gamma_N} (\cdot) \d{\Gamma}, \\
 \end{aligned} \qquad
 \begin{aligned} 
 \bm{\mathcal{I}}_{x}^\Omega &:=\int_{\Omega} \crmat{\bm{x}+\bm{u}_f} (\cdot) \d{\Omega}, \\
-\bm{\mathcal{I}}_{x}^\Gamma &:=\int_{\partial \Omega} \crmat{\bm{x}+\bm{u}_f} (\cdot) \d{\Gamma}. \\
+\bm{\mathcal{I}}_{x}^{\Gamma_N} &:=\int_{\Gamma_N} \crmat{\bm{x}+\bm{u}_f} (\cdot) \d{\Gamma}. \\
 \end{aligned}
 \end{equation*}
-The gradient of the Hamiltonian  gives $\partial_{\bm{e}} H = \bm{\mathcal{E}}^* \bm{z}$. Adopting the same nomenclature as in \cite{mehrmann2019structurepreserving}, $\bm{e}$ contains the state and $\bm{z}$ contains the effort functions. In this case the operators verify $\bm{\mathcal{E}} = \bm{\mathcal{E}}^*, \; \bm{\mathcal{J}} = -\bm{\mathcal{J}}^*$. The distributed control operator $\bm{\mathcal{B}}_d$ is bounded. Even if three dimensional elasticity has been taken as example up to this point, simpler models are easily considered. Beam and plate models \cite{BRUGNOLI2019940,BRUGNOLI2019961} are described by appropriate differential operators that replace the $\Div, \Grad$ appearing in \eqref{eq:ph_mfd_all} (see \secref{sec:ph_floatbeam}).
+The distributed control operator $\bm{\mathcal{B}}_d$  is compact. The boundary traction force acts on the rigid part through the compact operator $\bm{\mathcal{B}}_r$. The power Even if three dimensional elasticity has been taken as example up to this point, other models are easily considered. Beam and plate models \cite{BRUGNOLI2019940,BRUGNOLI2019961} are described by appropriate differential operators that replace the $\Div, \Grad$ appearing in \eqref{eq:ph_mfd_all} (see \secref{sec:ph_floatbeam}).
+
+\begin{remark}
+	Conservative forces are easily accounted for by introducing an appropriate potential energy. For example if the gravity force is considered, the corresponding potential reads
+	\begin{equation*}
+	H_{\text{pot}} = \int_{\Omega} \rho g \, ^i r_z \d{\Omega} = \int_{\Omega} \rho g \left[ ^i r_{P, z} +\bm{R}_z (\bm{x} + \bm{u}_f) \right] \d{\Omega}.
+	\end{equation*}
+	The associated co-energy variables are easily obtained
+	\begin{align*}
+	\partial_{\bm{r}_P}H_{\text{pot}} &= m g \, \widehat{\bm{Z}}, \quad \text{$\widehat{\bm{Z}}$ is the inertial frame vertical direction}\\
+	\partial_{\bm{R}_\text{v}}H_{\text{pot}} &= [\bm{0}_{(3, 1)}, \; \bm{0}_{(3, 1)}, \; \int_{\Omega} \rho g (\bm{x} + \bm{u}_f)^\top \d{\Omega}]^\top \\
+	\delta_{\bm{u}_f} H_{\text{pot}} &= \rho g \, \bm{R}_z^\top
+	\end{align*}
+	These correspond to the forcing terms due to gravity.
+\end{remark}
 
 \begin{remark}
 	The linear elasticity hypothesis does not allow to include the effect of non linearities due to large deformations.  However, geometric stiffening could be considered by adding a potential energy associated to centrifugal forces \cite{YIGIT1988201}. 
@@ -438,9 +462,9 @@ This system can be written in standard pH form as $\dot{\bm{x}} = \bm{J}(\bm{x})
 
 \section{Discretization procedure}
 \label{sec:discr}
-A finite-element based technique to obtain a finite dimensional pH system is illustrated. This methodology relies on the results explained in \cite{cardoso2019partitioned} and boils down to three simple steps
+A finite-element based technique to obtain a finite-dimensional pH system is illustrated. This methodology relies on the results explained in \cite{cardoso2019partitioned} and ahead, used in \cite{BRUGNOLI2019940,BRUGNOLI2019961}. The essential feature of this method is that it is structure-preserving. Given the lossless, passive infinite-dimensional system \eqref{eq:MFD_pHDAE} It boils down to three simple steps
 \begin{enumerate}
-	\item The system is put into weak form; 
+	\item The system is written in weak form; 
 	\item An integration by parts is applied to highlight the proper boundary control;
 	\item A Galerkin method is employed to obtain a finite-dimensional system.
 \end{enumerate}
@@ -450,11 +474,11 @@ To explain the methodology consider the elastodynamics PDE
 \begin{equation*}
 \rho \diffp[2]{\bm{u}}{t} - \Div\left(\bm{\mathcal{D}} \Grad(\bm{u})\right) = \bm{u}_d,
 \end{equation*}
-where a distributed control $u_d$ (a volumetric force) is considered. This model describe the flexible vibrations assuming small deformations. It is embedded in the general formulation \eqref{eq:ph_mfd_all} and therefore the procedure explained here is easily adapted to the general formulation. \\
+where a distributed control $\bm{u}_d$ (a volumetric force) is considered. This model describe the flexible vibrations assuming small deformations. It is embedded in the general formulation \eqref{eq:ph_mfd_all} and therefore the procedure explained here is easily adapted to the general formulation. \\
 To get a pH representation the energy variables have to properly selected by considering the total energy
 \[\displaystyle H = \frac{1}{2} \int_{\Omega} \left\{\rho \left(\diffp{\bm{u}}{t}\right)^2 + \bm\Sigma \cddot \bm\varepsilon \right\} \d{\Omega}.
 \]
-Taking as energies the linear momentum and the deformation
+Taking as energy variables the linear momentum and the deformation
 \begin{equation}
 \begin{aligned}
 \text{Energies} \quad  \bm{x}_1 &= \rho \ \partial_t \bm{u}, \\
@@ -516,9 +540,9 @@ Considering a test function $\bm{w} = [\bm{w}_1, \; \bm{W}_2]$ the weak form rea
 \left\langle \bm{w}, \; \bm{\mathcal{M}} \ \partial_t \bm{e} \right\rangle_{\mathscr{X}} = \left\langle \bm{w}, \; \bm{\mathcal{J}} \bm{e} \right\rangle_{\mathscr{X}} + \left\langle \bm{w}, \; \bm{\mathcal{B}}_d \bm{u}_d \right\rangle_{\mathscr{X}}
 \end{equation*}
 The bilinear form $m(\bm{w}, \partial_t \bm{e}) = \left\langle \bm{w}, \; \bm{\mathcal{M}} \ \partial_t \bm{e} \right\rangle_{\mathscr{X}}$ is symmetric and coercive. The bilinear form $b_d(\bm{w}, \bm{u}_d):=\left\langle \bm{w}, \; \bm{\mathcal{B}}_d \bm{u}_d \right\rangle_{\mathscr{X}}$ takes into account distributed control.\\
-Now an integration by parts is applied on $\bm{\mathcal{J}}_{\Div}$
+Now an integration by parts is applied on $\bm{\mathcal{J}}_{\Div}$:
 \begin{equation}
-\left\langle \bm{w}, \; \bm{\mathcal{J}} \bm{e} \right\rangle_{\mathscr{X}} = \left\langle \bm{w}, \; \bm{\mathcal{J}}_{\Grad} \bm{e} \right\rangle_{\mathscr{X}} - \left\langle \bm{\mathcal{J}}_{\Grad} \bm{w}, \; \bm{e} \right\rangle_{\mathscr{X}} + \left\langle \bm{w}, \; \bm{u}_\partial \right\rangle_{\mathscr{L}^2(\partial \Omega)}
+\left\langle \bm{w}, \; \bm{\mathcal{J}} \bm{e} \right\rangle_{\mathscr{X}} = \left\langle \bm{w}, \; \bm{\mathcal{J}}_{\Grad} \bm{e} \right\rangle_{\mathscr{X}} - \left\langle \bm{\mathcal{J}}_{\Grad} \bm{w}, \; \bm{e} \right\rangle_{\mathscr{X}} + \left\langle \bm{w}, \; \bm{u}_\partial \right\rangle_{\mathscr{L}^2(\partial \Omega)}.
 \end{equation}
 The expression $j_{\Grad}(\bm{w}, \bm{e}) :=\left\langle \bm{w}, \; \bm{\mathcal{J}}_{\Grad} \bm{e} \right\rangle_{\mathscr{X}} - \left\langle \bm{\mathcal{J}}_{\Grad} \bm{w}, \; \bm{e} \right\rangle_{\mathscr{X}}$ is a skew symmetric bilinear form as it holds $j_{\Grad}(\bm{w}, \bm{e})=-j_{\Grad}(\bm{w}, \bm{e})$. The bilinear form $b_{\partial}(\bm{w}, \bm{u}_\partial) := \left\langle \bm{w}, \; \bm{u}_\partial \right\rangle_{\mathscr{L}^2(\partial \Omega)}$ imposes weakly the Neumann condition. System \eqref{eq:eldyn_PDE} is now rewritten in weak form
 \begin{equation}
@@ -536,23 +560,23 @@ where $\mathscr{H}^1$ is the space of square integrable functions whose gradient
 If a Galerkin method is applied then corresponding test and trial functions are discretized using the same basis
 \begin{equation*}
 \begin{aligned}
-\bm{w}_1 = \bm{\phi}_1^\top \bm{w}_1, \\
-\bm{e}_1 = \bm{\phi}_1^\top \bm{e}_1, 
+\bm{w}_1(\bm{x},t) = \bm{\phi}_1^\top(\bm{x}) \mathbf{w}_1(t), \\
+\bm{e}_1(\bm{x},t) = \bm{\phi}_1^\top(\bm{x}) \mathbf{e}_1(t), 
 \end{aligned} \qquad
 \begin{aligned}
-\bm{W}_2 = \bm{\phi}_2^\top \bm{w}_2, \\
-\bm{E}_2 = \bm{\phi}_2^\top \bm{e}_2,
+\bm{W}_2(\bm{x},t) = \bm{\phi}_2^\top(\bm{x}) \mathbf{w}_2(t), \\
+\bm{E}_2(\bm{x},t) = \bm{\phi}_2^\top(\bm{x}) \mathbf{e}_2(t),
 \end{aligned}
 \end{equation*}
-where, with some abuse of notation, a physical vector and the numerical vector representing its approximation are denoted in the same manner. A finite dimensional pH system is readily obtained
+where the bold italic variables represent numerical vectors. A finite dimensional pH system is readily obtained
 \begin{equation}
 \begin{aligned}
-\bm{M} \dot{\bm{e}} &= \bm{J} \bm{e} + \bm{B}_d \bm{u}_d + \bm{B}_\partial \bm{u}_\partial, \\
-\bm{y}_d &:= \bm{M}_d \widetilde{\bm{y}}_d = \bm{B}_d^\top \bm{e},  \\
-\bm{y}_\partial &:= \bm{M}_\partial \widetilde{\bm{y}}_\partial = \bm{B}_\partial^\top \bm{e}.
+\mathbf{M} \dot{\bm{e}} &= \mathbf{J} \mathbf{e} + \mathbf{B}_d \mathbf{u}_d + \mathbf{B}_\partial \mathbf{u}_\partial, \\
+\mathbf{y}_d &:= \mathbf{M}_d \widetilde{\mathbf{y}}_d = \mathbf{B}_d^\top \mathbf{e},  \\
+\mathbf{y}_\partial &:= \mathbf{M}_\partial \widetilde{\mathbf{y}}_\partial = \mathbf{B}_\partial^\top \mathbf{e}.
 \end{aligned}
 \end{equation}
-Vectors $\widetilde{\bm{y}}_d, \widetilde{\bm{y}}_\partial$ correspond to the output degrees of freedom. The outputs $\bm{y}_d, \bm{y}_\partial$ have been defined incorporating the mass matrix in order get the discrete power balance $\dot{H}_d = \bm{u}_\partial^\top \bm{y}_\partial + \bm{u}_d^\top \bm{y}_d$.
+Vectors $\widetilde{\mathbf{y}}_d, \widetilde{\mathbf{y}}_\partial$ correspond to the output degrees of freedom. The outputs $\mathbf{y}_d, \mathbf{y}_\partial$ have been defined incorporating the mass matrix in order get the discrete power balance $\dot{H}_d = \mathbf{u}_\partial^\top \mathbf{y}_\partial + \mathbf{u}_d^\top \mathbf{y}_d$.
 
 \begin{remark}
 Stable mixed finite elements for the elastodynamics problem are detailed in \cite{ArnoldElasDyn}.  The formulation therein is based on a weak form obtained by integration by parts of the $\bm{\mathcal{J}}_{\Grad}$ operator. The mixed finite element method for such a problem are then stable in the sense of Brezzi thanks to the properties of $L^2 / H^{\Div}$ finite element spaces. However, the discretization scheme proposed here allows for an easier representation of floating bodies as the free condition corresponds to zero Neumann boundary conditions.
@@ -566,7 +590,7 @@ The same methodology is applied to system \eqref{eq:MFD_pHDAE}. If corresponding
 then a finite-dimensional pHDAE system is obtained (after integration by parts of the $\mathcal{J}_{\Div}$ operator as )
 \begin{equation}
 	\begin{aligned}
-	\bm{E}(\bm{e}) \dot{\bm{e}} &= \bm{J}(\bm{e}) \bm{z}(\bm{e}) + \bm{B}_d(\bm{e}) \bm{u}_d + \bm{B}_\partial(\bm{e}) \bm{u}_\partial, \\
+	\bm{E}(\bm{e}) \dot{\mathbf{e}} &= \bm{J}(\bm{e}) \bm{z}(\bm{e}) + \bm{B}_d(\bm{e}) \bm{u}_d + \bm{B}_\partial(\bm{e}) \bm{u}_\partial, \\
 	\bm{y}_d &:= \bm{M}_d \widetilde{\bm{y}}_d = \bm{B}_d^\top \bm{z}(\bm{e}),  \\
 	\bm{y}_\partial &:= \bm{M}_\partial \widetilde{\bm{y}}_\partial = \bm{B}_\partial^\top \bm{z}(\bm{e}).
 	\end{aligned}
@@ -1204,21 +1228,25 @@ Furthermore, it satisfies the Jacobi Identity
 \end{equation}
 In this paper, the adjoint of an operator is used. We recall the necessary definitions
 \begin{definition}
-Given a liner operator $\mathcal{A}: H^1 \rightarrow H^2$ between Hilbert spaces (or vectorial spaces) the formal adjoint $\mathcal{A}^*:H^2\rightarrow~H^1$ fulfills 
+Given a liner operator $\mathcal{A}: \mathscr{H}^1 \rightarrow \mathscr{H}^2$ between Hilbert spaces the adjoint $\mathcal{A}^*:\mathscr{H}^2\rightarrow~\mathscr{H}^1$ fulfills 
 \begin{equation}
-\langle y, \mathcal{A}x \rangle_{H^2} = \langle \mathcal{A}^* y, x \rangle_{H^1}, \qquad x \in H^1, y \in H^2.
+\langle y, \mathcal{A}x \rangle_{\mathscr{H}^2} = \langle \mathcal{A}^* y, x \rangle_{H^1}, \qquad x \in \mathscr{H}^1, y \in \mathscr{H}^2.
+\end{equation}
+\end{definition}
+To illustrate this definition consider the operator $\mathcal{I}^\Omega = \int_\Omega (\cdot) \d\Omega : \mathscr{L}^2(\Omega, \mathbb{R}^3) \rightarrow \mathbb{R}^3$. Given a function $\bm{u} \in \mathscr{L}^2(\Omega, \mathbb{R}^3)$ and a vector $\bm{v} \in \mathbb{R}^3$, then the adjoint operator $(\mathcal{I}^\Omega)^*$ extends the vector $\bm{v}$ as a constant vector field over $\Omega$
+\begin{equation*} 
+	\langle \bm{v}, \mathcal{I}^\Omega \bm{u} \rangle_{\mathbb{R}^3} = \langle (\mathcal{I}^\Omega)^* \bm{v},  \bm{u} \rangle_{\mathscr{L}^2(\Omega, \mathbb{R}^3)}. 
+\end{equation*}
+\begin{definition}
+An operator $\mathcal{A}: \mathscr{H} \rightarrow \mathscr{H}$ is self-adjoint if it holds
+\begin{equation}
+\langle y, \mathcal{A}x \rangle = \langle \mathcal{A} y, x \rangle, \qquad x, y \in \mathscr{H}
 \end{equation}
 \end{definition}
 \begin{definition}
-An operator $\mathcal{A}: H \rightarrow H$ is formally self-adjoint is it holds
-\begin{equation}
-\langle y, \mathcal{A}x \rangle = \langle \mathcal{A} y, x \rangle, \qquad x, y \in H
-\end{equation}
-\end{definition}
-\begin{definition}
-	An operator $\mathcal{A}: H \rightarrow H$ is formally skew-adjoint is it holds
+	An operator $\mathcal{A}: \mathscr{H} \rightarrow \mathscr{H}$ is  skew-adjoint if it holds
 	\begin{equation}
-	\langle y, \mathcal{A}x \rangle = -\langle \mathcal{A} y, x \rangle, \qquad x, y \in H
+	\langle y, \mathcal{A}x \rangle = -\langle \mathcal{A} y, x \rangle, \qquad x, y \in \mathscr{H}
 	\end{equation}	
 \end{definition}
 

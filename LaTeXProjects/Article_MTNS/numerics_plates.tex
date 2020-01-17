@@ -62,7 +62,7 @@
 	Valerie.Budinger@isae.fr, Denis.Matignon@isae.fr}
 
 \begin{abstract}
-Methods for discretizing port-Hamiltonian system are of interest both for simulation and control purposes. Despite the large literature in mixed finite element, no rigorous analysis of the connections between mixed elements and port-Hamiltonian system has been carried out. In this paper we demonstrate how existing discretization method can be employed to discretize dynamical plate problems. Convergence results based on existing methods are conjectured. Numerical simulations confirm the expected behavior of the convergence errors.
+Methods for discretizing port-Hamiltonian system are of interest both for simulation and control purposes. Despite the large literature in mixed finite element, no rigorous analysis of the connections between mixed elements and port-Hamiltonian system has been carried out. In this paper we demonstrate how existing methods can be employed to discretize dynamical plate problems. Convergence results based on existing methods are conjectured. Numerical simulations confirm the expected behavior of the convergence errors.
 \end{abstract}
 
 \begin{keyword}
@@ -79,9 +79,9 @@ Thanks to \cite{CardosoRibeiro2018}, it has become evident that there is a stric
 
 Mixed finite element for the wave equation has been studied in \cite{Geveci,becacheWave}. For elastodynamics the construction of stable elements gets more complicated because of the presence of the symmetric stress tensor. Existing elements enforce symmetry either strongly (\cite{becacheElas}) or weakly (\cite{ArnoldWeak,mindlinVeiga}).
 
-In this paper mixed finite element discretization of plate models in pH form is studied. These models have been already presented in \cite{BRUGNOLI2019940,BRUGNOLI2019961}, but without any convergence analysis. Here, available mixed finite elements for the wave dynamics and elastodynamics are adapted to the Mindlin plate problem. Error bounds are conjectured. For the Kirchhoff plate the differential operator is of second order. Hence, more regular elements are required. The Hellan-Herrmann-Jhonson is used (\cite{Blum1990}). It is conjectured that the convergence results valid for the static Kirchhoff plate problem still hold for the  dynamical problem. Numerical simulations are implement to confirm the conjectures.
+In this paper mixed finite element discretization of plate models in pH form is studied. These models have been already presented in \cite{BRUGNOLI2019940,BRUGNOLI2019961}, but without any convergence analysis. Here, available mixed finite elements for the wave dynamics and elastodynamics are adapted to the Mindlin plate problem. Error bounds are conjectured. For the Kirchhoff plate the differential operator is of second order. Hence, more regular elements are required. The Hellan-Herrmann-Jhonson is used (\cite{Blum1990,arnold2019hellan}). It is conjectured that the convergence results valid for the static Kirchhoff plate problem still hold for the  dynamical problem. Numerical simulations are implement to confirm the conjectures.
 
-In Section \ref{sec:pHplates} pH plate models are briefly recalled. In Sec. \ref{sec:mixed} the weak formulation and finite element combinations are illustrated. Sec. \ref{sec:numerics} numerical results, confirming the expected behavior, are presented.
+The paper is organized as follows. In Section \ref{sec:pHplates} pH plate models are briefly recalled. In Sec. \ref{sec:mixed} the weak formulation and finite element combinations are illustrated. Sec. \ref{sec:numerics} numerical results, confirming the expected behavior, are presented.
 
 \section{Plate models in port-Hamiltonian form}
 \label{sec:pHplates}
@@ -323,7 +323,7 @@ v_w \in L, \\
 \bm{v}_\gamma \in D.
 \end{aligned}
 \end{equation}
-This system is obtained by integrating by parts the last two lines of \eqref{eq:PH_sys_Min_Ten} and considering clamped boundary conditions. Obtaining stable finite element that embeds the symmetry of the stress tensor for the general elastodynamics problem has proven to be a difficult task. The easiest implementation is the one presented in \cite{becacheWave,becacheElas}. The main disadvantage is that this scheme requires the domain to be given by union of rectangles, as the mesh elements have to be squared. This allows constructing a simple element for the momenta tensor. The polynomial spaces for the discretization are
+This system is obtained by integrating by parts the last two lines of \eqref{eq:PH_sys_Min_Ten} and considering clamped boundary conditions. Obtaining stable finite element that embeds the symmetry of the stress tensor for the general elastodynamics problem has proven to be a difficult task. The easiest implementation is the one presented in \cite{becacheWave,becacheElas}. The main disadvantage is that this scheme requires the domain to be given by union of rectangles, as the mesh elements have to be squared. However, this allows constructing a simple element for the momenta tensor. The polynomial spaces for the discretization are
 \[
 N_{k} = \{p(x, y)| \; p(x, y) = \sum_{i\le k, j\le k} a_{ij} x^i y^j  \},
 \]
@@ -477,9 +477,9 @@ In this section numerical test cases are used to verify the conjectured orders o
 \[
 M \dot{\bm{e}} = J \bm{e}.
 \]
-Matrix $J$ is skew {\tiny }symmetric, matrix $M$ is symmetric and positive definite for \eqref{eq:weak_min_PH_strong}, \eqref{eq:weak_kir_PH} while it is symmetric and indefinite for \eqref{eq:weak_min_PH_weak}, because of the multiplier that enforces the symmetry. The Firedrake library (\cite{rathgeber2017firedrake}) is used to generate the matrices. To integrate the equations in time a Crank-Nicholson scheme has been used, for all simulation. The time step is set to $\Delta t = h/10$ to have a lower impact of the time discretization error with respect to the spatial error. The final time is set to one $t_f = 1 [\textrm{s}]$ for all simulations. To compute the $L^\infty \mathcal{X}$ space-time dependent norm  the following approximation is used
+Matrix $J$ is skew {\tiny }symmetric, matrix $M$ is symmetric and positive definite for \eqref{eq:weak_min_PH_strong}, \eqref{eq:weak_kir_PH} while it is symmetric and indefinite for \eqref{eq:weak_min_PH_weak}, because of the multiplier that enforces the symmetry. The Firedrake library (\cite{rathgeber2017firedrake}) is used to generate the matrices. To integrate the equations in time a Crank-Nicholson scheme has been used, for all simulation. The time step is set to $\Delta t = h/10$ to have a lower impact of the time discretization error with respect to the spatial error. The final time is set to one $t_f = 1 [\textrm{s}]$ for all simulations. To compute the $L^\infty \mathcal{X}$ space-time dependent norm  the following discrete norm is used
 \[
-||\cdot ||_{L^\infty \mathcal{X}} \approx \mathrm{max}_{t \in t_i} ||\cdot||_{L^\infty},
+||\cdot ||_{L^\infty_{\Delta t} \mathcal{X}} \approx \mathrm{max}_{t \in t_i} ||\cdot||_{\mathcal{X}},
 \]
 where $t_i$ are the discrete simulation istants. 
 \subsection{Numerical test for the Mindlin plate}
@@ -551,18 +551,18 @@ The weak form \eqref{eq:weak_min_PH_strong} and its corresponding element \eqref
 
 \begin{figure}[ht]%
 	\centering
-	\subfloat[][$L^\infty L^2$ error for $e_w$]{%
+	\subfloat[][$L^\infty_{\Delta t} L^2$ error for $e_w$]{%
 		\label{fig:errBEC1}%
 		\includegraphics[width=0.48\columnwidth]{Mindlin/CCCC_BEC__vel.eps}}%
 	\hspace{8pt}%
-	\subfloat[][$L^\infty L^2$ error for $\bm{e}_\theta$]{%
+	\subfloat[][$L^\infty_{\Delta t} L^2$ error for $\bm{e}_\theta$]{%
 		\label{fig:errBEC2}%
 		\includegraphics[width=0.48\columnwidth]{Mindlin/CCCC_BEC__om.eps}} \\
-	\subfloat[][$L^\infty L^2$ error for $\bm{E}_\kappa$]{%
+	\subfloat[][$L^\infty_{\Delta t} L^2$ error for $\bm{E}_\kappa$]{%
 		\label{fig:errBEC3}%
 		\includegraphics[width=0.48\columnwidth]{Mindlin/CCCC_BEC__sig.eps}}%
 	\hspace{8pt}%
-	\subfloat[][$L^\infty L^2$ error for $\bm{e}_\gamma$]{%
+	\subfloat[][$L^\infty_{\Delta t} L^2$ error for $\bm{e}_\gamma$]{%
 		\label{fig:errBEC4}%
 		\includegraphics[width=0.48\columnwidth]{Mindlin/CCCC_BEC__q.eps}}%
 	\caption[errorBEC]{Error for the Mindlin plate using the BJT element}%
@@ -574,21 +574,21 @@ Formulation \eqref{eq:weak_min_PH_weak} and its element \eqref{eq:AFW} are here 
 
 \begin{figure}[ht]%
 	\centering
-	\subfloat[][$L^\infty L^2$ error for $e_w$]{%
+	\subfloat[][$L^\infty_{\Delta t} L^2$ error for $e_w$]{%
 		\label{fig:errAFW1}%
 		\includegraphics[width=0.48\columnwidth]{Mindlin/CCCC__vel.eps}}%
 	\hspace{8pt}%
-	\subfloat[][$L^\infty L^2$ error for $\bm{e}_\theta$]{%
+	\subfloat[][$L^\infty_{\Delta t} L^2$ error for $\bm{e}_\theta$]{%
 		\label{fig:errAFW2}%
 		\includegraphics[width=0.48\columnwidth]{Mindlin/CCCC__om.eps}} \\
-	\subfloat[][$L^\infty L^2$ error for $\bm{E}_\kappa$]{%
+	\subfloat[][$L^\infty_{\Delta t} L^2$ error for $\bm{E}_\kappa$]{%
 		\label{fig:errAFW3}%
 		\includegraphics[width=0.48\columnwidth]{Mindlin/CCCC__sig.eps}}%
 	\hspace{8pt}%
-	\subfloat[][$L^\infty L^2$ error for $\bm{e}_\gamma$]{%
+	\subfloat[][$L^\infty_{\Delta t} L^2$ error for $\bm{e}_\gamma$]{%
 		\label{fig:errAFW4}%
 		\includegraphics[width=0.48\columnwidth]{Mindlin/CCCC__q.eps}}%
-	%\subfloat[][$L^\infty L^2$ error for $\bm{E}_r$]{%
+	%\subfloat[][$L^\infty_{\Delta t} L^2$ error for $\bm{E}_r$]{%
 	%\label{fig:errAFW5}%
 	%\includegraphics[width=0.48\columnwidth]{Mindlin/CCCC__r.eps}}%
 	\caption[errorAFW]{Error for the Mindlin plate using the AFW element}%
@@ -632,11 +632,11 @@ A direct solver with LU preconditioner is used to compute the solution. Results 
 
 \begin{figure}[ht]%
 	\centering
-	\subfloat[][$L^\infty H^1$ error for $e_w$]{%
+	\subfloat[][$L^\infty_{\Delta t} H^1$ error for $e_w$]{%
 		\label{fig:errHHJ1}%
 		\includegraphics[width=0.48\columnwidth]{Kirchhoff/SSSS__vel.eps}}%
 	\hspace{8pt}%
-	\subfloat[][$L^\infty L^2$ error for $\bm{E}_\kappa$]{%
+	\subfloat[][$L^\infty_{\Delta t} L^2$ error for $\bm{E}_\kappa$]{%
 		\label{fig:errHHJ2}%
 		\includegraphics[width=0.48\columnwidth]{Kirchhoff/SSSS__sig.eps}} \\
 	\caption[errorHHF]{Error for the Kirchhoff plate using the HHJ element}%
@@ -644,7 +644,7 @@ A direct solver with LU preconditioner is used to compute the solution. Results 
 \end{figure}
 
 \section{Conclusion}
-In this paper, the link between mixed finite element method and pH plate models has been studied. It was shown that existing element can be used to obtain structure preserving discretization. A rigorous error analysis is still missing but it should be easy to prove given the available results. Since the pH framework provides a powerful description of boundary controlled systems, it is important that numerical methods are capable of handling generic boundary conditions. The methods discussed here possess this feature only in the Mindlin plate case. For the Kirchhoff plate a promising methodology is detailed in \cite{mixed_kirchhoff} but the dynamical case has not been considered yet.
+In this paper, the link between mixed finite element method and pH plate models has been studied. It was shown that existing element can be used to obtain structure preserving discretization. A rigorous error analysis is still missing but it should be easy to prove given the available results. Since the pH framework provides a powerful description of boundary controlled systems, it is important that numerical methods are capable of handling generic boundary conditions. The methods discussed here possess this feature only in the Mindlin plate case. For the Kirchhoff plate a promising methodology is detailed in \cite{mixed_kirchhoff} but the dynamical case has not been considered yet. Future developments include the analysis and discretization of viscoelastic and thermoelastic problems in pH form.
 
 \begin{ack}
 The authors would like to thank Michel Sala\"un from ISAE-SUPAERO for the fruitful and insightful discussions.
