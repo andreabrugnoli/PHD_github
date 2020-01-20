@@ -16,8 +16,8 @@ import matplotlib.pyplot as plt
 
 matplotlib.rcParams['text.usetex'] = True
 
-bc_input = 'CCCC'
-save_res = False
+bc_input = 'CCCC_AFW'
+save_res = True
 
 def compute_err(n, r):
 
@@ -93,8 +93,10 @@ def compute_err(n, r):
     V_pth = VectorFunctionSpace(mesh, "DG", r-1)
     V_skw = FunctionSpace(mesh, "DG", r-1)
 
-    V_qth1 = FunctionSpace(mesh, "BDM", r)
-    V_qth2 = FunctionSpace(mesh, "BDM", r)
+    # V_qth1 = FunctionSpace(mesh, "BDM", r)
+    # V_qth2 = FunctionSpace(mesh, "BDM", r)
+    V_qth1 = FunctionSpace(mesh, "RT", r)
+    V_qth2 = FunctionSpace(mesh, "RT", r)
     V_qw = FunctionSpace(mesh, "RT", r)
 
     V = MixedFunctionSpace([V_pw, V_pth, V_qth1, V_qth2, V_qw, V_skw])
@@ -292,8 +294,25 @@ def compute_err(n, r):
 
     t_vec = np.linspace(0, t_fin, num=n_t)
 
-    param = {"ksp_type": "gmres", "ksp_gmres_restart":100} #, "ksp_atol":1e-40}
     # param = {"ksp_type": "preonly", "pc_type": "lu"}
+
+    param = {"ksp_type": "gmres", "ksp_gmres_restart":100}
+    # param = {"ksp_type": "gmres", "ksp_gmres_restart":100, "ksp_rtol": 1e-8, "pc_type": "ilu"}
+    # param = {"pc_type": "fieldsplit",
+    #           "pc_fieldsplit_type": "schur",
+    #           # first split contains first two fields, second
+    #           # contains the third
+    #           "pc_fieldsplit_0_fields": "0, 1, 2, 3, 4",
+    #           "pc_fieldsplit_1_fields": "5",
+    #           # Multiplicative fieldsplit for first field
+    #           "fieldsplit_0_pc_type": "fieldsplit",
+    #           "fieldsplit_0_pc_fieldsplit_type": "multiplicative",
+    #           # LU on each field
+    #           "fieldsplit_0_fieldsplit_0_pc_type": "lu",
+    #           "fieldsplit_0_fieldsplit_1_pc_type": "lu",
+    #           # ILU on the schur complement block
+    #           "fieldsplit_1_pc_type": "ilu"}
+
 
     for i in range(1, n_t):
 
@@ -387,7 +406,7 @@ def compute_err(n, r):
            q_err_max, q_err_quad, r_err_max, r_err_quad
 
 
-n_h = 2
+n_h = 5
 n1_vec = np.array([2**(i+2) for i in range(n_h)])
 n2_vec = np.array([2**(i+1) for i in range(n_h)])
 h1_vec = 1./n1_vec

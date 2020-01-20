@@ -19,8 +19,8 @@ matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{amsmath}"]
 matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{bm}"]
 
 path_res = "./convergence_results_mindlin/"
-bc_input= "CCCC_"
-save_res = True
+bc_input= "CCCC_AFW_"
+save_res = False
 
 coeff = 0.95
 
