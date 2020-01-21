@@ -732,7 +732,7 @@ The state and boundary vectors are expressed as
 \bm{y}_\partial &=  [v_{P}^x, \; v_{P}^y, \; \omega_{P}^z, \; v_{C}^x, \; v_{C}^y, \; \omega_{C}^z]^\top.
 \end{align*}
 The state contains the linear and angular velocity $v_P^x, \; v_P^y, \; \omega_P^z$ at point $P$, the deformation velocity $ v_f^x, \; v_f^y$ and the traction and bending stress $n_x, \; m_{xx}$. The boundary input contains the forces and torques acting at the extremities of the beam, while the boundary output contains the velocities at the extremities of the beam.
-The cross product are then adapted to the planar case. The mass operator then reads
+Partitioning the $\bm{p}$ system into rigid $\bm{p}_r = [v_P^x, \ v_P^y, \ \omega_P^z]^\top$ and flexible part $\bm{p}_f = [v_f^x, \ v_f^y, \ n_x, \ m_{xx}]^\top$, the mass operator then is formulated as follows
 \begin{equation}
 \label{eq:EB_M}
 \bm{\mathcal{M}} = 
@@ -752,7 +752,7 @@ m & 0 & 0 & \mathcal{I}_\rho^L & 0 & 0 & 0 \\
 0 & 0 & 0 & 0 & 0 & 0 & {EI}^{-1} \\
 \end{array} \right],
 \end{equation}
-where  $s^x = \int_{0}^{L} \rho A x \d{x}$ is the static moment, $J^{zz} = \int_{0}^{L} \rho A x^2 \d{x}$ is the moment of inertia, $\mathcal{I}_\rho^L := \int_{0}^L \rho A (\cdot) \d{x}, \; \mathcal{I}_{\rho x}^L := \int_{0}^L \rho A x (\cdot) \d{x}$. The interconnection operator 
+where  $s^x = \int_{0}^{L} \rho A x \d{x}$ is the static moment, $J^{zz} = \int_{0}^{L} \rho A x^2 \d{x}$ is the moment of inertia, $\mathcal{I}_\rho^L := \int_{0}^L \rho A (\cdot) \d{x}, \; \mathcal{I}_{\rho x}^L := \int_{0}^L \rho A x (\cdot) \d{x}$. The interconnection operator is found by adapting the cross product to th planar case:
 \begin{equation}
 \label{eq:EB_J}
 \bm{\mathcal{J}}_{e}(\bm{e}) = 
@@ -775,7 +775,7 @@ where  $s^x = \int_{0}^{L} \rho A x \d{x}$ is the static moment, $J^{zz} = \int_
 where $\widetilde{p}_t^x, \widetilde{p}_t^y$ are the modified canonical momenta components (see \eqref{eq:mod_momenta}), $\mathcal{I}_{p_f^x}^{L} := \int_{0}^{L} \left\{2 p_f^x + \rho A v_f^x \right\} (\cdot) \d{x}$ and $\mathcal{I}_{p_f^y}^{L} := \int_{0}^{L} \left\{2 p_f^y + \rho A v_f^y \right\} (\cdot) \d{x}$. The control operators read
 \begin{equation}
 \bm{\mathcal{B}}_r = \begin{bmatrix}
-I_{3\times 3} & \bm\tau_{CP}^\top \\
+\bm{I}_{3\times 3} & \bm\tau_{CP}^\top \\
 0_{4\times 3} & 0_{4\times 3} \\
 \end{bmatrix} \qquad \text{with} \quad
 \bm\tau_{CP} = \begin{bmatrix}
@@ -816,8 +816,8 @@ This two operator play the same role as their previously defined homonyms. The 2
 \end{bmatrix} &= 
 \begin{bmatrix}
 0 & \mathbf{J}_{qr}(\mathbf{q}) & \mathbf{J}_{qf} \\
-\mathbf{J}_{rq}(\mathbf{q}) & \mathbf{J}_{rr}(\mathbf{e}) & \mathbf{J}_{rf}(\mathbf{e})\\ 
-\mathbf{J}_{fq} & \mathbf{J}_{fr}(\mathbf{e}) & \mathbf{J}_{ff}(\mathbf{e})\\
+\mathbf{J}_{rq}(\mathbf{q}) & \mathbf{J}_{rr}(\mathbf{p}) & \mathbf{J}_{rf}(\mathbf{p})\\ 
+\mathbf{J}_{fq} & \mathbf{J}_{fr}(\mathbf{p}) & \mathbf{J}_{ff}\\
 \end{bmatrix}  
 \begin{bmatrix}
 \partial_{\mathbf{q}} H \\
@@ -839,6 +839,20 @@ This two operator play the same role as their previously defined homonyms. The 2
 \end{bmatrix},
 \end{aligned}
 \end{equation}
+where 
+\begin{align*}
+\mathbf{B}_{\partial, r} &= \begin{bmatrix}
+\mathbf{I}_{3\times 3} & \bm\tau_{CP}^\top \\
+\end{bmatrix} \\
+\mathbf{B}_{\partial, f} &= \begin{bmatrix}
+0_{n_f^{vx} \times 3} & \bm{\phi}_{v_f^x}(L) & 0 & 0 \\
+0_{n_f^{vy} \times 3} & 0 & \bm{\phi}_{v_f^y}(L) & \partial_x \bm{\phi}_{v_f^y}(L) \\
+0_{n_f^{\sigma x} \times 3} & 0 & 0 & 0 \\
+0_{n_f^^{\sigma y} \times 3} & 0 & 0 & 0 \\
+\end{bmatrix},
+\end{align*}
+where $\bm{\phi}_{v_f^x}, \ \bm{\phi}_{v_f^y}$ are the shape function for $\bm{v}_f^x, \bm{v}_f^y$.
+
 This model describes the motion of a flexible floating beam that undergoes small deformations. 
 
 \section{Multibody systems in pH form}
