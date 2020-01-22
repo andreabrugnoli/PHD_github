@@ -37,7 +37,7 @@
 		\;\mathrm{d}#1\@ifnextchar\d{\!}{}}}
 \makeatother
 
-
+\pdfminorversion=4 
 \graphicspath{{./Figures/}}
 %===============================================================================
 \begin{document}
@@ -74,9 +74,9 @@ Port-Hamiltonian systems, Kirchhoff Plate, Mindlin-Reissner Plate, Mixed Finite 
 %===============================================================================
 
 \section{Introduction}
-Distributed port-Hamiltonian (dpH) systems, since their introduction in \cite{VANDERSCHAFTdph}, have attracted a lot of attention. For simulation and control design purposes, a suitable, i.e. structure preserving, discretized model is needed. When dealing with higher geometrical dimensions, obtaining a finite-dimensional approximation is not an easy task. One possible strategy is to make use of finite element discretization. In \cite{WeakForm_Kot} the authors provide a way to discretize system of conservation law using finite element exterior calculus. However, this methodology does not easily generalize to more complicated models (e.g. elasticity problems).
+Distributed port-Hamiltonian (dpH) systems, since their introduction in \cite{VANDERSCHAFTdph}, have attracted a lot of attention. For simulation and control design purposes, a suitable, i.e. structure preserving, discretized model is needed. When dealing with higher geometrical dimensions, obtaining a finite-dimensional approximation is not an easy task. One possible strategy is to make use of finite element discretization. In \cite{WeakForm_Kot} the authors provide a way to discretize systems of conservation laws using finite element exterior calculus. However, this methodology does not easily generalize to more complicated models (e.g. elasticity problems).
 
-Thanks to \cite{CardosoRibeiro2018}, it has become evident that there is a strict link between  discretization of port-Hamiltonian (pH) systems and mixed finite elements. Velocity-stress formulation for the wave dynamics and elastodynamics problems are indeed Hamiltonian and their mixed discretization preserves such structure (cf. \cite{Kirby2015}, where a symplectic in time and space scheme is constructed for the wave equation). This allows using known finite element scheme to preserve the pH structure at the discrete level.
+Thanks to \cite{CardosoRibeiro2018}, it has become evident that there is a strict link between  discretization of port-Hamiltonian (pH) systems and mixed finite elements. Velocity-stress formulation for the wave dynamics and elastodynamics problems are indeed Hamiltonian and their mixed discretization preserves such a structure (cf. \cite{Kirby2015}, where a symplectic in time and space scheme is constructed for the wave equation). This allows using known finite element scheme to preserve the pH structure at the discrete level.
 
 Mixed finite elements for the wave equation have been studied in \cite{Geveci,becacheWave}. For elastodynamics the construction of stable elements gets more complicated because of the presence of the symmetric stress tensor. Existing elements enforce symmetry either strongly (\cite{becacheElas}) or weakly (\cite{ArnoldWeak,mindlinVeiga}).
 
@@ -116,7 +116,7 @@ The double divergence of a tensor field $\bm{U}$ is then a scalar field defined 
 \begin{equation*}
 \mathrm{div}(\mathrm{Div}(\bm U)):= \sum_{i, j = 1}^d \partial_{x_i} \partial_{x_j} u_{ij}.
 \end{equation*}
-The $L^2$ inner products of scalar, vector and matmathrm{ess \; sup}rix fields are defined as
+The $L^2$ inner products of scalar, vector and matrix fields are defined as
 \begin{align*}
 	(u, v) &= \int_{\Omega} u \ v \d\Omega, \quad u, v : \Omega \rightarrow \mathbb{R}, \\
 	(\bm{u}, \bm{v}) &= \int_{\Omega} \bm{u} \cdot \bm{v} \d\Omega, \quad \bm{u}, \bm{v} : \Omega \rightarrow \mathbb{V}, \\
@@ -159,7 +159,7 @@ The Mindlin model is a generalization to the 2D case of the Timoshenko beam mode
 \displaystyle \frac{\rho b^3}{12} \diffp[2]{\bm \theta}{t} &= \bm{q} + \mathrm{Div}(\bm M) + \bm{\tau}, \\
 \end{cases}
 \end{equation}
-where $\rho$ is the mass density, $b$ the plate thickness, $w$ the vertical displacement, $\bm \theta = (\theta_x, \theta_y)^\top$ collects the deflection of the cross section along axes $x$ and $y$ respectively. The fields $f, \bm{\tau}$ represent distributed forces and torques. Variables $\bm{M}, \bm{q}$ represent the momenta tensor and the shear stress. The Hooke's law relates those to the curvature tensor and shear deformation vector
+where $\rho$ is the mass density, $b$ the plate thickness, $w$ the vertical displacement, $\bm \theta = (\theta_x, \theta_y)^\top$ collects the deflection of the cross section along axes $x$ and $y$ respectively. The fields $f, \bm{\tau}$ represent distributed forces and torques. Variables $\bm{M}, \bm{q}$ represent the momenta tensor and the shear stress. Hooke's law relates those to the curvature tensor and shear deformation vector
 \begin{equation*}
 \begin{aligned}
 \bm{M} &:= \mathcal{D} \bm{K} \in \mathbb{S}, \\ \bm{q} &:= \mathcal{C} \bm{\gamma},
@@ -192,7 +192,7 @@ The Hamiltonian  is easily written as $H = E_c + E_p$. To get a port-Hamiltonian
 \bm\alpha_{\gamma} &= \bm{\gamma}. \\
 \end{aligned}
 \end{equation}
-The co-energy variables are found by computing the variational derivative of the Hamiltonian
+The co-energy variables are found by computing the variational derivatives of the Hamiltonian
 \begin{equation}
 \begin{aligned}
 e_w &:= \diffd{H}{\alpha_w} = \diffp{w}{t},  \\
@@ -205,7 +205,7 @@ e_w &:= \diffd{H}{\alpha_w} = \diffp{w}{t},  \\
 \end{equation}
 Energy and co-energy variables are related by a positive symmetric operator $\bm{\alpha} = \mathcal{Q} \bm{e}$
 \begin{equation}
-\mathcal{Q} = \mathrm{diag}[(\rho b)^{-1}, \; (\rho b^3/12)^{-1} , \; \mathcal{D}, \; \mathcal{C}]
+\mathcal{Q} = \mathrm{diag}[(\rho b)^{-1}, \; (\rho b^3/12)^{-1} , \; \mathcal{D}, \; \mathcal{C}].
 \end{equation}
 
 The port-Hamiltonian system is expressed as follows 
@@ -265,9 +265,9 @@ The Hamiltonian is then given by $H=E_c + E_p$. Selecting as energy variables
 \begin{equation}
 \alpha_w = \rho b \diffp{w}{t}, \quad \bm{A}_{\kappa} = \bm{K}, 
 \end{equation}
-the co-energy variables are found by computing the variational derivative of the Hamiltonian
+the co-energy variables are found by computing the variational derivatives of the Hamiltonian
 \begin{equation}
-e_w := \diffd{H}{\alpha_w} = \diffp{w}{t}, \quad \bm{E}_{\kappa} := \diffd{H}{\bm{A}_{\kappa}} = \bm{M}, \\
+e_w := \diffd{H}{\alpha_w} = \diffp{w}{t}, \quad \bm{E}_{\kappa} := \diffd{H}{\bm{A}_{\kappa}} = \bm{M}. \\
 \end{equation}
 The coercive operator linking energy and co-energy variables reads
 \begin{equation}
@@ -295,7 +295,7 @@ f \\
 0 \\
 \end{pmatrix}.
 \end{equation}
-Following remark \ref{rmk:stdir} this system would define a Stokes-Dirac if appropriate boundary variables are added. However, in this paper simply supported boundary conditions are considered, i.e.
+Following Remark \ref{rmk:stdir} this system would define a Stokes-Dirac if appropriate boundary variables were added. However, in this paper simply supported boundary conditions are considered, i.e.
 \[
 e_w|_{\partial \Omega} = 0, \quad m_{\text{nn}}|_{\partial \Omega}:= \bm{n}^\top \bm{E}_\kappa \bm{n}|_{\partial \Omega} = 0,
 \]
@@ -304,7 +304,7 @@ hence no boundary control is present. Differently from the Mindlin plate case, g
 \section{Available mixed finite elements}
 \label{sec:mixed}
 
-In this section suitable semi-discretized models are derived. For the Mindlin model, two different formulation are presented: the first one enforces the symmetry of the momenta tensor strongly (\S\ref{sec:min_strong}), the second weakly (\S\ref{sec:min_weak}). For the Kirchhoff plate, the formulation is based on the the non-conforming Hellan-Herrmann-Johnson method (HHJ). 
+In this section suitable semi-discretized models are derived. For the Mindlin model, two different formulation are presented: the first one enforces the symmetry of the momenta tensor strongly (\S\ref{sec:min_strong}), the second weakly (\S\ref{sec:min_weak}). For the Kirchhoff plate, the formulation is based on the the non-conforming Hellan-Herrmann-Johnson method (HHJ) (\S\ref{sec:HHJ}). 
 
 \begin{remark}
 System \eqref{eq:PH_sys_Min_Ten}, \eqref{eq:PH_sys_Kir_Ten} can be expressed using either the energy or the co-energy variables. The  most adapted formulation to the existing mixed finite element literature is the co-energy one, which reads $\mathcal{Q}^{-1} \partial_t \bm{e} = \mathcal{J} \bm{e}$.
@@ -408,7 +408,7 @@ D_h^{\text{AFW}} &= \{\bm{q}_h \in D | \ \forall T,\ \bm{q}_h|_{T} \in RT_{[k-1]
 K_h^{\text{AFW}} &= \{\bm{R}_h \in K | \ \forall T, \ w_h|_{T} \in P_{k-1} \}, \\ 
 \end{aligned}
 \end{equation}
-where $BDM$ are the Brezzi-Douglas-Marini elements and $RT$ the Raviart-Thomas elements. The acronym AFW stands for Arnold-Falk-Winther. A convergence analysis for the general elastodynamics problem with weak symmetry in the $L^\infty (L^2)$ norm is detailed \cite{ArnoldWeak}. A convergence study for the wave equation with mixed finite elements in the $L^\infty (L^2)$ is presented in \cite{Geveci}. Combining the results of the two, the following error estimate are conjectured:
+where $BDM$ are the Brezzi-Douglas-Marini elements and $RT$ the Raviart-Thomas elements. The acronym AFW stands for Arnold-Falk-Winther. A convergence analysis for the general elastodynamics problem with weak symmetry in the $L^\infty (L^2)$ norm is detailed \cite{ArnoldWeak}. A convergence study for the wave equation with mixed finite elements in the $L^\infty (L^2)$ is presented in \cite{Geveci}. Combining the results of the two, the following error estimates are conjectured:
 \begin{conjecture}
 	Assuming a smooth solution to problem~\eqref{eq:weak_min_PH_strong}, the following error estimates hold 
 	\begin{equation}
@@ -425,7 +425,7 @@ where $BDM$ are the Brezzi-Douglas-Marini elements and $RT$ the Raviart-Thomas e
 	\end{equation}
 \end{conjecture}
 
-\subsection{The HHJ scheme for the Kirchhoff plate}
+\subsection{The HHJ scheme for the Kirchhoff plate}\label{sec:HHJ}
 For the Kirchhoff plate, the HHJ scheme can be used to obtain a structure-preserving discretization. The discussion follows \cite{arnold2019hellan}. Given the non conforming nature of this scheme, it is necessary to first introduce the discrete functional spaces and state the problem directly in discrete form. The vertical displacement is approximated using continuous Lagrange polynomials, while the momenta tensor is discretized using the HHJ element
 \begin{equation}
 \label{eq:HHJ}
@@ -476,7 +476,7 @@ Assuming a smooth solution for problem~\eqref{eq:weak_kir_PH}, the following err
 
 \section{Numerical experiments}
 \label{sec:numerics}
-In this section numerical test cases are used to verify the conjectured orders of convergence for the two problems. Upon discretization, system \eqref{eq:weak_min_PH_strong}, \eqref{eq:weak_min_PH_weak}, \eqref{eq:weak_kir_PH} assumes the from 
+In this section numerical test cases are used to verify the conjectured orders of convergence for the two problems. Upon discretization, system \eqref{eq:weak_min_PH_strong}, \eqref{eq:weak_min_PH_weak}, \eqref{eq:weak_kir_PH} assumes the form 
 \[
 M \dot{\bm{e}} = J \bm{e}.
 \]
@@ -531,7 +531,7 @@ The momenta and shear force are then defined by
 \textbf{Step 3 } Appropriate forcing terms have to be introduced (i.e. $f, \bm{\tau}$ in \eqref{eq:clMin}). The force and torque in the dynamical case become
 \begin{equation*}
 f_d = f_s \sin(t) + \rho b \partial_{tt} w_d, \qquad
-\bm{\tau}_d = \frac{\rho b^3}{12} \partial_{tt} \bm{\theta}_d
+\bm{\tau}_d = \frac{\rho b^3}{12} \partial_{tt} \bm{\theta}_d.
 \end{equation*}
 Variables $(e_w^\text{ex}, \bm{e}_\theta^\text{ex}, \bm{E}_\kappa^\text{ex}, \bm{e}_\gamma^\text{ex})$ under excitations $(f_d, \bm{\tau}_d)$ solve problem~\eqref{eq:PH_sys_Min_Ten}. The solution being smooth, the conjectured error estimates should hold. The numerical values of the physical parameters are reported in Table \ref{tab:parMin}.
 
@@ -553,7 +553,7 @@ Variables $(e_w^\text{ex}, \bm{e}_\theta^\text{ex}, \bm{E}_\kappa^\text{ex}, \bm
 
 \subsubsection{Results for the strong symmetry formulation} 
 
-The weak form \eqref{eq:weak_min_PH_strong} and its corresponding finite elements \eqref{eq:BTJ} was implemented using Firedrake extruded mesh functionality (\cite{firedrake_extruded}). A direct solver based on a LU preconditioner is used. In Fig. \ref{fig:errorBEC} the errors for $(e_w, \bm{e}_\theta, \bm{E}_\kappa, \bm{e}_\gamma)$ are reported. As one can notice, the conjectured error estimates \eqref{eq:errBEC} are respected for all variables. 
+The weak form \eqref{eq:weak_min_PH_strong} and its corresponding finite elements \eqref{eq:BTJ} was implemented using Firedrake extruded mesh functionality (\cite{firedrake_extruded}). A direct solver based on an LU preconditioner is used. In Fig. \ref{fig:errorBEC} the errors for $(e_w, \bm{e}_\theta, \bm{E}_\kappa, \bm{e}_\gamma)$ are reported. As one can notice, the conjectured error estimates \eqref{eq:errBEC} are respected for all variables. 
 
 \begin{figure}[ht]%
 	\centering
@@ -576,7 +576,7 @@ The weak form \eqref{eq:weak_min_PH_strong} and its corresponding finite element
 \end{figure}
 
 \subsubsection{Results for the weak symmetry formulation} 
-Formulation \eqref{eq:weak_min_PH_weak} and its element \eqref{eq:AFW} are considered here. A direct solver failed for high order cases (i.e. $k=3$). For this reason a generalized minimal residual method is used with restart number of iterations equal to 100. In Fig. \ref{fig:errorAFW} the errors for variables $(e_w, \bm{e}_\theta, \bm{E}_\kappa, \bm{e}_\gamma)$  are reported. The errors for $(e_w, \bm{e}_\theta, \bm{e}_\gamma)$ respect the conjectured result \eqref{eq:errAFW}. Variable $\bm{E}_\kappa$ exhibit a superconvergence phenomenon for the case $k=1$. In \cite{ArnoldWeak} no numerical study was carried out for the case $k=1$. The $BDM$ elements may be responsible for such superconvergence. The convergence order of $(\bm{E}_\kappa, \bm{e}_\gamma)$ deteriorates for $k=3$ for the finest mesh. This must be linked to errors due to the underlying large saddle-point problem. Indeed in \cite{ArnoldWeak} an hybridization method is used to transform the saddle-point problem in a symmetric positive definite one.
+Formulation \eqref{eq:weak_min_PH_weak} and its element \eqref{eq:AFW} are considered here. A direct solver failed for high order cases (i.e. $k=3$). For this reason a generalized minimal residual method is used with restart number of iterations equal to 100. In Fig. \ref{fig:errorAFW} the errors for variables $(e_w, \bm{e}_\theta, \bm{E}_\kappa, \bm{e}_\gamma)$  are reported. The errors for $(e_w, \bm{e}_\theta, \bm{e}_\gamma)$ respect the conjectured result \eqref{eq:errAFW}. Variable $\bm{E}_\kappa$ exhibit a superconvergence phenomenon for the case $k=1$. In \cite{ArnoldWeak} no numerical study was carried out for the case $k=1$. The $BDM$ elements might be responsible for such superconvergence. The convergence order of $(\bm{E}_\kappa, \bm{e}_\gamma)$ deteriorates for $k=3$ for the finest mesh. This must be linked to errors due to the underlying large saddle-point problem. Indeed in \cite{ArnoldWeak} an hybridization method is used to transform the saddle-point problem into a symmetric positive definite one.
 
 \begin{figure}[ht]%
 	\centering
@@ -613,9 +613,9 @@ f = (4 D \pi^4 - \rho b) \sin(\pi x) \sin(\pi y) \sin(t), \quad D = \frac{E_Y b^
 \]
 The corresponding variables in the port-Hamiltonian frame work are
 \[
-e_w^{\text{ex}} = \partial_t w^{\text{ex}}, \quad \bm{E}_\kappa^{\text{ex}} = \mathcal{D} \nabla^2 w^{\text{ex}}
+e_w^{\text{ex}} = \partial_t w^{\text{ex}}, \quad \bm{E}_\kappa^{\text{ex}} = \mathcal{D} \nabla^2 w^{\text{ex}}.
 \]
-Variables $(e_w^{\text{ex}}, \bm{E}_\kappa^{\text{ex}})$ under excitation $f$ solve problem~\eqref{eq:PH_sys_Kir_Ten}. The physical parameters used in simulation are reported in Table \ref{tab:parKir}. The weak form \eqref{eq:weak_kir_PH} and the elements \eqref{eq:HHJ} are now considered. A direct solver with LU preconditioner is used to compute the solution. Results are shown in Fig. \ref{fig:errorHHJ}. The conjectured error estimates are respected.
+Variables $(e_w^{\text{ex}}, \bm{E}_\kappa^{\text{ex}})$ under excitation $f$ solve problem~\eqref{eq:PH_sys_Kir_Ten}. The physical parameters used in simulation are reported in Table \ref{tab:parKir}. The weak form \eqref{eq:weak_kir_PH} and the finite elements \eqref{eq:HHJ} are considered. A direct solver with an LU preconditioner is used to compute the solution. Results are shown in Fig.~\ref{fig:errorHHJ}. The conjectured error estimates are respected.
 
 \begin{table}[h]
 	\centering
@@ -642,12 +642,12 @@ Variables $(e_w^{\text{ex}}, \bm{E}_\kappa^{\text{ex}})$ under excitation $f$ so
 	\subfloat[][$L^\infty_{\Delta t} (L^2)$ error for $\bm{E}_\kappa$]{%
 		\label{fig:errHHJ2}%
 		\includegraphics[width=0.48\columnwidth]{Kirchhoff/SSSS__sig.eps}} \\
-	\caption[errorHHF]{Error for the Kirchhoff plate using the HHJ element}%
+	\caption[errorHHF]{Error for the Kirchhoff plate using HHJ elements}%
 	\label{fig:errorHHJ}%
 \end{figure}
 
 \section{Conclusion}
-In this paper, the link between mixed finite element method and pH plate models has been studied. It was shown that existing elements can be used to obtain structure preserving discretization. A rigorous error analysis is still to be done but it should be easy to prove, given the available results. Since the pH framework provides a powerful description of boundary controlled systems, it is important that numerical methods are capable of handling generic boundary conditions. The methods discussed here possess this feature in the Mindlin plate case. For the Kirchhoff plate, a promising methodology is detailed in \cite{mixed_kirchhoff}, but the dynamical case has not been considered yet. Future developments include the analysis and discretization of viscoelastic and thermoelastic problems in pH form.
+In this paper, the link between mixed finite element method and pH plate models has been studied. It was shown that existing elements can be used to obtain structure-preserving discretization. A rigorous error analysis is still to be done but it should be easy to prove, given the available results. Since the pH framework provides a powerful description of boundary controlled systems, it is important that numerical methods be capable of handling generic boundary conditions. The methods discussed here possess this feature in the Mindlin plate case. For the Kirchhoff plate, a promising methodology is detailed in \cite{mixed_kirchhoff}, but the dynamical case has not been considered yet. Future developments include the analysis and discretization of viscoelastic and thermoelastic problems in pH form.
 
 \begin{ack}
 	The authors would like to thank Michel Sala\"un, Xavier Vasseur and Ghislain Haine from ISAE for the insightful and fruitful discussions.

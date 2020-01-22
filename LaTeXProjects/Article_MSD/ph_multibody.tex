@@ -131,7 +131,7 @@ A new formulation for the modular construction of multibody systems is presented
 Especially in aerospace applications, where a strict requirement for lightweight structures applies, the accurate modeling  of flexible multibody systems is increasingly important. For structural control co-design, it is of interest to lower the system complexity and to dispose of a modular description, to simplify analysis. In this spirit, the transfer matrix method \cite{Rui2005} and the component mode synthesis \cite{HurtyCMS} are two well known substructuring techniques that allow the construction of complex multibody systems by interconnecting subcomponents together. These methodologies have been refined for structural and control co-design. A reformulation of the Finite Element-Transfer Matrix (FE-TM) method \cite{TAN199047} allows an easy construction of reduced models that are suited for decentralized control design. For the component mode synthesis, the controlled component synthesis (CCS), a framework for the design of decentralized controller of flexible structures, has been proposed in \cite{YoungCMS}. Another modeling paradigm based on the component mode synthesis is the two-input two-output port (TITOP) approach \cite{TITOP}. It conceives the dynamical model of each substructure as a transfer between the accelerations and the external forces at the connection points. This feature allows considering different boundary conditions by inverting specific channels in the transfer matrix. A rigorous validation was provided in \cite{Perez,SANFEDINO2018128}, where the robustness of the methodology in handling various boundary conditions was assessed. \\
 \indent To incorporate the elastic motion in multibody systems, three description are commonly used: the floating frame formulation, the corotational frame formulation and the inertial frame formulation \cite{Ellenbroek2018}. The corotational and inertial frame formulations allow to take into account large deformations of the elastic body but the application of linear model reduction techniques remains impractical \cite{Noor_rev}. On the contrary, the floating frame formulation, relying on the hypothesis of small deformations, easily integrates many model reduction techniques \cite{NOWAKOWSKI201240}, making it possible to obtain a low-dimensional problem for control design. \\
 \indent The Lagrangian formulation is the most commonly used methodology to retrieve the equations of motion. However, the port-Hamiltonian (pH) framework \cite{bookPHs} has been recently extended to describe the dynamics of rigid and flexible links \cite{macchelli_fl,macchelli_flrig}. The definition of the model naturally accounts for the non-linearities due to large deformations. Thanks to the properties of pH systems \cite{CerveraIntFinite},  this approach allows for the modular construction by interconnecting simpler elements. Nevertheless, the formulation therein heavily relies on Lie algebra and differential geometry concepts, making the overall implementation and analysis difficult. Furthermore, the discretization of underlying PDE requires non standard methodologies \cite{Golo}. \\
-\indent In this paper, we propose to combine the pH framework with a floating frame description of the dynamics. Starting from the general equation for the rigid flexible dynamics of a floating body, an equivalent port-Hamiltonian system is found by appropriate selection of the canonical momenta. The flexible behavior is based on the linear elasticity assumption making it possible to include models that cannot be easily formulated in terms of differential form  \cite{BRUGNOLI2019940,BRUGNOLI2019961}. The problem is then written as a coupled system of ODEs and PDEs, extending the general definition of finite-dimensional port-Hamiltonian descriptor systems provided in \cite{mehrmann2019structurepreserving}. A suitable structure-preserving discretization method, based on \cite{cardoso2019partitioned}, is then used to obtain a finite-dimensional pH system. Each individual component can then be interconnected to the other bodies using standard interconnection of pH systems, as it is done in \cite{macchelli_flrig}. The constraints are imposed on the velocities and results in a quasi-linear index 2 differential-algebraic port-Hamiltonian system (pHDAE) \cite{phd_steinbrecher,beattie2018linear}. The algebraic constraints can be eliminated, preserving the overall pH structure, using null space methods \cite{nullspaceFlMult}. The modularity feature of pH systems makes the proposed approach analogous to a substructuring technique \cite{substructuring}. A complex multibody system can be assembled by interconnecting blocks, allowing the usage of modeling platforms like \textsc{Simulink}$^{\tiny{\textregistered}}$. As a floating frame formulation is used, model reduction techniques can be employed to lower the computational complexity of the model \cite{phode_red,phdae_red}. All the features make the proposed formulation interesting for control applications, that can benefit from the properties of pH systems \cite{ORTEGAsurvey,PHadaptive}. \\
+\indent In this paper, we propose to combine the pH framework with a floating frame description of the dynamics. Starting from the general equation for the rigid flexible dynamics of a floating body, an equivalent port-Hamiltonian system is found by appropriate selection of the canonical momenta. The flexible behavior is based on the linear elasticity assumption making it possible to include models that cannot be easily formulated in terms of differential form  \cite{BRUGNOLI2019940,BRUGNOLI2019961}. The problem is then written as a coupled system of ODEs and PDEs, extending the general definition of finite-dimensional port-Hamiltonian descriptor systems provided in \cite{mehrmann2019structurepreserving}. A suitable structure-preserving discretization method, based on \cite{cardoso2019partitioned}, is then used to obtain a finite-dimensional pH system. Each individual component can then be interconnected to the other bodies using standard interconnection of pH systems, as it is done in \cite{macchelli_flrig}. The constraints are imposed on the velocities and results in a quasi-linear index 2 differential-algebraic port-Hamiltonian system (pHDAE) \cite{phd_steinbrecher,beattie2018linear}. The algebraic constraints can be eliminated, preserving the overall pH structure, using null space methods \cite{nullspaceFlMult}. The modularity feature of pH systems makes the proposed approach analogous to a substructuring technique \cite{substructuring}. A complex multibody system can be assembled by interconnecting blocks, allowing the usage of modeling platforms like \textsc{Simulink}$^{\tiny{\textregistered}}$ or \textsc{Modelica}$^{\tiny{\textregistered}}$. As a floating frame formulation is used, model reduction techniques can be employed to lower the computational complexity of the model \cite{phode_red,phdae_red}. All the features make the proposed formulation interesting for control applications, that can benefit from the properties of pH systems \cite{PHadaptive,ORTEGAsurvey}. \\
 \indent The paper is organized in the following manner. In Section \ref{sec:class_model} the classical equations of a flexible floating body, derived by means of the virtual work principle \cite{MB_Daepde,simeon2013computational}, are recalled. Using the Jacobi identity the equations are recast in a form closer to the pH structure. Section \ref{sec:pH_fd} details the pH formulation of a floating flexible body by introducing the proper canonical momenta. In Section \ref{sec:discr} a finite element based discretization is detailed for the elastodynamics problem. The procedure is then easily applied to flexible floating bodies. The particular case of thin planar beams is then detailed, as it will be then employed in the simulation part. Section~\ref{sec:MB_pH} explains how to interconnect models together using classical pH interconnection. Section \ref{sec:valid} is devoted to numerical examples, to assess the validity of the proposed methodology. The test cases are taken from previously published articles \cite{Chebbi2017,Ellenbroek2018}.
 
  
@@ -192,7 +192,7 @@ where $\bm{v}_P, \bm{\omega}_P$ are the linear and angular velocities of point $
 \end{itemize}
 
 \subsection{Towards a pH formulation}
-The gyroscopic term in Eqs. \eqref{eq:rig_tr1}, \eqref{eq:rig_rot1}, \eqref{eq:flex1} need some manipulation so that the skew-symmetric interconnection operator can be more easily highlight. Considering that $\dot{\bm{v}}_f = \ddot{\bm{u}}_f$ and using the Jacobi identity \eqref{eq:jacobi} (see Appendix B for a detailed explanation) the classical equations can be equivalently rewritten as follows. \\
+The gyroscopic term in Eqs. \eqref{eq:rig_tr1}, \eqref{eq:rig_rot1}, \eqref{eq:flex1} need some manipulation so that the skew-symmetric interconnection operator can be more easily highlighted. Considering that $\dot{\bm{v}}_f = \ddot{\bm{u}}_f$ and using the Jacobi identity \eqref{eq:jacobi} (see Appendix B for a detailed explanation) the classical equations can be equivalently rewritten as follows. \\
 \begin{itemize}
 \item Linear momentum balance:
 \begin{equation}
@@ -224,6 +224,7 @@ Again this equation requires the specification of the boundary conditions \eqref
 \end{itemize}
 
  Introduction the appropriate momenta, this model can be reformulated as a pH system as illustrated in the following section.
+
 
 \section{Elastic body under large rigid motion as a pH system}
 \label{sec:pH_fd}
@@ -395,14 +396,14 @@ where $\bm{u}_d = \bm\beta$. Using definitions  \eqref{eq:momenta}, it follows t
 
 Adopting the same nomenclature as in \cite{mehrmann2019structurepreserving}, $\bm{e}$ contains the state and $\bm{z}$ contains the effort functions. The operators verify $\bm{\mathcal{E}} = \bm{\mathcal{E}}^*, \; \bm{\mathcal{J}} = -\bm{\mathcal{J}}^*$. The control operators are expressed as
 \begin{align*}
-	\bm{\mathcal{B}}_d &= 
-	\begin{bmatrix}
-	0 & 0 & 0 & \mathcal{I}^\Omega & \bm{\mathcal{I}}_{x}^\Omega & \bm{I} & 0
-	\end{bmatrix}^\top, \\
-	 \bm{\mathcal{B}}_r &= 
-	 \begin{bmatrix}
-	0 & 0 & 0 & \mathcal{I}^{\Gamma} & \bm{\mathcal{I}}_{x}^{\Gamma} & 0 & 0 \\
-	 \end{bmatrix}^\top,
+\bm{\mathcal{B}}_d &= 
+\begin{bmatrix}
+0 & 0 & 0 & \mathcal{I}^\Omega & \bm{\mathcal{I}}_{x}^\Omega & \bm{I} & 0
+\end{bmatrix}^\top, \\
+\bm{\mathcal{B}}_r &= 
+\begin{bmatrix}
+0 & 0 & 0 & \mathcal{I}^{\Gamma} & \bm{\mathcal{I}}_{x}^{\Gamma} & 0 & 0 \\
+\end{bmatrix}^\top,
 \end{align*}
 where 
 \begin{equation*}
@@ -426,17 +427,17 @@ The power balance is naturally embedded in the dynamics
 &= \langle \bm{z}, \bm{\mathcal{E}} \partial_t {\bm{e}} \rangle_{\mathscr{X}}, \quad \text{Self-adjointness of } \bm{\mathcal{E}}, \\
 & = \langle \bm{z}, \bm{\mathcal{J}}\bm{z} + \bm{\mathcal{B}}_d(\bm{e}) \bm{u}_d + \bm{\mathcal{B}}_r(\bm{e}) \bm{u}_\partial \rangle_{\mathscr{X}}, \\
 & = \langle \bm{y}_\partial,  \bm{u}_\partial \rangle_{\mathscr{L}^2(\partial\Omega, \mathbb{R}^3)} + \langle \bm{\mathcal{B}}_d^* \bm{z}, \bm{u}_d \rangle_{\mathscr{X}} + \langle \bm{\mathcal{B}}_r^* \bm{z}, \bm{u}_\partial \rangle_{\mathscr{X}}, \quad \text{I.B.P. on } \bm{\mathcal{J}}, \\
- &= \langle \bm{y}_\partial + \bm{y}_r,  \bm{u}_\partial \rangle_{\mathscr{L}^2(\partial\Omega, \mathbb{R}^3)} + \langle \bm{y}_d,  \bm{u}_d \rangle_{\mathscr{L}^2(\Omega, \mathbb{R}^3)}, \\
+&= \langle \bm{y}_\partial + \bm{y}_r,  \bm{u}_\partial \rangle_{\mathscr{L}^2(\partial\Omega, \mathbb{R}^3)} + \langle \bm{y}_d,  \bm{u}_d \rangle_{\mathscr{L}^2(\Omega, \mathbb{R}^3)}, \\
 \end{aligned}
 \end{equation}
 where the integration by parts (Stokes theorem) has been used
 \begin{equation}
 \label{eq:stokes}
-\int_{\Omega} \bm\Sigma \cddot \Grad(\bm{v}_f) \d{\Omega} + \int_{\Omega} \Div(\bm\Sigma) \cdot \bm{v}_f \d{\Omega} = \int_{\partial \Omega} (\bm\Sigma \cdot \bm{n}) \cdot \bm{v}_f \d{\Omega} = \langle \bm{y}_\partial,  \bm{u}_\partial \rangle_{\mathscr{L}^2(\partial\Omega)}.
+\int_{\Omega} \bm\Sigma \cddot \Grad(\bm{v}_f) \d{\Omega} + \int_{\Omega} \Div(\bm\Sigma) \cdot \bm{v}_f \d{\Omega} = \int_{\partial \Omega} (\bm\Sigma \cdot \bm{n}) \cdot \bm{v}_f \d{\Gamma} = \langle \bm{y}_\partial,  \bm{u}_\partial \rangle_{\mathscr{L}^2(\partial\Omega)}.
 \end{equation}
 The power balance equals the power due to body force and surface traction
 \begin{equation}
-	\dot{H}(\bm{e}) = \int_{\partial \Omega} (\bm{\Sigma} \cdot \bm{n}) \cdot \bm{v} \d\Gamma + \int_{\Omega} \bm{u}_d \cdot \bm{v}  \d{\Omega}, \quad \bm{v} := \bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}+\bm{u}_f) + {\bm{v}}_f.
+\dot{H}(\bm{e}) = \int_{\partial \Omega} (\bm{\Sigma} \cdot \bm{n}) \cdot \bm{v} \d\Gamma + \int_{\Omega} \bm{u}_d \cdot \bm{v}  \d{\Omega}, \quad \bm{v} := \bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}+\bm{u}_f) + {\bm{v}}_f.
 \end{equation}
 Even if three dimensional elasticity has been taken as example up to this point, other models are easily considered. Beam and plate models \cite{BRUGNOLI2019940,BRUGNOLI2019961} are described by appropriate differential operators that replace the $\Div, \Grad$ appearing in \eqref{eq:ph_mfd_all} (see \secref{sec:ph_floatbeam}).
 
@@ -455,40 +456,40 @@ Even if three dimensional elasticity has been taken as example up to this point,
 \end{remark}
 
 \begin{remark}
-	The linear elasticity hypothesis does not allow to include the effect of non linearities due to large deformations.  However, geometric stiffening could be considered by adding a potential energy associated to centrifugal forces \cite{MB_Daepde,YIGIT1988201}. 
+	The linear elasticity hypothesis does not allow to include the effect of non linearities due to large deformations.  However, geometric stiffening could be considered by adding a potential energy associated to centrifugal forces \cite{MB_Daepde}. 
 \end{remark}
 
 \begin{remark}
-If case of vanishing deformation $\bm{u}_f \equiv 0$ the Newton-Euler equations on the Euclidian group $SE(3)$ are retrieved
-\begin{equation*}
-\begin{bmatrix}
-^i\dot{\bm{r}}_P \\ \bm{R}_{\text{v}} \\\dot{\bm{p}}_t \\ \dot{\bm{p}}_r \\
-\end{bmatrix} = 
-\begin{bmatrix}
-0 & 0 & \bm{R} & 0 \\
-0 & 0 & 0 & \crmat{\bm{R}_{\text{v}}} \\
-- \bm{R}^\top & 0 & 0 & \crmat{\bm{p}_t}\\
-0 & -\crmat{\bm{R}_{\text{v}}}^\top & \crmat{\bm{p}_t} & \crmat{\bm{p}_r} \\
-\end{bmatrix}
-\begin{bmatrix}
-\partial_{\bm{r}_P} H \\ \partial_{\bm{R}_{\text{v}}} H \\ \bm{v}_P \\ \bm{\omega}_P  \\
-\end{bmatrix},
-\end{equation*}
-where
-\begin{equation*}
-\begin{bmatrix}
-\bm{p}_t \\ \bm{p}_r \\ 
-\end{bmatrix} = 
-\begin{bmatrix}
-m \bm{I} & \crmat{\bm{s}}^\top \\
-\crmat{\bm{s}} & \bm{J} \\
-\end{bmatrix}
-\begin{bmatrix}
-\bm{v}_P \\ \bm{\omega}_P  \\ 
-\end{bmatrix}, \qquad \bm{p} = \bm{M} \bm{v}
-\end{equation*}
-The kinetic energy is then given by $H_{\text{kin}} = \frac{1}{2} \bm{v}^\top \bm{M} \bm{v}$.
-This system can be written in standard pH form as $\dot{\bm{x}} = \bm{J}(\bm{x})\partial_{\bm{x}} H$.
+	If case of vanishing deformation $\bm{u}_f \equiv 0$ the Newton-Euler equations on the Euclidian group $SE(3)$ are retrieved
+	\begin{equation*}
+	\begin{bmatrix}
+	^i\dot{\bm{r}}_P \\ \bm{R}_{\text{v}} \\\dot{\bm{p}}_t \\ \dot{\bm{p}}_r \\
+	\end{bmatrix} = 
+	\begin{bmatrix}
+	0 & 0 & \bm{R} & 0 \\
+	0 & 0 & 0 & \crmat{\bm{R}_{\text{v}}} \\
+	- \bm{R}^\top & 0 & 0 & \crmat{\bm{p}_t}\\
+	0 & -\crmat{\bm{R}_{\text{v}}}^\top & \crmat{\bm{p}_t} & \crmat{\bm{p}_r} \\
+	\end{bmatrix}
+	\begin{bmatrix}
+	\partial_{\bm{r}_P} H \\ \partial_{\bm{R}_{\text{v}}} H \\ \bm{v}_P \\ \bm{\omega}_P  \\
+	\end{bmatrix},
+	\end{equation*}
+	where
+	\begin{equation*}
+	\begin{bmatrix}
+	\bm{p}_t \\ \bm{p}_r \\ 
+	\end{bmatrix} = 
+	\begin{bmatrix}
+	m \bm{I} & \crmat{\bm{s}}^\top \\
+	\crmat{\bm{s}} & \bm{J} \\
+	\end{bmatrix}
+	\begin{bmatrix}
+	\bm{v}_P \\ \bm{\omega}_P  \\ 
+	\end{bmatrix}, \qquad \bm{p} = \bm{M} \bm{v}
+	\end{equation*}
+	The kinetic energy is then given by $H_{\text{kin}} = \frac{1}{2} \bm{v}^\top \bm{M} \bm{v}$.
+	This system can be written in standard pH form as $\dot{\bm{x}} = \bm{J}(\bm{x})\partial_{\bm{x}} H$.
 \end{remark}
 
 \section{Discretization procedure}
@@ -508,8 +509,8 @@ To explain the methodology consider the elastodynamics PDE
 where a distributed control $\bm{u}_d$ (a volumetric force) is considered. This model describe the flexible vibrations assuming small deformations. It is embedded in the general formulation \eqref{eq:ph_mfd_all} and therefore the procedure explained here is easily adapted to the general formulation. \\
 To get a pH representation the energy variables have to properly selected by considering the total energy
 \begin{equation}
-	\label{eq:en_eldyn}
-	\displaystyle H = \frac{1}{2} \int_{\Omega} \left\{\rho \left(\diffp{\bm{u}}{t}\right)^2 + \bm\Sigma \cddot \bm\varepsilon \right\} \d{\Omega}.
+\label{eq:en_eldyn}
+\displaystyle H = \frac{1}{2} \int_{\Omega} \left\{\rho \left(\diffp{\bm{u}}{t}\right)^2 + \bm\Sigma \cddot \bm\varepsilon \right\} \d{\Omega}.
 \end{equation}
 Taking as energy variables the linear momentum and the deformation
 \begin{equation}
@@ -525,21 +526,21 @@ Taking as energy variables the linear momentum and the deformation
 the port-Hamiltonian representation in co-energy variables becomes
 \begin{equation*}
 \underbrace{\begin{bmatrix}
-\rho & 0 \\ 0 & \bm{\mathcal{D}}^{-1} \\
-\end{bmatrix}}_{\bm{\mathcal{M}}}
+	\rho & 0 \\ 0 & \bm{\mathcal{D}}^{-1} \\
+	\end{bmatrix}}_{\bm{\mathcal{M}}}
 \diffp{}{t}
 \begin{bmatrix}
 \bm{e}_1 \\ \bm{E}_2 \\
 \end{bmatrix} = 
 \underbrace{\begin{bmatrix}
-0 & \Div \\ \Grad & 0 \\
-\end{bmatrix}}_{\bm{\mathcal{J}}}
+	0 & \Div \\ \Grad & 0 \\
+	\end{bmatrix}}_{\bm{\mathcal{J}}}
 \begin{bmatrix}
 \bm{e}_1 \\ \bm{E}_2 \\
 \end{bmatrix} + 
 \underbrace{\begin{bmatrix}
-\bm{I} \\ 0 \\
-\end{bmatrix}}_{\bm{\mathcal{B}}_d} \bm{u}_d 
+	\bm{I} \\ 0 \\
+	\end{bmatrix}}_{\bm{\mathcal{B}}_d} \bm{u}_d 
 \end{equation*}
 The interconnection operator may be decomposed as $\bm{\mathcal{J}} = \bm{\mathcal{J}}_{\Div} + \bm{\mathcal{J}}_{\Grad}$
 \begin{equation}
@@ -592,8 +593,8 @@ m(\bm{w}, \partial_t \bm{e}) = j_{\Grad}(\bm{w}, \bm{e}) + b_d(\bm{w}, \bm{u}_d)
 \end{equation}
 In this formulation the Dirichlet boundary condition have to be imposed strongly. For this reason the test function will belong to
 \begin{align*}
-	&\bm{w}_1 \in \mathscr{H}^1_{\Gamma_D}(\Omega, \mathbb{R}^3) := \{\bm{w}_1 \in \mathscr{H}^1(\Omega, \mathbb{R}^d)|\;  \bm{w}_1|_{\Gamma_D} = 0  \}, \\
-	&\bm{W}_2 \in \mathscr{L}^2(\Omega, \mathbb{R}^{3\times 3}_{\text{sym}}),
+&\bm{w}_1 \in \mathscr{H}^1_{\Gamma_D}(\Omega, \mathbb{R}^3) := \{\bm{w}_1 \in \mathscr{H}^1(\Omega, \mathbb{R}^d)|\;  \bm{w}_1|_{\Gamma_D} = 0  \}, \\
+&\bm{W}_2 \in \mathscr{L}^2(\Omega, \mathbb{R}^{3\times 3}_{\text{sym}}),
 \end{align*} 
 where $\mathscr{H}^1$ is the space of square integrable functions whose gradient is square integrable. The output equation is discretized considering test function $w_\partial$ defined over the boundary
 \begin{equation}
@@ -625,10 +626,10 @@ The discrete power balance is given by
 \end{equation*}
 
 \begin{remark}
-Vectors $\widetilde{\mathbf{y}}_d, \widetilde{\mathbf{y}}_\partial$ correspond to the output degrees of freedom. The outputs $\mathbf{y}_d, \mathbf{y}_\partial$ have been defined incorporating the mass matrix in order get the discrete power balance $\dot{H}_d = \mathbf{u}_\partial^\top \mathbf{y}_\partial + \mathbf{u}_d^\top \mathbf{y}_d$.
+	Vectors $\widetilde{\mathbf{y}}_d, \widetilde{\mathbf{y}}_\partial$ correspond to the output degrees of freedom. The outputs $\mathbf{y}_d, \mathbf{y}_\partial$ have been defined incorporating the mass matrix in order get the discrete power balance $\dot{H}_d = \mathbf{u}_\partial^\top \mathbf{y}_\partial + \mathbf{u}_d^\top \mathbf{y}_d$.
 \end{remark}
 \begin{remark}
-Stable mixed finite elements for the elastodynamics problem are detailed in \cite{ArnoldElasDyn}.  The formulation therein is based on a weak form obtained by integration by parts of the $\bm{\mathcal{J}}_{\Grad}$ operator. The mixed finite element method for such a problem are then stable in the sense of Brezzi thanks to the properties of $L^2 / H^{\Div}$ finite element spaces. However, the discretization scheme proposed here allows for an easier representation of floating bodies as the free condition corresponds to zero Neumann boundary conditions.
+	Stable mixed finite elements for the elastodynamics problem are detailed in \cite{ArnoldElasDyn}.  The formulation therein is based on a weak form obtained by integration by parts of the $\bm{\mathcal{J}}_{\Grad}$ operator. The mixed finite element method for such a problem are then stable in the sense of Brezzi thanks to the properties of $L^2 / H^{\Div}$ finite element spaces. However, the discretization scheme proposed here allows for an easier representation of floating bodies as the free condition corresponds to zero Neumann boundary conditions.
 \end{remark}
 
 \subsection{Discretized rigid-flexible port-Hamiltonian dynamics}
@@ -638,11 +639,11 @@ The same methodology is applied to system \eqref{eq:MFD_pHDAE}. If corresponding
 \]
 then a finite-dimensional pHDAE system is obtained (after integration by parts of the $\mathcal{J}_{\Div}$ operator)
 \begin{equation}
-	\begin{aligned}
-	\mathbf{E}(\mathbf{e}) \dot{\mathbf{e}} &= \mathbf{J}(\mathbf{e}) \mathbf{z}(\mathbf{e}) + \mathbf{B}_d(\mathbf{e}) \mathbf{u}_d + \mathbf{B}_\partial(\mathbf{e}) \mathbf{u}_\partial, \\
-	\mathbf{y}_d &:= \mathbf{M}_d \widetilde{\mathbf{y}}_d = \mathbf{B}_d^\top \mathbf{z}(\mathbf{e}),  \\
-	\mathbf{y}_\partial &:= \mathbf{M}_\partial \widetilde{\mathbf{y}}_\partial = \mathbf{B}_\partial^\top \mathbf{z}(\mathbf{e}).
-	\end{aligned}
+\begin{aligned}
+\mathbf{E}(\mathbf{e}) \dot{\mathbf{e}} &= \mathbf{J}(\mathbf{e}) \mathbf{z}(\mathbf{e}) + \mathbf{B}_d(\mathbf{e}) \mathbf{u}_d + \mathbf{B}_\partial(\mathbf{e}) \mathbf{u}_\partial, \\
+\mathbf{y}_d &:= \mathbf{M}_d \widetilde{\mathbf{y}}_d = \mathbf{B}_d^\top \mathbf{z}(\mathbf{e}),  \\
+\mathbf{y}_\partial &:= \mathbf{M}_\partial \widetilde{\mathbf{y}}_\partial = \mathbf{B}_\partial^\top \mathbf{z}(\mathbf{e}).
+\end{aligned}
 \end{equation}
 The computation of vector $\mathbf{z}$ is based on the discrete Hamiltonian  gradient:
 \[
@@ -681,7 +682,7 @@ where $\mathbf{M}_u=\int_{\Omega} \bm{\phi}_u \, \bm{\phi}_u^\top \d{\Omega}$. T
 	\label{fig:beam}
 \end{figure}
 
-If a thin planar flexible beams is considered as mechanical model. $P$ is placed at the origin of the local frame, while $C$ is the ending point of the beam (see Fig. \ref{fig:beam}). The beam has length $L$, Young modulus $E$, density $\rho$, cross section $A$ and second moment of area $I$. The model in strong form for a flexible beam is then written compactly as 
+If a thin planar flexible beams is considered as mechanical model. $P$ is placed at the origin of the local frame $P=\{x=0\}$, while $C$ is the ending point of the beam $P=\{x=L\}$ (see Fig. \ref{fig:beam}). The beam has length $L$, Young modulus $E$, density $\rho$, cross section $A$ and second moment of area $I$. The model in strong form for a flexible beam is then written compactly as 
 \begin{equation}
 \label{eq:EB_str_phdae}
 \begin{aligned}
@@ -709,30 +710,30 @@ If a thin planar flexible beams is considered as mechanical model. $P$ is placed
 \bm{y}_\partial &= \bm{\mathcal{C}}_{\partial} \bm{p},
 \end{aligned}
 \end{equation}
-where $\bm{q}$ represents the vector of generalized coordinates $\bm{q} = [^i\bm{r}_P; \ \bm{R}_{\text{v}}; \bm{u}_f]$.
-Furthermore, the deformation field has to be constrained, to prevent rigid movement (see Rmk. \ref{rmk:dirich}). The appropriate selection of the boundary condition for the deformation field is an avoidable problem that depends on the particular problem under consideration.  Depending on the application, cantilever or simply supported boundary conditions may be considered (see Sec. \secref{sec:valid})
-\begin{equation*}
-	\text{Cantilever}
-	\begin{cases}
-	u_f^x(x=0) &= 0, \\
-	u_f^y(x=0) &= 0, \\
-	\partial_x u_f^y(x=0) &= 0, \\
-	\end{cases} \qquad 
-	\text{Simply supported}
-	\begin{cases}
-	u_f^x(x=0) &= 0, \\
-	u_f^y(x=0) &= 0, \\
-	u_f^y(x=L) &= 0, \\
-	\end{cases}
-\end{equation*}
 The state and boundary vectors are expressed as
 \begin{align*}
-\bm{p} &= [v_P^x, \; v_P^y, \; \omega_P^z, \; v_f^x, \; v_f^y, \; n_x, \; m_{xx}]^\top, \\
+\bm{q} &= [^i\bm{r}_P, \; \bm{R}_{\text{v}}, \; \bm{u}_f]^\top \\
+\bm{p} &= [v_P^x, \; v_P^y, \; \omega_P^z, \; v_f^x, \; v_f^y, \; n_x, \; m_{x}]^\top, \\
 \bm{u}_\partial &=  [F_{P}^x, \; F_{P}^y, \; T_{P}^z, \; F_{C}^x, \; F_{C}^y, \; T_{C}^z]^\top, \\
 \bm{y}_\partial &=  [v_{P}^x, \; v_{P}^y, \; \omega_{P}^z, \; v_{C}^x, \; v_{C}^y, \; \omega_{C}^z]^\top.
 \end{align*}
-The state contains the linear and angular velocity $v_P^x, \; v_P^y, \; \omega_P^z$ at point $P$, the deformation velocity $ v_f^x, \; v_f^y$ and the traction and bending stress $n_x, \; m_{xx}$. The boundary input contains the forces and torques acting at the extremities of the beam, while the boundary output contains the velocities at the extremities of the beam.
-Partitioning the $\bm{p}$ system into rigid $\bm{p}_r = [v_P^x, \ v_P^y, \ \omega_P^z]^\top$ and flexible part $\bm{p}_f = [v_f^x, \ v_f^y, \ n_x, \ m_{xx}]^\top$, the mass operator then is formulated as follows
+The state contains the generalized coordinates $\bm{q}$, the linear and angular velocity $v_P^x, \; v_P^y, \; \omega_P^z$ at point $P$, the deformation velocity $ v_f^x, \; v_f^y$ and the traction and bending stress $n_x, \; m_{x}$. The boundary input contains the forces and torques acting at the extremities of the beam, while the boundary output contains the velocities at the extremities of the beam.
+The deformation field has to be constrained, to prevent rigid movement (see Rmk. \ref{rmk:dirich}). The appropriate selection of the boundary condition for the deformation field is an avoidable problem that depends on the particular problem under consideration.  Depending on the application, cantilever or simply supported boundary conditions may be considered (see Sec. \secref{sec:valid})
+\begin{equation*}
+\text{Cantilever}
+\begin{cases}
+u_f^x(x=0) = 0, \\
+u_f^y(x=0) = 0, \\
+\partial_x u_f^y(x=0) = 0, \\
+\end{cases} \qquad 
+\text{Simply supported}
+\begin{cases}
+u_f^x(x=0) = 0, \\
+u_f^y(x=0) = 0, \\
+u_f^y(x=L) = 0, \\
+\end{cases}
+\end{equation*}
+Partitioning the $\bm{p}$ system into rigid $\bm{p}_r = [v_P^x, \ v_P^y, \ \omega_P^z]^\top$ and flexible part $\bm{p}_f = [v_f^x, \ v_f^y, \ n_x, \ m_{x}]^\top$, the mass operator then is formulated as follows
 \begin{equation}
 \label{eq:EB_M}
 \bm{\mathcal{M}} = 
@@ -826,12 +827,12 @@ This two operator play the same role as their previously defined homonyms. The 2
 \end{bmatrix} + 
 \begin{bmatrix}
 0 \\
-\mathbf{B}_{\partial, r} \\ 
-\mathbf{B}_{\partial, f} \\ 
+\mathbf{B}_{r} \\ 
+\mathbf{B}_{f} \\ 
 \end{bmatrix}
- \mathbf{u}_\partial, \\
+\mathbf{u}_\partial, \\
 \mathbf{y}_\partial &= \begin{bmatrix}
-0 \ & \mathbf{B}_{\partial, r}^\top & \mathbf{B}_{\partial, f}^\top  
+0 \ & \mathbf{B}_{r}^\top & \mathbf{B}_{f}^\top  
 \end{bmatrix} \begin{bmatrix}
 \mathbf{q} \\
 {\mathbf{p}}_{r} \\ 
@@ -839,20 +840,23 @@ This two operator play the same role as their previously defined homonyms. The 2
 \end{bmatrix},
 \end{aligned}
 \end{equation}
-where 
+Matrix $\mathbf{B}_{r} = [\mathbf{I}_{3\times 3}, \; \bm\tau_{CP}^\top]$ accounts for the effect of boundary forces to the rigid part. Matrix $\mathbf{B}_{f}$  is the result of the integration by parts
 \begin{align*}
-\mathbf{B}_{\partial, r} &= \begin{bmatrix}
-\mathbf{I}_{3\times 3} & \bm\tau_{CP}^\top \\
-\end{bmatrix} \\
-\mathbf{B}_{\partial, f} &= \begin{bmatrix}
-0_{n_f^{vx} \times 3} & \bm{\phi}_{v_f^x}(L) & 0 & 0 \\
-0_{n_f^{vy} \times 3} & 0 & \bm{\phi}_{v_f^y}(L) & \partial_x \bm{\phi}_{v_f^y}(L) \\
-0_{n_f^{\sigma x} \times 3} & 0 & 0 & 0 \\
-0_{n_f^^{\sigma y} \times 3} & 0 & 0 & 0 \\
+\mathbf{B}_{f} = \begin{bmatrix}
+0_{n_f^{vx} \times 3} & \bm{\phi}_{v_f^x}(L) & 0_{n_f^{vx}} & 0_{n_f^{vx}} \\
+0_{n_f^{vy} \times 3} & 0_{n_f^{vy}} & \bm{\phi}_{v_f^y}(L) & \partial_x \bm{\phi}_{v_f^y}(L) \\
+0_{n_f^{\sigma x} \times 3} & 0_{n_f^{\sigma x}} & 0_{n_f^{\sigma x}} & 0_{n_f^{\sigma x}} \\
+0_{n_f^{\sigma y} \times 3} & 0_{n_f^{\sigma y}} & 0_{n_f^{\sigma y}} & 0_{n_f^{\sigma y}} \\
 \end{bmatrix},
 \end{align*}
-where $\bm{\phi}_{v_f^x}, \ \bm{\phi}_{v_f^y}$ are the shape function for $\bm{v}_f^x, \bm{v}_f^y$.
-
+where $\bm{\phi}_{v_f^x}, \ \bm{\phi}_{v_f^y}$ are the shape function for ${v}_f^x, {v}_f^y$ and $\bm{\phi}_{v_f^x}$. Fields ${v}_f^x, {v}_f^y, n_x, m_x$ are approximated using $n_f^{vx}, n_f^{vy}, n_f^{\sigma x}, n_f^{\sigma y}$ degrees of freedom respectively. System \eqref{eq:EB_sys} can be rewritten compactly as
+\begin{equation}
+\label{eq:beam_discr}
+\begin{aligned}
+\mathbf{E} \dot{\mathbf{e}} &= \mathbf{J}(\mathbf{e}) \mathbf{z}(\mathbf{e}) + \mathbf{B}_\partial \mathbf{u}_\partial\vspace{2mm} \\
+\mathbf{y}_\partial &= \mathbf{B}_\partial^{\top}  \mathbf{z} \\
+\end{aligned}
+\end{equation}
 This model describes the motion of a flexible floating beam that undergoes small deformations. 
 
 \section{Multibody systems in pH form}
@@ -863,13 +867,14 @@ In Sections \secref{sec:pH_fd}, \secref{sec:discr} the pH formulation of a singl
 Consider two geniric pHDAE systems of the form
 \begin{equation}
 \begin{cases}
-\bm{M}_i \dot{\bm{e}}_i = \bm{J}_i \bm{z}_i(\bm{e}_i) + \bm{B}_i^{\text{int}} \bm{u}_i^{\text{int}} + \bm{B}_i^{\text{ext}} \bm{u}_i^{\text{ext}}  \vspace{2mm} \\
-\bm{y}_i = \bm{B}_i^T  \bm{z}_i
+\mathbf{E}_i \dot{\mathbf{e}}_i = \mathbf{J}_i \mathbf{z}_i(\mathbf{e}_i) + \mathbf{B}_i^{\text{int}} \mathbf{u}_i^{\text{int}} + \mathbf{B}_i^{\text{ext}} \mathbf{u}_i^{\text{ext}}  \vspace{2mm} \\
+\mathbf{y}_i^{\text{int}} = \mathbf{B}_i^{\text{int} \top}  \mathbf{z}_i \\
+\mathbf{y}_i^{\text{ext}} = \mathbf{B}_i^{\text{ext} \top}  \mathbf{z}_i \\
 \end{cases} \qquad \forall i = 1, 2.
 \end{equation}
-where $\partial_{\bm{e}_i} {H_i} = \bm{M}_i^\top \bm{z}_i$. Systems of this kind arise from the discretization of formulation \eqref{eq:MFD_pHDAE}. The interconnection uses the internal control $\bm{u}_i^{\text{int}}$. An interconnection is said to be power preserving if and only if the following holds:
+where $\partial_{\mathbf{e}_i} {H_i} = \mathbf{E}_i^\top \mathbf{z}_i$. Systems of this kind arise from the discretization of formulation \eqref{eq:MFD_pHDAE}. The interconnection uses the internal control $\mathbf{u}_i^{\text{int}}$. An interconnection is said to be power preserving if and only if the following holds:
 \begin{equation} \label{eq:int_balance}
-\langle \bm{u}_1^{\text{int}}, \; \bm{y}_1^{\text{int}} \rangle + \langle \bm{u}_2^{\text{int}}, \; \bm{y}_2^{\text{int}} \rangle = 0.
+\langle \mathbf{u}_1^{\text{int}}, \; \mathbf{y}_1^{\text{int}} \rangle + \langle \mathbf{u}_2^{\text{int}}, \; \mathbf{y}_2^{\text{int}} \rangle = 0.
 \end{equation}
 
 The power going out from one system flows in the other in a lossless manner. Two main interconnections of this kind are of interest when coupling system: the gyrator and transformer interconnection.
@@ -877,84 +882,84 @@ The power going out from one system flows in the other in a lossless manner. Two
 \paragraph{Gyrator interconnection}
 The gyrator interconnection reads
 \begin{equation*}
-\bm{u}_1^{\text{int}} = -\bm{C} \bm{y}_2^{\text{int}}, \qquad
-\bm{u}_2^{\text{int}} = \bm{C}^\top \bm{y}_1^{\text{int}}.
+\mathbf{u}_1^{\text{int}} = -\mathbf{C} \mathbf{y}_2^{\text{int}}, \qquad
+\mathbf{u}_2^{\text{int}} = \mathbf{C}^\top \mathbf{y}_1^{\text{int}}.
 \end{equation*}
 This interconnection verifies \eqref{eq:int_balance}. It is easy to verify that from this interconnection, it is obtained
 \begin{align*}
 \begin{bmatrix}
-\bm{M}_1 & 0 \\ 0 & \bm{M}_2 \\
+\mathbf{E}_1 & 0 \\ 0 & \mathbf{E}_2 \\
 \end{bmatrix}
 \begin{bmatrix}
-\dot{\bm{e}}_1 \\ \dot{\bm{e}}_2 \\
+\dot{\mathbf{e}}_1 \\ \dot{\mathbf{e}}_2 \\
 \end{bmatrix} &= 
 \begin{bmatrix}
-\bm{J}_1 & -\bm{B}_1^{\text{int}} \bm{C} \bm{B}_2^{\text{int} \top} \\ 
-\bm{B}_2^{\text{int}} \bm{C} \bm{B}_1^{\text{int} \top}  & \bm{J}_2 \\
+\mathbf{J}_1 & -\mathbf{B}_1^{\text{int}} \mathbf{C} \mathbf{B}_2^{\text{int} \top} \\ 
+\mathbf{B}_2^{\text{int}} \mathbf{C} \mathbf{B}_1^{\text{int} \top}  & \mathbf{J}_2 \\
 \end{bmatrix}
 \begin{bmatrix}
-\bm{z}_1 \\ 
-\bm{z}_2 \\
+\mathbf{z}_1 \\ 
+\mathbf{z}_2 \\
 \end{bmatrix}+ 
 \begin{bmatrix}
-\bm{B}_1^{\text{ext}} & 0 \\ 0 & \bm{B}_2^{\text{ext}} \\
+\mathbf{B}_1^{\text{ext}} & 0 \\ 0 & \mathbf{B}_2^{\text{ext}} \\
 \end{bmatrix} 
 \begin{bmatrix}
-\bm{u}_1^{\text{ext}} \\ \bm{u}_2^{\text{ext}} \\
+\mathbf{u}_1^{\text{ext}} \\ \mathbf{u}_2^{\text{ext}} \\
 \end{bmatrix}  \\
 \begin{bmatrix}
-\bm{y}_1^{\text{ext}} \\ \bm{y}_2^{\text{ext}} \\
+\mathbf{y}_1^{\text{ext}} \\ \mathbf{y}_2^{\text{ext}} \\
 \end{bmatrix}  &= \begin{bmatrix}
-\bm{B}_1^{\text{ext} \top} & 0 \\
-0 & \bm{B}_2^{\text{ext} \top} \\
+\mathbf{B}_1^{\text{ext} \top} & 0 \\
+0 & \mathbf{B}_2^{\text{ext} \top} \\
 \end{bmatrix} \begin{bmatrix}
-\bm{z}_1 \\ 
-\bm{z}_2 \\
+\mathbf{z}_1 \\ 
+\mathbf{z}_2 \\
 \end{bmatrix},
 \end{align*}
-with $H(\bm{e}_1, \bm{e}_2) = H_1(\bm{e}_1) + H_2(\bm{e}_2)$.
+with $H(\mathbf{e}_1, \mathbf{e}_2) = H_1(\mathbf{e}_1) + H_2(\mathbf{e}_2)$.
 
 \paragraph{Transformer interconnection}
 The transformer interconnection reads
 \begin{equation*}
-\bm{u}_1^{\text{int}} = -\bm{C} \bm{u}_2^{\text{int}}, \qquad
-\bm{y}_2^{\text{int}} = \bm{C}^\top \bm{y}_1^{\text{int}}.
+\mathbf{u}_1^{\text{int}} = -\mathbf{C} \mathbf{u}_2^{\text{int}}, \qquad
+\mathbf{y}_2^{\text{int}} = \mathbf{C}^\top \mathbf{y}_1^{\text{int}}.
 \end{equation*}
 Again, this interconnection verifies \eqref{eq:int_balance}. After the interconnection the final system is differential algebraic:
 \begin{align*}
 \begin{bmatrix}
-\bm{M}_1 & 0 & 0 \\ 
-0 & \bm{M}_2 & 0 \\
+\mathbf{E}_1 & 0 & 0 \\ 
+0 & \mathbf{E}_2 & 0 \\
 0 & 0 & 0 \\
 \end{bmatrix}
 \begin{bmatrix}
-\dot{\bm{e}}_1 \\ \dot{\bm{e}}_2 \\ \dot{\bm{\lambda}} \\
+\dot{\mathbf{e}}_1 \\ \dot{\mathbf{e}}_2 \\ \dot{\bm{\lambda}} \\
 \end{bmatrix} &= 
 \begin{bmatrix}
-\bm{J}_1 & 0 & -\bm{B}_1^{\text{int}} \bm{C} \\ 
-0 & \bm{J}_2 & \bm{B}_2^{\text{int}} \\
-\bm{C}^\top \bm{B}_1^{\text{int} \top} & - \bm{B}_2^{\text{int} \top} & 0 \\
+\mathbf{J}_1 & 0 & -\mathbf{B}_1^{\text{int}} \mathbf{C} \\ 
+0 & \mathbf{J}_2 & \mathbf{B}_2^{\text{int}} \\
+\mathbf{C}^\top \mathbf{B}_1^{\text{int} \top} & - \mathbf{B}_2^{\text{int} \top} & 0 \\
 \end{bmatrix}
 \begin{bmatrix}
-\bm{z}_1 \\ 
-\bm{z}_2 \\
+\mathbf{z}_1 \\ 
+\mathbf{z}_2 \\
 \bm{\lambda} \\
 \end{bmatrix}+ 
 \begin{bmatrix}
-\bm{B}_1^{\text{ext}} & 0 \\ 0 & \bm{B}_2^{\text{ext}} \\ 0 & 0 \\
+\mathbf{B}_1^{\text{ext}} & 0 \\ 0 & \mathbf{B}_2^{\text{ext}} \\ 0 & 0 \\
 \end{bmatrix} 
 \begin{bmatrix}
-\bm{u}_1^{\text{ext}} \\ 
-\bm{u}_2^{\text{ext}} \\
+\mathbf{u}_1^{\text{ext}} \\ 
+\mathbf{u}_2^{\text{ext}} \\
 \end{bmatrix} \\
 \begin{bmatrix}
-\bm{y}_1^{\text{ext}} \\ \bm{y}_2^{\text{ext}} \\
+\mathbf{y}_1^{\text{ext}} \\ \mathbf{y}_2^{\text{ext}} \\
 \end{bmatrix}  &= \begin{bmatrix}
-\bm{B}_1^{\text{ext} \top} & 0 & 0 \\
-0 & \bm{B}_2^{\text{ext} \top} & 0 \\
+\mathbf{B}_1^{\text{ext} \top} & 0 & 0 \\
+0 & \mathbf{B}_2^{\text{ext} \top} & 0 \\
 \end{bmatrix} \begin{bmatrix}
-\bm{z}_1 \\ 
-\bm{z}_2 \\
+\mathbf{z}_1 \\ 
+\mathbf{z}_2 \\
 \bm{\lambda} \\
 \end{bmatrix}.
 \end{align*}
@@ -963,20 +968,20 @@ Again, this interconnection verifies \eqref{eq:int_balance}. After the interconn
 
 \subsection{Application to multibody systems of beams}
 \label{sec:int_beams}
-Once a discretized system is obtained by application of a transformer interconnection lossless joints can be introduced. A common example is an hinged link between two beams. In this case the internal variables are
+Once a discretized system is obtained by application of a transformer interconnection lossless joints can be introduced. A common example is an hinged link between two beams. Consider the discretization \eqref{eq:beam_discr}. The boundary control input $\mathbf{u}_{\partial, i}$ may be split interconnection variables and external forcing $\mathbf{u}_{\partial, i} = [\mathbf{u}_i^{\text{int}}; \ \mathbf{u}_i^{\text{ext}}]$. In this case the internal variables are
 \begin{equation*}
 \begin{aligned}
-\bm{u}_1^{\text{int}} &= [F^x_{C_1}, \, F^y_{C_1}]^\top := \bm{F}_{C_1}, \\
-\bm{u}_2^{\text{int}} &= [F^x_{P_2}, \, F^y_{P_2}]^\top := \bm{F}_{P_2},
+\mathbf{u}_1^{\text{int}} &= [F^x_{C_1}, \, F^y_{C_1}]^\top := \mathbf{F}_{C_1}, \\
+\mathbf{u}_2^{\text{int}} &= [F^x_{P_2}, \, F^y_{P_2}]^\top := \mathbf{F}_{P_2},
 \end{aligned} \qquad
 \begin{aligned}
-\bm{y}_1^{\text{int}} &= [v^x_{C_1}, \, v^y_{C_1}]^\top := \bm{v}_{C_1}, \\
-\bm{y}_2^{\text{int}} &= [v^x_{P_2}, \, v^y_{P_2}]^\top := \bm{v}_{P_2}.
+\mathbf{y}_1^{\text{int}} &= [v^x_{C_1}, \, v^y_{C_1}]^\top := \mathbf{v}_{C_1}, \\
+\mathbf{y}_2^{\text{int}} &= [v^x_{P_2}, \, v^y_{P_2}]^\top := \mathbf{v}_{P_2}.
 \end{aligned}
 \end{equation*}
 The interconnection matrix is the relative rotation matrix between the two local frames
 \begin{equation}
-\bm{R}(\theta) = \begin{bmatrix}
+\mathbf{R}(\theta) = \begin{bmatrix}
 \cos(\theta) & - \sin(\theta) \\
 \sin(\theta) & \cos(\theta) \\
 \end{bmatrix}, \qquad 
@@ -988,7 +993,7 @@ The interconnection matrix is the relative rotation matrix between the two local
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=0.45\textwidth]{beam_int.eps} 
-	\includegraphics[width=0.45\textwidth]{block_hinged_beam.eps} 
+	
 	\caption{Two beams interconnected by an hinge }
 	\label{fig:beam_int}
 \end{figure}
@@ -996,8 +1001,8 @@ The interconnection matrix is the relative rotation matrix between the two local
 The transformer interconnection
 \begin{equation}
 \label{eq:int_hinge}
-\bm{F}_{C_1} = -\bm{R}(\theta) \bm{F}_{P_2}, \qquad
-\bm{v}_{P_2} = \bm{R}(\theta)^\top \bm{v}_{C_1}.
+\mathbf{u}_1^{\text{int}} = -\mathbf{R}(\theta) \mathbf{u}_2^{\text{int}}, \qquad
+\mathbf{y}_2^{\text{int}} = \mathbf{R}(\theta)^\top \mathbf{y}_1^{\text{int}},
 \end{equation}
 imposes the constraints on a velocity level and gives rise to a quasi-linear index 2 pHDAE:
 
@@ -1005,117 +1010,160 @@ imposes the constraints on a velocity level and gives rise to a quasi-linear ind
 \label{eq:int_beams}
 \begin{aligned}
 \begin{bmatrix}
-\bm{M}_1 & 0 & 0 \\ 
-0 & \bm{M}_2 & 0 \\
+\mathbf{E}_1 & 0 & 0 \\ 
+0 & \mathbf{E}_2 & 0 \\
 0 & 0 & 0 \\
 \end{bmatrix}
 \begin{bmatrix}
-\dot{\bm{e}}_1 \\ \dot{\bm{e}}_2 \\ \dot{\bm{\lambda}} \\
+\dot{\mathbf{e}}_1 \\ \dot{\mathbf{e}}_2 \\ \dot{\bm{\lambda}} \\
 \end{bmatrix} &= 
 \begin{bmatrix}
-\bm{J}_1(\bm{e}_1) & 0 & -\bm{B}_1^{\text{int}} \bm{R} \\ 
-0 & \bm{J}_2(\bm{e}_2) & \bm{B}_2^{\text{int}} \\
-\bm{R}^\top \bm{B}_1^{\text{int} \top} & - \bm{B}_2^{\text{int} \top} & 0 \\
+\mathbf{J}_1(\mathbf{e}_1) & 0 & -\mathbf{B}_1^{\text{int}} \mathbf{R} \\ 
+0 & \mathbf{J}_2(\mathbf{e}_2) & \mathbf{B}_2^{\text{int}} \\
+\mathbf{R}^\top \mathbf{B}_1^{\text{int} \top} & - \mathbf{B}_2^{\text{int} \top} & 0 \\
 \end{bmatrix}
 \begin{bmatrix}
-\bm{z}_1  \\ 
-\bm{z}_2  \\ 
+\mathbf{z}_1  \\ 
+\mathbf{z}_2  \\ 
 \bm{\lambda} \\
 \end{bmatrix}+ 
 \begin{bmatrix}
-\bm{B}_{\partial 1}^{\text{ext}} & 0 \\ 0 & \bm{B}_{\partial 2}^{\text{ext}} \\ 0 & 0 \\
+\mathbf{B}_{\partial 1}^{\text{ext}} & 0 \\ 0 & \mathbf{B}_{\partial 2}^{\text{ext}} \\ 0 & 0 \\
 \end{bmatrix} 
 \begin{bmatrix}
-\bm{u}_1^{\text{ext}} \\ 
-\bm{u}_2^{\text{ext}} \\
+\mathbf{u}_1^{\text{ext}} \\ 
+\mathbf{u}_2^{\text{ext}} \\
 \end{bmatrix} \\
 \begin{bmatrix}
-\bm{y}_1^{\text{ext}} \\ \bm{y}_2^{\text{ext}} \\
+\mathbf{y}_1^{\text{ext}} \\ \mathbf{y}_2^{\text{ext}} \\
 \end{bmatrix}  &= \begin{bmatrix}
-\bm{B}_{\partial 1}^{\text{ext} \top} & 0 & 0 \\
-0 & \bm{B}_{\partial 2}^{\text{ext} \top} & 0 \\
+\mathbf{B}_{\partial 1}^{\text{ext} \top} & 0 & 0 \\
+0 & \mathbf{B}_{\partial 2}^{\text{ext} \top} & 0 \\
 \end{bmatrix} \begin{bmatrix}
-\bm{z}_1  \\ 
-\bm{z}_2  \\ 
+\mathbf{z}_1  \\ 
+\mathbf{z}_2  \\ 
 \bm{\lambda} \\
 \end{bmatrix}.
 \end{aligned}
 \end{equation}
 
 
-A transformer interconnection is indeed equivalent to a gyrator interconnection of pHDAE systems. It is sufficient to interchange the role of output and input of the second system $\bm{u}_2^{\text{int}} \leftrightarrow \bm{y}_2^{\text{int}}$. The output than plays the role of a Lagrange multiplier.  Thus one may use \textsc{Simulink}$^{\tiny{\textregistered}}$ to interconnect pHDAE using an equivalent gyrator interconnection. \\
- 
-This approach allows the modular construction of systems of arbitrary complexity. Other kind of lossless joints (prismatic, spherical) can be modeled by appropriate interconnections. The system can then be simulated by using specific DAE solvers \cite{daePetzold} or appropriately reduced to get an ordinary differential equation. The port-Hamiltonian structure is preserved if a null space matrix is employed to eliminate the Lagrange multiplier. Consider a generic pHDAE where the differential and algebraic part are explicitly separated
-
+A transformer interconnection is indeed equivalent to a gyrator interconnection of pHDAE systems. It is sufficient to interchange the role of output and input of the second system $\mathbf{u}_2^{\text{int}} \leftrightarrow \mathbf{y}_2^{\text{int}}$. The output than plays the role of a Lagrange multiplier. To illustrate this consider the discretization of the second planar beam system~\eqref{eq:beam_discr} where the input $\mathbf{u}_2^{\text{int}}$ is now considered as Lagrange multiplier ${\bm{\lambda}}_2$ and output $\mathbf{y}_2^{\text{int}}$ plays the role of $\mathbf{u}_2^{\text{int}}$. The discretized system assumes the following differential-algebraic structure
 \begin{equation}
 \begin{aligned}
-\bm{M} \dot{\bm{e}} &=  \bm{J}(\bm{e})\bm{z}(\bm{e}) + \bm{G}^\top(\bm{e}) \bm{\lambda} + \bm{B}\bm{u}, \\ 
-0 &= \bm{G}(\bm{e})\bm{z}(\bm{e}),
+\begin{bmatrix}
+\mathbf{E}_2 & 0 \\
+0 & 0 \\
+\end{bmatrix} \begin{bmatrix}
+\dot{\mathbf{e}}_2 \\
+\dot{\bm{\lambda}}_2 \\
+\end{bmatrix}
+&= \begin{bmatrix}
+\mathbf{J}_2(\mathbf{e}_2) & \mathbf{B}_2^{\text{int}} \\
+-\mathbf{B}_2^{\text{int} \top} & 0\\
+\end{bmatrix} \begin{bmatrix}
+\mathbf{z}_2 \\
+{\bm{\lambda}}_2
+\end{bmatrix} 
++ \begin{bmatrix}
+0 \\
+\mathbf{I}
+\end{bmatrix} \mathbf{u}_2^{\text{int}} + \begin{bmatrix}
+\mathbf{B}_2^{\text{ext}} \\
+0 \\
+\end{bmatrix} \mathbf{u}_2^{\text{ext}}  \vspace{2mm} \\
+\mathbf{y}_2^{\text{int}} &= {\bm{\lambda}}_2 \\
+\mathbf{y}_2^{\text{ext}} &= \mathbf{B}_2^{\text{ext} \top} \mathbf{z}_2 
 \end{aligned}
 \end{equation}
-and matrix $\bm{P}(\bm{e})$ that satisfies 
-\[
-\mathrm{range}\{\bm{P}(\bm{e})\} = \mathrm{null}\{\bm{G}(\bm{e})\},
-\]
-then the admissible variable belongs to the range of $\bm{P}$, considering the transformations $\widehat{\bm{z}} = \bm{P} \bm{z}, \; \widehat{\bm{e}} = \bm{P} \bm{e}$ and pre-multiplying the system by $\bm{P}^\top$ an equivalent ODE is obtained
-\[
-\widehat{\bm{M}}(\widehat{\bm{e}}) \dot{\widehat{\bm{e}}} =  \widehat{\bm{J}}(\widehat{\bm{e}})\widehat{\bm{z}}(\widehat{\bm{e}}) + \widehat{\bm{B}}(\widehat{\bm{e}})\bm{u},
-\]
-with $\widehat{\bm{M}} = \bm{P}^\top \bm{M} \bm{P}, \; \widehat{\bm{J}} = \bm{P}^\top \bm{J} \bm{P}, \; \widehat{\bm{B}} = \bm{P}^\top \bm{B}$. The actual computation of $\bm{P}$ can be obtained by QR decomposition of matrix $\bm{G}$ \cite{nullspaceFlMult}. Once an equivalent ODE formulation is obtained the concepts and ideas presented in \cite{phode_red} can be used to reduce the flexible dynamics.
+This system represent an improper system. Now, the same hinged interconnection can be obtained using a gyrator interconnection
+\begin{equation}
+\label{eq:int_hinge_DAE}
+\mathbf{u}_1^{\text{int}} = -\mathbf{R}(\theta) \mathbf{y}_2^{\text{int}}, \qquad
+\mathbf{u}_2^{\text{int}} = \mathbf{R}(\theta)^\top \mathbf{y}_1^{\text{int}},
+\end{equation}
+The resulting differential-algebraic system is exactly \eqref{eq:int_beams}, which is proper. The equivalence between the two representation is represented in Fig. \ref{fig:beam_int_block}. This approach allows the modular construction of systems of arbitrary complexity. Other kind of lossless joints (prismatic, spherical) can be modeled by appropriate interconnections. The system can then be simulated by using specific DAE solvers \cite{daePetzold}. 
+
+\begin{figure}[t]
+	\centering
+	\includegraphics[height=0.16\textheight]{block_hinged_beam.eps} \hspace{.5cm}
+	\includegraphics[height=0.16\textheight]{block_hinged_beam_DAE.eps} 	
+	\caption{Block diagrams representing the transformer interconnection \eqref{eq:int_hinge} (left) and the equivalent gyrator interconnection \eqref{eq:int_hinge_DAE} (right)}
+	\label{fig:beam_int_block}
+\end{figure}
 
 \subsection{The linear case: sub-structuring and model reduction}
-If the angular velocities and the relative orientations are small then the system may be linearized about a particular geometrical configuration. Omitting the partition related to the generalized coordinates and dividing the system into rigid and flexible dynamics, the resulting equations are then expressed as 
+If the angular velocities and the relative orientations are small then the system may be linearized about a particular geometrical configuration. Omitting the partition related to the generalized coordinates $\mathbf{q}$ and dividing the system into rigid and flexible dynamics, the resulting equations are then expressed as 
 \begin{equation}
 \label{eq:mbd_linear}
 \begin{bmatrix}
-\bm{M}_{rr} & \bm{M}_{rf} & 0 \\ 
-\bm{M}_{fr} & \bm{M}_{ff} & 0 \\
+\mathbf{M}_{rr} & \mathbf{M}_{rf} & 0 \\ 
+\mathbf{M}_{fr} & \mathbf{M}_{ff} & 0 \\
 0 & 0 & 0 \\
 \end{bmatrix}
 \begin{bmatrix}
-\dot{\bm{e}}_r \\ \dot{\bm{e}}_f \\ \dot{\bm{\lambda}} \\ 
+\dot{\mathbf{p}}_r \\ \dot{\mathbf{p}}_f \\ \dot{\bm{\lambda}} \\ 
 \end{bmatrix} = 
 \begin{bmatrix}
-0 & 0 & \bm{G}_r^\top \\ 
-0 & \bm{J}_{ff} & \bm{G}_f^\top \\ 
--\bm{G}_r & -\bm{G}_f & 0 \\
+0 & 0 & \mathbf{G}_r^\top \\ 
+0 & \mathbf{J}_{ff} & \mathbf{G}_f^\top \\ 
+-\mathbf{G}_r & -\mathbf{G}_f & 0 \\
 \end{bmatrix}
 \begin{bmatrix}
-\bm{e}_r \\ \bm{e}_f \\ {\bm{\lambda}} \\ 
+\mathbf{p}_r \\ \mathbf{p}_f \\ {\bm{\lambda}} \\ 
 \end{bmatrix} + 
 \begin{bmatrix}
-\bm{B}_r \\ \bm{B}_f \\ 0 \\
-\end{bmatrix}\bm{u},
+\mathbf{B}_r \\ \mathbf{B}_f \\ 0 \\
+\end{bmatrix}\mathbf{u},
 \end{equation}
-The Hamiltonian is now a quadratic function of the state variables $H = \frac{1}{2} \bm{e}^\top\bm{M}\bm{e}$ \cite{beattie2018linear}.
-The modular construction of complex multi-body systems than is analogous to a sub-structuring technique \cite{substructuring} where the velocities and forces are linked at the interconnection points. Such system can be reduced using Krilov subspace method directly on the DAE formulation \cite{phdae_red}. The basic idea relies on the construction of a subspace $\bm{V}_f^{\text{red}}$ for the vector $\bm{e}_f$ such that $\bm{e}_f \approx \bm{V}_f^{\text{red}} \bm{e}_f^{\text{red}}$. The reduced system then reads
+The Hamiltonian is now a quadratic function of the state variables $H = \frac{1}{2} \mathbf{p}^\top\mathbf{M}\mathbf{p}$ \cite{beattie2018linear}.
+The modular construction of complex multi-body systems then is analogous to a sub-structuring technique \cite{substructuring} where the velocities and forces are linked at the interconnection points. Such system can be reduced using Krylov subspace method directly on the DAE formulation \cite{phdae_red}. The basic idea relies on the construction of a subspace $\mathbf{V}_f^{\text{red}}$ for the vector $\mathbf{p}_f$ such that $\mathbf{p}_f \approx \mathbf{V}_f^{\text{red}} \mathbf{p}_f^{\text{red}}$. The reduced system then reads
 \begin{equation}
 \begin{bmatrix}
-\bm{M}_{rr} & \bm{M}_{rf}^{\text{red}} & 0 \\ 
-\bm{M}_{fr}^{\text{red}} & \bm{M}_{ff}^{\text{red}} & 0 \\
+\mathbf{M}_{rr} & \mathbf{M}_{rf}^{\text{red}} & 0 \\ 
+\mathbf{M}_{fr}^{\text{red}} & \mathbf{M}_{ff}^{\text{red}} & 0 \\
 0 & 0 & 0 \\
 \end{bmatrix}
 \begin{bmatrix}
-\dot{\bm{e}}_r \\ \dot{\bm{e}}_f^{\text{red}} \\ \dot{\bm{\lambda}} \\ 
+\dot{\mathbf{p}}_r \\ \dot{\mathbf{p}}_f^{\text{red}} \\ \dot{\mathbf{\lambda}} \\ 
 \end{bmatrix} = 
 \begin{bmatrix}
-0 & 0 & \bm{G}_r^\top \\ 
-0 & \bm{J}_{ff}^{\text{red}} & \bm{G}_f^{\text{red} \top} \\ 
--\bm{G}_r & -\bm{G}_f^{\text{red}} & 0 \\
+0 & 0 & \mathbf{G}_r^\top \\ 
+0 & \mathbf{J}_{ff}^{\text{red}} & \mathbf{G}_f^{\text{red} \top} \\ 
+-\mathbf{G}_r & -\mathbf{G}_f^{\text{red}} & 0 \\
 \end{bmatrix}
 \begin{bmatrix}
-\bm{e}_r \\ \bm{e}_f^{\text{red}} \\ {\bm{\lambda}} \\ 
+\mathbf{p}_r \\ \mathbf{p}_f^{\text{red}} \\ {\mathbf{\lambda}} \\ 
 \end{bmatrix} + 
 \begin{bmatrix}
-\bm{B}_r \\ \bm{B}_f^{\text{red}} \\ 0 \\
-\end{bmatrix}\bm{u},
+\mathbf{B}_r \\ \mathbf{B}_f^{\text{red}} \\ 0 \\
+\end{bmatrix}\mathbf{u},
 \end{equation}
-where the second equation has been pre-multiplied by $\bm{V}_f^{\text{red} \top}$.  
+where the second row has been pre-multiplied by $\mathbf{V}_f^{\text{red} \top}$. Alternatively, a null space matrix can employed to eliminate the Lagrange multiplier and preserve the port-Hamiltonian structure. Consider the pHDAE \eqref{eq:mbd_linear} where the differential and algebraic part are explicitly separated
+
+\begin{equation}
+\begin{aligned}
+\mathbf{M} \dot{\mathbf{p}} &=  \mathbf{J}\mathbf{p} + \mathbf{G}^\top \bm{\lambda} + \mathbf{B}\mathbf{u}, \\ 
+0 &= \mathbf{G}\mathbf{p},
+\end{aligned}
+\end{equation}
+and a matrix $\mathbf{P}$ that satisfies 
+\[
+\mathrm{range}\{\mathbf{P}\} = \mathrm{null}\{\mathbf{G}\},
+\]
+then the admissible variable belongs to the range of $\mathbf{P}$, considering the transformation $\widehat{\mathbf{p}} = \mathbf{P} \mathbf{p}$ and pre-multiplying the system by $\mathbf{P}^\top$ an equivalent ODE is obtained
+\[
+\widehat{\mathbf{M}} \ \dot{\widehat{\mathbf{p}}} =  \widehat{\mathbf{J}} \ \widehat{\mathbf{p}} + \widehat{\mathbf{B}} \ \mathbf{u},
+\]
+with $\widehat{\mathbf{M}} = \mathbf{P}^\top \mathbf{M} \mathbf{P}, \; \widehat{\mathbf{J}} = \mathbf{P}^\top \mathbf{J} \mathbf{P}, \; \widehat{\mathbf{B}} = \mathbf{P}^\top \mathbf{B}$. The actual computation of $\mathbf{P}$ can be obtained by QR decomposition of matrix $\mathbf{G}$ \cite{nullspaceFlMult}. A pH system in standard form is then obtained considering the variable change $\widehat{\mathbf{x}} = \widehat{\mathbf{M}} \widehat{\mathbf{p}}$
+\[ \dot{\widehat{\mathbf{x}}} =  \widehat{\mathbf{J}} \widehat{\mathbf{Q}}\ \widehat{\mathbf{x}} + \widehat{\mathbf{B}}  \mathbf{u}, \qquad \widehat{\mathbf{Q}}:= \widehat{\mathbf{M}}^{-1}
+\] 
+Once an equivalent ODE formulation is obtained the concepts and ideas presented in \cite{phode_red} can be used to reduce the flexible dynamics.
 
 \section{Validation}
 \label{sec:valid}
 
-In this section numerical simulations are perform to assess the correctness of the proposed formulation. A first example corners the computation of eigenvalues of a four bar mechanics for different geometrical configuration. The second example is a rotating crank-slider. In this case the non-linearities cannot be neglected. The third example is a beam hinged and undergoing external excitations so that the out of plane motion becomes important. The following example make use of Euler Bernoulli beam model \eqref{eq:EB_sys}. To discretized the system Lagrange polynomial of order one are used for $v_f^x$ and $n_x$, while Hermite polynomials are used for $v_f^y$ and $m_{xx}$. This choice ensures the conformity with respect to the differential operator. The Firedrake python library \cite{rathgeber2017firedrake} is employed to construct the finite dimensional discretization.  
+In this section numerical simulations are perform to assess the correctness of the proposed formulation. A first example corners the computation of eigenvalues of a four bar mechanics for different geometrical configuration. The second example is a rotating crank-slider. In this case the non-linearities cannot be neglected. The third example is a beam hinged and undergoing external excitations so that the out of plane motion becomes important. The following examples make use of Euler Bernoulli beam model \eqref{eq:EB_sys}. To discretize the system, Lagrange polynomial of order one are used for $v_f^x$ and $n_x$, while Hermite polynomials are used for $v_f^y$ and $m_{x}$. This choice ensures the conformity with respect to the differential operator. The Firedrake python library \cite{rathgeber2017firedrake} is employed to construct the finite-dimensional discretization.  
 
 \subsection{Linear analysis of a four-bar mechanism}
 
@@ -1144,20 +1192,20 @@ In this section numerical simulations are perform to assess the correctness of t
 	\end{tabular}
 \end{table}
 
-The four-bar mechanism has one degree of freedom and represent a closed chain of rigid body. The data are taken from \cite{KITIS1990267,Chebbi2017} are recalled in Table \ref{tab:data_4bars}. In Fig. \ref{fig:4bars} the mechanism and the corresponding block diagram used for constructing the final pH system are presented. The lumped mass are directly included in the coupler and follower model considering a simple modification to the rigid mass matrix
+The four-bar mechanism has one degree of freedom and represents a closed chain of rigid body. The data are taken from \cite{KITIS1990267,Chebbi2017} are recalled in Table \ref{tab:data_4bars}. In Fig. \ref{fig:4bars} the mechanism and the corresponding block diagram used for constructing the final pH system are presented. The lumped mass are directly included in the coupler and follower model considering a simple modification to the rigid mass matrix
 \begin{equation}
- \bm{M}_{rr}^{i + m_l}[1:2,1:2] = \bm{M}_{rr}^{i}[1:2,1:2] + \bm{I}_{2\times 2} m_l,
+\mathbf{M}_{rr}^{i + m_l}[1:2,1:2] = \mathbf{M}_{rr}^{i}[1:2,1:2] + \mathbf{I}_{2\times 2} m_l,
 \end{equation} 
-where $i=2,3$ denotes the coupler or follower model. Given a certain crank angle $\theta_1$ the relative angles between the different links are found by solving the two kinematic constraint
+where $i=2,3$ denotes the coupler or follower model. Given a certain crank angle $\theta_1$ the relative angles between the different links are found by solving the two kinematic constraints
 \begin{align*}
 L_1 \cos(\theta_1)+ L_2 \cos(\theta_1+\theta_2)+ L_3 \cos(\theta_1+\theta_2+\theta_3) &=L_0, \\
 L_1 \sin(\theta_1)+L_2 \sin(\theta_1+\theta_2)+L_3 \sin(\theta_1+\theta_2+\theta_3) &=0.
 \end{align*} 
-Once the geometrical configuration the transformer interconnection \eqref{eq:int_hinge} is applied to insert a revolute joint between adjacent links. For the deformation field a cantilever condition is imposed for each beam. The resulting system is the constrained to ground by imposing to following equalities
+Once the angles describing the geometrical configuration are known, the transformer interconnection \eqref{eq:int_hinge} is applied to insert a revolute joint between adjacent links. For the deformation field a cantilever condition is imposed for each beam. The resulting system is then constrained to ground by imposing to following equalities
 \begin{equation*}
-\bm{v}_{P_1} = 0, \quad \omega^z_{P_1} = 0, \quad \bm{v}_{C_3} = 0.
+\mathbf{v}_{P_1} = 0, \quad \omega^z_{P_1} = 0, \quad \mathbf{v}_{C_3} = 0.
 \end{equation*}
-The resulting system is expressed in pH form as $\bm{E}\dot{\bm{e}} = \bm{J} \bm{e}$. The eigenfrequencies are then found by solving the generalized eigenvalue problem $\bm{E}\bm{\Phi} = \bm{J} \bm{\Phi \Lambda}$. Since $\bm{J}$ is skew-symmetric the eigenvalues will be imaginary $\bm{\lambda} = j \bm{\Omega}$. The first three pulsations  are reported in \ref{fig:omega_4bars} for different values of the crank angle $\theta_1$. The results match perfectly \cite{KITIS1990267,Chebbi2017}, assessing the validity of the linear model.
+The resulting system is expressed in pH form as $\mathbf{E}\dot{\mathbf{e}} = \mathbf{J} \mathbf{e}$. The eigenfrequencies are then found by solving the generalized eigenvalue problem $\mathbf{E}\bm{\Phi} = \mathbf{J} \bm{\Phi \Lambda}$. Since $\mathbf{J}$ is skew-symmetric the eigenvalues will be imaginary $\bm{\lambda} = j \bm{\Omega}$. The first three pulsations  are reported in Fig. \ref{fig:omega_4bars} for different values of the crank angle $\theta_1$. The results match perfectly \cite{KITIS1990267,Chebbi2017}, assessing the validity of the linear model.
 
 \begin{figure}[tb]
 	\centering
@@ -1180,38 +1228,38 @@ To verify the non-linear planar model a crank-slider rotating at high speed is c
 
 An illustration of the system and the block diagram used to construct the model are provided is Fig. \ref{fig:crsl}. To construct the crank slider a transfomer interconnection is first used to connect the slider to the flexible coupler. The motion of the slider is then computed in the coupler reference frame. Then the sliding constraint, that requires the vertical velocity of the slider to be null in the inertial frame, is imposed as follows
 \[
-0 = \sin(\theta_{P_1}) v^x_{P_2} + \cos(\theta_{P_1}) v^y_{P_2} = \bm{R}_y(\theta_{P_1}) \bm{v}_{P_2},
+0 = \sin(\theta_{P_1}) v^x_{P_2} + \cos(\theta_{P_1}) v^y_{P_2} = \mathbf{R}_y(\theta_{P_1}) \mathbf{v}_{P_2},
 \]
-where $\bm{R}_y$ is the second line of the rotation matrix and $\dot{\theta}_{P_1} = \omega_{P_1}^z$ is the angle defining the orientation of the coupler. The rigid crank velocity at the endpoint  
+where $\mathbf{R}_y$ is the second line of the rotation matrix and $\dot{\theta}_{P_1} = \omega_{P_1}^z$ is the angle defining the orientation of the coupler. The rigid crank velocity at the endpoint  
 \begin{equation*}
-\bm{v}_{\text{cr}}(t) = -\omega_{\text{cr}} L _{\text{cr}} \sin(\omega_{\text{cr}} t) \widehat{\bm{X}} + \omega_{\text{cr}} L _{\text{cr}} \cos(\omega_{\text{cr}} t) \widehat{\bm{Y}}
+\mathbf{v}_{\text{cr}}(t) = -\omega_{\text{cr}} L _{\text{cr}} \sin(\omega_{\text{cr}} t) \widehat{\mathbf{X}} + \omega_{\text{cr}} L _{\text{cr}} \cos(\omega_{\text{cr}} t) \widehat{\mathbf{Y}}
 \end{equation*} 
 has to be written in the coupler reference frame to get the input
 \begin{equation}
-\bm{u}_{\text{cl}} = R(\theta_{P_1})^\top \bm{v}_{\text{cr}}.
+\mathbf{u}_{\text{cl}} = R(\theta_{P_1})^\top \mathbf{v}_{\text{cr}}.
 \end{equation}
 The resulting system is a quasi linear index-2 DAE of the form
 \begin{equation*}
 \begin{bmatrix}
-\bm{M} & 0 & 0 \\
+\mathbf{M} & 0 & 0 \\
 0 & 0 & 0 \\
 0 & 0 & 0 \\
 \end{bmatrix}
 \begin{bmatrix}
-\dot{\bm{e}} \\ \dot{\bm{\lambda}}_0 \\ \dot{\bm{\lambda}}_u \\
+\dot{\mathbf{e}} \\ \dot{\bm{\lambda}}_0 \\ \dot{\bm{\lambda}}_u \\
 \end{bmatrix}= 
 \begin{bmatrix}
-\bm{J}(\bm{e}) & \bm{G}_0^\top(\theta_{P_1}) & \bm{G}_u^\top \\
--\bm{G}_0(\theta_{P_1}) & 0 & 0 \\
--\bm{G}_u & 0 & 0 \\
+\mathbf{J}(\mathbf{e}) & \mathbf{G}_0^\top(\theta_{P_1}) & \mathbf{G}_u^\top \\
+-\mathbf{G}_0(\theta_{P_1}) & 0 & 0 \\
+-\mathbf{G}_u & 0 & 0 \\
 \end{bmatrix}
 \begin{bmatrix}
-\bm{e} \\ \bm{\lambda}_0 \\ \bm{\lambda}_u \\
+\mathbf{e} \\ \bm{\lambda}_0 \\ \bm{\lambda}_u \\
 \end{bmatrix} + 
 \begin{bmatrix}
 0 \\ 0 \\ R(\theta_{P_1})^\top \\
 \end{bmatrix}
-\bm{v}_{\text{cr}}
+\mathbf{v}_{\text{cr}}
 \end{equation*}
 
 
@@ -1223,12 +1271,12 @@ The resulting system is a quasi linear index-2 DAE of the form
 	\label{fig:defM_crsl}
 \end{figure}
 
-Setting properly initial condition is of crucial importance for a DAE solver. For this problem the beam is supposed undeformed at the initial time. The initial conditions for the rigid movement are then found using basic kinematics considerations.  The system is then solved using the IDA algorithm available in the Assimulo library \cite{assimulo}. In Fig. \ref{fig:defM_crsl} the midpoint deformation displacement $u_f^x(L_{\text{cl}/2}),\; u_f^y(L_{\text{cl}/2})$, normalized with respect to the coupler length, is reported. The resulting vertical displacement is in accordance with the results presented in \cite{Ellenbroek2018}. The horizontal displacement exhibits high oscillations because of the higher eigenfrequencies of the longitudinal movement. This is due to the fact that null initial condition, imposed on the deformation \cite{MB_Daepde}. In order to obtain a smoother solution, the initial deformation has to be computed from the rigid initial condition.
+Setting the initial conditions properly is of utmost  importance for a DAE solver. For this problem the beam is supposed undeformed at the initial time. The initial conditions for the rigid movement are then found using basic kinematics considerations.  The system is then solved using the IDA algorithm available in the Assimulo library \cite{assimulo}. In Fig. \ref{fig:defM_crsl} the midpoint deformation displacement $u_f^x(L_{\text{cl}/2}),\; u_f^y(L_{\text{cl}/2})$, normalized with respect to the coupler length, is reported. The resulting vertical displacement is in accordance with the results presented in \cite{Ellenbroek2018}. The horizontal displacement exhibits high oscillations because of the higher eigenfrequencies of the longitudinal movement. This is due to the fact that null initial conditions are imposed on the deformation \cite{MB_Daepde}. In order to obtain a smoother solution, the initial deformation has to be computed from the rigid initial condition.
 
 
 
 \subsection{Hinged spatial beam}
-A spatial beam rotating about a spherical joint is considered. This example was considered in \cite{Cardona2000,Ellenbroek2018}. The physical parameters are briefly recalled in Table \ref{tab:data_3Dbeam}. The spherical joint constraint is imposed by setting to zero the linear velocity, while a cantilever is imposed for the deformation field as the tip is free. For the first $10.2 [\mathrm{s}]$ a torque of 200 $[\mathrm{N/mm}]$ is applied about the vertical axis. Then an impulsive force of $[\mathrm{N}]$ is applied at the tip of the beam, to excite the out-of-plane movement. In Fig. \ref{fig:beam_3D} an illustration of the mechanical model is shown. The system is solved using an implicit Runge-Kutta method of the Radau IIA family. The simulation results, provided in Fig. \ref{fig:H_omega}, corresponds to the kinetic energy and the angular velocity measured in the inertial vertical direction. The result matches with the provided references. Indeed the non linearities associated to the gyroscopic terms are small as the maximum angular velocity is equal to $0.1 \ \mathrm{rad/s} \approx 5 \ \mathrm{deg/s}$. 
+A spatial beam rotating about a spherical joint is considered (see Fig. \ref{fig:beam_3D}). This example was considered in \cite{Cardona2000,Ellenbroek2018}. The physical parameters are briefly recalled in Table \ref{tab:data_3Dbeam}. The spherical joint constraint is imposed by setting to zero the linear velocity, while a cantilever is imposed for the deformation field as the tip is free. For the first $10.2 [\mathrm{s}]$ a torque $ M_z =200 [\mathrm{N/mm}]$ is applied about the vertical axis. Then an impulsive force $ F_z =100 [\mathrm{N}]$ is applied on tip of the beam at $15 [\mathrm{s}]$, to excite the out-of-plane movement. The system is solved using an implicit Runge-Kutta method of the Radau IIA family. The simulation results, provided in Fig. \ref{fig:H_omega}, corresponds to the kinetic energy and the angular velocity measured in the inertial vertical direction. The result matches with the provided references. Indeed the non linearities associated to the gyroscopic terms are small as the maximum angular velocity is equal to $0.1 \ \mathrm{rad/s} \approx 5 \ \mathrm{deg/s}$. 
 
 \begin{figure}[tb]
 	\centering
@@ -1261,7 +1309,9 @@ A spatial beam rotating about a spherical joint is considered. This example was 
 
 
 \section{Conclusion}
-A port-Hamiltonian formulation for the flexible multibody dynamics has been discussed. The proposed methodology, being based on a floating frame formulation, relies on the hypothesis of small deformations. The inclusion of the geometric stiffening is possible and will be investigated. The discretization procedure uses a mixed finite element method, hence, the stress distribution is available without any post-processing. This is a valuable characteristic of this framework as the stress distribution is the most important variable for preliminary analysis of mechanical components. Moreover, this approach allows to include higher dimensional problem easily (e.g. plates, shells). However, the stability and numerical convergence of the associated finite element has to be proved. Another interesting topic is the application of model reduction techniques. While for linear pHDAE systems consolidated methodologies exist, for the general non linear differential-algebraic case, solutions are not yet available. The index reduction strategies for differential algebraic systems can make the problem purely differential, eliminating the issues due to the algebraic part.  The pH framework is well suited for control applications and the incorporation of control strategies is an important topic to be explored in the future.
+A port-Hamiltonian formulation for the flexible multibody dynamics has been discussed. The proposed methodology, being based on a floating frame formulation, relies on the hypothesis of small deformations. However, the geometric stiffening effect can be accounted for by considering a corresponding energy. The discretization procedure uses a mixed finite element method, hence, the stress distribution is available without any post-processing. This is a valuable characteristic of this framework as the stress distribution is the most important variable for preliminary analysis of mechanical components. Moreover, this approach allows to treat models easily (e.g. plates, shells). The construction of complex multibody system under this framework becomes completely modular and well suited for control application.  \\
+Many future directions are to be investigated. Large deformation could be included by employing a substructuring technique \cite{SHABANA_substructure}.
+The stability and numerical convergence of the associated finite element is still to be proved. Another interesting topic is the application of model reduction techniques. While for linear pHDAE systems consolidated methodologies exist, for the general non linear differential-algebraic case, solutions are not yet available. The pH framework is well suited for control applications and the incorporation of control strategies is an important topic to be explored in the future.
 
 
 %\begin{acknowledgements}
@@ -1282,29 +1332,30 @@ a_z & 0 & -a_x \\
 This map allows rewriting the cross product as a matrix vector product $\bm{a}\wedge \bm{b} = \crmat{a}\bm{b}$. The cross product satisfies the anticommutativity property
 \begin{equation}
 \label{eq:anticom}
-	 \crmat{\bm{a}} \bm{b} = - \crmat{\bm{b}} \bm{a}, \qquad \bm{a}, \bm{b} \in \mathbb{R}^3.
+\crmat{\bm{a}} \bm{b} = - \crmat{\bm{b}} \bm{a}, \qquad \bm{a}, \bm{b} \in \mathbb{R}^3.
 \end{equation}
 Furthermore, it satisfies the Jacobi Identity
 \begin{equation}
 \label{eq:jacobi}
 \crmat{\bm{a}} (\crmat{\bm{b}} \bm{c}) + \crmat{\bm{b}} (\crmat{\bm{c}} \bm{a}) + \crmat{\bm{c}} (\crmat{\bm{a}} \bm{b}) = 0, \qquad \bm{a}, \bm{b}, \bm{c} \in \mathbb{R}^3.
 \end{equation}
+\vspace{.5cm}
 In this paper, the adjoint of an operator is used. We recall the necessary definitions
 \begin{definition}
-Given a liner operator $\mathcal{A}: \mathscr{H}^1 \rightarrow \mathscr{H}^2$ between Hilbert spaces the adjoint $\mathcal{A}^*:\mathscr{H}^2\rightarrow~\mathscr{H}^1$ fulfills 
-\begin{equation}
-\langle y, \mathcal{A}x \rangle_{\mathscr{H}^2} = \langle \mathcal{A}^* y, x \rangle_{\mathscr{H}^1}, \qquad x \in \mathscr{H}^1, y \in \mathscr{H}^2.
-\end{equation}
+	Given a liner operator $\mathcal{A}: \mathscr{H}^1 \rightarrow \mathscr{H}^2$ between Hilbert spaces the adjoint $\mathcal{A}^*:\mathscr{H}^2\rightarrow~\mathscr{H}^1$ fulfills 
+	\begin{equation}
+	\langle y, \mathcal{A}x \rangle_{\mathscr{H}^2} = \langle \mathcal{A}^* y, x \rangle_{\mathscr{H}^1}, \qquad x \in \mathscr{H}^1, y \in \mathscr{H}^2.
+	\end{equation}
 \end{definition}
-To illustrate this definition consider the operator $\mathcal{I}^\Omega = \int_\Omega (\cdot) \d\Omega : \mathscr{L}^2(\Omega, \mathbb{R}^3) \rightarrow \mathbb{R}^3$. Given a function $\bm{u} \in \mathscr{L}^2(\Omega, \mathbb{R}^3)$ and a vector $\bm{v} \in \mathbb{R}^3$, then the adjoint operator $(\mathcal{I}^\Omega)^*$ extends the vector $\bm{v}$ as a constant vector field over $\Omega$
+To illustrate this definition, consider the operator $\mathcal{I}^\Omega = \int_\Omega (\cdot) \d\Omega : \mathscr{L}^2(\Omega, \mathbb{R}^3) \rightarrow \mathbb{R}^3$. Given a function $\bm{u} \in \mathscr{L}^2(\Omega, \mathbb{R}^3)$ and a vector $\bm{v} \in \mathbb{R}^3$, then the adjoint operator $(\mathcal{I}^\Omega)^*$ extends the vector $\bm{v}$ as a constant vector field over $\Omega$
 \begin{equation*} 
-	\langle \bm{v}, \mathcal{I}^\Omega \bm{u} \rangle_{\mathbb{R}^3} = \langle (\mathcal{I}^\Omega)^* \bm{v},  \bm{u} \rangle_{\mathscr{L}^2(\Omega, \mathbb{R}^3)}. 
+\langle \bm{v}, \mathcal{I}^\Omega \bm{u} \rangle_{\mathbb{R}^3} = \langle (\mathcal{I}^\Omega)^* \bm{v},  \bm{u} \rangle_{\mathscr{L}^2(\Omega, \mathbb{R}^3)}. 
 \end{equation*}
 \begin{definition}
-An operator $\mathcal{A}: \mathscr{H} \rightarrow \mathscr{H}$ is self-adjoint if it holds
-\begin{equation}
-\langle y, \mathcal{A}x \rangle = \langle \mathcal{A} y, x \rangle, \qquad x, y \in \mathscr{H}
-\end{equation}
+	An operator $\mathcal{A}: \mathscr{H} \rightarrow \mathscr{H}$ is self-adjoint if it holds
+	\begin{equation}
+	\langle y, \mathcal{A}x \rangle = \langle \mathcal{A} y, x \rangle, \qquad x, y \in \mathscr{H}
+	\end{equation}
 \end{definition}
 \begin{definition}
 	An operator $\mathcal{A}: \mathscr{H} \rightarrow \mathscr{H}$ is  skew-adjoint if it holds
@@ -1312,14 +1363,14 @@ An operator $\mathcal{A}: \mathscr{H} \rightarrow \mathscr{H}$ is self-adjoint i
 	\langle y, \mathcal{A}x \rangle = -\langle \mathcal{A} y, x \rangle, \qquad x, y \in \mathscr{H}
 	\end{equation}	
 \end{definition}
-The definition of adjoint requires the specifications of the Hilbert spaces under consideration. Whenever those are unspecified, the notion of formal adjoint is the appropriate one. The formal adjoint respect the integration by parts formula and it is defined only for sufficiently smooth functions with compact support. 
+The definition of adjoint requires the specifications of the Hilbert spaces under consideration. Whenever those are unspecified, the notion of formal adjoint is the appropriate one. The formal adjoint respects the integration by parts formula and it is defined only for sufficiently smooth functions with compact support. 
 
- 
+
 \section*{Appendix B: Detailed derivation of the equation of motions}
 
 The detailed derivation of the pH system \eqref{eq:ph_mfd_all} is here presented. We stick to the notation adopted along the paper. First, let us recall the equations for a floating flexible body reported in \cite{MB_Daepde,simeon2013computational}.
-
-\indent Linear momentum balance:
+\begin{itemize}
+\item Linear momentum balance:
 \begin{equation}
 \label{eq:rig_tr3}
 \begin{split}
@@ -1327,7 +1378,7 @@ The detailed derivation of the pH system \eqref{eq:ph_mfd_all} is here presented
 &\quad + \bm{R} \left\{ -\crmat{\bm{\omega}_P} \crmat{\bm{\omega}_P} \bm{s}_u -  \int_{\Omega} 2 \rho \crmat{\bm{\omega}_P} \dot{\bm{u}}_f \d{\Omega} +  \int_{\Omega} \bm\beta \d{\Omega} +  \int_{\partial \Omega} \bm\tau \d{\Gamma}  \right\} 
 \end{split}
 \end{equation}
-\indent Angular momentum balance:
+\item Angular momentum balance:
 \begin{equation}
 \label{eq:rig_rot3}
 \begin{split}
@@ -1335,19 +1386,20 @@ The detailed derivation of the pH system \eqref{eq:ph_mfd_all} is here presented
 - \int_{\Omega} 2\rho \crmat{\bm{x}+\bm{u}_f} \crmat{\bm\omega_P} \dot{\bm{u}}_f \d{\Omega} + \int_{\Omega}\crmat{\bm{x}+\bm{u}_f} \bm\beta \d{\Omega} + \int_{\partial \Omega}\crmat{\bm{x}+\bm{u}_f} \bm\tau \d{\Gamma} \\
 \end{split}
 \end{equation}
-\indent Flexibility PDE:
+\item Flexibility PDE:
 \begin{equation}
 \label{eq:flex3}
 \rho  {\bm{R}^{\top}} \ ^{i}\ddot{\bm{r}}_P + \rho (\crmat{\dot{\bm\omega}_P} + \crmat{\bm{\omega}_P}\crmat{\bm{\omega}_P})(\bm{x}+\bm{u}_f) + \rho (2 \crmat{\bm{\omega}_P} \dot{\bm{u}}_f + \ddot{\bm{u}}_f) = \Div{\bm\Sigma} + \bm\beta,
 \end{equation}
-Considering that the position of point $P$ $^{i}{\bm{r}}_P$ is computed in the inertial frame and $\bm{v}_P$ in the body frame, it holds $^{i}\dot{\bm{r}}_P = \bm{R} \bm{v}_P$. If this expression is derived then
+\end{itemize}
+The first two equations are written in the inertial frame and so they need to be projected in the body frame. Considering that the position of point $P$, i.e. $^{i}{\bm{r}}_P$, is computed in the inertial frame and $\bm{v}_P$ in the body frame, it holds $^{i}\dot{\bm{r}}_P = \bm{R} \bm{v}_P$. The derivative of this gives
 \begin{equation}
 \label{eq:acc_rP}
 ^{i}\ddot{\bm{r}}_P = \bm{R} \left(\dot{\bm{v}}_P + \crmat{\bm{\omega}_P} \bm{v}_P \right)
 \end{equation}
-If \eqref{eq:acc_rP} is put into \eqref{eq:rig_tr3}, \eqref{eq:rig_rot3}, \eqref{eq:flex3} and premultiplying  Eq. \eqref{eq:rig_tr3} by $\bm{R}^\top$, Eqs. \eqref{eq:rig_tr1} \eqref{eq:rig_rot1}, \eqref{eq:flex1} are obtained.
-
-\indent Linear momentum balance:
+If \eqref{eq:acc_rP} is put into \eqref{eq:rig_tr3}, \eqref{eq:rig_rot3}, \eqref{eq:flex3} and pre-multiplying  Eq. \eqref{eq:rig_tr3} by $\bm{R}^\top$, Eqs. \eqref{eq:rig_tr1} \eqref{eq:rig_rot1}, \eqref{eq:flex1} are obtained.
+\begin{itemize}
+\item Linear momentum balance:
 \begin{equation}
 \label{eq:rig_tr4}
 \begin{split}
@@ -1355,7 +1407,7 @@ If \eqref{eq:acc_rP} is put into \eqref{eq:rig_tr3}, \eqref{eq:rig_rot3}, \eqref
 &\quad - \crmat{\bm{\omega}_P} \crmat{\bm{\omega}_P} \bm{s}_u - \int_{\Omega} 2 \rho \crmat{\bm{\omega}_P} {\bm{v}}_f \d{\Omega} +  \int_{\Omega} \bm\beta \d{\Omega} + \int_{\partial \Omega} \bm\tau \d{\Gamma}.
 \end{split}
 \end{equation}
-\indent Angular momentum balance:
+\item Angular momentum balance:
 \begin{equation}
 \label{eq:rig_rot4}
 \begin{split}
@@ -1363,12 +1415,15 @@ If \eqref{eq:acc_rP} is put into \eqref{eq:rig_tr3}, \eqref{eq:rig_rot3}, \eqref
 - \int_{\Omega} 2\rho \crmat{\bm{x}+\bm{u}_f} \crmat{\bm\omega_P} {\bm{v}}_f \d{\Omega} + \int_{\Omega}\crmat{\bm{x}+\bm{u}_f} \bm\beta \d{\Omega} + \int_{\partial \Omega}\crmat{\bm{x}+\bm{u}_f} \bm\tau \d{\Gamma}. \\
 \end{split}
 \end{equation}
-\indent Flexibility PDE:
+\item Flexibility PDE:
 \begin{equation}
 \label{eq:flex4}
 \rho (\dot{\bm{v}}_P + \crmat{\bm\omega_P} \bm{v}_P) + \rho (\crmat{\dot{\bm\omega}_P} + \crmat{\bm{\omega}_P}\crmat{\bm{\omega}_P})(\bm{x}+\bm{u}_f) + \rho (2 \crmat{\bm{\omega}_P} {\bm{v}}_f + \dot{\bm{v}}_f) = \Div{\bm\Sigma} + \bm\beta,
 \end{equation}
-where $\bm{v}_f = \dot{\bm{u}}_f$. Consider now the term $\crmat{\bm{\omega}_P} (\crmat{\bm{\omega}_P} \bm{s}_u)$, appearing in \eqref{eq:rig_tr4}. Using the anticommutativity \eqref{eq:anticom} and the fact that the cross map is skew-symmetric $\crmat{\bm{a}} = -\crmat{\bm{a}}^\top$ one finds
+where $\bm{v}_f = \dot{\bm{u}}_f$.
+\end{itemize}
+
+Consider now the term $\crmat{\bm{\omega}_P} (\crmat{\bm{\omega}_P} \bm{s}_u)$, appearing in \eqref{eq:rig_tr4}. Using the anticommutativity \eqref{eq:anticom} and the fact that the cross map is skew-symmetric $\crmat{\bm{a}} = -\crmat{\bm{a}}^\top$ one finds
 \begin{align*}
 -\crmat{\bm{\omega}_P} (\crmat{\bm{\omega}_P} \bm{s}_u) = \crmat{\crmat{\bm{s}_u}^\top\bm{\omega}_{P}} \bm{\omega}_{P}.
 \end{align*}
@@ -1382,8 +1437,8 @@ m\dot{\bm{v}}_P + \crmat{\bm{s}_u}^\top \dot{\bm{\omega}}_P +   \int_{\Omega} \r
 \end{equation}
 The terms $\crmat{\bm{s}_u} (\crmat{\bm{\omega}_P} \bm{v}_P), \; 2\rho \crmat{\bm{x}+\bm{u}_f} (\crmat{\bm\omega_P} {\bm{v}}_f)$, appearing in \eqref{eq:rig_rot4} can be rewritten using the Jacobi identity \eqref{eq:jacobi}
 \begin{align}
-	\crmat{\bm{s}_u} (\crmat{\bm{\omega}_P} \bm{v}_P) &= - \crmat{\crmat{\bm{s}_u} \bm{v}_P} \bm{\omega}_P - \crmat{\crmat{\bm{s}_u}^\top \bm{\omega}_P} \bm{v}_P, \\
-	2\rho \crmat{\bm{x}+\bm{u}_f} (\crmat{\bm\omega_P} {\bm{v}}_f) &= - \crmat{2\rho \crmat{\bm{x}+\bm{u}_f} \bm{v}_f} \bm\omega_P - \crmat{2\rho \crmat{\bm{x}+\bm{u}_f}^\top \bm\omega_P} \bm{v}_f
+\crmat{\bm{s}_u} (\crmat{\bm{\omega}_P} \bm{v}_P) &= - \crmat{\crmat{\bm{s}_u} \bm{v}_P} \bm{\omega}_P - \crmat{\crmat{\bm{s}_u}^\top \bm{\omega}_P} \bm{v}_P, \\
+2\rho \crmat{\bm{x}+\bm{u}_f} (\crmat{\bm\omega_P} {\bm{v}}_f) &= - \crmat{2\rho \crmat{\bm{x}+\bm{u}_f} \bm{v}_f} \bm\omega_P - \crmat{2\rho \crmat{\bm{x}+\bm{u}_f}^\top \bm\omega_P} \bm{v}_f
 \end{align}
 Eq. \eqref{eq:rig_rot4} is then rewritten as
 \begin{equation}
@@ -1405,29 +1460,29 @@ Notice that $2 \crmat{\bm{v}_f}\bm{v}_P + 2 \crmat{\bm{v}_P}\bm{v}_f = 0$. Using
 \end{equation}
 Eqs. \eqref{eq:rig_tr5}, \eqref{eq:rig_rot5}, \eqref{eq:flex5} are exactly \eqref{eq:rig_tr2}, \eqref{eq:rig_rot2}, \eqref{eq:flex2}. Now by definitions \eqref{eq:mod_momenta}, \eqref{eq:mod_momentafl}
 \begin{align*}
-	\widetilde{\bm{p}}_t &= m \bm{v}_P + \crmat{\bm{s}_u}^\top \bm\omega_P +2 \int_{\Omega} \rho \bm{v}_f \d{\Omega}, \\
-	\widetilde{\bm{p}}_r &= \crmat{\bm{s}_u} \bm{v}_P + \bm{J}_u \bm\omega_P + 2 \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f} {\bm{v}}_f \d{\Omega}, \\
-	\bm{\mathcal{I}}_{p_f}^\Omega(\cdot) &= \int_{\Omega} \left[ 2 \left(\rho \bm{v}_P + \rho \crmat{\bm{x}+\bm{u}_f}^\top \, \bm\omega_P +\rho \bm{v}_f\right) + \rho \bm{v}_f \right]_\times (\cdot) \d{\Omega}, 
+\widetilde{\bm{p}}_t &= m \bm{v}_P + \crmat{\bm{s}_u}^\top \bm\omega_P +2 \int_{\Omega} \rho \bm{v}_f \d{\Omega}, \\
+\widetilde{\bm{p}}_r &= \crmat{\bm{s}_u} \bm{v}_P + \bm{J}_u \bm\omega_P + 2 \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f} {\bm{v}}_f \d{\Omega}, \\
+\bm{\mathcal{I}}_{p_f}^\Omega(\cdot) &= \int_{\Omega} \left[ 2 \left(\rho \bm{v}_P + \rho \crmat{\bm{x}+\bm{u}_f}^\top \, \bm\omega_P +\rho \bm{v}_f\right) + \rho \bm{v}_f \right]_\times (\cdot) \d{\Omega}, 
 \end{align*}
 Eqs. \eqref{eq:rig_tr3}, \eqref{eq:rig_rot3}, \eqref{eq:flex3} are written as 
 \begin{equation}
 \bm{\mathcal{M}}
 \diff{}{t}
 \begin{bmatrix}
-	\bm{v}_P \\ \bm\omega_P  \\ \bm{v}_f  \\ \bm\Sigma \\
-	\end{bmatrix} = 
-	\begin{bmatrix}
-	 0 & \crmat{\widetilde{\bm{p}}_t} & 0 & 0 \\
-	\crmat{\widetilde{\bm{p}}_t} & \crmat{\widetilde{\bm{p}}_r} & \bm{\mathcal{I}}_{p_f}^\Omega & 0 \\
-	0 & -(\bm{\mathcal{I}}_{p_f}^\Omega)^* & 0 & \Div \\
-	0 & 0 & \Grad & 0 \\
-	\end{bmatrix}
+\bm{v}_P \\ \bm\omega_P  \\ \bm{v}_f  \\ \bm\Sigma \\
+\end{bmatrix} = 
 \begin{bmatrix}
-	\bm{v}_P \\ \bm\omega_P  \\ \bm{v}_f  \\ \bm\Sigma \\
-	\end{bmatrix} - 
-	\begin{bmatrix}
-	0 \\ 0  \\ \delta_{\bm{u}_f}H  \\ 0 \\
-	\end{bmatrix},
+0 & \crmat{\widetilde{\bm{p}}_t} & 0 & 0 \\
+\crmat{\widetilde{\bm{p}}_t} & \crmat{\widetilde{\bm{p}}_r} & \bm{\mathcal{I}}_{p_f}^\Omega & 0 \\
+0 & -(\bm{\mathcal{I}}_{p_f}^\Omega)^* & 0 & \Div \\
+0 & 0 & \Grad & 0 \\
+\end{bmatrix}
+\begin{bmatrix}
+\bm{v}_P \\ \bm\omega_P  \\ \bm{v}_f  \\ \bm\Sigma \\
+\end{bmatrix} - 
+\begin{bmatrix}
+0 \\ 0  \\ \delta_{\bm{u}_f}H  \\ 0 \\
+\end{bmatrix},
 \end{equation} 
 with
 \begin{align*}

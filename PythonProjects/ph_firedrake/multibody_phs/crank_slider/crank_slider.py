@@ -211,7 +211,7 @@ else:
     ewM_B = wp_sol[n_elem - 1, :]
 
 
-path_fig = "/home/a.brugnoli/Plots_Videos/Python/Plots/Multibody_PH/CrankSlider/"
+path_fig = "/home/a.brugnoli/Plots/Python/Plots/Multibody_PH/CrankSlider/"
 fntsize = 16
 
 H_vec = np.zeros((n_ev,))
