@@ -1,0 +1,123 @@
+% !BIB TS-program = biber
+\RequirePackage{filecontents}
+\begin{filecontents*}{\jobname.bib}
+	@thesis{key2,
+		author  = {Doe, John},
+		title   = {My nice thesis 2},
+		school  = {Department of cheese},
+		address = {Switzerland},
+		year    = {2015},
+	}
+	@thesis{key1,
+		author  = {Doe, John},
+		title   = {My nice thesis},
+		school  = {Department of chocolate},
+		address = {Switserland},
+		year    = {2013},
+		note    = {promotor: Francesca},
+	}
+	@article{paper3,
+		author    = {Doe, John}, 
+		title     = {My third paper title}, 
+		journal   = {Journal Name},
+		year      = {2016}, 
+		publisher = {Publisher},
+		address   = {City},
+		number    = {6}, 
+		pages     = {32--46}, 
+		issn      = {1234-5678},
+	}
+	@article{paper2,
+		author    = {Doe, John}, 
+		title     = {My second paper title}, 
+		journal   = {Journal Name},
+		year      = {2015}, 
+		publisher = {Publisher},
+		address   = {City},
+		number    = {5}, 
+		pages     = {32--46}, 
+		issn      = {1234-5678},
+	}
+	@article{paper1,
+		author    = {Doe, John}, 
+		title     = {My first paper title}, 
+		journal   = {Journal Name},
+		year      = {2014}, 
+		publisher = {Publisher},
+		address   = {City},
+		number    = {4}, 
+		pages     = {32--46}, 
+		issn      = {1234-5678},
+	}
+\end{filecontents*}
+
+
+\documentclass[11pt,sans]{moderncv}
+
+\usepackage[%
+backend=biber,
+defernumbers=true,
+sorting=ydnt,         % Sort by year (descending), name, title
+% sorting=none,         % Do not sort at all. All entries are processed in citation order.
+]{biblatex}
+\addbibresource{\jobname.bib} % to use bib file created with filecontents
+
+\makeatletter
+\newcommand{\citesinthissection}[1]{\xdef\@totalcites{#1}}
+% http://tex.stackexchange.com/q/66829/5764
+\newcounter{numbibentries}
+\renewbibmacro*{finentry}{\stepcounter{numbibentries}\finentry}
+% http://tex.stackexchange.com/q/123805/5764
+\defbibenvironment{bibliography}
+{\list
+	{\printtext[labelnumberwidth]{% label format from numeric.bbx
+			\printfield{labelprefix}%
+			\number\numexpr\@totalcites-\abx@field@labelnumber+1\relax}}
+	{\setlength{\topsep}{0pt}% layout parameters from moderncvstyleclassic.sty
+		\setlength{\labelwidth}{\hintscolumnwidth}%
+		\setlength{\labelsep}{\separatorcolumnwidth}%
+		\leftmargin\labelwidth%
+		\advance\leftmargin\labelsep}%
+	\sloppy\clubpenalty4000\widowpenalty4000}
+{\endlist}
+{\item}
+\makeatother
+
+\usepackage[utf8]{inputenc}
+\usepackage[scale=0.75]{geometry}
+
+\moderncvstyle{classic}
+\moderncvcolor{blue}
+
+% personal data
+\name{John}{Doe}
+\title{Resumé title}
+\address{street and number}{postcode city}{country}
+\phone[mobile]{+1~(234)~567~890}
+\phone[fixed]{+2~(345)~678~901}
+\phone[fax]{+3~(456)~789~012}
+\email{john@doe.org}
+\homepage{www.johndoe.com}
+\social[linkedin]{john.doe}
+\social[twitter]{jdoe}
+\social[github]{jdoe}
+\extrainfo{additional information}
+\photo[64pt][0.4pt]{example-image-a}
+\quote{Some quote}
+
+
+
+
+\begin{document}
+	
+	\makecvtitle
+	
+	\nocite{key1,key2}
+	\citesinthissection{2}% There are 2 cites in this section
+	\printbibliography[type=thesis,title={Theses}]
+	
+	\citesinthissection{5}% There are 3 cites in this section + 2 above
+	\nocite{paper1,paper2,paper3}
+	\printbibliography[type=article,title={Papers}]
+	
+\end{document}
