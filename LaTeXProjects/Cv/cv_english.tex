@@ -1,4 +1,3 @@
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % "ModernCV" CV and Cover Letter
 % LaTeX Template
@@ -24,17 +23,78 @@
 %	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
 %----------------------------------------------------------------------------------------
 \documentclass[11pt,a4paper,sans]{moderncv} % Font sizes: 10, 11, or 12; paper sizes: a4paper, letterpaper, a5paper, legalpaper, executivepaper or landscape; font families: sans or roman
-\usepackage[utf8]{inputenc}
-\usepackage[scale=0.75]{geometry}
-%\usepackage[top=0.5cm, bottom=0.5cm, left=1.5cm, right=1.5cm]{geometry} 
-
 
 \moderncvstyle{banking} % CV theme - options include: 'casual' (default), 'classic', 'oldstyle' and 'banking'
 \moderncvcolor{blue} % CV color - options include: 'blue' (default), 'orange', 'green', 'red', 'purple', 'grey' and 'black'
 
+\usepackage[utf8]{inputenc}
+\usepackage[scale=0.8]{geometry}
+%\usepackage[top=0.5cm, bottom=0.5cm, left=1.5cm, right=1.5cm]{geometry} 
+
 %\usepackage[T1]{fontenc}
-\usepackage{parcolumns}
+%\usepackage{parcolumns}
 \usepackage{comment}
+%\usepackage{url}
+
+\patchcmd{\makehead}
+{\hfil}
+{\hspace*{0.15\textwidth}}
+{}
+{}
+\patchcmd{\makehead}
+{\setlength{\makeheaddetailswidth}{0.8\textwidth}}
+{\setlength{\makeheaddetailswidth}{0.67\textwidth}}
+{}
+{}
+\patchcmd{\makehead}
+{\\[2.5em]}
+{\hfil\raisebox{-.7cm}{\framebox{\includegraphics[width=\@photowidth]{\@photo}}}\\[2.5em]}
+{}
+{}
+
+\newcommand*{\httpslink}[2][]{% <=======================================
+	\ifthenelse{\equal{#1}{}}%
+	{\href{https://#2}{#2}}%
+	{\href{https://#2}{#1}}}
+
+\newcommand*{\googlescholarsocialsymbol}  {\includegraphics[width=0.27cm]{logo_scholar}~} % <===================
+\newcommand*{\researchgatesocialsymbol}  {\includegraphics[width=0.27cm]{logo_researchgate}~} % <===================
+
+\makeatletter
+\RenewDocumentCommand{\social}{O{}O{}m}{%
+	\ifthenelse{\equal{#2}{}}%
+	{ 
+		\ifthenelse{\equal{#1}{linkedin}}{\collectionadd[linkedin]{socials}{\protect\httpslink[#3]{www.linkedin.com/in/#3}}}{}%
+		\ifthenelse{\equal{#1}{googlescholar}}{\collectionadd[googlescholar]{socials}{\protect\httpslink[#3]{www.googlescholar.com/profile/#3}}}{}% <================================================================
+		\ifthenelse{\equal{#1}{researchgate}}{\collectionadd[researchgate]{socials}{\protect\httpslink[#3]{www.researchgate.com/profile/#3}}}{}% <================================================================
+		\ifthenelse{\equal{#1}{twitter}} {\collectionadd[twitter]{socials} {\protect\httpslink[#3]{www.twitter.com/#3}}}    {}%
+		\ifthenelse{\equal{#1}{github}}  {\collectionadd[github]{socials}  {\protect\httpslink[#3]{www.github.com/#3}}}     {}%
+	}
+	{\collectionadd[#1]{socials}{\protect\httpslink[#3]{#2}}}}
+\makeatother
+
+\newcommand{\cvdoublecolumn}[2]{%
+	\cvitem[0.75em]{}{%
+		\begin{minipage}[t]{\listdoubleitemcolumnwidth}#1\end{minipage}%
+		\hfill%
+		\begin{minipage}[t]{\listdoubleitemcolumnwidth}#2\end{minipage}%
+	}%
+}
+
+% usage: \cvreference{name}{address line 1}{address line 2}{address line 3}{address line 4}{e-mail address}{phone number}
+% Everything but the name is optional
+% If \addresssymbol, \emailsymbol or \phonesymbol are specified, they will be used.
+% (Per default, \addresssymbol isn't specified, the other two are specified.)
+% If you don't like the symbols, remove them from the following code, including the tilde ~ (space).
+
+\newcommand{\cvreference}[7]{%
+	\textbf{#1}\newline% Name
+	\ifthenelse{\equal{#2}{}}{}{\addresssymbol~#2\newline}%
+	\ifthenelse{\equal{#3}{}}{}{#3\newline}%
+	\ifthenelse{\equal{#4}{}}{}{#4\newline}%
+	\ifthenelse{\equal{#5}{}}{}{#5\newline}%
+	\ifthenelse{\equal{#6}{}}{}{\emailsymbol~\texttt{#6}\newline}%
+	\ifthenelse{\equal{#7}{}}{}{\phonesymbol~#7}}
 
 \makeatletter\renewcommand*{\bibliographyitemlabel}{\@biblabel{\arabic{enumiv}}}\makeatother
 
@@ -45,27 +105,28 @@
 %	NAME AND CONTACT INFORMATION SECTION
 %----------------------------------------------------------------------------------------
 
-\firstname{Andrea} % Your first name
-\familyname{Brugnoli} % Your last name
+\name{Andrea}{Brugnoli}
+%\address{103 rue Bonnat}{Toulouse}{France}% optional, remove / comment the line if not wanted; the "postcode city" and "country" arguments can be omitted or provided empty
+\phone[mobile]{+33~7~50~39~47~27}                   % optional, remove / comment the line if not wanted; the optional "type" of the phone can be "mobile" (default), "fixed" or "fax"
+\email{andrea.brugnoli92@gmail.com}                               % optional, remove / comment the line if not wanted
+%\homepage{www.johndoe.com}                         % optional, remove / comment the line if not wanted
+%\social[linkedin]{john.doe}                        % optional, remove / comment the line if not wanted
+%\social[twitter]{jdoe}                             % optional, remove / comment the line if not wanted
+\social[github]{andreabrugnoli}                              % optional, remove / comment the line if not wanted
+\social[googlescholar][scholar.google.com/citations?user=aze4Eh4AAAAJ&hl=it]{andrea.brugnoli} % <====================================
+\social[researchgate][www.researchgate.net/profile/Andrea_Brugnoli2]{andrea.brugnoli}
+%\extrainfo{additional information}                 % optional, remove / comment the line if not wanted
+\photo[60pt][0.4pt]{Foto_Cv-min}   
 
-%% All information in this block is optional, comment out any lines you don't need
-%\address{Via Ca' del Frate 7 E}{Negrar (VR), Italy 37024}
-%\mobile{(+39) 340 8323361}
-%% \phone{(000) 111 1112}
-%% \fax{(000) 111 1113}
-%\email{brugnoss.ab@gmail.com}
-%% \homepage{staff.org.edu/~jsmith}{staff.org.edu/$\sim$jsmith} % The first argument is the url for the clickable link, the second argument is the url displayed in the template - this allows special characters to be displayed such as the tilde in this example
-%\extrainfo{Skype contact: brugnoss}
-%\photo[70pt][0.4pt]{pictures/Foto_cv} % The first bracket is the picture height, the second is the thickness of the frame around the picture (0pt for no frame)
 
-\AtBeginDocument{\hypersetup{baseurl={}}}
+%\AtBeginDocument{\hypersetup{baseurl={}}}
 
 %----------------------------------------------------------------------------------------
 
 \begin{document}
 
-%\makecvtitle % Print the CV title
-
+\makecvtitle % Print the CV title
+\begin{comment}
 \begin{minipage}{.8\linewidth}
 {\huge{\textsc{Andrea BRUGNOLI}}}
 
@@ -76,52 +137,45 @@
 
 { Andrea.BRUGNOLI@supaero.isae.fr or andrea.brugnoli92@gmail.com}
 
-\vspace{3mm}
-% \homepage{staff.org.edu/~jsmith}{staff.org.edu/$\sim$jsmith} % The first argument is the url for the clickable link, the second argument is the url displayed in the template - this allows special characters to be displayed such as the tilde in this example
-%\end{minipage}
-%\begin{minipage}{.4\linewidth}
+\vspace{1pt}
+\homepage{staff.org.edu/~jsmith}{staff.org.edu/$\sim$jsmith} % The first argument is the url for the clickable link, the second argument is the url displayed in the template - this allows special characters to be displayed such as the tilde in this example
+
 
 \fcolorbox{cyan}{white}{%
-    \parbox{\textwidth}{\textbf{Phd candidate at ISAE-Supaero (Toulouse)} \newline
- \vspace{1mm}
+\parbox{\textwidth}{\textbf{Phd candidate at ISAE-Supaero (Toulouse)} \newline
+\vspace{1mm}
 International spirit, initiative and ability to adapt. Fluent in three languages.
-  }}
+}}
 \end{minipage}
 \begin{minipage}{.2\linewidth}
 \begin{center}
 \includegraphics[width=0.8\linewidth]{Foto_Cv-min.jpg}
 \end{center}
 \end{minipage}
-
-%\vspace{2mm}
-% \textbf{Seeking a job from April 2017 in automatics and optimization.}
+\vspace{3mm}
+\end{comment}
 
 %----------------------------------------------------------------------------------------
 %	EDUCATION SECTION
 %----------------------------------------------------------------------------------------
-
-\vspace{3mm}
-
-
-
 \section{Education}
 
 % usage: \cventry[spacing]{years}{degree/job title}{institution/employer}{localization}{optionnal: grade/...}{optional: comment/job description}
 
 \cventry{October 2017-October 2020}{PhD candidate}{ISAE-Supaero}{Toulouse}{}{A port-Hamiltonian formulation of flexible structures: modelling and symplectic finite element discretization.}
 
-\cventry{2016--2017}{Research Master in automatics and image processing}{Université Paris Saclay/\,Supélec}{Paris/Toulouse}{}{Courses: inverse problem, advanced dynamics of flexible structures, parameter estimation}
+\cventry{2016--2017}{Research Master in automatics and image processing}{Universit\'{e} Paris Saclay/\,Sup\'{e}lec}{Paris/Toulouse}{}{Courses: inverse problem, advanced dynamics of flexible structures, parameter estimation.}
 
-\cventry{2015--2017}{Double degree in aerospace and astronautical engineering}{ISAE-Supaero}{Toulouse}{}{Specialisation in applied mathematics and advanced automatics: multidisciplinary optimisation, high performance computing, control of flexible structures}
-
-
-\cventry{2014--2017}{Master in space engineering}{Politecnico di Milano}{Milano}{\textit{110/110 cum laude} }{
-Courses: orbital mechanics, structural dynamics and control, thermochemical propulsion }
+\cventry{2015--2017}{Double degree in aerospace and astronautical engineering}{ISAE-Supaero}{Toulouse}{}{Specialisation in applied mathematics and advanced automatics: multidisciplinary optimisation, high performance computing, control of flexible structures.}
 
 
-\cventry{2011--2014}{Mechanical Engineering Degree}{Politecnico di Milano}{Milano}{\textit{110/110 cum laude} }{Courses: finite element method, mechanical vibrations, numerical methods for engineering}
+\cventry{2014--2017}{Master in space engineering}{Politecnico di Milano}{Milan}{\textit{110/110 cum laude} }{
+Courses: orbital mechanics, structural dynamics and control, thermochemical propulsion.}
 
-%\cventry{2006--2011}{High school diploma}{Liceo Classico Scipione Maffei}{Verona}{\textit{100/100}}{}
+
+\cventry{2011--2014}{Mechanical Engineering Degree}{Politecnico di Milano}{Milan}{\textit{110/110 cum laude} }{Courses: finite element method, mechanical vibrations, numerical methods for engineering.}
+
+\cventry{2006--2011}{High school diploma}{Liceo Classico Scipione Maffei}{Verona}{\textit{100/100}}{}
 
 \vspace{1mm}
 
@@ -131,28 +185,22 @@ Courses: orbital mechanics, structural dynamics and control, thermochemical prop
 
 \section{Experiences}
 
-\cventry{January 2019, 4 months}{Visiting researcher}{ITA-Instituto Tecnol\'{o}gico de Aeron\'{a}utica}{S\~{a}o Jos\'{e} dos Campos}{}{Collaboration with Flavio Cardoso-Riberio on numerical methods for port-Hamiltonian systems (see References).}
+\cventry{January 2019, 4 months}{Visiting researcher}{ITA-Instituto Tecnol\'{o}gico de Aeron\'{a}utica}{S\~{a}o Jos\'{e} dos Campos}{}{Collaboration with Flavio Cardoso-Riberio on numerical methods for port-Hamiltonian systems.}
 
-\cventry{2017, 6 months}{Internship}{CNES-Centre  des études spatiales}{Toulouse}{}{Analysis of dismissed satellites subject to solar pressure to identify stable pointing configurations and periodical behaviours.}
+\cventry{2017, 6 months}{Internship}{CNES-Centre  des études spatiales}{Toulouse}{}{Analysis of dismissed satellites subjected to solar pressure to identify stable pointing configurations and periodical behaviours.}
 
-\cventry{2016, 5 months}{Industrial and entrepreneurial project}{ISAE-Supaero in partnership with LAAS}{Toulouse}{}{Intelligent teleoperations for micro-drones systems (six people team).}
+\cventry{2016, 5 months}{Industrial and entrepreneurial project}{ISAE-Supaero in partnership with LAAS}{Toulouse}{}{Intelligent teleoperations and optimal control for micro-drones systems (six people team).}
 
-\cventry{2016, 4 months}{Research project}{ISAE-Supaero}{Toulouse}{}{Modular modelling of rigid multibody systems following the logic of Simscape Multibody}
+\cventry{2016, 4 months}{Research project}{ISAE-Supaero}{Toulouse}{}{Modular modelling of rigid multibody systems following the logic of Simscape Multibody.}
 
 %\cventry{2015, 2 months}{Interplanetary transfer}{Politecnico di Milano}{Milano}{}{\' 
 %Study of optimal trajectories with gravity assist to minimise propellant usage. Perturbation analysis on operational orbit.}
 
-\cventry{July 2014, September 2014}{Bachelor project}{Politecnico di Milano in  partnership with Danieli S.p.A}{Milano}{} {Dynamics of a forging manipulator: kinematics modelisation and dynamic analysis. Presented at Danieli.}
+\cventry{2014, 3 months}{Bachelor project}{Politecnico di Milano in  partnership with Danieli S.p.A}{Milan}{} {Dynamics of a forging manipulator: kinematics modelisation and dynamic analysis. Presented at Danieli.}
 
 %\cventry{2014, 3 months}{Fem analysis of a mechanical component}{Politecnico di Milano}{Milano}{}{Implementation on Abaqus, equivalent model coded on Matlab , results validation and comparison.}
 
 %\cventry{}{Horizontal Axis Wind Turbine Design}{Politecnico di Milano}{Milano}{}{General sizing, performances optimization nominal point, performance analysis off design. Team of four. Published on Academia  \textcolor{blue}{\texttt{\href{https://www.academia.edu/9561531/Horizontal_Axis_Wind_Turbine_Design}{Horizontal Axis Wind Turbine Design}}} }
-
-%\nocite{companion,bertram,cicero,augustine}
-
-\nocite{*}
-\bibliographystyle{unsrt}
-\bibliography{cv_bibliography}   
 
 %----------------------------------------------------------------------------------------
 %	COMPUTER SKILLS SECTION
@@ -170,20 +218,20 @@ Courses: orbital mechanics, structural dynamics and control, thermochemical prop
 %----------------------------------------------------------------------------------------
 %	LANGUAGES SECTION
 %----------------------------------------------------------------------------------------
-\begin{minipage}[t]{0.4\linewidth}
+\begin{minipage}[t]{0.44\linewidth}
 \section{Languages}
-\cvitem{English}{fluent (Toeic 965/990 2014)}
+\cvitem{Italian}{native speaker}
+\cvitem{English}{fluent (Toeic 965/990)}
 \cvitem{French}{fluent}
 \cvitem{Spanish}{intermediate}
 \cvitem{Brazilian portuguese}{intermediate}
-\cvitem{Italian}{native speaker}
 \end{minipage}
-\begin{minipage}[t]{0.5\linewidth}
+\begin{minipage}[t]{0.55\linewidth}
 \section{Computer skills}
 \cvitem{Softwares and platforms}{Simulink, Abaqus, Inventor, Solid Works, Labview}
 \cvitem{Languages}{Python (especially FEM librairies: FEniCS and Firedrake), Matlab, Java, C, \LaTeX}
+\cvitem{OS}{Linux environment (Fedora, Ubuntu)}
 \end{minipage}
-
 
 \begin{comment}
 \section{Languages}
@@ -198,16 +246,58 @@ Courses: orbital mechanics, structural dynamics and control, thermochemical prop
 \end{minipage}
 \end{comment}
 
+%----------------------------------------------------------------------------------------
+%	PUBLICATIONS AND REFERENCES SECTION
+%----------------------------------------------------------------------------------------
+
+%\nocite{companion,bertram,cicero,augustine}
+\section{References}
+
+\cvdoublecolumn{
+	\cvreference{Denis Matignon}
+	{Department of Applied Mathematics}
+	{ISAE-Supaero}
+	{Toulouse, 31055 (FR)}
+	{10 Avenue Edouard Belin}
+	{denis.matignon@isae.fr}
+	{0033-661741511}\\[1em]
+	\cvreference{Daniel Alazard}
+	{Department of Space and Aeronautics Vehicle Dynamics}
+	{ISAE-Supaero}
+	{Toulouse, 31055 (FR)}
+	{10 Avenue Edouard Belin}
+	{daniel.alazard@isae.fr}
+	{0033-634981322}\\[1em]
+}
+{\cvreference{Paul Kotyzca}
+	{Department of Mechanical Engineering}
+	{Technical University of Munich}
+	{Munich, 85748 (GE)}
+	{Boltzmannstr. 15}
+	{kotyczka@tum.de}
+	{}\\[1em]
+	\cvreference{Laurent Lef\`{e}vre}
+	{Laboratory for system conception and integration}
+	{Universit\'{e} de Grenoble Alpes, LCIS}
+	{Valence, F26902 (FR)}
+	{50 rue Laffémas}
+	{laurent.lefevre@lcis.grenoble-inp.fr}
+	{}
+}
 
 
+
+\nocite{*}
+\bibliographystyle{unsrt}
+\bibliography{cv_bibliography} 
 %----------------------------------------------------------------------------------------
 %	INTERESTS SECTION
 %----------------------------------------------------------------------------------------
 
 \section{Interests}
 
-\cvitem{}{Tutor of mathematics and physics for first and second year bachelor students}
-\cvitem{}{Tennis, travelling, literature and cinema}
+\cvitem{}{Tutor of mathematics and physics for bachelor students.}
+\cvitem{}{Lindy Hop, tennis, travelling, literature and cinema.}
 
 
 
