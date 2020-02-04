@@ -10,63 +10,51 @@ import matplotlib.pyplot as plt
 import petsc4py
 
 matplotlib.rcParams['text.usetex'] = True
-save_res = False
-bc_input = 'SSSS'
+save_res = True
+bc_input = 'SSSS_grgr'
 
 
 def compute_err(n, r):
 
     h_mesh = 1/n
 
-    E = Constant(136 * 10**9) # Pa
-    rho = Constant(5600)  # kg/m^3
-    nu = Constant(0.3)
-    h = Constant(0.001)
+    # E = Constant(136 * 10**9) # Pa
+    # rho = Constant(5600)  # kg/m^3
+    # nu = Constant(0.3)
+    # h = 0.001
+    # wid = 0.05
+    # Area = Constant(h*wid)
+    # I = Constant(wid*h**3/12)
 
-    Lx = 1
-    Ly = 1
+    E = 1  # Pa
+    rho = 1  # kg/m^3
+    nu = 1
+    h = 1
+    wid = 1
+    Area = 1
+    I = 1
 
-    D = Constant(E * h ** 3 / (1 - nu ** 2) / 12)
-    fl_rot = Constant(12 / (E * h ** 3))
-    # Useful Matrices
+    L = 1
 
     # Operators and functions
-    def gradSym(u):
-        return 0.5 * (nabla_grad(u) + nabla_grad(u).T)
-        # return sym(nabla_grad(u))
-
-    def bending_mom(kappa):
-        momenta = D * ((1 - nu) * kappa + nu * Identity(2) * tr(kappa))
-        return momenta
-
-    def bending_curv(momenta):
-        kappa = fl_rot * ((1+nu)*momenta - nu * Identity(2) * tr(momenta))
-        return kappa
 
     def j_operator(v_p, v_q, e_p, e_q):
 
-        j_form = - inner(grad(grad(v_p)), e_q) * dx \
-        + jump(grad(v_p), n_ver) * dot(dot(e_q('+'), n_ver('+')), n_ver('+')) * dS \
-        + dot(grad(v_p), n_ver) * dot(dot(e_q, n_ver), n_ver) * ds \
-        + inner(v_q, grad(grad(e_p))) * dx \
-        - dot(dot(v_q('+'), n_ver('+')), n_ver('+')) * jump(grad(e_p), n_ver) * dS \
-        - dot(dot(v_q, n_ver), n_ver) * dot(grad(e_p), n_ver) * ds
+        j_form = -v_q.dx(0) * e_p.dx(0) * dx + v_p.dx(0) * e_q.dx(0) * dx
 
         return j_form
 
     # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
 
-    mesh = RectangleMesh(n, n, Lx, Lx, quadrilateral=False)
+    mesh = IntervalMesh(n, L)
 
     # Domain, Subdomains, Boundary, Suboundaries
 
     # Finite element defition
 
-    Vp = FunctionSpace(mesh, 'CG', r)
-    Vq = FunctionSpace(mesh, 'HHJ', r-1)
+    Vp = FunctionSpace(mesh, "CG", r)
+    Vq = FunctionSpace(mesh, "CG", r)
     V = Vp * Vq
-
-    # Vgradp = VectorFunctionSpace(mesh, 'CG', r)
 
     n_Vp = V.sub(0).dim()
     n_Vq = V.sub(1).dim()
@@ -79,8 +67,8 @@ def compute_err(n, r):
     e = TrialFunction(V)
     e_p, e_q = split(e)
 
-    al_p = rho * h * e_p
-    al_q = bending_curv(e_q)
+    al_p = rho * Area * e_p
+    al_q = 1/(E*I) * e_q
 
     dx = Measure('dx')
     ds = Measure('ds')
@@ -88,21 +76,13 @@ def compute_err(n, r):
 
     m_form = inner(v_p, al_p) * dx + inner(v_q, al_q) * dx
 
-    n_ver = FacetNormal(mesh)
-    s_ver = as_vector([-n_ver[1], n_ver[0]])
-
-    # e_mnn = inner(e_q, outer(n_ver, n_ver))
-    # v_mnn = inner(v_q, outer(n_ver, n_ver))
-    #
-    # e_mns = inner(e_q, outer(n_ver, s_ver))
-    # v_mns = inner(v_q, outer(n_ver, s_ver))
-
     j_form = j_operator(v_p, v_q, e_p, e_q)
 
     bcs = []
 
     bc_p = DirichletBC(V.sub(0), Constant(0.0), "on_boundary")
-    bc_q = DirichletBC(V.sub(1), Constant(((0.0, 0.0), (0.0, 0.0))), "on_boundary")
+    # print(bc_p.nodes)
+    bc_q = DirichletBC(V.sub(1), Constant(0.0), "on_boundary")
     bcs.append(bc_p)
     bcs.append(bc_q)
 
@@ -113,23 +93,21 @@ def compute_err(n, r):
     x = mesh.coordinates
 
     beta = 1
-    w_exact = sin(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*sin(beta*t_)
-    grad_wex = as_vector([pi/Lx*cos(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*sin(beta*t_),
-                           pi/Ly*sin(pi*x[0]/Lx)*cos(pi*x[1]/Ly)*sin(beta*t_)])
+    w_exact = sin(pi*x[0]/L)*sin(beta*t_)
+    grad_wex = pi/L*cos(pi*x[0]/L)*sin(beta*t_)
 
-    v_exact = beta * sin(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*cos(beta*t_)
-    grad_vex = as_vector([beta * pi / Lx * cos(pi * x[0] / Lx) * sin(pi * x[1] / Ly) * cos(beta * t_),
-                          beta * pi / Ly * sin(pi * x[0] / Lx) * cos(pi * x[1] / Ly) * cos(beta * t_)])
+    v_exact = beta * sin(pi*x[0]/L)*cos(beta*t_)
+    grad_vex = beta * pi / L * cos(pi * x[0] / L) * cos(beta * t_)
+    dxx_vex = -beta * (pi/L)**2 * sin(pi * x[0] / L) * cos(beta * t_)
 
-    dxx_wex = - (pi/Lx)**2*sin(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*sin(beta*t_)
-    dyy_wex = - (pi/Ly)**2*sin(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*sin(beta*t_)
-    dxy_wex = pi**2/(Lx*Ly)*cos(pi*x[0]/Lx)*cos(pi*x[1]/Ly)*sin(beta*t_)
+    dxx_wex = - (pi/L)**2*sin(pi*x[0]/L)*sin(beta*t_)
+    dxxx_wex = - (pi/L)**3*cos(pi*x[0]/L)*sin(beta*t_)
 
-    sigma_ex = as_tensor([[D * (dxx_wex + nu * dyy_wex), D * (1 - nu) * dxy_wex],
-                          [D * (1 - nu) * dxy_wex, D * (dyy_wex + nu * dxx_wex)]])
+    sigma_ex = E*I*dxx_wex
+    grad_sigex = E * I * dxxx_wex
 
-    force = sin(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*sin(beta*t_)*(D *((pi/Lx)**2 + (pi/Ly)**2)**2 - rho*h*beta**2)
-    force1 = sin(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*sin(beta*t_1)*(D *((pi/Lx)**2 + (pi/Ly)**2)**2 - rho*h*beta**2)
+    force = sin(pi*x[0]/L)*sin(beta*t_)*(E*I * (pi/L)**4 - rho*Area*beta**2)
+    force1 = sin(pi*x[0]/L)*sin(beta*t_1)*(E*I * (pi/L)**4 - rho*Area*beta**2)
 
     f_form = v_p*force*dx
     f_form1 = v_p*force1*dx
@@ -151,7 +129,7 @@ def compute_err(n, r):
     w_n1 = Function(Vp, name="w old")
     w_n = Function(Vp, name="w next")
 
-    e_n.sub(0).assign(interpolate(v_exact, Vp))
+    e_n.sub(0).assign(project(v_exact, Vp))
 
     ep_n, eq_n = e_n.split()
 
@@ -161,18 +139,24 @@ def compute_err(n, r):
 
     w_err_H1 = np.zeros((n_t,))
     v_err_H1 = np.zeros((n_t,))
+    v_err_L2 = np.zeros((n_t,))
+
+    sig_err_H1 = np.zeros((n_t,))
     sig_err_L2 = np.zeros((n_t,))
 
     w_atP = np.zeros((n_t,))
     v_atP = np.zeros((n_t,))
-    Ppoint = (Lx/14, Ly/3)
-    v_atP[0] = ep_n.at(Ppoint)
+    Ppoint = L/6
+    # v_atP[0] = ep_n.at(Ppoint)
 
     # w_err_H1[0] = np.sqrt(assemble(dot(w_n-w_exact, w_n-w_exact) *dx
     #                      + dot(grad(w_n) - grad_wex, grad(w_n) - grad_wex) * dx))
     v_err_H1[0] = np.sqrt(assemble(dot(ep_n - v_exact, ep_n - v_exact) * dx
-                                   + dot(grad(ep_n) - grad_vex, grad(ep_n) - grad_vex) * dx))
+                                   + dot(ep_n.dx(0) - grad_vex, ep_n.dx(0) - grad_vex) * dx))
+    v_err_L2[0] = np.sqrt(assemble(dot(ep_n - v_exact, ep_n - v_exact) * dx))
 
+    sig_err_H1[0] = np.sqrt(assemble(inner(eq_n - sigma_ex, eq_n - sigma_ex) * dx
+                                     + dot(eq_n.dx(0) - grad_sigex, eq_n.dx(0) - grad_sigex) * dx))
     sig_err_L2[0] = np.sqrt(assemble(inner(eq_n - sigma_ex, eq_n - sigma_ex) * dx))
 
     t_vec = np.linspace(0, t_fin, num=n_t)
@@ -184,6 +168,7 @@ def compute_err(n, r):
     #                      'ksp_view': None}
 
     param = {"ksp_type": "preonly", "pc_type": "lu"}
+    # param = {"ksp_type": "gmres", "ksp_gmres_restart":100}
 
     # print(e_n.vector().get_local())
     for i in range(1, n_t):
@@ -192,8 +177,8 @@ def compute_err(n, r):
         t_1.assign(t+dt)
 
         ep_n, eq_n = e_n.split()
-        alp_n = rho * h * ep_n
-        alq_n = bending_curv(eq_n)
+        alp_n = rho * Area * ep_n
+        alq_n = 1./(E*I)*eq_n
 
         # rhs = inner(v_p, alp_n) * dx + inner(v_q, alq_n) * dx \
         #       + dt * (1 - theta) * (- inner(grad(grad(v_p)), eq_n) * dx \
@@ -219,26 +204,31 @@ def compute_err(n, r):
         e_n.assign(e_n1)
         w_n.assign(w_n1)
 
-        w_atP[i] = w_n1.at(Ppoint)
-        v_atP[i] = ep_n1.at(Ppoint)
+        # w_atP[i] = w_n1.at(Ppoint)
+        # v_atP[i] = ep_n1.at(Ppoint)
         t_.assign(t)
+
+        ep_n, eq_n = e_n.split()
 
         # w_err_H1[i] = np.sqrt(assemble(dot(w_n1-w_exact, w_n1-w_exact) * dx
         #                      + dot(grad(w_n1)-grad_wex, grad(w_n1)-grad_wex) * dx))
         v_err_H1[i] = np.sqrt(assemble(dot(ep_n1 - v_exact, ep_n1 - v_exact) * dx
-                                       + dot(grad(ep_n1) - grad_vex, grad(ep_n1) - grad_vex) * dx))
+                                       + dot(ep_n1.dx(0) - grad_vex, ep_n1.dx(0) - grad_vex) * dx))
+        v_err_L2[i] = np.sqrt(assemble(dot(ep_n1 - v_exact, ep_n1 - v_exact) * dx))
 
+        sig_err_H1[i] = np.sqrt(assemble(inner(eq_n1 - sigma_ex, eq_n1 - sigma_ex) * dx
+                                         + dot(eq_n1.dx(0) - grad_sigex, eq_n1.dx(0) - grad_sigex) * dx))
         sig_err_L2[i] = np.sqrt(assemble(inner(eq_n1 - sigma_ex, eq_n1 - sigma_ex) * dx))
 
-    plt.figure()
-    plt.plot(t_vec, w_atP, 'r-', label=r'approx $w$')
-    plt.plot(t_vec, np.sin(pi*Ppoint[0]/Lx)*np.sin(pi*Ppoint[1]/Ly)*np.sin(beta*t_vec), 'b-', label=r'exact $w$')
-    # plt.plot(t_vec, v_atP, 'r-', label=r'approx $v$')
-    # plt.plot(t_vec, beta * np.sin(pi*Ppoint[0]/Lx)*np.sin(pi*Ppoint[1]/Ly) * np.cos(beta * t_vec), 'b-', label=r'exact $v$')
-    plt.xlabel(r'Time [s]')
-    plt.title(r'Displacement at' + str(Ppoint))
-    plt.legend()
-    # plt.show()
+    # plt.figure()
+    # plt.plot(t_vec, w_atP, 'r-', label=r'approx $w$')
+    # plt.plot(t_vec, np.sin(pi*Ppoint/L)*np.sin(beta*t_vec), 'b-', label=r'exact $w$')
+    # # plt.plot(t_vec, v_atP, 'r-', label=r'approx $v$')
+    # # plt.plot(t_vec, beta * np.sin(pi*Ppoint[0]/Lx)*np.sin(pi*Ppoint[1]/Ly) * np.cos(beta * t_vec), 'b-', label=r'exact $v$')
+    # plt.xlabel(r'Time [s]')
+    # plt.title(r'Displacement at' + str(Ppoint))
+    # plt.legend()
+    # # plt.show()
 
     # v_err_last = w_err_H1[-1]
     # v_err_max = max(w_err_H1)
@@ -248,23 +238,32 @@ def compute_err(n, r):
     v_err_max = max(v_err_H1)
     v_err_quad = np.sqrt(np.sum(dt * np.power(v_err_H1, 2)))
 
-    sig_err_last = sig_err_L2[-1]
-    sig_err_max = max(sig_err_L2)
-    sig_err_quad = np.sqrt(np.sum(dt * np.power(sig_err_L2, 2)))
+    sig_err_last = sig_err_H1[-1]
+    sig_err_max = max(sig_err_H1)
+    sig_err_quad = np.sqrt(np.sum(dt * np.power(sig_err_H1, 2)))
+
+    # v_err_last = v_err_L2[-1]
+    # v_err_max = max(v_err_L2)
+    # v_err_quad = np.sqrt(np.sum(dt * np.power(v_err_L2, 2)))
+    #
+    # sig_err_last = sig_err_L2[-1]
+    # sig_err_max = max(sig_err_L2)
+    # sig_err_quad = np.sqrt(np.sum(dt * np.power(sig_err_L2, 2)))
 
     return v_err_last, v_err_max, v_err_quad, sig_err_last, sig_err_max, sig_err_quad
 
 
-n_h = 2
+n_h = 4
 n1_vec = np.array([2**(i+2) for i in range(n_h)])
-n2_vec = np.array([2**(i+1) for i in range(n_h)])
 h1_vec = 1./n1_vec
+
+n2_vec = np.array([2**(i+1) for i in range(n_h)])
 h2_vec = 1./n2_vec
 
 v_err_r1 = np.zeros((n_h,))
 v_errInf_r1 = np.zeros((n_h,))
 v_errQuad_r1 = np.zeros((n_h,))
-
+#
 v_err_r2 = np.zeros((n_h,))
 v_errInf_r2 = np.zeros((n_h,))
 v_errQuad_r2 = np.zeros((n_h,))
@@ -276,7 +275,7 @@ v_errQuad_r3 = np.zeros((n_h,))
 v_r1_atF = np.zeros((n_h-1,))
 v_r1_max = np.zeros((n_h-1,))
 v_r1_L2 = np.zeros((n_h-1,))
-
+#
 v_r2_atF = np.zeros((n_h-1,))
 v_r2_max = np.zeros((n_h-1,))
 v_r2_L2 = np.zeros((n_h-1,))
@@ -343,7 +342,7 @@ for i in range(n_h):
         sig_r3_max[i - 1] = np.log(sig_errInf_r3[i] / sig_errInf_r3[i - 1]) / np.log(h2_vec[i] / h2_vec[i - 1])
         sig_r3_L2[i - 1] = np.log(sig_errQuad_r3[i] / sig_errQuad_r3[i - 1]) / np.log(h2_vec[i] / h2_vec[i - 1])
 
-path_res = "./convergence_results_kirchhoff/"
+path_res = "./convergence_results_bernoulli/"
 if save_res:
     np.save(path_res + bc_input + "_h1", h1_vec)
     np.save(path_res + bc_input + "_h2", h1_vec)
@@ -412,19 +411,20 @@ print("")
 
 plt.figure()
 
-# plt.plot(np.log(h1_vec), np.log(v_r1_atF), ':o', label='HHJ 1')
-plt.plot(np.log(h1_vec), np.log(v_errInf_r1), '-.+', label='HHJ 1 $L^\infty$')
-plt.plot(np.log(h1_vec), np.log(v_errQuad_r1), '--*', label='HHJ 1 $L^2$')
+# plt.plot(np.log(h1_vec), np.log(v_r1_atF), ':o', label='LL 1')
+plt.plot(np.log(h1_vec), np.log(v_errInf_r1), '-.+', label='LL 1 $L^\infty$')
+plt.plot(np.log(h1_vec), np.log(v_errQuad_r1), '--*', label='LL 1 $L^2$')
 plt.plot(np.log(h1_vec), np.log(h1_vec), '-v', label=r'$h$')
 
-# plt.plot(np.log(h1_vec), np.log(v_r2_atF), ':o', label='HHJ 2')
-plt.plot(np.log(h1_vec), np.log(v_errInf_r2), '-.+', label='HHJ 2 $L^\infty$')
-plt.plot(np.log(h1_vec), np.log(v_errQuad_r2), '--*', label='HHJ 2 $L^2$')
+# # plt.plot(np.log(h1_vec), np.log(v_r2_atF), ':o', label='LL 2')
+plt.plot(np.log(h1_vec), np.log(v_errInf_r2), '-.+', label='LL 2 $L^\infty$')
+plt.plot(np.log(h1_vec), np.log(v_errQuad_r2), '--*', label='LL 2 $L^2$')
 plt.plot(np.log(h1_vec), np.log(h1_vec**2), '-v', label=r'$h^2$')
 
-# plt.plot(np.log(h2_vec), np.log(v_r3_atF), ':o', label='HHJ 3')
-plt.plot(np.log(h2_vec), np.log(v_errInf_r3), '-.+', label='HHJ 3 $L^\infty$')
-plt.plot(np.log(h2_vec), np.log(v_errQuad_r3), '--*', label='HHJ 3 $L^2$')
+#
+# # plt.plot(np.log(h2_vec), np.log(v_r3_atF), ':o', label='LL 3')
+plt.plot(np.log(h2_vec), np.log(v_errInf_r3), '-.+', label='LL 3 $L^\infty$')
+plt.plot(np.log(h2_vec), np.log(v_errQuad_r3), '--*', label='LL 3 $L^2$')
 plt.plot(np.log(h2_vec), np.log(h2_vec**3), '-v', label=r'$h^3$')
 
 plt.xlabel(r'log(Mesh size $h$)')
@@ -473,19 +473,19 @@ print("")
 
 plt.figure()
 
-# plt.plot(np.log(h1_vec), np.log(sig_r1_atF), ':o', label='HHJ 1')
-plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+', label='HHJ 1 $L^\infty$')
-plt.plot(np.log(h1_vec), np.log(sig_errQuad_r1), '--*', label='HHJ 1 $L^2$')
+# plt.plot(np.log(h1_vec), np.log(sig_r1_atF), ':o', label='LL 1')
+plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+', label='LL 1 $L^\infty$')
+plt.plot(np.log(h1_vec), np.log(sig_errQuad_r1), '--*', label='LL 1 $L^2$')
 plt.plot(np.log(h1_vec), np.log(h1_vec), '-v', label=r'$h$')
 
-# plt.plot(np.log(h1_vec), np.log(sig_r2_atF), ':o', label='HHJ 2')
-plt.plot(np.log(h1_vec), np.log(sig_errInf_r2), '-.+', label='HHJ 2 $L^\infty$')
-plt.plot(np.log(h1_vec), np.log(sig_errQuad_r2), '--*', label='HHJ 2 $L^2$')
+# # plt.plot(np.log(h1_vec), np.log(sig_r2_atF), ':o', label='LL 2')
+plt.plot(np.log(h1_vec), np.log(sig_errInf_r2), '-.+', label='LL 2 $L^\infty$')
+plt.plot(np.log(h1_vec), np.log(sig_errQuad_r2), '--*', label='LL 2 $L^2$')
 plt.plot(np.log(h1_vec), np.log(h1_vec**2), '-v', label=r'$h^2$')
 
-# plt.plot(np.log(h2_vec), np.log(sig_r3_atF), ':o', label='HHJ 3')
-plt.plot(np.log(h2_vec), np.log(sig_errInf_r3), '-.+', label='HHJ 3 $L^\infty$')
-plt.plot(np.log(h2_vec), np.log(sig_errQuad_r3), '--*', label='HHJ 3 $L^2$')
+# # plt.plot(np.log(h2_vec), np.log(sig_r3_atF), ':o', label='LL 3')
+plt.plot(np.log(h2_vec), np.log(sig_errInf_r3), '-.+', label='LL 3 $L^\infty$')
+plt.plot(np.log(h2_vec), np.log(sig_errQuad_r3), '--*', label='LL 3 $L^2$')
 plt.plot(np.log(h2_vec), np.log(h2_vec**3), '-v', label=r'$h^3$')
 
 plt.xlabel(r'log(Mesh size $h$)')

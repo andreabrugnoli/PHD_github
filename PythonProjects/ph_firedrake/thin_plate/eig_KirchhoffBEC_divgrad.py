@@ -210,7 +210,6 @@ for key,val in bc_dict.items():
             b_vec.append(v_mnn * om_n * ds_t)
 
 
-
 b_u = sum(b_vec)
 
 M = assemble(m_form, mat_type='aij')

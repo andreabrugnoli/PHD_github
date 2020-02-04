@@ -93,10 +93,10 @@ def compute_err(n, r):
     V_pth = VectorFunctionSpace(mesh, "DG", r-1)
     V_skw = FunctionSpace(mesh, "DG", r-1)
 
-    # V_qth1 = FunctionSpace(mesh, "BDM", r)
-    # V_qth2 = FunctionSpace(mesh, "BDM", r)
-    V_qth1 = FunctionSpace(mesh, "RT", r)
-    V_qth2 = FunctionSpace(mesh, "RT", r)
+    V_qth1 = FunctionSpace(mesh, "BDM", r)
+    V_qth2 = FunctionSpace(mesh, "BDM", r)
+    # V_qth1 = FunctionSpace(mesh, "RT", r)
+    # V_qth2 = FunctionSpace(mesh, "RT", r)
     V_qw = FunctionSpace(mesh, "RT", r)
 
     V = MixedFunctionSpace([V_pw, V_pth, V_qth1, V_qth2, V_qw, V_skw])

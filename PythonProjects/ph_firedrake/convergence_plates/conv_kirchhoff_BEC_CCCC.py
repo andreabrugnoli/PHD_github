@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 import petsc4py
 
 matplotlib.rcParams['text.usetex'] = True
-save_res = False
-bc_input = 'SSSS'
+save_res = True
+bc_input = 'CCCC_BJT'
 
 
 def compute_err(n, r):
@@ -25,10 +25,17 @@ def compute_err(n, r):
 
     Lx = 1
     Ly = 1
+    assert Lx==Ly
 
     D = Constant(E * h ** 3 / (1 - nu ** 2) / 12)
     fl_rot = Constant(12 / (E * h ** 3))
-    # Useful Matrices
+
+    # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
+
+    # mesh = RectangleMesh(n_x, n_y, L_x, L_y, quadrilateral=True)
+
+    mesh_int = IntervalMesh(n, Lx)
+    mesh = ExtrudedMesh(mesh_int, n)
 
     # Operators and functions
     def gradSym(u):
@@ -45,28 +52,58 @@ def compute_err(n, r):
 
     def j_operator(v_p, v_q, e_p, e_q):
 
-        j_form = - inner(grad(grad(v_p)), e_q) * dx \
-        + jump(grad(v_p), n_ver) * dot(dot(e_q('+'), n_ver('+')), n_ver('+')) * dS \
-        + dot(grad(v_p), n_ver) * dot(dot(e_q, n_ver), n_ver) * ds \
-        + inner(v_q, grad(grad(e_p))) * dx \
-        - dot(dot(v_q('+'), n_ver('+')), n_ver('+')) * jump(grad(e_p), n_ver) * dS \
-        - dot(dot(v_q, n_ver), n_ver) * dot(grad(e_p), n_ver) * ds
+        n_ver = FacetNormal(mesh)
+        s_ver = as_vector([-n_ver[1], n_ver[0]])
+
+        e_mnn = inner(e_q, outer(n_ver, n_ver))
+        v_mnn = inner(v_q, outer(n_ver, n_ver))
+
+        e_mns = inner(e_q, outer(n_ver, s_ver))
+        v_mns = inner(v_q, outer(n_ver, s_ver))
+
+        # j_graddiv = dot(grad(v_p), div(e_q)) * dx \
+        #             + v_p * dot(grad(e_mns), s_ver) * ds_v \
+        #             + v_p * dot(grad(e_mns), s_ver) * ds_b \
+        #             + v_p * dot(grad(e_mns), s_ver) * ds_t
+        # j_divgrad = - dot(div(v_q), grad(e_p)) * dx \
+        #             - dot(grad(v_mns), s_ver) * e_p * ds_v \
+        #             - dot(grad(v_mns), s_ver) * e_p * ds_b \
+        #             - dot(grad(v_mns), s_ver) * e_p * ds_t
+        #
+        # j_form = j_graddiv + j_divgrad
+
+        j_form = dot(grad(v_p), div(e_q)) * dx - dot(div(v_q), grad(e_p)) * dx
 
         return j_form
-
-    # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
-
-    mesh = RectangleMesh(n, n, Lx, Lx, quadrilateral=False)
 
     # Domain, Subdomains, Boundary, Suboundaries
 
     # Finite element defition
 
-    Vp = FunctionSpace(mesh, 'CG', r)
-    Vq = FunctionSpace(mesh, 'HHJ', r-1)
-    V = Vp * Vq
+    CG_deg1 = FiniteElement("CG", interval, r)
+    DG_deg1 = FiniteElement("DG", interval, r)
 
-    # Vgradp = VectorFunctionSpace(mesh, 'CG', r)
+    DG_deg = FiniteElement("DG", interval, r - 1)
+
+    P_CG1_DG = TensorProductElement(CG_deg1, DG_deg)
+    P_DG_CG1 = TensorProductElement(DG_deg, CG_deg1)
+
+    RT_horiz = HDivElement(P_CG1_DG)
+    RT_vert = HDivElement(P_DG_CG1)
+    RT_quad = RT_horiz + RT_vert
+
+    P_CG1_DG1 = TensorProductElement(CG_deg1, DG_deg1)
+    P_DG1_CG1 = TensorProductElement(DG_deg1, CG_deg1)
+
+    BDM_horiz = HDivElement(P_CG1_DG1)
+    BDM_vert = HDivElement(P_DG1_CG1)
+    BDM_quad = BDM_horiz + BDM_vert
+
+    Vp = FunctionSpace(mesh, "CG", r)
+    VqD = FunctionSpace(mesh, RT_quad)
+    Vq12 = FunctionSpace(mesh, "CG", r)
+
+    V = MixedFunctionSpace([Vp, VqD, Vq12])
 
     n_Vp = V.sub(0).dim()
     n_Vq = V.sub(1).dim()
@@ -74,10 +111,18 @@ def compute_err(n, r):
     print(n_V)
 
     v = TestFunction(V)
-    v_p, v_q = split(v)
+    v_p, v_qD, v_q12 = split(v)
 
     e = TrialFunction(V)
-    e_p, e_q = split(e)
+    e_p, e_qD, e_q12 = split(e)
+
+    v_q = as_tensor([[v_qD[0], v_q12],
+                     [v_q12, v_qD[1]]
+                     ])
+
+    e_q = as_tensor([[e_qD[0], e_q12],
+                     [e_q12, e_qD[1]]
+                     ])
 
     al_p = rho * h * e_p
     al_q = bending_curv(e_q)
@@ -101,10 +146,21 @@ def compute_err(n, r):
 
     bcs = []
 
+    bc_p_l = DirichletBC(V.sub(0), Constant(0.0), 1)
+    bc_p_r = DirichletBC(V.sub(0), Constant(0.0), 2)
+    bc_p_b = DirichletBC(V.sub(0), Constant(0.0), "bottom")
+    bc_p_t = DirichletBC(V.sub(0), Constant(0.0), "top")
+
     bc_p = DirichletBC(V.sub(0), Constant(0.0), "on_boundary")
-    bc_q = DirichletBC(V.sub(1), Constant(((0.0, 0.0), (0.0, 0.0))), "on_boundary")
-    bcs.append(bc_p)
-    bcs.append(bc_q)
+
+    bcs.append(bc_p_l)
+    bcs.append(bc_p_r)
+    bcs.append(bc_p_b)
+    bcs.append(bc_p_t)
+
+    # print(bc_p.nodes)
+    # print(bc_p_l.nodes, bc_p_r.nodes)
+    # print(bc_p_d.nodes, bc_p_u.nodes)
 
     t = 0.
     t_ = Constant(t)
@@ -113,23 +169,29 @@ def compute_err(n, r):
     x = mesh.coordinates
 
     beta = 1
-    w_exact = sin(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*sin(beta*t_)
-    grad_wex = as_vector([pi/Lx*cos(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*sin(beta*t_),
-                           pi/Ly*sin(pi*x[0]/Lx)*cos(pi*x[1]/Ly)*sin(beta*t_)])
+    w_exact = (x[0]**2*(Lx-x[0])**2)*(x[1]**2*(Ly-x[1])**2)*sin(beta*t_)
+    grad_wex = as_vector([2*x[0]*(Lx-x[0])*(Lx-2*x[0])*(x[1]**2*(Ly-x[1])**2)*sin(beta*t_),
+                         (x[0]**2*(Lx-x[0])**2)*2*x[1]*(Ly-x[1])*(Ly-2*x[1])*sin(beta*t_)])
 
-    v_exact = beta * sin(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*cos(beta*t_)
-    grad_vex = as_vector([beta * pi / Lx * cos(pi * x[0] / Lx) * sin(pi * x[1] / Ly) * cos(beta * t_),
-                          beta * pi / Ly * sin(pi * x[0] / Lx) * cos(pi * x[1] / Ly) * cos(beta * t_)])
+    v_exact = beta * (x[0]**2*(Lx-x[0])**2)*(x[1]**2*(Ly-x[1])**2)*cos(beta*t_)
+    grad_vex = as_vector([beta * 2*x[0]*(Lx-x[0])*(Lx-2*x[0])*(x[1]**2*(Ly-x[1])**2) * cos(beta * t_),
+                          beta * (x[0]**2*(Lx-x[0])**2)*2*x[1]*(Ly-x[1])*(Ly-2*x[1]) * cos(beta * t_)])
 
-    dxx_wex = - (pi/Lx)**2*sin(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*sin(beta*t_)
-    dyy_wex = - (pi/Ly)**2*sin(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*sin(beta*t_)
-    dxy_wex = pi**2/(Lx*Ly)*cos(pi*x[0]/Lx)*cos(pi*x[1]/Ly)*sin(beta*t_)
+    dxx_wex = 2*(Lx**2-6*Lx*x[0]+6*x[0]**2)*(x[1]**2*(Ly-x[1])**2)*sin(beta*t_)
+    dyy_wex = (x[0]**2*(Lx-x[0])**2)*2*(Ly**2-6*Ly*x[1]+6*x[1]**2)*sin(beta*t_)
+    dxy_wex = 2*x[0]*(Lx-x[0])*(Lx-2*x[0])*2*x[1]*(Ly-x[1])*(Ly-2*x[1])*sin(beta*t_)
 
     sigma_ex = as_tensor([[D * (dxx_wex + nu * dyy_wex), D * (1 - nu) * dxy_wex],
                           [D * (1 - nu) * dxy_wex, D * (dyy_wex + nu * dxx_wex)]])
 
-    force = sin(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*sin(beta*t_)*(D *((pi/Lx)**2 + (pi/Ly)**2)**2 - rho*h*beta**2)
-    force1 = sin(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*sin(beta*t_1)*(D *((pi/Lx)**2 + (pi/Ly)**2)**2 - rho*h*beta**2)
+    force = -rho*h*beta**2*(x[0]**2*(Lx-x[0])**2)*(x[1]**2*(Ly-x[1])**2)*sin(beta*t_) \
+            + D*(24*(x[1]**2*(Ly-x[1])**2) \
+                 + 8 * (Lx**2-6*Lx*x[0]+6*x[0]**2)*(Ly**2-6*Ly*x[1]+6*x[1]**2) \
+                 + 24*(x[0]**2*(Lx-x[0])**2))*sin(beta*t_)
+    force1 = -rho*h*beta**2*(x[0]**2*(Lx-x[0])**2)*(x[1]**2*(Ly-x[1])**2)*sin(beta*t_1) \
+            + D*(24*(x[1]**2*(Ly-x[1])**2) \
+                 +8*(Lx**2-6*Lx*x[0]+6*x[0]**2)*(Ly**2-6*Ly*x[1]+6*x[1]**2) \
+                 +24*(x[0]**2*(Lx-x[0])**2))*sin(beta*t_1)
 
     f_form = v_p*force*dx
     f_form1 = v_p*force1*dx
@@ -153,15 +215,22 @@ def compute_err(n, r):
 
     e_n.sub(0).assign(interpolate(v_exact, Vp))
 
-    ep_n, eq_n = e_n.split()
+    ep_n, eqD_n, eq12_n = e_n.split()
+
+    eq_n = as_tensor([[eqD_n[0], eq12_n],
+                     [eq12_n, eqD_n[1]]
+                     ])
 
     w_n.assign(Constant(0.0))
 
     n_t = int(floor(t_fin/dt) + 1)
 
-    w_err_H1 = np.zeros((n_t,))
+    # w_err_H1 = np.zeros((n_t,))
+    v_err_L2 = np.zeros((n_t,))
     v_err_H1 = np.zeros((n_t,))
+
     sig_err_L2 = np.zeros((n_t,))
+    sig_err_div = np.zeros((n_t,))
 
     w_atP = np.zeros((n_t,))
     v_atP = np.zeros((n_t,))
@@ -172,7 +241,10 @@ def compute_err(n, r):
     #                      + dot(grad(w_n) - grad_wex, grad(w_n) - grad_wex) * dx))
     v_err_H1[0] = np.sqrt(assemble(dot(ep_n - v_exact, ep_n - v_exact) * dx
                                    + dot(grad(ep_n) - grad_vex, grad(ep_n) - grad_vex) * dx))
+    v_err_L2[0] = np.sqrt(assemble(dot(ep_n - v_exact, ep_n - v_exact) * dx))
 
+    sig_err_div[0] = np.sqrt(assemble(inner(eq_n - sigma_ex, eq_n - sigma_ex) * dx
+                                      +inner(div(eq_n-sigma_ex), div(eq_n-sigma_ex)) * dx))
     sig_err_L2[0] = np.sqrt(assemble(inner(eq_n - sigma_ex, eq_n - sigma_ex) * dx))
 
     t_vec = np.linspace(0, t_fin, num=n_t)
@@ -191,7 +263,12 @@ def compute_err(n, r):
         t_.assign(t)
         t_1.assign(t+dt)
 
-        ep_n, eq_n = e_n.split()
+        ep_n, eqD_n, eq12_n = e_n.split()
+
+        eq_n = as_tensor([[eqD_n[0], eq12_n],
+                          [eq12_n, eqD_n[1]]
+                          ])
+
         alp_n = rho * h * ep_n
         alq_n = bending_curv(eq_n)
 
@@ -212,7 +289,11 @@ def compute_err(n, r):
 
         t += dt
         solve(A, e_n1, b, solver_parameters=param)
-        ep_n1, eq_n1 = e_n1.split()
+        ep_n1, eqD_n1, eq12_n1 = e_n1.split()
+
+        eq_n1 = as_tensor([[eqD_n1[0], eq12_n1],
+                          [eq12_n1, eqD_n1[1]]
+                          ])
 
         w_n1.assign(w_n + dt/2*(ep_n + ep_n1))
 
@@ -227,17 +308,20 @@ def compute_err(n, r):
         #                      + dot(grad(w_n1)-grad_wex, grad(w_n1)-grad_wex) * dx))
         v_err_H1[i] = np.sqrt(assemble(dot(ep_n1 - v_exact, ep_n1 - v_exact) * dx
                                        + dot(grad(ep_n1) - grad_vex, grad(ep_n1) - grad_vex) * dx))
+        v_err_L2[i] = np.sqrt(assemble(dot(ep_n1 - v_exact, ep_n1 - v_exact) * dx))
 
+        sig_err_div[i] = np.sqrt(assemble(inner(eq_n1 - sigma_ex, eq_n1 - sigma_ex) * dx
+                                          + inner(div(eq_n1-sigma_ex), div(eq_n1-sigma_ex)) * dx))
         sig_err_L2[i] = np.sqrt(assemble(inner(eq_n1 - sigma_ex, eq_n1 - sigma_ex) * dx))
 
-    plt.figure()
-    plt.plot(t_vec, w_atP, 'r-', label=r'approx $w$')
-    plt.plot(t_vec, np.sin(pi*Ppoint[0]/Lx)*np.sin(pi*Ppoint[1]/Ly)*np.sin(beta*t_vec), 'b-', label=r'exact $w$')
-    # plt.plot(t_vec, v_atP, 'r-', label=r'approx $v$')
-    # plt.plot(t_vec, beta * np.sin(pi*Ppoint[0]/Lx)*np.sin(pi*Ppoint[1]/Ly) * np.cos(beta * t_vec), 'b-', label=r'exact $v$')
-    plt.xlabel(r'Time [s]')
-    plt.title(r'Displacement at' + str(Ppoint))
-    plt.legend()
+    # plt.figure()
+    # plt.plot(t_vec, w_atP, 'r-', label=r'approx $w$')
+    # plt.plot(t_vec, (Ppoint[0]**2*(Lx-Ppoint[0])**2)*(Ppoint[1]**2*(Ly-Ppoint[1])**2)*np.sin(beta*t_vec), 'b-', label=r'exact $w$')
+    # # plt.plot(t_vec, v_atP, 'r-', label=r'approx $v$')
+    # # plt.plot(t_vec, beta * np.sin(pi*Ppoint[0]/Lx)*np.sin(pi*Ppoint[1]/Ly) * np.cos(beta * t_vec), 'b-', label=r'exact $v$')
+    # plt.xlabel(r'Time [s]')
+    # plt.title(r'Displacement at' + str(Ppoint))
+    # plt.legend()
     # plt.show()
 
     # v_err_last = w_err_H1[-1]
@@ -248,6 +332,14 @@ def compute_err(n, r):
     v_err_max = max(v_err_H1)
     v_err_quad = np.sqrt(np.sum(dt * np.power(v_err_H1, 2)))
 
+    # v_err_last = v_err_L2[-1]
+    # v_err_max = max(v_err_L2)
+    # v_err_quad = np.sqrt(np.sum(dt * np.power(v_err_L2, 2)))
+
+    # sig_err_last = sig_err_div[-1]
+    # sig_err_max = max(sig_err_div)
+    # sig_err_quad = np.sqrt(np.sum(dt * np.power(sig_err_div, 2)))
+
     sig_err_last = sig_err_L2[-1]
     sig_err_max = max(sig_err_L2)
     sig_err_quad = np.sqrt(np.sum(dt * np.power(sig_err_L2, 2)))
@@ -255,7 +347,7 @@ def compute_err(n, r):
     return v_err_last, v_err_max, v_err_quad, sig_err_last, sig_err_max, sig_err_quad
 
 
-n_h = 2
+n_h = 4
 n1_vec = np.array([2**(i+2) for i in range(n_h)])
 n2_vec = np.array([2**(i+1) for i in range(n_h)])
 h1_vec = 1./n1_vec
