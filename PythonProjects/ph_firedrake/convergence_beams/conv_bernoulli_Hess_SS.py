@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 import petsc4py
 
 matplotlib.rcParams['text.usetex'] = True
-save_res = False
-bc_input = 'SSSS_Hess'
+save_res = True
+bc_input = 'SS_Hess'
 
 
 def compute_err(n, r):
@@ -245,9 +245,9 @@ def compute_err(n, r):
     # v_err_max = max(v_err_H1)
     # v_err_quad = np.sqrt(np.sum(dt * np.power(v_err_H1, 2)))
 
-    v_err_last = v_err_H1[-1]
-    v_err_max = max(v_err_H1)
-    v_err_quad = np.sqrt(np.sum(dt * np.power(v_err_H1, 2)))
+    v_err_last = v_err_H2[-1]
+    v_err_max = max(v_err_H2)
+    v_err_quad = np.sqrt(np.sum(dt * np.power(v_err_H2, 2)))
 
     sig_err_last = sig_err_L2[-1]
     sig_err_max = max(sig_err_L2)

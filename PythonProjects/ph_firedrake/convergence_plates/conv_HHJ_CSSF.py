@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import petsc4py
 
 matplotlib.rcParams['text.usetex'] = True
-save_res = True
+save_res = False
 bc_input = 'CSSF'
 
 
@@ -40,30 +40,13 @@ def compute_err(n, r):
 
     h_mesh = 1/n
 
-    E = Constant(136 * 10**9) # Pa
     rho = Constant(5600)  # kg/m^3
-    nu = Constant(0.3)
     h = Constant(0.001)
 
     Lx = 2
     Ly = 2
 
-    D = Constant(E * h ** 3 / (1 - nu ** 2) / 12)
-    fl_rot = Constant(12 / (E * h ** 3))
-    # Useful Matrices
-
-    # Operators and functions
-    def gradSym(u):
-        return 0.5 * (nabla_grad(u) + nabla_grad(u).T)
-        # return sym(nabla_grad(u))
-
-    def bending_mom(kappa):
-        # momenta = D * ((1 - nu) * kappa + nu * Identity(2) * tr(kappa))
-        momenta = kappa
-        return momenta
-
     def bending_curv(momenta):
-        # kappa = fl_rot * ((1+nu)*momenta - nu * Identity(2) * tr(momenta))
         kappa = momenta
         return kappa
 
@@ -104,7 +87,7 @@ def compute_err(n, r):
     e_p, e_q = split(e)
 
     al_p = rho * h * e_p
-    al_q = e_q
+    al_q = bending_curv(e_q)
 
     dx = Measure('dx')
     ds = Measure('ds')
@@ -289,8 +272,6 @@ def compute_err(n, r):
 
     plt.figure()
     wst_atP = interpolate(wst, Vp).at(Ppoint)
-    # plt.plot(t_vec, w_atP, 'r-', label=r'approx $w$')
-    # plt.plot(t_vec, np.sin(pi*Ppoint[0]/Lx)*np.sin(pi*Ppoint[1]/Ly)*np.sin(beta*t_vec), 'b-', label=r'exact $w$')
     vex_atP = wst_atP * beta * np.cos(beta * t_vec)
     plt.plot(t_vec, v_atP, 'r-', label=r'approx $v$')
     plt.plot(t_vec, vex_atP, 'b-', label=r'exact $v$')
@@ -314,7 +295,7 @@ def compute_err(n, r):
     return v_err_last, v_err_max, v_err_quad, sig_err_last, sig_err_max, sig_err_quad
 
 
-n_h = 5
+n_h = 2
 n1_vec = np.array([2**(i+2) for i in range(n_h)])
 n2_vec = np.array([2**(i+1) for i in range(n_h)])
 h1_vec = 1./n1_vec

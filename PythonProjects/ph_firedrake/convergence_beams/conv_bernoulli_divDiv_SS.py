@@ -11,7 +11,7 @@ import petsc4py
 
 matplotlib.rcParams['text.usetex'] = True
 save_res = True
-bc_input = 'SSSS_divDiv'
+bc_input = 'SS_divDiv'
 
 
 def compute_err(n, r):
@@ -80,32 +80,39 @@ def compute_err(n, r):
 
     bcs = []
 
+    bc_p = DirichletBC(V.sub(1), Constant(0.0), "on_boundary")
+    # print(bc_p.nodes)
+    # bc_q = DirichletBC(V.sub(1), Constant(((0.0, 0.0), (0.0, 0.0))), "on_boundary")
+    bcs.append(bc_p)
+    # bcs.append(bc_q)
+
     t = 0.
     t_ = Constant(t)
     t_1 = Constant(t)
-    t_fin = 1        # total simulation time
+    t_fin = 1  # total simulation time
     x = mesh.coordinates
 
     beta = 1
-    w_exact = (x[0]**2*(L-x[0])**2)*(exp(beta*t_)-1)
-    grad_wex = 2*x[0]*(L-x[0])*(L-2*x[0])*(exp(beta*t_)-1)
+    w_exact = sin(pi * x[0] / L) * sin(beta * t_)
+    grad_wex = pi / L * cos(pi * x[0] / L) * sin(beta * t_)
 
-    v_exact = beta * (x[0]**2*(L-x[0])**2)*exp(beta*t_)
-    grad_vex = beta * 2*x[0]*(L-x[0])*(L-2*x[0]) * exp(beta*t_)
-    dxx_vex = beta * 2 * (L-6*L*x[0]+6*x[0]**2) * exp(beta*t_)
+    v_exact = beta * sin(pi * x[0] / L) * cos(beta * t_)
+    grad_vex = beta * pi / L * cos(pi * x[0] / L) * cos(beta * t_)
+    dxx_vex = -beta * (pi / L) ** 2 * sin(pi * x[0] / L) * cos(beta * t_)
 
-    dxx_wex = 2 * (L-6*L*x[0]+6*x[0]**2) * (exp(beta*t_)-1)
-    dxxx_wex = 12 * (2*x[0]-L) * (exp(beta * t_) - 1)
+    dxx_wex = - (pi / L) ** 2 * sin(pi * x[0] / L) * sin(beta * t_)
+    dxxx_wex = - (pi / L) ** 3 * cos(pi * x[0] / L) * sin(beta * t_)
+    dxxxx_wex = (pi / L) ** 4 * sin(pi * x[0] / L) * sin(beta * t_)
 
-    sigma_ex = E*I*dxx_wex
+    sigma_ex = E * I * dxx_wex
     grad_sigex = E * I * dxxx_wex
-    dxx_sigex = E * I * 24 * (exp(beta * t_) - 1)
+    dxx_sigex = E * I * dxxxx_wex
 
-    force = rho*Area*beta**2*(x[0]**2*(L-x[0])**2)*exp(beta*t_) + E*I*24*(exp(beta*t_)-1)
-    force1 = rho*Area*beta**2*(x[0]**2*(L-x[0])**2)*exp(beta*t_1) + E*I*24*(exp(beta*t_1)-1)
+    force = sin(pi * x[0] / L) * sin(beta * t_) * (E * I * (pi / L) ** 4 - rho * Area * beta ** 2)
+    force1 = sin(pi * x[0] / L) * sin(beta * t_1) * (E * I * (pi / L) ** 4 - rho * Area * beta ** 2)
 
-    f_form = v_p*force*dx
-    f_form1 = v_p*force1*dx
+    f_form = v_p * force * dx
+    f_form1 = v_p * force1 * dx
 
     # J = assemble(j_form)
     # M = assemble(m_form)
@@ -247,7 +254,7 @@ def compute_err(n, r):
     sig_err_quad = np.sqrt(np.sum(dt * np.power(sig_err_H2, 2)))
 
     return v_err_last, v_err_max, v_err_quad, sig_err_last, sig_err_max, sig_err_quad
-0
+
 
 n_h = 6
 n1_vec = np.array([2**(i+2) for i in range(n_h)])

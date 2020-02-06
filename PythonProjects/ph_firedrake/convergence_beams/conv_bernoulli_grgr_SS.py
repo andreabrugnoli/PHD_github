@@ -11,7 +11,7 @@ import petsc4py
 
 matplotlib.rcParams['text.usetex'] = True
 save_res = True
-bc_input = 'SSSS_grgr'
+bc_input = 'SS_grgr'
 
 
 def compute_err(n, r):
@@ -253,7 +253,7 @@ def compute_err(n, r):
     return v_err_last, v_err_max, v_err_quad, sig_err_last, sig_err_max, sig_err_quad
 
 
-n_h = 4
+n_h = 6
 n1_vec = np.array([2**(i+2) for i in range(n_h)])
 h1_vec = 1./n1_vec
 

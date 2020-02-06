@@ -1,0 +1,226 @@
+\chapter{TITOP theory}
+
+
+\section{Inversion of TITOP models}
+\label{chap:appendix1}
+Let us consider a square (same number of inputs and outputs) linear system G(s) with order n and m channels (i.e., m inputs and m outputs). A state-space realization of the system $\mathbf{G}(s)$ is a set of four matrices $\mathbf{A}_{n\times n}$, $\mathbf{B}_{n\times m}$, $\mathbf{C}_{m\times n}$, and $\mathbf{D}_{m\times m}$ such that
+\begin{equation}
+	\mathbf{G}(s) = \mathbf{D}+ \mathbf{C}\left(s\mathbf{I}_n-\mathbf{A}\right)^{-1}\mathbf{B}
+\end{equation}
+The matrix $\mathbf{M}(\mathbf{I},\mathbf{J})$ (corresponding to the subsystem $\mathbf{G}_{\mathbf{I},\mathbf{J}}(s)$) denotes the system $\mathbf{G}(s)$ restricted to the rows ordered in vector $\mathbf{I}$ and the columns ordered in vector $\mathbf{J}$. 
+
+\paragraph{Single-channel inversion}
+
+The system corresponding to the inversion of the $i$-th channel of the system $\mathbf{G}(s)$ ($i\in\left[1,m\right]$) is denoted $G^{-1i}(s)$. Let $\mathbf{J}$ be the vector of indexes from 1 to $m$ without $i$:
+$\mathbf{J} = \left[1,\dots,i-1,i+1,\dots,m\right]$. If $\mathbf{D}\left(i,i\right)\neq 0$, let define $f_i = \mathbf{D}^{-1}\left(1,1\right)$.
+The inversion of the channel $i$ is made in two steps \cite{chebbi2016linear}:
+\begin{enumerate}
+	\item Compute the intermediate inverse system
+		\begin{equation}
+			\tilde{G}^{-1i}(s)=\left[\begin{array}{c|c} \mathbf{A} - f_i\mathbf{B}(:,i)\mathbf{C}(i,:) & \left[\begin{array}{cc}
+			\mathbf{B}(:,\mathbf{J})-f_i\mathbf{B(:,i)}\mathbf{D}(i,\mathbf{J}) & f_i\mathbf{B}(:,i)
+			\end{array}\right] \\ \hline
+			\left[\begin{array}{c}
+				\mathbf{C}(\mathbf{J},:)-f_i\mathbf{D}(\mathbf{J},i)\mathbf{C}(i,:)\\ -f_i\mathbf{C}(i,:)
+			\end{array}\right] & \left[\begin{array}{cc}
+			\mathbf{D}(\mathbf{J},\mathbf{J})-f_i\mathbf{D}(\mathbf{J},i)\mathbf{D}(i,\mathbf{J}) & f_i\mathbf{D}(\mathbf{J},i) \\
+			-f_i\mathbf{D}(i,\mathbf{J}) & f_i
+\end{array}\right]			 
+			\end{array}\right].
+		\end{equation}
+		Note that in $\tilde{G}^{-1i}(s)$ the $i$-th inverted channel appears on the last channel.
+	\item Reorder the channels using the vector of indexes $\mathbf{K}=\left[1,\dots,i-1,m,i+1,\dots,m-1\right]$, and then
+	\begin{equation}
+		\mathbf{G}^{-1i}(s) = \tilde{\mathbf{G}} ^{-1i}_{\mathbf{K},\mathbf{K}}(s)
+	\end{equation}
+\end{enumerate}
+
+\section[Beam Element]{Mass and kinetic matrices for the uniform beam element}
+\label{chap:appendix2}
+
+\begin{equation}
+	\mathbf{M}_e = \frac{\rho S L}{420}\begin{bmatrix}156 & 22L & 54 & -13L \\ 
+																							22L & 4L^2 & 13L & -3L^2 \\
+																							54 & 13L & 156 & -22L \\
+																							-13L & -3L^2 & -22L & 4L^2 \end{bmatrix},	\label{eq:beam_mass}
+\end{equation}
+\begin{equation}
+	\mathbf{K}_e = \frac{E J}{L^3}\begin{bmatrix}12 & 6L & -12 & 6L \\ 
+																																										 6L & 4L^2 & -6L & 2L^2 \\
+																																										 -12 & -6L & 12 & -6L \\
+																																										 6L & 2L^2 & -6L & 4L^2\end{bmatrix},															\label{eq:beam_kin}
+\end{equation}
+
+with $\rho$ density, $S$ cross-sectional area, $L$ length, $E$ Young Modulus and $J$ second moment of area.
+
+\section[Beam Super-Element]{Mass and kinetic matrices for the uniform beam super-element}
+\label{chap:appendix3}
+
+\begin{align}
+	\mathbf{M}_e = \frac{\rho S L}{55440}\begin{bmatrix}21720 & 3732L & 281L^2 & 6000 & -1812L & 181L^2 \\ 
+																							3732L & 832L^2 & 69L^3 & 1812L & -532L^2 & 52L^3 \\
+																							281L^2 & 69L^3 & 6L^4 & 181L^2 & -52L^3 & 5L^4  \\
+																							6000 & 1812L & 181L^2 & 21720 & -3732L & 281L^2\\
+																							-1812L & -532L^2 & -52L^3 & -3732L & 832L^2 & -69L^3 \\
+																							181L^2 & 52L^3 & 5L^4 & 281L^2 & -69L^3 & 6L^4\end{bmatrix},\\ 
+																			 \mathbf{K}_e = \frac{E J}{70L^3}\begin{bmatrix}1200 & 600L & 30L^2 & -1200 & 600L & -30L^2\\ 
+																																							600L & 384L^2 & 22L^3 & -600L & 216L^2 & -8L^3 \\
+																																							30L^2 & 22L^3 & 6L^4 & -30L^2 & 8L^3 & L^4\\
+																																							-1200 & -600L & -30L^2 & 1200 & -600L & 30L^2 \\
+																																							600L & 216L^2 & 8L^3 & -600L & 384L^2 & -22L^3\\
+																																							-30L^2 & -8L^3 & L^4 & 30L^2 & -22L^3 & 6L^4\end{bmatrix},
+\end{align}
+ 
+with $\rho$ density, $S$ cross-sectional area, $L$ length, $E$ Young Modulus and $J$ second moment of area.
+
+\newpage
+
+\section[Kirchhoff Element]{Mass and kinetic matrices for the Kirchhoff element}
+\label{chap:appendix4}
+
+\begin{scriptsize}
+\begin{lstlisting}[frame=single] 
+%
+%  ^
+% y|                       Input:
+%  |                       rho: density
+%  |                       E :  Young Modulus [i.e.: Pa]
+%  4 ------- 3             ni:  Poisson Ratio [/]
+%  |         |             lx:  x-element length [i.e.: m]
+%  |         |             ly:  y-element length [i.e.: m]
+%  1 --------2 -----> x    t :  plate thickness  [i.e.: m]
+%
+
+syms rho E ni lx ly t x y;
+
+% Coordinates
+px = [0;lx;lx;0];
+py = [0;0;ly;ly];
+
+% Flexural Rigidity
+D = E*t^3/12/(1-ni^2); 
+DD = [D ni*D 0; ...
+      ni*D D 0; ...
+      0 0 (1-ni)*D/2];
+P = sym([]);
+P = [1 x y x^2 x*y y^2 x^3 x^2*y x*y^2 y^3 x^3*y x*y^3; ...
+     0 0 1 0 x 2*y 0 x^2 2*x*y 3*y^2 x^3 3*x*y^2; ...
+     0 -1 0 -2*x -y 0 -3*x^2 -2*x*y -y^2 0 -3*x^2*y -y^3];
+
+C = [];
+for i = 1:4
+   C = [C; [1 px(i) py(i) px(i)^2 px(i)*py(i) py(i)^2 px(i)^3 px(i)^2*py(i) px(i)*py(i)^2 py(i)^3 px(i)^3*py(i) px(i)*py(i)^3; ...
+     0 0 1 0 px(i) 2*py(i) 0 px(i)^2 2*px(i)*py(i) 3*py(i)^2 px(i)^3 3*px(i)*py(i)^2; ...
+     0 -1 0 -2*px(i) -py(i) 0 -3*px(i)^2 -2*px(i)*py(i) -py(i)^2 0 -3*px(i)^2*py(i) -py(i)^3]];
+end
+
+% Shape function matrix
+N = sym([]);
+N = P*inv(C);
+Q = sym([]);
+Q = [0 0 0 -2 0 0 -6*x -2*y 0 0 -6*x*y 0; ...
+     0 0 0 0 0 -2 0 0 -2*x -6*y 0 -6*x*y; ...
+     0 0 0 0 -2 0 0 -4*x  -4*y 0 -6*x^2 -6*y^2];
+B = sym([]);
+B = Q*inv(C);
+
+% Stiffness Matrix
+Kel = int((int(B.'*DD*B,x,0,lx)),y,0,ly);
+
+% Mass Matrix
+J = rho.*diag([t,t^3/12,t^3/12]);
+Mel = int(int(N.'*J*N,x,0,lx),y,0,ly);
+\end{lstlisting}
+\end{scriptsize}
+\newpage
+%\noindent\rule[2pt]{\textwidth}{0.5pt}
+\thispagestyle{empty}
+\afterpage{%
+\newgeometry{left=1cm,right=1cm,top=3cm,bottom=3.2cm}
+% material for this page
+\section{Data of the test spacecraft}
+\label{app:data_sc}
+\begin{table}[!th]
+\renewcommand{\arraystretch}{1.3}
+%\caption{Values of the spacecraft parameters.}
+\label{tab:spacecraft_data_sadm}
+    \centering
+    \begin{scriptsize}
+    \begin{tabular}{cllr}
+    \hline
+    \textbf{System} & \textbf{Parameter} & \textbf{Description} & \textbf{Value \& Uncertainty} \\ \hline
+      & $m_{\mathrm{MH}}$ & Mass & $800\,\mathrm{kg}\pm 5\%$\\
+      & $\left[\begin{array}{ccc}
+    J_{x}^{\mathrm{MH}} & J_{xy}^{\mathrm{MH}} & J_{xz}^{\mathrm{MH}} \\
+    & J_{y}^{\mathrm{MH}} & J_{yz}^{\mathrm{MH}} \\
+    & & J_{z}^{\mathrm{MH}}
+    \end{array}\right]$ & Inertia in main body frame & $\left[\begin{array}{ccc}
+    381 & -9 & 3 \\
+     & 800 & -40 \\
+     & & 94
+    \end{array}\right]\mathrm{kg\, m^2}\pm 5\%$ \\
+     & $\mathbf{r}_G$ & Spacecraft CG & $\left[1.4\,\,0.01\,\,0.03\right]\,\mathrm{m}$\\
+     \multirow{-6}{*}{Main Hub} & $\mathbf{r}_P$ & SA attachment point &  $\left[1.25\,\,-0.6\,\,0\right]\,\mathrm{m}\pm 5\%$\\ \hline
+     & $m_{\mathrm{SA}}$ & Mass & $40\,\mathrm{kg}\pm 5\%$\\
+     &  $\left[\begin{array}{ccc}
+    J_{x}^{\mathrm{SA}} & J_{xy}^{\mathrm{SA}} & J_{xz}^{\mathrm{SA}} \\
+    & J_{y}^{\mathrm{SA}} & J_{yz}^{\mathrm{SA}} \\
+    & & J_{z}^{\mathrm{SA}}
+    \end{array}\right]$ & Inertia in SA frame &  $\left[\begin{array}{ccc}
+    60 & 0.4 & -0.1 \\
+    & 18 & 21 \\
+    & & 64
+    \end{array}\right]\mathrm{kg\, m^2}\pm 5\%$\\
+    & $\mathbf{r}_{o}^{\mathrm{SA}}$ & SA CG in SA frame &  $\left[0\,\,-1.7\,\,0.03\right]\,\mathrm{m}$\\
+     & $\left[\omega_1^{\mathrm{SA}}\, \omega_2^{\mathrm{SA}}\, \omega_3^{\mathrm{SA}}\, \omega_4^{\mathrm{SA}}\, \omega_5^{\mathrm{SA}}\right]$ & Flexible modes' frequencies & $\left[0.45\,\, 2.5\,\,12\,\, 28\,\, 62 \right]\,\mathrm{Hz}\pm 5\%$ \\
+    & $\zeta_1^{\mathrm{SA}}, \zeta_2^{\mathrm{SA}}, \zeta_3^{\mathrm{SA}}, \zeta_4^{\mathrm{SA}}, \zeta_5^{\mathrm{SA}}$ & Flexible modes' damping & $0.03\pm 5\%$\\
+    \multirow{-10}{*}{\shortstack{Solar \\ Array}} & $\mathbf{L}_{\mathrm{SA}}$ & Modal participation factors & $\left[\begin{array}{ccccc}
+        0 & 5 & 0.3 & 0 & 0 \\
+        -1.5 & 0 & 0 & -1 & 6 \\
+        -4.7 & 0 & 0.03 & 2.8 & -1 \\
+        14 & 0 & -0.02 & -2 & 3 \\
+        0 & 2 & 3 & -0.03 & -0.01 \\
+        0 & 14 & -0.2 & 0 & 0
+    \end{array} \right]^{\mathrm{T}}$\\ \hline
+     & $m_W$ & Wheel mass & $2.95\,\mathrm{kg}\pm 1\%$ \\
+    & $J_{W_r}$ & Wheel radial inertia & $21\cdot10^{-3}\,\mathrm{kg\, m^2}\pm 1\%$ \\
+    & $J_{W_z}$ & Wheel axial inertia & $75\cdot10^{-3}\,\mathrm{kg\, m^2}\pm 1\%$ \\
+    & $m_A$ & Plate mass & $1.01\,\mathrm{kg}\pm 1\%$ \\
+    & $\mathrm{J}_{A}$ & Plate inertia & $\mathrm{diag}(15.8\,\,15.8\,\,64.45)\cdot 10^{-3}\,\mathrm{kg\, m^2}\pm 1\%$ \\
+    & $\left[d_W\,\,d_A\,\,d_{A_1}\,\,d_{A_2}\,\,d_I\,\,d_S\right]$ & see Fig. \ref{fig:reaction_wheel_scheme} & $\left[ 6\,\,0.3\,\,3\,\,3\,\,9.18\,\,4.2 \right]\cdot 10^{-2}\,\mathrm{m}\pm 1\%$ \\
+    & \multirow{ 2}{*}{$\mathbf{K}_B$} & Bearing stiffness (translations) & $7.861\cdot 10^6\mathbf{I}_3\,\mathrm{N/m}$ \\
+    & & Bearing stiffness (rotations) & $3.7\cdot 10^4 \mathbf{I}_2\,\mathrm{N\,m/rad}$ \\ 
+     & \multirow{ 2}{*}{$\mathbf{C}_B$} & Bearing damping (translations) & $200\mathbf{I}_3\,\mathrm{N\,s/m}$ \\
+     & & Bearing damping (rotations) & $0.942\mathbf{I}_2\,\mathrm{N\,s\,m/rad}$ \\ 
+     & \multirow{ 2}{*}{$\mathbf{K}_I$} & Isolator stiffness (translations) & $1.013\cdot 10^5\mathbf{I}_3\,\mathrm{N/m}$ \\
+    & & Isolator stiffness (rotations) & $\left[\begin{array}{cc}
+   2.026\cdot 10^3\mathbf{I}_2 & \\
+   & 2\cdot 2.026\cdot 10^3
+    \end{array}\right]\,\mathrm{N\,m/rad}$ \\ 
+    & \multirow{ 2}{*}{$\mathbf{K}_I$} & Isolator damping (translations) & $256\mathbf{I}_3\,\mathrm{N\,s/m}$ \\
+    & & Isolator damping (rotations) & $\left[\begin{array}{cc}
+   5.12\mathbf{I}_2 & \\
+   & 2\cdot 5.12
+    \end{array}\right]\,\mathrm{N\,s\,m/rad}$ \\ 
+    & $\left[C_{f_1} \, C_{f_2} \, C_{f_3} \, C_{f_4} \right]$ & Force coefficients & $\left[ 7.160\,\, 2.721 \,\, 0.709 \,\, 0.945  \right]\,\cdot\mathrm{10^{-6}}\,\mathrm{N}/(\mathrm{rad/s})^2$ \\
+     \multirow{-17}{*}{\shortstack{Reaction \\ Wheel \\ Assembly}} & $\left[C_{t_1} \, C_{t_2} \, C_{t_3} \, C_{t_4} \right]$ & Torque coefficients & $\left[ 2.954\,\, 0.678 \,\, 0.282 \,\, 0.110  \right]\,\cdot\mathrm{10^{-6}}\,\mathrm{N}\,\mathrm{m}/(\mathrm{rad/s})^2$\\ \hline
+     %& $\left[h_1 \, h_2 \, h_3 \, h_4\right]$ & Harmonic numbers &  $\left[1\,2\,3\,4\right]$\\ \hline
+      & $K_m$ & Motor torque const & $3\,\mathrm{N\, m/(A\, rad)}$\\
+      & $K_d$ & Detent torque const & $1.08\,\mathrm{N\, m/rad}$\\
+     & $z$ & Rotor teeth & 90 \\
+     & $p$ & Motor poles & 4\\
+     & $n_{\mu}$ & $\mu$-step subdivisions & 8\\
+     & $I$ & Phase current & $0.1\,\mathrm{A}$ \\
+     & $J_r$ & Rotor inertia & $1.3\cdot 10^{-4}\,\mathrm{kg\, m^2}$ \\
+     & $C_r$ & Viscous damping & $15\cdot 10^{-4}\mathrm{N\, m\, s/rad}$ \\
+    \multirow{-9}{*}{\shortstack{Solar \\ Array \\ Drive \\ Mechanism}} & $\Omega_{\mathrm{S}}$ & Rotor angular speed & $1\cdot10^{-3}\,\mathrm{rad/s}$\\ \hline
+     & $K_b$ & Stiffness & $96000\,\mathrm{N\, m/rad}$ \\
+      & $C_b$ & Viscous damping & $0.1\,\mathrm{N\, m\, s/rad}$ \\
+    \multirow{-3}{*}{Gearbox} & $N_g$ & Reduction ratio & 60\\ \hline 
+    \end{tabular}
+    \end{scriptsize}
+\end{table}
+\clearpage
+\restoregeometry
+} 
+

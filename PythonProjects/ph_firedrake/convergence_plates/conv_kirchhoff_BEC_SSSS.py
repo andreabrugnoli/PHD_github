@@ -63,14 +63,14 @@ def compute_err(n, r):
     CG_deg1 = FiniteElement("CG", interval, r)
     DG_deg1 = FiniteElement("DG", interval, r)
 
-    # DG_deg = FiniteElement("DG", interval, r - 1)
+    DG_deg = FiniteElement("DG", interval, r - 1)
 
-    # P_CG1_DG = TensorProductElement(CG_deg1, DG_deg)
-    # P_DG_CG1 = TensorProductElement(DG_deg, CG_deg1)
-    #
-    # RT_horiz = HDivElement(P_CG1_DG)
-    # RT_vert = HDivElement(P_DG_CG1)
-    # RT_quad = RT_horiz + RT_vert
+    P_CG1_DG = TensorProductElement(CG_deg1, DG_deg)
+    P_DG_CG1 = TensorProductElement(DG_deg, CG_deg1)
+
+    RT_horiz = HDivElement(P_CG1_DG)
+    RT_vert = HDivElement(P_DG_CG1)
+    RT_quad = RT_horiz + RT_vert
 
     P_CG1_DG1 = TensorProductElement(CG_deg1, DG_deg1)
     P_DG1_CG1 = TensorProductElement(DG_deg1, CG_deg1)
@@ -80,7 +80,7 @@ def compute_err(n, r):
     BDM_quad = BDM_horiz + BDM_vert
 
     Vp = FunctionSpace(mesh, "CG", r)
-    VqD = FunctionSpace(mesh, BDM_quad)
+    VqD = FunctionSpace(mesh, RT_quad)
     Vq12 = FunctionSpace(mesh, "CG", r)
 
     V = MixedFunctionSpace([Vp, VqD, Vq12])
@@ -137,10 +137,10 @@ def compute_err(n, r):
     bc_qD_t = DirichletBC(V.sub(1), Constant((0.0, 0.0)), "top")
     bc_qD_b = DirichletBC(V.sub(1), Constant((0.0, 0.0)), "bottom")
 
-    # bc_q12_l = DirichletBC(V.sub(2), Constant(0.0), 1)
-    # bc_q12_r = DirichletBC(V.sub(2), Constant(0.0), 2)
-    # bc_q12_t = DirichletBC(V.sub(2), Constant(0.0), "top")
-    # bc_q12_b = DirichletBC(V.sub(2), Constant(0.0), "bottom")
+    bc_q12_l = DirichletBC(V.sub(2), Constant(0.0), 1)
+    bc_q12_r = DirichletBC(V.sub(2), Constant(0.0), 2)
+    bc_q12_t = DirichletBC(V.sub(2), Constant(0.0), "top")
+    bc_q12_b = DirichletBC(V.sub(2), Constant(0.0), "bottom")
 
     bcs.append(bc_p_l)
     bcs.append(bc_p_r)
@@ -152,10 +152,10 @@ def compute_err(n, r):
     bcs.append(bc_qD_t)
     bcs.append(bc_qD_b)
 
-    # bcs.append(bc_q12_l)
-    # bcs.append(bc_q12_r)
-    # bcs.append(bc_q12_t)
-    # bcs.append(bc_q12_b)
+    bcs.append(bc_q12_l)
+    bcs.append(bc_q12_r)
+    bcs.append(bc_q12_t)
+    bcs.append(bc_q12_b)
 
     t = 0.
     t_ = Constant(t)
@@ -325,18 +325,18 @@ def compute_err(n, r):
     # v_err_max = max(v_err_L2)
     # v_err_quad = np.sqrt(np.sum(dt * np.power(v_err_L2, 2)))
 
-    sig_err_last = sig_err_div[-1]
-    sig_err_max = max(sig_err_div)
-    sig_err_quad = np.sqrt(np.sum(dt * np.power(sig_err_div, 2)))
+    # sig_err_last = sig_err_div[-1]
+    # sig_err_max = max(sig_err_div)
+    # sig_err_quad = np.sqrt(np.sum(dt * np.power(sig_err_div, 2)))
 
-    # sig_err_last = sig_err_L2[-1]
-    # sig_err_max = max(sig_err_L2)
-    # sig_err_quad = np.sqrt(np.sum(dt * np.power(sig_err_L2, 2)))
+    sig_err_last = sig_err_L2[-1]
+    sig_err_max = max(sig_err_L2)
+    sig_err_quad = np.sqrt(np.sum(dt * np.power(sig_err_L2, 2)))
 
     return v_err_last, v_err_max, v_err_quad, sig_err_last, sig_err_max, sig_err_quad
 
 
-n_h = 2
+n_h = 3
 n1_vec = np.array([2**(i+2) for i in range(n_h)])
 n2_vec = np.array([2**(i+1) for i in range(n_h)])
 h1_vec = 1./n1_vec
@@ -394,10 +394,10 @@ sig_r3_L2 = np.zeros((n_h-1,))
 for i in range(n_h):
     v_err_r1[i], v_errInf_r1[i], v_errQuad_r1[i],\
     sig_err_r1[i], sig_errInf_r1[i], sig_errQuad_r1[i] = compute_err(n1_vec[i], 1)
-    v_err_r2[i], v_errInf_r2[i], v_errQuad_r2[i], sig_err_r2[i],\
-    sig_errInf_r2[i], sig_errQuad_r2[i] = compute_err(n1_vec[i], 2)
-    v_err_r3[i], v_errInf_r3[i], v_errQuad_r3[i], sig_err_r3[i],\
-    sig_errInf_r3[i], sig_errQuad_r3[i] = compute_err(n2_vec[i], 3)
+    # v_err_r2[i], v_errInf_r2[i], v_errQuad_r2[i], sig_err_r2[i],\
+    # sig_errInf_r2[i], sig_errQuad_r2[i] = compute_err(n1_vec[i], 2)
+    # v_err_r3[i], v_errInf_r3[i], v_errQuad_r3[i], sig_err_r3[i],\
+    # sig_errInf_r3[i], sig_errQuad_r3[i] = compute_err(n2_vec[i], 3)
 
     if i>0:
         v_r1_atF[i-1] = np.log(v_err_r1[i]/v_err_r1[i-1])/np.log(h1_vec[i]/h1_vec[i-1])

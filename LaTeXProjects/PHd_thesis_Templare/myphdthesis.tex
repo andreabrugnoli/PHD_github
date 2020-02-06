@@ -1,0 +1,124 @@
+% A LaTeX template fitted for a Phd thesis report
+% Copyright (C) 2013 Damien Roque
+% Author : Damien Roque <damien.roque_AT_isae-supaero.fr>
+
+\documentclass[a4paper,11pt,twoside]{templates/roque-phdthesis-template}
+
+% Include configuration (loading packages, defining the style of the document...)
+\usepackage[utf8]{inputenc}
+
+
+\include{0-configuration/configuration}
+
+% Include user's macros
+\include{0-configuration/macros}
+
+
+
+% Build only the following parts of the document (recommended for large documents)
+% \include{2-chapters/2-1-introduction}
+% \include{2-chapters/2-2-first-chapter}
+% \include{2-chapters/2-3-another-chapter}
+% \include{2-chapters/2-7-conclusion}
+
+\begin{document}
+% Include the title pages
+% (the first is made mandatory by UDG and the second is more traditional)
+
+% Matlab Preferences
+\lstset{language=Matlab,%
+    %basicstyle=\color{red},
+    breaklines=true,%
+    morekeywords={matlab2tikz},
+    keywordstyle=\color{blue},%
+    morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},
+    identifierstyle=\color{black},%
+    stringstyle=\color{mylilas},
+    commentstyle=\color{mygreen},%
+    showstringspaces=false,%without this there will be a symbol in the places where there is a space
+    numbers=left,%
+    numberstyle={\tiny \color{black}},% size of the numbers
+    numbersep=9pt, % this defines how far the numbers are from the text
+    emph=[1]{for,end,break},emphstyle=[1]\color{blue}, %some words to emphasise
+    emph=[1]{inv,diag},emphstyle=[1]\color{black}, %some
+    %emph=[2]{word1,word2}, emphstyle=[2]{style},    
+}
+
+
+\include{1-opening/titlepage}
+\blankpage
+
+% Build a per-chapter table of content
+\dominitoc
+
+% Use roman page numbering for non-significant pages
+\pagenumbering{roman}
+\frontmatter
+
+% Include the acknowledgements page
+\cleardoublepage
+\include{1-opening/abstract}
+%\include{1-opening/resume}
+\include{1-opening/acknowledgements}
+\include{1-opening/remerciements}
+\include{1-opening/ringraziamenti}
+\include{1-opening/dedication}
+
+% Build the general table of contents
+\setcounter{tocdepth}{2}
+\begingroup\singlespacing
+\tableofcontents
+\endgroup
+
+%% Build the list of figures
+\listoffigures
+
+% Build the list of tables
+\listoftables
+
+% Include the acronym list
+\cleardoublepage
+\include{1-opening/acronyms}
+\pagestyle{fancy}
+%\include{1-opening/french_resume}
+%\include{2-chapters/2-1-french-resume}
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Chapters are included here %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Use arabic page numbering for significant pages
+\mainmatter
+%\pagestyle{fancy}
+
+% Include the chapters
+\include{2-chapters/2-1-introduction}
+\include{2-chapters/2-2-first-chapter}
+\include{2-chapters/2-3-second-chapter}
+\include{2-chapters/2-4-third-chapter}
+\include{2-chapters/2-7-conclusion}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Appendices are included here %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+\include{3-appendices/3-1-first-appendix}
+
+% Build the references list
+%% Bibtex
+%%
+\bibliographystyle{alpha}
+\bibliography{mybibliography} 
+
+
+%%%% BibLatex
+%\printbibliography
+%\addstarredchapter{Bibliographie}
+%\markboth{Bibliographie}{Bibliographie}
+
+% Include the abstract
+\cleardoublepage
+\input{4-closing/abstract}
+
+\end{document}
+
+

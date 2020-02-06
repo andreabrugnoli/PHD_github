@@ -52,14 +52,14 @@ def compute_err(n, r):
 
     def j_operator(v_p, v_q, e_p, e_q):
 
-        n_ver = FacetNormal(mesh)
-        s_ver = as_vector([-n_ver[1], n_ver[0]])
-
-        e_mnn = inner(e_q, outer(n_ver, n_ver))
-        v_mnn = inner(v_q, outer(n_ver, n_ver))
-
-        e_mns = inner(e_q, outer(n_ver, s_ver))
-        v_mns = inner(v_q, outer(n_ver, s_ver))
+        # n_ver = FacetNormal(mesh)
+        # s_ver = as_vector([-n_ver[1], n_ver[0]])
+        #
+        # e_mnn = inner(e_q, outer(n_ver, n_ver))
+        # v_mnn = inner(v_q, outer(n_ver, n_ver))
+        #
+        # e_mns = inner(e_q, outer(n_ver, s_ver))
+        # v_mns = inner(v_q, outer(n_ver, s_ver))
 
         # j_graddiv = dot(grad(v_p), div(e_q)) * dx \
         #             + v_p * dot(grad(e_mns), s_ver) * ds_v \
@@ -347,7 +347,7 @@ def compute_err(n, r):
     return v_err_last, v_err_max, v_err_quad, sig_err_last, sig_err_max, sig_err_quad
 
 
-n_h = 4
+n_h = 5
 n1_vec = np.array([2**(i+2) for i in range(n_h)])
 n2_vec = np.array([2**(i+1) for i in range(n_h)])
 h1_vec = 1./n1_vec
@@ -504,19 +504,19 @@ print("")
 
 plt.figure()
 
-# plt.plot(np.log(h1_vec), np.log(v_r1_atF), ':o', label='HHJ 1')
-plt.plot(np.log(h1_vec), np.log(v_errInf_r1), '-.+', label='HHJ 1 $L^\infty$')
-plt.plot(np.log(h1_vec), np.log(v_errQuad_r1), '--*', label='HHJ 1 $L^2$')
+# plt.plot(np.log(h1_vec), np.log(v_r1_atF), ':o', label='BTJ 1')
+plt.plot(np.log(h1_vec), np.log(v_errInf_r1), '-.+', label='BTJ 1 $L^\infty$')
+plt.plot(np.log(h1_vec), np.log(v_errQuad_r1), '--*', label='BTJ 1 $L^2$')
 plt.plot(np.log(h1_vec), np.log(h1_vec), '-v', label=r'$h$')
 
-# plt.plot(np.log(h1_vec), np.log(v_r2_atF), ':o', label='HHJ 2')
-plt.plot(np.log(h1_vec), np.log(v_errInf_r2), '-.+', label='HHJ 2 $L^\infty$')
-plt.plot(np.log(h1_vec), np.log(v_errQuad_r2), '--*', label='HHJ 2 $L^2$')
+# plt.plot(np.log(h1_vec), np.log(v_r2_atF), ':o', label='BTJ 2')
+plt.plot(np.log(h1_vec), np.log(v_errInf_r2), '-.+', label='BTJ 2 $L^\infty$')
+plt.plot(np.log(h1_vec), np.log(v_errQuad_r2), '--*', label='BTJ 2 $L^2$')
 plt.plot(np.log(h1_vec), np.log(h1_vec**2), '-v', label=r'$h^2$')
 
-# plt.plot(np.log(h2_vec), np.log(v_r3_atF), ':o', label='HHJ 3')
-plt.plot(np.log(h2_vec), np.log(v_errInf_r3), '-.+', label='HHJ 3 $L^\infty$')
-plt.plot(np.log(h2_vec), np.log(v_errQuad_r3), '--*', label='HHJ 3 $L^2$')
+# plt.plot(np.log(h2_vec), np.log(v_r3_atF), ':o', label='BTJ 3')
+plt.plot(np.log(h2_vec), np.log(v_errInf_r3), '-.+', label='BTJ 3 $L^\infty$')
+plt.plot(np.log(h2_vec), np.log(v_errQuad_r3), '--*', label='BTJ 3 $L^2$')
 plt.plot(np.log(h2_vec), np.log(h2_vec**3), '-v', label=r'$h^3$')
 
 plt.xlabel(r'log(Mesh size $h$)')
@@ -565,19 +565,19 @@ print("")
 
 plt.figure()
 
-# plt.plot(np.log(h1_vec), np.log(sig_r1_atF), ':o', label='HHJ 1')
-plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+', label='HHJ 1 $L^\infty$')
-plt.plot(np.log(h1_vec), np.log(sig_errQuad_r1), '--*', label='HHJ 1 $L^2$')
+# plt.plot(np.log(h1_vec), np.log(sig_r1_atF), ':o', label='BTJ 1')
+plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+', label='BTJ 1 $L^\infty$')
+plt.plot(np.log(h1_vec), np.log(sig_errQuad_r1), '--*', label='BTJ 1 $L^2$')
 plt.plot(np.log(h1_vec), np.log(h1_vec), '-v', label=r'$h$')
 
-# plt.plot(np.log(h1_vec), np.log(sig_r2_atF), ':o', label='HHJ 2')
-plt.plot(np.log(h1_vec), np.log(sig_errInf_r2), '-.+', label='HHJ 2 $L^\infty$')
-plt.plot(np.log(h1_vec), np.log(sig_errQuad_r2), '--*', label='HHJ 2 $L^2$')
+# plt.plot(np.log(h1_vec), np.log(sig_r2_atF), ':o', label='BTJ 2')
+plt.plot(np.log(h1_vec), np.log(sig_errInf_r2), '-.+', label='BTJ 2 $L^\infty$')
+plt.plot(np.log(h1_vec), np.log(sig_errQuad_r2), '--*', label='BTJ 2 $L^2$')
 plt.plot(np.log(h1_vec), np.log(h1_vec**2), '-v', label=r'$h^2$')
 
-# plt.plot(np.log(h2_vec), np.log(sig_r3_atF), ':o', label='HHJ 3')
-plt.plot(np.log(h2_vec), np.log(sig_errInf_r3), '-.+', label='HHJ 3 $L^\infty$')
-plt.plot(np.log(h2_vec), np.log(sig_errQuad_r3), '--*', label='HHJ 3 $L^2$')
+# plt.plot(np.log(h2_vec), np.log(sig_r3_atF), ':o', label='BTJ 3')
+plt.plot(np.log(h2_vec), np.log(sig_errInf_r3), '-.+', label='BTJ 3 $L^\infty$')
+plt.plot(np.log(h2_vec), np.log(sig_errQuad_r3), '--*', label='BTJ 3 $L^2$')
 plt.plot(np.log(h2_vec), np.log(h2_vec**3), '-v', label=r'$h^3$')
 
 plt.xlabel(r'log(Mesh size $h$)')
