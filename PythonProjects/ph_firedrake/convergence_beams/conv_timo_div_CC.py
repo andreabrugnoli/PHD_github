@@ -19,6 +19,29 @@ matplotlib.rcParams['text.usetex'] = True
 bc_input = 'CC_div'
 save_res = False
 
+def compute_constants(h):
+
+    x = 1
+
+    A11 = ((x+2)*exp(-x)+x+h**2*(1-exp(x))-2)
+    A12 = (exp(-x)+x-1)
+    A21 = ((x+1)*np.exp(x)-1)
+    A22 = (np.exp(-x)-1)
+
+    A = np.array([[A11, A12],
+                  [A21, A22]])
+
+    b1 = -x**2/2 - h**2/2*(1-exp(2*x))
+    b2 = 1
+
+    b = np.array([b1, b2])
+
+    c1, c2 = np.linalg.solve(A, b)
+
+    return c1, c2
+
+
+
 def compute_err(n, r):
 
     h_mesh = 1/n
@@ -29,10 +52,10 @@ def compute_err(n, r):
     x = SpatialCoordinate(mesh)[0]
 
     h = 1
-    E = h**3*exp(x)
-    k = h**3*exp(-x)
+    E_Y = h**3*exp(x)
+    k_sh = h**3*exp(-x)
 
-    rho = 3
+    rho = 1
 
     def m_operator(v_pw, al_pw, v_pth, al_pth, v_qth, al_qth, v_qw, al_qw):
         m_form = v_pw * al_pw * dx \
@@ -82,8 +105,8 @@ def compute_err(n, r):
 
     al_pw = rho * h * e_pw
     al_pth = (rho * h ** 3) / 12. * e_pth
-    al_qth = 1./E * e_qth
-    al_qw = 1./k * e_qw
+    al_qth = 1./E_Y * e_qth
+    al_qw = 1./k_sh * e_qw
 
     dx = Measure('dx')
     ds = Measure('ds')
@@ -95,24 +118,35 @@ def compute_err(n, r):
     t_1 = Constant(t)
 
     beta = 1
-    eee = exp(1.)
 
-    c1 =(h**2*(eee**2-1)-2/(1-eee)-1)/(6*eee**(-1)+2*h**2*(1-eee)-2*(eee**(-1)-1)/(1-eee))
-    c2 =(1-c1*(2*eee**(-1)-1))/(eee**(-1)-1)
+    c1 =(h**2*(exp(2)-1)-2/(1-exp(1.))-1)/(6*exp(-1.)+2*h**2*(1-exp(1.))-2*(exp(-1.)-1)/(1-exp(1.)))
 
-    w_st = x**2/2+c1*((x+2)*eee**(-x)+x+h**2*(1-eee**x)-2)+c2*(eee**(-x)+x-1)+h**2/2*(1-eee**(2*x))
-    th_st = x - c1*((x+1)*eee**x-1) - c2*(eee**(-x)-1)
+    c2 = (1-c1*(2*exp(-1)-1))/(exp(-1)-1)
 
-    f_st = h**3*eee**x
+    # c1, c2 = compute_constants(h)
+
+    w_st = x**2/2+c1*((x+2)*exp(-x)+x+h**2*(1-exp(x))-2)+c2*(exp(-x)+x-1)+h**2/2*(1-exp(2*x))
+    th_st = x - c1*((x+1)*exp(x)-1) - c2*(exp(-x)-1)
+
+    f_st = h**3*exp(x)
 
     w_dyn = w_st * sin(beta * t_)
     th_dyn = th_st * sin(beta * t_)
 
-    M_st = eee**x+c1*x+c2
-    q_st = eee**x+c1
+    M_st = exp(x)+c1*x+c2
+    q_st = -(exp(x)+c1)
+
+    print(Function(V_pw).assign(interpolate(w_st, V_pw)).at(0), Function(V_pw).assign(interpolate(w_st, V_pw)).at(1))
+    print(Function(V_pth).assign(interpolate(th_st, V_pth)).at(0), Function(V_pth).assign(interpolate(th_st, V_pth)).at(1))
+
+    dx_Mst = exp(x) + c1
+    dx_qst = exp(x)
 
     M_ex = M_st*sin(beta*t_)
     q_ex = q_st*sin(beta*t_)
+
+    dx_Mex = dx_Mst*sin(beta*t_)
+    dx_qex = dx_qst*sin(beta*t_)
 
     dt_w = beta * w_st * cos(beta*t_)
     dtt_w = -beta**2 * w_st * sin(beta*t_)
@@ -138,8 +172,8 @@ def compute_err(n, r):
     m_form = m_operator(v_pw, al_pw, v_pth, al_pth, v_qth, al_qth, v_qw, al_qw)
     j_form = j_operator(v_pw, e_pw, v_pth, e_pth, v_qth, e_qth, v_qw, e_qw)
 
-    f_form = v_pw*f_dyn*dx + v_pth* m_dyn*dx
-    f_form1 = v_pw*f_dyn1*dx + v_pth* m_dyn1*dx
+    f_form = v_pw*f_dyn*dx + v_pth * m_dyn*dx
+    f_form1 = v_pw*f_dyn1*dx + v_pth * m_dyn1*dx
 
     # MM = sp.sparse.csr_matrix(assemble(m_form, mat_type='aij').M.handle.getValuesCSR()[::-1])
     # JJ = sp.sparse.csr_matrix(assemble(j_form, mat_type='aij').M.handle.getValuesCSR()[::-1])
@@ -176,15 +210,15 @@ def compute_err(n, r):
 
     v_err_L2 = np.zeros((n_t,))
     om_err_L2 = np.zeros((n_t,))
-    sig_err_L2 = np.zeros((n_t,))
-    # q_err_Hdiv = np.zeros((n_t,))
+    M_err_L2 = np.zeros((n_t,))
+    q_err_Hdiv = np.zeros((n_t,))
     q_err_L2 = np.zeros((n_t,))
 
     v_err_L2[0] = np.sqrt(assemble((epw_n - dt_w)*(epw_n - dt_w) * dx))
     om_err_L2[0] = np.sqrt(assemble(inner(epth_n - dt_th, epth_n - dt_th) * dx))
-    sig_err_L2[0] = np.sqrt(assemble(inner(eqth_n - M_ex, eqth_n - M_ex) * dx))
-    # q_err_Hdiv[0] = np.sqrt(assemble(inner(eqw_n - q_ex, eqw_n - q_ex) * dx \
-    #                                + inner(div(eqw_n - q_ex), div(eqw_n - q_ex)) * dx))
+    M_err_L2[0] = np.sqrt(assemble(inner(eqth_n - M_ex, eqth_n - M_ex) * dx))
+    q_err_Hdiv[0] = np.sqrt(assemble(inner(eqw_n - q_ex, eqw_n - q_ex) * dx \
+                                    + inner(eqw_n.dx(0) - dx_qex, eqw_n.dx(0) - dx_qex) * dx))
     q_err_L2[0] = np.sqrt(assemble(inner(eqw_n - q_ex, eqw_n - q_ex) * dx))
 
     t_vec = np.linspace(0, t_fin, num=n_t)
@@ -199,10 +233,10 @@ def compute_err(n, r):
 
         epw_n, epth_n, eqth_n, eqw_n = e_n.split()
 
-        alpw_n = rho * t * epw_n
-        alpth_n = (rho * t ** 3) / 12. * epth_n
-        alqth_n = 1./E*eqth_n
-        alqw_n = 1. / k*eqw_n
+        alpw_n = rho * h * epw_n
+        alpth_n = (rho * h ** 3) / 12. * epth_n
+        alqth_n = 1./E_Y*eqth_n
+        alqw_n = 1. / k_sh*eqw_n
 
         rhs = m_operator(v_pw, alpw_n, v_pth, alpth_n, v_qth, alqth_n, v_qw, alqw_n) \
               + dt * (1 - theta) * j_operator(v_pw, epw_n, v_pth, epth_n, v_qth, eqth_n, v_qw, eqw_n) \
@@ -228,9 +262,9 @@ def compute_err(n, r):
 
         v_err_L2[i] = np.sqrt(assemble(inner(epw_n1 - dt_w, epw_n1 - dt_w) * dx))
         om_err_L2[i] = np.sqrt(assemble(inner(epth_n1 - dt_th, epth_n1 - dt_th) * dx))
-        sig_err_L2[i] = np.sqrt(assemble(inner(eqth_n1 - M_ex, eqth_n1 - M_ex) * dx))
+        M_err_L2[i] = np.sqrt(assemble(inner(eqth_n1 - M_ex, eqth_n1 - M_ex) * dx))
         # q_err_Hdiv[i] = np.sqrt(assemble(inner(eqw_n1 - q_ex, eqw_n1 - q_ex) * dx  \
-        #                                  + inner(div(eqw_n1 - q_ex), div(eqw_n1 - q_ex)) * dx))
+        #                                  + inner(eqw_n.dx(0) - dx_qex, eqw_n.dx(0) - dx_qex) * dx))
         q_err_L2[i] = np.sqrt(assemble(inner(eqw_n1 - q_ex, eqw_n1 - q_ex) * dx))
 
     plt.figure()
@@ -248,8 +282,8 @@ def compute_err(n, r):
     om_err_max = max(om_err_L2)
     om_err_quad = np.sqrt(np.sum(dt * np.power(om_err_L2, 2)))
 
-    sig_err_max = max(sig_err_L2)
-    sig_err_quad = np.sqrt(np.sum(dt * np.power(sig_err_L2, 2)))
+    sig_err_max = max(M_err_L2)
+    sig_err_quad = np.sqrt(np.sum(dt * np.power(M_err_L2, 2)))
 
     # q_err_max = max(q_err_Hdiv)
     # q_err_quad = np.sqrt(np.sum(dt * np.power(q_err_Hdiv, 2)))
@@ -342,7 +376,7 @@ q_r3_L2 = np.zeros((n_h-1,))
 for i in range(n_h):
     v_errInf_r1[i], v_errQuad_r1[i], om_errInf_r1[i], om_errQuad_r1[i], \
     sig_errInf_r1[i], sig_errQuad_r1[i], q_errInf_r1[i], q_errQuad_r1[i] = compute_err(n1_vec[i], 1)
-
+#
     v_errInf_r2[i], v_errQuad_r2[i], om_errInf_r2[i], om_errQuad_r2[i], \
     sig_errInf_r2[i], sig_errQuad_r2[i], q_errInf_r2[i], q_errQuad_r2[i] = compute_err(n1_vec[i], 2)
 
