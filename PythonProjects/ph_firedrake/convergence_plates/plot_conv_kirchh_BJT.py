@@ -19,7 +19,7 @@ matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
 matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{bm}"]
 
 path_res = "./convergence_results_kirchhoff/"
-bc_input = "CSSF_BJT_"
+bc_input = "SSSS_BJT_"
 save_res = False
 
 coeff = 1

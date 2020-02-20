@@ -11,7 +11,7 @@ import petsc4py
 
 matplotlib.rcParams['text.usetex'] = True
 save_res = False
-bc_input = 'CSSC'
+bc_input = 'CSSC_HHJ'
 
 
 def compute_constants():

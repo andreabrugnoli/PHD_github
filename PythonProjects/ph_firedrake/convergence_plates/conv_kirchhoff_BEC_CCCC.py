@@ -100,7 +100,7 @@ def compute_err(n, r):
     BDM_quad = BDM_horiz + BDM_vert
 
     Vp = FunctionSpace(mesh, "CG", r)
-    VqD = FunctionSpace(mesh, RT_quad)
+    VqD = FunctionSpace(mesh, BDM_quad)
     Vq12 = FunctionSpace(mesh, "CG", r)
 
     V = MixedFunctionSpace([Vp, VqD, Vq12])

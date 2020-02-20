@@ -19,7 +19,7 @@ matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
 matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{bm}"]
 
 path_res = "./convergence_results_kirchhoff/"
-bc_input = "SSSS_"
+bc_input = "SSSS_HHJ_"
 save_res = True
 
 coeff = 0.90

@@ -187,7 +187,7 @@ def computeH_dae(ind):
         ft_imp = (t > t_diss)  # * (1 - np.exp((t - t_diss)/tau_imp))
         ft_ctrl = 1  # (t<t_diss)
         res_e = MM @ ed_var - (JJ @ e_var + G_D @ lmb_var + B_N * ft_ctrl)
-        res_lmb = - G_D.T @ e_var - Z * B_D @ B_D.T @ lmb_var * ft_imp
+        res_lmb = - G_D.T @ e_var - RR @ lmb_var * ft_imp
     
         return np.concatenate((res_e, res_lmb))
     

@@ -13,9 +13,8 @@ import scipy.linalg as la
 import scipy.sparse as spa
 import scipy.sparse.linalg as sp_la
 matplotlib.rcParams['text.usetex'] = True
-save_res = False
-case = 'SSSS_H2'
-bc_input = 'SSSS'
+save_res = True
+bc_input = 'SSSS_H2'
 
 def compute_err(n, r):
 
@@ -57,8 +56,8 @@ def compute_err(n, r):
 
     # Finite element defition
 
-    name_FEp = 'Bell'
-    name_FEq = 'Hermite'
+    name_FEp = 'Argyris'
+    name_FEq = 'DG'
     deg_q = 3
 
     if name_FEp == 'Morley':
@@ -114,7 +113,7 @@ def compute_err(n, r):
 
     j_form = j_operator(v_p, v_q, e_p, e_q)
 
-    bc_1, bc_3, bc_2, bc_4 = bc_input
+    bc_1, bc_3, bc_2, bc_4 = 'SSSS'
 
     bc_dict = {1: bc_1, 2: bc_2, 3: bc_3, 4: bc_4}
 
@@ -180,6 +179,13 @@ def compute_err(n, r):
     grad_vex = as_vector([beta * pi / Lx * cos(pi * x[0] / Lx) * sin(pi * x[1] / Ly) * cos(beta * t_),
                           beta * pi / Ly * sin(pi * x[0] / Lx) * cos(pi * x[1] / Ly) * cos(beta * t_)])
 
+    dxx_vex = -beta * (pi / Lx)**2 * sin(pi * x[0] / Lx) * sin(pi * x[1] / Ly) * cos(beta * t_)
+    dyy_vex = -beta * (pi / Ly) ** 2 * sin(pi * x[0] / Lx) * sin(pi * x[1] / Ly) * cos(beta * t_)
+    dxy_vex = beta * (pi / Lx) * (pi / Ly) * cos(pi * x[0] / Lx) * cos(pi * x[1] / Ly) * cos(beta * t_)
+
+    hess_vex = as_tensor([[dxx_vex, dxy_vex],
+                          [dxy_vex, dyy_vex]])
+
     dxx_wex = - (pi/Lx)**2*sin(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*sin(beta*t_)
     dyy_wex = - (pi/Ly)**2*sin(pi*x[0]/Lx)*sin(pi*x[1]/Ly)*sin(beta*t_)
     dxy_wex = pi**2/(Lx*Ly)*cos(pi*x[0]/Lx)*cos(pi*x[1]/Ly)*sin(beta*t_)
@@ -210,6 +216,7 @@ def compute_err(n, r):
     n_t = int(floor(t_fin/dt) + 1)
 
     w_err_H1 = np.zeros((n_t,))
+    v_err_H2 = np.zeros((n_t,))
     v_err_H1 = np.zeros((n_t,))
     sig_err_L2 = np.zeros((n_t,))
 
@@ -220,6 +227,9 @@ def compute_err(n, r):
 
     # w_err_H1[0] = np.sqrt(assemble(dot(w_n-w_exact, w_n-w_exact) *dx
     #                      + dot(grad(w_n) - grad_wex, grad(w_n) - grad_wex) * dx))
+    v_err_H2[0] = np.sqrt(assemble(dot(ep_n - v_exact, ep_n - v_exact) * dx
+                                   + dot(grad(ep_n) - grad_vex, grad(ep_n) - grad_vex) * dx
+                                   + inner(grad(grad(ep_n)) - hess_vex, grad(grad(ep_n)) - hess_vex) * dx))
     v_err_H1[0] = np.sqrt(assemble(dot(ep_n - v_exact, ep_n - v_exact) * dx
                                    + dot(grad(ep_n) - grad_vex, grad(ep_n) - grad_vex) * dx))
 
@@ -227,7 +237,7 @@ def compute_err(n, r):
 
     t_vec = np.linspace(0, t_fin, num=n_t)
 
-    param = {"ksp_type": "preonly", "pc_type": "lu"}
+    # param = {"ksp_type": "preonly", "pc_type": "lu"}
 
     # print(e_n.vector().get_local())
     for i in range(1, n_t):
@@ -257,6 +267,10 @@ def compute_err(n, r):
 
         # w_err_H1[i] = np.sqrt(assemble(dot(w_n1-w_exact, w_n1-w_exact) * dx
         #                      + dot(grad(w_n1)-grad_wex, grad(w_n1)-grad_wex) * dx))
+        v_err_H2[i] = np.sqrt(assemble(dot(ep_n1 - v_exact, ep_n1 - v_exact) * dx
+                                       + dot(grad(ep_n1) - grad_vex, grad(ep_n1) - grad_vex) * dx
+                                       + inner(grad(grad(ep_n1)) - hess_vex, grad(grad(ep_n1)) - hess_vex) * dx))
+
         v_err_H1[i] = np.sqrt(assemble(dot(ep_n1 - v_exact, ep_n1 - v_exact) * dx
                                        + dot(grad(ep_n1) - grad_vex, grad(ep_n1) - grad_vex) * dx))
 
@@ -276,9 +290,13 @@ def compute_err(n, r):
     # v_err_max = max(w_err_H1)
     # v_err_quad = np.sqrt(np.sum(dt * np.power(w_err_H1, 2)))
 
-    v_err_last = v_err_H1[-1]
-    v_err_max = max(v_err_H1)
-    v_err_quad = np.sqrt(np.sum(dt * np.power(v_err_H1, 2)))
+    # v_err_last = v_err_H1[-1]
+    # v_err_max = max(v_err_H1)
+    # v_err_quad = np.sqrt(np.sum(dt * np.power(v_err_H1, 2)))
+
+    v_err_last = v_err_H2[-1]
+    v_err_max = max(v_err_H2)
+    v_err_quad = np.sqrt(np.sum(dt * np.power(v_err_H2, 2)))
 
     sig_err_last = sig_err_L2[-1]
     sig_err_max = max(sig_err_L2)
@@ -462,9 +480,9 @@ plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log(Error Velocity)')
 plt.title(r'Velocity Error vs Mesh size')
 plt.legend()
-path_fig = "/home/a.brugnoli/Plots_Videos/Python/Plots/Kirchhoff_plots/Convergence/firedrake/"
+path_fig = "/home/a.brugnoli/Plots/Python/Plots/Kirchhoff_plots/Convergence/firedrake/"
 if save_res:
-    plt.savefig(path_fig + case + "_vel.eps", format="eps")
+    plt.savefig(path_fig + bc_input + "_vel.eps", format="eps")
 
 sig_r1int_atF = np.polyfit(np.log(h1_vec), np.log(sig_err_r1), 1)[0]
 sig_r1int_max = np.polyfit(np.log(h1_vec), np.log(sig_errInf_r1), 1)[0]
@@ -524,5 +542,5 @@ plt.ylabel(r'log(Error Stress)')
 plt.title(r'Stress Error vs Mesh size')
 plt.legend()
 if save_res:
-    plt.savefig(path_fig + case + "_sigma.eps", format="eps")
+    plt.savefig(path_fig + bc_input + "_sigma.eps", format="eps")
 plt.show()

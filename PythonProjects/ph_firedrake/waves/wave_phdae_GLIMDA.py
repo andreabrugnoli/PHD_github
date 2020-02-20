@@ -1,3 +1,7 @@
+# Dissipation is not considered carefully
+# BEWARE
+
+
 from firedrake import *
 import numpy as np
 import scipy.linalg as la

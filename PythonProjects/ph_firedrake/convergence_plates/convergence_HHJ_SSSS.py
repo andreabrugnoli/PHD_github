@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 import petsc4py
 
 matplotlib.rcParams['text.usetex'] = True
-save_res = False
-bc_input = 'SSSS'
+save_res = True
+bc_input = 'SSSS_HHJ'
 
 
 def compute_err(n, r):
@@ -255,7 +255,7 @@ def compute_err(n, r):
     return v_err_last, v_err_max, v_err_quad, sig_err_last, sig_err_max, sig_err_quad
 
 
-n_h = 2
+n_h = 5
 n1_vec = np.array([2**(i+2) for i in range(n_h)])
 n2_vec = np.array([2**(i+1) for i in range(n_h)])
 h1_vec = 1./n1_vec

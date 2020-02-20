@@ -123,6 +123,7 @@ def computeH_dae(ind):
 
     controlD_dofs = np.where(B_D.any(axis=0))[0]
     B_D = B_D[:, controlD_dofs]
+    M_D = B_D[controlD_dofs, :]
     B_D = B_D[dirichlet_dofs, :]
 
     # plt.plot(x_cor[:], r_cor[:], 'bo')
@@ -138,7 +139,11 @@ def computeH_dae(ind):
     t_diss = 0.2 * t_final
 
     tau_imp = t_final / 100
-    invMM = la.inv(MM)
+
+    if ind != 15:
+        invMM = la.inv(MM)
+
+    RR = Z * B_D @ la.inv(M_D) @ B_D.T
 
     def dae_closed_phs(t, y, yd):
 
@@ -151,7 +156,22 @@ def computeH_dae(ind):
         ft_imp = (t > t_diss)  # * (1 - np.exp((t - t_diss)/tau_imp))
         ft_ctrl = 1  # (t<t_diss)
         res_e = ed_var - invMM @ (JJ @ e_var + G_D @ lmb_var + B_N * ft_ctrl)
-        res_lmb = - G_D.T @ e_var - Z * B_D @ B_D.T @ lmb_var * ft_imp
+        res_lmb = - G_D.T @ e_var - RR @ lmb_var * ft_imp
+
+        return np.concatenate((res_e, res_lmb))
+
+    def dae_closed_phs_ref(t, y, yd):
+
+        print(t / t_final * 100)
+
+        e_var = y[:n_e]
+        lmb_var = y[n_e:]
+        ed_var = yd[:n_e]
+
+        ft_imp = (t > t_diss)  # * (1 - np.exp((t - t_diss)/tau_imp))
+        ft_ctrl = 1  # (t<t_diss)
+        res_e = MM @ ed_var - (JJ @ e_var + G_D @ lmb_var + B_N * ft_ctrl)
+        res_lmb = - G_D.T @ e_var - RR @ lmb_var * ft_imp
 
         return np.concatenate((res_e, res_lmb))
 
@@ -193,7 +213,10 @@ def computeH_dae(ind):
     # print_modes(Maug, Jaug, Vp, 10)
 
     # Create an Assimulo implicit problem
-    imp_mod = Implicit_Problem(dae_closed_phs, y0, yd0, name='dae_closed_pHs')
+    if ind != 15:
+        imp_mod = Implicit_Problem(dae_closed_phs, y0, yd0, name='dae_closed_pHs')
+    else:
+        imp_mod = Implicit_Problem(dae_closed_phs_ref, y0, yd0, name='dae_closed_pHs')
     imp_mod.handle_result = handle_result
 
     # Set the algebraic components

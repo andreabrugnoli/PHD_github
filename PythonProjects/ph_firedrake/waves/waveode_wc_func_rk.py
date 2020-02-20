@@ -100,6 +100,9 @@ def computeH_ode(ind):
         controlD_dofs = np.where(B_D.any(axis=0))[0]
 
         B_D = B_D[:, controlD_dofs]
+        M_D = assemble(v_D * u_D * is_uD * r1 * ds1).array()
+        M_D = M_D[:, controlD_dofs]
+        M_D = M_D[controlD_dofs, :]
 
         nu_D = len(controlD_dofs)
 
@@ -237,7 +240,7 @@ def computeH_ode(ind):
         ep_0 = np.concatenate((ep1_0, ep2_0))
         eq_0 = np.concatenate((eq1_0, eq2_0))
 
-        return sys_DN, Vp1, Vp2, ep_0, eq_0, ind_x
+        return sys_DN, Vp1, Vp2, ep_0, eq_0, ind_x, M_D
 
     path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/waves/meshes_ifacwc/"
     mesh1 = Mesh(path_mesh + "duct_dom1_" + str(ind) + ".msh")
@@ -255,7 +258,7 @@ def computeH_ode(ind):
     degp2 = 1
     degq2 = 2
 
-    sys_DN, Vp1, Vp2, ep_0, eq_0, ind_x = create_sys(mesh1, mesh2, degp1, degq1, degp2, degq2)
+    sys_DN, Vp1, Vp2, ep_0, eq_0, ind_x, M_D = create_sys(mesh1, mesh2, degp1, degq1, degp2, degq2)
     JJ = sys_DN.J
     MM = sys_DN.E
     BB = sys_DN.B
@@ -280,7 +283,7 @@ def computeH_ode(ind):
     if ind != 15:
         invMM = la.inv(MM)
 
-    RR = Z * B_D @ B_D.T
+    RR = Z * B_D @ la.inv(M_D) @ B_D.T
 
     def ode_closed_phs(t, y):
         print(t / t_final * 100)
@@ -392,7 +395,7 @@ def computeH_ode(ind):
 
     Writer = animation.writers['ffmpeg']
     writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
-    path_videos = "/home/a.brugnoli/Plots_Videos/Python/Videos/Waves/IFAC_WC2020/"
+    path_videos = "/home/a.brugnoli/Videos/Waves/IFAC_WC2020/"
     anim.save(path_videos + 'wave_ode' + str(ind) + '.mp4', writer=writer)
 
     return H_vec, t_sol
