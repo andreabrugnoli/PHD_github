@@ -15,8 +15,8 @@ from math import pi
 plt.rc('text', usetex=True)
 
 
-n_el = 5 #int(input("Number of elements for side: "))
-deg = 0 #int(input('Degree for FE: '))
+n_el = 10 #int(input("Number of elements for side: "))
+deg = 1 #int(input('Degree for FE: '))
 nreq = 10
 
 E = 1
@@ -37,18 +37,6 @@ F = G * h * k
 # Useful Matrices
 D = E * h ** 3 / (1 - nu ** 2) / 12.
 fl_rot = 12 / (E * h ** 3)
-
-D_b = as_tensor([
-  [D, D * nu, 0],
-  [D * nu, D, 0],
-  [0, 0, D * (1 - nu) / 2]
-])
-
-C_b = as_tensor([
-    [fl_rot, -nu * fl_rot, 0],
-    [-nu * fl_rot, fl_rot, 0],
-    [0, 0, fl_rot * (1 + nu) / 2]
-])
 
 # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
 
@@ -96,9 +84,9 @@ def bending_curv(momenta):
 
 # Finite element defition
 
-CG_deg1 = FiniteElement("CG", interval, deg+1)
-DG_deg = FiniteElement("DG", interval, deg)
-DG_deg1 = FiniteElement("DG", interval, deg+1)
+CG_deg1 = FiniteElement("CG", interval, deg)
+DG_deg = FiniteElement("DG", interval, deg-1)
+DG_deg1 = FiniteElement("DG", interval, deg)
 
 P_CG1_DG = TensorProductElement(CG_deg1, DG_deg)
 P_DG_CG1 = TensorProductElement(DG_deg, CG_deg1)
@@ -114,10 +102,10 @@ BDM_horiz = HDivElement(P_CG1_DG1)
 BDM_vert = HDivElement(P_DG1_CG1)
 BDM_quad = BDM_horiz + BDM_vert
 
-V_pw = FunctionSpace(mesh, "DG", deg)
-V_pth = VectorFunctionSpace(mesh, "DG", deg)
+V_pw = FunctionSpace(mesh, "DG", deg-1)
+V_pth = VectorFunctionSpace(mesh, "DG", deg-1)
 V_qthD = FunctionSpace(mesh, BDM_quad)
-V_qth12 = FunctionSpace(mesh, "CG", deg+1)
+V_qth12 = FunctionSpace(mesh, "CG", deg)
 V_qw = FunctionSpace(mesh, BDM_quad)
 
 V = MixedFunctionSpace([V_pw, V_pth, V_qthD, V_qth12, V_qw])
@@ -195,9 +183,9 @@ v_qn = dot(v_qw, n_ver)
 v_Mnn = inner(v_qth, outer(n_ver, n_ver))
 v_Mns = inner(v_qth, outer(n_ver, s_ver))
 
-V_wt = FunctionSpace(mesh, "DG", deg)
-V_omn = FunctionSpace(mesh, "DG", deg)
-V_oms = FunctionSpace(mesh, "DG", deg)
+V_wt = FunctionSpace(mesh, "DG", deg-1)
+V_omn = FunctionSpace(mesh, "DG", deg-1)
+V_oms = FunctionSpace(mesh, "DG", deg-1)
 
 # V_wt = FunctionSpace(mesh, "CR", deg+1)
 # V_omn = FunctionSpace(mesh, "CR", deg+1)

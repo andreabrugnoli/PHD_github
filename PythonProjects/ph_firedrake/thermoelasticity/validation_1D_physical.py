@@ -16,8 +16,8 @@ import matplotlib.pyplot as plt
 
 matplotlib.rcParams['text.usetex'] = True
 import mpmath
-mpmath.mp.dps = 15
-mpmath.mp.pretty = True
+mpmath.mp.dps = 15; mpmath.mp.pretty = True
+
 
 def compute_analytical(delta, xi, tfin_hat):
 
@@ -43,50 +43,35 @@ def compute_analytical(delta, xi, tfin_hat):
 
     return t_vec, theta_t, disp_t, stress_t
 
+
 def compute_sol(n, r, delta, tfin_hat):
 
-    lamda = 0.8529 * 10**9  # kg cm^-1 s^-2
-    mu = 0.5686 * 10**9 # kg cm^-1 s^-2
-    rho = 7.82 * 10**(-3)  # kg cm^-3
-    c_E = 4.61 * 10**6  # cm^2 K^-1 s^-3
-    K = 1.7 * 10**3  # kg cm K^-1 s^-3
+    lamda = 0.8529 * 10 ** 9  # kg cm^-1 s^-2
+    mu = 0.5686 * 10 ** 9  # kg cm^-1 s^-2
+    rho = 7.82 * 10 ** (-3)  # kg cm^-3
+    c_E = 4.61 * 10 ** 6  # cm^2 K^-1 s^-3
+    K = 1.7 * 10 ** 3  # kg cm K^-1 s^-3
 
-    c_1 = np.sqrt((lamda + 2*mu)/rho)
+    c_1 = np.sqrt((lamda + 2 * mu) / rho)
 
-    alpha_T = 9.0375 * 10**(-6)  # K^-1  alpha = K/(rho*c_E)
-    T_0 = 300  #  K
+    alpha_T = 9.0375 * 10 ** (-6)  # K^-1  alpha = K/(rho*c_E)
+    T_0 = 300  # K
 
-    beta = K/(rho*c_E*c_1)
-    gamma = alpha_T*(3*lamda+2*mu)
+    beta = K / (rho * c_E * c_1)
+    gamma = alpha_T * (3 * lamda + 2 * mu)
 
-    # C = 0
-    # fac = 0
-    C = alpha_T**2*(3*lamda+2*mu)**2*T_0/(rho*c_E*(2*mu + lamda))
-    fac = 1/C
+    C = alpha_T ** 2 * (3 * lamda + 2 * mu) ** 2 * T_0 / (rho * c_E * (2 * mu + lamda))
+    fac = 1 / C
 
-    # alpha_TCoup = np.sqrt((C*rho*c_E*(2*mu+lamda))/(T_0*(3*lamda + 2*mu)**2))
-    # print(alpha_TCoup/alpha_T)
-    # Operators and functions
-
-    def gradSym(u):
-        return 0.5 * (nabla_grad(u) + nabla_grad(u).T)
-        # return sym(nabla_grad(u))
-
-    def gradSkew(u):
-        return 0.5 * (nabla_grad(u) - nabla_grad(u).T)
+    def rigidity_tensor(epsilon):
+        sigma = (2*mu + lamda)*epsilon
+        return sigma
 
     # E = mu*(3*lamda + 2*mu)/(lamda + mu)
     # nu = lamda/(2*(lamda+mu))
 
-    def rigidity_tensor(epsilon):
-        sigma = 2*mu*epsilon + lamda * Identity(2)*tr(epsilon)
-        return sigma
-
     def compliance(stress):
-        # epsilon = 1./(2*mu) * stress - lamda/(2*mu*(3*lamda + 2*mu))*tr(stress)* Identity(2)
-        # epsilon = 1./E * ((1+nu)*stress - nu*tr(stress)*Identity(2))
-        epsilon = 1. / (2 * mu + lamda) * stress
-
+        epsilon = 1./(2*mu + lamda) * stress
         return epsilon
 
     def e_operator(v_pel, al_pel, v_qel, al_qel, v_pt, al_pt):
@@ -98,17 +83,16 @@ def compute_sol(n, r, delta, tfin_hat):
 
     def j_operator(v_pel, e_pel, v_qel, e_qel, v_pt, e_pt, v_qt, e_qt):
 
-        jel_grad = inner(v_qel, gradSym(e_pel)) * dx
-        jel_gradIP = -inner(gradSym(v_pel), e_qel) * dx
+        jel_grad = v_qel * e_pel.dx(0) * dx
+        jel_gradIP = - v_pel.dx(0) * e_qel * dx
 
         if delta != 0:
-            jcoup_div  = - fac*gamma * T_0 * v_pt * div(e_pel) * dx
+            jcoup_div = - fac*gamma * T_0 * v_pt * e_pel.dx(0) * dx
 
-        jcoup_divIP = gamma * T_0 * div(v_pel) * e_pt * dx
+        jcoup_divIP = gamma * T_0 * v_pel.dx(0) * e_pt * dx
 
-
-        jt_grad = -dot(v_qt, grad(e_pt)) * dx
-        jt_gradIP = +dot(grad(v_pt), e_qt) * dx
+        jt_grad = - v_qt*e_pt.dx(0) * dx
+        jt_gradIP = + v_pt.dx(0) * e_qt * dx
 
         if delta != 0:
             j_form = jel_grad + jel_gradIP + jcoup_div + jcoup_divIP + jt_grad + jt_gradIP
@@ -119,28 +103,25 @@ def compute_sol(n, r, delta, tfin_hat):
 
 
     def r_operator(v_qt, e_qt):
-        r_form = 1./(T_0*K)*inner(v_qt, e_qt)*dx
+        r_form = 1./(T_0*K)*v_qt*e_qt*dx
 
         return r_form
 
     # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
 
     L_hat = 10
-    L_x = beta*L_hat
-    L_y = L_x
-    n_x = n
-    n_y = n
-    mesh = RectangleMesh(n_x, n_y, L_x, L_y, quadrilateral=False)
+    L = beta * L_hat
+    mesh = IntervalMesh(n, L)
 
     # plot(mesh);
     # plt.show()
 
 
     # Finite element defition
-    V_pel = VectorFunctionSpace(mesh, "CG", r)
-    V_qel = VectorFunctionSpace(mesh, "DG", r-1, dim=3)
+    V_pel = FunctionSpace(mesh, "CG", r)
+    V_qel = FunctionSpace(mesh, "DG", r-1)
     V_pt = FunctionSpace(mesh, "CG", r)
-    V_qt = VectorFunctionSpace(mesh, "DG", r-1)
+    V_qt = FunctionSpace(mesh, "DG", r-1)
 
     V = MixedFunctionSpace([V_pel, V_qel, V_pt, V_qt])
 
@@ -153,12 +134,6 @@ def compute_sol(n, r, delta, tfin_hat):
     e = TrialFunction(V)
     e_pel, e_qel, e_pt, e_qt = split(e)
 
-    v_qel = as_tensor([[v_qel[0], v_qel[1]],
-                       [v_qel[1], v_qel[2]]])
-
-    e_qel = as_tensor([[e_qel[0], e_qel[1]],
-                       [e_qel[1], e_qel[2]]])
-
     al_pel = rho * e_pel
     al_qel = compliance(e_qel)
     al_pt = rho * c_E * T_0 * e_pt
@@ -169,8 +144,7 @@ def compute_sol(n, r, delta, tfin_hat):
     ds = Measure('ds')
 
     t = 0
-
-    t_fin = beta*tfin_hat/c_1     # total simulation time
+    t_fin = beta * tfin_hat / c_1  # total simulation time
 
     # J, M = PETScMatrix(), PETScMatrix()
 
@@ -196,11 +170,7 @@ def compute_sol(n, r, delta, tfin_hat):
 
     epel_n, eqel_n, ept_n, eqt_n = e_n.split()
 
-    eqel_n = as_tensor([[eqel_n[0], eqel_n[1]],
-                       [eqel_n[1], eqel_n[2]]
-                       ])
-
-    v_n.assign(Constant((0.0, 0.0)))
+    v_n.assign(Constant(0.0))
 
     n_t = int(floor(t_fin/dt) + 1)
 
@@ -209,12 +179,9 @@ def compute_sol(n, r, delta, tfin_hat):
     theta_atP = np.zeros((n_t,))
 
     x_hat = 1
-    x_P = x_hat*beta
-    y_hat = L_hat/2
-    y_P = y_hat*beta
+    x_P = x_hat * beta
 
-
-    Ppoint = (x_P, y_P)
+    Ppoint = x_P
 
     param = {"ksp_type": "gmres", "ksp_gmres_restart":100, "ksp_atol":1e-60}
     # param = {"ksp_type": "preonly", "pc_type": "lu"}
@@ -222,11 +189,7 @@ def compute_sol(n, r, delta, tfin_hat):
     for i in range(1, n_t):
         epel_n, eqel_n, ept_n, eqt_n = e_n.split()
 
-        eqel_n = as_tensor([[eqel_n[0], eqel_n[1]],
-                            [eqel_n[1], eqel_n[2]]
-                            ])
-
-        alpel_n = rho * epel_n
+        alpel_n = rho*epel_n
         alqel_n = compliance(eqel_n)
         alpt_n = rho * c_E * T_0 * ept_n
         alqt_n = eqt_n
@@ -243,32 +206,29 @@ def compute_sol(n, r, delta, tfin_hat):
 
         epel_n1, eqel_n1, ept_n1, eqt_n1 = e_n.split()
 
-        # eqel_n1 = as_tensor([[eqel_n1[0], eqel_n1[1]],
-        #                     [eqel_n1[1], eqel_n1[2]]
-        #                     ])
-
         v_n1.assign(epel_n1)
         e_n.assign(e_n1)
 
-        u_atP[i] = u_atP[i-1] + dt/2*(v_n.at(Ppoint)[0] + v_n1.at(Ppoint)[0])
+        u_atP[i] = u_atP[i-1] + dt/2*(v_n.at(Ppoint) + v_n1.at(Ppoint))
         v_n.assign(v_n1)
         theta_atP[i] = ept_n1.at(Ppoint)
         print(i)
 
     t_vec_hat = np.linspace(0, tfin_hat, num=n_t)
-    u_atP_hat = u_atP*(lamda + 2*mu)/(beta*gamma*T_0)
+
+    u_atP_hat = u_atP * (lamda + 2 * mu) / (beta * gamma * T_0)
 
     return t_vec_hat, theta_atP, u_atP_hat
 
-
-n = 50
+n = 100
 r = 1
 t_fin_hat = 4
 
-t1, th1, u1 = compute_sol(n, r, 0, t_fin_hat)
-t_an1, th_an1, disp_an1, stress_an1 = compute_analytical(0, 1, t_fin_hat)
 
+t1, th1, u1 = compute_sol(n, r, 0, t_fin_hat)
 t2, th2, u2 = compute_sol(n, r, 1, t_fin_hat)
+
+t_an1, th_an1, disp_an1, stress_an1 = compute_analytical(0, 1, t_fin_hat)
 t_an2, th_an2, disp_an2, stress_an2 = compute_analytical(1, 1, t_fin_hat)
 
 path_fig = "/home/a.brugnoli/Plots/Python/Plots/Thermoelasticity/"
@@ -276,23 +236,23 @@ save_fig = True
 plt.figure()
 
 plt.plot(t1, th1, '-.', label=r'approx $\theta$ $\delta=0$')
-plt.plot(t_an1, th_an1, '-', label=r'exact $\theta$ $\delta=0$')
 plt.plot(t2, th2, '--', label=r'approx $\theta$ $\delta=1$')
+plt.plot(t_an1, th_an1, '-', label=r'exact $\theta$ $\delta=0$')
 plt.plot(t_an2, th_an2, ':', label=r'exact $\theta$ $\delta=1$')
 plt.xlabel(r'Dimensionless Time')
 plt.title(r'Dimensionless Temperature at ' + str(1))
 plt.legend()
 
-plt.savefig(path_fig + "temp_at1_2D_2", format="eps")
+plt.savefig(path_fig + "temp_at1_1D", format="eps")
 plt.figure()
 
 plt.plot(t1, u1, '-.', label=r'approx $u_x$ $\delta=0$')
-plt.plot(t_an1, disp_an1, '-', label=r'exact $\theta$ $\delta=0$')
 plt.plot(t2, u2, '-.', label=r'approx $u_x$ $\delta=1$')
+plt.plot(t_an1, disp_an1, '-', label=r'exact $\theta$ $\delta=0$')
 plt.plot(t_an2, disp_an2, ':', label=r'exact $\theta$ $\delta=1$')
 plt.xlabel(r'Dimensionless Time')
 plt.title(r'Dimensionless Displacement at ' + str(1))
 plt.legend()
 
-plt.savefig(path_fig + "disp_at1_2D_2", format="eps")
+plt.savefig(path_fig + "disp_at1_1D", format="eps")
 plt.show()

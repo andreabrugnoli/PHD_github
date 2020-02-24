@@ -124,7 +124,7 @@ class SysPhdae:
         if Q is not None:
             assert Q.shape == matr_shape
             if not check_positive_matrix(Q):
-                warnings.warn("Q matrix is not symmetric according to tol. Mass matrix ill condiitioned")
+                warnings.warn("Q matrix is not symmetric according to tol. Mass matrix ill conditioned")
             if not (Q.T @ E - E.T @ Q).all() == 0:
                 warnings.warn("Q^T E != E^T Q")
             self.Q = Q

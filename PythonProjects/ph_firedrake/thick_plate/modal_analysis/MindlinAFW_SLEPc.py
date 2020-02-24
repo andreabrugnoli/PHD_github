@@ -3,8 +3,7 @@
 from firedrake import *
 import numpy as np
 import scipy.linalg as la
-from modules_ph.classes_phsystem import SysPhdaeRig, check_positive_matrix
-import warnings
+
 np.set_printoptions(threshold=np.inf)
 from matplotlib import pyplot as plt
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
@@ -14,9 +13,16 @@ from mpl_toolkits.mplot3d import Axes3D
 from math import pi
 plt.rc('text', usetex=True)
 
+from firedrake.petsc import PETSc
+try:
+    from slepc4py import SLEPc
+except ImportError:
+    import sys
+    warning("Unable to import SLEPc, eigenvalue computation not possible (try firedrake-update --slepc)")
+    sys.exit(0)
 
-n_el = 7  #int(input("Number of elements for side: "))
-deg = 2  #int(input('Degree for FE: '))
+n_el = 4 #int(input("Number of elements for side: "))
+deg = r #int(input('Degree for FE: '))
 nreq = 5
 
 E = 1
@@ -79,7 +85,7 @@ V_pth = VectorFunctionSpace(mesh, "DG", deg-1)
 
 V_qth1 = FunctionSpace(mesh, "BDM", deg)
 V_qth2 = FunctionSpace(mesh, "BDM", deg)
-V_qw = FunctionSpace(mesh, "RT", deg)
+V_qw = FunctionSpace(mesh, "BDM", deg)
 
 # V_qth1 = FunctionSpace(mesh, "RT", deg+1)
 # V_qth2 = FunctionSpace(mesh, "RT", deg+1)
@@ -177,10 +183,6 @@ V_wt = FunctionSpace(mesh, "DG", deg-1)
 V_omn = FunctionSpace(mesh, "DG", deg-1)
 V_oms = FunctionSpace(mesh, "DG", deg-1)
 
-# V_wt = FunctionSpace(mesh, "CG", deg)
-# V_omn = FunctionSpace(mesh, "CG", deg)
-# V_oms = FunctionSpace(mesh, "CG", deg)
-
 Vu = MixedFunctionSpace([V_wt, V_omn, V_oms])
 
 w_t, om_n, om_s = TrialFunction(Vu)
@@ -194,7 +196,7 @@ for key,val in bc_dict.items():
     if val == 'F':
         b_vec.append(v_qn * w_t * ds(key) + v_Mnn * om_n * ds(key) + v_Mns * om_s * ds(key))
     elif val == 'S':
-        b_vec.append(v_Mnn * om_n * ds(key))
+        b_vec.append(v_Mnn * om_n * ds(key) )
 
 b_u = sum(b_vec)
 
