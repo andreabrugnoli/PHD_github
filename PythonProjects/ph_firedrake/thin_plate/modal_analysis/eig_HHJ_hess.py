@@ -118,43 +118,56 @@ bc_dict = {1: bc_1, 3: bc_2, 2: bc_3, 4: bc_4}
 # 4: plane y == 1
 
 bcs = []
-boundary_dofs = []
 
 for key, val in bc_dict.items():
 
     if val == 'C':
-        bc_p = DirichletBC(Vp, Constant(0.0), key)
-        for node in bc_p.nodes:
-            boundary_dofs.append(node)
-        bcs.append(bc_p)
+        bcs.append(DirichletBC(V.sub(0), Constant(0.0), key))
 
     elif val == 'S':
-        bc_p = DirichletBC(Vp, Constant(0.0), key)
-        bc_q = DirichletBC(Vq, Constant(((0.0, 0.0), (0.0, 0.0))), key)
-
-        for node in bc_p.nodes:
-            boundary_dofs.append(node)
-        bcs.append(bc_p)
-
-        for node in bc_q.nodes:
-            boundary_dofs.append(n_Vp + node)
-        bcs.append(bc_q)
+        bcs.append(DirichletBC(V.sub(0), Constant(0.0), key))
+        bcs.append( DirichletBC(V.sub(1), Constant(((0.0, 0.0), (0.0, 0.0))), key))
 
     elif val == 'F':
-        bc_q = DirichletBC(Vq, Constant(((0.0, 0.0), (0.0, 0.0))), key)
-        for node in bc_q.nodes:
-            boundary_dofs.append(n_Vp + node)
-        bcs.append(bc_q)
+        bcs.append(DirichletBC(V.sub(1), Constant(((0.0, 0.0), (0.0, 0.0))), key))
 
-boundary_dofs = sorted(boundary_dofs)
-n_lmb = len(boundary_dofs)
+# boundary_dofs = []
+#
+# for key, val in bc_dict.items():
+#
+#     if val == 'C':
+#         bc_p = DirichletBC(Vp, Constant(0.0), key)
+#         for node in bc_p.nodes:
+#             boundary_dofs.append(node)
+#         bcs.append(bc_p)
+#
+#     elif val == 'S':
+#         bc_p = DirichletBC(Vp, Constant(0.0), key)
+#         bc_q = DirichletBC(Vq, Constant(((0.0, 0.0), (0.0, 0.0))), key)
+#
+#         for node in bc_p.nodes:
+#             boundary_dofs.append(node)
+#         bcs.append(bc_p)
+#
+#         for node in bc_q.nodes:
+#             boundary_dofs.append(n_Vp + node)
+#         bcs.append(bc_q)
+#
+#     elif val == 'F':
+#         bc_q = DirichletBC(Vq, Constant(((0.0, 0.0), (0.0, 0.0))), key)
+#         for node in bc_q.nodes:
+#             boundary_dofs.append(n_Vp + node)
+#         bcs.append(bc_q)
+#
+# boundary_dofs = sorted(boundary_dofs)
+# n_lmb = len(boundary_dofs)
+#
+# G = np.zeros((n_V, n_lmb))
+# for (i, j) in enumerate(boundary_dofs):
+#     G[j, i] = 1
 
-G = np.zeros((n_V, n_lmb))
-for (i, j) in enumerate(boundary_dofs):
-    G[j, i] = 1
-
-J = assemble(j_form, mat_type='aij')
-M = assemble(m_form, mat_type='aij')
+J = assemble(j_form, bcs=bcs, mat_type='aij')
+M = assemble(m_form, bcs=bcs, mat_type='aij')
 
 petsc_j = J.M.handle
 petsc_m = M.M.handle
@@ -162,16 +175,18 @@ petsc_m = M.M.handle
 JJ = np.array(petsc_j.convert("dense").getDenseArray())
 MM = np.array(petsc_m.convert("dense").getDenseArray())
 
-Z_lmb = np.zeros((n_lmb, n_lmb))
+# Z_lmb = np.zeros((n_lmb, n_lmb))
+#
+# J_aug = np.vstack([np.hstack([JJ, G]),
+#                    np.hstack([-G.T, Z_lmb])
+#                 ])
+#
+# M_aug = la.block_diag(MM, Z_lmb)
+# tol = 10**(-9)
 
-J_aug = np.vstack([np.hstack([JJ, G]),
-                   np.hstack([-G.T, Z_lmb])
-                ])
+# eigenvalues, eigvectors = la.eig(J_aug, M_aug)
+eigenvalues, eigvectors = la.eig(JJ, MM)
 
-M_aug = la.block_diag(MM, Z_lmb)
-tol = 10**(-9)
-
-eigenvalues, eigvectors = la.eig(J_aug, M_aug)
 omega_all = np.imag(eigenvalues)
 
 tol = 10**(-9)
@@ -188,8 +203,8 @@ omega_tilde = omega * norm_coeff
 n_om = 10
 
 for i in range(n_om):
-    print(omega_tilde[i])
-
+    # print(omega_tilde[i])
+    print(omega[i])
 n_fig = 5
 
 
