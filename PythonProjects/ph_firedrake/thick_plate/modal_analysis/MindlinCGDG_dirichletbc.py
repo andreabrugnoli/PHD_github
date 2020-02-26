@@ -11,7 +11,7 @@ from firedrake.plot import _two_dimension_triangle_func_val
 from mpl_toolkits.mplot3d import Axes3D
 plt.rc('text', usetex=True)
 
-n = 10
+n = 15
 deg = 1
 
 rho = 1
@@ -74,6 +74,8 @@ mesh = UnitSquareMesh(n_x, n_y)
 
 Vp_w = FunctionSpace(mesh, "CG", deg)
 Vp_th = VectorFunctionSpace(mesh, "CG", deg)
+# Vq_th = VectorFunctionSpace(mesh, "CG", deg, dim=3)
+# Vq_w = VectorFunctionSpace(mesh, "CG", deg)
 Vq_th = VectorFunctionSpace(mesh, "DG", deg-1, dim=3)
 Vq_w = VectorFunctionSpace(mesh, "DG", deg-1)
 
@@ -120,61 +122,32 @@ bc_1, bc_2, bc_3, bc_4 = bc_input
 
 bc_dict = {1: bc_1, 2: bc_3, 3: bc_2, 4: bc_4}
 
-n = FacetNormal(mesh)
-s = as_vector([-n[1], n[0] ])
 
-Vf = FunctionSpace(mesh, 'DG', deg-1)
-Vu = Vf * Vf * Vf
-
-q_n, M_nn, M_ns = TrialFunction(Vu)
-
-v_omn = dot(v_pth, n)
-v_oms = dot(v_pth, s)
-
-b_vec = []
+bcs = []
 for key,val in bc_dict.items():
     if val == 'C':
-        b_vec.append(v_pw * q_n * ds(key) + v_omn * M_nn * ds(key) + v_oms * M_ns * ds(key))
+        bcs.append(DirichletBC(V.sub(0), Constant(0.0), key))
+        bcs.append(DirichletBC(V.sub(1), Constant((0.0, 0.0)), key))
+
     elif val == 'S':
-        b_vec.append(v_pw * q_n * ds(key) + v_oms * M_ns * ds(key))
+        bcs.append(DirichletBC(V.sub(0), Constant(0.0), key))
+        if key == 1 or key ==2:
+            bcs.append(DirichletBC(V.sub(1).sub(1), Constant(0.0), key))
+        else:
+            bcs.append(DirichletBC(V.sub(1).sub(0), Constant(0.0), key))
 
-b_u = sum(b_vec)
-
-
-J = assemble(j_form, mat_type='aij')
-M = assemble(m_form, mat_type='aij')
-B = assemble(b_u, mat_type="aij")
+J = assemble(j_form, bcs=bcs, mat_type='aij')
+M = assemble(m_form, bcs=bcs, mat_type='aij')
 
 petsc_j = J.M.handle
 petsc_m = M.M.handle
-petsc_b = B.M.handle
 
 JJ = np.array(petsc_j.convert("dense").getDenseArray())
 MM = np.array(petsc_m.convert("dense").getDenseArray())
-B_in = np.array(petsc_b.convert("dense").getDenseArray())
 
-boundary_dofs = np.where(B_in.any(axis=0))[0]
-B_in = B_in[:,boundary_dofs]
-
-N_al = V.dim()
-N_u = len(boundary_dofs)
-# print(N_u)
-
-Z_u = np.zeros((N_u, N_u))
-
-J_aug = np.vstack([ np.hstack([JJ, B_in]),
-                    np.hstack([-B_in.T, Z_u])
-                ])
-
-Z_al_u = np.zeros((N_al, N_u))
-Z_u_al = np.zeros((N_u, N_al))
-
-M_aug = np.vstack([ np.hstack([MM, Z_al_u]),
-                    np.hstack([Z_u_al,    Z_u])
-                 ])
 tol = 10**(-9)
 
-eigenvalues, eigvectors = la.eig(J_aug, M_aug)
+eigenvalues, eigvectors = la.eig(JJ, MM)
 omega_all = np.imag(eigenvalues)
 
 index = omega_all > tol
@@ -189,15 +162,14 @@ omega.sort()
 
 omega_tilde = omega*L*((2*(1+nu)*rho)/E)**0.5
 
-for i in range(10):
-    print(omega_tilde[i])
+for i in range(5):
+    print("Eigenvalue num " + str(i + 1) + ":" + str(omega_tilde[i]))
 
 n_fig = 5
 
 n_Vpw = Vp_w.dim()
 fntsize = 15
 for i in range(n_fig):
-    print("Eigenvalue num " + str(i + 1) + ":" + str(omega[i]))
     eig_real_w = Function(Vp_w)
     eig_imag_w = Function(Vp_w)
 

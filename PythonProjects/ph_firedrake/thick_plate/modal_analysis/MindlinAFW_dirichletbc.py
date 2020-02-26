@@ -21,22 +21,34 @@ except ImportError:
     warning("Unable to import SLEPc, eigenvalue computation not possible (try firedrake-update --slepc)")
     sys.exit(0)
 
-n_el = 8 #int(input("Number of elements for side: "))
-deg = 1 #int(input('Degree for FE: '))
-nreq = 5
+n = 4
+deg = 2
 
-E = 1
+rho = 2700
+E = 1e12
 nu = 0.3
-
-rho = 1
-k = 0.8601
-L = 1
-h = 0.1
+thick = 'y'
+if thick == 'y':
+    h = 0.1
+else:
+    h = 0.01
 
 plot_eigenvector = 'y'
 
-bc_input = input('Select Boundary Condition: ')   #'SSSS'
+# bc_input = input('Select Boundary Condition: ')
+bc_input = 'CCCC'
 
+if bc_input == 'CCCC' or  bc_input == 'CCCF':
+    k = 0.8601 # 5./6. #
+elif bc_input == 'SSSS':
+    k = 0.8333
+elif bc_input == 'SCSC':
+    k = 0.822
+else: k = 0.8601
+
+L = 1
+
+D = E * h ** 3 / (1 - nu ** 2) / 12.
 G = E / 2 / (1 + nu)
 F = G * h * k
 
@@ -49,7 +61,7 @@ fl_rot = 12 / (E * h ** 3)
 
 L = 1
 
-n_x, n_y = n_el, n_el
+n_x, n_y = n, n
 L_x, L_y = L, L
 mesh = RectangleMesh(n_x, n_y, L_x, L_y, quadrilateral=False)
 
@@ -216,6 +228,8 @@ eigvec_omega = eigvec_omega[:, perm]
 omega.sort()
 
 omega_tilde = omega*L*((2*(1+nu)*rho)/E)**0.5
+
+nreq = 4
 
 for i in range(nreq):
     print(omega_tilde[i])

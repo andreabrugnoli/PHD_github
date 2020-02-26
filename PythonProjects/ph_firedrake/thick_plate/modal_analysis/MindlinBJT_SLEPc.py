@@ -1,16 +1,13 @@
 # Mindlin plate written with the port Hamiltonian approach
-# with weak symmetry
+# with strong symmetry
 from firedrake import *
 import numpy as np
-import scipy.linalg as la
-
 np.set_printoptions(threshold=np.inf)
 from matplotlib import pyplot as plt
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from matplotlib import cm
 from firedrake.plot import _two_dimension_triangle_func_val
 from mpl_toolkits.mplot3d import Axes3D
-from math import pi
 plt.rc('text', usetex=True)
 
 from firedrake.petsc import PETSc
@@ -21,22 +18,22 @@ except ImportError:
     warning("Unable to import SLEPc, eigenvalue computation not possible (try firedrake-update --slepc)")
     sys.exit(0)
 
-n = 20
+
+n_el = 10
 deg = 2
 
 rho = 2700
 E = 1e12
 nu = 0.3
+
+L = 1
+
 thick = 'n'
 if thick == 'y':
     h = 0.1
 else:
     h = 0.01
-
-plot_eigenvector = 'y'
-
 bc_input = input('Select Boundary Condition: ')
-# bc_input = 'CCCC'
 
 if bc_input == 'CCCC' or  bc_input == 'CCCF':
     k = 0.8601 # 5./6. #
@@ -46,12 +43,8 @@ elif bc_input == 'SCSC':
     k = 0.822
 else: k = 0.8601
 
-L = 1
-
-D = E * h ** 3 / (1 - nu ** 2) / 12.
 G = E / 2 / (1 + nu)
 F = G * h * k
-
 
 # Useful Matrices
 D = E * h ** 3 / (1 - nu ** 2) / 12.
@@ -61,15 +54,19 @@ fl_rot = 12 / (E * h ** 3)
 
 L = 1
 
-n_x, n_y = n, n
+n_x, n_y = n_el, n_el
 L_x, L_y = L, L
-mesh = RectangleMesh(n_x, n_y, L_x, L_y, quadrilateral=False)
+# mesh = RectangleMesh(n_x, n_y, L_x, L_y, quadrilateral=True)
+
+mesh_int = IntervalMesh(n_el, L)
+mesh = ExtrudedMesh(mesh_int, n_el)
 
 # domain = mshr.Rectangle(Point(0, 0), Point(l_x, l_y))
 # mesh = mshr.generate_mesh(domain, n, "cgal")
 
 # plot(mesh)
 # plt.show()
+
 
 # Operators and functions
 def gradSym(u):
@@ -83,62 +80,70 @@ def bending_moment(kappa):
 def bending_curv(momenta):
     kappa = fl_rot * ((1+nu)*momenta - nu * Identity(2) * tr(momenta))
     return kappa
+#
+# def strain2voigt(eps):
+#     return as_vector([eps[0, 0], eps[1, 1], 2 * eps[0, 1]])
+#
+# def voigt2stress(S):
+#     return as_tensor([[S[0], S[2]], [S[2], S[1]]])
+#
+# def bending_moment(u):
+#     return voigt2stress(dot(D_b, strain2voigt(u)))
+#
+# def bending_curv(u):
+#     return voigt2stress(dot(C_b, strain2voigt(u)))
+
 
 # Finite element defition
 
+CG_deg1 = FiniteElement("CG", interval, deg)
+DG_deg = FiniteElement("DG", interval, deg-1)
+DG_deg1 = FiniteElement("DG", interval, deg)
 
-Vp_w = FunctionSpace(mesh, "DG", deg-1)
-Vskw = FunctionSpace(mesh, "DG", deg-1)
-Vp_th = VectorFunctionSpace(mesh, "DG", deg-1)
+P_CG1_DG = TensorProductElement(CG_deg1, DG_deg)
+P_DG_CG1 = TensorProductElement(DG_deg, CG_deg1)
 
-# Vq_th1 = FunctionSpace(mesh, "BDM", deg)
-# Vq_th2 = FunctionSpace(mesh, "BDM", deg)
-# Vq_w = FunctionSpace(mesh, "BDM", deg)
+RT_horiz = HDivElement(P_CG1_DG)
+RT_vert = HDivElement(P_DG_CG1)
+RT_quad = RT_horiz + RT_vert
 
-Vq_th1 = FunctionSpace(mesh, "BDM", deg)
-Vq_th2 = FunctionSpace(mesh, "BDM", deg)
-Vq_w = FunctionSpace(mesh, "BDM", deg)
+P_CG1_DG1 = TensorProductElement(CG_deg1, DG_deg1)
+P_DG1_CG1 = TensorProductElement(DG_deg1, CG_deg1)
 
-# Vq_th1 = FunctionSpace(mesh, "RT", deg+1)
-# Vq_th2 = FunctionSpace(mesh, "RT", deg+1)
-# Vq_w = FunctionSpace(mesh, "RT", deg+1)
+BDM_horiz = HDivElement(P_CG1_DG1)
+BDM_vert = HDivElement(P_DG1_CG1)
+BDM_quad = BDM_horiz + BDM_vert
 
-V = MixedFunctionSpace([Vp_w, Vskw, Vp_th, Vq_th1, Vq_th2, Vq_w])
+V_pw = FunctionSpace(mesh, "DG", deg-1)
+V_pth = VectorFunctionSpace(mesh, "DG", deg-1)
+V_qthD = FunctionSpace(mesh, BDM_quad)
+V_qth12 = FunctionSpace(mesh, "CG", deg)
+V_qw = FunctionSpace(mesh, BDM_quad)
+
+V = MixedFunctionSpace([V_pw, V_pth, V_qthD, V_qth12, V_qw])
 
 n_V = V.dim()
 print(n_V)
 
 v = TestFunction(V)
-v_pw, v_skw, v_pth, v_qth1, v_qth2, v_qw = split(v)
+v_pw, v_pth, v_qthD, v_qth12, v_qw = split(v)
 
 e = TrialFunction(V)
-e_pw, e_skw, e_pth, e_qth1, e_qth2, e_qw = split(e)
+e_pw, e_pth, e_qthD, e_qth12, e_qw = split(e)
 
-v_qth = as_tensor([[v_qth1[0], v_qth1[1]],
-                    [v_qth2[0], v_qth2[1]]
+v_qth = as_tensor([[v_qthD[0], v_qth12],
+                    [v_qth12, v_qthD[1]]
                    ])
 
-e_qth = as_tensor([[e_qth1[0], e_qth1[1]],
-                    [e_qth2[0], e_qth2[1]]
+e_qth = as_tensor([[e_qthD[0], e_qth12],
+                    [e_qth12, e_qthD[1]]
                    ])
-
-# v_qth = as_tensor([[v_qth1[0], v_qth2[0]],
-#                    [v_qth1[1], v_qth2[1]]
-#                    ])
-#
-# e_qth = as_tensor([[e_qth1[0], e_qth2[0]],
-#                    [e_qth1[1], e_qth2[1]]
-#                    ])
 
 al_pw = rho * h * e_pw
 al_pth = (rho * h ** 3) / 12. * e_pth
 al_qth = bending_curv(e_qth)
 al_qw = 1. / F * e_qw
 
-v_skw = as_tensor([[0, v_skw],
-                    [-v_skw, 0]])
-al_skw = as_tensor([[0, e_skw],
-                    [-e_skw, 0]])
 
 # v_skw = skew(v_skw)
 # al_skw = skew(e_skw)
@@ -148,9 +153,8 @@ ds = Measure('ds')
 
 m_form = v_pw * al_pw * dx \
     + dot(v_pth, al_pth) * dx \
-    + inner(v_qth, al_qth) * dx + inner(v_qth, al_skw) * dx \
-    + dot(v_qw, al_qw) * dx \
-    + inner(v_skw, e_qth) * dx
+    + inner(v_qth, al_qth) * dx \
+    + dot(v_qw, al_qw) * dx
 
 j_div = v_pw * div(e_qw) * dx
 j_divIP = -div(v_qw) * e_pw * dx
@@ -184,36 +188,45 @@ bc_1, bc_2, bc_3, bc_4 = bc_input
 bc_dict = {1: bc_1, 3: bc_2, 2: bc_3, 4: bc_4}
 
 bcs = []
-for key, val in bc_dict.items():
+for key,val in bc_dict.items():
     if val == 'F':
-        bc_qn = DirichletBC(V.sub(5), Constant((0.0, 0.0)), key)
-        bc_m1 = DirichletBC(V.sub(3), Constant((0.0, 0.0)), key)
-        bc_m2 = DirichletBC(V.sub(4), Constant((0.0, 0.0)), key)
-
-        bcs.append(bc_qn)
-        bcs.append(bc_m1)
-        bcs.append(bc_m2)
+        if key == 1 or key == 2:
+            bcs.append(DirichletBC(V.sub(2), Constant((0.0, 0.0)), key))
+            bcs.append(DirichletBC(V.sub(3), Constant(0.0), key))
+            bcs.append(DirichletBC(V.sub(4), Constant((0.0, 0.0)), key))
+        elif key == 3:
+            bcs.append(DirichletBC(V.sub(2), Constant((0.0, 0.0)), "bottom"))
+            bcs.append(DirichletBC(V.sub(3), Constant(0.0), "bottom"))
+            bcs.append(DirichletBC(V.sub(4), Constant((0.0, 0.0)), "bottom"))
+        else:
+            bcs.append(DirichletBC(V.sub(2), Constant((0.0, 0.0)), "top"))
+            bcs.append(DirichletBC(V.sub(3), Constant(0.0), "top"))
+            bcs.append(DirichletBC(V.sub(4), Constant((0.0, 0.0)), "top"))
     elif val == 'S':
-        bc_m1 = DirichletBC(V.sub(3), Constant((0.0, 0.0)), key)
-        bc_m2 = DirichletBC(V.sub(4), Constant((0.0, 0.0)), key)
-
-        bcs.append(bc_m1)
-        bcs.append(bc_m2)
+        if key == 1 or key == 2:
+            bcs.append(DirichletBC(V.sub(2), Constant((0.0, 0.0)), key))
+        elif key == 3:
+            bcs.append(DirichletBC(V.sub(2), Constant((0.0, 0.0)), "bottom"))
+        else:
+            bcs.append(DirichletBC(V.sub(2), Constant((0.0, 0.0)), "top"))
 
 
 M = assemble(m_form, bcs=bcs, mat_type='aij')
 J = assemble(j_form, bcs=bcs, mat_type='aij')
 
-
 petsc_j = J.M.handle
 petsc_m = M.M.handle
+
+tol = 10**(-9)
+
+# plt.spy(J_aug); plt.show()
 
 num_eigenvalues = 10
 
 target = 1/(L*((2*(1+nu)*rho)/E)**0.5)
 
 opts = PETSc.Options()
-opts.setValue("eps_gen_non_hermitian", None)
+opts.setValue("pos_gen_non_hermitian", None)
 opts.setValue("st_pc_factor_shift_type", "NONZERO")
 opts.setValue("eps_type", "krylovschur")
 opts.setValue("eps_tol", 1e-10)
@@ -252,11 +265,11 @@ omega_tilde = []
 eig_real_w_vec = []
 eig_imag_w_vec = []
 
-eig_real_w = Function(Vp_w)
-eig_imag_w = Function(Vp_w)
+eig_real_w = Function(V_pw)
+eig_imag_w = Function(V_pw)
 fntsize = 15
 
-n_pw = Vp_w.dim()
+n_pw = V_pw.dim()
 for i in range(nconv):
     lam = es.getEigenpair(i, vr, vi)
 
@@ -265,6 +278,8 @@ for i in range(nconv):
     lam_c = np.imag(lam)
 
     if lam_c > tol:
+
+        print(n_stocked_eig)
 
         omega_tilde.append(lam_c*L*((2*(1+nu)*rho)/E)**0.5)
 
@@ -281,29 +296,26 @@ for i in range(n_stocked_eig):
 
 n_fig = min(n_stocked_eig, 4)
 
-if plot_eigenvector == 'y':
-    for i in range(n_fig):
-        norm_real_eig = np.linalg.norm(eig_real_w_vec[i])
-        norm_imag_eig = np.linalg.norm(eig_imag_w_vec[i])
-
-        eig_real_w.vector()[:] = eig_real_w_vec[i]
-        eig_imag_w.vector()[:] = eig_imag_w_vec[i]
-
-        if norm_imag_eig > norm_real_eig:
-            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_imag_w, 10)
-        else:
-            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_real_w, 10)
-
-        figure = plt.figure()
-        ax = figure.add_subplot(111, projection="3d")
-
-        ax.plot_trisurf(triangulation, z_goodeig, cmap=cm.jet)
-
-        ax.set_xlabel('$x [m]$', fontsize=fntsize)
-        ax.set_ylabel('$y [m]$', fontsize=fntsize)
-        ax.set_title('Eigenvector num ' + str(i + 1), fontsize=fntsize)
-
-        ax.w_zaxis.set_major_locator(LinearLocator(10))
-        ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
-
-plt.show()
+# for i in range(n_fig):
+#     norm_real_eig = np.linalg.norm(eig_real_w_vec[i])
+#     norm_imag_eig = np.linalg.norm(eig_imag_w_vec[i])
+#
+#     eig_real_w.vector()[:] = eig_real_w_vec[i]
+#     eig_imag_w.vector()[:] = eig_imag_w_vec[i]
+#
+#     figure = plt.figure()
+#     ax = figure.add_subplot(111, projection="3d")
+#
+#     ax.set_xlabel('$x [m]$', fontsize=fntsize)
+#     ax.set_ylabel('$y [m]$', fontsize=fntsize)
+#     ax.set_title('Eigenvector num ' + str(i + 1), fontsize=fntsize)
+#
+#     ax.w_zaxis.set_major_locator(LinearLocator(10))
+#     ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
+#
+#     if norm_imag_eig > norm_real_eig:
+#         plot(eig_imag_w, axes=ax, plot3d=True)
+#     else:
+#         plot(eig_real_w, axes=ax, plot3d=True)
+#
+# plt.show()

@@ -11,13 +11,22 @@ from firedrake.plot import _two_dimension_triangle_func_val
 from mpl_toolkits.mplot3d import Axes3D
 plt.rc('text', usetex=True)
 
-n = 10
-deg = 1
 
-rho = 1
-E = 1
+from firedrake.petsc import PETSc
+try:
+    from slepc4py import SLEPc
+except ImportError:
+    import sys
+    warning("Unable to import SLEPc, eigenvalue computation not possible (try firedrake-update --slepc)")
+    sys.exit(0)
+
+n = 20
+deg = 2
+
+rho = 2700
+E = 1e12
 nu = 0.3
-thick = 'y'
+thick = 'n'
 if thick == 'y':
     h = 0.1
 else:
@@ -26,6 +35,7 @@ else:
 plot_eigenvector = 'y'
 
 bc_input = input('Select Boundary Condition: ')
+# bc_input = 'CCCC'
 
 if bc_input == 'CCCC' or  bc_input == 'CCCF':
     k = 0.8601 # 5./6. #
@@ -120,94 +130,105 @@ bc_1, bc_2, bc_3, bc_4 = bc_input
 
 bc_dict = {1: bc_1, 2: bc_3, 3: bc_2, 4: bc_4}
 
-n = FacetNormal(mesh)
-s = as_vector([-n[1], n[0] ])
 
-Vf = FunctionSpace(mesh, 'DG', deg-1)
-Vu = Vf * Vf * Vf
-
-q_n, M_nn, M_ns = TrialFunction(Vu)
-
-v_omn = dot(v_pth, n)
-v_oms = dot(v_pth, s)
-
-b_vec = []
+bcs = []
 for key,val in bc_dict.items():
     if val == 'C':
-        b_vec.append(v_pw * q_n * ds(key) + v_omn * M_nn * ds(key) + v_oms * M_ns * ds(key))
+        bcs.append(DirichletBC(V.sub(0), Constant(0.0), key))
+        bcs.append(DirichletBC(V.sub(1), Constant((0.0, 0.0)), key))
+
     elif val == 'S':
-        b_vec.append(v_pw * q_n * ds(key) + v_oms * M_ns * ds(key))
+        bcs.append(DirichletBC(V.sub(0), Constant(0.0), key))
+        if key == 1 or key ==2:
+            bcs.append(DirichletBC(V.sub(1).sub(1), Constant(0.0), key))
+        else:
+            bcs.append(DirichletBC(V.sub(1).sub(0), Constant(0.0), key))
 
-b_u = sum(b_vec)
-
-
-J = assemble(j_form, mat_type='aij')
-M = assemble(m_form, mat_type='aij')
-B = assemble(b_u, mat_type="aij")
+J = assemble(j_form, bcs=bcs, mat_type='aij')
+M = assemble(m_form, bcs=bcs, mat_type='aij')
 
 petsc_j = J.M.handle
 petsc_m = M.M.handle
-petsc_b = B.M.handle
 
-JJ = np.array(petsc_j.convert("dense").getDenseArray())
-MM = np.array(petsc_m.convert("dense").getDenseArray())
-B_in = np.array(petsc_b.convert("dense").getDenseArray())
+num_eigenvalues = 10
 
-boundary_dofs = np.where(B_in.any(axis=0))[0]
-B_in = B_in[:,boundary_dofs]
+target = 1/(L*((2*(1+nu)*rho)/E)**0.5)
 
-N_al = V.dim()
-N_u = len(boundary_dofs)
-# print(N_u)
-
-Z_u = np.zeros((N_u, N_u))
-
-J_aug = np.vstack([ np.hstack([JJ, B_in]),
-                    np.hstack([-B_in.T, Z_u])
-                ])
-
-Z_al_u = np.zeros((N_al, N_u))
-Z_u_al = np.zeros((N_u, N_al))
-
-M_aug = np.vstack([ np.hstack([MM, Z_al_u]),
-                    np.hstack([Z_u_al,    Z_u])
-                 ])
-tol = 10**(-9)
-
-eigenvalues, eigvectors = la.eig(J_aug, M_aug)
-omega_all = np.imag(eigenvalues)
-
-index = omega_all > tol
-
-omega = omega_all[index]
-eigvec_omega = eigvectors[:, index]
-perm = np.argsort(omega)
-eigvec_omega = eigvec_omega[:, perm]
-
-omega.sort()
+opts = PETSc.Options()
+opts.setValue("pos_gen_non_hermitian", None)
+opts.setValue("st_pc_factor_shift_type", "NONZERO")
+opts.setValue("eps_type", "krylovschur")
+opts.setValue("eps_tol", 1e-10)
+opts.setValue("st_type", "sinvert")
+# opts.setValue("eps_target_imaginary", None)
+opts.setValue("st_shift", target)
+opts.setValue("eps_target", target)
 
 
-omega_tilde = omega*L*((2*(1+nu)*rho)/E)**0.5
+es = SLEPc.EPS().create(comm=COMM_WORLD)
+# st = es.getST()
+# st.setShift(0)
+# st.setType("sinvert")
+# es.setST(st)
+# es.setWhichEigenpairs(1)
+es.setDimensions(num_eigenvalues)
+es.setOperators(petsc_j, petsc_m)
+es.setFromOptions()
+es.solve()
 
-for i in range(10):
-    print(omega_tilde[i])
+nconv = es.getConverged()
 
-n_fig = 5
+if nconv == 0:
+    import sys
+    warning("Did not converge any eigenvalues")
+    sys.exit(0)
 
-n_Vpw = Vp_w.dim()
+vr, vi = petsc_j.getVecs()
+
+tol = 1e-6
+lamda_vec = np.zeros((nconv))
+
+n_stocked_eig = 0
+
+omega_tilde = []
+eig_real_w_vec = []
+eig_imag_w_vec = []
+
+eig_real_w = Function(Vp_w)
+eig_imag_w = Function(Vp_w)
 fntsize = 15
+
+n_pw = Vp_w.dim()
+for i in range(nconv):
+    lam = es.getEigenpair(i, vr, vi)
+
+
+    lam_r = np.real(lam)
+    lam_c = np.imag(lam)
+
+    if lam_c > tol:
+
+        omega_tilde.append(lam_c*L*((2*(1+nu)*rho)/E)**0.5)
+
+        vr_w = vr.getArray().copy()[:n_pw]
+        vi_w = vi.getArray().copy()[:n_pw]
+
+        eig_real_w_vec.append(vr_w)
+        eig_imag_w_vec.append(vi_w)
+
+        n_stocked_eig += 1
+
+for i in range(n_stocked_eig):
+    print("Eigenvalue num " + str(i + 1) + ":" + str(omega_tilde[i]))
+
+n_fig = min(n_stocked_eig, 4)
+
 for i in range(n_fig):
-    print("Eigenvalue num " + str(i + 1) + ":" + str(omega[i]))
-    eig_real_w = Function(Vp_w)
-    eig_imag_w = Function(Vp_w)
+    norm_real_eig = np.linalg.norm(eig_real_w_vec[i])
+    norm_imag_eig = np.linalg.norm(eig_imag_w_vec[i])
 
-    eig_real_pw = np.real(eigvec_omega[:n_Vpw, i])
-    eig_imag_pw = np.imag(eigvec_omega[:n_Vpw, i])
-    eig_real_w.vector()[:] = eig_real_pw
-    eig_imag_w.vector()[:] = eig_imag_pw
-
-    norm_real_eig = np.linalg.norm(eig_real_w.vector().get_local())
-    norm_imag_eig = np.linalg.norm(eig_imag_w.vector().get_local())
+    eig_real_w.vector()[:] = eig_real_w_vec[i]
+    eig_imag_w.vector()[:] = eig_imag_w_vec[i]
 
     if norm_imag_eig > norm_real_eig:
         triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_imag_w, 10)
@@ -221,7 +242,7 @@ for i in range(n_fig):
 
     ax.set_xlabel('$x [m]$', fontsize=fntsize)
     ax.set_ylabel('$y [m]$', fontsize=fntsize)
-    ax.set_title('Eigenvector num ' + str(i + 1), fontsize=fntsize)
+    ax.set_title(r'Eigenvector num ' + str(i + 1), fontsize=fntsize)
 
     ax.w_zaxis.set_major_locator(LinearLocator(10))
     ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))

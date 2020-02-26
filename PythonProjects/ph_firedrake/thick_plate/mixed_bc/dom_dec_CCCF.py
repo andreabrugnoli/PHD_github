@@ -143,12 +143,13 @@ def create_sys1(mesh1, r):
     s_ver1 = as_vector([-n_ver1[1], n_ver1[0]])
 
     vqn_1 = dot(vqw_1, n_ver1)
-    vMnn_1 = inner(vqth_1, outer(n_ver1, n_ver1))
-    vMns_1 = inner(vqth_1, outer(n_ver1, s_ver1))
+    vMnn_1 = inner(sym(vqth_1), outer(n_ver1, n_ver1))
+    vMns_1 = inner(sym(vqth_1), outer(n_ver1, s_ver1))
 
     is_int1 = conditional(And(gt(x1, L/2 - tol), And(lt(y1, x1+tol), gt(y1, L - x1-tol))), 1, 0)
 
     Vu = FunctionSpace(mesh1, "CG", 1)
+
     n_u = int(Vu.dim())
 
     f_D = TrialFunction(Vu)
@@ -244,9 +245,12 @@ def create_sys2(mesh2, r2):
 
     Vpw_2 = FunctionSpace(mesh2, "CG", r2)
     Vpth_2 = VectorFunctionSpace(mesh2, "CG", r2)
-    VqthD_2 = VectorFunctionSpace(mesh2, "DG", r2 - 1)
-    Vqth12_2 = FunctionSpace(mesh2, "DG", r2 - 1)
-    Vqw_2 = VectorFunctionSpace(mesh2, "DG", r2 - 1)
+    VqthD_2 = VectorFunctionSpace(mesh2, "CG", r2)
+    Vqth12_2 = FunctionSpace(mesh2, "CG", r2)
+    Vqw_2 = VectorFunctionSpace(mesh2, "CG", r2)
+    # VqthD_2 = VectorFunctionSpace(mesh2, "DG", r2 - 1)
+    # Vqth12_2 = FunctionSpace(mesh2, "DG", r2 - 1)
+    # Vqw_2 = VectorFunctionSpace(mesh2, "DG", r2 - 1)
 
     V2 = MixedFunctionSpace([Vpw_2, Vpth_2, VqthD_2, Vqth12_2, Vqw_2])
 
@@ -344,8 +348,6 @@ def print_modes(sys1, sys2, Mdelta, Vp1, Vp2, n_modes):
 
     sys_CF = SysPhdae.gyrator(sys1, sys2, list(range(m1)), list(range(m2)), la.inv(Mdelta))
 
-    plt.spy(sys_CF.E); plt.show()
-
     eigenvalues, eigvectors = la.eig(sys_CF.J, sys_CF.E)
     omega_all = np.imag(eigenvalues)
 
@@ -389,15 +391,15 @@ def print_modes(sys1, sys2, Mdelta, Vp1, Vp2, n_modes):
         ax = figure.add_subplot(111, projection="3d")
 
         if norm_imag_eig > norm_real_eig:
-            plot(eig_imag_p1, axes=ax, plot3d=True)
-            plot(eig_imag_p2, axes=ax, plot3d=True)
-            # triangulation1, z1_goodeig = _two_dimension_triangle_func_val(eig_imag_p1, 10)
-            # triangulation2, z2_goodeig = _two_dimension_triangle_func_val(eig_imag_p2, 10)
+            # plot(eig_imag_p1, axes=ax, plot3d=True)
+            # plot(eig_imag_p2, axes=ax, plot3d=True)
+            triangulation1, z1_goodeig = _two_dimension_triangle_func_val(eig_imag_p1, 10)
+            triangulation2, z2_goodeig = _two_dimension_triangle_func_val(eig_imag_p2, 10)
         else:
-            plot(eig_real_p1, axes=ax, plot3d=True)
-            plot(eig_real_p2, axes=ax, plot3d=True)
-            # triangulation1, z1_goodeig = _two_dimension_triangle_func_val(eig_real_p1, 10)
-            # triangulation2, z2_goodeig = _two_dimension_triangle_func_val(eig_real_p2, 10)
+            # plot(eig_real_p1, axes=ax, plot3d=True)
+            # plot(eig_real_p2, axes=ax, plot3d=True)
+            triangulation1, z1_goodeig = _two_dimension_triangle_func_val(eig_real_p1, 10)
+            triangulation2, z2_goodeig = _two_dimension_triangle_func_val(eig_real_p2, 10)
 
         ax.set_xlabel('$x [m]$', fontsize=fntsize)
         ax.set_ylabel('$y [m]$', fontsize=fntsize)
@@ -406,22 +408,22 @@ def print_modes(sys1, sys2, Mdelta, Vp1, Vp2, n_modes):
         ax.w_zaxis.set_major_locator(LinearLocator(10))
         ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
 
-        # plot_eig1 = ax.plot_trisurf(triangulation1, z1_goodeig, cmap=cm.jet)
-        # plot_eig1._facecolors2d = plot_eig1._facecolors3d
-        # plot_eig1._edgecolors2d = plot_eig1._edgecolors3d
-        #
-        # plot_eig2 = ax.plot_trisurf(triangulation2, z2_goodeig, cmap=cm.jet)
-        # plot_eig2._facecolors2d = plot_eig2._facecolors3d
-        # plot_eig2._edgecolors2d = plot_eig2._edgecolors3d
-        #
-        # ax.legend(("mesh 1", "mesh2"))
+        plot_eig1 = ax.plot_trisurf(triangulation1, z1_goodeig, cmap=cm.jet)
+        plot_eig1._facecolors2d = plot_eig1._facecolors3d
+        plot_eig1._edgecolors2d = plot_eig1._edgecolors3d
+
+        plot_eig2 = ax.plot_trisurf(triangulation2, z2_goodeig, cmap=cm.jet)
+        plot_eig2._facecolors2d = plot_eig2._facecolors3d
+        plot_eig2._edgecolors2d = plot_eig2._edgecolors3d
+
+        ax.legend(("mesh 1", "mesh2"))
 
         # path_figs = "/home/a.brugnoli/Plots_Videos/Python/Plots/Waves/"
         # plt.savefig(path_figs + "Eig_n" + str(i) + ".eps")
 
 
-r1 = 2
-r2 = 2
+r1 = 1
+r2 = 1
 
 path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/thick_plate/mixed_bc/"
 mesh1 = Mesh(path_mesh + "dom_1.msh")

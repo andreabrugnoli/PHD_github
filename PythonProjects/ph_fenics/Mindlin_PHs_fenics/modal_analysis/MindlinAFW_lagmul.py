@@ -17,9 +17,9 @@ from matplotlib import cm
 
 matplotlib.rcParams['text.usetex'] = True
 
-n = 5 #int(input("Number of elements for side: "))
+n = 10 #int(input("Number of elements for side: "))
 deg = 0 #int(input('Degree for FE: '))
-nreq = 10
+nreq = 3
 
 E = 1
 nu = 0.3
@@ -180,9 +180,10 @@ v_qn = dot(v_qw, n)
 v_Mnn = inner(v_qth, outer(n, n))
 v_Mns = inner(v_qth, outer(n, s))
 
-w_t = e_pw
-om_n = dot(e_pth, n)
-om_s = dot(e_pth, s)
+Vu = FunctionSpace(mesh, 'DG', deg)
+w_t = TrialFunction(Vu)
+om_n = TrialFunction(Vu)
+om_s = TrialFunction(Vu)
 
 b_vec = []
 for key,val in bc_dict.items():
