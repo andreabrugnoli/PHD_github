@@ -13,11 +13,11 @@ import matplotlib.pyplot as plt
 import matplotlib
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from matplotlib import cm
-from AnimateSurfFiredrake import animate2D
+from tools_plotting.animate_surf import animate2D
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as animation
 
-from symplectic_integrators import StormerVerletGrad
+from thin_plate.symplectic_integrators import StormerVerletGrad
 
 
 matplotlib.rcParams['text.usetex'] = True

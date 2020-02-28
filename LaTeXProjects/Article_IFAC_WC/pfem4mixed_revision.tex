@@ -14,6 +14,17 @@
 \usepackage{url}
 \usepackage{comment}
 
+\makeatletter
+\def\endfigure{\end@float}
+\def\endtable{\end@float}
+\makeatother
+
+\usepackage[caption=false]{subfig}
+\usepackage{etoolbox}
+
+\AtBeginEnvironment{figure}{\setlength{\captionwidth}{0.8\linewidth}}
+\AtBeginEnvironment{table}{\setlength{\captionwidth}{0.8\linewidth}}
+\captionsetup[subfloat]{width=.7\captionwidth}
 
 \newtheorem{remark}{Remark}
 \newcommand{\secref}[1]{\S\ref{#1}}
@@ -176,7 +187,9 @@ The second step is crucial as it determines which boundary condition appears as 
 \label{eq:weak_form}
     \left(w, \mathcal{Q}^{-1} \partial_t{e} \right)_{\Omega_{\text{r}}} = \left(w, \mathcal{J} e \right)_{\Omega_{\text{r}}}.
 \end{equation}
-As $Q$ is coercive the inner product on the left hand side corresponds to a symmetric and coercive bilinear form $m(w, \partial_t{e}) := \left(w, \mathcal{Q}^{-1} \partial_t{e} \right)_{\Omega_{\text{r}}}$.
+As $Q$ is coercive the inner product on the left hand side corresponds to a symmetric and coercive bilinear form 
+\[m(w, \partial_t{e}) := \left(w, \mathcal{Q}^{-1} \partial_t{e} \right)_{\Omega_{\text{r}}}.
+\]
 The integration by parts will define which boundary control will appear explicitly.
 
 \subsection{Neumann boundary control}
@@ -254,104 +267,126 @@ m(w, \partial_t{e}) &= j_{\text{grad}}(w, e) + \left(w_p, u_N \right)_{\Gamma_N}
 \left(w_D, y_D \right)_{\Gamma_D} &= \left(w_D, \lambda_D \right)_{\Gamma_D}, 
 \end{aligned}
 \end{equation}
-where $w_N, w_D$ are the test functions associated to the output discretization and $\left( \cdot, \cdot \right)_{\Gamma_{*}}$ is the $L^2$ inner product on boundary $\Gamma_*$. A Galerkin method can now be applied to retrieve a finite dimensional pH system. This means that corresponding test and trial functions are discretized using the same basis, leading to the finite dimensional pHDAE (\cite{beattie2018linear}):
+where $w_N, w_D$ are the test functions associated to the output discretization and $\left( \cdot, \cdot \right)_{\Gamma_{*}}$ is the $L^2$ inner product on boundary $\Gamma_*$. A Galerkin method can now be applied to retrieve a finite dimensional pH system. This means that corresponding test and trial functions are discretized using the same basis
+\begin{align*}
+\begin{aligned}
+e &\approx \bm\phi_e \mathbf{e}, \\
+p &\approx \bm\phi_p \mathbf{p}
+\end{aligned} \qquad
+\begin{aligned}
+\lambda_D/u_D/y_D &\approx \bm\phi_D \bm{\lambda}_D/\mathbf{u}_D/\mathbf{y}_D, \\
+y_N &\approx \bm\phi_N \mathbf{u}_N
+\end{aligned}
+\end{align*}
+
+ leading to the finite dimensional pHDAE (\cite{beattie2018linear}):
 \begin{equation}
 \begin{aligned}
 \label{eq:discr_phdae}
 \begin{bmatrix}
-\bm{M} & \bm{0} \\
-\bm{0} & \bm{0} \\
+\mathbf{M} & \mathbf{0} \\
+\mathbf{0} & \mathbf{0} \\
 \end{bmatrix} \frac{\d}{\d t}
 \begin{bmatrix}
-\bm{e}\\
+\mathbf{e}\\
 \bm{\lambda}_D \\
 \end{bmatrix}
 &= \begin{bmatrix}
-\bm{J} & \bm{G}_D\\
--\bm{G}_D^T & \bm{0} \\
+\mathbf{J} & \mathbf{G}_D\\
+-\mathbf{G}_D^T & \mathbf{0} \\
 \end{bmatrix}
 \begin{bmatrix}
-\bm{e}\\
+\mathbf{e}\\
 \bm{\lambda}_D \\
 \end{bmatrix} + \begin{bmatrix}
-\bm{B}_N & \bm{0}\\
-\bm{0} & \bm{B}_D \\
+\mathbf{B}_N & \mathbf{0}\\
+\mathbf{0} & \mathbf{B}_D \\
 \end{bmatrix}
 \begin{bmatrix}
-\bm{u}_N \\
-\bm{u}_D \\
+\mathbf{u}_N \\
+\mathbf{u}_D \\
 \end{bmatrix}, \\
 \begin{bmatrix}
-\bm{y}_N \\
-\bm{y}_D \\
+\mathbf{y}_N \\
+\mathbf{y}_D \\
 \end{bmatrix} &=
 \begin{bmatrix}
-\bm{B}_N^T & \bm{0} \\ 
-\bm{0} & \bm{B}_D^T \\ 
+\mathbf{B}_N^T & \mathbf{0} \\ 
+\mathbf{0} & \mathbf{B}_D^T \\ 
 \end{bmatrix}
 \begin{bmatrix}
-\bm{e}\\
+\mathbf{e}\\
 \bm{\lambda}_D \\
 \end{bmatrix}.
 \end{aligned}
 \end{equation}
-
+where 
+\begin{equation*}
+\begin{aligned}
+\mathbf{M}^{ij} &= m({\phi}_{e}^i, {\phi}_{e}^j), \\
+\mathbf{J}^{ij} &= j_{\text{grad}}({\phi}_{e}^{i}, {\phi}_{e}^{j}), \\
+\mathbf{G}_{D}^{ij} &= ({\phi}_{p}^i, {\phi}_{D}^j)_{\Gamma_D}, 
+\end{aligned} \qquad 
+\begin{aligned}
+\mathbf{B}_{N}^{ij} &= ({\phi}_{p}^{i}, {\phi}_{N}^{j})_{\Gamma_N}, \\ \mathbf{B}_{D}^{ij} &= ({\phi}_{p}^{i}, {\phi}_{N}^{j})_{\Gamma_N}. 
+\end{aligned}\\
+\end{equation*}
 \begin{remark}
-The output vector $\bm{y}_N, \bm{y}_D$ does not correspond to the actual degrees of freedom. In fact it has been defined incorporating the boundary mass matrix $\bm{M}_{\Gamma_N}, \, \bm{M}_{\Gamma_D}$. The actual degrees of freedom corresponding to the output are found by solving
+The output vector $\mathbf{y}_N, \mathbf{y}_D$ does not correspond to the actual degrees of freedom. In fact it has been defined incorporating the boundary mass matrix $\mathbf{M}_{\Gamma_N}, \, \mathbf{M}_{\Gamma_D}$. The actual degrees of freedom corresponding to the output are found by solving
 \begin{equation}
 \label{eq:y_dof}
 \begin{bmatrix}
-\bm{M}_{\Gamma_N} & \bm{0} \\
-\bm{0} & \bm{M}_{\Gamma_D} \\
+\mathbf{M}_{\Gamma_N} & \mathbf{0} \\
+\mathbf{0} & \mathbf{M}_{\Gamma_D} \\
 \end{bmatrix}
 \begin{bmatrix}
-\widehat{\bm{y}}_N \\
-\widehat{\bm{y}}_D \\
+\widehat{\mathbf{y}}_N \\
+\widehat{\mathbf{y}}_D \\
 \end{bmatrix} = 
 \begin{bmatrix}
-\bm{y}_N \\
-\bm{y}_D \\
+\mathbf{y}_N \\
+\mathbf{y}_D \\
 \end{bmatrix}, \qquad
-\bm{M}_{\partial\Omega_r} \,  \widehat{\bm{y}} = \bm{y}.
+\mathbf{M}_{\partial\Omega_r} \,  \widehat{\mathbf{y}} = \mathbf{y}.
 \end{equation}
 However, this definition of output is in accordance with the classical power balance for finite-dimensional pH systems
 \begin{align*}
 \dot{H} &= \int_{\Gamma_N} u_N y_N \d{\Gamma_N} + \int_{\Gamma_D} u_D y_D \d{\Gamma_D} \\
-&\approx \bm{u}_N^T \bm{M}_{\Gamma_N} \widehat{\bm{y}}_N + \bm{u}_D^T \bm{M}_{\Gamma_D} \widehat{\bm{y}}_D = \bm{u}_N^T \bm{y}_N + \bm{u}_D^T \bm{y}_D.
+&\approx \mathbf{u}_N^T \mathbf{M}_{\Gamma_N} \widehat{\mathbf{y}}_N + \mathbf{u}_D^T \mathbf{M}_{\Gamma_D} \widehat{\mathbf{y}}_D = \mathbf{u}_N^T \mathbf{y}_N + \mathbf{u}_D^T \mathbf{y}_D.
 \end{align*}
 The actual degrees of freedom will be used in \secref{sec:vdd} to get the proper interconnection when connecting systems with different causality.
 \end{remark}
 
 Concerning the actual boundary conditions, on $\Gamma_D$ the impedance condition \eqref{eq:bc_imp} is applied while on  $\Gamma_N$ the inlet and outlet flow condition \eqref{eq:bc_flowL}, \eqref{eq:bc_flowR} hold on the left and right side of the rectangle. The impedance boundary conditions is imposed by putting into weak form the expression $u_D=-\mathcal{Z}\lambda_D=-\mathcal{Z}y_D$:
-\[ \bm{M}_{\Gamma_D} \bm{u}_D = - \bm{M}_{\Gamma_D, \mathcal{Z}} \widehat{\bm{y}}_D,
+\[ \mathbf{M}_{\Gamma_D} \mathbf{u}_D = - \mathbf{M}_{\Gamma_D, \mathcal{Z}} \widehat{\mathbf{y}}_D,
 \]
-where $\bm{M}_{\Gamma_D, \mathcal{Z}}$ corresponds to the mass matrix associated to the weighted inner product $\left(w_D, \mathcal{Z}  y_D\right)_{\Gamma_D}$. This amounts to applying to system \eqref{eq:sys_dae} the control law
-\[ \bm{u}_D = - \bm{M}_{\Gamma_D}^{-1} \bm{M}_{\Gamma_D, \mathcal{Z}} \bm{M}_{\Gamma_D}^{-1} \bm{y}_D = -\bm{Z} \bm{y}_D.
+where $\mathbf{M}_{\Gamma_D, \mathcal{Z}}$ corresponds to the mass matrix associated to the weighted inner product $\left(w_D, \mathcal{Z}  y_D\right)_{\Gamma_D}$, namely $\mathbf{M}_{\Gamma_D, \mathcal{Z}}^{ij} = \left(\phi_D^i, \mathcal{Z}  \phi_D^j \right)_{\Gamma_D}$. This amounts to applying to system \eqref{eq:sys_dae} the control law
+\[ \mathbf{u}_D = - \mathbf{M}_{\Gamma_D}^{-1} \mathbf{M}_{\Gamma_D, \mathcal{Z}} \mathbf{M}_{\Gamma_D}^{-1} \mathbf{y}_D = -\mathbf{Z} \mathbf{y}_D.
 \]
 The Neumann boundary condition is imposed by projection on the $u_N$ space.   The boundary controlled system becomes   
 \begin{equation}
 \label{eq:sys_dae}
 \begin{bmatrix}
-\bm{M} & \bm{0} \\
-\bm{0} & \bm{0} \\
+\mathbf{M} & \mathbf{0} \\
+\mathbf{0} & \mathbf{0} \\
 \end{bmatrix} \frac{\d}{\d t}
 \begin{bmatrix}
-\bm{e}\\
+\mathbf{e}\\
 \bm{\lambda}_D \\
 \end{bmatrix}
 = \begin{bmatrix}
-\bm{J} & \bm{G}_D\\
--\bm{G}_D^T & -\bm{R} \\
+\mathbf{J} & \mathbf{G}_D\\
+-\mathbf{G}_D^T & -\mathbf{R} \\
 \end{bmatrix}
 \begin{bmatrix}
-\bm{e}\\
+\mathbf{e}\\
 \bm{\lambda}_D \\
 \end{bmatrix} + \begin{bmatrix}
-\bm{b}_N \\
-\bm{0} \\
+\mathbf{b}_N \\
+\mathbf{0} \\
 \end{bmatrix},
 \end{equation}
-with $\bm{R} = \bm{B}_D \bm{Z} \bm{B}_D^T$ a symmetric positive definite matrix. 
+with $\mathbf{R} = \mathbf{B}_D \mathbf{Z} \mathbf{B}_D^T$ a symmetric positive definite matrix. 
 
 \subsection{Virtual Domain Decomposition}
 \label{sec:vdd}
@@ -378,7 +413,7 @@ m^{\Omega_D}(w, \partial_t{e}) &= j_{\text{div}}^{\Omega_D}(w, e) + \left(\bm{w}
 \end{equation}
 where $\partial \Omega_{N/D}$ denotes the boundary of each sub-domain and the superscript ${\Omega_{N,D}}$ denote that the bilinear forms are obtained by integration over each sub-domain
 \[
-j_{\text{div/grad}}^{\Omega_{N,D}}(w, e) := \left(w, \mathcal{J}_{\text{div/grad}}  e \right)_{\Omega_{N,D}} - \left(\mathcal{J}_{\text{div/grad}}  w, e \right)_{\Omega_{N,D}}.
+j_{\text{div/grad}}^{\Omega_{N/D}}(w, e) := \left(w, \mathcal{J}_{\text{div/grad}}  e \right)_{\Omega_{N/D}} - \left(\mathcal{J}_{\text{div/grad}}  w, e \right)_{\Omega_{N/D}}.
 \]
 The boundary terms in \eqref{eq:wfdec_intbp} are then split into two contributions $\partial\Omega_N = \Gamma_N \cup \Gamma_{\text{int}}, \; \partial\Omega_D = \Gamma_D \cup \Gamma_{\text{int}}$ so that the common boundary is highlighted
 \begin{align*}
@@ -389,63 +424,63 @@ Applying a Galerkin method to system \eqref{eq:wfdec_intbp} leads to two finite 
 \begin{equation}
 \label{eq:fd_N}
 \begin{aligned}
-\bm{M}_N \diff{\bm{e}_N}{t} &= \bm{J}_N \bm{e}_N + \bm{B}_{N, \text{int}} \bm{u}_N^{\text{int}} + \bm{B}_N \bm{u}_N, \\
-\bm{y}_N^{\text{int}} &= \bm{M}_{\Gamma_{\text{int}}} \widehat{\bm{y}}_N^{\text{int}} =  \bm{B}_{N, \text{int}}^T \bm{e}_N, \\
-\bm{y}_N &= \bm{M}_{\Gamma_N} \widehat{\bm{y}}_N = \bm{B}_{N}^T \bm{e}_N, \\
+\mathbf{M}_N \diff{\mathbf{e}_N}{t} &= \mathbf{J}_N \mathbf{e}_N + \mathbf{B}_{N, \text{int}} \mathbf{u}_N^{\text{int}} + \mathbf{B}_N \mathbf{u}_N, \\
+\mathbf{y}_N^{\text{int}} &= \mathbf{M}_{\Gamma_{\text{int}}} \widehat{\mathbf{y}}_N^{\text{int}} =  \mathbf{B}_{N, \text{int}}^T \mathbf{e}_N, \\
+\mathbf{y}_N &= \mathbf{M}_{\Gamma_N} \widehat{\mathbf{y}}_N = \mathbf{B}_{N}^T \mathbf{e}_N, \\
 \end{aligned}
 \end{equation}
 and
 \begin{equation}
 \label{eq:fd_D}
 \begin{aligned}
-\bm{M}_D \diff{\bm{e}_D}{t} &= \bm{J}_D \bm{e}_D + \bm{B}_{D, \text{int}} \bm{u}_D^{\text{int}} + \bm{B}_D \bm{u}_D, \\
-\bm{y}_D^{\text{int}} &= \bm{M}_{\Gamma_{\text{int}}} \widehat{\bm{y}}_D^{\text{int}} = \bm{B}_{D, \text{int}}^T \bm{e}_D, \\
-\bm{y}_D &= \bm{M}_{\Gamma_D} \widehat{\bm{y}}_D = \bm{B}_{D}^T \, \bm{e}_D. \\
+\mathbf{M}_D \diff{\mathbf{e}_D}{t} &= \mathbf{J}_D \mathbf{e}_D + \mathbf{B}_{D, \text{int}} \mathbf{u}_D^{\text{int}} + \mathbf{B}_D \mathbf{u}_D, \\
+\mathbf{y}_D^{\text{int}} &= \mathbf{M}_{\Gamma_{\text{int}}} \widehat{\mathbf{y}}_D^{\text{int}} = \mathbf{B}_{D, \text{int}}^T \mathbf{e}_D, \\
+\mathbf{y}_D &= \mathbf{M}_{\Gamma_D} \widehat{\mathbf{y}}_D = \mathbf{B}_{D}^T \, \mathbf{e}_D. \\
 \end{aligned}
 \end{equation}
 In order to get a final dimensional system with mixed causality, systems \eqref{eq:fd_N} and \eqref{eq:fd_D} have to be interconnected using a classical gyrator interconnection. Considering that the pressure field is continuous at $\Gamma_{\text{int}}$, the outward normal verifies $\bm{n}_D \vert_{\Gamma_{\text{int}}}= - \bm{n}_N \vert_{\Gamma_{\text{int}}}$ and the corresponding degrees of freedom have to be matched, the correct interconnection reads
 \begin{equation}
 \begin{aligned}{}
-\bm{u}_N^{\text{int}} &= - \widehat{\bm{y}}_D^{\text{int}} = - \bm{M}_{\Gamma_{\text{int}}}^{-1} \bm{y}_D^{\text{int}}, \\
-\bm{u}_D^{\text{int}} &= \widehat{\bm{y}}_N^{\text{int}} = \bm{M}_{\Gamma_{\text{int}}}^{-1} \bm{y}_N^{\text{int}}.
+\mathbf{u}_N^{\text{int}} &= - \widehat{\mathbf{y}}_D^{\text{int}} = - \mathbf{M}_{\Gamma_{\text{int}}}^{-1} \mathbf{y}_D^{\text{int}}, \\
+\mathbf{u}_D^{\text{int}} &= \widehat{\mathbf{y}}_N^{\text{int}} = \mathbf{M}_{\Gamma_{\text{int}}}^{-1} \mathbf{y}_N^{\text{int}}.
 \end{aligned}
 \end{equation}
 This interconnection establishes that the power is exchanged without loss between the two systems
 \begin{equation}
-\bm{u}_D^{\text{int}} \cdot \bm{y}_D^{\text{int}} + \bm{u}_N^{\text{int}} \cdot \bm{y}_N^{\text{int}} = 0.
+\mathbf{u}_D^{\text{int}} \cdot \mathbf{y}_D^{\text{int}} + \mathbf{u}_N^{\text{int}} \cdot \mathbf{y}_N^{\text{int}} = 0.
 \end{equation}
 The resulting interconnected system is written as
 \begin{equation}
 \begin{aligned}
-\bm{M}_{ND} \diff{\bm{e}_{ND}}{t} &= \bm{J}_{ND} \, \bm{e}_{ND} + \bm{B}_{ND} \, \bm{u}_{ND}, \\
-\bm{y}_{ND}& = \bm{B}_{ND}^T \bm{e}_{ND}.
+\mathbf{M}_{ND} \diff{\mathbf{e}_{ND}}{t} &= \mathbf{J}_{ND} \, \mathbf{e}_{ND} + \mathbf{B}_{ND} \, \mathbf{u}_{ND}, \\
+\mathbf{y}_{ND}& = \mathbf{B}_{ND}^T \mathbf{e}_{ND}.
 \end{aligned}
 \end{equation}
 The interconnection matrix exhibits a coupling between the two sub-domains
 \[
-\bm{J}_{ND} = 
+\mathbf{J}_{ND} = 
 \begin{bmatrix}
-\bm{J}_N & -\bm{C} \\
-\bm{C}^T & \bm{J}_D \\
+\mathbf{J}_N & -\mathbf{C} \\
+\mathbf{C}^T & \mathbf{J}_D \\
 \end{bmatrix},
 \]
-where $\bm{C} = \bm{B}_{N, \text{int}} \bm{M}_{\Gamma_{\text{int}}}^{-1} \bm{B}_{D, \text{int}}^T$. The other matrices and vectors are simply given by the concatenation of each sub-domain part
+where $\mathbf{C} = \mathbf{B}_{N, \text{int}} \mathbf{M}_{\Gamma_{\text{int}}}^{-1} \mathbf{B}_{D, \text{int}}^T$. The other matrices and vectors are simply given by the concatenation of each sub-domain part
 \begin{equation*}
 \begin{aligned}
-\bm{M}_{ND} &= \text{diag}(\bm{M}_N, \bm{M}_D), \\
-\bm{e}_{ND} &= [\bm{e}_N, \, \bm{e}_D], 
+\mathbf{M}_{ND} &= \text{diag}(\mathbf{M}_N, \mathbf{M}_D), \\
+\mathbf{e}_{ND} &= [\mathbf{e}_N, \, \mathbf{e}_D], 
 \end{aligned} \qquad 
 \begin{aligned}
-\bm{B}_{ND} &= \text{diag}(\bm{B}_N, \bm{N}_D), \\
-\bm{u}_{ND} &= [\bm{u}_N, \, \bm{u}_D].
+\mathbf{B}_{ND} &= \text{diag}(\mathbf{B}_N, \mathbf{N}_D), \\
+\mathbf{u}_{ND} &= [\mathbf{u}_N, \, \mathbf{u}_D].
 \end{aligned}
 \end{equation*}
 Now that a model with different causality has been obtained, the actual boundary condition \eqref{eq:bc_imp} can be plugged into the system as it was done in \secref{sec:lgr_mul}. This leads to the final system
 \begin{equation}
 \label{eq:sys_ode}
-\bm{M}_{ND} \diff{\bm{e}_{ND}}{t} = \left(\bm{J}_{ND} - \bm{R}_{ND} \right) \ \bm{e}_{ND} + \bm{b}_{ND}, \\
+\mathbf{M}_{ND} \diff{\mathbf{e}_{ND}}{t} = \left(\mathbf{J}_{ND} - \mathbf{R}_{ND} \right) \ \mathbf{e}_{ND} + \mathbf{b}_{ND}, \\
 \end{equation}
-where $\bm{R}_{ND} = \text{diag}(\bm{0}, \bm{R}_D)$ and $\bm{R}_D = \bm{B}_D \bm{Z} \bm{B}_D^T$.
+where $\mathbf{R}_{ND} = \text{diag}(\mathbf{0}, \mathbf{R}_D)$ and $\mathbf{R}_D = \mathbf{B}_D \mathbf{Z} \mathbf{B}_D^T$.
 
 \section{Numerical results and discussions}
 \label{sec:numerics}
@@ -493,40 +528,89 @@ A radial component of the velocity allows to highlight the effect of the impedan
     \item the boundary variables are approximated by Lagrange polynomial of order~1 defined on the boundary $\Gamma_D$ (for $\lambda_D, u_D$) or $\Gamma_N$ (for $u_N$).
 \end{itemize}
 
+\begin{comment}
 \begin{figure}[t]
-    \centering
-    \includegraphics[width=0.95\columnwidth]{Href.eps} 
-	\caption{Hamiltonian trend for reference solution.}
-	\label{fig:Hdae15}
+\centering
+\includegraphics[width=0.95\columnwidth]{Href.eps} 
+\caption{Hamiltonian trend for reference solution.}
+\label{fig:Hdae15}
 \end{figure}
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\columnwidth]{Hall_diff.eps} 
+\caption{$L^2$ error on the Hamiltonian.}
+\label{fig:Hdiff}
+\end{figure}
+\end{comment}
+
 Such a choice guarantees the conformity with respect to the operator $\mathcal{J}$. The matrices are obtained by using Fenics (\cite{LoggMardalEtAl2012}). 
 The reference solution, obtained by using the DAE approach on a very fine mesh, is plotted in Fig. \ref{fig:Hdae15}, where the two contribution to the total energy
 \[
-H_p = \frac{1}{2} \chi_s p^2  \approx \frac{1}{2} \bm{p}^T \bm{M}_p \bm{p}, \quad H_v = \frac{1}{2} \mu_0 \, ||\bm{v}||^2 \approx \frac{1}{2} \bm{v}^T \bm{M}_v \bm{v}, \]
+H_p = \frac{1}{2} \chi_s p^2  \approx \frac{1}{2} \mathbf{p}^T \mathbf{M}_p \mathbf{p}, \quad H_v = \frac{1}{2} \mu_0 \, ||\mathbf{v}||^2 \approx \frac{1}{2} \mathbf{v}^T \mathbf{M}_v \mathbf{v}, \]
 are highlighted. The Dirichlet condition induces a continuous transfer from radial kinetic energy into pressure potential. The impedance acts by dissipating the radial component of the velocity so that only the axial flow contribution is left. The total energy at the initial time of the simulation is given only by the kinetic energy
 \[
 H_v^0 = H_{vx}^0 + H_{vr}^0 = \frac{1}{2} \int_{0}^L\int_{0}^R  \mu_0 \left[(v_x^0)^2 + (v_r^0)^2 \right] \ r \d{r}\d{x}.
 \]
 Given the physical parameters in Tab. \ref{tab:par}, the numerical values of the energy contribution are readily found
 \[H_v^0 = 0.453 [J], \ \; H_{vx}^0 = 0.204 [J], \ \; H_{vr}^0 = 0.249 [J].\]
+
+\begin{figure}[ht]%
+	\centering
+	\subfloat[][Reference Hamiltonian.]{%
+		\label{fig:Hdae15}%
+		\includegraphics[width=0.48\columnwidth]{Href.eps}}%
+	\hspace{8pt}%
+	\subfloat[][$L^2$ error.]{%
+		\label{fig:Hdiff}%
+		\includegraphics[width=0.48\columnwidth]{Hall_diff.eps}} \\
+	\caption[]{Reference Hamiltonian and $L^2$ error.}%
+	\label{fig:Href_err}%
+\end{figure}
+
+
+\begin{figure}[ht]%
+	\centering
+	\subfloat[][System \eqref{eq:sys_dae}.]{%
+		\label{fig:Htrend_dae}%
+		\includegraphics[width=0.48\columnwidth]{Hdae_all.eps}}%
+	\hspace{8pt}%
+	\subfloat[][System \eqref{eq:sys_ode}.]{%
+		\label{fig:Htrend_ode}%
+		\includegraphics[width=0.48\columnwidth]{Hode_all.eps}} \\
+	\caption[]{Hamiltonian trend}%
+	\label{fig:Htrend}%
+\end{figure}
+
+\begin{comment}
 \begin{figure}[t]
-    \centering
-    \includegraphics[width=0.45\textwidth]{Hdae_all.eps} 
-	\caption{Hamiltonian trend based on system \eqref{eq:sys_dae}.}
-	\label{fig:Htrend_dae}
+\centering
+\includegraphics[width=0.45\textwidth]{Hdae_all.eps} 
+\caption{Hamiltonian trend based on system \eqref{eq:sys_dae}.}
+\label{fig:Htrend_dae}
 \end{figure}
 \begin{figure}[t]
-    \centering
-    \includegraphics[width=0.45\textwidth]{Hode_all.eps} 
-	\caption{Hamiltonian trend based on system \eqref{eq:sys_ode}.}
-	\label{fig:Htrend_ode}
+\centering
+\includegraphics[width=0.45\textwidth]{Hode_all.eps} 
+\caption{Hamiltonian trend based on system \eqref{eq:sys_ode}.}
+\label{fig:Htrend_ode}
 \end{figure}
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=0.95\columnwidth]{Hall_diff.eps} 
-	\caption{$L^2$ error of the Hamiltonian.}
-	\label{fig:Hdiff}
+\end{comment}
+
+
+\begin{figure}[ht]%
+\centering
+\subfloat[][Pressure error.]{%
+\label{fig:p_err}%
+\includegraphics[width=0.48\columnwidth]{err_ep.eps}}%
+\hspace{8pt}%
+\subfloat[][Velocity error.]{%
+\label{fig:v_err}%
+\includegraphics[width=0.48\columnwidth]{err_eq.eps}} \\
+\caption[]{Error on the state variables.}%
+\label{fig:error_x}%
 \end{figure}
+
+\begin{comment}
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.45\textwidth]{err_ep.eps} 
@@ -539,11 +623,13 @@ Given the physical parameters in Tab. \ref{tab:par}, the numerical values of the
 	\caption{Velocity error given by the two methods.}
 	\label{fig:v_err}
 \end{figure}
+\end{comment}
+
 In order to demonstrate the consistency of the two proposed approaches the following measures are adopted
 \begin{align*}
 \varepsilon^{H}_{\text{ODE}/\text{DAE}} = \frac{||H_{\text{REF}} - H_{\text{ODE}/\text{DAE}} ||_{L^2}}{||H_{\text{REF}}||_{L^2}}, \\
 \varepsilon^p_{\text{ODE}/\text{DAE}} = \frac{||p_{\text{REF}} - p_{\text{ODE}/\text{DAE}} ||_{L^2}}{||p_{\text{REF}}||_{L^2}}, \\
-\varepsilon^v_{\text{ODE}/\text{DAE}} = \frac{||\bm{v}_{\text{REF}} - \bm{v}_{\text{ODE}/\text{DAE}} ||_{L^2}}{||\bm{v}_{\text{REF}}||_{L^2}}, 
+\varepsilon^v_{\text{ODE}/\text{DAE}} = \frac{||\mathbf{v}_{\text{REF}} - \mathbf{v}_{\text{ODE}/\text{DAE}} ||_{L^2}}{||\mathbf{v}_{\text{REF}}||_{L^2}}, 
 \end{align*}
 The total energy obtained with several meshes is shown in Figs. \ref{fig:Htrend_dae}, \ref{fig:Htrend_ode} for the DAE and ODE approach respectively. It can be noticed that the Hamiltonian tends to the value $H_{vx}^0$ as expected. The overall Hamiltonian trend is well captured and even for coarse meshes the relative error does not exceed 6\% (see Fig. \ref{fig:Hdiff}).
 Both methods converge monotonically to the reference solution, as illustrated in Figs. \ref{fig:p_err}, \ref{fig:v_err}. The faster convergence of one method on the other cannot be established. Anyway, each methodology possesses advantages and drawbacks. The DAE approach \eqref{eq:sys_dae} guarantees the overall continuity of the variables and does not require the construction two compatibles meshes. However, the introduction of Lagrange multiplier requires the verification of the inf-sup condition.  The ODE approach \eqref{eq:sys_ode} requires the construction of two separate mesh and the selection of an appropriate interface boundary $\Gamma_{\text{int}}$. This may lead to deformed mesh elements and hence less accurate solutions.  Furthermore, it does not guarantee the continuity of the fields at the interface. For what concerns the computational cost, in Tab. \ref{tab:deltaT} the simulation time required by each solver is shown. The ODE approach is less time consuming for mesh size sufficiently small. It is important to remark that if the problem is already differential-algebraic \cite{TFMST1,TFMST2} the domain decomposition technique loses its advantages as the final system will anyway be differential algebraic.

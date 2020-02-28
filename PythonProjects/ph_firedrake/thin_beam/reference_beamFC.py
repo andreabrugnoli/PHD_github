@@ -7,6 +7,7 @@ from scipy import integrate
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
+from firedrake.plot import calculate_one_dim_points
 
 plt.rc('text', usetex=True)
 
@@ -32,7 +33,7 @@ mesh2 = IntervalMesh(n_el2, L2)
 # Finite element defition
 deg = 3
 Vp1 = FunctionSpace(mesh1, "Hermite", deg)
-Vp2 = FunctionSpace(mesh2, "Hermite", deg)
+Vp2 = FunctionSpace(mesh2, "DG", 1)
 
 n_e = beamFC.n
 n_p = beamFC.n_p
@@ -117,36 +118,56 @@ fntsize = 16
 #
 # plt.show()
 
-n_plot = 30
-n_plot1 = int(n_plot/frac)
-n_plot2 = n_plot - n_plot1
+# n_plot = 30
+n_plot1 = 15 # int(n_plot/frac)
 
+
+x1_plot = np.linspace(0, L1, n_plot1)
+# x2_plot = np.linspace(L1, L, n_plot2)
+
+
+t_plot = t_ev
+
+v2_f = Function(Vp2)
+
+v1_i = draw_allbending(n_plot1, [0, 0, 0], ep_sol[:n_p1, 0], L1)[2]
+# v2_i = draw_allbending(n_plot2, [0, 0, 0], ep_sol[n_p1:n_p, i], L2)[2]
+
+v2_f.vector().set_local(ep_sol[n_p1:n_p, 0])
+x2_plot, v2_i = calculate_one_dim_points(v2_f, 10)
+
+x2_plot += L1
+x_plot = np.concatenate((x1_plot, x2_plot))
+
+n_plot2 = len(x2_plot)
+
+n_plot = n_plot1 + n_plot2
 v_plot = np.zeros((n_plot, n_ev))
 w_plot = np.zeros((n_plot, n_ev))
 
-x1_plot = np.linspace(0, L1, n_plot1)
-x2_plot = np.linspace(L1, L, n_plot2)
-
-x_plot = np.concatenate((x1_plot, x2_plot))
-
-t_plot = t_ev
+v_plot[:n_plot1, i] = v1_i
+v_plot[n_plot1:n_plot, i] = v2_i
 
 w1_old = w_plot[:n_plot1, 0]
 w2_old = w_plot[n_plot1:n_plot, 0]
 
-for i in range(n_ev):
+
+for i in range(1, n_ev):
     v1_i = draw_allbending(n_plot1, [0, 0, 0], ep_sol[:n_p1, i], L1)[2]
-    v2_i = draw_allbending(n_plot2, [0, 0, 0], ep_sol[n_p1:n_p, i], L2)[2]
+    # v2_i = draw_allbending(n_plot2, [0, 0, 0], ep_sol[n_p1:n_p, i], L2)[2]
+
+    v2_f.vector().set_local(ep_sol[n_p1:n_p, i])
+    v2_i = calculate_one_dim_points(v2_f, 10)[1]
 
     v_plot[:n_plot1, i] = v1_i
     v_plot[n_plot1:n_plot, i] = v2_i
 
-    if i > 0:
-        w_plot[:n_plot1, i] = w1_old + 0.5 * (v_plot[:n_plot1, i - 1] + v_plot[:n_plot1, i]) * dt_vec[i-1]
-        w_plot[n_plot1:n_plot, i] = w2_old + 0.5 * (v_plot[n_plot1:n_plot, i - 1] + v_plot[n_plot1:n_plot, i]) * dt_vec[i-1]
+    w_plot[:n_plot1, i] = w1_old + 0.5 * (v_plot[:n_plot1, i - 1] + v_plot[:n_plot1, i]) * dt_vec[i-1]
+    w_plot[n_plot1:n_plot, i] = w2_old + 0.5 * (v_plot[n_plot1:n_plot, i - 1] + v_plot[n_plot1:n_plot, i]) * dt_vec[i-1]
 
-        w1_old = w_plot[:n_plot1, i]
-        w2_old = w_plot[n_plot1:n_plot, i]
+    w1_old = w_plot[:n_plot1, i]
+    w2_old = w_plot[n_plot1:n_plot, i]
+
 # from matplotlib import animation
 #
 # # First set up the figure, the axis, and the plot element we want to animate
@@ -187,7 +208,9 @@ X_plot, T_plot = np.meshgrid(x_plot, t_plot)
 # Plot the surface.
 ax.set_xlabel('Space coordinate $[m]$', fontsize=fntsize)
 ax.set_ylabel('Time $[s]$', fontsize=fntsize)
-ax.set_zlabel('$w [m]$', fontsize=fntsize)
+ax.set_zlabel('Vertical deflection $[m]$', fontsize=fntsize)
+
+# ax.set_title(r'Vertical deflection', fontsize=fntsize, loc='left')
 
 
 W_plot = np.transpose(w_plot)
@@ -196,9 +219,13 @@ surf = ax.plot_surface(X_plot, T_plot, W_plot, cmap=cm.jet, linewidth=0, antiali
 surf._facecolors2d = surf._facecolors3d
 surf._edgecolors2d = surf._edgecolors3d
 
-x0 = np.zeros((n_ev,))
-w0_plot = ax.plot(x0, t_ev, np.sin(omega_r * t_ev), label='Reference $w$', color='black')
-ax.legend(handles=[w0_plot[0]])
-
 fig.colorbar(surf, shrink=0.5, aspect=5)
+x0 = np.zeros((n_ev,))
+w0_plot = ax.plot(x0, t_ev, np.sin(omega_r * t_ev), label='Output $w(0, t)$', color='purple', linewidth=5)
+
+u_t = 0.5 * (np.cosh(sqrom_r) + np.cos(sqrom_r)) * np.sin(omega_r * t_ev)
+x1 = np.ones((n_ev,))
+w1_plot = ax.plot(x1, t_ev, u_t, label='Control $w(L, t)$', color='black', linewidth=5)
+
+ax.legend(handles=[w0_plot[0], w1_plot[0]])
 plt.show()

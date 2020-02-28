@@ -9,8 +9,11 @@ from assimulo.implicit_ode import Implicit_Problem
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from matplotlib import animation
 plt.rc('text', usetex=True)
-# Finite element defition
-
+import matplotlib
+matplotlib.rcParams["legend.loc"] = 'best'
+matplotlib.rcParams['text.usetex'] = True
+matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
+matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{bm}"]
 
 def computeH_dae(ind):
 
@@ -258,6 +261,16 @@ def computeH_dae(ind):
         w_fun.vector()[:] = ep_sol[:, i]
         wfun_vec.append(interpolate(w_fun, Vp))
 
+    anim = animate2D(minZ, maxZ, wfun_vec, t_ev, xlabel='$x[\mathrm{m}]$', ylabel='$r [\mathrm{m}]$', \
+                     title='Pressure $[\mathrm{Pa}]$')
+
+    rallenty = 10
+    fps = 20
+    Writer = animation.writers['ffmpeg']
+    writer = Writer(fps=fps, metadata=dict(artist='Me'), bitrate=1800)
+    path_videos = "/home/a.brugnoli/Videos/Waves/IFAC_WC2020/"
+    anim.save(path_videos + 'wave_dae' + str(ind) + '.mp4', writer=writer)
+
     H_vec = np.zeros((n_ev,))
     Hp_vec = np.zeros((n_ev,))
     Hq_vec = np.zeros((n_ev,))
@@ -272,5 +285,18 @@ def computeH_dae(ind):
     np.save(path_results + "H_dae_" + str(ind) + ".npy", H_vec)
     np.save(path_results + "Hp_dae_" + str(ind) + ".npy", Hp_vec)
     np.save(path_results + "Hq_dae_" + str(ind) + ".npy", Hq_vec)
+
+    # fig = plt.figure()
+    # plt.plot(t_sol, H_vec, 'b-', label="H")
+    # plt.plot(t_sol, Hp_vec, 'r-', label="Hp")
+    # plt.plot(t_sol, Hq_vec, 'g-', label="Hq")
+    #
+    # fntsize = 15
+    # plt.xlabel(r'{Time} (s)', fontsize=fntsize)
+    # plt.ylabel(r'{Hamiltonian} (J)', fontsize=fntsize)
+    # plt.title(r"Hamiltonian trend",
+    #           fontsize=fntsize)
+    # plt.legend(loc='upper right')
+
 
     return H_vec, t_sol

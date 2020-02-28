@@ -118,6 +118,8 @@ n_uD = B_D.shape[1]
 t_final = 0.01
 
 Z = 1000
+RR = Z * B_D @ la.inv(M_D) @ B_D.T
+
 Amp_uNxy = 0.1
 
 t_diss = 0.05*t_final
@@ -130,7 +132,7 @@ def dae_closed_phs(t, y, yd):
     lmb_var = y[n_e:]
     ed_var = yd[:n_e]
 
-    res_e = MM @ ed_var - JJ @ e_var - G_N @ lmb_var + Z * B_D @ B_D.T @ e_var * (t>t_diss)
+    res_e = MM @ ed_var - JJ @ e_var - G_N @ lmb_var + RR @ e_var * (t>t_diss)
     res_lmb = - G_N.T @ e_var + B_N * Amp_uNxy * (1 - np.cos(pi*t/t_diss)) # *(t<t_diss)
 
     return np.concatenate((res_e, res_lmb))

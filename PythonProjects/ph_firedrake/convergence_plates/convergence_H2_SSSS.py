@@ -462,8 +462,8 @@ print("")
 plt.figure()
 
 # plt.plot(np.log(h1_vec), np.log(v_r1_atF), ':o', label='HHJ 1')
-plt.plot(np.log(h1_vec), np.log(v_errInf_r1), '-.+', label='HHJ 1 $L^\infty$')
-plt.plot(np.log(h1_vec), np.log(v_errQuad_r1), '--*', label='HHJ 1 $L^2$')
+plt.plot(np.log(h1_vec), np.log(v_errInf_r1), '-.+', label='H^2 $L^\infty$')
+plt.plot(np.log(h1_vec), np.log(v_errQuad_r1), '--*', label='H^2 $L^2$')
 plt.plot(np.log(h1_vec), np.log(h1_vec), '-v', label=r'$h$')
 
 # # plt.plot(np.log(h1_vec), np.log(v_r2_atF), ':o', label='HHJ 2')
@@ -523,8 +523,8 @@ print("")
 plt.figure()
 
 # plt.plot(np.log(h1_vec), np.log(sig_r1_atF), ':o', label='HHJ 1')
-plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+', label='HHJ 1 $L^\infty$')
-plt.plot(np.log(h1_vec), np.log(sig_errQuad_r1), '--*', label='HHJ 1 $L^2$')
+plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+', label='H^2 $L^\infty$')
+plt.plot(np.log(h1_vec), np.log(sig_errQuad_r1), '--*', label='H^2 $L^2$')
 plt.plot(np.log(h1_vec), np.log(h1_vec), '-v', label=r'$h$')
 
 # # plt.plot(np.log(h1_vec), np.log(sig_r2_atF), ':o', label='HHJ 2')

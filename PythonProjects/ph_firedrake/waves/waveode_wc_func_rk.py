@@ -15,7 +15,11 @@ from mpl_toolkits.mplot3d import Axes3D
 from math import pi
 import time
 plt.rc('text', usetex=True)
-
+import matplotlib
+matplotlib.rcParams["legend.loc"] = 'best'
+matplotlib.rcParams['text.usetex'] = True
+matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
+matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{bm}"]
 
 def computeH_ode(ind):
 
@@ -100,7 +104,8 @@ def computeH_ode(ind):
         controlD_dofs = np.where(B_D.any(axis=0))[0]
 
         B_D = B_D[:, controlD_dofs]
-        M_D = assemble(v_D * u_D * is_uD * r1 * ds1).array()
+        petsc_md = assemble(v_D * u_D * is_uD * r1 * ds1, mat_type='aij').M.handle
+        M_D = np.array(petsc_md.convert("dense").getDenseArray())
         M_D = M_D[:, controlD_dofs]
         M_D = M_D[controlD_dofs, :]
 
@@ -361,18 +366,18 @@ def computeH_ode(ind):
 
     fntsize = 16
 
-    fig = plt.figure()
-    plt.plot(t_ev, H_vec, 'b-', label="H")
-    plt.plot(t_ev, Hp_vec, 'r-', label="Hp")
-    plt.plot(t_ev, Hq_vec, 'g-', label="Hq")
+    # fig = plt.figure()
+    # plt.plot(t_sol, H_vec, 'b-', label="H")
+    # plt.plot(t_sol, Hp_vec, 'r-', label="Hp")
+    # plt.plot(t_sol, Hq_vec, 'g-', label="Hq")
+    #
+    # plt.xlabel(r'{Time} (s)', fontsize=fntsize)
+    # plt.ylabel(r'{Hamiltonian} (J)', fontsize=fntsize)
+    # plt.title(r"Hamiltonian trend",
+    #           fontsize=fntsize)
+    # plt.legend(loc='upper right')
 
-    plt.xlabel(r'{Time} (s)', fontsize=fntsize)
-    plt.ylabel(r'{Hamiltonian} (J)', fontsize=fntsize)
-    plt.title(r"Hamiltonian trend",
-              fontsize=fntsize)
-    plt.legend(loc='upper right')
-
-    path_figs = "/home/a.brugnoli/Plots_Videos/Python/Plots/Waves/IFAC_WC2020/"
+    path_figs = "/home/a.brugnoli/Plots/Python/Plots/Waves/IFAC_WC2020/"
     plt.savefig(path_figs + "H_ode" + str(ind) + ".eps", format="eps")
 
     w1_fun = Function(Vp1)
@@ -390,13 +395,14 @@ def computeH_ode(ind):
         w2_fun.vector()[:] = ep2_sol[:, i]
         w2fun_vec.append(interpolate(w2_fun, Vp2))
 
-    anim = animate2D(minZ, maxZ, w1fun_vec, w2fun_vec, t_ev, xlabel='$x[m]$', ylabel='$r [m]$', \
-                     zlabel='$p [Pa]$', title='Pressure')
+    anim = animate2D(minZ, maxZ, w1fun_vec, w2fun_vec, t_ev, xlabel='$x[\mathrm{m}]$', ylabel='$r [\mathrm{m}]$', \
+                     title='Pressure $[\mathrm{Pa}]$')
 
     Writer = animation.writers['ffmpeg']
     writer = Writer(fps=20, metadata=dict(artist='Me'), bitrate=1800)
     path_videos = "/home/a.brugnoli/Videos/Waves/IFAC_WC2020/"
     anim.save(path_videos + 'wave_ode' + str(ind) + '.mp4', writer=writer)
+
 
     return H_vec, t_sol
 

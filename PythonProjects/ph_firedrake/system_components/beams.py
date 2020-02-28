@@ -1102,7 +1102,7 @@ class FreeEB(SysPhdaeRig):
         # Finite element defition
         deg = 3
         Vp = FunctionSpace(mesh, "Hermite", deg)
-        Vq = FunctionSpace(mesh, "Hermite", deg)
+        Vq = FunctionSpace(mesh, "DG", 1)
 
         V = Vp * Vq
         n_Vp = Vp.dim()
@@ -1161,7 +1161,7 @@ class ClampedEB(SysPhdaeRig):
 
         # Finite element defition
         deg = 3
-        Vp = FunctionSpace(mesh, "Hermite", deg)
+        Vp = FunctionSpace(mesh, "DG", 1)
         Vq = FunctionSpace(mesh, "Hermite", deg)
 
         V = Vp * Vq

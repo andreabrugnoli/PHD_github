@@ -12,7 +12,7 @@ import scipy.linalg as la
 import scipy.sparse as spa
 import scipy.sparse.linalg as sp_la
 
-n = 10
+n = 15
 
 E = 2e11 # Pa
 rho = 8000  # kg/m^3
@@ -54,7 +54,7 @@ mesh = UnitSquareMesh(n_x, n_y, quadrilateral=False)
 # plot(mesh)
 # plt.show()
 
-name_FEp = 'Bell'
+name_FEp = 'Argyris'
 name_FEq = 'DG'
 deg_q = 3
 
@@ -204,6 +204,7 @@ omega_tilde = L**2*sqrt(rho*h/D)*omega
 for i in range(min(6, len(omega_tilde))):
     print(omega_tilde[i])
 
+n_fig = len(omega_tilde)
 
 plot_eigenvectors = True
 if plot_eigenvectors:
@@ -219,7 +220,7 @@ if plot_eigenvectors:
     plt.close('all')
     matplotlib.rcParams['text.usetex'] = True
 
-    for i in range(n_om):
+    for i in range(n_fig):
         eig_real_w = Function(Vp)
         eig_imag_w = Function(Vp)
 
@@ -236,12 +237,12 @@ if plot_eigenvectors:
         norm_imag_eig = np.linalg.norm(eig_imag_wCG.vector().get_local())
 
         if norm_imag_eig > norm_real_eig:
-            # triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_imag_wCG, 10)
-            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_imag_w, 10)
+            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_imag_wCG, 10)
+            # triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_imag_w, 10)
 
         else:
-            # triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_real_wCG, 10)
-            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_real_w, 10)
+            triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_real_wCG, 10)
+            # triangulation, z_goodeig = _two_dimension_triangle_func_val(eig_real_w, 10)
 
 
         figure = plt.figure(i)
@@ -255,7 +256,7 @@ if plot_eigenvectors:
         ax.set_ybound(-tol, l_y + tol)
         ax.set_ylabel('$y [m]$', fontsize=fntsize)
 
-        ax.set_title('$v_{e_{w}}$', fontsize=fntsize)
+        ax.set_title(r'Eigenvector num' + str(i), fontsize=fntsize)
 
         ax.w_zaxis.set_major_locator(LinearLocator(10))
         ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
