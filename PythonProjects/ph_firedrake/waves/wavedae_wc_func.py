@@ -8,6 +8,7 @@ from assimulo.solvers import IDA
 from assimulo.implicit_ode import Implicit_Problem
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from matplotlib import animation
+import time
 plt.rc('text', usetex=True)
 import matplotlib
 matplotlib.rcParams["legend.loc"] = 'best'
@@ -241,7 +242,10 @@ def computeH_dae(ind):
     # Simulate
     n_ev = 500
     t_ev = np.linspace(0, t_final, n_ev)
+    ti_sim = time.time()
     t_sol, y_sol, yd_sol = imp_sim.simulate(t_final, 0, t_ev)
+    tf_sim = time.time()
+    elapsed_t = tf_sim - ti_sim
 
     t_sol = np.array(t_sol)
     e_sol = y_sol[:, :n_e].T
@@ -285,6 +289,10 @@ def computeH_dae(ind):
     np.save(path_results + "H_dae_" + str(ind) + ".npy", H_vec)
     np.save(path_results + "Hp_dae_" + str(ind) + ".npy", Hp_vec)
     np.save(path_results + "Hq_dae_" + str(ind) + ".npy", Hq_vec)
+    np.save(path_results + "ep_dae_" + str(ind) + ".npy", ep_sol)
+    np.save(path_results + "eq_dae_" + str(ind) + ".npy", eq_sol)
+    np.save(path_results + "t_elapsed_dae_" + str(ind) + ".npy", elapsed_t)
+
 
     # fig = plt.figure()
     # plt.plot(t_sol, H_vec, 'b-', label="H")
