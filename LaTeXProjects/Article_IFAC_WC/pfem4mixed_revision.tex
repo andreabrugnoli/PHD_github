@@ -248,18 +248,18 @@ This approach can equivalently use Eq. \eqref{eq:wf_grad} or Eq. \eqref{eq:wf_di
 	\caption[bcpart]{Boundary partition for the problem.}
 	\label{fig:bc_part}
 \end{figure}
-The boundary is split in two partition (see Fig. \ref{fig:bc_part}). For the time being generic inputs $u_D, u_N$ for the Dirichlet and Neumann conditions are considered.  First of all the boundary term in Eq. \eqref{eq:f_N} needs to be revisited. The quantity $\bm{v}\cdot\bm{n}\vert_{\partial \Omega_{\text{r}}}$ is known only $\Gamma_N$. On $\Gamma_D$ a Lagrange multiplier $\lambda_D$ has to be introduced to enforce the Dirichlet boundary condition. This leads to 
+The boundary is split in two partition (see Fig. \ref{fig:bc_part}). For the time being generic inputs $u_D, u_N$ for the Dirichlet and Neumann conditions are considered.  First of all, the boundary term in Eq. \eqref{eq:f_N} needs to be revisited. The quantity $\bm{v}\cdot\bm{n}\vert_{\partial \Omega_{\text{r}}}$ is known only $\Gamma_N$. On $\Gamma_D$ a Lagrange multiplier $\lambda_D$ has to be introduced to enforce the Dirichlet boundary condition. This leads to 
 \begin{equation}
 \label{eq:bdint_dae}
 \int_{\partial \Omega_{\text{r}}} w_p \bm{v} \cdot \bm{n} \d{\Gamma_r} = \int_{\Gamma_N} w_p u_N \ \d{\Gamma_r} + \int_{\Gamma_D} w_p \lambda_D \d{\Gamma_r}.
 \end{equation}
-The constraint associated with the Lagrange multiplier  is the in-homogeneous Dirichlet condition
+The constraint associated with the Lagrange multiplier  is the non-homogeneous Dirichlet condition
 \begin{equation}
 \label{eq:wf_con}
 \int_{\Gamma_D} w_\lambda (p - u_D) \d{\Gamma_r} = 0,
 \end{equation}
 where $w_\lambda$ is the test function associated with the Lagrange multiplier. The system in weak form is obtained by using Eqs. \eqref{eq:wf_grad}, \eqref{eq:f_N}, \eqref{eq:bdint_dae} and \eqref{eq:wf_con}, together with the power conjugated outputs ($y_N = p|_{\Gamma_N}, \; y_N = \lambda_D|_{\Gamma_D} = \bm{v} \cdot \bm{n}|_{\Gamma_D}$)
-\begin{equation}
+\begin{equation}\label{eq:weak_lag}
 \begin{aligned}
 m(w, \partial_t{e}) &= j_{\text{grad}}(w, e) + \left(w_p, \lambda_D \right)_{\Gamma_D} + \left(w_p, u_N \right)_{\Gamma_N}, \\
 0 &= - \left(w_\lambda, p \right)_{\Gamma_D} + \left(w_\lambda, u_D \right)_{\Gamma_D}, \\
@@ -272,16 +272,16 @@ where $w_N, w_D$ are the test functions associated to the output discretization 
 \label{eq:basis_func}
 \begin{aligned}
 \begin{aligned}
-p &\approx \sum_{i=1}^{n_p} \phi_p^i p^i, \\
-\bm{v} &\approx \sum_{i=1}^{n_v} \bm\phi_v^i v^i, \\
+p &\approx \sum_{i=1}^{n_p} \phi_p^i(x, r) p^i, \\
+\bm{v} &\approx \sum_{i=1}^{n_v} \bm\phi_v^i(x, r) v^i, \\
 \end{aligned} \qquad
 \begin{aligned}
-*_D &\approx \sum_{i=1}^{n_D} \phi^i_\Gamma *^i_D, \quad (* = \{u, y, \lambda\}), \\
-*_N &\approx \sum_{i=1}^{n_N} \phi_\Gamma^i *^i_N, \quad (* = \{u,  y\}),
+*_D &\approx \sum_{i=1}^{n_D} \phi^i_\Gamma(s) *^i_D, \quad (* = \{u, y, \lambda\}), \\
+*_N &\approx \sum_{i=1}^{n_N} \phi_\Gamma^i(s) *^i_N, \quad (* = \{u,  y\}).
 \end{aligned} 
 \end{aligned}
 \end{equation}
-leading to the finite dimensional pHDAE (\cite{beattie2018linear}):
+The shape functions $\phi_p^i(x, r), \bm\phi_v^i(x, r)$ are defined over the domain, whereas $\phi_\Gamma^i(s)$ ($s$ is the curvilinear abscissa) is defined on the boundary only. Plugging the approximations \eqref{eq:basis_func} into \eqref{eq:weak_lag}, a pHDAE (\cite{beattie2018linear}) is obtained:
 \begin{equation}
 \begin{aligned}
 \label{eq:discr_phdae}
@@ -319,10 +319,10 @@ leading to the finite dimensional pHDAE (\cite{beattie2018linear}):
 \begin{bmatrix}
 \mathbf{e}\\
 \bm{\lambda}_D \\
-\end{bmatrix}.
+\end{bmatrix},
 \end{aligned}
 \end{equation}
-where $\mathbf{M} = \mathrm{Diag}(\mathbf{M}_p, \mathbf{M}_v)$ and
+where $\mathbf{M} = \mathrm{diag}(\mathbf{M}_p, \mathbf{M}_v)$ and
 \begin{equation*}
 \mathbf{J} = \begin{bmatrix}
 \mathbf{0} & \mathbf{A}_{\mathrm{grad}} \\
@@ -435,8 +435,8 @@ m^{\Omega_D}(w, \partial_t{e}) &= j_{\text{div}}^{\Omega_D}(w, e) + \left(\bm{w}
 \end{equation}
 where $\partial \Omega_{N/D}$ denotes the boundary of each sub-domain and the superscript ${\Omega_{N,D}}$ denote that the bilinear forms are obtained by integration over each sub-domain
 \begin{align*}
-m^{\Omega_N}(w, \partial_t{e}) &:= \int_{\Omega_N} w \cdot \mathcal{Q}^{-1} e \ \d{\Omega_r}, \\
-m^{\Omega_D}(w, \partial_t{e}) &:= \int_{\Omega_D} w \cdot \mathcal{Q}^{-1} e \ \d{\Omega_r},  \\
+m^{\Omega_N}(w, \partial_t{e}) &:= \left(w, \mathcal{Q}^{-1} e \right)_{\Omega_{N}}, \\
+m^{\Omega_D}(w, \partial_t{e}) &:= \left(w, \mathcal{Q}^{-1} e \right)_{\Omega_{D}},  \\
 j_{\text{grad}}^{\Omega_{N}}(w, e) &:= \left(w, \mathcal{J}_{\text{grad}} \ e \right)_{\Omega_{N}} - \left(\mathcal{J}_{\text{grad}} \ w, e \right)_{\Omega_{N}}, \\
 j_{\text{div}}^{\Omega_{D}}(w, e) &:= \left(w, \mathcal{J}_{\text{div}} \ e \right)_{\Omega_{D}} - \left(\mathcal{J}_{\text{div}} \ w, e \right)_{\Omega_{D}}.
 \end{align*}
@@ -463,7 +463,7 @@ and
 \mathbf{y}_D^{\text{int}} &= \mathbf{M}_{\Gamma_{\text{int}}} \widehat{\mathbf{y}}_D^{\text{int}} = \mathbf{B}_{D}^{\text{int}\, T} \mathbf{e}_D. \\
 \end{aligned}
 \end{equation}
-The matrices are structured 
+The matrices structure is given by
 \begin{equation*}
 \begin{aligned}
 \mathbf{M}_N &= \mathrm{Diag}(\mathbf{M}_{N, p},\, \mathbf{M}_{N, v}), \\
@@ -511,7 +511,7 @@ The matrices elements are computed as follows:
 \mathbf{B}_{D, v}^{\text{int}, ij} &= (\bm{\phi}_{v}^{i} \cdot \bm{n},\, {\phi}_{\Gamma}^{j})_{\Gamma_{\text{int}}}. \\
 \end{aligned}
 \end{equation*}
-Furthermore, $\mathbf{M}_{\Gamma_{N}},\, \mathbf{M}_{\Gamma_{D}}$ are defined in \eqref{eq:Mgamma}, and $\mathbf{M}_{\Gamma_{\text{int}}} = ({\phi}_{\Gamma}^{i},\, {\phi}_{\Gamma}^{j})_{\Gamma_{\text{int}}}$. In order to get a final dimensional system with mixed causality, systems \eqref{eq:fd_N} and \eqref{eq:fd_D} have to be interconnected using a classical gyrator interconnection. Considering that the pressure field is continuous at $\Gamma_{\text{int}}$, the outward normal verifies $\bm{n}_D \vert_{\Gamma_{\text{int}}}= - \bm{n}_N \vert_{\Gamma_{\text{int}}}$ and the corresponding degrees of freedom have to be matched, the correct interconnection reads
+Furthermore, $\mathbf{M}_{\Gamma_{N}},\, \mathbf{M}_{\Gamma_{D}}$ are defined in \eqref{eq:Mgamma}, and $\mathbf{M}_{\Gamma_{\text{int}}} = ({\phi}_{\Gamma}^{i},\, {\phi}_{\Gamma}^{j})_{\Gamma_{\text{int}}}$. In order to get a system with mixed causality, systems \eqref{eq:fd_N} and \eqref{eq:fd_D} have to be interconnected using a classical gyrator interconnection. Considering that the pressure field is continuous at $\Gamma_{\text{int}}$, the outward normal verifies $\bm{n}_D \vert_{\Gamma_{\text{int}}}= - \bm{n}_N \vert_{\Gamma_{\text{int}}}$ and the corresponding degrees of freedom have to be matched, the correct interconnection reads
 \begin{equation}
 \begin{aligned}{}
 \mathbf{u}_N^{\text{int}} &= - \widehat{\mathbf{y}}_D^{\text{int}} = - \mathbf{M}_{\Gamma_{\text{int}}}^{-1} \mathbf{y}_D^{\text{int}}, \\
@@ -525,7 +525,7 @@ This interconnection establishes that the power is exchanged without loss betwee
 The resulting interconnected system is written as
 \begin{equation}
 \begin{aligned}
-\mathbf{M}_{ND} \diff{\mathbf{e}_{ND}}{t} &= \mathbf{J}_{ND} \, \mathbf{e}_{ND} + \mathbf{B}_{ND} \, \mathbf{u}_{ND}, \\
+\mathbf{M}_{ND}\frac{\d \mathbf{e}_{ND}}{\d t} &= \mathbf{J}_{ND} \, \mathbf{e}_{ND} + \mathbf{B}_{ND} \, \mathbf{u}_{ND}, \\
 \mathbf{y}_{ND}& = \mathbf{B}_{ND}^T \mathbf{e}_{ND}.
 \end{aligned}
 \end{equation}
@@ -593,12 +593,12 @@ p^0(x, r) = 0 , \quad v_x^0(x, r) = f(r), \quad v_r^0(x, r) = g(r).
 	\label{tab:par}
 \end{table}
 
-A radial component of the velocity allows to highlight the effect of the impedance. The velocity profile satisfies some regularity conditions so that the transition between Neumann and Dirichlet boundary conditions is smooth. In order to get a finite dimensional discretization the fields are approximated using the following finite element families for both approaches:
+A radial component of the velocity allows highlighting the effect of the impedance. The velocity profile satisfies some regularity conditions so that the transition between Neumann and Dirichlet boundary conditions is smooth. In order to get a finite dimensional discretization the fields are approximated using the following finite element families for both approaches:
 
 \begin{itemize}
-    \item $\phi_p$ is interpolated using order~1 Lagrange polynomials;
-    \item $\bm{\phi}_v$ is interpolated using order~2 Raviart-Thomas polynomials;
-    \item ${\phi}_\Gamma$ is approximated by Lagrange polynomial of order~1 defined on the boundary $\Gamma_D$ (for $\lambda_D, u_D, y_D$) or $\Gamma_N$ (for $u_N, y_N$).
+    \item $\phi_p(x, r)$ is interpolated using order~1 Lagrange polynomials;
+    \item $\bm{\phi}_v(x, r)$ is interpolated using order~2 Raviart-Thomas polynomials;
+    \item ${\phi}_\Gamma(s)$ is approximated by Lagrange polynomial of order~1 defined on the boundary $\Gamma_D$ (for $\lambda_D, u_D, y_D$) or $\Gamma_N$ (for $u_N, y_N$).
 \end{itemize}
 
 \begin{comment}
@@ -702,10 +702,10 @@ In order to demonstrate the consistency of the two proposed approaches the follo
 \begin{align*}
 \varepsilon^{H}_{\text{ODE}/\text{DAE}} = \frac{||H_{\text{REF}} - H_{\text{ODE}/\text{DAE}} ||_{L^2}}{||H_{\text{REF}}||_{L^2}}, \\
 \varepsilon^p_{\text{ODE}/\text{DAE}} = \frac{||p_{\text{REF}} - p_{\text{ODE}/\text{DAE}} ||_{L^2}}{||p_{\text{REF}}||_{L^2}}, \\
-\varepsilon^v_{\text{ODE}/\text{DAE}} = \frac{||\mathbf{v}_{\text{REF}} - \mathbf{v}_{\text{ODE}/\text{DAE}} ||_{L^2}}{||\mathbf{v}_{\text{REF}}||_{L^2}}. 
+\varepsilon^v_{\text{ODE}/\text{DAE}} = \frac{||\bm{v}_{\text{REF}} - \bm{v}_{\text{ODE}/\text{DAE}} ||_{L^2}}{||\mathbf{v}_{\text{REF}}||_{L^2}}. 
 \end{align*}
 The total energy obtained with several meshes is shown in Figs. \ref{fig:Htrend_dae}, \ref{fig:Htrend_ode} for the DAE and ODE approach respectively. It can be noticed that the Hamiltonian tends to the value $H_{vx}^0$ as expected. The overall Hamiltonian trend is well captured and even for coarse meshes the relative error does not exceed 6\% (see Fig. \ref{fig:Hdiff}).
-Both methods converge monotonically to the reference solution, as illustrated in Figs. \ref{fig:p_err}, \ref{fig:v_err}. The faster convergence of one method on the other cannot be established. Anyway, each methodology possesses advantages and drawbacks. The DAE approach \eqref{eq:sys_dae} guarantees the overall continuity of the variables and does not require the construction two compatibles meshes. However, the introduction of Lagrange multiplier requires the verification of the inf-sup condition.  The ODE approach \eqref{eq:sys_ode} requires the construction of two separate mesh and the selection of an appropriate interface boundary $\Gamma_{\text{int}}$. This may lead to deformed mesh elements and hence less accurate solutions.  Furthermore, it does not guarantee the continuity of the fields at the interface. For what concerns the computational cost, in Tab. \ref{tab:deltaT} the simulation time required by each solver is shown. The ODE approach is less time consuming for mesh size sufficiently small. It is important to remark that if the problem is already differential-algebraic \cite{TFMST1,TFMST2} the domain decomposition technique loses its advantages as the final system will anyway be differential algebraic.
+Both methods converge monotonically to the reference solution, as illustrated in Figs. \ref{fig:p_err}, \ref{fig:v_err}. The faster convergence of one method on the other cannot be established. Anyway, each methodology possesses advantages and drawbacks. The DAE approach \eqref{eq:sys_dae} guarantees the overall continuity of the variables and does not require the construction of two compatibles meshes. However, the introduction of Lagrange multiplier requires the verification of the inf-sup condition.  The ODE approach \eqref{eq:sys_ode} requires the construction of two separate mesh and the selection of an appropriate interface boundary $\Gamma_{\text{int}}$. This may lead to deformed mesh elements and hence less accurate solutions.  Furthermore, it does not guarantee the continuity of the fields at the interface. For what concerns the computational cost, in Tab. \ref{tab:deltaT} the simulation time required by each solver is shown. The ODE approach is less time consuming for mesh size sufficiently small. It is important to remark that if the problem is already differential-algebraic \cite{TFMST1,TFMST2} the domain decomposition technique loses its advantages as the final system will anyway be differential algebraic.
 
 \begin{table}[t]
 	\centering
