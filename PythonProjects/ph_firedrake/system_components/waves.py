@@ -1,7 +1,8 @@
 from firedrake import *
 import numpy as np
 import scipy.linalg as la
-from modules_ph.classes_phsystem import SysPhdaeRig, check_positive_matrix
+from modules_ph.classes_phsystem import SysPhdaeRig, check_positive_matrix,\
+    check_skew_symmetry, permute_rows_columns, permute_rows
 import warnings
 np.set_printoptions(threshold=np.inf)
 from matplotlib import pyplot as plt
@@ -170,6 +171,118 @@ class DirichletWave(SysPhdaeRig):
             printmodes(Ef_aug, Jf_aug, Vp, n_modes)
 
         SysPhdaeRig.__init__(self, n_e, 0, 0, n_p, n_q, E=MM, J=JJ, B=B_D)
+
+
+class NeumannWave1D(SysPhdaeRig):
+
+    def __init__(self, n_el, L, rho, T):
+        mesh = IntervalMesh(n_el, L)
+        x = SpatialCoordinate(mesh)
+
+        # Finite element defition
+        deg = 1
+        Vp = FunctionSpace(mesh, "Lagrange", deg)
+        Vq = FunctionSpace(mesh, "Lagrange", deg)
+
+        V = Vp * Vq
+        n_Vp = Vp.dim()
+        n_Vq = Vq.dim()
+        n_V = V.dim()
+
+        v = TestFunction(V)
+        v_p, v_q = split(v)
+
+        e = TrialFunction(V)
+        e_p, e_q = split(e)
+
+        al_p = rho * e_p
+        al_q = 1. / T * e_q
+
+        dx = Measure('dx')
+        ds = Measure('ds')
+
+        m_form = v_p * al_p * dx + v_q * al_q * dx
+
+        petsc_m = assemble(m_form, mat_type='aij').M.handle
+        M = np.array(petsc_m.convert("dense").getDenseArray())
+
+        assert check_positive_matrix(M)
+
+        j_grad = v_q * e_p.dx(0) * dx
+        j_gradIP = -v_p.dx(0) * e_q * dx
+
+        j_form = j_grad + j_gradIP
+
+        petcs_j = assemble(j_form, mat_type='aij').M.handle
+        J = np.array(petcs_j.convert("dense").getDenseArray())
+
+        assert check_skew_symmetry(J)
+
+        b0_N = v_p * ds(1)
+        bL_N = v_p * ds(2)
+
+        B0_N = assemble(b0_N).vector().get_local().reshape((-1, 1))
+        BL_N = assemble(bL_N).vector().get_local().reshape((-1, 1))
+
+        B = np.hstack((B0_N, BL_N))
+
+        SysPhdaeRig.__init__(self, n_V, 0, 0, n_Vp, n_Vq, E=M, J=J, B=B)
+
+
+class DirichletWave1D(SysPhdaeRig):
+
+    def __init__(self, n_el, L, rho, T):
+        mesh = IntervalMesh(n_el, L)
+        x = SpatialCoordinate(mesh)
+
+        # Finite element defition
+        deg = 1
+        Vp = FunctionSpace(mesh, "Lagrange", deg)
+        Vq = FunctionSpace(mesh, "Lagrange", deg)
+
+        V = Vp * Vq
+        n_Vp = Vp.dim()
+        n_Vq = Vq.dim()
+        n_V = V.dim()
+
+        v = TestFunction(V)
+        v_p, v_q = split(v)
+
+        e = TrialFunction(V)
+        e_p, e_q = split(e)
+
+        al_p = rho * e_p
+        al_q = 1. / T * e_q
+
+        dx = Measure('dx')
+        ds = Measure('ds')
+
+        m_form = v_p * al_p * dx + v_q * al_q * dx
+
+        petsc_m = assemble(m_form, mat_type='aij').M.handle
+        M = np.array(petsc_m.convert("dense").getDenseArray())
+
+        assert check_positive_matrix(M)
+
+        j_div = v_p * e_q.dx(0) * dx
+        j_divIP = -v_q.dx(0) * e_p * dx
+
+        j_form = j_div + j_divIP
+
+        petcs_j = assemble(j_form, mat_type='aij').M.handle
+        J = np.array(petcs_j.convert("dense").getDenseArray())
+
+        assert check_skew_symmetry(J)
+
+        b0_D = -v_q * ds(1)
+        bL_D = v_q * ds(2)
+
+        B0_D = assemble(b0_D).vector().get_local().reshape((-1, 1))
+        BL_D = assemble(bL_D).vector().get_local().reshape((-1, 1))
+
+        B = np.hstack((B0_D, BL_D))
+
+        SysPhdaeRig.__init__(self, n_V, 0, 0, n_Vp, n_Vq, E=M, J=J, B=B)
 
 
 def find_point(coords, point):
