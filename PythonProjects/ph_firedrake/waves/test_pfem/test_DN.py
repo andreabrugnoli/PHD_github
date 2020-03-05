@@ -2,6 +2,8 @@ from firedrake import *
 import numpy as np
 import scipy.linalg as la
 import scipy.sparse as spa
+import scipy.sparse.linalg as sp_la
+
 from scipy import integrate
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -10,24 +12,33 @@ from firedrake.plot import calculate_one_dim_points
 
 fntsize = 15
 
-n_el = 100
+n_el = 1000
 L = 1
 
 mesh = IntervalMesh(n_el, L)
 x = SpatialCoordinate(mesh)[0]
 
-rho = 1
-T = 1
-w0 = -5*sin(2*pi*x)*cos(2*pi*x)
-v0 = 2*sin(pi*x/2)*sin(pi*x/2)
+tfin = 10
+
+# Physical parameters
+rho = 10-cos(pi*x) #  Space-dependent mass density
+T = 1.25*(-x*(1-x)+2/3) # Space-dependent Young's modulus
+w0 = 20*exp(-10*(x-1/2)**2) + 5*x**2 - 8*x + 2 #  Space-dependent initial deflection
+v0 = 2*x*(1-x) + 2  # Space-dependent initial deflection velocity
+
+
+# rho = 1
+# T = 1
+# w0 = -5*sin(2*pi*x)*cos(2*pi*x)
+# v0 = 2*sin(pi*x/2)*sin(pi*x/2)
 
 sig0 = T*w0.dx(0)
 
 # Finite element defition
 Vp_N = FunctionSpace(mesh, "Lagrange", 1)
-Vq_N = FunctionSpace(mesh, "Lagrange", 1)
+Vq_N = FunctionSpace(mesh, "DG", 0)
 
-Vp_D = FunctionSpace(mesh, "Lagrange", 1)
+Vp_D = FunctionSpace(mesh, "DG", 0)
 Vq_D = FunctionSpace(mesh, "Lagrange", 1)
 
 V_N = Vp_N * Vq_N
@@ -64,17 +75,19 @@ ds = Measure('ds')
 m_formN = vp_N * alp_N * dx + vq_N * alq_N * dx
 
 petsc_mN = assemble(m_formN, mat_type='aij').M.handle
-M_N = np.array(petsc_mN.convert("dense").getDenseArray())
+# M_N = np.array(petsc_mN.convert("dense").getDenseArray())
+M_N = spa.csr_matrix(petsc_mN.getValuesCSR()[::-1])
 
 # M = spa.csr_matrix(M)
-invM_N = np.linalg.inv(M_N)
+# invM_N = np.linalg.inv(M_N)
 
 m_formD = vp_D * alp_D * dx + vq_D * alq_D * dx
 
 petsc_mD = assemble(m_formD, mat_type='aij').M.handle
-M_D = np.array(petsc_mD.convert("dense").getDenseArray())
+# M_D = np.array(petsc_mD.convert("dense").getDenseArray())
+M_D = spa.csr_matrix(petsc_mD.getValuesCSR()[::-1])
 
-invM_D = np.linalg.inv(M_D)
+# invM_D = np.linalg.inv(M_D)
 
 j_grad = vq_N * ep_N.dx(0) * dx
 j_gradIP = - vp_N.dx(0) * eq_N * dx
@@ -82,15 +95,17 @@ j_gradIP = - vp_N.dx(0) * eq_N * dx
 j_N = j_grad + j_gradIP
 
 petcs_jN = assemble(j_N, mat_type='aij').M.handle
-J_N = np.array(petcs_jN.convert("dense").getDenseArray())
+# J_N = np.array(petcs_jN.convert("dense").getDenseArray())
+J_N = spa.csr_matrix(petcs_jN.getValuesCSR()[::-1])
 
-b0_N = -vp_N * ds(1)
+b0_N = vp_N * ds(1)
 bL_N = vp_N * ds(2)
 
 B0_N = assemble(b0_N).vector().get_local().reshape((-1, 1))
 BL_N = assemble(bL_N).vector().get_local().reshape((-1, 1))
 
 B_N = np.hstack((B0_N, BL_N))
+B_N = spa.csr_matrix(B_N)
 
 j_div = vp_D * eq_D.dx(0) * dx
 j_divIP = - vq_D.dx(0) * ep_D * dx
@@ -98,7 +113,8 @@ j_divIP = - vq_D.dx(0) * ep_D * dx
 j_D = j_div + j_divIP
 
 petcs_jD = assemble(j_D, mat_type='aij').M.handle
-J_D = np.array(petcs_jD.convert("dense").getDenseArray())
+# J_D = np.array(petcs_jD.convert("dense").getDenseArray())
+J_D = spa.csr_matrix(petcs_jD.getValuesCSR()[::-1])
 
 b0_D = -vq_D * ds(1)
 bL_D = vq_D * ds(2)
@@ -107,7 +123,7 @@ B0_D = assemble(b0_D).vector().get_local().reshape((-1, 1))
 BL_D = assemble(bL_D).vector().get_local().reshape((-1, 1))
 
 B_D = np.hstack((B0_D, BL_D))
-
+B_D = spa.csr_matrix(B_D)
 
 exp_w0_N = interpolate(w0, Vp_N)
 exp_v0_N = interpolate(v0, Vp_N)
@@ -135,32 +151,45 @@ v0_L = Function(Vp_D).assign(exp_v0_D).at(L)
 
 # Controls: boundary sigma (Neumann)
 
-uN_0 = lambda t: np.cos(pi*t) * sig0_0
-uN_L = lambda t: np.cos(4*pi*t) * sig0_L
+uN_0 = lambda t: -np.cos(pi*t) * (t+1) * sig0_0
+uN_L = lambda t: np.cos(4*pi*t) * np.exp(-t) * sig0_L
 
 # Controls: boundary velocities (Dirichlet)
 
-uD_0 = lambda t: np.cos(pi*t) * v0_0
-uD_L = lambda t: np.cos(4*pi*t) * v0_L
+uD_0 = lambda t: np.cos(pi*t) * 1/(t+1) * v0_0
+uD_L = lambda t: np.cos(4*pi*t) * np.exp(-t) * v0_L
 
 
 def func_N(t, y):
 
     uN = np.array([uN_0(t), uN_L(t)])
-    dydt = invM_N @ (J_N @ y + B_N @ uN)
+    dydt = sp_la.spsolve(M_N, J_N @ y + B_N @ uN)
 
     return dydt
 
 def func_D(t, y):
 
     uD = np.array([uD_0(t), uD_L(t)])
-    dydt = invM_D @ (J_D @ y + B_D @ uD)
+    dydt = sp_la.spsolve(M_D, J_D @ y + B_D @ uD)
 
     return dydt
 
+# def func_N(t, y):
+#
+#     uN = np.array([uN_0(t), uN_L(t)])
+#     dydt = invM_N @ (J_N @ y + B_N @ uN)
+#
+#     return dydt
+#
+# def func_D(t, y):
+#
+#     uD = np.array([uD_0(t), uD_L(t)])
+#     dydt = invM_D @ (J_D @ y + B_D @ uD)
+#
+#     return dydt
+
 
 t0 = 0
-tfin = 1
 n_t = 200
 
 t_ev = np.linspace(t0, tfin, num=n_t)
@@ -225,104 +254,104 @@ for i in range(n_evD):
 yN = B_N.T @ e_solN
 yD = B_D.T @ e_solD
 
+# Hamiltonians
+plt.figure()
+plt.plot(t_evN, H_N, 'r', label='Neumann')
+plt.plot(t_evD, H_D, 'b', label='Dirichlet')
+plt.ylabel('Hamiltonian (Joules)')
+plt.title('Energies')
+plt.legend()
 
-# # Hamiltonians
-# plt.figure()
-# plt.plot(t_evN, H_N, 'r', label='Neumann')
-# plt.plot(t_evD, H_D, 'b', label='Dirichlet')
-# plt.ylabel('Hamiltonian (Joules)')
-# plt.title('Energies')
+
+X_plotN, T_plotN = np.meshgrid(x_plotN, t_evN)
+X_plotD, T_plotD = np.meshgrid(x_plotD, t_evD)
+
+# Customize the z axis.
+
+
+# Plot the surface.
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.set_xlabel('Space coordinate $[m]$', fontsize=fntsize)
+ax.set_ylabel('Time $[s]$', fontsize=fntsize)
+ax.set_zlabel('Vertical deflection $[m]$', fontsize=fntsize)
+ax.set_title('Neumann')
+W_plotN = np.transpose(w_plotN)
+surf_N = ax.plot_surface(X_plotN, T_plotN, W_plotN, cmap=cm.jet, linewidth=0, antialiased=False, label='Neumann $w$')
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.set_xlabel('Space coordinate $[m]$', fontsize=fntsize)
+ax.set_ylabel('Time $[s]$', fontsize=fntsize)
+ax.set_zlabel('Vertical deflection $[m]$', fontsize=fntsize)
+ax.set_title('Dirichlet')
+W_plotD = np.transpose(w_plotD)
+surf_D = ax.plot_surface(X_plotD, T_plotD, W_plotD, cmap=cm.jet, linewidth=0, antialiased=False, label='Dirichlet $w$')
+
+# surf_D._facecolors2d = surf_D._facecolors3d
+# surf_D._edgecolors2d = surf_D._edgecolors3d
+#
+# surf_N._facecolors2d = surf_N._facecolors3d
+# surf_N._edgecolors2d = surf_N._edgecolors3d
+#
 # plt.legend()
-#
-#
-# X_plotN, T_plotN = np.meshgrid(x_plotN, t_evN)
-# X_plotD, T_plotD = np.meshgrid(x_plotD, t_evD)
-#
-# # Customize the z axis.
-#
-#
-# # Plot the surface.
-# fig = plt.figure()
-# ax = fig.gca(projection='3d')
-# ax.set_xlabel('Space coordinate $[m]$', fontsize=fntsize)
-# ax.set_ylabel('Time $[s]$', fontsize=fntsize)
-# ax.set_zlabel('Vertical deflection $[m]$', fontsize=fntsize)
-# ax.set_title('Neumann')
-# W_plotN = np.transpose(w_plotN)
-# surf_N = ax.plot_surface(X_plotN, T_plotN, W_plotN, cmap=cm.jet, linewidth=0, antialiased=False, label='Neumann $w$')
-#
-# fig = plt.figure()
-# ax = fig.gca(projection='3d')
-# ax.set_xlabel('Space coordinate $[m]$', fontsize=fntsize)
-# ax.set_ylabel('Time $[s]$', fontsize=fntsize)
-# ax.set_zlabel('Vertical deflection $[m]$', fontsize=fntsize)
-# ax.set_title('Dirichlet')
-# W_plotD = np.transpose(w_plotD)
-# surf_D = ax.plot_surface(X_plotD, T_plotD, W_plotD, cmap=cm.jet, linewidth=0, antialiased=False, label='Dirichlet $w$')
-#
-# # surf_D._facecolors2d = surf_D._facecolors3d
-# # surf_D._edgecolors2d = surf_D._edgecolors3d
-# #
-# # surf_N._facecolors2d = surf_N._facecolors3d
-# # surf_N._edgecolors2d = surf_N._edgecolors3d
-# #
-# # plt.legend()
-#
-# # Boundary controls
-# plt.figure()
-# plt.plot(t_evN, eq_solN[0, :], label='Left force (Neumann)')
-# plt.plot(t_evN, uN_0(t_evN), label='Left force (exact)')
-# # plt.legend()ep_solD[0, :]
-# # plt.title('Boundary controls Neumann')
-# # plt.xlabel('t (seconds)')
-# #
-# # plt.figure()
-#
-# plt.plot(t_evN, eq_solN[-1, :], label='Right force (Neumann)')
-# plt.plot(t_evN, uN_L(t_evN), label='Right force (exact)')
-# plt.legend()
+
+# Boundary controls
+plt.figure()
+plt.plot(t_evN, -eq_solN[0, :], label='Left force (Neumann)')
+plt.plot(t_evN, uN_0(t_evN), label='Left force (exact)')
+# plt.legend()ep_solD[0, :]
 # plt.title('Boundary controls Neumann')
 # plt.xlabel('t (seconds)')
 #
 # plt.figure()
-# plt.plot(t_evD, ep_solD[0, :], label='Left velocity (Dirichlet)')
-# plt.plot(t_evD, uD_0(t_evD), label='Left velocity (exact)')
-# # plt.legend()
-# # plt.title('Boundary controls Dirichlet')
-# # plt.xlabel('t (seconds)')
-# #
-# # plt.figure()
-# plt.plot(t_evD, ep_solD[-1, :], label='Right velocity (Dirichlet)')
-# plt.plot(t_evD, uD_L(t_evD), label='Right velocity (exact)')
-#
+
+plt.plot(t_evN, eq_solN[-1, :], label='Right force (Neumann)')
+plt.plot(t_evN, uN_L(t_evN), label='Right force (exact)')
+plt.legend()
+plt.title('Boundary controls Neumann')
+plt.xlabel('t (seconds)')
+
+plt.figure()
+plt.plot(t_evD, ep_solD[0, :], label='Left velocity (Dirichlet)')
+plt.plot(t_evD, uD_0(t_evD), label='Left velocity (exact)')
 # plt.legend()
 # plt.title('Boundary controls Dirichlet')
 # plt.xlabel('t (seconds)')
 #
-# # Boundary observations
 # plt.figure()
-# plt.plot(t_evN, yN[0, :], label='Left velocity (Neumann)')
-# plt.plot(t_evN, yN[1, :], label='Right velocity (Neumann)')
-# plt.legend()
-# plt.title('Boundary Observations Neumann')
-# plt.xlabel('t (seconds)')
-#
-# plt.figure()
-# plt.plot(t_evD, yD[0, :], label='Left force (Dirichlet)')
-# plt.plot(t_evD, yD[1, :], label='Right force (Dirichlet)')
-#
-# plt.legend()
-# plt.title('Boundary Observations Dirichlet')
-# plt.xlabel('t (seconds)')
+plt.plot(t_evD, ep_solD[-1, :], label='Right velocity (Dirichlet)')
+plt.plot(t_evD, uD_L(t_evD), label='Right velocity (exact)')
+
+plt.legend()
+plt.title('Boundary controls Dirichlet')
+plt.xlabel('t (seconds)')
+
+# Boundary observations
+plt.figure()
+plt.plot(t_evN, yN[0, :], label='Left velocity (Neumann)')
+plt.plot(t_evN, yN[1, :], label='Right velocity (Neumann)')
+plt.legend()
+plt.title('Boundary Observations Neumann')
+plt.xlabel('t (seconds)')
+
+plt.figure()
+plt.plot(t_evD, yD[0, :], label='Left force (Dirichlet)')
+plt.plot(t_evD, yD[1, :], label='Right force (Dirichlet)')
+
+plt.legend()
+plt.title('Boundary Observations Dirichlet')
+plt.xlabel('t (seconds)')
 
 diffH_N = np.diff(H_N)
 diffH_D = np.diff(H_D)
 
 dotHNint = np.divide(diffH_N, dt_vecN)
-dotHNext = np.multiply(eq_solN[0, :], yN[0, :]) + np.multiply(eq_solN[-1, :], yN[1, :])
+# dotHNext = np.multiply(eq_solN[0, :], yN[0, :]) + np.multiply(eq_solN[-1, :], yN[1, :])
+dotHNext = np.multiply(uN_0(t_evN), yN[0, :]) + np.multiply(uN_L(t_evN), yN[1, :])
 
 plt.figure()
-plt.plot(t_evN[1:], dotHNint, label='H int (Neumann)')
+plt.plot(t_evN[:-1], dotHNint, label='H int (Neumann)')
 plt.plot(t_evN, dotHNext, label='Hext (Neumann)')
 plt.legend()
 plt.title('Hamitonian Neumann')
@@ -330,10 +359,10 @@ plt.xlabel('t (seconds)')
 
 dotHDint = np.divide(diffH_D, dt_vecD)
 # dotHDext = np.multiply(ep_solD[0, :], yD[0, :]) + np.multiply(ep_solD[-1, :], yD[1, :])
-dotHDext = np.multiply(uD_0(t_evD), yD[0, :]) + np.multiply(ep_solD[-1, :], yD[1, :])
+dotHDext = np.multiply(uD_0(t_evD), yD[0, :]) + np.multiply(uD_L(t_evD), yD[1, :])
 
 plt.figure()
-plt.plot(t_evD[1:], dotHDint, label='H int (Dirichlet)')
+plt.plot(t_evD[:-1], dotHDint, label='H int (Dirichlet)')
 plt.plot(t_evD, dotHDext, label='Hext (Dirichlet)')
 
 plt.legend()

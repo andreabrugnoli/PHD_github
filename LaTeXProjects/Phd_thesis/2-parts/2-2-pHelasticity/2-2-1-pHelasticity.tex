@@ -3,27 +3,68 @@
 \epigraph{I try not to break the rules but merely to test their elasticity.}{\textit{Bill Veeck}}
 \minitoc
 
-Continuum mechanics is the mathematical description of how materials behave kinematically under external excitations. In this framework, the microscopic structure of a material body is neglected and a macroscopic viewpoint, that describes the body as a continuum, is adopted. An elastic material is able to resist distorting excitations and return to its original size and shape when these are removed. In this chapter, the general linear elastodynamics problem is recalled. A suitable port-Hamiltonian realization is then derived using a velocity-stress formulation.
+Continuum mechanics is the mathematical description of how materials behave kinematically under external excitations. In this framework, the microscopic structure of a material body is neglected and a macroscopic viewpoint, that describes the body as a continuum, is adopted. Continua phenomena are modeled using PDE. In this chapter, the general linear elastodynamics problem is recalled. A suitable port-Hamiltonian realization is then derived using a velocity-stress formulation.
 
 \section{Deformation, strain and stress}
 In this section, the main concepts behind a deformable continuum are briefly recalled following \cite{lee2012mixed}. For a detailed discussion on this topic, the reader may consult \cite{abeyaratne2012notes,landau2012elasticity}. \\
 
-The bounded region of $\mathbb{R}^n \; (n=2, 3)$ occupied by a solid is called configuration. The reference configuration $\Omega$ is the domain that a bodies occupies at the initial state. To describe how the body deforms in time the deformation map $\bm\Phi: \Omega \times [0, T_f] \rightarrow \Omega' \subset \mathbb{R}^n$ is introduced. This map is differentiable and orientation preserving and the image of $\Omega$ under $\bm\Phi(\cdot, t) \; \forall t \in [0, T_f]$ is called the deformed configuration $\Omega_t$. The gradient of the deformation map is called the deformation gradient $\bm{F}:=\grad\bm{\Phi}$. A rigid deformation maps a point $\bm{x} \in \mathbb{R}^n \rightarrow \bm{A}(t) \bm{x} + \bm{b}(t)$, where $\bm{A}(t)$ is an orthogonal matrix and $\bm{b}(t)$ a $\mathbb{R}^n$ vector. A differentiable deformation map $\bm\Phi$ is a rigid deformation iff $\bm{F}^\top \bm{F} - \bm{I} = 0$,  where $\bm{I}$ is the identity in $\mathbb{R}^{n\times n}$ (for the proof see \cite{ciarlet1988mathematical}, page 44). For this reason, a suitable measure of the deformation is the Green-St.Venant strain tensor $\frac{1}{2} (\bm{F}^\top \bm{F} - \bm{I})$.  \\
+The bounded region of $\mathbb{R}^n \; (n=2, 3)$ occupied by a solid is called configuration. The reference configuration $\Omega$ is the domain that a bodies occupies at the initial state. To describe how the body deforms in time the deformation map $\bm\Phi: \Omega \times [0, T_f] \rightarrow \Omega' \subset \mathbb{R}^n$ is introduced. This map is differentiable and orientation preserving and the image of $\Omega$ under $\bm\Phi(\cdot, t) \; \forall t \in [0, T_f]$ is called the deformed configuration $\Omega_t$. Given a specific point in the reference frame is image is denoted by $\bm{y} = \bm{\Phi}(\bm{x}, t)$. The gradient of the deformation map is called the deformation gradient $\bm{F}:=\nabla_x\bm{\Phi} = \diffp{\bm{y}}{\bm{x}}$. A rigid deformation maps a point $\bm{x} \in \Omega \rightarrow \bm{A}(t) \bm{x} + \bm{b}(t)$, where $\bm{A}(t)$ is an orthogonal matrix and $\bm{b}(t)$ a $\mathbb{R}^n$ vector. A differentiable deformation map $\bm\Phi$ is a rigid deformation iff $\bm{F}^\top \bm{F} - \bm{I} = 0$,  where $\bm{I}$ is the identity in $\mathbb{R}^{n\times n}$ (for the proof see \cite{ciarlet1988mathematical}, page 44). For this reason, a suitable measure of the deformation is the Green-St.Venant strain tensor $\bm{E} = \frac{1}{2} (\bm{F}^\top \bm{F} - \bm{I})$.  \\
 
-A quantity of interest is the displacement $\bm{u}: \Omega \rightarrow \mathbb{R}^n$ with respect to the reference configuration. It is defined as $\bm{u} = \bm{\Phi}(\bm{x}, t) - \bm{x}$. The gradient of the displacement verifies $\grad\bm{u} = \bm{F} - \bm{I}$. The strain tensor can now be written in terms of the displacement
-\begin{align*}
-	\frac{1}{2} (\bm{F}^\top \bm{F} - \bm{I}) &= \frac{1}{2}\left[(\grad \bm{u} + \bm{I})^\top (\grad \bm{u} + \bm{I}) - \bm{I}\right] \\
-	&= \frac{1}{2}\left[\grad \bm{u} + (\grad \bm{u})^\top + (\grad \bm{u})^\top (\grad \bm{u})\right]
-\end{align*}
-
-The linear and angular momentum in a subdomain $\omega \subset \Omega$ are then computed as 
-\[
-\int_{\omega} \rho \, \bm{v} \d{\omega}, \qquad \int_{\omega} \rho \, \bm{x} \times \bm{v} \d{\omega}
+A quantity of interest is the displacement $\bm{u}: \Omega \times [0, T_f] \rightarrow \mathbb{R}^n$ with respect to the reference configuration. It is defined as $\bm{u}(\bm{x}, t) = \bm{\Phi}(\bm{x}, t) - \bm{x}$. The gradient of the displacement verifies $\grad\bm{u} = \bm{F} - \bm{I}$. The strain tensor can now be written in terms of the displacement
+\begin{equation*}
+\begin{aligned}
+\bm{E} &= \frac{1}{2}\left[(\nabla_x \bm{u} + \bm{I})^\top (\nabla_x \bm{u} + \bm{I}) - \bm{I}\right] \\
+&= \frac{1}{2}\left[\nabla_x \bm{u} + (\nabla_x \bm{u})^\top + (\nabla_x \bm{u})^\top (\nabla_x \bm{u})\right],
+\end{aligned}
+\end{equation*}
+or in components \[
+E_{ij} = \frac{1}{2} \left(\diffp{u_i}{x_j} + \diffp{u_j}{x_i} + \diffp{u_i}{x_j}\diffp{u_j}{x_i}\right).
 \]
 
+To state the balance laws the actual deformed configuration is considered. The linear and angular momentum in a subdomain $\omega_t \subset \Omega_t$ are computed as 
+\[
+\int_{\omega_t} \rho \, \bm{v} \d{\omega_t}, \qquad \int_{\omega_t} \rho \, \bm{y} \times \bm{v} \d{\omega},
+\]
+where $\rho$ is the mass density and the velocity $\bm{v} = \frac{D\bm{u}}{Dt}(\bm{y},t)$ is material time derivative of the displacement (see \cite[Chapter 1]{abeyaratne2012notes}).  Let $\omega_{t, 1},\, \omega_{t, 2}$ be two subregions in a deformed continuum $\Omega_t$ with contacting surface $S_{12}$. There is a force acting on this surface for a continuum that is called stress vector or traction. If $\bm{n}$ is the outward normal at $\bm{y}$ on $S_{12}$ with respect to $\omega_{t, 1}$, then the surface force that $\omega_{t, 1}$ exerts on $\omega_{t, 2}$ is denoted by $\bm{t}(\bm{y}, \bm{n}) \in \mathbb{R}^n$. By the Newton third law, the surface force that $\omega_{t, 1}$ applies on $\omega_{t, 2}$ is given by $\bm{t}(\bm{y}, -\bm{n}) = - \bm{t}(\bm{y}, \bm{n})$. It is assumed that the linear and angular momentum balance hold for any subregion $\omega \in \Omega_t$ 
+\begin{align*}
+	\diff{}{t} \int_{\omega_t} \rho \bm{v} \d{\omega_t} &= \int_{\partial \omega_t} \bm{t}(\bm{y}, \bm{n}) \d{S} + \int_{\omega_t} \bm{f} \d{\omega_t}, \\
+	\diff{}{t} \int_{\omega_t} \rho\bm{y} \times \bm{v} \d{\omega_t} &= \int_{\partial \omega_t} \bm{y} \times \bm{t}(\bm{y}, \bm{n}) \d{S} + \int_{\omega_t} \bm{y} \times \bm{f} \d{\omega_t}, \\
+\end{align*}
+where $\bm{n}$ is the outward normal to the surface $\partial\omega_t$. The following theorem characterizes the stress vector (see \cite[Chapter 2]{ciarlet1988mathematical}):
+
+\begin{theorem}[Cauchy’s theorem]
+If the linear and angular momenta balance hold, then there exists a matrix valued function $\bm{\Sigma}$ from $\Omega_t$ to $\mathbb{S}$ such
+that $\bm{t}(\bm{y}, \bm{n}) = \bm{\Sigma}(\bm{y}) \bm{n}, \; \forall \bm{y} \in \Omega_t$ where the right-hand side is the matrix-vector multiplication.
+\end{theorem}
+The set $\mathbb{S}=\mathbb{R}^{n\times n}_{\mathrm{sym}}$ denotes the field of symmetric matrices in $\mathbb{R}^{n\times n}$. The symmetric of the stress tensor $\bm{\Sigma}$ is due to the balance of angular momentum. The divergence theorem can then be applied
+\begin{equation*}
+\int_{\partial \omega} \bm{\Sigma} \, \bm{n} \d{S} = \int_{\omega} \nabla_y \cdot\bm{\Sigma} \d{\omega},
+\end{equation*}
+where $\nabla_y \cdot$ is the tensor divergence with respect to the deformed configuration, $\nabla_y \cdot\bm{\Sigma} = \sum_{i=1}^{n}\diffp{\Sigma_{ij}}{y_i}$.
+Because the considered subregion $\omega$ is arbitrary, using the linear balance momentum and the conservation of mass the following PDE is found
+\begin{equation*}
+	\rho \frac{D\bm{v}}{Dt} - \nabla_y \cdot{\bm{\Sigma}} = \bm{f}, \qquad \bm{y} \in \Omega_t.
+\end{equation*}
+This equation is written with respect to the deformed configuration $\Omega_t$. For a detailed derivation of this equation the reader may consult \cite[Chapter 4]{abeyaratne2012notes}.
+
 \section{The linear elastodynamics problem}
+Whenever deformations are small, $\nabla_x\bm{u} \ll 1$, there the reference and deformed configuration are almost indistinguishable $\bm{y} = \bm{x} + \bm{u} = \bm{x}  + O(\nabla_x\bm{u}) \approx \bm{x}$. This allows to write the linear momentum balance in the reference configuration
+\begin{equation*}
+	\rho \diffp{\bm{v}}{t}(\bm{x, t}) - \Div(\Sigma(\bm{x}, t)) = \bm{f}.
+\end{equation*}
+The material derivative simplifies to a partial one. The operator $\Div$ is the divergence of a tensor field with respect to the reference configuration
+\[
+\Div(\Sigma(\bm{x}, t)) = \nabla_x \cdot \Sigma(\bm{x}, t) = \sum_{i=1}^{n}\diffp{\Sigma_{ij}}{x_i}.
+\]
+Furthermore the Green-St. Venant strain tensor simplifies to the infinitesimal strain tensor
+\[
+\bm{E} = \frac{1}{2}\left[\nabla_x \bm{u} + (\nabla_x \bm{u})^\top + (\nabla_x \bm{u})^\top (\nabla_x \bm{u})\right]
+\approx \frac{1}{2}\left[\nabla_x \bm{u} + (\nabla_x \bm{u})^\top\right] =:\bm{\Varepsilon}.
+\]
 
 
+An elastic material is able to resist distorting excitations and return to its original size and shape when these are removed. For an elastic material the stress
+ 
 \section{Port-Hamiltonian formulation}
 
 
