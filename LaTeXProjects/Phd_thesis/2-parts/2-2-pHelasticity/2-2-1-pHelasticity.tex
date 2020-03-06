@@ -3,7 +3,7 @@
 \epigraph{I try not to break the rules but merely to test their elasticity.}{\textit{Bill Veeck}}
 \minitoc
 
-Continuum mechanics is the mathematical description of how materials behave kinematically under external excitations. In this framework, the microscopic structure of a material body is neglected and a macroscopic viewpoint, that describes the body as a continuum, is adopted. Continua phenomena are modeled using PDE. In this chapter, the general linear elastodynamics problem is recalled. A suitable port-Hamiltonian realization is then derived using a velocity-stress formulation.
+Continuum mechanics is the mathematical description of how materials behave kinematically under external excitations. In this framework, the microscopic structure of a material body is neglected and a macroscopic viewpoint, that describes the body as a continuum, is adopted. Continua phenomena are modeled using PDE. In this chapter, the general linear elastodynamics problem is recalled. A suitable port-Hamiltonian realization is then derived.
 
 \section{Deformation, strain and stress}
 In this section, the main concepts behind a deformable continuum are briefly recalled following \cite{lee2012mixed}. For a detailed discussion on this topic, the reader may consult \cite{abeyaratne2012notes,landau2012elasticity}. \\
@@ -50,21 +50,102 @@ This equation is written with respect to the deformed configuration $\Omega_t$. 
 \section{The linear elastodynamics problem}
 Whenever deformations are small, $\nabla_x\bm{u} \ll 1$, there the reference and deformed configuration are almost indistinguishable $\bm{y} = \bm{x} + \bm{u} = \bm{x}  + O(\nabla_x\bm{u}) \approx \bm{x}$. This allows to write the linear momentum balance in the reference configuration
 \begin{equation*}
-	\rho \diffp{\bm{v}}{t}(\bm{x, t}) - \Div(\Sigma(\bm{x}, t)) = \bm{f}.
+	\rho \diffp{\bm{v}}{t}(\bm{x, t}) - \Div(\bm\Sigma(\bm{x}, t)) = \bm{f}, \qquad \bm{x} \in \Omega.
 \end{equation*}
 The material derivative simplifies to a partial one. The operator $\Div$ is the divergence of a tensor field with respect to the reference configuration
 \[
-\Div(\Sigma(\bm{x}, t)) = \nabla_x \cdot \Sigma(\bm{x}, t) = \sum_{i=1}^{n}\diffp{\Sigma_{ij}}{x_i}.
+\Div(\bm\Sigma(\bm{x}, t)) = \nabla_x \cdot \bm\Sigma(\bm{x}, t) = \sum_{i=1}^{n}\diffp{\Sigma_{ij}}{x_i}.
 \]
-Furthermore the Green-St. Venant strain tensor simplifies to the infinitesimal strain tensor
+Furthermore, the non-linear terms in the Green-St. Venant strain tensor can be dropped
 \[
 \bm{E} = \frac{1}{2}\left[\nabla_x \bm{u} + (\nabla_x \bm{u})^\top + (\nabla_x \bm{u})^\top (\nabla_x \bm{u})\right]
-\approx \frac{1}{2}\left[\nabla_x \bm{u} + (\nabla_x \bm{u})^\top\right] =:\bm{\Varepsilon}.
+\approx \frac{1}{2}\left[\nabla_x \bm{u} + (\nabla_x \bm{u})^\top\right].
+\]
+The linearized strain tensor (also called infinitesimal strain tensor) is the symmetric gradient of the displacement
+\[
+\bm{\varepsilon} := \Grad\bm{u}, \where \Grad\bm{u} = \frac{1}{2}\left[\nabla_x \bm{u} + (\nabla_x \bm{u})^\top\right].
+\]
+To obtain a closed system of equations, it is now necessary to characterize the relation between stress and strain. This relation is normally called \textit{constitutive law}. In the following, the particular case of elastic materials is considered. For this class of materials, the stress tensor is solely determined by the deformed configuration at a given time. An elastic material is able to resist distorting excitations and return to its original size and shape when these are removed. A linear elastic material satisfies the Hooke's law
+\[
+\bm{\Sigma}(\bm{x}) = \bm{\mathcal{D}}(\bm{x}) \, \bm{\varepsilon}(\bm{u}(\bm{x})).
+\]
+The \textit{stiffness tensor} or \textit{elasticity tensor} $\bm{\mathcal{D}} : \mathbb{S} \rightarrow \mathbb{S}$ is a rank 4 tensor that is symmetric positive definite and uniformly bounded above and below. Because of symmetry, its components satisfy
+\[
+\mathcal{D}_{ijkl} = \mathcal{D}_{jikl} = \mathcal{D}_{klij}.
+\]
+From the uniform boundedness of $\bm{\mathcal{D}}$, the map
+$\bm{\mathcal{D}}: L^2 (\Omega; \mathbb{S}) \rightarrow L^2 (\Omega; \mathbb{S})$ is a symmetric positive definite bounded linear operator ($L^2 (\Omega; \mathbb{S})$ is the space of square integrable symmetric tensor valued functions). The compliance tensor $\bm{\mathcal{A}}$ is defined by $\bm{\mathcal{A}} = \bm{\mathcal{D}}^{-1}$ . Thus $\bm{\mathcal{A}} : \mathbb{S} \rightarrow \mathbb{S}$ is as well symmetric positive definite and uniformly bounded above and below. An isotropic
+elastic medium has the same kinematic properties in any direction and at each point. If an elastic medium is isotropic, then the stiffness and compliance tensors assume the form
+\[
+\bm{\mathcal{D}}(\cdot) = 2\mu (\cdot) + \lambda \Tr(\cdot)\bm{I}, \qquad \bm{\mathcal{A}}(\cdot) = \frac{1}{2\mu}\left[(\cdot) - \frac{\lambda}{2\mu + n\lambda}\Tr(\cdot)\bm{I}\right], \qquad n= \{2,3\},
 \]
 
+where  $\Tr$ is the trace operator and the positive scalar functions $\mu, \lambda$, defined on $\Omega$, are called the Lam\'e coefficients. In engineering applications it is easier to compute experimentally two other parameters: the Young modulus $E$ and  Poisson's ratio $\nu$. Those are expressed in terms of the Lam\'e  coefficients as 
+\[
+\nu =\frac{\lambda}{2(\lambda +\mu)}, \qquad 
+E=\frac{\mu (3\lambda +2\mu)}{\lambda +\mu},
+\]
+and inversely
+\[
+\lambda =\frac {E\nu }{(1+\nu )(1-2\nu )}, \qquad
+\mu = \frac{E}{2(1+\nu)}.
+\]
+The stiffness and compliant tensor assume the expressions
+\[
+\bm{\mathcal{D}}(\cdot) = \frac{E}{1+\nu} \left[(\cdot) + \frac{\nu}{1-2\nu}\Tr(\cdot)\bm{I}\right], \qquad \bm{\mathcal{A}}(\cdot) = \frac{1+\nu}{E}\left[(\cdot) - \frac{\nu}{1+\nu(n-2)}\Tr(\cdot)\bm{I}\right].
+\]
+The linear elastodynamics problem is formulated through a vector-valued PDE
+\begin{equation}\label{eq:lin_elastodyn}
+\rho \diffp[2]{\bm{u}}{t} - \Div(\bm{\mathcal{D}} \Grad \bm{u}) = \bm{f}.
+\end{equation}  
+The classical elastodynamics problem is expressed in terms of the displacement as the unknown. 
 
-An elastic material is able to resist distorting excitations and return to its original size and shape when these are removed. For an elastic material the stress
- 
 \section{Port-Hamiltonian formulation}
+
+In this section a port-Hamiltonian formulation for elasticity is deduced from the classical elastodynamics problem. It must be appointed that already in the seventies a purely hyperbolic formulation for elasticity was detailed \cite{hughes1978classical}. The missing point is the clear connection with the theory of Hamiltonian PDEs. An Hamiltonian formulation can be found in \cite{grinfield2015}, but without any connection to the concept of Stokes-Dirac structure induced by the underlying geometry.
+
+First, infinite dimensional port-Hamiltonian systems and the concept of Stokes-Dirac are presented. Then, it is shown that the linear elastodynamics model is a pH system.
+
+\subsection{Reminder of distributed port-Hamiltonian systems}
+
+A distributed conservative port-Hamiltonian system is defined by a set of variables that describes the unknowns, by a formally skew-adjoint differential operator, an energy functional and a set of boundary inputs and corresponding conjugated outputs. Such a system is described by the following set of equations
+\begin{equation}
+\begin{aligned}
+\displaystyle \diffp{\bm{\alpha}}{t} &= \mathcal{J}\bm{e} \displaystyle \diffd{H}{\bm{\alpha}}, \vspace{3pt}\\
+\bm{u}_\partial &= \mathcal{B} \displaystyle \bm{e}, \vspace{3pt}\\
+\bm{y}_\partial &= \mathcal{C} \displaystyle \bm{e}. \vspace{3pt}\\
+\end{aligned}
+\end{equation}
+The unknowns $\bm{\alpha}$ are called energy variables in the port-Hamiltonian framework, the formally skew-symmetric operator $\mathcal{J}$ is named interconnection operator (see appendix \ref{app:math} for a precise definition of formal skew adjointness). $\mathcal{B}, \mathcal{C}$ are boundary operator, that provide the boundary input $\bm{u}_\partial$ and output $\bm{y}_\partial$. Vector $\bm{e}$ contains the coenergy variables. These correspond to the variational derivative of the energy functional  $H(\bm{\alpha})$.
+
+\begin{definition}[Variational derivative]
+Consider a functional $H(\bm{\alpha})$
+\[ H(\bm{\alpha}) = \int_{\Omega} \mathcal{H}(\bm{\alpha}) \d{\Omega}.
+\]
+Given a variation $\bm{\alpha} = \bar{\bm{\alpha}} + \epsilon \bm{\delta\alpha}$ the variational derivative $\diffd{H}{\bm{\alpha}}$ is defined as
+\[
+H(\bar{\bm{\alpha}} + \epsilon \bm{\delta\alpha}) = H(\bar{\bm{\alpha}}) + \epsilon \int_{\Omega} \diffd{H}{\bm{\alpha}} \bm{\delta\alpha} \d{\Omega} + O(\epsilon^2).
+\]
+\end{definition}
+\begin{remark}
+If the integrand does not contain derivative of the argument $\bm{\alpha}$ then the variational derivative is equal to the partial derivative of the Hamiltonian density $\mathcal{H}$
+\[
+\diffd{H}{\bm{\alpha}} = \diffp{\mathcal{H}}{\bm{\alpha}}.
+\]
+\end{remark}
+Conservative port-Hamiltonian systems possess a peculiar property. The energy rate is given by the power due to the boundary ports $\bm{u}_\partial, \bm{y}_\partial$
+\begin{equation}
+\begin{aligned}
+\dot{H} &= \int_{\Omega} \diffp{\mathcal{H}}{\bm{\alpha}}  \diffp{\bm{\alpha}}{t} \d{\Omega} \\
+&=\int_{\partial \Omega} \bm{u}_\partial \bm{y}_\partial \d{S}
+\end{aligned}
+\end{equation} 
+
+
+
+
+
+
+
 
 
