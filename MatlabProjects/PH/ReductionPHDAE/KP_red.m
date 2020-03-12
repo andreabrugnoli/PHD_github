@@ -1,20 +1,18 @@
 clc
 close all
 clear all
+path_mat = './KP_Experiment/'
+addpath(path_mat)
+addpath('/home/a.brugnoli/GitProjects/MatlabProjects/PH/Functions/')
+renameFiles(path_mat)
 
-addpath('./KP_Experiment/')
-addpath('/home/a.brugnoli/GitProjects/MatlabProjects/PH/Settings/')
-
-% load('M.mat'); load J.mat; load B.mat; load C.mat; 
-% load Mr.mat; load Jr.mat; load Br.mat; load Cr.mat;
 
 load M; load J; load R; load B; load C; 
 load Mr; load Jr; load Rr; load Br; load Cr;
 sys_full = dss(J-R,B,C,[0, 0],M);
-% sys_full = minreal(sys_full);
-
-
 sys_red = dss(Jr-Rr,Br,Cr,[0, 0],Mr);
+
+% sys_full = minreal(sys_full);
 % sys_red = minreal(sys_red);
 
 fntsize = 15;
@@ -39,16 +37,9 @@ xlabel('Frequency',...
 'FontWeight','normal',...
 'FontSize',fntsize,...
 'FontName','Times')
-legend({'KP red', 'KP red'},...
+legend({'KP red', 'KP full'},...
 'FontSize',fntsize,...
 'interpreter', 'latex',...
 'FontName','Times',...
 'Location','NorthEast')
-
-% for i=1:6
-%     figure(i); 
-% %     sigma(sys_full(i,i), 'b', sys_red(i,i), 'r')
-%     bode(sys_red, 'b', sys_full, 'r',{1/(2*pi), 150/(2*pi)})
-%     legend('KP full', 'KP n = 3')
-% end
 

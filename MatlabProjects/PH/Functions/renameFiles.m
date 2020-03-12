@@ -2,6 +2,9 @@
 
 files=dir(path)
 for id=3:length(files);
- newName=strcat(files(id).name, '.mat');
-movefile( fullfile(path, files(id).name), fullfile(path, sprintf(newName)) ); 
+    name_file = files(id).name;
+    if ~contains(name_file, '.')
+        newName=strcat(name_file, '.mat');
+        movefile( fullfile(path, name_file), fullfile(path, sprintf(newName)) );
+    end
 end

@@ -5,7 +5,7 @@
 
 Continuum mechanics is the mathematical description of how materials behave kinematically under external excitations. In this framework, the microscopic structure of a material body is neglected and a macroscopic viewpoint, that describes the body as a continuum, is adopted. This leads to a PDE describing the evolution of the displacement field. In this chapter, the general linear elastodynamics problem is recalled. A suitable port-Hamiltonian realization is then derived.
 
-\section{Deformation, strain and stress}
+\section{Deformation and stress}
 In this section, the main concepts behind a deformable continuum are briefly recalled following \cite{lee2012mixed}. For a detailed discussion on this topic, the reader may consult \cite{abeyaratne2012notes,landau2012elasticity}. \\
 
 The bounded region of $\mathbb{R}^d \; (d=2, 3)$ occupied by a solid is called configuration. The reference configuration $\Omega$ is the domain that a bodies occupies at the initial state. To describe how the body deforms in time the deformation map $\bm\Phi: \Omega \times [0, T_f] \rightarrow \Omega' \subset \mathbb{R}^d$ is introduced. This map is differentiable and orientation preserving and the image of $\Omega$ under $\bm\Phi(\cdot, t) \; \forall t \in [0, T_f]$ is called the deformed configuration $\Omega_t$. Given a specific point in the reference frame is image is denoted by $\bm{y} = \bm{\Phi}(\bm{x}, t)$. The gradient of the deformation map is called the deformation gradient $\bm{F}:=\nabla_x\bm{\Phi} = \diffp{\bm{y}}{\bm{x}}$. A rigid deformation maps a point $\bm{x} \in \Omega \rightarrow \bm{A}(t) \bm{x} + \bm{b}(t)$, where $\bm{A}(t)$ is an orthogonal matrix and $\bm{b}(t)$ a $\mathbb{R}^d$ vector. A differentiable deformation map $\bm\Phi$ is a rigid deformation iff $\bm{F}^\top \bm{F} - \bm{I} = 0$,  where $\bm{I}$ is the identity in $\mathbb{R}^{d\times d}$ (for the proof see \cite{ciarlet1988mathematical}, page 44). For this reason, a suitable measure of the deformation is the Green-St.Venant strain tensor $\bm{E} = \frac{1}{2} (\bm{F}^\top \bm{F} - \bm{I})$.  \\
@@ -100,18 +100,57 @@ The linear elastodynamics problem is formulated through a vector-valued PDE
 \end{equation}  
 The classical elastodynamics problem is expressed in terms of the displacement as the unknown. 
 
-\section{Port-Hamiltonian formulation}
+\section{Reminder on port-Hamiltonian systems}
 
-In this section a port-Hamiltonian formulation for elasticity is deduced from the classical elastodynamics problem. It must be appointed that already in the seventies a purely hyperbolic formulation for elasticity was detailed \cite{hughes1978classical}. The missing point is the clear connection with the theory of Hamiltonian PDEs. An Hamiltonian formulation can be found in \cite{grinfield2015}, but without any connection to the concept of Stokes-Dirac structure induced by the underlying geometry. \\
+Before introducing the pH of the elastodynamics problem that the main concept behind the formalism are recalled. First, the concept of Stokes-Dirac and  presented. This is normally introduced by making use of a differential geometry approach. The interested reader may consult \cite[Chapter 2]{kotyczka2019numerical}. Despite being really insightful in terms of geometrical structure, this approach does not encompass the case of higher-order differential operators. An extension in this sense is still an open question. Since bending problems in elasticity introduce higher-order differential operators, the language of PDE will be privileged over the one of differential forms. To have the most suitable definition of Stokes-Dirac structure for flexible systems, the approach adopted in \cite{macchelli2005modelling} is here recovered. \\
 
-First, the concept of Stokes-Dirac is recalled presented. This is normally introduced by making use of a differential geometry approach. The interested reader may consult \cite[Chapter 2]{kotyczka2019numerical}. Despite being really insightful in terms of geometrical structure, this approach does not encompass the case of higher-order differential operators. An extension in this sense is still an open question. Since bending problems in elasticity introduce higher-order differential operators, the language of PDE will be privileged over the one of differential forms. To have the most suitable definition of Stokes-Dirac structure for flexible systems, the approach adopted in \cite{macchelli2005modelling} is here recovered.\\
-
-Second, distributed port-Hamiltonian systems will be introduced, in connection with the underlying Stokes-Dirac structure. Then, the linear elastodynamics problem is recast in pH form.  Few reference deal with the higher-dimensional case, with the notable exceptions of \cite{zwart2015wave,skrepek2019wellposedness}. The former demonstrate the well-posedness of the linear wave equations in arbitrary geometrical dimensions. The latter generalizes results of the former to treat the case of generic first order linear pHs in arbitrary geometrical dimensions. Linear elasticity falls within the assumption of \cite{skrepek2019wellposedness}. Therefore, it is a well posed boundary controlled pH systems. 
+Second, distributed port-Hamiltonian systems will be introduced, in connection with the underlying Stokes-Dirac structure. PHs as boundary control systems have been analyzed deeply in one geometrical dimension \cite{zwart2012,legorrec2005}. Here, a more general but not so rigorous definition is given. The complete characterization of pH in arbitrary dimension is still an open research field. Two notable exceptions (\cite{zwart2015wave,skrepek2019wellposedness}) provide partial answers to this problem. The first demonstrate the well-posedness of the linear wave equations in arbitrary geometrical dimensions. The second generalizes this result to treat the case of generic first order linear pHs in arbitrary geometrical dimensions.
 
  
-\subsection{Reminder on the Stokes-Dirac structure}
+\subsection{The Stokes-Dirac structure}
 
-To define the Stokes-Dirac structure for higher differential and geometrical pHs, it is important to define and characterize the differential operators that come into play. 
+To define the Stokes-Dirac structure for distributed pHs it is important to first state the concept of Dirac structure and the case of finite-dimensional pHs. To introduce the infinite-dimensional extension of Dirac structure, namely the Stokes-Dirac structure, the differential operators that come into play are characterized. 
+
+\subsubsection{Dirac Structures}
+Consider an  finite dimensional space ${F}$ over the field $\mathbb{R}$ and ${E} \equiv {F}'$ its dual, i.e. the space of linear operator $\mathbf{e} : {F} \rightarrow \mathbb{R}$. The elements of ${F}$ are called flows, while the elements of ${E}$ are called efforts. Those are port variables and their combination gives the power flowing inside the system. The space ${B} = {F} \times {E}$ is called the bond space of power variables. Therefore the power is defined as  $\left\langle \mathbf{e}, \mathbf{f} \right\rangle = \bm{e}(\mathbf{f})$, where $\left\langle \mathbf{e} , \mathbf{f} \right\rangle$ is the dual product between $\mathbf{f}$ and $\mathbf{e}$.
+\begin{definition}[\cite{courant1990}, Def. 1.1.1]
+	Given the finite-dimensional space ${F}$ and its dual ${E}$ with respect to the inner product $\left\langle \cdot , \cdot \right\rangle : {F} \times {E} \rightarrow \mathbb{R}$, define the symmetric bilinear form:
+	\begin{equation}
+	\bilprod{(\mathbf{f}_1, \mathbf{e}_1)}{(\mathbf{f}_2, \mathbf{e}_2)} := \inner{\mathbf{e}_1}{\mathbf{f}_2} +  \inner{\mathbf{e}_2}{\mathbf{f}_1}, \where (\mathbf{f}_i, \mathbf{e}_i) \in {B}, \; i = 1, 2
+	\end{equation}
+	
+	A Dirac structure on ${B} := {F} \times {E}$ is a subspace ${D} \subset {B}$, which is maximally isotropic under $\left\langle \left\langle \cdot, \cdot \right\rangle \right\rangle$.	Equivalently, a Dirac structure on $\mathcal{B} := \mathcal{F} \times \mathcal{E}$ is a subspace $\mathcal{D} \subset \mathcal{B}$ 	which equals its orthogonal complement with respect to $\left\langle \left\langle \cdot, \cdot \right\rangle \right\rangle: \mathcal{D} =\mathcal{D}^\perp$.
+\end{definition}
+This definition can be extended to consider distributed forces and dissipation \cite{villegas2007}.
+\begin{proposition}
+	\label{prop:Dirac}
+	Consider the space of power variables ${F} \times {E}$ and let ${X}$ denote an $n$-dimensional space, the space of energy variables. Suppose that ${F} := ({F}_s, \ {F}_e )$ and that ${E} := ({E}_s,  \ {E}_e )$, with $\text{dim} \, {F}_s = \text{dim} \, {E}_s = n$ and $\text{dim} \, {F}_e = \text{dim} \, {E}_e = m$. Moreover, let $\mathbf{J}(\mathbf{x})$ denote
+	a skew-symmetric matrix of dimension $n$ and by $\mathbf{B}(\mathbf{x})$ a matrix of dimension $n \times m$. Then, the set
+	\begin{equation}
+	{D} := \left\{ (\mathbf{f}_s, \mathbf{f}_e , \mathbf{e}_s ,\mathbf{e}_e ) \in {F} \times {E} \vert \quad \mathbf{f}_s = - \mathbf{J}(\mathbf{x}) \mathbf{e}_s - \mathbf{B}(\mathbf{x}) \mathbf{f}_e, \; \mathbf{e}_e = \mathbf{B}(\mathbf{x})^\top \mathbf{e}_s \right\}
+	\end{equation}
+	is a Dirac structure.
+\end{proposition}
+
+\subsubsection{Finite-dimensional PHs}
+Consider the time-invariant dynamical system:
+\begin{equation}
+\label{eq:finitePH}
+\begin{cases}
+\dot{ \mathbf{x} } &= \mathbf{J}(\mathbf{x}) \nabla H(\mathbf{x}) + \mathbf{B}(\mathbf{x})\mathbf{u}, \\
+\mathbf{y} &= \mathbf{B}(\mathbf{x})^\top \nabla H(\mathbf{x}),
+\end{cases}
+\end{equation}
+where $ H(\mathbf{x}) : X \rightarrow \mathbb{R} $, the Hamiltonian, is a real-valued function bounded from below. Such system is called port-Hamiltonian, as it arises from the Hamiltonian modelling of a physical system and it interacts with the environment through the input $\mathbf{u}$ included in the formulation. The connection with the concept of Dirac structure is achieved by considering the following port behavior:
+\begin{equation}
+\begin{aligned}
+\mathbf{f}_s &= - \dot{\mathbf{x}}, \qquad 
+&\mathbf{e}_s &= \nabla{H}(\mathbf{x}), \\
+\mathbf{f}_e &= \mathbf{u}, \qquad
+&\mathbf{e}_e &= \mathbf{y}. \\
+\end{aligned}
+\end{equation}
+With this choice of the port variables system \eqref{eq:finitePH} defines, by proposition \ref{prop:Dirac}, a Dirac structure. Dissipation and distributed forces can be included and the corresponding system defines an extended Dirac structure, once the proper port variables are introduced.
 
 \subsubsection{Constant matrix differential operators}
 
@@ -124,10 +163,11 @@ Let $\Omega$ denote a compact subset of $\mathbb{R}^d$ representing the spatial 
 	\end{equation}
 	where $\alpha := (\alpha_1, \dots , \alpha_d)$ is a multi-index of order $|\alpha| := \sum_{i=1}^d \alpha_i$, $\bm{P}_\alpha$ are a set of constant real $q_v \times q_u$ matrices and $\partial^{\alpha} := \partial_{x_1}^{\alpha_1} \dots \partial_{x_d}^{\alpha_d}$ is a differential operator of order $|\alpha|$ resulting from a combination of spatial derivatives. 
 \end{definition}
+The following definition, instrumental for the case of dpHs, is a simplified version of definition \eqref{def:foradj}.
 \begin{definition}
 	Consider the constant matrix differential operator \eqref{eq:diffOp}. Its formal adjoint is the map $\mathcal{L}^*$ from $\mathcal{V}$ to $\mathcal{U}$ such that:
 	\begin{equation}
-	\bm{u} = \mathcal{L}^* \bm{v} \iff \bm{u} := \sum_{|\alpha|=0}^N  (-1)^{|\alpha|} \bm{P}_{\alpha}^\top \partial^{\alpha} \bm{v}.
+	\bm{u} = \mathcal{L}^* \bm{v} \iff \bm{u} := \sum_{|\alpha|=0}^n  (-1)^{|\alpha|} \bm{P}_{\alpha}^\top \partial^{\alpha} \bm{v}.
 	\end{equation}
 \end{definition}
 \begin{definition}
@@ -159,43 +199,53 @@ It is important to note that $\widetilde{\mathcal{B}}_{\mathcal{L}}$ is a consta
 \end{corollary}
 
 \subsubsection{Constant Stokes-Dirac structures}
-Following \cite{macchelli2005modelling}, let ${F}$ denote the space of flows, i.e. the space of smooth functions from the compact set $\Omega \subset \mathbb{R}^d$ to $\mathbb{R}^q$. For simplicity assume that  the space of efforts is ${E} \equiv {F}$ (generally speaking these spaces are Hilbert spaces linked by duality, as in \cite{villegas2007}). Given $\bm{f} = (f_1, \dots, f_q) \in {F}$ and $\bm{e} = (e_1, \dots, e_q) \in {E}$. Let $\bm{z} = \mathcal{B}_\partial(\bm{e})$ denote the boundary terms, where $\mathcal{B}_\partial$ provides the restriction on $\partial\Omega$ of the effort $e$ and of its spatial derivatives of proper order. Then it can be written:
+Following \cite{macchelli2005modelling}, let ${F}$ denote the space of flows, i.e. the space of smooth functions from the compact set $\Omega \subset \mathbb{R}^d$ to $\mathbb{R}^q$. For simplicity assume that  the space of efforts is ${E} \equiv {F}$ (generally speaking these spaces are Hilbert spaces linked by duality, as in \cite{villegas2007}). Given $\bm{f} = (f_1, \dots, f_q) \in {F}$ and $\bm{e} = (e_1, \dots, e_q) \in {E}$. Let $\bm{z} = \mathcal{B}_\partial(\bm{e})$ denote the boundary terms, where $\mathcal{B}_\partial$ provides the restriction on $\partial\Omega$ of the effort $e$ and of its spatial derivatives of proper order. The associated boundary space is ${Z} := \left\{ \bm{z} \vert \; \bm{z} = \mathcal{B}_{\partial}(\bm{e})  \right\}$. Then, it holds
 \begin{equation}
 \int_{\partial \Omega} \widetilde{\mathcal{B}}_{\mathcal{J}}(\bm{e}_1, \bm{e}_2) \d{S} = \int_{\partial \Omega} \mathcal{B}_{\mathcal{J}}(\bm{z}_1, \bm{z}_2) \d{S}, \quad \text{with} \quad  \widetilde{\mathcal{B}}_\mathcal{J}(\cdot, \cdot) = \mathcal{B}_{\mathcal{J}}(\mathcal{B}_{\partial}(\cdot), \, \mathcal{B}_{\partial}(\cdot)).
 \end{equation}
-Define the set
-\begin{equation}
-{Z} := \left\{ \bm{z} \vert \; \bm{z} = \mathcal{B}_{\partial}(\bm{e})  \right\}.
-\end{equation}
 The following theorem characterizes Stokes-Dirac structures for pHs of arbitrary geometrical dimension and differential order.
-\begin{theorem}[\cite{macchelli2005modelling}]
-	\label{th:StokesDirac}
+\begin{proposition}[Proposition 3.3 \cite{macchelli2005modelling}]
+	\label{prop:StokesDirac}
+	
 	Consider the space of power variables ${B} = {F} \times {E} \times {Z}$. The linear subspace ${D} \subset {B}$
 	\begin{equation}
 	{D} = \left\{ (\bm{f}, \bm{e}, \bm{z}) \in  {F} \times {E} \times {Z} \; \vert \; \bm{f} = -\mathcal{J} \bm{e}, \; \bm{z} = \mathcal{B}_\partial(\bm{e}) \right\},
 	\end{equation}
 	is a Stokes–Dirac structure on $\mathcal{B}$ with respect to the pairing
 	\begin{equation}
-	\left\langle \left\langle (\bm{f}_1, \bm{e}_1, \bm{z}_1), (\bm{f}_2, \bm{e}_2, \bm{z}_2) \right\rangle \right\rangle  := \int_{\Omega} \left( \bm{e}_1^\top \bm{f}_2 + \bm{e}_2^\top \bm{f}_1 \right) \d\Omega + \int_{\partial \Omega} \mathcal{B}_{\mathcal{J}}(\bm{z}_1, \bm{z}_2) \d{S}.
+	\bilprod{(\bm{f}, \bm{e}, \bm{z})}{(\bm{f}, \bm{e}, \bm{z})}  := \int_{\Omega} \left( \bm{e}_1^\top \bm{f}_2 + \bm{e}_2^\top \bm{f}_1 \right) \d\Omega + \int_{\partial \Omega} \mathcal{B}_{\mathcal{J}}(\bm{z}_1, \bm{z}_2) \d{S}.
 	\end{equation}
-\end{theorem}
+\end{proposition}
+From this proposition, if $(\bm{f}, \bm{e}, \bm{z}) \in  D$, then $\bilprod{(\bm{f}, \bm{e}, \bm{z})}{(\bm{f}, \bm{e}, \bm{z})}=0$, that is
+\begin{equation}\label{eq:enbalstr}
+\int_{\Omega} \bm{e}^\top \bm{f}  \d\Omega + \frac{1}{2} \int_{\partial \Omega} \mathcal{B}_{\mathcal{J}}(\bm{z}, \bm{z}) \d{S} = 0.
+\end{equation}
+
+
+This  relation expresses the  power  conservation property of the Stokes–Dirac structure. It states the relation between the variation of internal energy (the integral on the domain $\Omega$) with the power flowing through the boundary (the integral over $\partial\Omega$). Thanks to the power conservation property dpHs always dispose of an associated Stokes Dirac structure. This concept can be extended to consider dissipation or distributed forces. For this it is necessary to include additional ports to account for the power exchange due to these effects (see Theorem 3.4 \cite{macchelli2005modelling}). 
+
+
 \begin{remark}
-	The constant Stokes-Dirac structure has been defined in case of smooth vector valued functions for simplicity. In this context the pairing has been defined as the $L^2$ inner product of vector-valued function. The definition is indeed more general and encompasses the case of more complex functional spaces. Linear elasticity for example is defined on a mixed function space of vector- and tensor- valued functions. The result presented here remains valid provided that the proper {pairing is being chosen}. Furthermore, the constant differential operator may contain intrinsic operators ($\mathrm{Div}, \, \mathrm{Grad}$) as it will be shown in \secref{sec:pHelas}.
+	The constant Stokes-Dirac structure has been defined in case of smooth vector valued functions for simplicity.  The definition is indeed more general and encompasses the case of more complex functional spaces, in particular the $L^2$ space of square integrable functions.  Linear elasticity for example is defined on a mixed function space of vector- and tensor- valued functions. The result presented here remains valid provided that the proper {pairing is being chosen}. Furthermore, the constant differential operator may contain intrinsic operators ($\mathrm{Div}, \, \mathrm{Grad}$) as it will be shown in \secref{sec:pHelas}.
 \end{remark}
 
 
-\subsection{Reminder of distributed port-Hamiltonian systems}
+\subsection{Distributed port-Hamiltonian systems}
 
 A distributed conservative port-Hamiltonian system is defined by a set of variables that describes the unknowns, by a formally skew-adjoint differential operator, an energy functional and a set of boundary inputs and corresponding conjugated outputs. Such a system is described by the following set of equations
-\begin{equation}
-\begin{aligned}
-\displaystyle \diffp{\bm{\alpha}}{t} &= \mathcal{J}\bm{e}, \vspace{3pt}\\
-\bm{u}_\partial &= \mathcal{B} \displaystyle \bm{e}, \vspace{3pt}\\
-\bm{y}_\partial &= \mathcal{C} \displaystyle \bm{e}, \vspace{3pt}\\
-\bm{e} &= \displaystyle \diffd{H}{\bm{\alpha}}. \\
-\end{aligned}
+\begin{equation}\label{eq:syspH}
+\begin{cases}
+\displaystyle \diffp{\bm{\alpha}}{t} = \mathcal{J}\displaystyle \bm{e}, \vspace{3pt}\\
+\bm{u}_\partial = \mathcal{B}  \displaystyle \bm{e}, \vspace{3pt}\\
+\bm{y}_\partial = \mathcal{C} \displaystyle \bm{e}, \vspace{3pt}\\
+\bm{e} := \displaystyle \diffd{\mathcal{H}}{\bm{\alpha}}.
+\end{cases}
 \end{equation}
-The unknowns $\bm{\alpha}$ are called energy variables in the port-Hamiltonian framework, the formally skew-adjoint operator $\mathcal{J}$ is named interconnection operator (see appendix \ref{app:math} for a precise definition of formal skew adjointness). $\mathcal{B}, \mathcal{C}$ are boundary operator, that provide the boundary input $\bm{u}_\partial$ and output $\bm{y}_\partial$. Vector $\bm{e}$ contains the coenergy variables. These correspond to the variational derivative of the energy functional  $H(\bm{\alpha})$.
+The unknowns $\bm{\alpha}$ are called energy variables in the port-Hamiltonian framework, the formally skew-adjoint operator $\mathcal{J}$ is named interconnection operator (see appendix \ref{app:math}, Def. \ref{def:foradj} for a precise definition of formal skew adjointness). $\mathcal{B}, \mathcal{C}$ are boundary operator, that provide the boundary input $\bm{u}_\partial$ and output $\bm{y}_\partial$. The variational derivative of the Hamiltonian define the so-called coenergy variables $\bm{e}$.
+
+\begin{remark}
+	It will become clear in this section that the effort variable of the Stokes-Dirac structure are indeed equivalent to the co-energy variables of the pH system. This justifies using the same notation for both.
+\end{remark}
 
 \begin{definition}[Variational derivative, Def. 4.1 in \cite{olver1993}]
 Consider a functional $H(\bm{\alpha})$
@@ -203,7 +253,7 @@ Consider a functional $H(\bm{\alpha})$
 \]
 Given a variation $\bm{\alpha} = \bar{\bm{\alpha}} + \epsilon \bm{\delta\alpha}$ the variational derivative $\diffd{H}{\bm{\alpha}}$ is defined as
 \[
-H(\bar{\bm{\alpha}} + \epsilon \bm{\delta\alpha}) = H(\bar{\bm{\alpha}}) + \epsilon \int_{\Omega} \diffd{H}{\bm{\alpha}} \bm{\delta\alpha} \d{\Omega} + O(\epsilon^2).
+H(\bar{\bm{\alpha}} + \epsilon \bm{\delta\alpha}) = H(\bar{\bm{\alpha}}) + \epsilon \int_{\Omega} \diffd{H}{\bm{\alpha}} \cdot \bm{\delta\alpha} \d{\Omega} + O(\epsilon^2).
 \]
 \end{definition}
 \begin{remark}
@@ -212,21 +262,108 @@ If the integrand does not contain derivative of the argument $\bm{\alpha}$ then 
 \diffd{H}{\bm{\alpha}} = \diffp{\mathcal{H}}{\bm{\alpha}}.
 \]
 \end{remark}
+
+
 Conservative port-Hamiltonian systems possess a peculiar property. The energy rate is given by the power due to the boundary ports $\bm{u}_\partial, \bm{y}_\partial$
-\begin{equation}
+\begin{equation}\label{eq:enrate}
 \begin{aligned}
-\dot{H} &= \int_{\Omega} \diffp{\mathcal{H}}{\bm{\alpha}} \cdot \diffp{\bm{\alpha}}{t} \d{\Omega} =\inner{\dder{H}{\bm{\alpha}}}{\pder{\bm{\alpha}}{t}}{\Omega}\\
-&=\int_{\partial \Omega} \bm{u}_\partial \cdot \bm{y}_\partial \d{S} =\inner{\bm{u}_\partial}{\bm{y}_\partial}{\partial \Omega}
+\dot{H} &= \int_{\Omega} \diffp{\mathcal{H}}{\bm{\alpha}} \cdot \diffp{\bm{\alpha}}{t} \d{\Omega} =\inner[\Omega]{\dder{H}{\bm{\alpha}}}{\pder{\bm{\alpha}}{t}}, \qquad \text{Stokes theorem}\\
+&=\int_{\partial \Omega} \bm{u}_\partial \cdot \bm{y}_\partial \d{S} =\inner[\partial \Omega]{\bm{u}_\partial}{\bm{y}_\partial},
 \end{aligned}
 \end{equation} 
+From the energy rate, the structural power balance is obtained
+\begin{equation}\label{eq:strpow}
+-\inner[\Omega]{\dder{H}{\bm{\alpha}}}{\pder{\bm{\alpha}}{t}} + \inner[\partial \Omega]{\bm{u}_\partial}{\bm{y}_\partial} = 0
+\end{equation}
 
-Port-Hamiltonian system is one geometrical dimensional have been the main object of study and re
+
+From \eqref{eq:enbalstr}, it is clear by identification that $\mathcal{B}_{\mathcal{J}}(\bm{z}, \bm{z}) = 2\,  \bm{u}_\partial \cdot \bm{y}_\partial$. That means that in a general characterization of pHs, the boundary space can be split into boundary input and output
+\[
+{Z} := \left\{ \bm{z} \vert \; \bm{z} = \mathcal{B}_{\partial}(\bm{e}) = (\bm{u}_\partial, \, \bm{y}_\partial) \right\}
+\]
+If the flow, effort and boundary variables are chosen to be
+\[ 
+\bm{f}:= -\partial_t \bm{\alpha}, \quad \bm{e}:=\delta_{\bm\alpha} H, \quad \bm{z}:=(\bm{u}_\partial, \, \bm{y}_\partial), 
+\]
+then system \eqref{eq:syspH} defines a Stokes Dirac structure by proposition \ref{prop:StokesDirac}.  In this rather informal treatment of dpHs, no rigorous characterization whatsoever has been introduced for operators $\mathcal{J,\, B,\, C}$ in system \eqref{eq:syspH}. A precise characterization of these operators has been given in \cite{legorrec2005} for pH of generic order only in one geometrical dimensional. In the following examples it will be shown that the boundary variables are nothing else than the classical Dirichlet and Neumann boundary conditions for PDEs.
+
+\subsubsection{Wave equation}\label{sec:waveeq}
+Given a constant speed propagation $c>0$ in open bounded connected set $\Omega \subset \mathbb{R}^d \, (d=2,3)$ with Lipschitz continuous boundary $\partial\Omega$, the wave equation takes the form 
+\begin{equation}\label{eq:waveeq}
+\partial_{tt} u(\bm{x}, t) = c^2 \Delta u(\bm{x}, t), \qquad \bm{x}\in \Omega, \quad \Delta = \div\grad.
+\end{equation}
+
+The Hamiltonian (total energy) reads
+\[
+H = \frac{1}{2} \int_{\Omega} (\partial_t u)^2 + ||c \nabla u||^2 \d\Omega.
+\]
+To recast \eqref{eq:waveeq} in pH form the energy variables has to be introduced $\bm{\alpha} = [\alpha_p, \, \bm{\alpha}_v]^\top$
+\[
+\alpha_p := \partial_t u, \qquad \bm{\alpha}_v := \nabla w.
+\] 
+The Hamiltonian is now a quadratic function of the energy variable
+\[
+H = \frac{1}{2} \int_{\Omega} p^2 + ||c \bm{v}||^2  \d\Omega.
+\]
+By definition, the co-energy are 
+\[
+e_p = \diffd{H}{\alpha_p} = p, \qquad \bm{e}_v = \diffd{H}{\bm{\alpha}_v} = c\bm{\alpha}_v.
+\]
+The wave equation can be recast in port-Hamiltonian form
+\[
+\diffp{}{t}
+\begin{pmatrix}
+\alpha_p \\
+\bm{\alpha}_v \\
+\end{pmatrix} = 
+\begin{bmatrix}
+0 & \div \\
+\grad & \bm{0}
+\end{bmatrix}
+\begin{pmatrix}
+e_p \\
+\bm{e}_v \\
+\end{pmatrix}
+\]
+From the energy rate it is possible to identify the boundary variables. 
+\begin{align*}
+\dot{H} &= \int_{\Omega} e_p \ \partial_t \alpha_p + \bm{e}_v \cdot \partial_t \bm{\alpha}_v \d\Omega, \\
+ &= \int_{\Omega} e_p \ \div \bm{e}_v + \bm{e}_v \cdot \grad e_p \d\Omega,  \\
+ &= \int_{\Omega} \div(e_p \ \bm{e}_v) \d\Omega, \qquad \text{Stokes theorem}, \\
+ &= \int_{\partial \Omega} e_p \ \bm{e}_v\cdot\bm{n} \d{S} = \inner[\partial\Omega]{e_p}{\bm{e}_v \cdot\bm{n}}.
+\end{align*}
+The boundary term $\inner[\partial\Omega]{e_p}{\bm{e}_v}$ pairs two power variables. One is taken as control input, the other plays the role of power-conjugated output. The assignment of these roles to the boundary power variables is referred to as causality of the boundary port \cite[Chapter 2]{kotyczka2019numerical}. Under uniform causality assumption, either $e_p$ or $\bm{e}_v$ can assume the role of (distributed) boundary input, but not both. This leads to two possible selection. 
+\begin{itemize}
+	\item {First case} ${u}_\partial = e_p, \quad {y}_\partial = \bm{e}_v \cdot\bm{n}$. \\
+	This imposes the variable $e_p:= \partial_t w$ as boundary input and corresponds to a classical Dirichlet condition.
+	
+	\item {Second case} ${u}_\partial = \bm{e}_v \cdot\bm{n}, \quad {y}_\partial = e_p$. \\
+	This imposes the variable $\bm{e}_v \cdot\bm{n}:= \partial_{\bm{n}} w$ as boundary input and corresponds to a classical Neumann condition.
+\end{itemize} 
+
+
+\subsubsection{2D shallow water equations}
+This formulation may be found in \cite[Section 6.2.]{cardoso2016}. This model describes  a thin layer of fluid of constant density in hydrostaticbalance, like the propagation of a tsunami wave far from the shore. representing the m  The mass conservation implies
+\[
+\diffp{h}{t} + \div(h\bm{v}) = 0,
+\]
+where $h$ is the fluid height, $\bm{v}$ is the fluid velocity. The conservation of linear momentum 
+\[
+\diffp{\rho\bm{v}}{t} + \rho (\bm{v} \cdot \nabla) \bm{v} + \nabla(\rho g h) = 0,
+\]
+where $\rho$ is the mass density and $g$ the gravitational acceleration constant. Using the identity
+\[
+(\bm{v} \cdot \nabla) \bm{v} = \frac{1}{2} \nabla(\norm{\bm{v}}^2)  + (\nabla \times \bm{v}) \times \bm{v}, 
+\]
+where $\nabla \times$ is the rotational of $\bm{v}$ (also denoted $\curl \bm{v}$)
 
 
 \section{Port-Hamiltonian formulation of linear elasticity}\label{sec:pHelas}
 
+In this section a port-Hamiltonian formulation for elasticity is deduced from the classical elastodynamics problem. It must be appointed that already in the seventies a purely hyperbolic formulation for elasticity was detailed \cite{hughes1978classical}. The missing point is the clear connection with the theory of Hamiltonian PDEs. An Hamiltonian formulation can be found in \cite{grinfield2015}, but without any connection to the concept of Stokes-Dirac structure induced by the underlying geometry. \\
+
+Linear elasticity falls within the assumption of \cite{skrepek2019wellposedness}. Therefore, it is a well posed boundary controlled pH systems. 
 
 
 
-
-
+\newpage
