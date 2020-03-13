@@ -8,17 +8,17 @@ Continuum mechanics is the mathematical description of how materials behave kine
 \section{Deformation and stress}
 In this section, the main concepts behind a deformable continuum are briefly recalled following \cite{lee2012mixed}. For a detailed discussion on this topic, the reader may consult \cite{abeyaratne2012notes,landau2012elasticity}. \\
 
-The bounded region of $\mathbb{R}^d \; (d=2, 3)$ occupied by a solid is called configuration. The reference configuration $\Omega$ is the domain that a bodies occupies at the initial state. To describe how the body deforms in time the deformation map $\bm\Phi: \Omega \times [0, T_f] \rightarrow \Omega' \subset \mathbb{R}^d$ is introduced. This map is differentiable and orientation preserving and the image of $\Omega$ under $\bm\Phi(\cdot, t) \; \forall t \in [0, T_f]$ is called the deformed configuration $\Omega_t$. Given a specific point in the reference frame is image is denoted by $\bm{y} = \bm{\Phi}(\bm{x}, t)$. The gradient of the deformation map is called the deformation gradient $\bm{F}:=\nabla_x\bm{\Phi} = \diffp{\bm{y}}{\bm{x}}$. A rigid deformation maps a point $\bm{x} \in \Omega \rightarrow \bm{A}(t) \bm{x} + \bm{b}(t)$, where $\bm{A}(t)$ is an orthogonal matrix and $\bm{b}(t)$ a $\mathbb{R}^d$ vector. A differentiable deformation map $\bm\Phi$ is a rigid deformation iff $\bm{F}^\top \bm{F} - \bm{I} = 0$,  where $\bm{I}$ is the identity in $\mathbb{R}^{d\times d}$ (for the proof see \cite{ciarlet1988mathematical}, page 44). For this reason, a suitable measure of the deformation is the Green-St.Venant strain tensor $\bm{E} = \frac{1}{2} (\bm{F}^\top \bm{F} - \bm{I})$.  \\
+The bounded region of $\mathbb{R}^d \; (d=2, 3)$ occupied by a solid is called configuration. The reference configuration $\Omega$ is the domain that a bodies occupies at the initial state. To describe how the body deforms in time the deformation map $\bm\Phi: \Omega \times [0, T_f] \rightarrow \Omega' \subset \mathbb{R}^d$ is introduced. This map is differentiable and orientation preserving and the image of $\Omega$ under $\bm\Phi(\cdot, t) \; \forall t \in [0, T_f]$ is called the deformed configuration $\Omega_t$. Given a specific point in the reference frame is image is denoted by $\bm{y} = \bm{\Phi}(\bm{x}, t)$. The gradient of the deformation map is called the deformation gradient $\bm{F}:=\nabla_x\bm{\Phi} = \diffp{\bm{y}}{\bm{x}}$. A rigid deformation maps a point $\bm{x} \in \Omega \rightarrow \bm{A}(t) \bm{x} + \bm{b}(t)$, where $\bm{A}(t)$ is an orthogonal matrix and $\bm{b}(t)$ a $\mathbb{R}^d$ vector. A differentiable deformation map $\bm\Phi$ is a rigid deformation iff $\bm{F}^\top \bm{F} - \bm{I} = 0$,  where $\bm{I}$ is the identity in $\mathbb{R}^{d\times d}$ (for the proof see \cite{ciarlet1988mathematical}, page 44). For this reason, a suitable measure of the deformation is the Green-St.Venant strain tensor $\frac{1}{2} (\bm{F}^\top \bm{F} - \bm{I})$.  \\
 
 A quantity of interest is the displacement $\bm{u}: \Omega \times [0, T_f] \rightarrow \mathbb{R}^d$ with respect to the reference configuration. It is defined as $\bm{u}(\bm{x}, t) = \bm{\Phi}(\bm{x}, t) - \bm{x}$. The gradient of the displacement verifies $\grad\bm{u} = \bm{F} - \bm{I}$. The strain tensor can now be written in terms of the displacement
 \begin{equation*}
 \begin{aligned}
-\bm{E} &= \frac{1}{2}\left[(\nabla_x \bm{u} + \bm{I})^\top (\nabla_x \bm{u} + \bm{I}) - \bm{I}\right] \\
+\frac{1}{2} (\bm{F}^\top \bm{F} - \bm{I}) &= \frac{1}{2}\left[(\nabla_x \bm{u} + \bm{I})^\top (\nabla_x \bm{u} + \bm{I}) - \bm{I}\right] \\
 &= \frac{1}{2}\left[\nabla_x \bm{u} + (\nabla_x \bm{u})^\top + (\nabla_x \bm{u})^\top (\nabla_x \bm{u})\right],
 \end{aligned}
 \end{equation*}
 or in components \[
-E_{ij} = \frac{1}{2} \left(\diffp{u_i}{x_j} + \diffp{u_j}{x_i} + \diffp{u_i}{x_j}\diffp{u_j}{x_i}\right).
+\frac{1}{2} ({F}_{ik}^\top {F}_{kj} - {I}_{ij}) = \frac{1}{2} \left(\diffp{u_i}{x_j} + \diffp{u_j}{x_i} + \diffp{u_i}{x_j}\diffp{u_j}{x_i}\right).
 \]
 
 To state the balance laws the actual deformed configuration is considered. The linear and angular momentum in a subdomain $\omega_t \subset \Omega_t$ are computed as 
@@ -58,7 +58,7 @@ The material derivative simplifies to a partial one. The operator $\Div$ is the 
 \]
 Furthermore, the non-linear terms in the Green-St. Venant strain tensor can be dropped
 \[
-\bm{E} = \frac{1}{2}\left[\nabla_x \bm{u} + (\nabla_x \bm{u})^\top + (\nabla_x \bm{u})^\top (\nabla_x \bm{u})\right]
+\frac{1}{2} (\bm{F}^\top \bm{F} - \bm{I}) = \frac{1}{2}\left[\nabla_x \bm{u} + (\nabla_x \bm{u})^\top + (\nabla_x \bm{u})^\top (\nabla_x \bm{u})\right]
 \approx \frac{1}{2}\left[\nabla_x \bm{u} + (\nabla_x \bm{u})^\top\right].
 \]
 The linearized strain tensor (also called infinitesimal strain tensor) is the symmetric gradient of the displacement
@@ -87,12 +87,12 @@ E=\frac{\mu (3\lambda +2\mu)}{\lambda +\mu},
 \]
 and inversely
 \[
-\lambda =\frac {E\nu }{(1+\nu )(1-2\nu )}, \qquad
+\lambda =\frac {E \nu }{(1+\nu )(1-2\nu )}, \qquad
 \mu = \frac{E}{2(1+\nu)}.
 \]
 The stiffness and compliant tensor assume the expressions
 \[
-\bm{\mathcal{D}}(\cdot) = \frac{E}{1+\nu} \left[(\cdot) + \frac{\nu}{1-2\nu}\Tr(\cdot)\bm{I}\right], \qquad \bm{\mathcal{A}}(\cdot) = \frac{1+\nu}{E}\left[(\cdot) - \frac{\nu}{1+\nu(d-2)}\Tr(\cdot)\bm{I}\right].
+\bm{\mathcal{D}}(\cdot) = \frac{E_Y}{1+\nu} \left[(\cdot) + \frac{\nu}{1-2\nu}\Tr(\cdot)\bm{I}\right], \qquad \bm{\mathcal{A}}(\cdot) = \frac{1+\nu}{E}\left[(\cdot) - \frac{\nu}{1+\nu(d-2)}\Tr(\cdot)\bm{I}\right].
 \]
 The linear elastodynamics problem is formulated through a vector-valued PDE
 \begin{equation}\label{eq:lin_elastodyn}
@@ -282,32 +282,32 @@ From \eqref{eq:enbalstr}, it is clear by identification that $\mathcal{B}_{\math
 {Z} := \left\{ \bm{z} \vert \; \bm{z} = \mathcal{B}_{\partial}(\bm{e}) = (\bm{u}_\partial, \, \bm{y}_\partial) \right\}
 \]
 If the flow, effort and boundary variables are chosen to be
-\[ 
+\begin{equation}
 \bm{f}:= -\partial_t \bm{\alpha}, \quad \bm{e}:=\delta_{\bm\alpha} H, \quad \bm{z}:=(\bm{u}_\partial, \, \bm{y}_\partial), 
-\]
-then system \eqref{eq:syspH} defines a Stokes Dirac structure by proposition \ref{prop:StokesDirac}.  In this rather informal treatment of dpHs, no rigorous characterization whatsoever has been introduced for operators $\mathcal{J,\, B,\, C}$ in system \eqref{eq:syspH}. A precise characterization of these operators has been given in \cite{legorrec2005} for pH of generic order only in one geometrical dimensional. In the following examples it will be shown that the boundary variables are nothing else than the classical Dirichlet and Neumann boundary conditions for PDEs.
+\end{equation}
+
+then system \eqref{eq:syspH} defines a Stokes Dirac structure by proposition \ref{prop:StokesDirac}.  In this rather informal treatment of dpHs, no rigorous characterization whatsoever has been introduced for operators $\mathcal{J,\, B,\, C}$ in system \eqref{eq:syspH}. A precise characterization of these operators has been given in \cite{legorrec2005} for pH of generic order only in one geometrical dimensional. In the following examples it will be shown that from the energy rate appropriate boundary variables can be defined.
 
 \subsubsection{Wave equation}\label{sec:waveeq}
 Given a constant speed propagation $c>0$ in open bounded connected set $\Omega \subset \mathbb{R}^d \, (d=2,3)$ with Lipschitz continuous boundary $\partial\Omega$, the wave equation takes the form 
 \begin{equation}\label{eq:waveeq}
-\partial_{tt} u(\bm{x}, t) = c^2 \Delta u(\bm{x}, t), \qquad \bm{x}\in \Omega, \quad \Delta = \div\grad.
+\partial_{tt} w(\bm{x}, t) = c^2 \Delta w(\bm{x}, t), \qquad \bm{x}\in \Omega, \quad \Delta = \div\grad.
 \end{equation}
-
-The Hamiltonian (total energy) reads
+The scalar field $w \in \mathbb{R}$ may represent the pressure in acoustics of a linear displacement in mechanical applications. The Hamiltonian (total energy) reads
 \[
-H = \frac{1}{2} \int_{\Omega} (\partial_t u)^2 + ||c \nabla u||^2 \d\Omega.
+H = \frac{1}{2} \int_{\Omega} \left\{(\partial_t w)^2 + \norm{c \nabla w}^2 \right\} \d\Omega.
 \]
 To recast \eqref{eq:waveeq} in pH form the energy variables has to be introduced $\bm{\alpha} = [\alpha_p, \, \bm{\alpha}_v]^\top$
 \[
-\alpha_p := \partial_t u, \qquad \bm{\alpha}_v := \nabla w.
+\alpha_p := \partial_t w, \qquad \bm{\alpha}_v := \nabla w.
 \] 
 The Hamiltonian is now a quadratic function of the energy variable
 \[
-H = \frac{1}{2} \int_{\Omega} p^2 + ||c \bm{v}||^2  \d\Omega.
+H = \frac{1}{2} \int_{\Omega} \left\{p^2 + \norm{c \bm{v}}^2 \right\} \d\Omega.
 \]
 By definition, the co-energy are 
 \[
-e_p = \diffd{H}{\alpha_p} = p, \qquad \bm{e}_v = \diffd{H}{\bm{\alpha}_v} = c\bm{\alpha}_v.
+e_p = \diffd{H}{\alpha_p} = \alpha_p, \qquad \bm{e}_v = \diffd{H}{\bm{\alpha}_v} = c \bm{\alpha}_v.
 \]
 The wave equation can be recast in port-Hamiltonian form
 \[
@@ -323,14 +323,14 @@ The wave equation can be recast in port-Hamiltonian form
 \begin{pmatrix}
 e_p \\
 \bm{e}_v \\
-\end{pmatrix}
+\end{pmatrix}.
 \]
 From the energy rate it is possible to identify the boundary variables. 
 \begin{align*}
-\dot{H} &= \int_{\Omega} e_p \ \partial_t \alpha_p + \bm{e}_v \cdot \partial_t \bm{\alpha}_v \d\Omega, \\
- &= \int_{\Omega} e_p \ \div \bm{e}_v + \bm{e}_v \cdot \grad e_p \d\Omega,  \\
- &= \int_{\Omega} \div(e_p \ \bm{e}_v) \d\Omega, \qquad \text{Stokes theorem}, \\
- &= \int_{\partial \Omega} e_p \ \bm{e}_v\cdot\bm{n} \d{S} = \inner[\partial\Omega]{e_p}{\bm{e}_v \cdot\bm{n}}.
+\dot{H} &= \int_{\Omega} \left\{ e_p \, \partial_t \alpha_p + \bm{e}_v \cdot \partial_t \bm{\alpha}_v\right\} \d\Omega, \\
+ &= \int_{\Omega} \left\{e_p \, \div \bm{e}_v + \bm{e}_v \cdot \grad e_p \right\}\d\Omega,  \\
+ &= \int_{\Omega} \div(e_p \, \bm{e}_v) \d\Omega, \qquad \text{Stokes theorem}, \\
+ &= \int_{\partial \Omega} e_p \, \bm{e}_v\cdot\bm{n} \d{S} = \inner[\partial\Omega]{e_p}{\bm{e}_v \cdot\bm{n}}.
 \end{align*}
 The boundary term $\inner[\partial\Omega]{e_p}{\bm{e}_v}$ pairs two power variables. One is taken as control input, the other plays the role of power-conjugated output. The assignment of these roles to the boundary power variables is referred to as causality of the boundary port \cite[Chapter 2]{kotyczka2019numerical}. Under uniform causality assumption, either $e_p$ or $\bm{e}_v$ can assume the role of (distributed) boundary input, but not both. This leads to two possible selection. 
 \begin{itemize}
@@ -343,11 +343,11 @@ The boundary term $\inner[\partial\Omega]{e_p}{\bm{e}_v}$ pairs two power variab
 
 
 \subsubsection{2D shallow water equations}
-This formulation may be found in \cite[Section 6.2.]{cardoso2016}. This model describes  a thin layer of fluid of constant density in hydrostaticbalance, like the propagation of a tsunami wave far from the shore. representing the m  The mass conservation implies
+This formulation may be found in \cite[Section 6.2.]{cardoso2016}. This model describes a thin fluid layer of constant density in hydrostatic balance, like the propagation of a tsunami wave far from shore. Consider an open bounded connected set $\Omega \subset \mathbb{R}^2$ and a constant bed profile. The mass conservation implies
 \[
 \diffp{h}{t} + \div(h\bm{v}) = 0,
 \]
-where $h$ is the fluid height, $\bm{v}$ is the fluid velocity. The conservation of linear momentum 
+where $h(x,y,t) \in \mathbb{R}$ is a scalar field representing the fluid height, $\bm{v}(x,y,t) \in \mathbb{R}^2$ is the fluid velocity field. The conservation of linear momentum reads
 \[
 \diffp{\rho\bm{v}}{t} + \rho (\bm{v} \cdot \nabla) \bm{v} + \nabla(\rho g h) = 0,
 \]
@@ -355,12 +355,92 @@ where $\rho$ is the mass density and $g$ the gravitational acceleration constant
 \[
 (\bm{v} \cdot \nabla) \bm{v} = \frac{1}{2} \nabla(\norm{\bm{v}}^2)  + (\nabla \times \bm{v}) \times \bm{v}, 
 \]
-where $\nabla \times$ is the rotational of $\bm{v}$ (also denoted $\curl \bm{v}$)
+where $\nabla \times$ is the rotational of $\bm{v}$ (also denoted $\curl \bm{v}$), the momentum is rearranged as follows
+\[
+\diffp{\rho \bm{v}}{t} = -\nabla\left(\frac{1}{2}\rho \norm{\bm{v}}^2 + \rho g h\right) - \rho (\nabla \times \bm{v}) \times \bm{v}.
+\]
+The last term on the right side can be rewritten
+\[
+\rho (\nabla \times \bm{v}) \times \bm{v} =   
+\begin{bmatrix}
+0 & -\rho\omega \\
+\rho\omega & 0 \\
+\end{bmatrix}
+\bm{v},
+\]
+with $\omega = \partial_x v_y - \partial_y v_x$ the local vorticity term. To derive a suitable pH formulation the energy, made up of kinetic and potential contribution, has to be invoked
+\[
+H = \frac{1}{2} \int_\Omega \left\{\rho h \norm{\bm{v}}^2 + \rho g h^2 \right\}  \d\Omega.
+\]
+As energy variable the fluid height and the linear momentum are chosen
+\[
+\alpha_h = h, \qquad \bm{\alpha}_v = \rho \bm{v}.
+\]
+The Hamiltonian is a non separable functional of the energy variables
+\[
+H(\alpha_h, \bm{\alpha}_v) = \frac{1}{2} \int_\Omega \frac{1}{\rho} \alpha_h \norm{\bm{\alpha}_v}^2 + \rho g \alpha_h^2 \d\Omega.
+\]
+The co-energy variables are given by
+\[
+e_h := \diffd{H}{\alpha_h} = \frac{1}{2 \rho} \norm{\bm{\alpha}_v}^2 + \rho g \alpha_h, \qquad \bm{e}_v := \diffd{H}{\bm{\alpha}_v} = \frac{1}{\rho} \alpha_h \bm{\alpha}_v.
+\]
+The mass and momentum conservation are then rewritten as follows
+\[
+\diffp{}{t}
+\begin{pmatrix}
+\alpha_h \\
+\bm{\alpha}_v \\
+\end{pmatrix} = 
+\begin{bmatrix}
+0 & -\div \\
+-\grad & \mathcal{G}
+\end{bmatrix}
+\begin{pmatrix}
+e_h \\
+\bm{e}_v \\
+\end{pmatrix},
+\]
+The gyroscopic skew-symmetric term $\mathcal{G}$ introduces a non-linearity as it depends on the energy variables
+\[
+\mathcal{G}(\alpha_h, \bm{\alpha}_v) = \frac{\partial_x \alpha_{v, y} - \partial_y \alpha_{v, x}}{\alpha_h} \begin{bmatrix}
+0 & -1 \\
+1 & 0 \\
+\end{bmatrix}.
+\]
+Despite the non-standard formulation, the energy rate provides anyway the boundary variables
+\begin{align*}
+\dot{H} &= +\int_{\Omega} \left\{ e_h \, \partial_t \alpha_h + \bm{e}_v \cdot \partial_t \bm{\alpha}_v \right\} \d\Omega, \\
+&= -\int_{\Omega} \left\{ e_h \, \div \bm{e}_v + \bm{e}_v \cdot (\grad e_h - \mathcal{G} \bm{e}_v) \right\} \d\Omega,  \\
+&= -\int_{\Omega} \left\{e_h \, \div \bm{e}_v + \bm{e}_v \cdot \grad e_h \right\}\d\Omega, \qquad \text{Skew-symmetry of }\mathcal{G}  \\
+&= -\int_{\Omega} \div(e_h \, \bm{e}_v) \d\Omega, \qquad \text{Stokes theorem}, \\
+&= -\int_{\partial \Omega} e_h \, \bm{e}_v\cdot\bm{n} \d{S} = -\inner[\partial\Omega]{e_h}{\bm{e}_v \cdot\bm{n}}.
+\end{align*}
 
+Again two possible cases of homogeneous boundary causality arise 
+\begin{itemize}
+	\item {First case} ${u}_\partial = e_h, \quad {y}_\partial = \bm{e}_v \cdot\bm{n}$. \\
+	This imposes the variable $e_h:= h$ as boundary input ans corresponds to a given water level for a fluid boundary.
+	
+	\item {Second case} ${u}_\partial = \bm{e}_v \cdot\bm{n}, \quad {y}_\partial = e_p$. \\
+	This imposes the variable $\bm{e}_v \cdot\bm{n}:= h \bm{v} \cdot \bm{n}$ as boundary input and corresponds to a given volumetric flow rate.
+\end{itemize} 
 
 \section{Port-Hamiltonian formulation of linear elasticity}\label{sec:pHelas}
 
 In this section a port-Hamiltonian formulation for elasticity is deduced from the classical elastodynamics problem. It must be appointed that already in the seventies a purely hyperbolic formulation for elasticity was detailed \cite{hughes1978classical}. The missing point is the clear connection with the theory of Hamiltonian PDEs. An Hamiltonian formulation can be found in \cite{grinfield2015}, but without any connection to the concept of Stokes-Dirac structure induced by the underlying geometry. \\
+
+Consider an open connected set $\Omega \subset \mathbb{R}^d, \; d=(2,3)$. The displacement within a deformable continuum are given by Eq. \eqref{eq:lin_elastodyn}. 
+\begin{equation}
+\rho \diffp[2]{\bm{u}}{t} - \Div(\bm{\mathcal{D}} \Grad \bm{u}) =0, \qquad \bm{x} \in \Omega.
+\end{equation}
+The contribution of the body force $\bm{f}$ has been removed for ease of presentation. To derive a pH formulation, the total energy, that includes the kinetic and  deformation energy, is needed
+\begin{equation}
+	H = \energy{\rho \left(\partial_t \bm{u} \right)^2 + \bm{\varepsilon}}
+\end{equation}
+
+
+
+
 
 Linear elasticity falls within the assumption of \cite{skrepek2019wellposedness}. Therefore, it is a well posed boundary controlled pH systems. 
 
