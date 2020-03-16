@@ -74,10 +74,10 @@ The \textit{stiffness tensor} or \textit{elasticity tensor} $\bm{\mathcal{D}} : 
 \mathcal{D}_{ijkl} = \mathcal{D}_{jikl} = \mathcal{D}_{klij}.
 \]
 From the uniform boundedness of $\bm{\mathcal{D}}$, the map
-$\bm{\mathcal{D}}: L^2 (\Omega; \mathbb{S}) \rightarrow L^2 (\Omega; \mathbb{S})$ is a symmetric positive definite bounded linear operator ($L^2 (\Omega; \mathbb{S})$ is the space of square integrable symmetric tensor valued functions). The compliance tensor $\bm{\mathcal{A}}$ is defined by $\bm{\mathcal{A}} = \bm{\mathcal{D}}^{-1}$ . Thus $\bm{\mathcal{A}} : \mathbb{S} \rightarrow \mathbb{S}$ is as well symmetric positive definite and uniformly bounded above and below. An isotropic
+$\bm{\mathcal{D}}: L^2 (\Omega; \mathbb{S}) \rightarrow L^2 (\Omega; \mathbb{S})$ is a symmetric positive definite bounded linear operator ($L^2 (\Omega; \mathbb{S})$ is the space of square integrable symmetric tensor valued functions). The compliance tensor $\bm{\mathcal{C}}$ is defined by $\bm{\mathcal{C}} = \bm{\mathcal{D}}^{-1}$ . Thus $\bm{\mathcal{C}} : \mathbb{S} \rightarrow \mathbb{S}$ is as well symmetric positive definite and uniformly bounded above and below. An isotropic
 elastic medium has the same kinematic properties in any direction and at each point. If an elastic medium is isotropic, then the stiffness and compliance tensors assume the form
 \[
-\bm{\mathcal{D}}(\cdot) = 2\mu (\cdot) + \lambda \Tr(\cdot)\bm{I}, \qquad \bm{\mathcal{A}}(\cdot) = \frac{1}{2\mu}\left[(\cdot) - \frac{\lambda}{2\mu + d\lambda}\Tr(\cdot)\bm{I}\right], \qquad d= \{2,3\},
+\bm{\mathcal{D}}(\cdot) = 2\mu (\cdot) + \lambda \Tr(\cdot)\bm{I}, \qquad \bm{\mathcal{C}}(\cdot) = \frac{1}{2\mu}\left[(\cdot) - \frac{\lambda}{2\mu + d\lambda}\Tr(\cdot)\bm{I}\right], \qquad d= \{2,3\},
 \]
 
 where  $\Tr$ is the trace operator and the positive scalar functions $\mu, \lambda$, defined on $\Omega$, are called the Lam\'e coefficients. In engineering applications it is easier to compute experimentally two other parameters: the Young modulus $E$ and  Poisson's ratio $\nu$. Those are expressed in terms of the Lam\'e  coefficients as 
@@ -92,7 +92,7 @@ and inversely
 \]
 The stiffness and compliant tensor assume the expressions
 \[
-\bm{\mathcal{D}}(\cdot) = \frac{E_Y}{1+\nu} \left[(\cdot) + \frac{\nu}{1-2\nu}\Tr(\cdot)\bm{I}\right], \qquad \bm{\mathcal{A}}(\cdot) = \frac{1+\nu}{E}\left[(\cdot) - \frac{\nu}{1+\nu(d-2)}\Tr(\cdot)\bm{I}\right].
+\bm{\mathcal{D}}(\cdot) = \frac{E}{1+\nu} \left[(\cdot) + \frac{\nu}{1-2\nu}\Tr(\cdot)\bm{I}\right], \qquad \bm{\mathcal{C}}(\cdot) = \frac{1+\nu}{E}\left[(\cdot) - \frac{\nu}{1+\nu(d-2)}\Tr(\cdot)\bm{I}\right].
 \]
 The linear elastodynamics problem is formulated through a vector-valued PDE
 \begin{equation}\label{eq:lin_elastodyn}
@@ -163,7 +163,7 @@ Let $\Omega$ denote a compact subset of $\mathbb{R}^d$ representing the spatial 
 	\end{equation}
 	where $\alpha := (\alpha_1, \dots , \alpha_d)$ is a multi-index of order $|\alpha| := \sum_{i=1}^d \alpha_i$, $\bm{P}_\alpha$ are a set of constant real $q_v \times q_u$ matrices and $\partial^{\alpha} := \partial_{x_1}^{\alpha_1} \dots \partial_{x_d}^{\alpha_d}$ is a differential operator of order $|\alpha|$ resulting from a combination of spatial derivatives. 
 \end{definition}
-The following definition, instrumental for the case of dpHs, is a simplified version of definition \eqref{def:foradj}.
+The following definition, instrumental for the case of dpHs, is a simplified version of \eqref{def:foradj}.
 \begin{definition}
 	Consider the constant matrix differential operator \eqref{eq:diffOp}. Its formal adjoint is the map $\mathcal{L}^*$ from $\mathcal{V}$ to $\mathcal{U}$ such that:
 	\begin{equation}
@@ -226,7 +226,7 @@ This  relation expresses the  power  conservation property of the Stokes–Dirac
 
 
 \begin{remark}
-	The constant Stokes-Dirac structure has been defined in case of smooth vector valued functions for simplicity.  The definition is indeed more general and encompasses the case of more complex functional spaces, in particular the $L^2$ space of square integrable functions.  Linear elasticity for example is defined on a mixed function space of vector- and tensor- valued functions. The result presented here remains valid provided that the proper {pairing is being chosen}. Furthermore, the constant differential operator may contain intrinsic operators ($\mathrm{Div}, \, \mathrm{Grad}$) as it will be shown in \secref{sec:pHelas}.
+	The constant Stokes-Dirac structure has been defined in case of smooth vector valued functions for simplicity.  The definition is indeed more general and encompasses the case of more complex functional spaces, in particular the $L^2$ space of square integrable functions.  Linear elasticity for example is defined on a mixed function space of vector- and tensor- valued functions. The constant differential operator may contain intrinsic operators ($\mathrm{Div}, \, \mathrm{Grad}$) as it will be shown in \secref{sec:pHelas}. The result presented here remains valid provided that the proper {pairing is being chosen}. 
 \end{remark}
 
 
@@ -251,9 +251,9 @@ The unknowns $\bm{\alpha}$ are called energy variables in the port-Hamiltonian f
 Consider a functional $H(\bm{\alpha})$
 \[ H(\bm{\alpha}) = \int_{\Omega} \mathcal{H}(\bm{\alpha}) \d{\Omega}.
 \]
-Given a variation $\bm{\alpha} = \bar{\bm{\alpha}} + \epsilon \bm{\delta\alpha}$ the variational derivative $\diffd{H}{\bm{\alpha}}$ is defined as
+Given a variation $\bm{\alpha} = \bar{\bm{\alpha}} + \eta \bm{\delta\alpha}$ the variational derivative $\diffd{H}{\bm{\alpha}}$ is defined as
 \[
-H(\bar{\bm{\alpha}} + \epsilon \bm{\delta\alpha}) = H(\bar{\bm{\alpha}}) + \epsilon \int_{\Omega} \diffd{H}{\bm{\alpha}} \cdot \bm{\delta\alpha} \d{\Omega} + O(\epsilon^2).
+H(\bar{\bm{\alpha}} + \eta \bm{\delta\alpha}) = H(\bar{\bm{\alpha}}) + \eta \int_{\Omega} \diffd{H}{\bm{\alpha}} \cdot \bm{\delta\alpha} \d{\Omega} + O(\eta^2).
 \]
 \end{definition}
 \begin{remark}
@@ -277,7 +277,7 @@ From the energy rate, the structural power balance is obtained
 \end{equation}
 
 
-From \eqref{eq:enbalstr}, it is clear by identification that $\mathcal{B}_{\mathcal{J}}(\bm{z}, \bm{z}) = 2\,  \bm{u}_\partial \cdot \bm{y}_\partial$. That means that in a general characterization of pHs, the boundary space can be split into boundary input and output
+From \eqref{eq:enbalstr}, it is clear by identification that $\mathcal{B}_{\mathcal{J}}(\bm{z}, \bm{z}) = 2\,  \bm{u}_\partial \cdot \bm{y}_\partial$. This means that the boundary space can be split into boundary input and output
 \[
 {Z} := \left\{ \bm{z} \vert \; \bm{z} = \mathcal{B}_{\partial}(\bm{e}) = (\bm{u}_\partial, \, \bm{y}_\partial) \right\}
 \]
@@ -286,7 +286,7 @@ If the flow, effort and boundary variables are chosen to be
 \bm{f}:= -\partial_t \bm{\alpha}, \quad \bm{e}:=\delta_{\bm\alpha} H, \quad \bm{z}:=(\bm{u}_\partial, \, \bm{y}_\partial), 
 \end{equation}
 
-then system \eqref{eq:syspH} defines a Stokes Dirac structure by proposition \ref{prop:StokesDirac}.  In this rather informal treatment of dpHs, no rigorous characterization whatsoever has been introduced for operators $\mathcal{J,\, B,\, C}$ in system \eqref{eq:syspH}. A precise characterization of these operators has been given in \cite{legorrec2005} for pH of generic order only in one geometrical dimensional. In the following examples it will be shown that from the energy rate appropriate boundary variables can be defined.
+then system \eqref{eq:syspH} defines a Stokes Dirac structure by proposition \ref{prop:StokesDirac}.  In this rather informal treatment of dpHs, no rigorous characterization whatsoever has been introduced for operators $\mathcal{J,\, B,\, C}$ in system \eqref{eq:syspH}. A formal characterization of these operators has been given in \cite{legorrec2005} for pH of generic order only in one geometrical dimensional. In the following examples it will be shown that from the power balance appropriate boundary variables can be defined.
 
 \subsubsection{Wave equation}\label{sec:waveeq}
 Given a constant speed propagation $c>0$ in open bounded connected set $\Omega \subset \mathbb{R}^d \, (d=2,3)$ with Lipschitz continuous boundary $\partial\Omega$, the wave equation takes the form 
@@ -332,7 +332,7 @@ From the energy rate it is possible to identify the boundary variables.
  &= \int_{\Omega} \div(e_p \, \bm{e}_v) \d\Omega, \qquad \text{Stokes theorem}, \\
  &= \int_{\partial \Omega} e_p \, \bm{e}_v\cdot\bm{n} \d{S} = \inner[\partial\Omega]{e_p}{\bm{e}_v \cdot\bm{n}}.
 \end{align*}
-The boundary term $\inner[\partial\Omega]{e_p}{\bm{e}_v}$ pairs two power variables. One is taken as control input, the other plays the role of power-conjugated output. The assignment of these roles to the boundary power variables is referred to as causality of the boundary port \cite[Chapter 2]{kotyczka2019numerical}. Under uniform causality assumption, either $e_p$ or $\bm{e}_v$ can assume the role of (distributed) boundary input, but not both. This leads to two possible selection. 
+The boundary term $\inner[\partial\Omega]{e_p}{\bm{e}_v}$ pairs two power variables. One is taken as control input, the other plays the role of power-conjugated output. The assignment of these roles to the boundary power variables is referred to as causality of the boundary port \cite[Chapter 2]{kotyczka2019numerical}. Under uniform causality assumption, either $e_p$ or $\bm{e}_v$ can assume the role of (distributed) boundary input, but not both. This leads to two possible selection:
 \begin{itemize}
 	\item {First case} ${u}_\partial = e_p, \quad {y}_\partial = \bm{e}_v \cdot\bm{n}$. \\
 	This imposes the variable $e_p:= \partial_t w$ as boundary input and corresponds to a classical Dirichlet condition.
@@ -402,10 +402,10 @@ e_h \\
 \]
 The gyroscopic skew-symmetric term $\mathcal{G}$ introduces a non-linearity as it depends on the energy variables
 \[
-\mathcal{G}(\alpha_h, \bm{\alpha}_v) = \frac{\partial_x \alpha_{v, y} - \partial_y \alpha_{v, x}}{\alpha_h} \begin{bmatrix}
+\mathcal{G}(\alpha_h, \bm{\alpha}_v) = \frac{\omega}{\alpha_h} \begin{bmatrix}
 0 & -1 \\
 1 & 0 \\
-\end{bmatrix}.
+\end{bmatrix}, \qquad \omega = \partial_x \alpha_{v, y} - \partial_y \alpha_{v, x}.
 \]
 Despite the non-standard formulation, the energy rate provides anyway the boundary variables
 \begin{align*}
@@ -435,12 +435,129 @@ Consider an open connected set $\Omega \subset \mathbb{R}^d, \; d=(2,3)$. The di
 \end{equation}
 The contribution of the body force $\bm{f}$ has been removed for ease of presentation. To derive a pH formulation, the total energy, that includes the kinetic and  deformation energy, is needed
 \begin{equation}
-	H = \energy{\rho \left(\partial_t \bm{u} \right)^2 + \bm{\varepsilon}}
+	H = \energy{\rho \left(\partial_t \bm{u} \right)^2 + \bm{\Sigma} \cddot \bm{\varepsilon}}.
 \end{equation}
+Recall that $\bm{\varepsilon}= \Grad{\bm{u}}$ and $\bm{\Sigma}=\bm{\mathcal{D}}\bm{\varepsilon}$. The energy variables are then the linear momentum and the deformation field
+\[
+\bm{\alpha}_v = \rho \bm{v}, \qquad \bm{A}_{\varepsilon} = \bm{\varepsilon},
+\]
+where $\bm{v}:= \partial_t \bm{u}$. The Hamiltonian can be rewritten as a quadratic functional in the energy variables
+\begin{equation}
+H = \energy{\frac{1}{\rho} \bm{\alpha}_v^2 + (\bm{\mathcal{D}} \bm{A}_{\varepsilon}) \cddot  \bm{A}_{\varepsilon}}.
+\end{equation}
+The notation $\bm{A}\cddot \bm{B} = \Tr(\bm{A}^\top\bm{B}) = A_{ij} B_{ij}$ denotes the tensor contraction. The co-energy variables are given by
+\begin{equation}
+\bm{e}_v := \diffd{H}{\bm{\alpha}_v} = \bm{v}, \qquad \bm{E}_\varepsilon := \diffd{H}{\bm{A}_{\varepsilon}} = \bm{\Sigma}.
+\end{equation}  
 
+The tensor-valued co-energy $\bm{E}_\varepsilon$ is obtained by taking the variational derivative with respect to a tensor.
+\begin{proposition}
+	The variational derivative of the Hamiltonian with respect to the strain tensor is the stress tensor $\delta_{\bm{A}_{\varepsilon}}H = \bm{\Sigma}$.
+	\begin{proof}
+		The contribution due to the deformation part in Hamiltonian is given by:		\[H_d(\bm{A}_{\varepsilon}) = \frac{1}{2} \int_{\Omega} (\bm{\mathcal{D}} \bm{A}_{\varepsilon}) \cddot \bm{A}_{\varepsilon}  \; \d\Omega. \]
+	
+		A variation $\bm{\Delta}\bm{A}_{\varepsilon}$ of the strain tensor with respect to a given value $\bar{\bm{A}}_{\varepsilon}$ leads to:
+		\begin{align*}
+		H_d(\bar{\bm{A}}_{\varepsilon} + \eta \bm{\Delta}\bm{A}_{\varepsilon}) = &+\frac{1}{2} \int_{\Omega} (\bm{\mathcal{D}} \bar{\bm{A}}_{\varepsilon}) \cddot \bar{\bm{A}}_{\varepsilon} \; \d\Omega \\
+		&+ \eta \frac{1}{2} \int_{\Omega} \left\{ (\bm{\mathcal{D}} \bar{\bm{A}}_{\varepsilon}) \cddot \bm{\Delta}\bm{A}_{\varepsilon}
+		+ (\bm{\mathcal{D}} \bm{\Delta}\bm{A}_{\varepsilon}) \cddot \bar{\bm{A}}_{\varepsilon}\right\}\; \d\Omega  + O(\eta^2).
+		\end{align*}
 
+		The term $(\bm{\mathcal{D}} \bm{\Delta}\bm{A}_{\varepsilon}) \cddot \bar{\bm{A}}_{\varepsilon}$ can be further manipulated as follows 
+		\[ 
+		(\bm{\mathcal{D}} \bm{\Delta}\bm{A}_{\varepsilon}) \cddot \bar{\bm{A}}_{\varepsilon} = (\bm{\mathcal{D}} \bar{\bm{A}}_{\varepsilon}) \cddot \bm{\Delta}\bm{A}_{\varepsilon}
+		\]
+		so that 
+		\[H_d(\bar{\bm{A}}_{\varepsilon} + \eta \bm{\Delta}\bm{A}_{\varepsilon}) = \frac{1}{2} \int_{\Omega} (\bm{\mathcal{D}} \bar{\bm{A}}_{\varepsilon}) \cddot \bar{\bm{A}}_{\varepsilon} \; \d\Omega + \eta \int_{\Omega} (\bm{\mathcal{D}} \bar{\bm{A}}_{\varepsilon}) \cddot \bm{\Delta}\bm{A}_{\varepsilon}\; \d\Omega  + O(\eta^2). \]
+		By definition of the variational derivative it can be written:
+		\[H_d(\bar{\bm{A}}_{\varepsilon} + \eta \bm{\Delta}\bm{A}_{\varepsilon}) = H_d(\bar{\bm{A}}_{\varepsilon}) + \eta \inner[L^2(\Omega, \mathbb{S})]{\diffd{H}{\bm{A}_{\varepsilon}}}{\bm{\Delta}\bm{A}_{\varepsilon}} + O(\eta^2), \]
+		where $L^2(\Omega, \mathbb{S})$ is the space of the square integrable $\mathbb{R}^{d\times d}$ symmetric tensors endowed with the tensor contraction as inner product
+		\begin{equation}\label{eq:normL2sym}
+		\inner[L^2(\Omega, \mathbb{S})]{\bm{A}}{\bm{B}} = \int_{\Omega} \bm{A} \cddot \bm{B} \d\Omega. 
+		\end{equation}
+		Then, by identification 
+		\[
+		\diffd{H_d}{\bm{A}_{\varepsilon}} = \bm{\mathcal{D}} \bar{\bm{A}}_{\varepsilon} = \bm{\Sigma}.
+		\]
+		Since the Hamiltonian is separable then $\delta_{\bm{A}_{\varepsilon}}{H_d} =\delta_{\bm{A}_{\varepsilon}} H$, leading to the final result.
+	\end{proof}
+\end{proposition}
 
+It is now possible to state the final pH form
+\begin{equation}
+\diffp{}{t}
+\begin{pmatrix}
+\bm{\alpha}_v \\
+\bm{A}_\varepsilon
+\end{pmatrix} = 
+\begin{bmatrix}
+\bm{0} & \Div \\
+\Grad & \bm{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+\bm{e}_v \\
+\bm{E}_\varepsilon
+\end{pmatrix}.
+\end{equation}
+The first equation of the system is the conservation of linear momentum. The second represents a compatibility condition 
+\begin{align*}
+\partial_t {\bm{A}_\varepsilon} &= \Grad(\bm{e}_v), \\
+\partial_t\bm{\varepsilon} &= \Grad(\bm{v}), \\
+\partial_t \Grad \bm{u} &= \Grad(\partial_t \bm{u}). \\
+\end{align*}
+Assuming that $\bm{u} \in C^2$, higher order derivatives commute (Schwarz theorem). Hence, the equation is verified. The following theorem ensures the differential operator is formally skew-adjoint. 
 
+\begin{theorem}{The formal adjoint of the tensor divergence $\mathrm{Div}$ is $- \mathrm{Grad}$, the opposite of the symmetric gradient.}
+	\begin{proof}
+		The space of symmetric tensor field in $\mathbb{R}^{d\times d}$ is denoted by $\mathbb{S}$, whereas the space of vector field in $\mathbb{R}^{d}$ is denoted by $\mathbb{V}$. Let us consider the Hilbert space of the square integrable symmetric tensors $L^2(\Omega, \mathbb{S})$ over the open connected set $\Omega$. Its scalar product is defined in \eqref{eq:normL2sym}. Moreover the Hilbert space of the square integrable vector functions over the same open connected set $\Omega$ will be denoted by $L^2(\Omega, \mathbb{V})$, endowed with the usual scalar product:
+		\[
+		\left\langle \bm{a} , \bm{b} \right\rangle_{L^2(\Omega, \mathbb{V})} = \int_{\Omega}  \bm{a} \cdot \bm{b} \; \d\Omega = \int_{\Omega} \bm{a}^\top \bm{b}\; \d\Omega, \quad \forall \bm{a}, \bm{b} \in L^2(\Omega, \mathbb{R}^{d}). \]
+		Let us consider the tensor divergence operator defined as:
+		\[
+		\begin{aligned}
+		\Div: \; L^2(\Omega, \mathbb{S})& \rightarrow L^2(\Omega, \mathbb{V}), \\
+		\bm{\Psi}& \rightarrow \Div\bm{\Psi} = \bm{\psi}, \\
+		\end{aligned}
+		\qquad \text{with } \psi_i = \mathrm{div}(\Psi_{ji}) = \sum_{j = 1}^d \diffp{\Psi_{ji}}{x_j}.
+		\]
+		We try to identify $\Div{}^*$
+		\[
+		\begin{aligned}
+		\Div{}^*: \; L^2(\Omega, \mathbb{V}) & \rightarrow L^2(\Omega, \mathbb{S}), \\
+		\bm{\phi}& \rightarrow  \Div{}^* \bm{\phi} = \bm{\Phi}, \\
+		\end{aligned}
+		\]
+		such that \[
+		\left\langle \Div \bm{\Psi} , \bm{\phi} \right\rangle_{L^2(\Omega, \mathbb{V})} = \left\langle \bm{\Psi} , \Div{}^* \bm{\phi} \right\rangle_{L^2(\Omega, \mathbb{S})},
+		\begin{aligned} \qquad
+		&\forall \bm{\Psi} \in \mathrm{Domain}(\Div) \subset L^2(\Omega, \mathbb{S}) \\
+		&\forall \bm{\phi} \in \mathrm{Domain}(\Div{}^*) \subset L^2(\Omega, \mathbb{V})
+		\end{aligned}
+		\]
+		Now let us take $\bm{\Psi} \in {C}_0^1(\Omega, \mathbb{S}) \subset \mathrm{Domain}(\Div)$ the space of differentiable symmetric tensors with compact support in~$\Omega$. Additionally $\bm{\phi}$ will belong to ${C}_0^1(\Omega, \mathbb{V}) \subset \mathrm{Domain}(\Div{}^*)$, the space of differentiable vector functions with compact support in~$\Omega$. Then
+		\[
+		\begin{aligned}
+		\left\langle \Div\bm{\Psi} , \bm{\phi} \right\rangle_{L^2(\Omega, \mathbb{V})} &= \int_{\Omega}  \bm{\psi} \cdot \bm{\phi} \; \d\Omega, \\
+		&= \int_{\Omega} \sum_{i=1}^d \sum_{j=1}^d \diffp{\Psi_{ji}}{x_j} \phi_i \; \d\Omega,  \\ 
+		&= - \int_{\Omega} \sum_{i=1}^d \sum_{j=1}^d \Psi_{ji} \diffp{\phi_i}{x_j} \; \d\Omega\,, \qquad &\text{since the functions vanish at the boundary,}\\
+		&= - \int_{\Omega} \sum_{i=1}^d \sum_{j=1}^d \Psi_{ji} {F}_{ji} \;\d\Omega,  \qquad &\text{if we first choose} \quad {F}_{ji} = \diffp{\phi_i}{x_j}.\\
+		\end{aligned}	 
+		\]
+		But in this latter case, it could not indeed  be stated that ${F} \in L^2(\Omega, \mathbb{S})$. Now, since  $\bm{\Psi} \in L^2(\Omega, \mathbb{S})$, $\Psi_{ji}=\Psi_{ij}$,  thus we are  allowed to further decompose the last equality as:
+		
+		\[ \sum_{i,j}\Psi_{ji} \diffp{\phi_i}{x_j} = \sum_{i,j}\Psi_{ji} \frac{1}{2} \left(\diffp{\phi_i}{x_j} + \diffp{\phi_j}{x_i}  \right) = 	\sum_{i,j} \Psi_{ji} {\Phi}_{ji}, \qquad \text{with } {\Phi}_{ji}:= \frac{1}{2} \left(\diffp{\phi_i}{x_j} + \diffp{\phi_j}{x_i}  \right).
+		\]
+		Thus $\Psi \in L^2(\Omega, \mathbb{S})$ and it can be stated that:
+		\begin{align*}
+		\left\langle \Div\bm{\Psi} , \bm{\phi} \right\rangle_{L^2(\Omega, \mathbb{V})} &= - \int_{\Omega} \sum_{i,j} \Psi_{ji} \frac{1}{2} \left(\diffp{\phi_i}{x_j} + \diffp{\phi_j}{x_i}  \right) \;\d\Omega \\
+		&= - \int_{\Omega} \sum_{i,j} \Psi_{ji} \Phi_{ji} \;\d\Omega = \left\langle \bm{\Psi} , -\Grad \bm{\phi} \right\rangle_{L^2(\Omega, \mathbb{S})}.
+		\end{align*}
+
+		It can be concluded that the formal adjoint of $\Div$ is $\Div{}^* = -\Grad$.
+	\end{proof}
+\end{theorem}
+
+The boundary values are then found by evaluating the energy rate
 
 Linear elasticity falls within the assumption of \cite{skrepek2019wellposedness}. Therefore, it is a well posed boundary controlled pH systems. 
 
