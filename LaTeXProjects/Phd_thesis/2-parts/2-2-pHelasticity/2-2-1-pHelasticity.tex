@@ -5,8 +5,11 @@
 
 Continuum mechanics is the mathematical description of how materials behave kinematically under external excitations. In this framework, the microscopic structure of a material body is neglected and a macroscopic viewpoint, that describes the body as a continuum, is adopted. This leads to a PDE describing the evolution of the displacement field. In this chapter, the general linear elastodynamics problem is recalled. A suitable port-Hamiltonian realization is then derived.
 
-\section{Deformation and stress}
-In this section, the main concepts behind a deformable continuum are briefly recalled following \cite{lee2012mixed}. For a detailed discussion on this topic, the reader may consult \cite{abeyaratne2012notes,landau2012elasticity}. \\
+\section{Continuum mechanics}
+
+In this section, the main concepts behind a deformable continuum are briefly recalled following \cite{lee2012mixed}. For a detailed discussion on this topic, the reader may consult \cite{abeyaratne2012notes,landau2012elasticity}. 
+
+\subsection{Non linear formulation of elasticity}
 
 The bounded region of $\mathbb{R}^d \; (d=2, 3)$ occupied by a solid is called configuration. The reference configuration $\Omega$ is the domain that a bodies occupies at the initial state. To describe how the body deforms in time the deformation map $\bm\Phi: \Omega \times [0, T_f] \rightarrow \Omega' \subset \mathbb{R}^d$ is introduced. This map is differentiable and orientation preserving and the image of $\Omega$ under $\bm\Phi(\cdot, t) \; \forall t \in [0, T_f]$ is called the deformed configuration $\Omega_t$. Given a specific point in the reference frame is image is denoted by $\bm{y} = \bm{\Phi}(\bm{x}, t)$. The gradient of the deformation map is called the deformation gradient $\bm{F}:=\nabla_x\bm{\Phi} = \diffp{\bm{y}}{\bm{x}}$. A rigid deformation maps a point $\bm{x} \in \Omega \rightarrow \bm{A}(t) \bm{x} + \bm{b}(t)$, where $\bm{A}(t)$ is an orthogonal matrix and $\bm{b}(t)$ a $\mathbb{R}^d$ vector. A differentiable deformation map $\bm\Phi$ is a rigid deformation iff $\bm{F}^\top \bm{F} - \bm{I} = 0$,  where $\bm{I}$ is the identity in $\mathbb{R}^{d\times d}$ (for the proof see \cite{ciarlet1988mathematical}, page 44). For this reason, a suitable measure of the deformation is the Green-St.Venant strain tensor $\frac{1}{2} (\bm{F}^\top \bm{F} - \bm{I})$.  \\
 
@@ -36,7 +39,7 @@ where $\bm{n}$ is the outward normal to the surface $\partial\omega_t$. The foll
 If the linear and angular momenta balance hold, then there exists a matrix valued function $\bm{\Sigma}$ from $\Omega_t$ to $\mathbb{S}$ such
 that $\bm{t}(\bm{y}, \bm{n}) = \bm{\Sigma}(\bm{y}) \bm{n}, \; \forall \bm{y} \in \Omega_t$ where the right-hand side is the matrix-vector multiplication.
 \end{theorem}
-The set $\mathbb{S}=\mathbb{R}^{d\times d}_{\mathrm{sym}}$ denotes the field of symmetric matrices in $\mathbb{R}^{d\times d}$. The symmetric of the stress tensor $\bm{\Sigma}$ is due to the balance of angular momentum. The divergence theorem can then be applied
+The set $\mathbb{S}=\mathbb{R}^{d\times d}_{\mathrm{sym}}$ denotes the field of symmetric matrices in $\mathbb{R}^{d\times d}$. The symmetry of the stress tensor $\bm{\Sigma}$ is due to the balance of angular momentum. The divergence theorem can then be applied
 \begin{equation*}
 \int_{\partial \omega} \bm{\Sigma} \, \bm{n} \d{S} = \int_{\omega} \nabla_y \cdot\bm{\Sigma} \d{\omega},
 \end{equation*}
@@ -45,9 +48,9 @@ Because the considered subregion $\omega$ is arbitrary, using the linear balance
 \begin{equation*}
 	\rho \frac{D\bm{v}}{Dt} - \nabla_y \cdot{\bm{\Sigma}} = \bm{f}, \qquad \bm{y} \in \Omega_t.
 \end{equation*}
-This equation is written with respect to the deformed configuration $\Omega_t$. For a detailed derivation of this equation the reader may consult \cite[Chapter 4]{abeyaratne2012notes}.
+This equation is written with respect to the deformed configuration $\Omega_t$. For a detailed derivation of this equation the reader may consult \cite[Chapter 4]{abeyaratne2012notes}. To obtain a closed formulation the constitutive law, i.e. the link between $\bm{\Sigma}$ and the strain tensor $\frac{1}{2} (\bm{F}^\top \bm{F} - \bm{I})$ has to be introduced. In the next such relation will be investigated for the case of linear elasticity.
 
-\section{The linear elastodynamics problem}
+\subsection{The linear elastodynamics problem}
 Whenever deformations are small, $\nabla_x\bm{u} \ll 1$, there the reference and deformed configuration are almost indistinguishable $\bm{y} = \bm{x} + \bm{u} = \bm{x}  + O(\nabla_x\bm{u}) \approx \bm{x}$. This allows to write the linear momentum balance in the reference configuration
 \begin{equation*}
 	\rho \diffp{\bm{v}}{t}(\bm{x, t}) - \Div(\bm\Sigma(\bm{x}, t)) = \bm{f}, \qquad \bm{x} \in \Omega.
@@ -100,7 +103,7 @@ The linear elastodynamics problem is formulated through a vector-valued PDE
 \end{equation}  
 The classical elastodynamics problem is expressed in terms of the displacement as the unknown. 
 
-\section{Reminder on port-Hamiltonian systems}
+\section{Port-Hamiltonian systems}
 
 Before introducing the pH of the elastodynamics problem that the main concept behind the formalism are recalled. First, the concept of Stokes-Dirac and  presented. This is normally introduced by making use of a differential geometry approach. The interested reader may consult \cite[Chapter 2]{kotyczka2019numerical}. Despite being really insightful in terms of geometrical structure, this approach does not encompass the case of higher-order differential operators. An extension in this sense is still an open question. Since bending problems in elasticity introduce higher-order differential operators, the language of PDE will be privileged over the one of differential forms. To have the most suitable definition of Stokes-Dirac structure for flexible systems, the approach adopted in \cite{macchelli2005modelling} is here recovered. \\
 
@@ -112,7 +115,7 @@ Second, distributed port-Hamiltonian systems will be introduced, in connection w
 To define the Stokes-Dirac structure for distributed pHs it is important to first state the concept of Dirac structure and the case of finite-dimensional pHs. To introduce the infinite-dimensional extension of Dirac structure, namely the Stokes-Dirac structure, the differential operators that come into play are characterized. 
 
 \subsubsection{Dirac Structures}
-Consider an  finite dimensional space ${F}$ over the field $\mathbb{R}$ and ${E} \equiv {F}'$ its dual, i.e. the space of linear operator $\mathbf{e} : {F} \rightarrow \mathbb{R}$. The elements of ${F}$ are called flows, while the elements of ${E}$ are called efforts. Those are port variables and their combination gives the power flowing inside the system. The space ${B} = {F} \times {E}$ is called the bond space of power variables. Therefore the power is defined as  $\left\langle \mathbf{e}, \mathbf{f} \right\rangle = \bm{e}(\mathbf{f})$, where $\left\langle \mathbf{e} , \mathbf{f} \right\rangle$ is the dual product between $\mathbf{f}$ and $\mathbf{e}$.
+Consider an  finite dimensional space ${F}$ over the field $\mathbb{R}$ and ${E} \equiv {F}'$ its dual, i.e. the space of linear operator $\mathbf{e} : {F} \rightarrow \mathbb{R}$. The elements of $\mathit{F}$ are called flows, while the elements of ${E}$ are called efforts. Those are port variables and their combination gives the power flowing inside the system. The space ${B} = {F} \times {E}$ is called the bond space of power variables. Therefore the power is defined as  $\left\langle \mathbf{e}, \mathbf{f} \right\rangle = \bm{e}(\mathbf{f})$, where $\left\langle \mathbf{e} , \mathbf{f} \right\rangle$ is the dual product between $\mathbf{f}$ and $\mathbf{e}$.
 \begin{definition}[\cite{courant1990}, Def. 1.1.1]
 	Given the finite-dimensional space ${F}$ and its dual ${E}$ with respect to the inner product $\left\langle \cdot , \cdot \right\rangle : {F} \times {E} \rightarrow \mathbb{R}$, define the symmetric bilinear form:
 	\begin{equation}
@@ -209,14 +212,14 @@ The following theorem characterizes Stokes-Dirac structures for pHs of arbitrary
 	
 	Consider the space of power variables ${B} = {F} \times {E} \times {Z}$. The linear subspace ${D} \subset {B}$
 	\begin{equation}
-	{D} = \left\{ (\bm{f}, \bm{e}, \bm{z}) \in  {F} \times {E} \times {Z} \; \vert \; \bm{f} = -\mathcal{J} \bm{e}, \; \bm{z} = \mathcal{B}_\partial(\bm{e}) \right\},
+	{D}_{\mathcal{J}} = \left\{ (\bm{f}, \bm{e}, \bm{z}) \in  {F} \times {E} \times {Z} \; \vert \; \bm{f} = -\mathcal{J} \bm{e}, \; \bm{z} = \mathcal{B}_\partial(\bm{e}) \right\},
 	\end{equation}
 	is a Stokes–Dirac structure on $\mathcal{B}$ with respect to the pairing
 	\begin{equation}
-	\bilprod{(\bm{f}, \bm{e}, \bm{z})}{(\bm{f}, \bm{e}, \bm{z})}  := \int_{\Omega} \left( \bm{e}_1^\top \bm{f}_2 + \bm{e}_2^\top \bm{f}_1 \right) \d\Omega + \int_{\partial \Omega} \mathcal{B}_{\mathcal{J}}(\bm{z}_1, \bm{z}_2) \d{S}.
+	\bilprod{(\bm{f}^1, \bm{e}^1, \bm{z}^1)}{(\bm{f}^2, \bm{e}^2, \bm{z}^2)}  := \int_{\Omega} \left( \bm{e}^{1 \top} \bm{f}^ 2 + \bm{e}^{2 \top} \bm{f}^1 \right) \d\Omega + \int_{\partial \Omega} \mathcal{B}_{\mathcal{J}}(\bm{z}^1, \bm{z}^2) \d{S}.
 	\end{equation}
 \end{proposition}
-From this proposition, if $(\bm{f}, \bm{e}, \bm{z}) \in  D$, then $\bilprod{(\bm{f}, \bm{e}, \bm{z})}{(\bm{f}, \bm{e}, \bm{z})}=0$, that is
+From this proposition, if $(\bm{f}, \bm{e}, \bm{z}) \in  D_{\mathcal{J}}$, then $\bilprod{(\bm{f}, \bm{e}, \bm{z})}{(\bm{f}, \bm{e}, \bm{z})}=0$, that is
 \begin{equation}\label{eq:enbalstr}
 \int_{\Omega} \bm{e}^\top \bm{f}  \d\Omega + \frac{1}{2} \int_{\partial \Omega} \mathcal{B}_{\mathcal{J}}(\bm{z}, \bm{z}) \d{S} = 0.
 \end{equation}
@@ -234,12 +237,12 @@ This  relation expresses the  power  conservation property of the Stokes–Dirac
 
 A distributed conservative port-Hamiltonian system is defined by a set of variables that describes the unknowns, by a formally skew-adjoint differential operator, an energy functional and a set of boundary inputs and corresponding conjugated outputs. Such a system is described by the following set of equations
 \begin{equation}\label{eq:syspH}
-\begin{cases}
-\displaystyle \diffp{\bm{\alpha}}{t} = \mathcal{J}\displaystyle \bm{e}, \vspace{3pt}\\
-\bm{u}_\partial = \mathcal{B}  \displaystyle \bm{e}, \vspace{3pt}\\
-\bm{y}_\partial = \mathcal{C} \displaystyle \bm{e}, \vspace{3pt}\\
-\bm{e} := \displaystyle \diffd{\mathcal{H}}{\bm{\alpha}}.
-\end{cases}
+\begin{aligned}
+\diffp{\bm{\alpha}}{t} &= \mathcal{J}\displaystyle \bm{e}, \vspace{3pt}\\
+\bm{u}_\partial &= \mathcal{B}  \displaystyle \bm{e}, \vspace{3pt}\\
+\bm{y}_\partial &= \mathcal{C} \displaystyle \bm{e}, \vspace{3pt}\\
+\bm{e} &:= \displaystyle \diffd{H}{\bm{\alpha}}.
+\end{aligned}
 \end{equation}
 The unknowns $\bm{\alpha}$ are called energy variables in the port-Hamiltonian framework, the formally skew-adjoint operator $\mathcal{J}$ is named interconnection operator (see appendix \ref{app:math}, Def. \ref{def:foradj} for a precise definition of formal skew adjointness). $\mathcal{B}, \mathcal{C}$ are boundary operator, that provide the boundary input $\bm{u}_\partial$ and output $\bm{y}_\partial$. The variational derivative of the Hamiltonian define the so-called coenergy variables $\bm{e}$.
 
@@ -303,7 +306,7 @@ To recast \eqref{eq:waveeq} in pH form the energy variables has to be introduced
 \] 
 The Hamiltonian is now a quadratic function of the energy variable
 \[
-H = \frac{1}{2} \int_{\Omega} \left\{p^2 + \norm{c \bm{v}}^2 \right\} \d\Omega.
+H = \frac{1}{2} \int_{\Omega} \left\{\alpha_p^2 + \norm{c \bm{\alpha}_v}^2 \right\} \d\Omega.
 \]
 By definition, the co-energy are 
 \[
@@ -328,8 +331,8 @@ e_p \\
 From the energy rate it is possible to identify the boundary variables. 
 \begin{align*}
 \dot{H} &= \int_{\Omega} \left\{ e_p \, \partial_t \alpha_p + \bm{e}_v \cdot \partial_t \bm{\alpha}_v\right\} \d\Omega, \\
- &= \int_{\Omega} \left\{e_p \, \div \bm{e}_v + \bm{e}_v \cdot \grad e_p \right\}\d\Omega,  \\
- &= \int_{\Omega} \div(e_p \, \bm{e}_v) \d\Omega, \qquad \text{Stokes theorem}, \\
+ &= \int_{\Omega} \left\{e_p \, \div \bm{e}_v + \bm{e}_v \cdot \grad e_p \right\}\d\Omega, \qquad &\text{Chain rule}, \\
+ &= \int_{\Omega} \div(e_p \, \bm{e}_v) \d\Omega, \qquad &\text{Stokes theorem}, \\
  &= \int_{\partial \Omega} e_p \, \bm{e}_v\cdot\bm{n} \d{S} = \inner[\partial\Omega]{e_p}{\bm{e}_v \cdot\bm{n}}.
 \end{align*}
 The boundary term $\inner[\partial\Omega]{e_p}{\bm{e}_v}$ pairs two power variables. One is taken as control input, the other plays the role of power-conjugated output. The assignment of these roles to the boundary power variables is referred to as causality of the boundary port \cite[Chapter 2]{kotyczka2019numerical}. Under uniform causality assumption, either $e_p$ or $\bm{e}_v$ can assume the role of (distributed) boundary input, but not both. This leads to two possible selection:
@@ -411,8 +414,8 @@ Despite the non-standard formulation, the energy rate provides anyway the bounda
 \begin{align*}
 \dot{H} &= +\int_{\Omega} \left\{ e_h \, \partial_t \alpha_h + \bm{e}_v \cdot \partial_t \bm{\alpha}_v \right\} \d\Omega, \\
 &= -\int_{\Omega} \left\{ e_h \, \div \bm{e}_v + \bm{e}_v \cdot (\grad e_h - \mathcal{G} \bm{e}_v) \right\} \d\Omega,  \\
-&= -\int_{\Omega} \left\{e_h \, \div \bm{e}_v + \bm{e}_v \cdot \grad e_h \right\}\d\Omega, \qquad \text{Skew-symmetry of }\mathcal{G}  \\
-&= -\int_{\Omega} \div(e_h \, \bm{e}_v) \d\Omega, \qquad \text{Stokes theorem}, \\
+&= -\int_{\Omega} \left\{e_h \, \div \bm{e}_v + \bm{e}_v \cdot \grad e_h \right\}\d\Omega, \qquad &\text{Chain rule and skew-symmetry of }\mathcal{G}  \\
+&= -\int_{\Omega} \div(e_h \, \bm{e}_v) \d\Omega, \qquad &\text{Stokes theorem}, \\
 &= -\int_{\partial \Omega} e_h \, \bm{e}_v\cdot\bm{n} \d{S} = -\inner[\partial\Omega]{e_h}{\bm{e}_v \cdot\bm{n}}.
 \end{align*}
 
@@ -427,8 +430,9 @@ Again two possible cases of homogeneous boundary causality arise
 
 \section{Port-Hamiltonian formulation of linear elasticity}\label{sec:pHelas}
 
-In this section a port-Hamiltonian formulation for elasticity is deduced from the classical elastodynamics problem. It must be appointed that already in the seventies a purely hyperbolic formulation for elasticity was detailed \cite{hughes1978classical}. The missing point is the clear connection with the theory of Hamiltonian PDEs. An Hamiltonian formulation can be found in \cite{grinfield2015}, but without any connection to the concept of Stokes-Dirac structure induced by the underlying geometry. \\
+In this section a port-Hamiltonian formulation for elasticity is deduced from the classical elastodynamics problem. It must be appointed that already in the seventies a purely hyperbolic formulation for elasticity was detailed \cite{hughes1978classical}. The missing point is the clear connection with the theory of Hamiltonian PDEs. An Hamiltonian formulation can be found in \cite[Chapter 16]{grinfield2015}, but without any connection to the concept of Stokes-Dirac structure induced by the underlying geometry. \\
 
+\subsection{Energy and co-energy variables}
 Consider an open connected set $\Omega \subset \mathbb{R}^d, \; d=(2,3)$. The displacement within a deformable continuum are given by Eq. \eqref{eq:lin_elastodyn}. 
 \begin{equation}
 \rho \diffp[2]{\bm{u}}{t} - \Div(\bm{\mathcal{D}} \Grad \bm{u}) =0, \qquad \bm{x} \in \Omega.
@@ -454,34 +458,36 @@ The tensor-valued co-energy $\bm{E}_\varepsilon$ is obtained by taking the varia
 \begin{proposition}
 	The variational derivative of the Hamiltonian with respect to the strain tensor is the stress tensor $\delta_{\bm{A}_{\varepsilon}}H = \bm{\Sigma}$.
 	\begin{proof}
-		The contribution due to the deformation part in Hamiltonian is given by:		\[H_d(\bm{A}_{\varepsilon}) = \frac{1}{2} \int_{\Omega} (\bm{\mathcal{D}} \bm{A}_{\varepsilon}) \cddot \bm{A}_{\varepsilon}  \; \d\Omega. \]
+		The contribution due to the deformation part in Hamiltonian is given by:		\[H_{\mathrm{def}}(\bm{A}_{\varepsilon}) = \frac{1}{2} \int_{\Omega} (\bm{\mathcal{D}} \bm{A}_{\varepsilon}) \cddot \bm{A}_{\varepsilon}  \; \d\Omega. \]
 	
 		A variation $\bm{\Delta}\bm{A}_{\varepsilon}$ of the strain tensor with respect to a given value $\bar{\bm{A}}_{\varepsilon}$ leads to:
 		\begin{align*}
-		H_d(\bar{\bm{A}}_{\varepsilon} + \eta \bm{\Delta}\bm{A}_{\varepsilon}) = &+\frac{1}{2} \int_{\Omega} (\bm{\mathcal{D}} \bar{\bm{A}}_{\varepsilon}) \cddot \bar{\bm{A}}_{\varepsilon} \; \d\Omega \\
+		H_{\mathrm{def}}(\bar{\bm{A}}_{\varepsilon} + \eta \bm{\Delta}\bm{A}_{\varepsilon}) = &+\frac{1}{2} \int_{\Omega} (\bm{\mathcal{D}} \bar{\bm{A}}_{\varepsilon}) \cddot \bar{\bm{A}}_{\varepsilon} \; \d\Omega \\
 		&+ \eta \frac{1}{2} \int_{\Omega} \left\{ (\bm{\mathcal{D}} \bar{\bm{A}}_{\varepsilon}) \cddot \bm{\Delta}\bm{A}_{\varepsilon}
 		+ (\bm{\mathcal{D}} \bm{\Delta}\bm{A}_{\varepsilon}) \cddot \bar{\bm{A}}_{\varepsilon}\right\}\; \d\Omega  + O(\eta^2).
 		\end{align*}
 
-		The term $(\bm{\mathcal{D}} \bm{\Delta}\bm{A}_{\varepsilon}) \cddot \bar{\bm{A}}_{\varepsilon}$ can be further manipulated as follows 
+		The term $(\bm{\mathcal{D}} \bm{\Delta}\bm{A}_{\varepsilon}) \cddot \bar{\bm{A}}_{\varepsilon}$ can be further rearranged using the symmetry of $\bm{\mathcal{D}}$ and the commutativity of the tensor contraction
 		\[ 
-		(\bm{\mathcal{D}} \bm{\Delta}\bm{A}_{\varepsilon}) \cddot \bar{\bm{A}}_{\varepsilon} = (\bm{\mathcal{D}} \bar{\bm{A}}_{\varepsilon}) \cddot \bm{\Delta}\bm{A}_{\varepsilon}
+		(\bm{\mathcal{D}} \bm{\Delta}\bm{A}_{\varepsilon}) \cddot \bar{\bm{A}}_{\varepsilon} = (\bm{\mathcal{D}} \bar{\bm{A}}_{\varepsilon}) \cddot \bm{\Delta}\bm{A}_{\varepsilon},
 		\]
 		so that 
-		\[H_d(\bar{\bm{A}}_{\varepsilon} + \eta \bm{\Delta}\bm{A}_{\varepsilon}) = \frac{1}{2} \int_{\Omega} (\bm{\mathcal{D}} \bar{\bm{A}}_{\varepsilon}) \cddot \bar{\bm{A}}_{\varepsilon} \; \d\Omega + \eta \int_{\Omega} (\bm{\mathcal{D}} \bar{\bm{A}}_{\varepsilon}) \cddot \bm{\Delta}\bm{A}_{\varepsilon}\; \d\Omega  + O(\eta^2). \]
+		\[H_{\mathrm{def}}(\bar{\bm{A}}_{\varepsilon} + \eta \bm{\Delta}\bm{A}_{\varepsilon}) = \frac{1}{2} \int_{\Omega} (\bm{\mathcal{D}} \bar{\bm{A}}_{\varepsilon}) \cddot \bar{\bm{A}}_{\varepsilon} \; \d\Omega + \eta \int_{\Omega} (\bm{\mathcal{D}} \bar{\bm{A}}_{\varepsilon}) \cddot \bm{\Delta}\bm{A}_{\varepsilon}\; \d\Omega  + O(\eta^2). \]
 		By definition of the variational derivative it can be written:
-		\[H_d(\bar{\bm{A}}_{\varepsilon} + \eta \bm{\Delta}\bm{A}_{\varepsilon}) = H_d(\bar{\bm{A}}_{\varepsilon}) + \eta \inner[L^2(\Omega, \mathbb{S})]{\diffd{H}{\bm{A}_{\varepsilon}}}{\bm{\Delta}\bm{A}_{\varepsilon}} + O(\eta^2), \]
+		\[H_{\mathrm{def}}(\bar{\bm{A}}_{\varepsilon} + \eta \bm{\Delta}\bm{A}_{\varepsilon}) = H_d(\bar{\bm{A}}_{\varepsilon}) + \eta \inner[L^2(\Omega, \mathbb{S})]{\diffd{H}{\bm{A}_{\varepsilon}}}{\bm{\Delta}\bm{A}_{\varepsilon}} + O(\eta^2), \]
 		where $L^2(\Omega, \mathbb{S})$ is the space of the square integrable $\mathbb{R}^{d\times d}$ symmetric tensors endowed with the tensor contraction as inner product
 		\begin{equation}\label{eq:normL2sym}
 		\inner[L^2(\Omega, \mathbb{S})]{\bm{A}}{\bm{B}} = \int_{\Omega} \bm{A} \cddot \bm{B} \d\Omega. 
 		\end{equation}
 		Then, by identification 
 		\[
-		\diffd{H_d}{\bm{A}_{\varepsilon}} = \bm{\mathcal{D}} \bar{\bm{A}}_{\varepsilon} = \bm{\Sigma}.
+		\diffd{H_{\mathrm{def}}}{\bm{A}_{\varepsilon}} = \bm{\mathcal{D}} \bar{\bm{A}}_{\varepsilon} = \bm{\Sigma}.
 		\]
-		Since the Hamiltonian is separable then $\delta_{\bm{A}_{\varepsilon}}{H_d} =\delta_{\bm{A}_{\varepsilon}} H$, leading to the final result.
+		Since the Hamiltonian is separable then $\delta_{\bm{A}_{\varepsilon}}{H_{\mathrm{def}}} =\delta_{\bm{A}_{\varepsilon}} H$, leading to the final result.
 	\end{proof}
 \end{proposition}
+
+\subsection{Final system and associated Stokes-Dirac structure}
 
 It is now possible to state the final pH form
 \begin{equation}
@@ -509,16 +515,16 @@ Assuming that $\bm{u} \in C^2$, higher order derivatives commute (Schwarz theore
 
 \begin{theorem}{The formal adjoint of the tensor divergence $\mathrm{Div}$ is $- \mathrm{Grad}$, the opposite of the symmetric gradient.}
 	\begin{proof}
-		The space of symmetric tensor field in $\mathbb{R}^{d\times d}$ is denoted by $\mathbb{S}$, whereas the space of vector field in $\mathbb{R}^{d}$ is denoted by $\mathbb{V}$. Let us consider the Hilbert space of the square integrable symmetric tensors $L^2(\Omega, \mathbb{S})$ over the open connected set $\Omega$. Its scalar product is defined in \eqref{eq:normL2sym}. Moreover the Hilbert space of the square integrable vector functions over the same open connected set $\Omega$ will be denoted by $L^2(\Omega, \mathbb{V})$, endowed with the usual scalar product:
+		The space of symmetric tensor field in $\mathbb{R}^{d\times d}$ is denoted by $\mathbb{S}$, whereas the space of vector field in $\mathbb{R}^{d}$ is denoted by $\mathbb{V}$. Let us consider the Hilbert space of the square integrable symmetric tensors $L^2(\Omega, \mathbb{S})$ with scalar product is defined in \eqref{eq:normL2sym}. Moreover consider the Hilbert space of the square integrable vector function $L^2(\Omega, \mathbb{V})$, endowed with the usual scalar product:
 		\[
-		\left\langle \bm{a} , \bm{b} \right\rangle_{L^2(\Omega, \mathbb{V})} = \int_{\Omega}  \bm{a} \cdot \bm{b} \; \d\Omega = \int_{\Omega} \bm{a}^\top \bm{b}\; \d\Omega, \quad \forall \bm{a}, \bm{b} \in L^2(\Omega, \mathbb{R}^{d}). \]
+		\left\langle \bm{a} , \bm{b} \right\rangle_{L^2(\Omega, \mathbb{V})} = \int_{\Omega}  \bm{a} \cdot \bm{b} \; \d\Omega = \int_{\Omega} \bm{a}^\top \bm{b}\; \d\Omega, \quad \forall \bm{a}, \bm{b} \in L^2(\Omega, \mathbb{V}). \]
 		Let us consider the tensor divergence operator defined as:
 		\[
 		\begin{aligned}
 		\Div: \; L^2(\Omega, \mathbb{S})& \rightarrow L^2(\Omega, \mathbb{V}), \\
 		\bm{\Psi}& \rightarrow \Div\bm{\Psi} = \bm{\psi}, \\
 		\end{aligned}
-		\qquad \text{with } \psi_i = \mathrm{div}(\Psi_{ji}) = \sum_{j = 1}^d \diffp{\Psi_{ji}}{x_j}.
+		\qquad \text{with } \psi_j = \mathrm{div}(\Psi_{ij}) = \sum_{i = 1}^d \diffp{\Psi_{ij}}{x_i}.
 		\]
 		We try to identify $\Div{}^*$
 		\[
@@ -538,19 +544,20 @@ Assuming that $\bm{u} \in C^2$, higher order derivatives commute (Schwarz theore
 		\[
 		\begin{aligned}
 		\left\langle \Div\bm{\Psi} , \bm{\phi} \right\rangle_{L^2(\Omega, \mathbb{V})} &= \int_{\Omega}  \bm{\psi} \cdot \bm{\phi} \; \d\Omega, \\
-		&= \int_{\Omega} \sum_{i=1}^d \sum_{j=1}^d \diffp{\Psi_{ji}}{x_j} \phi_i \; \d\Omega,  \\ 
-		&= - \int_{\Omega} \sum_{i=1}^d \sum_{j=1}^d \Psi_{ji} \diffp{\phi_i}{x_j} \; \d\Omega\,, \qquad &\text{since the functions vanish at the boundary,}\\
-		&= - \int_{\Omega} \sum_{i=1}^d \sum_{j=1}^d \Psi_{ji} {F}_{ji} \;\d\Omega,  \qquad &\text{if we first choose} \quad {F}_{ji} = \diffp{\phi_i}{x_j}.\\
+		&= \int_{\Omega} \sum_{i=1}^d \sum_{j=1}^d \diffp{\Psi_{ij}}{x_i} \phi_j \; \d\Omega,  \\ 
+		&= - \int_{\Omega} \sum_{i=1}^d \sum_{j=1}^d \Psi_{ij} \diffp{\phi_j}{x_i} \; \d\Omega\,, \qquad &\text{since the functions vanish at the boundary,}\\
+		&= - \int_{\Omega} \sum_{i=1}^d \sum_{j=1}^d \Psi_{ij} {F}_{ij} \;\d\Omega,  \qquad &\where {F}_{ij} = \diffp{\phi_j}{x_i},\\
+		&= - \left\langle \bm{\Psi} , \bm{F} \right\rangle_{L^2(\Omega, \mathbb{S})},  \qquad &\bm{F} = (\nabla{\bm\phi})^\top.
 		\end{aligned}	 
 		\]
-		But in this latter case, it could not indeed  be stated that ${F} \in L^2(\Omega, \mathbb{S})$. Now, since  $\bm{\Psi} \in L^2(\Omega, \mathbb{S})$, $\Psi_{ji}=\Psi_{ij}$,  thus we are  allowed to further decompose the last equality as:
+		But in this latter case, it could not  be stated that $\bm{F} \in L^2(\Omega, \mathbb{S})$. Now, since  $\bm{\Psi} \in L^2(\Omega, \mathbb{S})$, $\Psi_{ji}=\Psi_{ij}$,  thus we are  allowed to further decompose the last equality as
 		
-		\[ \sum_{i,j}\Psi_{ji} \diffp{\phi_i}{x_j} = \sum_{i,j}\Psi_{ji} \frac{1}{2} \left(\diffp{\phi_i}{x_j} + \diffp{\phi_j}{x_i}  \right) = 	\sum_{i,j} \Psi_{ji} {\Phi}_{ji}, \qquad \text{with } {\Phi}_{ji}:= \frac{1}{2} \left(\diffp{\phi_i}{x_j} + \diffp{\phi_j}{x_i}  \right).
+		\[ \sum_{i,j}\Psi_{ij} \diffp{\phi_j}{x_i} = \sum_{i,j}\Psi_{ij} \frac{1}{2} \left(\diffp{\phi_i}{x_j} + \diffp{\phi_j}{x_i}  \right) = 	\sum_{i,j} \Psi_{ij} {\Phi}_{ij}, \qquad \text{with } {\Phi}_{ij}:= \frac{1}{2} \left(\diffp{\phi_i}{x_j} + \diffp{\phi_j}{x_i}  \right).
 		\]
-		Thus $\Psi \in L^2(\Omega, \mathbb{S})$ and it can be stated that:
+		Thus $\bm{\Phi}=\Grad \bm{\phi} \in L^2(\Omega, \mathbb{S})$ and it can be stated that:
 		\begin{align*}
-		\left\langle \Div\bm{\Psi} , \bm{\phi} \right\rangle_{L^2(\Omega, \mathbb{V})} &= - \int_{\Omega} \sum_{i,j} \Psi_{ji} \frac{1}{2} \left(\diffp{\phi_i}{x_j} + \diffp{\phi_j}{x_i}  \right) \;\d\Omega \\
-		&= - \int_{\Omega} \sum_{i,j} \Psi_{ji} \Phi_{ji} \;\d\Omega = \left\langle \bm{\Psi} , -\Grad \bm{\phi} \right\rangle_{L^2(\Omega, \mathbb{S})}.
+		\left\langle \Div\bm{\Psi} , \bm{\phi} \right\rangle_{L^2(\Omega, \mathbb{V})} &= - \int_{\Omega} \sum_{i,j} \Psi_{ij} \frac{1}{2} \left(\diffp{\phi_i}{x_j} + \diffp{\phi_j}{x_i}  \right) \;\d\Omega \\
+		&= - \int_{\Omega} \sum_{i,j} \Psi_{ij} \Phi_{ij} \;\d\Omega = \left\langle \bm{\Psi} , -\Grad \bm{\phi} \right\rangle_{L^2(\Omega, \mathbb{S})}.
 		\end{align*}
 
 		It can be concluded that the formal adjoint of $\Div$ is $\Div{}^* = -\Grad$.
@@ -558,6 +565,125 @@ Assuming that $\bm{u} \in C^2$, higher order derivatives commute (Schwarz theore
 \end{theorem}
 
 The boundary values are then found by evaluating the energy rate
+\begin{equation}\label{eq:enbalElas}
+\begin{aligned}
+\dot{H} &= \int_{\Omega} \left\{ \bm{e}_v \cdot \partial_t \bm\alpha_v + \bm{E}_\varepsilon \cddot \partial_t \bm{A}_\varepsilon \right\} \d\Omega, \\
+&= \int_{\Omega} \left\{\bm{e}_v \cdot \Div \bm{E}_\varepsilon + \bm{E}_\varepsilon \cddot \Grad \bm{e}_v \right\}\d\Omega, \qquad &\text{Chain rule},\\
+&= \int_{\Omega} \div(\bm{E}_\varepsilon \cdot \bm{e}_v) \d\Omega, \qquad &\text{Stokes theorem}, \\
+&= \int_{\partial \Omega} \bm{e}_v \cdot (\bm{E}_\varepsilon\cdot\bm{n}) \d{S} = \inner[\partial\Omega]{\bm{e}_v}{\bm{E}_\varepsilon \cdot\bm{n}}.
+\end{aligned}
+\end{equation}
+
+The imposition of the velocity field along the boundary $\bm{e}_v = \partial_t \bm{u}$ corresponds to a Dirichlet condition. On the contrary, setting $\bm{E}_\varepsilon \cdot\bm{n} = \bm{\Sigma} \cdot \bm{n} = \bm{t}$ corresponds to a Neumann condition. Consider a partition of the boundary $\partial\Omega = \Gamma_N \cup \Gamma_D$ and $\Gamma_N \cap \Gamma_D =  \{\emptyset\}$, where a Dirichlet and a Neumann condition applies on the subset $\Gamma_D$ and $\Gamma_N$ respectively. Then the final pH formulation reads
+
+\begin{equation}\label{eq:syspHelas}
+\begin{aligned}
+\displaystyle
+\diffp{}{t}
+\begin{pmatrix}
+\bm{\alpha}_v \\
+\bm{A}_\varepsilon
+\end{pmatrix} &= \underbrace{
+\begin{bmatrix}
+\bm{0} & \Div \\
+\Grad & \bm{0} \\
+\end{bmatrix}}_{\mathcal{J}}
+\begin{pmatrix}
+\bm{e}_v \\
+\bm{E}_\varepsilon
+\end{pmatrix}, \vspace{3pt}\\
+\bm{u}_\partial &= \underbrace{
+	\begin{bmatrix}
+	\bm\gamma_{0}^{\Gamma_D} & \bm{0} \\
+	\bm{0} & \bm\gamma_n^{\Gamma_N} \\
+	\end{bmatrix}}_{\mathcal{B}} \begin{pmatrix}
+\bm{e}_v \\
+\bm{E}_\varepsilon
+\end{pmatrix}, \vspace{3pt}\\
+\bm{y}_\partial &= \underbrace{
+\begin{bmatrix}
+\bm{0} & \bm\gamma_{n}^{\Gamma_D} \\
+\bm\gamma_0^{\Gamma_N} & \bm{0} \\
+\end{bmatrix}}_{\mathcal{C}}
+\begin{pmatrix}
+\bm{e}_v \\
+\bm{E}_\varepsilon
+\end{pmatrix},
+\end{aligned}
+\end{equation}
+where $\bm\gamma_{0}^{\Gamma_*}$ denotes the trace over the set $\Gamma_*$, namely $\bm\gamma_{0}^{\Gamma_*}\bm{e}_v = \bm{e}_v\vert_{\Gamma_*}$. Furthermore, $\bm\gamma_{n}^{\Gamma_*}$ denotes the normal trace over the set $\Gamma_*$, namely $\bm\gamma_{n}^{\Gamma_*}\bm{E}_\varepsilon = \bm{E}_\varepsilon \cdot \bm{n}\vert_{\Gamma_*}$.
+
+\begin{theorem}[Stokes-Dirac structure for elastodynamics]
+Let $H^{\Grad}(\Omega, \mathbb{V})$ the space of vectors with symmetric gradient in $L^2(\Omega, \mathbb{S})$ and $H^{\Div}  (\Omega, \mathbb{S})$ denote the space of symmetric tensor with divergence in $L^2(\Omega, \mathbb{V})$. Denote by $H = H^{\Div}(\Omega, \mathbb{S}) \times H^{\Grad}(\Omega, \mathbb{V}), \; F = L^2(\Omega, \mathbb{V}) \times L^2(\Omega, \mathbb{S})$ and $F_\partial = L^2(\partial\Omega, \mathbb{V})$.
+
+The set 
+\begin{equation}
+{D}_{\mathcal{J}} = \left\{
+\begin{pmatrix}
+\bm{f} \\ \bm{f}_\partial \\ \bm{e} \\ \bm{e}_\partial \\
+\end{pmatrix}
+\vert \;
+ \bm{e} \in H, \; \bm{f} = -\mathcal{J} \bm{e}, \;\bm{f}_\partial = \mathcal{B}\bm{e}, \; \bm{e}_\partial = \mathcal{C}\bm{e}   \right\},
+\end{equation}
+where $\bm{e} = (\bm{e}_v,\, \bm{E}_\varepsilon)$ and $\mathcal{J, B, C}$ are defined in \eqref{eq:syspHelas}, is a Stokes–Dirac structure with respect to the pairing
+\begin{equation}\label{eq:bilinearElas}
+\bilprod{(\bm{f}^1, \bm{f}_{\partial}^1, \bm{e}^1, \bm{e}_{\partial}^1)}{(\bm{f}^2, \bm{f}_{\partial}^2, \bm{e}^2, \bm{e}_{\partial}^2)}  := \inner[F]{\bm{e}^1}{\bm{f}^2} + \inner[F]{\bm{e}^2}{\bm{f}^1} + \inner[F_\partial]{\bm{e}_{\partial}^1}{\bm{f}_{\partial}^2} + \inner[F_\partial]{\bm{e}_{\partial}^2}{\bm{f}_{\partial}^1}.
+\end{equation}
+
+\begin{proof}
+A Stokes-Dirac is characterized by the fact that ${D}_{\mathcal{J}} = {D}_{\mathcal{J}}^\perp$. Then one has to show that ${D}_{\mathcal{J}} \subset {D}_{\mathcal{J}}^\perp$ and ${D}_{\mathcal{J}}^\perp \subset {D}_{\mathcal{J}}$.\\
+The proof is found by employing the integration by parts formula \cite[Chapter 1]{boffi2013mixed} already used for \eqref{eq:enbalElas}. The main steps of Theorem 3.6 in \cite{legorrec2005} are followed here. \\
+
+\textit{Step 1}. If ${D}_{\mathcal{J}} \subset {D}_{\mathcal{J}}^\perp$ then the bilinear form \eqref{eq:bilinearElas} is 0. Take $(\bm{f}, \, \bm{f}_\partial, \, \bm{e}, \, \bm{e}_\partial) \in {D}_{\mathcal{J}}$. Then
+\begin{align*}
+\bilprod{(\bm{f}, \bm{f}_{\partial}, \bm{e}, \bm{e}_{\partial})}{(\bm{f}, \bm{f}_{\partial}, \bm{e}, \bm{e}_{\partial})} =& 2 \inner[F]{\bm{e}}{\bm{f}} + 2 \inner[F_\partial]{\bm{e}_{\partial}}{\bm{f}_{\partial}}, \\
+=& 2 \inner[F]{\bm{e}}{-\mathcal{J}\bm{e}} + 2 \inner[F_\partial]{\bm{e}_{\partial}}{\bm{f}_{\partial}}, \\
+=& - 2 \int_{\Omega} \left\{\bm{e}_v \cdot \Div \bm{E}_\varepsilon + \bm{E}_\varepsilon \cddot \Grad \bm{e}_v \right\}\d\Omega\\
+&+ 2 \int_{\partial \Omega} \bm{e}_v \cdot (\bm{E}_\varepsilon\cdot\bm{n}) \d{S}= 0, \quad \text{from \eqref{eq:enbalElas}}.
+\end{align*}
+
+\textit{Step 2}. Take $(\bm{\phi}, \, \bm{\phi}_\partial, \, \bm{\epsilon}, \, \bm{\epsilon}_\partial) \in {D}_{\mathcal{J}}^\perp$ and $\bm{e}_0 \in H$ with compact support on $\Omega$. This implies $\mathcal{B}\bm{e}_0 = (\bm{0},\, \bm{0})$ and $\mathcal{C}\bm{e}_0 = (\bm{0},\, \bm{0})$. Taking $(-\mathcal{J}\bm{e}_0, \bm{0}, \bm{e}_0, \bm{0}) \in {D}_{\mathcal{J}}$ then 
+\[
+\bilprod{(\bm{\phi}, \bm{\phi}_\partial,  \bm{\epsilon}, \bm{\epsilon}_\partial)}{(\mathcal{J}\bm{e}_0, \bm{0}, \bm{e}_0, \bm{0})} = \inner[F]{\bm{\epsilon}}{-\mathcal{J}\bm{e}_0} + \inner[F]{\bm{e}_0}{\bm{\phi}} = 0, \quad \forall \bm{e}_0 \in H.
+\]
+It follows that $\bm{\epsilon} \in H$ and $\bm{\phi}=-\mathcal{J}\bm{\epsilon}$. \\
+
+\textit{Step 3}. Take $(\bm{\phi}, \, \bm{\phi}_\partial, \, \bm{\epsilon}, \, \bm{\epsilon}_\partial) \in {D}_{\mathcal{J}}^\perp$ and $(\bm{f}, \, \bm{f}_\partial, \, \bm{e}, \, \bm{e}_\partial) \in {D}_{\mathcal{J}}$. Variables $\bm{e}, \bm{\epsilon}$ are indeed tuples containing a vector and a tensor: $\bm{e} = (\bm{e}_v, \, \bm{E}_\varepsilon), \;\bm{\epsilon} = (\bm{\epsilon}_v, \, \bm{\mathcal{E}}_\varepsilon)$. From step 2 and \eqref{eq:bilinearElas}
+
+\begin{align*}
+0 &=-\inner[F]{\bm{e}}{\mathcal{J}\bm{\epsilon}} - \inner[F]{\mathcal{J}\bm{e}}{\bm{\epsilon}}+ \inner[F_\partial]{\bm{e}_{\partial}}{\bm{\phi}_{\partial}} +  \inner[F_\partial]{\bm{\epsilon}_{\partial}}{\bm{f}_{\partial}}, \\
+&=-\int_{\partial\Omega} \left\{\bm{e}_v \cdot (\bm{\mathcal{E}}_\varepsilon \cdot \bm{n}) + \bm{\epsilon}_v \cdot (\bm{{E}}_\varepsilon \cdot \bm{n})\right\}  \d{S} + \inner[F_\partial]{\bm{e}_{\partial}}{\bm{\phi}_{\partial}} +  \inner[F_\partial]{\bm{\epsilon}_{\partial}}{\bm{f}_{\partial}}
+\end{align*}
+Consider the splitting of the boundary $\partial\Omega = \Gamma_N \cup \Gamma_D$
+\begin{align*}
+	\int_{\partial\Omega} \left\{\bm{e}_v \cdot (\bm{\mathcal{E}}_\varepsilon \cdot \bm{n}) + \bm{\epsilon}_v \cdot (\bm{{E}}_\varepsilon \cdot \bm{n})\right\}  \d{S} 
+	=& +\int_{\Gamma_N} \left\{\bm{e}_{\partial, 2} \cdot (\bm{\mathcal{E}}_\varepsilon \cdot \bm{n}) + \bm{\epsilon}_v \cdot \bm{f}_{\partial, 2}\right\}  \d{S}, \\
+	&+ \int_{\Gamma_D} \left\{\bm{f}_{\partial, 1} \cdot (\bm{\mathcal{E}}_\varepsilon \cdot \bm{n}) + \bm{\epsilon}_v \cdot \bm{e}_{\partial, 1}\right\}  \d{S},
+\end{align*}
+where the elements of the vectors $(\bm{f}_{\partial, 1}, \bm{f}_{\partial, 2}) = \bm{f}_{\partial}, (\bm{e}_{\partial, 1}, \bm{e}_{\partial, 2}) = \bm{e}_{\partial}$ have been considering. By expanding of the terms $\inner[F_\partial]{\bm{e}_{\partial}}{\bm{\phi}_{\partial}} +  \inner[F_\partial]{\bm{\epsilon}_{\partial}}{\bm{f}_{\partial}}$ and given the fact that $\bm{e}_\partial, \, \bm{f}_\partial$ have arbitrary values then
+\begin{equation*}
+\bm{\phi}_{\partial} = \begin{bmatrix}
+\bm\gamma_{0}^{\Gamma_D} & \bm{0} \\
+\bm{0} & \bm\gamma_n^{\Gamma_N} \\
+\end{bmatrix} \begin{pmatrix}
+\bm{\epsilon}_v \\
+\bm{\mathcal{E}}_\varepsilon
+\end{pmatrix}, \qquad 
+\bm{\epsilon}_{\partial} = 
+\begin{bmatrix}
+\bm{0} & \bm\gamma_{n}^{\Gamma_D} \\
+\bm\gamma_0^{\Gamma_N} & \bm{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+\bm{\epsilon}_v \\
+\bm{\mathcal{E}}_\varepsilon
+\end{pmatrix}
+\end{equation*}
+This concludes the proof. 
+\end{proof}
+
+\end{theorem}
+
 
 Linear elasticity falls within the assumption of \cite{skrepek2019wellposedness}. Therefore, it is a well posed boundary controlled pH systems. 
 
