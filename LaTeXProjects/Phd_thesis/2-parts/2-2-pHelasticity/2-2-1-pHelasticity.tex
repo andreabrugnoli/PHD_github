@@ -30,7 +30,7 @@ where $\rho$ is the mass density and the velocity $\bm{v} = \frac{D\bm{u}}{Dt}(\
 	\diff{}{t} \int_{\omega_t} \rho \bm{v} \d{\omega_t} &= \int_{\partial \omega_t} \bm{t}(\bm{y}, \bm{n}) \d{S} + \int_{\omega_t} \bm{f} \d{\omega_t}, \\
 	\diff{}{t} \int_{\omega_t} \rho\bm{y} \times \bm{v} \d{\omega_t} &= \int_{\partial \omega_t} \bm{y} \times \bm{t}(\bm{y}, \bm{n}) \d{S} + \int_{\omega_t} \bm{y} \times \bm{f} \d{\omega_t}, \\
 \end{align*}
-where $\partial \omega_t$ stands for the boundary surface of the subdomain $\omega_t$, $\bm{n}$ is the outward normal to the surface $\partial\omega_t$ and $\bm{f}$ represents is an exterior body force. The following theorem characterizes the stress vector (see \cite[Chapter 2]{ciarlet1988mathematical}):
+where $\partial \omega_t$ stands for the boundary surface of the subdomain $\omega_t$, $\bm{n}$ is the outward normal to the surface $\partial\omega_t$ and $\bm{f}$ represents an exterior body force. The following theorem characterizes the stress vector (see \cite[Chapter 2]{ciarlet1988mathematical}):
 
 \begin{theorem}[Cauchy’s theorem]
 If the linear and angular momenta balance hold, then there exists a matrix-valued function $\bm{\Sigma}$ from $\Omega_t$ to $\mathbb{S}$ such
@@ -90,9 +90,10 @@ and conversely
 \mu = \frac{E}{2(1+\nu)}.
 \end{equation}
 The stiffness and compliant tensor assume the expressions
-\begin{equation}
-	\bm{\mathcal{D}}(\cdot) = \frac{E}{1+\nu} \left[(\cdot) + \frac{\nu}{1-2\nu}\Tr(\cdot)\bm{I}\right], \qquad \bm{\mathcal{C}}(\cdot) = \frac{1+\nu}{E}\left[(\cdot) - \frac{\nu}{1+\nu(d-2)}\Tr(\cdot)\bm{I}\right].
-\end{equation}
+\begin{align}
+	\bm{\mathcal{D}}(\cdot) &= \frac{E}{1+\nu} \left[(\cdot) + \frac{\nu}{1-2\nu}\Tr(\cdot)\bm{I}\right], \label{eq:stiff3D} \vspace{3pt}\\
+	\bm{\mathcal{C}}(\cdot) &= \frac{1+\nu}{E}\left[(\cdot) - \frac{\nu}{1+\nu(d-2)}\Tr(\cdot)\bm{I}\right].
+\end{align}
 The linear elastodynamics problem is formulated through a vector-valued PDE
 \begin{equation}\label{eq:lin_elastodyn}
 \rho \diffp[2]{\bm{u}}{t} - \Div(\bm{\mathcal{D}} \Grad \bm{u}) = \bm{f}.
@@ -303,7 +304,7 @@ If the flow, effort and boundary variables are chosen to be
 \bm{f}:= -\partial_t \bm{\alpha}, \quad \bm{e}:=\delta_{\bm\alpha} H, \quad \bm{z}:=(\bm{u}_\partial, \, \bm{y}_\partial), 
 \end{equation}
 
-then system \eqref{eq:syspH} defines a Stokes Dirac structure by Proposition \ref{prop:StokesDirac}.  In this rather informal treatment of dpHs, no rigorous characterization whatsoever has been introduced for operators $\mathcal{B,\, C}$ in system \eqref{eq:syspH}. A formal characterization of these operators has been given in \cite{legorrec2005} for pH of generic order only in one geometrical dimensional. In the following examples it will be shown that from the power balance appropriate boundary variables can be defined.
+then system \eqref{eq:syspH} defines a Stokes Dirac structure by Proposition \ref{prop:StokesDirac}.  In this rather informal treatment of dpHs, no rigorous characterization whatsoever has been introduced for operators $\mathcal{B,\, C}$ in system \eqref{eq:syspH}. A formal characterization of these operators has been given in \cite{legorrec2005} for pH of generic order only in one geometrical dimensional. In the following examples it is shown that from the power balance appropriate boundary variables can be defined.
 
 \subsubsection{Wave equation}\label{sec:waveeq}
 
@@ -429,8 +430,8 @@ The gyroscopic skew-symmetric term $\mathcal{G}$ introduces a non-linearity as i
 Despite the non-standard formulation, the energy rate provides anyway the boundary variables
 \begin{align*}
 \dot{H} &= +\int_{\Omega} \left\{ e_h \, \partial_t \alpha_h + \bm{e}_v \cdot \partial_t \bm{\alpha}_v \right\} \d\Omega, \\
-&= -\int_{\Omega} \left\{ e_h \, \div \bm{e}_v + \bm{e}_v \cdot (\grad e_h - \mathcal{G} \bm{e}_v) \right\} \d\Omega,  \\
-&= -\int_{\Omega} \left\{e_h \, \div \bm{e}_v + \bm{e}_v \cdot \grad e_h \right\}\d\Omega, \qquad &\text{Chain rule and skew-symmetry of }\mathcal{G}  \\
+&= -\int_{\Omega} \left\{ e_h \, \div \bm{e}_v + \bm{e}_v \cdot (\grad e_h - \mathcal{G} \bm{e}_v) \right\} \d\Omega, \qquad &\text{skew-symmetry of }\mathcal{G}, \\
+&= -\int_{\Omega} \left\{e_h \, \div \bm{e}_v + \bm{e}_v \cdot \grad e_h \right\}\d\Omega, \qquad &\text{Chain rule},  \\
 &= -\int_{\Omega} \div(e_h \, \bm{e}_v) \d\Omega, \qquad &\text{Stokes theorem}, \\
 &= -\int_{\partial \Omega} e_h \, \bm{e}_v\cdot\bm{n} \d{S} = -\inner[\partial\Omega]{e_h}{\bm{e}_v \cdot\bm{n}}.
 \end{align*}
@@ -585,7 +586,7 @@ Assuming that $\bm{u} \in C^2$, higher order derivatives commute (Schwarz theore
 \end{theorem}
 
 The boundary values are then found by evaluating the energy rate
-\begin{equation}\label{eq:enbalElas}
+\begin{equation}\label{eq:enrateElas}
 \begin{aligned}
 \dot{H} &= \int_{\Omega} \left\{ \bm{e}_v \cdot \partial_t \bm\alpha_v + \bm{E}_\varepsilon \cddot \partial_t \bm{A}_\varepsilon \right\} \d\Omega, \\
 &= \int_{\Omega} \left\{\bm{e}_v \cdot \Div \bm{E}_\varepsilon + \bm{E}_\varepsilon \cddot \Grad \bm{e}_v \right\}\d\Omega, \qquad &\text{Chain rule},\\
@@ -600,7 +601,7 @@ The boundary values are then found by evaluating the energy rate
 \caption{A 2D continuum with Neumann and Dirichlet boundary conditions}
 \label{fig:bc_elas2D}
 \end{figure}
-The imposition of the velocity field along the boundary $\bm{e}_v = \partial_t \bm{u}$ corresponds to a Dirichlet condition. On the contrary, setting $\bm{E}_\varepsilon \cdot\bm{n} = \bm{\Sigma} \cdot \bm{n} = \bm{t}$ corresponds to a Neumann condition. Consider a partition of the boundary $\partial\Omega = \Gamma_N \cup \Gamma_D$ and $\Gamma_N \cap \Gamma_D =  \{\emptyset\}$, where a Dirichlet and a Neumann condition applies on the subset $\Gamma_D$ and $\Gamma_N$ respectively (see Fig. \ref{fig:bc_elas2D}). Then the final pH formulation reads
+The imposition of the velocity field along the boundary $\bm{e}_v = \partial_t \bm{u}$ corresponds to a Dirichlet condition. Setting $\bm{E}_\varepsilon \cdot\bm{n} = \bm{\Sigma} \cdot \bm{n} = \bm{t}$ corresponds to a Neumann condition. Consider a partition of the boundary $\partial\Omega = \Gamma_N \cup \Gamma_D$ and $\Gamma_N \cap \Gamma_D =  \{\emptyset\}$, where a Dirichlet and a Neumann condition applies on the subset $\Gamma_D$ and $\Gamma_N$ respectively (see Fig. \ref{fig:bc_elas2D}). Then the final pH formulation reads
 
 \begin{equation}\label{eq:syspHelas}
 \begin{aligned}
@@ -639,8 +640,13 @@ The imposition of the velocity field along the boundary $\bm{e}_v = \partial_t \
 \end{equation}
 where $\bm\gamma_{0}^{\Gamma_*}$ denotes the trace over the set $\Gamma_*$, namely $\bm\gamma_{0}^{\Gamma_*}\bm{e}_v = \bm{e}_v\vert_{\Gamma_*}$. Furthermore, $\bm\gamma_{n}^{\Gamma_*}$ denotes the normal trace over the set $\Gamma_*$, namely $\bm\gamma_{n}^{\Gamma_*}\bm{E}_\varepsilon = \bm{E}_\varepsilon \cdot \bm{n}\vert_{\Gamma_*}$.
 
-\begin{theorem}[Stokes-Dirac structure for elastodynamics]
-Let $H^{\Grad}(\Omega, \mathbb{V})$ the space of vectors with symmetric gradient in $L^2(\Omega, \mathbb{S})$ and $H^{\Div}  (\Omega, \mathbb{S})$ denote the space of symmetric tensor with divergence in $L^2(\Omega, \mathbb{V})$. Denote by $H = H^{\Div}(\Omega, \mathbb{S}) \times H^{\Grad}(\Omega, \mathbb{V}), \; F = L^2(\Omega, \mathbb{V}) \times L^2(\Omega, \mathbb{S})$ and $F_\partial = L^2(\partial\Omega, \mathbb{V})$.
+\begin{theorem}[Stokes-Dirac structure for elastodynamics] \label{th:stdirElas}
+Let $H^{\Grad}(\Omega, \mathbb{V})$ the space of vectors with symmetric gradient in $L^2(\Omega, \mathbb{S})$ and $H^{\Div}  (\Omega, \mathbb{S})$ denote the space of symmetric tensor with divergence in $L^2(\Omega, \mathbb{V})$. Denote by 
+\begin{align*}
+H &= H^{\Grad}(\Omega, \mathbb{V}) \times H^{\Div}(\Omega, \mathbb{S}), \\
+F &= L^2(\Omega, \mathbb{V}) \times L^2(\Omega, \mathbb{S}), \\
+F_\partial &= L^2(\Gamma_D, \mathbb{V}) \times L^2(\Gamma_N, \mathbb{V}).
+\end{align*}
 
 The set 
 \begin{equation}
@@ -653,18 +659,24 @@ The set
 \end{equation}
 where $\bm{e} = (\bm{e}_v,\, \bm{E}_\varepsilon)$ and $\mathcal{J, B, C}$ are defined in \eqref{eq:syspHelas}, is a Stokes–Dirac structure with respect to the pairing
 \begin{equation}\label{eq:bilinearElas}
-\bilprod{(\bm{f}^1, \bm{f}_{\partial}^1, \bm{e}^1, \bm{e}_{\partial}^1)}{(\bm{f}^2, \bm{f}_{\partial}^2, \bm{e}^2, \bm{e}_{\partial}^2)}  := \inner[F]{\bm{e}^1}{\bm{f}^2} + \inner[F]{\bm{e}^2}{\bm{f}^1} + \inner[F_\partial]{\bm{e}_{\partial}^1}{\bm{f}_{\partial}^2} + \inner[F_\partial]{\bm{e}_{\partial}^2}{\bm{f}_{\partial}^1}.
+\bilprod{(\bm{f}^1, \bm{f}_{\partial}^1, \bm{e}^1, \bm{e}_{\partial}^1)}{(\bm{f}^2, \bm{f}_{\partial}^2, \bm{e}^2, \bm{e}_{\partial}^2)}  := \inner[F]{\bm{e}^1}{\bm{f}^2} + \inner[F]{\bm{e}^2}{\bm{f}^1} + \inner[F_\partial]{\bm{e}_{\partial}^1}{\bm{f}_{\partial}^2} + \inner[F_\partial]{\bm{e}_{\partial}^2}{\bm{f}_{\partial}^1},
 \end{equation}
-
+where 
+\[
+\inner[F_\partial]{(\bm{a}, \, \bm{b})}{(\bm{c}, \, \bm{d})} = \int_{\Gamma_D} \bm{a} \cdot \bm{c} \d{S} + \int_{\Gamma_N} \bm{b} \cdot \bm{d} \d{S}, \quad \bm{a},\ \bm{b},\ \bm{c},\ \bm{d} \in \mathbb{V}. 
+\]
 \begin{proof}
-A Stokes-Dirac is characterized by the fact that ${D}_{\mathcal{J}} = {D}_{\mathcal{J}}^\perp$. Then one has to show that ${D}_{\mathcal{J}} \subset {D}_{\mathcal{J}}^\perp$ and ${D}_{\mathcal{J}}^\perp \subset {D}_{\mathcal{J}}$. The proof is found by employing the integration by parts formula  already used for \eqref{eq:enbalElas}. The main steps of Theorem 3.6 in \cite{legorrec2005} are followed here. \\
+A Stokes-Dirac is characterized by the fact that ${D}_{\mathcal{J}} = {D}_{\mathcal{J}}^\perp$. Then one has to show that ${D}_{\mathcal{J}} \subset {D}_{\mathcal{J}}^\perp$ and ${D}_{\mathcal{J}}^\perp \subset {D}_{\mathcal{J}}$. The proof is found by employing the integration by parts formula  already used for \eqref{eq:enrateElas}. The main steps of Theorem 3.6 in \cite{legorrec2005} are followed here. \\
 
 \textit{Step 1}. To show that ${D}_{\mathcal{J}} \subset {D}_{\mathcal{J}}^\perp$, take $(\bm{f}, \, \bm{f}_\partial, \, \bm{e}, \, \bm{e}_\partial) \in {D}_{\mathcal{J}}$. Then
 \begin{align*}
 \bilprod{(\bm{f}, \bm{f}_{\partial}, \bm{e}, \bm{e}_{\partial})}{(\bm{f}, \bm{f}_{\partial}, \bm{e}, \bm{e}_{\partial})} =& 2 \inner[F]{\bm{e}}{\bm{f}} + 2 \inner[F_\partial]{\bm{e}_{\partial}}{\bm{f}_{\partial}}, \\
 =& 2 \inner[F]{\bm{e}}{-\mathcal{J}\bm{e}} + 2 \inner[F_\partial]{\bm{e}_{\partial}}{\bm{f}_{\partial}}, \\
 =& - 2 \int_{\Omega} \left\{\bm{e}_v \cdot \Div \bm{E}_\varepsilon + \bm{E}_\varepsilon \cddot \Grad \bm{e}_v \right\}\d\Omega\\
-&+ 2 \int_{\partial \Omega} \bm{e}_v \cdot (\bm{E}_\varepsilon\cdot\bm{n}) \d{S}= 0, \quad \text{from \eqref{eq:enbalElas}}.
+&+ 2 \int_{\Gamma_D} \bm{e}_v \cdot (\bm{E}_\varepsilon\cdot\bm{n}) \d{S} + 2 \int_{\Gamma_N} \bm{e}_v \cdot (\bm{E}_\varepsilon\cdot\bm{n}) \d{S}, \\
+=& - 2 \int_{\Omega} \left\{\bm{e}_v \cdot \Div \bm{E}_\varepsilon + \bm{E}_\varepsilon \cddot \Grad \bm{e}_v \right\}\d\Omega\\
+&+ 2 \int_{\partial\Omega} \bm{e}_v \cdot (\bm{E}_\varepsilon\cdot\bm{n}) \d{S},
+= 0, \quad \text{from \eqref{eq:enrateElas}}.
 \end{align*}
 This implies ${D}_{\mathcal{J}} \subset {D}_{\mathcal{J}}^\perp$.
 
@@ -707,17 +719,11 @@ where the elements of the vectors $\bm{f}_{\partial} = (\bm{f}_{\partial, 1}, \b
 \end{equation*}
 meaning that ${D}_{\mathcal{J}}^\perp \subset {D}_{\mathcal{J}}$. This concludes the proof. 
 \end{proof}
-
 \end{theorem}
-
-
-Linear elasticity falls within the assumption of \cite{skrepek2019wellposedness}. Therefore, it is a well posed boundary controlled pH systems. A question that naturally arises is how to reformulate this system using the language of differential geometry. This is possible through the usage of vector-valued differential forms. The interested reader may consult \cite{brezzi2008mixed}.
-
+Linear elasticity falls within the assumption of \cite{skrepek2019wellposedness}. Therefore, it is a well posed boundary control pH system. A question that naturally arises is how to reformulate this system using the language of differential geometry. This is possible through the usage of vector-valued differential forms. The interested reader may consult \cite{brezzi2008mixed}.
 
 \section{Conclusion}
-
 In this chapter, the pH formulation of elasticity have been obtained. This model represents a generalization of the wave equation to higher dimensional variables. This leads to the introduction of symmetric tensorial quantities describing the state of stress and deformation within the body.  \\
-
 For a plane continuum with moderate thickness, it is possible to
 reduce the general three-dimensional mode to two uncoupled system: one representing the in plane behavior ruled by 2D elasticity and one representing the out-of-plane deflection. This will be the object of the next chapter dedicated to the study of a pH formulation of plate bending. It is important to remember that plate models are just particular cases of three-dimensional elasticity.
 

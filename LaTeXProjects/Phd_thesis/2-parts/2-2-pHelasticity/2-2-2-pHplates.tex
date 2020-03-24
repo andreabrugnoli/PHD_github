@@ -42,11 +42,11 @@ where $\alpha=\{x,y\}, \; \beta=\{x,y\}$. The tensors $\bm{\varepsilon}^0,\, \bm
 \bm{\gamma} &= \grad u_z - \bm{\theta}. \label{eq:gamma}
 \end{align}
 
-For an isotropic linear elastic material the Hooke's law for 3D continua reads
+It is assumed that the material is isotropic, linear elastic. The Hooke's law for 3D continua reads (see Eq. \eqref{eq:stiff3D})
 \[
 \bm{\Sigma} = \frac{E}{1+\nu} \left[\bm{\varepsilon} + \frac{\nu}{1-2\nu} \Tr(\bm{\varepsilon})\bm{I}_{3\times 3} \right].
 \]
-where $E,\, \nu$ are the Young modulus and Poisson ratio. The hypothesis of inextensible fibers leads to $\varepsilon_{zz}=0$. However, imposing a plane strain condition provides a model that is too stiff. Rather than a plain strain assumption, a plain stress hypothesis is used to derive the constitutive law for plates. Setting $\Sigma_{zz}=0$, then one gets
+where $E,\, \nu$ are the Young modulus and Poisson ratio. The hypothesis of inextensible fibers implies $\varepsilon_{zz}=0$. However, imposing a plane strain condition provides a model that is too stiff. Rather than a plain strain assumption, a plain stress hypothesis is used to derive the constitutive law for plates. The displacement field \eqref{eq:disp1or} is left unchanged. However, instead of $\varepsilon_{zz}$, $\Sigma_{zz}$ is set to zero. If $\Sigma_{zz}=0$ one gets
 \[
 \varepsilon_{zz} = - \frac{\nu}{1 - \nu} (\varepsilon_{xx} + \varepsilon_{yy}).
 \]
@@ -58,14 +58,14 @@ The constitutive law for the in-plane stress takes the form
 \bm{\Sigma}_{2D} = \bm{\mathcal{D}}_{2D} \, \bm{\varepsilon}_{2D},
 \]
 where $\bm{\Sigma}_{2D} = \Sigma_{\alpha\beta}, \; \bm{\varepsilon}_{2D} = \varepsilon_{\alpha\beta}$ and 
-\[
+\begin{equation}\label{eq:stiff2D}
 \bm{\mathcal{D}}_{2D} = \frac{E}{1-\nu^2}\left[ (1-\nu) (\cdot) + {\nu} \Tr(\cdot) \bm{I}_{2\times 2} \right].
-\]
+\end{equation}
 Concerning the shear deformation, the constitutive law reduces to 
 \begin{equation}
 \bm{\sigma}_s = G \bm{\gamma},
 \end{equation}
-where $\bm{\sigma}_\alpha := \bm{\Sigma}_{\alpha, 3}$ and $G = \frac{E}{2(1 + \nu)}$ is the shear modulus. In the following sections the most common plate model will be presented and discussed.
+where $\bm{\sigma}_\alpha := \bm{\Sigma}_{\alpha, 3}$ and $G = \frac{E}{2(1 + \nu)}$ is the shear modulus. In the following sections the most common plate models will be presented and discussed.
 
 \subsection{Mindlin-Reissner model}
 The Mindlin-Reissner model was formulated by Mindlin in the fifties \cite{mindlin1951}. It represent a first-order shear deformation theory for describing the bending of plate. The in-plane displacement of the mid-plane are assumed to be zero $\bm{u}^0(x,y)=\bm{0}$. Hence, the displacement field assumes the form
@@ -82,9 +82,10 @@ In pure bending, the strain tensor is given by
 \]
 with $\bm\kappa$ given by \eqref{eq:kappa}. Consequently, the stress tensor reads
 \[
-\bm{\Sigma}_b := \bm{\Sigma}_{2D}(\bm{u}^0=\bm{0}) = -z \bm{\mathcal{D}}_{2D} \bm{\kappa}.
+\bm{\Sigma}_b := \bm{\Sigma}_{2D}(\bm{u}^0=\bm{0}) = -z \bm{\mathcal{D}}_{2D} \bm{\kappa},
 \]
-To effectively reduce the problem from three- to two-dimensional, the stresses have to be integrated along the fibers. Consider an undeformed middle plane of the plate is denoted by $\Omega$. The total domain of the plate is the product $\Omega \times (-h/2, h/2)$, where $h$ is the constant thickness. Since the stress varies linearly, one has to multiply the stress by $z$ to get a non null contribution. Such a quantity is called bending momenta tensor and is given by 
+where $\bm{\mathcal{D}}_{2D}$ is defined in Eq. \eqref{eq:stiff2D}. \\
+Consider an undeformed middle plane of the plate is denoted by $\Omega$. The total domain of the plate is the product $\Omega \times (-h/2, h/2)$, where $h$ is the constant thickness. To effectively reduce the problem from three- to two-dimensional, the stresses have to be integrated along the fibers. Since the stress varies linearly across the thickness, one has to multiply the stress by $z$ before the integration to get a non null contribution. Such a quantity is called bending momenta tensor and is given by 
 \begin{equation}\label{eq:momenta}
 \bm{M} :=-\int_{-h/2}^{h/2} z \bm{\Sigma}_{b} \d{z} = \bm{\mathcal{D}}_{b} \, \bm{\kappa}, 
 \end{equation}
@@ -168,7 +169,7 @@ is neglected given the small thickness assumption. The final result from the Ham
 \begin{equation}\label{eq:classKir}
 \rho \diffp[2]{u_z}{t} + \div\Div \bm{M} = f, \qquad (x,y) \in \Omega.
 \end{equation}
-Considering that $\bm{M}= \bm{\mathcal{D}}_b\, \Hess{u_z}$ then one obtains
+Considering that $\bm{M}= \bm{\mathcal{D}}_b\, \Hess{u_z}$ one obtains
 \begin{equation*}
 \rho \diffp[2]{u_z}{t} + D_b \Delta^2 u_z = f, \qquad (x,y) \in \Omega.
 \end{equation*}
@@ -179,33 +180,33 @@ where $\Delta^2 = \diffp[4]{}{x} + 2\diffp[2]{}{x}\diffp[2]{}{y} + \diffp[4]{}{y
 In this section the pH formulation of the Mindlin and Kirchhoff plate models is studied. In \cite{macchelli2005mindlin}, the Mindlin plate model was put in pH form by appropriate selection of the energy variables. However, the final system does not consider the nature of the different variables that come into play, leading to a non intrinsic final formulation. Additionally, this model was presented using the jet bundle formalism in \cite{schoberl2017mindlin}. The Kirchhoff model was never explored in the framework of pHs and represents an original contribution of this thesis. The interested reader can find in \cite{rafetseder2018siam} a rigorous mathematical treatment of the biharmonic problem and its decomposition in 2D geometries (the 3D, that does not relate to plate bending, is treated in \cite{pauly2018divdiv}), but only for the static case. 
 
 \subsection{Port-Hamiltonian Mindlin plate}\label{sec:pHmin}
-Let $w:= u_z$ denote the vertical displacement of the plate. Consider the Hamiltonian (total energy) expression:
+Let $w:= u_z$ denote the vertical displacement of the plate. Consider a bounded, connected domain $\Omega \subset \mathbb{R}^2$ and the Hamiltonian (total energy)
 	\begin{equation}
 	\label{eq:H_min}
-	H = \int_{\Omega} \frac{1}{2} \left\{ \rho h \left(\diffp{w}{t} \right)^2 + \frac{\rho h^3}{12} \norm{\diffp{\bm{\theta}}{t}}^2 +   \bm{M} \cddot \bm{\kappa} + \bm{q} \cdot \bm{\gamma}  \right\}  \d\Omega, 
+	H = \frac{1}{2} \int_{\Omega}  \left\{ \rho h \left(\diffp{w}{t} \right)^2 + \frac{\rho h^3}{12} \norm{\diffp{\bm{\theta}}{t}}^2 +   \bm{M} \cddot \bm{\kappa} + \bm{q} \cdot \bm{\gamma}  \right\}  \d\Omega, 
 	\end{equation}
 	where $\bm{M},\, \bm{\kappa},\, \bm{q}, \, \bm{\gamma}$ are defined in Eqs. \eqref{eq:momenta}, \eqref{eq:kappa}, \eqref{eq:shearstress}, \eqref{eq:gamma} respectively. 
 	The choice of the energy variables is the same as in \cite{macchelli2005mindlin} but here scalar,  vector and tensor variables are gathered together:
 \begin{equation}
 \begin{aligned}
 \alpha_w &= \rho h \diffp{w}{t}, \quad &\text{Linear momentum,} \\
-\bm{A}_{\kappa} &= \bm{\kappa}, \quad &\text{Curvature Tensor,} \\
+\bm{A}_{\kappa} &= \bm{\kappa}, \quad &\text{Curvature tensor,} \\
 \end{aligned} \qquad
 \begin{aligned}
 \bm\alpha_{\theta} &=  \frac{\rho h^3}{12} \diffp{\bm{\theta}}{t}, \quad &\text{Angular momentum,}\\
-\bm\alpha_{\gamma} &= \bm{\gamma}. \quad &\text{Shear Deformation.}\\
+\bm\alpha_{\gamma} &= \bm{\gamma}. \quad &\text{Shear deformation.}\\
 \end{aligned}
 \end{equation}
 The energy is now a quadratic function of the energy variables
 \begin{equation}
 \label{eq:Halpha_min}
-H = \int_{\Omega} \frac{1}{2} \left\{ \frac{1}{\rho h}\alpha_w^2 + \frac{12}{\rho h^3} \norm{\bm{\alpha}_{\theta}}^2 + (\bm{\mathcal{D}}_b \bm{A}_\kappa) \cddot \bm{A}_\kappa + (\bm{\mathcal{D}}_s \bm{\alpha}_\gamma) \cdot  \bm{\alpha}_\gamma  \right\}  \d\Omega, 
+H = \frac{1}{2} \int_{\Omega}  \left\{ \frac{1}{\rho h}\alpha_w^2 + \frac{12}{\rho h^3} \norm{\bm{\alpha}_{\theta}}^2 + (\bm{\mathcal{D}}_b \bm{A}_\kappa) \cddot \bm{A}_\kappa + (\bm{\mathcal{D}}_s \bm{\alpha}_\gamma) \cdot  \bm{\alpha}_\gamma  \right\}  \d\Omega, 
 \end{equation}
 where $\bm{\mathcal{D}}_s:= Ghk \bm{I}_{2\times 2}$ and $G$ is the shear modulus $k$ the correction factor. The co-energy variables are found by computing the variational derivative of the Hamiltonian:
 \begin{equation}
 \begin{aligned}
 e_w &:= \diffd{H}{\alpha_w} = \diffp{w}{t},  \quad &\text{Linear velocity,} \\
-\bm{E}_{\kappa} &:= \diffd{H}{\bm{A}_{\kappa}} = \bm{M}, \quad &\text{Momenta Tensor,}\\
+\bm{E}_{\kappa} &:= \diffd{H}{\bm{A}_{\kappa}} = \bm{M}, \quad &\text{Momenta tensor,}\\
 \end{aligned} \qquad
 \begin{aligned}
 \bm{e}_{\theta} &:= \diffd{H}{\bm\alpha_{\theta}} = \diffp{\bm{\theta}}{t}, \quad &\text{Angular velocity,}  \\
@@ -242,25 +243,30 @@ e_w \\
 \end{pmatrix}.
 \end{equation}
 The first two equations are equivalent to \eqref{eq:classMin}. The last two equations, like \eqref{eq:compderElas} for linear elasticity represent the fact the higher order derivatives commute.
+
+\begin{remark}
+	It can be observed that the interconnection structure given by $\mathcal{J}$ in \eqref{eq:phsysMin} mimics that of the Timoshenko beam \cite[Chapter 7]{zwart2012}.
+\end{remark}
+
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=0.7\textwidth]{chapter_4/cauchy_law.eps}
 	\caption{Cauchy law for momenta and forces at the boundary.}
 	\label{fig:Cauchy_law}
 \end{figure}
-\begin{figure}[t]
+\begin{figure}[tb]
 	\centering
 	\includegraphics[width=0.7\textwidth]{chapter_4/plate_ref.eps}
 	\caption{Reference frames and notations.}
 	\label{fig:plate_ref}
 \end{figure}
-{
+
 We shall now establish the total energy balance in terms of boundary variables. Those will then be part of the underlying Stokes-Dirac structure of this model. The energy rate reads
 \begin{equation}
 \label{eq:enrateMin}
 \begin{aligned}
 \dot{H}&= \int_{\Omega} \left\{ \diffp{\alpha_w}{t} e_w  + \diffp{\bm\alpha_\theta}{t} \cdot \bm{e}_\theta + \diffp{\bm{A}_{\kappa}}{t} \cddot \bm{E}_{\kappa}  + \diffp{\bm\alpha_{\gamma}}{t} \cdot \bm{e}_{\gamma} \right\} \d\Omega\\
-&= \int_{\Omega} \left\{ \div(\bm{e}_{\gamma}) e_w  + \Div(\bm{E}_{\kappa}) \cdot \bm{e}_\theta + \; \Grad(\bm{e}_{\theta}) \cddot \bm{E}_{\kappa}  + \grad (e_w) \cdot \bm{e}_{\gamma} \right\} \d\Omega \\
+&= \int_{\Omega} \left\{ \div(\bm{e}_{\gamma}) e_w  + \Div(\bm{E}_{\kappa}) \cdot \bm{e}_\theta + \; \Grad(\bm{e}_{\theta}) \cddot \bm{E}_{\kappa}  + \grad (e_w) \cdot \bm{e}_{\gamma} \right\} \d\Omega \qquad \text{Stokes theorem,} \\
 &= \int_{\partial \Omega} \left\{ w_t \, q_n  + \omega_n \, M_{nn} + \omega_s \, M_{ns} \right\} \d{s},  \\
 \end{aligned}
 \end{equation}
@@ -268,13 +274,13 @@ where $s$ is the curvilinear abscissa. The last integral is obtained by applying
 \begin{equation}
 \label{eq:QnMnnMns}
 \begin{aligned}
-\text{Shear Force}  \qquad q_{n} &:= \bm{q} \cdot \bm{n}=  \bm{e}_{\gamma} \cdot \bm{n},  \\
+\text{Shear force}  \qquad q_{n} &:= \bm{q} \cdot \bm{n}=  \bm{e}_{\gamma} \cdot \bm{n},  \\
 \text{Flexural momentum} \quad 
 M_{nn} &:=  \bm{M} \cddot (\bm{n}\otimes{\bm{n}}) = \bm{E}_{\kappa} \cddot (\bm{n}\otimes{\bm{n}}) 	\\
 \text{Torsional momentum} \quad M_{ns} &:= \bm{M} \cddot (\bm{s}\otimes{\bm{n}}) = \bm{E}_{\kappa} \cddot (\bm{s}\otimes{\bm{n}}),	
 \end{aligned},
 \end{equation}
-Vectors $\bm{n}$ and $\bm{s}$ designate the normal and tangential unit vectors to the boundary, as shown in Fig. \ref{fig:plate_ref}. Given two vectors $\bm{a} \in \mathbb{R}^n, \, \bm{a} \in \mathbb{R}^m$, the notation $\bm{a}\otimes{\bm{b}} = \bm{a} \bm{b}^\top \in \mathbb{R}^{n\times m}$ denote the outer product of two vectors (dyadic product) The corresponding power conjugated variables are:
+Vectors $\bm{n}$ and $\bm{s}$ designate the normal and tangential unit vectors to the boundary, as shown in Fig. \ref{fig:plate_ref}. Given two vectors $\bm{a} \in \mathbb{R}^n, \, \bm{a} \in \mathbb{R}^m$, the notation $\bm{a}\otimes{\bm{b}} = \bm{a} \bm{b}^\top \in \mathbb{R}^{n\times m}$ denote the outer product of two vectors (dyadic product). \\ The corresponding power conjugated variables are:
 \begin{equation}
 \label{eq:wtwnws}
 \begin{aligned}
@@ -285,14 +291,20 @@ Vectors $\bm{n}$ and $\bm{s}$ designate the normal and tangential unit vectors t
 \omega_{s} &:= \diffp{\bm{\theta}}{t} \cdot \bm{s} = \bm{e}_\theta \cdot \bm{s}.	
 \end{aligned},
 \end{equation}
-Consider a partition of the boundary $\partial \Omega  = \overline{\Gamma}_{C} \cup \overline{\Gamma}_{S} \cup \overline{\Gamma}_{F}, \; \overline{\Gamma}_{C} \cap \overline{\Gamma}_{S} \cap \overline{\Gamma}_{F} = \{\emptyset\}$. The set $\Gamma_{C}, \, \Gamma_{S}, \, \Gamma_{F}$ could be empty.
-Given definitions \eqref{eq:QnMnnMns}, \eqref{eq:wtwnws}, the boundary conditions for the Mn that will be considered are:
+
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.6\textwidth]{chapter_4/min_plate_bcs.eps}
+	\caption{Boundary conditions for the Mindlin plate.}
+	\label{fig:bcs_min}
+\end{figure}
+Consider a partition of the boundary $\partial \Omega  = {\Gamma}_{C} \cup {\Gamma}_{S} \cup {\Gamma}_{F}, \; {\Gamma}_{C} \cap {\Gamma}_{S} \cap {\Gamma}_{F} = \{\emptyset\}$. The set $\Gamma_{C}, \, \Gamma_{S}, \, \Gamma_{F}$ could be empty. Given definitions \eqref{eq:QnMnnMns}, \eqref{eq:wtwnws}, the boundary conditions for the Mindlin plate \cite{duran1999approximation} (see Fig. \ref{fig:bcs_min}) that will be considered are:
 \begin{itemize}
 \item Clamped (C) on $\Gamma_{C}\subseteq \partial \Omega$ : $w_t = 0, \ \omega_{n} = 0, \ \omega_{s}=0$;
-\item Simply supported hard (S) on $\Gamma_{S}\subseteq \partial \Omega$: $w_t = 0, \ m_{nn} = 0, \ \omega_{s}=0$;
-\item Free (F) on $\Gamma_{F}\subseteq \partial \Omega$: $ q_n = 0, \ m_{nn}=0, \ m_{ns} = 0$.
+\item Simply supported hard (S) on $\Gamma_{S}\subseteq \partial \Omega$: $w_t = 0, \ \omega_{s}=0, \ M_{nn} = 0$;
+\item Free (F) on $\Gamma_{F}\subseteq \partial \Omega$: $M_{nn}=0, \ M_{ns} = 0, \ q_n = 0$.
 \end{itemize}
-The imposition of the velocity field along the boundary $\bm{e}_v = \partial_t \bm{u}$ corresponds to a Dirichlet condition. On the contrary, setting $\bm{E}_\varepsilon \cdot\bm{n} = \bm{\Sigma} \cdot \bm{n} = \bm{t}$ corresponds to a Neumann condition. Consider a partition of the boundary $\partial\Omega = \Gamma_N \cup \Gamma_D$ and $\Gamma_N \cap \Gamma_D =  \{\emptyset\}$, where a Dirichlet and a Neumann condition applies on the subset $\Gamma_D$ and $\Gamma_N$ respectively (see Fig. \ref{fig:bc_elas2D}). Then the final pH formulation reads
+Then the final pH formulation reads
 
 \begin{equation}\label{eq:phsysMin}
 \begin{aligned}
@@ -318,31 +330,52 @@ e_w \\
 \end{pmatrix}, \vspace{3pt}\\
 \bm{u}_\partial &= \underbrace{
 \begin{bmatrix}
-\bm\gamma_{0}^{\Gamma_D} & \bm{0} \\
-\bm{0} & \bm\gamma_n^{\Gamma_N} \\
+\gamma_{0}^{\Gamma_C} & {0} & {0} & {0} \\
+{0} & \gamma_n^{\Gamma_C} &  {0} & {0} \\
+{0} & \gamma_s^{\Gamma_C} &  {0} & {0} \\
+\gamma_{0}^{\Gamma_S} & {0} & {0} & {0} \\
+{0} & \gamma_s^{\Gamma_S} & {0} & {0} \\
+{0} &  {0} & \gamma_{nn}^{\Gamma_S} & {0} \\
+{0} &  {0} & \gamma_{nn}^{\Gamma_F} & {0} \\
+{0} &  {0} & \gamma_{ns}^{\Gamma_F} & {0} \\
+{0} &  {0} & {0} & \gamma_{n}^{\Gamma_F} \\
 \end{bmatrix}}_{\mathcal{B}} \begin{pmatrix}
-\bm{e}_v \\
-\bm{E}_\varepsilon
+e_w \\
+\bm{e}_{\theta} \\
+\bm{E}_{\kappa} \\
+\bm{e}_{\gamma} \\
 \end{pmatrix}, \vspace{3pt}\\
 \bm{y}_\partial &= \underbrace{
 \begin{bmatrix}
-\bm{0} & \bm\gamma_{n}^{\Gamma_D} \\
-\bm\gamma_0^{\Gamma_N} & \bm{0} \\
+{0} & {0} & {0} & \gamma_{n}^{\Gamma_C} \\
+{0} & {0} & \gamma_{nn}^{\Gamma_C} & {0} \\
+{0} & {0} & \gamma_{ns}^{\Gamma_C} & {0} \\
+{0} & {0} & {0} & \gamma_{n}^{\Gamma_S} \\
+{0} & {0} & \gamma_{ns}^{\Gamma_S} & {0} \\
+{0} & \gamma_{n}^{\Gamma_S} & {0} & {0} \\
+{0} & \gamma_{n}^{\Gamma_F} & {0} & {0} \\
+{0} & \gamma_{s}^{\Gamma_F} & {0} & {0} \\
+\gamma_{0}^{\Gamma_F} & {0} & {0} & {0} \\
 \end{bmatrix}}_{\mathcal{C}}
 \begin{pmatrix}
-\bm{e}_v \\
-\bm{E}_\varepsilon
+e_w \\
+\bm{e}_{\theta} \\
+\bm{E}_{\kappa} \\
+\bm{e}_{\gamma} \\
 \end{pmatrix},
 \end{aligned}
 \end{equation}
-where $\bm\gamma_{0}^{\Gamma_*}$ denotes the trace over the set $\Gamma_*$, namely $\bm\gamma_{0}^{\Gamma_*}\bm{e}_v = \bm{e}_v\vert_{\Gamma_*}$. Furthermore, $\bm\gamma_{n}^{\Gamma_*}$ denotes the normal trace over the set $\Gamma_*$, namely $\bm\gamma_{n}^{\Gamma_*}\bm{E}_\varepsilon = \bm{E}_\varepsilon \cdot \bm{n}\vert_{\Gamma_*}$.
+where $\gamma_{0}^{\Gamma_*}$ denotes the trace over the set $\Gamma_*$, namely $\bm\gamma_{0}^{\Gamma_*}a = a\vert_{\Gamma_*}$. Furthermore, $\gamma_{n}^{\Gamma_*}, \gamma_{s}^{\Gamma_*}$ denotes the normal and tangential trace over the set $\Gamma_*$, namely $\gamma_{n}^{\Gamma_*}\bm{a} = \bm{a} \cdot \bm{n}\vert_{\Gamma_*}, \,  \gamma_{s}^{\Gamma_*}\bm{a}= \bm{a} \cdot \bm{s}\vert_{\Gamma_*}$. Symbols $\gamma_{nn}^{\Gamma_*}, \gamma_{ns}^{\Gamma_*}$ denote the normal-normal trace and the normal-tangential trace of tensor-valued functions, $\gamma_{nn}^{\Gamma_*}\bm{A} = \bm{A} \cddot (\bm{n} \otimes \bm{n})\vert_{\Gamma_*}, \, \gamma_{ns}^{\Gamma_*}\bm{A} = \bm{A} \cddot (\bm{n} \otimes \bm{s})\vert_{\Gamma_*}$
 
-\begin{remark}
-It can be observed that the interconnection structure given by $\mathcal{J}$ in \eqref{eq:phsysMin} mimics that of the Timoshenko beam \cite[Chapter 7]{zwart2012}.
-\end{remark}
 
-\begin{theorem}[Stokes-Dirac structure for elastodynamics]
-Let $H^{\Grad}(\Omega, \mathbb{V})$ the space of vectors with symmetric gradient in $L^2(\Omega, \mathbb{S})$ and $H^{\Div}  (\Omega, \mathbb{S})$ denote the space of symmetric tensor with divergence in $L^2(\Omega, \mathbb{V})$. Denote by $H = H^{\Div}(\Omega, \mathbb{S}) \times H^{\Grad}(\Omega, \mathbb{V}), \; F = L^2(\Omega, \mathbb{V}) \times L^2(\Omega, \mathbb{S})$ and $F_\partial = L^2(\partial\Omega, \mathbb{V})$.
+\begin{theorem}[Stokes-Dirac structure for the Mindlin plate]\label{th:stdirMin}
+Consider $\mathbb{V} = \mathbb{R}^2, \, \mathbb{S} = \mathbb{R}^{2\times 2}_{\text{sym}}$ and
+let $H^{\grad}(\Omega)$ be the space of function with gradient in $L^2(\Omega, \mathbb{V})$ and $H^{\div}  (\Omega, \mathbb{V})$ the space of vector-valued function with divergence in $L^2(\Omega)$. Furthermore, $H^{\Grad}(\Omega, \mathbb{V})$ is the space of vectors with symmetric gradient in $L^2(\Omega, \mathbb{S})$ and $H^{\Div}  (\Omega, \mathbb{S})$ denote the space of symmetric tensor with divergence in $L^2(\Omega, \mathbb{V})$. Denote by 
+\begin{align*}
+H &= H^{\grad}(\Omega) \times H^{\Grad}(\Omega, \mathbb{V}) \times H^{\Div}(\Omega, \mathbb{S}) \times H^{\div}(\Omega, \mathbb{V}), \\
+F &= L^2(\Omega) \times L^2(\Omega, \mathbb{V}) \times L^2(\Omega, \mathbb{S}) \times L^2(\Omega, \mathbb{V}), \\
+F_\partial &= L^2(\Gamma_C, \mathbb{R}^3) \times L^2(\Gamma_S, \mathbb{R}^3) \times L^2(\Gamma_F, \mathbb{R}^3). 
+\end{align*}
 
 The set 
 \begin{equation}
@@ -353,71 +386,237 @@ The set
 \vert \;
 \bm{e} \in H, \; \bm{f} = -\mathcal{J} \bm{e}, \;\bm{f}_\partial = \mathcal{B}\bm{e}, \; \bm{e}_\partial = \mathcal{C}\bm{e}   \right\},
 \end{equation}
-where $\bm{e} = (\bm{e}_v,\, \bm{E}_\varepsilon)$ and $\mathcal{J, B, C}$ are defined in \eqref{eq:syspHelas}, is a Stokes–Dirac structure with respect to the pairing
-\begin{equation}\label{eq:bilinearElas}
-\bilprod{(\bm{f}^1, \bm{f}_{\partial}^1, \bm{e}^1, \bm{e}_{\partial}^1)}{(\bm{f}^2, \bm{f}_{\partial}^2, \bm{e}^2, \bm{e}_{\partial}^2)}  := \inner[F]{\bm{e}^1}{\bm{f}^2} + \inner[F]{\bm{e}^2}{\bm{f}^1} + \inner[F_\partial]{\bm{e}_{\partial}^1}{\bm{f}_{\partial}^2} + \inner[F_\partial]{\bm{e}_{\partial}^2}{\bm{f}_{\partial}^1}.
+where $\bm{e} = ({e}_w, \,\bm{e}_\theta, \, \bm{E}_\kappa, \, \bm{e}_\gamma)$ and $\mathcal{J, B, C}$ are defined in \eqref{eq:phsysMin}, is a Stokes–Dirac structure with respect to the pairing
+\begin{equation}\label{eq:bilinearMin}
+\bilprod{(\bm{f}^1, \bm{f}_{\partial}^1, \bm{e}^1, \bm{e}_{\partial}^1)}{(\bm{f}^2, \bm{f}_{\partial}^2, \bm{e}^2, \bm{e}_{\partial}^2)}  := \inner[F]{\bm{e}^1}{\bm{f}^2} + \inner[F]{\bm{e}^2}{\bm{f}^1} + \inner[F_\partial]{\bm{e}_{\partial}^1}{\bm{f}_{\partial}^2} + \inner[F_\partial]{\bm{e}_{\partial}^2}{\bm{f}_{\partial}^1},
 \end{equation}
+where $\bm{e}_{\partial}^i = (\bm{e}_{\partial, 1}^i, \ \bm{e}_{\partial, 2}^i, \ \bm{e}_{\partial, 3}^i), \, \bm{f}_{\partial}^i = (\bm{f}_{\partial, 1}^i, \ \bm{f}_{\partial, 2}^i, \ \bm{f}_{\partial, 3}^i)$ and
+\[
+\inner[F_\partial]{(\bm{a}, \, \bm{b}, \, \bm{c})}{(\bm{d}, \, \bm{e}, \, \bm{f})} = \int_{\Gamma_C} \bm{a} \cdot \bm{d} \d{S} + \int_{\Gamma_S} \bm{b} \cdot \bm{e} \d{S}  + \int_{\Gamma_F} \bm{c} \cdot \bm{f} \d{S}, \quad \bm{a},\ \bm{b},\ \bm{c},\ \bm{d},\ \bm{e},\ \bm{f} \in \mathbb{R}^3. 
+\]
 
 \begin{proof}
-	A Stokes-Dirac is characterized by the fact that ${D}_{\mathcal{J}} = {D}_{\mathcal{J}}^\perp$. Then one has to show that ${D}_{\mathcal{J}} \subset {D}_{\mathcal{J}}^\perp$ and ${D}_{\mathcal{J}}^\perp \subset {D}_{\mathcal{J}}$. The proof is found by employing the integration by parts formula  already used for \eqref{eq:enbalElas}. The main steps of Theorem 3.6 in \cite{legorrec2005} are followed here. \\
-	
-	\textit{Step 1}. To show that ${D}_{\mathcal{J}} \subset {D}_{\mathcal{J}}^\perp$, take $(\bm{f}, \, \bm{f}_\partial, \, \bm{e}, \, \bm{e}_\partial) \in {D}_{\mathcal{J}}$. Then
-	\begin{align*}
-	\bilprod{(\bm{f}, \bm{f}_{\partial}, \bm{e}, \bm{e}_{\partial})}{(\bm{f}, \bm{f}_{\partial}, \bm{e}, \bm{e}_{\partial})} =& 2 \inner[F]{\bm{e}}{\bm{f}} + 2 \inner[F_\partial]{\bm{e}_{\partial}}{\bm{f}_{\partial}}, \\
-	=& 2 \inner[F]{\bm{e}}{-\mathcal{J}\bm{e}} + 2 \inner[F_\partial]{\bm{e}_{\partial}}{\bm{f}_{\partial}}, \\
-	=& - 2 \int_{\Omega} \left\{\bm{e}_v \cdot \Div \bm{E}_\varepsilon + \bm{E}_\varepsilon \cddot \Grad \bm{e}_v \right\}\d\Omega\\
-	&+ 2 \int_{\partial \Omega} \bm{e}_v \cdot (\bm{E}_\varepsilon\cdot\bm{n}) \d{S}= 0, \quad \text{from \eqref{eq:enbalElas}}.
-	\end{align*}
-	This implies ${D}_{\mathcal{J}} \subset {D}_{\mathcal{J}}^\perp$.
-	
-	\textit{Step 2}. Take $(\bm{\phi}, \, \bm{\phi}_\partial, \, \bm{\epsilon}, \, \bm{\epsilon}_\partial) \in {D}_{\mathcal{J}}^\perp$ and $\bm{e}_0 \in H$ with compact support on $\Omega$. This implies $\mathcal{B}\bm{e}_0 = (\bm{0},\, \bm{0})$ and $\mathcal{C}\bm{e}_0 = (\bm{0},\, \bm{0})$. Taking $(-\mathcal{J}\bm{e}_0, \bm{0}, \bm{e}_0, \bm{0}) \in {D}_{\mathcal{J}}$ then 
-	\[
-	\bilprod{(\bm{\phi}, \bm{\phi}_\partial,  \bm{\epsilon}, \bm{\epsilon}_\partial)}{(\mathcal{J}\bm{e}_0, \bm{0}, \bm{e}_0, \bm{0})} = \inner[F]{\bm{\epsilon}}{-\mathcal{J}\bm{e}_0} + \inner[F]{\bm{e}_0}{\bm{\phi}} = 0, \quad \forall \bm{e}_0 \in H.
-	\]
-	It follows that $\bm{\epsilon} \in H$ and $\bm{\phi}=-\mathcal{J}\bm{\epsilon}$. \\
-	
-	\textit{Step 3}. Take $(\bm{\phi}, \, \bm{\phi}_\partial, \, \bm{\epsilon}, \, \bm{\epsilon}_\partial) \in {D}_{\mathcal{J}}^\perp$ and $(\bm{f}, \, \bm{f}_\partial, \, \bm{e}, \, \bm{e}_\partial) \in {D}_{\mathcal{J}}$. Variables $\bm{e}, \bm{\epsilon}$ are indeed tuples containing a vector and a tensor, namely $\bm{e} = (\bm{e}_v, \, \bm{E}_\varepsilon), \;\bm{\epsilon} = (\bm{\epsilon}_v, \, \bm{\mathcal{E}}_\varepsilon)$. From step 2 and \eqref{eq:bilinearElas}
-	
-	\begin{align*}
-	0 &=-\inner[F]{\bm{e}}{\mathcal{J}\bm{\epsilon}} - \inner[F]{\mathcal{J}\bm{e}}{\bm{\epsilon}}+ \inner[F_\partial]{\bm{e}_{\partial}}{\bm{\phi}_{\partial}} +  \inner[F_\partial]{\bm{\epsilon}_{\partial}}{\bm{f}_{\partial}}, \\
-	&=-\int_{\partial\Omega} \left\{\bm{e}_v \cdot (\bm{\mathcal{E}}_\varepsilon \cdot \bm{n}) + \bm{\epsilon}_v \cdot (\bm{{E}}_\varepsilon \cdot \bm{n})\right\}  \d{S} + \inner[F_\partial]{\bm{e}_{\partial}}{\bm{\phi}_{\partial}} +  \inner[F_\partial]{\bm{\epsilon}_{\partial}}{\bm{f}_{\partial}}
-	\end{align*}
-	Consider the splitting of the boundary $\partial\Omega = \Gamma_N \cup \Gamma_D$
-	\begin{align*}
-	\int_{\partial\Omega} \left\{\bm{e}_v \cdot (\bm{\mathcal{E}}_\varepsilon \cdot \bm{n}) + \bm{\epsilon}_v \cdot (\bm{{E}}_\varepsilon \cdot \bm{n})\right\}  \d{S} 
-	=& +\int_{\Gamma_N} \left\{\bm{e}_{\partial, 2} \cdot (\bm{\mathcal{E}}_\varepsilon \cdot \bm{n}) + \bm{\epsilon}_v \cdot \bm{f}_{\partial, 2}\right\}  \d{S}, \\
-	&+ \int_{\Gamma_D} \left\{\bm{f}_{\partial, 1} \cdot (\bm{\mathcal{E}}_\varepsilon \cdot \bm{n}) + \bm{\epsilon}_v \cdot \bm{e}_{\partial, 1}\right\}  \d{S},
-	\end{align*}
-	where the elements of the vectors $\bm{f}_{\partial} = (\bm{f}_{\partial, 1}, \bm{f}_{\partial, 2}), \; \bm{e}_{\partial} = (\bm{e}_{\partial, 1}, \bm{e}_{\partial, 2})$ have been considering. By expanding of the terms $\inner[F_\partial]{\bm{e}_{\partial}}{\bm{\phi}_{\partial}} +  \inner[F_\partial]{\bm{\epsilon}_{\partial}}{\bm{f}_{\partial}}$ and given the fact that $\bm{e}_\partial, \, \bm{f}_\partial$ have arbitrary values then
-	\begin{equation*}
-	\bm{\phi}_{\partial} = \begin{bmatrix}
-	\bm\gamma_{0}^{\Gamma_D} & \bm{0} \\
-	\bm{0} & \bm\gamma_n^{\Gamma_N} \\
-	\end{bmatrix} \begin{pmatrix}
-	\bm{\epsilon}_v \\
-	\bm{\mathcal{E}}_\varepsilon
-	\end{pmatrix}, \qquad 
-	\bm{\epsilon}_{\partial} = 
-	\begin{bmatrix}
-	\bm{0} & \bm\gamma_{n}^{\Gamma_D} \\
-	\bm\gamma_0^{\Gamma_N} & \bm{0} \\
-	\end{bmatrix}
-	\begin{pmatrix}
-	\bm{\epsilon}_v \\
-	\bm{\mathcal{E}}_\varepsilon
-	\end{pmatrix},
-	\end{equation*}
-	meaning that ${D}_{\mathcal{J}}^\perp \subset {D}_{\mathcal{J}}$. This concludes the proof. 
+The proof is analogous to the one of Th. \ref{th:stdirElas}. The integration by parts has to be carried as in Eq. \eqref{eq:enrateMin}.
 \end{proof}
 
 \end{theorem}
-The Mindlin plate falls within the assumption of \cite{skrepek2019wellposedness}, hence it is a well posed boundary controlled pH systems.
+The Mindlin plate falls within the assumption of \cite{skrepek2019wellposedness}, hence it is a well posed boundary control pH systems.
 	
 
 \subsection{Port-Hamiltonian Kirchhoff plate}\label{sec:pHkirchh}
+Again the starting point is the Hamiltonian (total energy):
+\begin{equation}
+\label{eq:Hkir}
+H = \frac{1}{2} \int_{\Omega} \left\{\rho h \left(\diffp{w}{t} \right)^2 + \bm{M} \cddot \bm{\kappa}  \right\}  \d{\Omega} ,
+\end{equation}
+where $\bm{M}, \ \bm{\kappa}$ are defined in Eqs. \eqref{eq:momenta}, \eqref{eq:kappaKir}. For what concerns the choice of the energy variables, a scalar and a tensor variable are considered:
+\begin{equation}
+\alpha_w = \mu \diffp{w}{t}, \quad \text{Linear momentum}, \qquad \bm{A}_{\kappa} = \bm{\kappa}, \quad \text{Curvature tensor}.	\end{equation}
+The co-energy variables are found by computing the variational derivative of the Hamiltonian:
+\begin{equation}
+e_w := \diffd{H}{\alpha_w} = \diffp{w}{t}, \quad \text{Linear velocity},  \qquad  \bm{E}_{\kappa} := \diffd{H}{\bm{A}_{\kappa}} = \bm{M}, \quad \text{Curvature tensor}.
+\end{equation}
+
+The port-Hamiltonian system is then written as
+\begin{equation}
+\diffp{}{t}
+\begin{pmatrix}
+\alpha_w \\
+\bm{A}_{\kappa} \\
+\end{pmatrix} = 
+\begin{bmatrix}
+	0  &  - \mathrm{div} \circ \mathrm{Div} \\
+	\mathrm{Grad} \circ \mathrm{grad} & 0 \\
+	\end{bmatrix}
+\begin{pmatrix}
+e_w \\
+\bm{E}_{\kappa} \\
+\end{pmatrix}.
+\end{equation}
+The first equation is equivalent to \eqref{eq:classKir}. The last equation represent the fact the higher order derivatives commute
+\begin{align*}
+\partial_t \bm{A}_{\kappa} &= \Grad(\grad (e_w)), \\
+\partial_t \bm{\kappa} &= \Grad(\grad (\partial_t w)), \\
+\partial_t \Grad(\grad(w))  &= \Grad(\grad (\partial_t w)), \\
+\end{align*}
+The last equation holds for $w \in C^3(\Omega)$.
+
+\begin{remark}
+	The interconnection structure $\mathcal{J}$ resembles that of the Bernoulli beam \cite{cardoso2017}. The double divergence and the double gradient coincide, in dimension one, with the second derivative.
+\end{remark}
+
+\begin{theorem}
+	The operator $\mathrm{Grad} \circ \mathrm{grad}$, corresponding to the Hessian operator, is the adjoint of the double divergence $\mathrm{div} \circ \mathrm{Div}$.
+	\begin{proof}
+		Let $\mathbb{S} = \mathbb{R}^{d \times d}_{\text{sym}}$ and consider the Hilbert space of the square integrable symmetric square tensors  $L^2(\Omega, \mathbb{S})$ over an open connected set $\Omega$ (its inner product is defined in \eqref{eq:normL2sym}). 		Consider the Hilbert space $L^2(\Omega)$ of scalar square integrable functions, endowed with the standard inner product. Consider the double divergence operator defined as: 
+		\[
+		\begin{aligned}
+		A: \; L^2(\Omega, \mathbb{S})& \rightarrow L^2(\Omega), \\
+		\bm{\Psi}& \rightarrow \mathrm{div}(\mathrm{Div}(\bm{\Psi}) = \psi, \\	\end{aligned}
+		\qquad \text{with } \psi = \mathrm{div}(\mathrm{Div}(\bm{\Psi}) = \sum_{i = 1}^d \sum_{j = 1}^d \diffp{\bm{\Psi}_{ij}}{x_i,x_j}.
+		\]
+		We {shall} identify $A^*$
+		\[
+		\begin{aligned}
+		A^*: \; L^2(\Omega)& \rightarrow L^2(\Omega, \mathbb{S}), \\
+		f& \rightarrow  A^* f = \bm{F}, \\
+		\end{aligned}
+		\]
+		such that \[
+		\left\langle A \bm{\Psi} , f \right\rangle_{L^2(\Omega)} = \left\langle \bm{\Psi} , A^* f \right\rangle_{L^2(\Omega, \mathbb{S})},
+		\begin{aligned} \qquad
+		&\forall \,\bm{\Psi} \in \mathrm{Domain}(A) \subset L^2(\Omega, \mathbb{S}) \\
+		&\forall \,f \in \mathrm{Domain}(A^*) \subset L^2(\Omega)
+		\end{aligned}
+		\]
+		
+		
+		The function have to belong to the operator domain, so for instance $f \in \mathcal{C}_0^2(\Omega) \in \mathrm{Domain}(A^*)$ the space of twice differentiable scalar functions with compact support and $\bm{\Psi}$ can be chosen in the set $\mathcal{C}_{0}^2(\Omega, \mathbb{S}) \in \mathrm{Domain}(A)$, the space of twice differentiable $2 \times 2$ symmetric tensors with compact support on $\Omega$. A classical result is the fact that the adjoint of the vector divergence is $\mathrm{div}^* = -\mathrm{grad}$ as stated in \cite{zwart2015wave}. By theorem \ref{th:adjDiv} it holds $\mathrm{Div}^* = -\mathrm{Grad}$. Considering that $A$ is the composition of two different operators $A = \mathrm{div} \circ \mathrm{Div}$ and that the adjoint of a composed operator is the adjoint of each operator in reverse order, i.e. $(B \circ C)^* = C^* \circ B^*$, then it can be stated
+		\[
+		A^* = (\mathrm{div} \circ \mathrm{Div})^* = \mathrm{Div}^* \circ \mathrm{div}^* = \mathrm{Grad} \circ \mathrm{grad}.
+		\]  
+		Since only formal adjoints are being looked for, this concludes the proof.
+	\end{proof}
+\end{theorem}
+
+The energy rate provides the boundary port variables
+\begin{equation}\label{eq:enrateKirNotAll}
+\begin{aligned}
+\dot{H}&= \int_{\Omega} \left\{ \partial_t {\alpha_w} \, e_w  + \partial_t \bm{A}_{\kappa} \cddot \bm{E}_{\kappa} \right\} \d\Omega \\
+&= \int_{\Omega} \left\{ - \div(\Div(\bm{E}_{\kappa})) \, e_w + \Grad(\grad(e_w)) \cddot \bm{E}_{\kappa} \right\} \d\Omega, &\qquad \text{Stokes theorem} \\
+&=  \int_{\partial \Omega} \left\{ - \bm{n} \cdot \Div(\bm{E}_{\kappa}) \, e_w + \left(\bm{n} \otimes \grad(e_w) \right)\cddot \bm{E}_{\kappa} \right\} \d{s},  \\
+&=\int_{\partial \Omega} \left\{ \widehat{q}_n \, e_w + \partial_{\bm{n}}{e_w} \left(\bm{n} \otimes \bm{n} \right) \cddot \bm{E}_{\kappa} + \partial_{\bm{s}}{e_w} \left(\bm{n} \otimes\bm{s} \right)\cddot \bm{E}_{\kappa}   \right\} \d{s}, &\qquad \text{Dyadic properties}\\
+&=\int_{\partial \Omega} \left\{ \widehat{q}_n \, w_t + \partial_{\bm{n}}{w_t} \, M_{nn} + \partial_{\bm{s}}{w_t} \, M_{ns}   \right\} \d{s}. 
+\end{aligned}
+\end{equation}
+where $s$ is the curvilinear abscissa, $w_t:= \partial_t w$ and $\partial_{\bm{s}}{w_t}$ denotes the directional derivative along the tangential versor at the boundary. Additionally, the following definitions have been introduced
+\begin{equation}\label{eq:qhat}
+\widehat{q}_n :=  - \bm{n} \cdot \mathrm{Div}(\bm{E}_{\kappa}), \quad
+M_{nn} := \left(\bm{n} \otimes \bm{n} \right) \cddot \bm{E}_{\kappa}, \quad
+M_{ns} := \left(\bm{n} \otimes \bm{s} \right) \cddot \bm{E}_{\kappa}.
+\end{equation}
+Variables $w_t$ and $\partial_{\bm{s}}{w_t}$ are not independent as they are differentially related with respect to derivation along $\bm{s}$ (see for instance
+\cite{timoshenko1959theory}). The tangential derivative has to be moved on the torsional momentum $M_{ns}$. For sake of simplicity, $\partial \Omega$ is supposed to be regular. Then the integration by parts provides
+\begin{equation}
+\int_{\partial \Omega} \partial_{\bm{s}}{w_t} \, M_{ns} \ \d{s} =  - \int_{\partial \Omega} \partial_{\bm{s}}{M_{ns}} \, w_t \ \d{s}.
+\end{equation}
+The final energy balance reads
+\begin{equation}\label{eq:enrateKir}
+\dot{H} = \int_{\partial \Omega} \left\{ w_t \, \widetilde{q}_n + \partial_{\bm{n}}{w_t} \, M_{nn}\right\} \, \d{s}, 
+\end{equation} 
+where the boundary variables are 
+\begin{equation}
+\label{eq:QnTilMnn}
+\begin{aligned}
+\text{Effective shear force}  \qquad \widetilde{q}_{n} &:= \widehat{q}_n - \partial_{\bm{s}}{M_{ns}},  \\
+\text{Flexural momentum} \quad M_{nn} &:=  \bm{M} \cddot (\bm{n}\otimes{\bm{n}}) = \bm{E}_{\kappa} \cddot (\bm{n}\otimes{\bm{n}}),
+\end{aligned}
+\end{equation}
+where $\widehat{q}_n$ is defined in \eqref{eq:qhat}. The corresponding power conjugated variables are:
+\begin{equation}
+\label{eq:wtdwdn}
+\begin{aligned}
+\text{Vertical velocity}  \qquad w_t &:= \diffp{w}{t} = e_w, \\
+\text{Flexural rotation} \quad 
+\partial_{\bm{n}}{w_t} &:= \nabla{e_w} \cdot \bm{n}.
+\end{aligned},
+\end{equation}
+
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.6\textwidth]{chapter_4/kirchh_plate_bcs.eps}
+	\caption{Boundary conditions for the Kirchhoff plate.}
+	\label{fig:bcs_kirchh}
+\end{figure}
+Consider a partition of the boundary $\partial \Omega  = {\Gamma}_{C} \cup {\Gamma}_{S} \cup {\Gamma}_{F}, \; {\Gamma}_{C} \cap {\Gamma}_{S} \cap {\Gamma}_{F} = \{\emptyset\}$. The set $\Gamma_{C}, \, \Gamma_{S}, \, \Gamma_{F}$ could be empty. Given definitions \eqref{eq:QnTilMnn}, \eqref{eq:wtdwdn}, the boundary conditions for the Kirchhoff plate \cite{gustafsson2018} :
+\begin{itemize}
+	\item Clamped (C) on $\Gamma_{C}\subseteq \partial \Omega$ : $w_t = 0, \ \partial_{\bm{n}}{w_t} = 0$;
+	\item Simply supported (S) on $\Gamma_{S}\subseteq \partial \Omega$: $w_t = 0, \ M_{nn} = 0$;
+	\item Free (F) on $\Gamma_{F}\subseteq \partial \Omega$: $\widetilde{q}_n = 0, \ M_{nn}=0$.
+\end{itemize}
+Then the final pH formulation reads
+
+\begin{equation}\label{eq:phsysKir}
+\begin{aligned}
+\displaystyle
+\diffp{}{t}
+\begin{pmatrix}
+\alpha_w \\
+\bm{A}_{\kappa} \\
+\end{pmatrix} &= 
+\begin{bmatrix}
+0  &  - \mathrm{div} \circ \mathrm{Div} \\
+\mathrm{Grad} \circ \mathrm{grad} & 0 \\
+\end{bmatrix}
+\begin{pmatrix}
+e_w \\
+\bm{E}_{\kappa} \\
+\end{pmatrix}, \vspace{3pt}\\
+\bm{u}_\partial &= \underbrace{
+	\begin{bmatrix}
+	\gamma_{0}^{\Gamma_C} & {0}  \\
+	\gamma_1^{\Gamma_C} &  {0} \\
+	\gamma_{0}^{\Gamma_S} &  {0}  \\
+	{0} & \gamma_{nn}^{\Gamma_S} \\
+	{0} & \gamma_{nn, 1}^{\Gamma_F}  \\
+	{0} & \gamma_{nn}^{\Gamma_F}\\
+	\end{bmatrix}}_{\mathcal{B}} \begin{pmatrix}
+e_w \\
+\bm{E}_{\kappa} \\
+\end{pmatrix}, \vspace{3pt}\\
+\bm{y}_\partial &= \underbrace{
+	\begin{bmatrix}
+	{0} & \gamma_{nn, 1}^{\Gamma_C} \\
+	{0} & \gamma_{nn}^{\Gamma_C} \\
+	{0} & \gamma_{nn, 1}^{\Gamma_S} \\
+	\gamma_{1}^{\Gamma_S} & {0} \\
+	\gamma_{0}^{\Gamma_F} & {0} \\
+	\gamma_{1}^{\Gamma_F} & {0} \\
+	\end{bmatrix}}_{\mathcal{C}}
+\begin{pmatrix}
+e_w \\
+\bm{E}_{\kappa} \\
+\end{pmatrix},
+\end{aligned}
+\end{equation}
+where $\bm\gamma_{0}^{\Gamma_*}a = a\vert_{\Gamma_*}$ denotes the trace over the set $\Gamma_*$, and  $\gamma_{1}^{\Gamma_*}a = \partial_{\bm{n}} a \vert_{\Gamma_*}$ denotes the trace of the normal derivative over the set $\Gamma_*$. The symbol $\gamma_{nn, 1}^{\Gamma_*}$ denotes the map $\gamma_{nn, 1}^{\Gamma_*}\bm{A} = -\Div \bm{A} \cdot \bm{n} - \partial_{\bm{s}} (\bm{A}(\bm{n} \otimes \bm{s}))\vert_{\Gamma_*},$, while $\gamma_{nn}^{\Gamma_*}\bm{A} = \bm{A} \cddot (\bm{n} \otimes \bm{n})\vert_{\Gamma_*}$ indicates the normal-normal trace of a tensor-valued function.
+
+
+\begin{theorem}[Stokes-Dirac structure for the Kirchhoff plate]\label{th:stdirKir}
+	Consider $\mathbb{S} = \mathbb{R}^{2\times 2}_{\text{sym}}$ and
+	let $H^{2}(\Omega)$ be the space of function with Hessian in $L^2(\Omega, \mathbb{S})$ and $H^{\div\Div}  (\Omega, \mathbb{S})$ the space of vector-valued function with double divergence in $L^2(\Omega)$. Denote by 
+	\begin{align*}
+	H &=H^{2}(\Omega) \times H^{\div\Div}(\Omega, \mathbb{S}), \\
+	F &= L^2(\Omega) \times L^2(\Omega, \mathbb{S}), \\
+	F_\partial &= L^2(\Gamma_C, \mathbb{R}^2) \times L^2(\Gamma_S, \mathbb{R}^2) \times L^2(\Gamma_F, \mathbb{R}^2). 
+	\end{align*}
+	
+	The set 
+	\begin{equation}
+	{D}_{\mathcal{J}} = \left\{
+	\begin{pmatrix}
+	\bm{f} \\ \bm{f}_\partial \\ \bm{e} \\ \bm{e}_\partial \\
+	\end{pmatrix}
+	\vert \;
+	\bm{e} \in H, \; \bm{f} = -\mathcal{J} \bm{e}, \;\bm{f}_\partial = \mathcal{B}\bm{e}, \; \bm{e}_\partial = \mathcal{C}\bm{e}   \right\},
+	\end{equation}
+	where $\bm{e} = ({e}_w, \, \bm{E}_\kappa)$ and $\mathcal{J, B, C}$ are defined in \eqref{eq:phsysKir}, is a Stokes–Dirac structure with respect to the pairing
+	\begin{equation}\label{eq:bilinearKir}
+	\bilprod{(\bm{f}^1, \bm{f}_{\partial}^1, \bm{e}^1, \bm{e}_{\partial}^1)}{(\bm{f}^2, \bm{f}_{\partial}^2, \bm{e}^2, \bm{e}_{\partial}^2)}  := \inner[F]{\bm{e}^1}{\bm{f}^2} + \inner[F]{\bm{e}^2}{\bm{f}^1} + \inner[F_\partial]{\bm{e}_{\partial}^1}{\bm{f}_{\partial}^2} + \inner[F_\partial]{\bm{e}_{\partial}^2}{\bm{f}_{\partial}^1},
+	\end{equation}
+	where $\bm{e}_{\partial}^i = (\bm{e}_{\partial, 1}^i, \ \bm{e}_{\partial, 2}^i), \, \bm{f}_{\partial}^i = (\bm{f}_{\partial, 1}^i, \ \bm{f}_{\partial, 2}^i)$ and
+	\[
+	\inner[F_\partial]{(\bm{a}, \, \bm{b}, \, \bm{c})}{(\bm{d}, \, \bm{e}, \, \bm{f})} = \int_{\Gamma_C} \bm{a} \cdot \bm{d} \d{S} + \int_{\Gamma_S} \bm{b} \cdot \bm{e} \d{S}  + \int_{\Gamma_F} \bm{c} \cdot \bm{f} \d{S}, \quad \bm{a},\ \bm{b},\ \bm{c},\ \bm{d},\ \bm{e},\ \bm{f} \in \mathbb{R}^2. 
+	\]
+	
+	\begin{proof}
+		The proof is analogous to the one of Th. \ref{th:stdirElas}. The integration by parts has to be carried as in Eq. \eqref{eq:enrateKirNotAll}.
+	\end{proof}
+
+\end{theorem}
 
 \section{Laminated anisotropic case}
-
+Until now homogeneous isotropic materials have been considered. For this class of materials, the membrane and bending problems are decoupled. In aeronautical applications, structure are made up of layers of different materials to enhance the mechanical properties of the resulting laminated structure.  
 \subsection{Thin plate assumption}
 
 \subsection{Thick plate assumption}
