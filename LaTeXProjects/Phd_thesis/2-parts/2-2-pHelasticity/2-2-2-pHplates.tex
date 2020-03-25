@@ -4,12 +4,11 @@
 Ludwig Wittgenstein}}
 \minitoc
 
-\lettrine{\color{theme}{P}}lates are plane structural element with a small thickness compared to the planar dimension. Because of the thickness smallness, it is not necessary to model plate structure using three-dimensional models. Therefore, dimensional reduction strategies are employed to model plate structures as two-dimensional problems. These strategies rely on a educated guess of the displacement field. Enough freedom is left so that the assumed field satisfies the equations of elasticity. For beams ans plates the displacement field is expressed in terms of unknown functions $\phi_i^j(x,y,t)$ that solely depends on the midplane coordinates $(x,y)$
-
+\lettrine{\color{theme}{P}}lates are plane structural element with a small thickness compared to the planar dimension. Thanks to this feature, it is not necessary to model plate structures using three-dimensional models. Therefore, dimensional reduction strategies are employed to model plate structures as two-dimensional problems. These strategies rely on a educated guess of the displacement field. For beams ans plates the displacement field is expressed in terms of unknown functions $\phi_i^j(x,y,t)$ that solely depends on the midplane coordinates $(x,y)$
 \[
-u_i(x,y,z,y) = \sum_{j=0}^m (z)^j \phi_i^j(x,y,t).
+u_i(x,y,z,t) = \sum_{j=0}^m (z)^j \phi_i^j(x,y,t).
 \]
-where $u_{i}$ for $i = \{x, y, z\}$ are the component of the displacement field. The unknown functions are determined so to respect the principle of virtual displacement. In this chapter, the main focus is on the first-order theory. This means that only a linear dependence on $z$ is considered. Two main models arise from such a framework: 
+where $u_{i}$ for $i = \{x, y, z\}$ are the component of the displacement field. The unknown functions are determined so to respect the principle of virtual displacement. In this chapter, the focus is on the first-order theory. This means that only a linear dependence on $z$ is considered. Two main models arise from such a framework: 
 \begin{itemize}
 	\item The Kirchhoff-Love model for thin plates;
 	\item The Mindlin-Reissner model for thick plates;
@@ -31,13 +30,13 @@ u_z(x,y,z,t) &= u_z^0(x,y,t),
 \end{aligned}
 \end{equation}
 where $u_i(x,y,t) = \phi_i^0(x,y,t), \, \theta_i(x,y,t) = -\phi_i^1(x,y,t)$. Assuming a linear elastic behavior, the 3D strain tensor for such a displacement field takes the form
-\begin{align*}
-\varepsilon_{\alpha \beta} &= \frac{1}{2} \left(\partial_\beta u_\alpha + \partial_\alpha u_\beta \right) - z \frac{1}{2} \left(\partial_\beta \theta_\alpha + \partial_\alpha \theta_\beta \right) = {\varepsilon}^0_{\alpha \beta} - z \kappa_{\alpha \beta}, \\
+\begin{align}
+\varepsilon_{\alpha \beta} &= \frac{1}{2} \left(\partial_\beta u_\alpha + \partial_\alpha u_\beta \right) - z \frac{1}{2} \left(\partial_\beta \theta_\alpha + \partial_\alpha \theta_\beta \right) = {\varepsilon}^0_{\alpha \beta} - z \kappa_{\alpha \beta}, \label{eq:eps_inplane}\\
 \varepsilon_{\alpha z} &= \frac{1}{2} \left(\partial_a u_z - \theta_\alpha \right) = \frac{1}{2} \gamma_\alpha,
-\end{align*}
+\end{align}
 where $\alpha=\{x,y\}, \; \beta=\{x,y\}$. The tensors $\bm{\varepsilon}^0,\, \bm{\kappa},\, \bm{\gamma}$ are called membrane, bending (or curvature) and shear strain tensor
 \begin{align}
-\bm{\varepsilon}^0 &= \Grad \bm{u}^0, \where \bm{u}^0 = (u_x, u_y)^\top,  \\
+\bm{\varepsilon}^0 &= \Grad \bm{u}^0, \where \bm{u}^0 = (u_x, u_y)^\top, \label{eq:eps0} \\
 \bm{\kappa} &= \Grad \bm{\theta}, \where \bm{\theta} = (\theta_x, \theta_y)^\top, \label{eq:kappa}  \\
 \bm{\gamma} &= \grad u_z - \bm{\theta}. \label{eq:gamma}
 \end{align}
@@ -129,7 +128,7 @@ with $\bm{M}= \bm{\mathcal{D}}_b\,\Grad{\bm{\theta}}$ and $\bm{q}= kGh\,(\grad u
 	\label{fig:kirchh_hyp}
 \end{figure}
 
-The Kirchhoff hypotheses on the displacement field consists of the following three points (see Fig. \ref{fig:kirchh_hyp}):
+The Kirchhoff model was the first to be formulated (around 1850) and it is referred to as classical plate theory. The hypotheses on the displacement field consist of the following three points (see Fig. \ref{fig:kirchh_hyp}):
 \begin{enumerate}
 \item The fibers, segments perpendicular to the mid-plane before deformation, remain straight after deformation.
 \item The fibers are inextensible.
@@ -138,7 +137,7 @@ middle surface after deformation.
 \end{enumerate}
 While the first two points are common for first order plate models, the third assumption is  peculiar to the Kirchhoff-Love model. For this class of plates the span-to-thickness ratio is of the order of $L/h \approx 100 - 1000$. Such an assumption implies zero transverse shear deformation. 
 \[
-\bm{\gamma}=0 \implies \varepsilon_{xz}= - \theta_x + \diffp{w}{x} = 0, \qquad \varepsilon_{yz}=-\theta_y + \diffp{w}{y} = 0,
+\bm{\gamma}=0 \implies \varepsilon_{xz}= - \theta_x + \diffp{u_z}{x} = 0, \qquad \varepsilon_{yz}=-\theta_y + \diffp{u_z}{y} = 0,
 \]
 where $\varepsilon_{ii}$ are the components of the infinitesimal strain tensor. The rotation vector is then related to the vertical displacement $\bm{\theta} = \grad u_z$. Plugging this into \eqref{eq:kappa}, it is found
 \begin{equation}\label{eq:kappaKir}
@@ -411,7 +410,7 @@ H = \frac{1}{2} \int_{\Omega} \left\{\rho h \left(\diffp{w}{t} \right)^2 + \bm{M
 \end{equation}
 where $\bm{M}, \ \bm{\kappa}$ are defined in Eqs. \eqref{eq:momenta}, \eqref{eq:kappaKir}. For what concerns the choice of the energy variables, a scalar and a tensor variable are considered:
 \begin{equation}
-\alpha_w = \mu \diffp{w}{t}, \quad \text{Linear momentum}, \qquad \bm{A}_{\kappa} = \bm{\kappa}, \quad \text{Curvature tensor}.	\end{equation}
+\alpha_w = \rho h \diffp{w}{t}, \quad \text{Linear momentum}, \qquad \bm{A}_{\kappa} = \bm{\kappa}, \quad \text{Curvature tensor}.	\end{equation}
 The co-energy variables are found by computing the variational derivative of the Hamiltonian:
 \begin{equation}
 e_w := \diffd{H}{\alpha_w} = \diffp{w}{t}, \quad \text{Linear velocity},  \qquad  \bm{E}_{\kappa} := \diffd{H}{\bm{A}_{\kappa}} = \bm{M}, \quad \text{Curvature tensor}.
@@ -425,8 +424,8 @@ The port-Hamiltonian system is then written as
 \bm{A}_{\kappa} \\
 \end{pmatrix} = 
 \begin{bmatrix}
-	0  &  - \mathrm{div} \circ \mathrm{Div} \\
-	\mathrm{Grad} \circ \mathrm{grad} & 0 \\
+	0  &  - \div \circ \Div \\
+	\Grad \circ \grad & 0 \\
 	\end{bmatrix}
 \begin{pmatrix}
 e_w \\
@@ -435,9 +434,9 @@ e_w \\
 \end{equation}
 The first equation is equivalent to \eqref{eq:classKir}. The last equation represent the fact the higher order derivatives commute
 \begin{align*}
-\partial_t \bm{A}_{\kappa} &= \Grad(\grad (e_w)), \\
-\partial_t \bm{\kappa} &= \Grad(\grad (\partial_t w)), \\
-\partial_t \Grad(\grad(w))  &= \Grad(\grad (\partial_t w)), \\
+\partial_t \bm{A}_{\kappa} &= \Grad\grad e_w, \\
+\partial_t \bm{\kappa} &= \Grad\grad \partial_t w, \\
+\partial_t \Grad\grad w  &= \Grad\grad \partial_t w, \\
 \end{align*}
 The last equation holds for $w \in C^3(\Omega)$.
 
@@ -452,8 +451,8 @@ The last equation holds for $w \in C^3(\Omega)$.
 		\[
 		\begin{aligned}
 		A: \; L^2(\Omega, \mathbb{S})& \rightarrow L^2(\Omega), \\
-		\bm{\Psi}& \rightarrow \mathrm{div}(\mathrm{Div}(\bm{\Psi}) = \psi, \\	\end{aligned}
-		\qquad \text{with } \psi = \mathrm{div}(\mathrm{Div}(\bm{\Psi}) = \sum_{i = 1}^d \sum_{j = 1}^d \diffp{\bm{\Psi}_{ij}}{x_i,x_j}.
+		\bm{\Psi}& \rightarrow \div\Div \bm{\Psi} = \psi, \\	\end{aligned}
+		\qquad \text{with } \psi = \div\Div \bm{\Psi} = \sum_{i = 1}^d \sum_{j = 1}^d \diffp{\bm{\Psi}_{ij}}{x_i,x_j}.
 		\]
 		We {shall} identify $A^*$
 		\[
@@ -483,9 +482,9 @@ The energy rate provides the boundary port variables
 \begin{equation}\label{eq:enrateKirNotAll}
 \begin{aligned}
 \dot{H}&= \int_{\Omega} \left\{ \partial_t {\alpha_w} \, e_w  + \partial_t \bm{A}_{\kappa} \cddot \bm{E}_{\kappa} \right\} \d\Omega \\
-&= \int_{\Omega} \left\{ - \div(\Div(\bm{E}_{\kappa})) \, e_w + \Grad(\grad(e_w)) \cddot \bm{E}_{\kappa} \right\} \d\Omega, &\qquad \text{Stokes theorem} \\
-&=  \int_{\partial \Omega} \left\{ - \bm{n} \cdot \Div(\bm{E}_{\kappa}) \, e_w + \left(\bm{n} \otimes \grad(e_w) \right)\cddot \bm{E}_{\kappa} \right\} \d{s},  \\
-&=\int_{\partial \Omega} \left\{ \widehat{q}_n \, e_w + \partial_{\bm{n}}{e_w} \left(\bm{n} \otimes \bm{n} \right) \cddot \bm{E}_{\kappa} + \partial_{\bm{s}}{e_w} \left(\bm{n} \otimes\bm{s} \right)\cddot \bm{E}_{\kappa}   \right\} \d{s}, &\qquad \text{Dyadic properties}\\
+&= \int_{\Omega} \left\{ - \div\Div \bm{E}_{\kappa} \, e_w + \Grad\grad e_w \cddot \bm{E}_{\kappa} \right\} \d\Omega, &\quad \text{Stokes theorem} \\
+&=  \int_{\partial \Omega} \left\{ - \bm{n} \cdot \Div\bm{E}_{\kappa} \, e_w + \left(\bm{n} \otimes \grad e_w \right)\cddot \bm{E}_{\kappa} \right\} \d{s},  \\
+&=\int_{\partial \Omega} \left\{ - \bm{n} \cdot \Div\bm{E}_{\kappa} \, e_w + \partial_{\bm{n}}{e_w} \left(\bm{n} \otimes \bm{n} \right) \cddot \bm{E}_{\kappa} + \partial_{\bm{s}}{e_w} \left(\bm{n} \otimes\bm{s} \right)\cddot \bm{E}_{\kappa}   \right\} \d{s}, &\quad \text{Dyadic properties}\\
 &=\int_{\partial \Omega} \left\{ \widehat{q}_n \, w_t + \partial_{\bm{n}}{w_t} \, M_{nn} + \partial_{\bm{s}}{w_t} \, M_{ns}   \right\} \d{s}. 
 \end{aligned}
 \end{equation}
@@ -496,7 +495,7 @@ M_{nn} := \left(\bm{n} \otimes \bm{n} \right) \cddot \bm{E}_{\kappa}, \quad
 M_{ns} := \left(\bm{n} \otimes \bm{s} \right) \cddot \bm{E}_{\kappa}.
 \end{equation}
 Variables $w_t$ and $\partial_{\bm{s}}{w_t}$ are not independent as they are differentially related with respect to derivation along $\bm{s}$ (see for instance
-\cite{timoshenko1959theory}). The tangential derivative has to be moved on the torsional momentum $M_{ns}$. For sake of simplicity, $\partial \Omega$ is supposed to be regular. Then the integration by parts provides
+\cite[Chapter 4]{timoshenko1959theory}). The tangential derivative has to be moved on the torsional momentum $M_{ns}$. For sake of simplicity, $\partial \Omega$ is supposed to be regular. Then the integration by parts provides
 \begin{equation}
 \int_{\partial \Omega} \partial_{\bm{s}}{w_t} \, M_{ns} \ \d{s} =  - \int_{\partial \Omega} \partial_{\bm{s}}{M_{ns}} \, w_t \ \d{s}.
 \end{equation}
@@ -545,8 +544,8 @@ Then the final pH formulation reads
 \bm{A}_{\kappa} \\
 \end{pmatrix} &= 
 \begin{bmatrix}
-0  &  - \mathrm{div} \circ \mathrm{Div} \\
-\mathrm{Grad} \circ \mathrm{grad} & 0 \\
+	0  &  - \div \circ \Div \\
+\Grad \circ \grad & 0 \\
 \end{bmatrix}
 \begin{pmatrix}
 e_w \\
@@ -579,7 +578,7 @@ e_w \\
 \end{pmatrix},
 \end{aligned}
 \end{equation}
-where $\bm\gamma_{0}^{\Gamma_*}a = a\vert_{\Gamma_*}$ denotes the trace over the set $\Gamma_*$, and  $\gamma_{1}^{\Gamma_*}a = \partial_{\bm{n}} a \vert_{\Gamma_*}$ denotes the trace of the normal derivative over the set $\Gamma_*$. The symbol $\gamma_{nn, 1}^{\Gamma_*}$ denotes the map $\gamma_{nn, 1}^{\Gamma_*}\bm{A} = -\Div \bm{A} \cdot \bm{n} - \partial_{\bm{s}} (\bm{A}(\bm{n} \otimes \bm{s}))\vert_{\Gamma_*},$, while $\gamma_{nn}^{\Gamma_*}\bm{A} = \bm{A} \cddot (\bm{n} \otimes \bm{n})\vert_{\Gamma_*}$ indicates the normal-normal trace of a tensor-valued function.
+where $\bm\gamma_{0}^{\Gamma_*}a = a\vert_{\Gamma_*}$ denotes the trace over the set $\Gamma_*$, and  $\gamma_{1}^{\Gamma_*}a = \partial_{\bm{n}} a \vert_{\Gamma_*}$ denotes the trace of the normal derivative over the set $\Gamma_*$. The symbol $\gamma_{nn, 1}^{\Gamma_*}$ denotes the map $\gamma_{nn, 1}^{\Gamma_*}\bm{A} = -\bm{n} \cdot \Div \bm{A} - \partial_{\bm{s}} (\bm{A} \cddot (\bm{n} \otimes \bm{s}))\vert_{\Gamma_*},$, while $\gamma_{nn}^{\Gamma_*}\bm{A} = \bm{A} \cddot (\bm{n} \otimes \bm{n})\vert_{\Gamma_*}$ indicates the normal-normal trace of a tensor-valued function.
 
 
 \begin{theorem}[Stokes-Dirac structure for the Kirchhoff plate]\label{th:stdirKir}
@@ -616,10 +615,99 @@ where $\bm\gamma_{0}^{\Gamma_*}a = a\vert_{\Gamma_*}$ denotes the trace over the
 \end{theorem}
 
 \section{Laminated anisotropic case}
-Until now homogeneous isotropic materials have been considered. For this class of materials, the membrane and bending problems are decoupled. In aeronautical applications, structure are made up of layers of different materials to enhance the mechanical properties of the resulting laminated structure.  
-\subsection{Thin plate assumption}
 
-\subsection{Thick plate assumption}
+
+Until now homogeneous isotropic materials have been considered. For this class of materials, the membrane and bending problems are decoupled. In aeronautical applications, structure are made up of laminae of different materials to enhance the mechanical properties of the resulting laminated structure. In some cases, a certain coupling is sought for, to increase the wing aerodynamical performance as it deforms. For a general overview on laminated plates the reader may consult \cite[Chapter 3]{reddy2003mechanics}.
+
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.5\textwidth]{chapter_4/laminated_plate.eps}
+	\caption{Laminated plate with 4 layers.}
+	\label{fig:laminated_plate}
+\end{figure}
+
+Consider again the deformation field given by \eqref{eq:disp1or}
+
+\begin{equation*}\label{eq:dis1or_2}
+\begin{aligned}
+\bm{u}(x,y,z,t) &= \bm{u}^0(x,y,t) -z \bm{\theta}(x,y,t), \where \bm{u} = (u_x, \, u_y), \\
+u_z(x,y,z,t) &= u_z^0(x,y,t), 
+\end{aligned}
+\end{equation*}
+The link between in-plane deformation \eqref{eq:eps_inplane} and the membrane and bending contribution \eqref{eq:eps0}, \eqref{eq:kappa}.
+\begin{equation}
+\bm{\varepsilon_{2D}} = \bm{\varepsilon}^0 - z \bm{\kappa} \where \bm{\varepsilon}^0=\Grad \bm{u}^0, \quad \bm{\kappa} = \Grad \bm{\theta}.
+\end{equation}
+
+Assume that each layer is an orthotropic material under plane stress condition (see \cite[Chapter 1]{reddy2003mechanics} for the details). Then, it holds
+
+\[
+\bm{\Sigma}_{2D}^i = \bm{\mathcal{D}}_{2D}^i \bm{\varepsilon}_{2D}^i,
+\]  
+where $i$ indicates the layer under consideration. The matrix $ \bm{\mathcal{D}}_{2D}^i$ depends on the properties of each material and on the orientation of each lamina. To reduce the problem to bi-dimensional,  the stresses have to be integrated along the thickness. Differently from isotropic plate, for laminated anisotropic plates the membrane and bending behavior are coupled. To see this consider the in plane and bending resultant of the stress 
+
+\begin{equation}
+	\begin{aligned}
+	\bm{N} := \int_{-h/2}^{h/2} \bm{\Sigma}_{2D} \d{z}, \qquad 
+	\bm{M} := \int_{-h/2}^{h/2} - z \bm{\Sigma}_{2D} \d{z}. \
+	\end{aligned}
+\end{equation}
+Since the stress are discontinuous due to the change of constitutive law along the thickness, the integral has to be computed lamina by lamina
+\begin{equation}\label{eq:NM_laminated}
+\begin{pmatrix}
+\bm{N} \\ \bm{M} \\ 
+\end{pmatrix} = 
+\begin{bmatrix}
+\bm{\mathcal{D}}_{m} & \bm{\mathcal{D}}_{c} \\
+\bm{\mathcal{D}}_{c} & \bm{\mathcal{D}}_{b} \\
+\end{bmatrix}
+\begin{pmatrix}
+\bm{\varepsilon}^0 \\ \bm{\kappa} \\ 
+\end{pmatrix},
+\end{equation}
+where
+\begin{equation}
+	\bm{\mathcal{D}}_{m} = \sum_{i = 1}^{n_{\text{layer}}} \bm{\mathcal{D}}_{2D}^i (z_{i+1}-z_{i}), \quad \bm{\mathcal{D}}_{c} = -\frac{1}{2}\sum_{i = 1}^{n_{\text{layer}}} \bm{\mathcal{D}}_{2D}^i (z_{i+1}^2-z_{i}^2), \quad \bm{\mathcal{D}}_{b} = \frac{1}{3} \sum_{i = 1}^{n_{\text{layer}}} \bm{\mathcal{D}}_{2D}^i (z_{i+1}^3-z_{i}^3),
+\end{equation}
+where $z_i$ represents the height of the $i^{\text{th}}$ layer (see Fig. \ref{fig:laminated_plate}). For the shear contribution it is obtained
+\begin{equation}\label{eq:q_laminated}
+	\bm{q} := \int_{-h/2}^{h/2} \bm{\sigma}_{s} \d{z} = \bm{\mathcal{D}}_s \bm{\gamma}, \where \bm{\gamma}= \grad u_z - \bm{\theta}.
+\end{equation} 
+
+\subsection{Port-Hamiltonian Mindlin laminated plate}
+By using the Hamilton principle the equations of motion can be retrieved. The reader can consult \cite[Chapter 3]{reddy2003mechanics} for an exhaustive explanation. The final equations are
+\begin{equation}
+	\begin{aligned}
+	\diffp[2]{\bm{u}^0}{t} &= \Div \bm{N}, \\
+	\diffp[2]{{u}_z}{t} &= \div \bm{q}, \\
+	\diffp[2]{\bm{\theta}}{t} &= \bm{q} + \Div \bm{M}, \\
+	\end{aligned}	
+\end{equation}
+where $\bm{q}, \, \bm{N}, \, \bm{M}$ are defined in Eqs. \eqref{eq:q_laminated}, \eqref{eq:NM_laminated}. The total energy of this model reads
+
+\[
+H = \energy{\rho h \left(\norm{\diffp{\bm{u}^0}{t}}^2 + \left(\diffp{u_z}{t}\right)^2 \right) + \frac{\rho h^3}{12} \norm{\diffp{\bm{\theta}}{t}}^2 +  \bm{N} \cddot \bm{\varepsilon}^0 + \bm{M} \cddot \bm{\kappa} + \bm{q} \cdot \bm{\gamma} }.
+\]
+To get a quadratic Hamiltonian, the following energy variable are chosen
+\begin{equation}
+	\begin{aligned}
+	\bm{\alpha}_u &= \rho h \diffp{\bm{u}^0}{t}, \\
+	\bm{A}_{\varepsilon^0} &= \bm{\varepsilon}^0,
+	\end{aligned} \qquad
+	\begin{aligned}
+	{\alpha}_w &= \rho h \diffp{\bm{u}_z}{t}, \\
+	\bm{A}_{\kappa} &= \bm{\kappa},
+	\end{aligned} \qquad
+	\begin{aligned}
+	\bm{\alpha}_\theta &= \frac{\rho h^3}{12} \diffp{\bm{\theta}}{t}, \\
+	\bm{\alpha}_{\gamma} &= \bm{\gamma}.
+	\end{aligned}
+\end{equation} 
+This choice highlights the nature of the problem in which a membrane part (equivalent to a 2D elasticity)
+
+
+\subsection{Port-Hamiltonian Kirchhoff laminated plate}
+
 
 
 \section{The membrane shell problem ?}
