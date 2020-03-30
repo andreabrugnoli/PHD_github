@@ -4,10 +4,106 @@
 Jules Verne}}
 \minitoc
  
+\lettrine{\color{theme}{T}}hermoelasticity is the study of deformable bodies undergoing thermal excitations. It is a clear example of a multiphysics phenomenon since the heat transfer and elastic vibrations within the body mutually interact. In this chapter, a linear model of thermoelasticity is obtained under the pH formalism. Each physics is described separately and the final system is obtained considering a power-preserving interconnection of two pHs.
 
-\cite{duhamel1837}
+\begin{comment}
+The first work on this discipline dates back to \cite{duhamel1837}, but it was only more than a century later, thanks to the paper of Biot \cite{biot1956thermoelasticity}, that research on this topic received a new impulse.
+\end{comment}
 
-\section{Linear coupled thermoelasticity}
+\section{Port-Hamiltonian linear coupled thermoelasticity}\label{sec:phTher}
+In this section, a pH formulation of heat transfer is first introduced. The classical model of thermoelasticity is then recalled. The same model is found by interconnecting the heat equation and the linear elastodynamics problem seen as pHs. It is shown that the interconnection preserves a quadratic functional that plays the role of a fictitious energy. The resulting system is dissipative  with respect to this functional. The proposed construction makes use of the intrinsic modularity of pHs \cite{kurula2010} to derive a multiphysics composing together each physical realm.
+
+\subsection{The heat equation as a pH descriptor system}
+Consider the heat equation in a bounded connected set $\Omega \subset \mathbb{R}^d, \, d=\{1,2,3\}$, describing the evolution of the temperature field $T(\bm{x}, t)$
+\begin{equation}\label{eq:heatEq}
+\rho c_V \diffp{T}{t} = \lambda \Delta T + r_Q, \qquad \bm{x} \in \Omega,
+\end{equation}
+where $\rho, c_V, k, r_Q$ are the mass density, the specific heat density at constant strain, the thermal diffusivity and the heat source. The Dirichlet and Neumann condition of this problem are 
+\begin{equation*}
+	\begin{aligned}
+	T \text{ known on } \Gamma_D^T \times (0, +\infty), \qquad \text{Dirichlet condition}, \\
+	-k \, \grad T \cdot \bm{n} \text{ known on } \Gamma_N^T \times (0, +\infty) \qquad \text{Neumann condition},
+	\end{aligned}
+\end{equation*}
+where a partition of the boundary $\partial \Omega = \Gamma_D^T \cup \Gamma_N^T$ has been considered. This model can be put in pH form by means of a canonical interconnection structure ( cf. \cite[Chapter 2]{kotyczka2019numerical}). An algebraic relatioship that describes the Fourier law has to be incorporated in the model. Here, a differential-algebraic formulation is exploited to obtain the same system. \\
+
+Let $T_0$ be a constant reference temperature (the introduction of this variables is instrumental for coupled thermoelasticity). The functional 
+\begin{equation*}
+	H_T = \energy{\rho c_V T_0 \left(\frac{T-T_0}{T_0} \right)^2 }
+\end{equation*} 
+has the physical dimension of an energy and represents a Lyapunov functional of this system. Even though it does not represent the internal energy, it has some important properties. Select as energy variable 
+\begin{equation*}
+\alpha_T := \rho c_V (T-T_0),
+\end{equation*}
+whose corresponding co-energy is 
+\begin{equation*}
+	e_T := \diffd{H_T}{\alpha_T} = \frac{\alpha_T}{\rho c_V T_0} = \frac{T-T_0}{T_0} =: \theta.
+\end{equation*}
+Introducing the heat flux $\bm{j}_Q := -k \grad T$ as additional variable, the heat equation \eqref{eq:heatEq} is equivalently reformulated as
+\begin{equation}
+\begin{bmatrix}
+	\rho c_V T_0 & 0 \\
+	\bm{0} & \bm{0} \\
+	\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+e_T \\
+\bm{j}_Q \\
+\end{pmatrix} = 
+\begin{bmatrix}
+	0 & -\div \\
+	-\grad & -T_0 k \\
+\end{bmatrix}
+\begin{pmatrix}
+e_T \\
+\bm{j}_Q \\
+\end{pmatrix} + 
+\begin{pmatrix}
+r_Q \\
+\bm{0} \\
+\end{pmatrix},
+\end{equation}
+or more compactly 
+\begin{equation}
+	{\mathcal{E}}
+	\diffp{}{t}
+	\bm{e}  = \left( {\mathcal{J}} - {\mathcal{R}}
+	\right)
+	\begin{pmatrix}
+	e_T \\
+	\bm{j}_Q \\
+	\end{pmatrix}
+\end{equation}
+
+
+\subsection{Classical thermoelasticity}
+The derivation of the classical theory of thermoelasticity is not carried out here. The reader may consult in \cite[Chapter 1]{hetnarski2009thermal} or \cite[Chapter 8]{abeyaratne2012notes} for a detailed discussion on this topic. 
+
+Consider a bounded connected set $\Omega \subset \mathbb{R}^d, \, d=\{1,2,3\}$. The classical equations for linear fully-coupled thermoelasticity for an isotropic thermoelastic material are \cite{carlson1973}
+\begin{equation}\label{eq:sysThElas}
+\begin{aligned}
+\displaystyle \rho \diffp[2]{\bm{u}}{t} &= \Div(\bm{\Sigma}_{ET}) , \\
+\displaystyle \rho c_V \diffp{T}{t} &= -\div(\bm{j}_Q) - T_0 \beta (2 \mu + d \lambda) \bm{I}_{d\times d} \cddot \displaystyle\diffp{\bm{\varepsilon}}{t}, \\
+\bm{\Sigma}_{ET} &= \bm{\Sigma}_E + \bm{\Sigma}_{T}, \\
+\bm{\Sigma}_E &= 2\mu \bm{\varepsilon} + \lambda \Tr(\bm{\varepsilon}) \bm{I}_{d\times d}, \\
+\bm{\Sigma}_T &= - \beta (2 \mu + d \lambda) \bm{I}_{d\times d} (T - T_0),  \\
+\bm{\varepsilon} &= \Grad(\bm{u}), \\
+\bm{j}_Q &= -k \, \grad T.
+\end{aligned}
+\end{equation}
+
+Field $\bm{u}$ is the displacement, $T_0$ is the constant reference temperature, $\bm{\varepsilon}$ is the infinitesimal strain tensor, $\bm{\Sigma}_E, \bm{\Sigma}_T$ are the stress tensor contribution due to mechanical deformation and a thermal field, $\bm{j}_Q$ is the heat flux. Coefficients $\lambda, \mu$ are the Lam\'e parameters,  and $\beta$ the thermal expansion coefficient. Given a partition of the boundary $\partial \Omega = \Gamma_D^E \cup \Gamma_N^E = \Gamma_D^T \cup \Gamma_N^T$ for the elastic and thermal domain. The general homogeneous boundary conditions read 
+\begin{equation}
+\begin{aligned}
+\bm{u} \text{ known on } \Gamma_D^E \times (0, +\infty), \\
+\bm{\Sigma}_{ET} \text{ known on } \Gamma_N^E \times (0, +\infty), 
+\end{aligned} \qquad
+\begin{aligned}
+T \text{ known on } \Gamma_D^T \times (0, +\infty), \\
+\bm{j}_Q \text{ known on } \Gamma_N^T \times (0, +\infty).
+\end{aligned}
+\end{equation}
+
 
 \section{Thermoelastic Euler-Bernoulli beam}
 
