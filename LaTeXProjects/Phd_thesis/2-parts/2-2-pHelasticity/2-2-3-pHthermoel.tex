@@ -18,7 +18,7 @@ Consider the heat equation in a bounded connected set $\Omega \subset \mathbb{R}
 \begin{equation}\label{eq:heatEq}
 \rho c_V \diffp{T}{t} = \lambda \Delta T + r_Q, \qquad \bm{x} \in \Omega,
 \end{equation}
-where $\rho, c_V, k, r_Q$ are the mass density, the specific heat density at constant strain, the thermal diffusivity and the heat source. The Dirichlet and Neumann condition of this problem are 
+where $\rho, c_V, k, r_Q$ are the mass density, the specific heat density at constant strain, the thermal diffusivity and an heat source. The Dirichlet and Neumann condition of this problem are 
 \begin{equation*}
 	\begin{aligned}
 	T \text{ known on } \Gamma_D^T \times (0, +\infty), \qquad \text{Dirichlet condition}, \\
@@ -29,7 +29,7 @@ where a partition of the boundary $\partial \Omega = \Gamma_D^T \cup \Gamma_N^T$
 
 Let $T_0$ be a constant reference temperature (the introduction of this variables is instrumental for coupled thermoelasticity). The functional 
 \begin{equation*}
-	H_T = \energy{\rho c_V T_0 \left(\frac{T-T_0}{T_0} \right)^2 }
+	H_T = \frac{1}{2} \int_\Omega \rho c_V T_0 \left(\frac{T-T_0}{T_0} \right)^2 \d\Omega
 \end{equation*} 
 has the physical dimension of an energy and represents a Lyapunov functional of this system. Even though it does not represent the internal energy, it has some important properties. Select as energy variable 
 \begin{equation*}
@@ -40,40 +40,77 @@ whose corresponding co-energy is
 	e_T := \diffd{H_T}{\alpha_T} = \frac{\alpha_T}{\rho c_V T_0} = \frac{T-T_0}{T_0} =: \theta.
 \end{equation*}
 Introducing the heat flux $\bm{j}_Q := -k \grad T$ as additional variable, the heat equation \eqref{eq:heatEq} is equivalently reformulated as
-\begin{equation}
+\begin{equation}\label{eq:phsysHeat}
+\begin{aligned}
 \begin{bmatrix}
-	\rho c_V T_0 & 0 \\
-	\bm{0} & \bm{0} \\
-	\end{bmatrix}
+1 & 0 \\
+\bm{0} & \bm{0} \\
+\end{bmatrix}
 \diffp{}{t}
 \begin{pmatrix}
-e_T \\
+\alpha_T \\
 \bm{j}_Q \\
-\end{pmatrix} = 
+\end{pmatrix} &= 
 \begin{bmatrix}
-	0 & -\div \\
-	-\grad & -T_0 k \\
+0 & -\div \\
+-\grad & -(T_0 k)^{-1} \\
 \end{bmatrix}
 \begin{pmatrix}
 e_T \\
 \bm{j}_Q \\
 \end{pmatrix} + 
-\begin{pmatrix}
-r_Q \\
+\begin{bmatrix}
+1 \\
 \bm{0} \\
-\end{pmatrix},
+\end{bmatrix} u_T, \\
+y_T &= \begin{bmatrix}
+1 & \bm{0} \\
+\end{bmatrix} \begin{pmatrix}
+e_T \\
+\bm{j}_Q \\
+\end{pmatrix}.
+\end{aligned}
 \end{equation}
-or more compactly 
+with $u_T:=r_Q$ and $y_T$ represents the corresponding power-conjugated variable. In matrix notation, it is obtained
 \begin{equation}
-	{\mathcal{E}}
-	\diffp{}{t}
-	\bm{e}  = \left( {\mathcal{J}} - {\mathcal{R}}
-	\right)
-	\begin{pmatrix}
-	e_T \\
-	\bm{j}_Q \\
-	\end{pmatrix}
+\begin{aligned}
+\mathcal{E}_T \partial_{t} \bm{\alpha}_T  &= \left(\mathcal{J}_T - \mathcal{R}_T \right)\bm{e}_T + \mathcal{B}_{T}\, u_T, \\
+y_d &= \mathcal{B}_{T}^* \, \bm{e}_T
+\end{aligned}
 \end{equation}
+where $\bm{\alpha}_T = (\alpha_T,\ \bm{j}_Q), \; \bm{e}_T = (e_T,\ \bm{j}_Q)$ and
+\begin{equation*}
+\mathcal{E}_T = \begin{bmatrix}
+1 & 0 \\
+\bm{0} & \bm{0} \\
+\end{bmatrix}, \quad
+\mathcal{J}_T = \begin{bmatrix}
+0 & -\div \\
+-\grad & \bm{0} \\
+\end{bmatrix}, \quad 
+\mathcal{R}_T = \begin{bmatrix}
+0 & 0 \\
+\bm{0} & (T_0 k)^{-1} \\
+\end{bmatrix}, \quad
+\mathcal{B}_T = \begin{bmatrix}
+1 \\
+\bm{0} \\
+\end{bmatrix}.
+\end{equation*}
+The system is an example of pH descriptor system (cf. \cite{beattie2018linear} for the finite dimensional case). The Hamiltonian reads 
+\begin{equation}\label{eq:hamHeat}
+	H_T = \frac{1}{2}\int_\Omega \bm{e}_T \cdot \mathcal{E}_T\bm{\alpha}_T \d\Omega.
+\end{equation}
+The power rate is then deduced
+\begin{equation}\label{eq:enrateHeat}
+\begin{aligned}
+\dot{H}_T &= \int_\Omega \bm{e}_T \cdot \mathcal{E}_T\, \partial_t \bm{\alpha}_T \d\Omega, \\
+		&= \int_\Omega \bm{e}_T \cdot \left\{(\mathcal{J}_T-\mathcal{R}_T) \bm{e} + \mathcal{B}_T u_T \right\} \d\Omega, \\
+		&= \int_\Omega u_T \, y_T \d\Omega -\int_\Omega \left(e_T \div \bm{j}_Q + \bm{j}_Q \grad e_T + \frac{\norm{\bm{j}_Q}^2}{k T_0} \right) \d\Omega, \\
+		&\le \int_\Omega u_T \, y_T \d\Omega -\int_{\partial\Omega} e_T \ \bm{j}_Q \cdot \bm{n} \d{S}.
+\end{aligned}
+\end{equation}
+This choice of Hamiltonian allows retrieving the classical boundary conditions and leads to a dissipative system. Other formulations, based on an entropy or internal energy functionals are possible for the heat equation \cite{serhani2019modeling}. Unfortunately these formulations are non linear and their discretization is a difficult task \cite{serhani2019discretization}. 
 
 
 \subsection{Classical thermoelasticity}
@@ -83,24 +120,198 @@ Consider a bounded connected set $\Omega \subset \mathbb{R}^d, \, d=\{1,2,3\}$. 
 \begin{equation}\label{eq:sysThElas}
 \begin{aligned}
 \displaystyle \rho \diffp[2]{\bm{u}}{t} &= \Div(\bm{\Sigma}_{ET}) , \\
-\displaystyle \rho c_V \diffp{T}{t} &= -\div(\bm{j}_Q) - T_0 \beta (2 \mu + d \lambda) \bm{I}_{d\times d} \cddot \displaystyle\diffp{\bm{\varepsilon}}{t}, \\
+\displaystyle \rho c_V \diffp{T}{t} &= -\div(\bm{j}_Q) - \mathcal{I}_\beta \cddot \displaystyle\diffp{\bm{\varepsilon}}{t}, \\
 \bm{\Sigma}_{ET} &= \bm{\Sigma}_E + \bm{\Sigma}_{T}, \\
 \bm{\Sigma}_E &= 2\mu \bm{\varepsilon} + \lambda \Tr(\bm{\varepsilon}) \bm{I}_{d\times d}, \\
-\bm{\Sigma}_T &= - \beta (2 \mu + d \lambda) \bm{I}_{d\times d} (T - T_0),  \\
+\bm{\Sigma}_T &= - \mathcal{I}_\beta \theta,  \\
 \bm{\varepsilon} &= \Grad(\bm{u}), \\
 \bm{j}_Q &= -k \, \grad T.
 \end{aligned}
 \end{equation}
-
-Field $\bm{u}$ is the displacement, $T_0$ is the constant reference temperature, $\bm{\varepsilon}$ is the infinitesimal strain tensor, $\bm{\Sigma}_E, \bm{\Sigma}_T$ are the stress tensor contribution due to mechanical deformation and a thermal field, $\bm{j}_Q$ is the heat flux. Coefficients $\lambda, \mu$ are the Lam\'e parameters,  and $\beta$ the thermal expansion coefficient. Given a partition of the boundary $\partial \Omega = \Gamma_D^E \cup \Gamma_N^E = \Gamma_D^T \cup \Gamma_N^T$ for the elastic and thermal domain. The general homogeneous boundary conditions read 
+For simplicity  the coupling term
+\[\mathcal{I}_\beta:=T_0 \beta(2\mu + d \lambda)\bm{I}_{d\times d} \]
+has been introduced. Field $\bm{u}$ is the displacement, $\bm{\varepsilon}$ is the infinitesimal strain tensor, $\bm{\Sigma}_E, \bm{\Sigma}_T$ are the stress tensor contribution due to mechanical deformation and a thermal field. Coefficients $\lambda, \mu$ are the Lam\'e parameters,  and $\beta$ the thermal expansion coefficient. Given a partition of the boundary $\partial \Omega = \Gamma_D^E \cup \Gamma_N^E = \Gamma_D^T \cup \Gamma_N^T$ for the elastic and thermal domain. The general homogeneous boundary conditions read 
 \begin{equation}
 \begin{aligned}
 \bm{u} \text{ known on } \Gamma_D^E \times (0, +\infty), \\
-\bm{\Sigma}_{ET} \text{ known on } \Gamma_N^E \times (0, +\infty), 
+\bm{\Sigma}_{ET} \cdot \bm{n} \text{ known on } \Gamma_N^E \times (0, +\infty), 
 \end{aligned} \qquad
 \begin{aligned}
 T \text{ known on } \Gamma_D^T \times (0, +\infty), \\
-\bm{j}_Q \text{ known on } \Gamma_N^T \times (0, +\infty).
+\bm{j}_Q \cdot \bm{n} \text{ known on } \Gamma_N^T \times (0, +\infty).
+\end{aligned}
+\end{equation}
+
+\section{Thermoelasticity as two coupled pHs}
+
+Consider again the equation of elasticity on $\Omega \subset \mathbb{R}^d, \, d =\{2, 3\}$ (cf. Eq. \eqref{eq:phsysElas}), together with a distributed input $\bm{u}_E$ that plays the role of a distributed force
+\begin{equation}
+\begin{aligned}
+\diffp{}{t}
+\begin{pmatrix}
+\bm{\alpha}_v \\
+\bm{A}_{\varepsilon} \\
+\end{pmatrix} &= 
+\begin{bmatrix}
+\bm{0} & \Div \\
+\Grad & \bm{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+\bm{e}_v \\
+\bm{E}_{\varepsilon} \\
+\end{pmatrix} + 
+\begin{bmatrix}
+\bm{I}_{d\times d} \\
+\bm{0} \\
+\end{bmatrix}\bm{u}_E, \\
+\bm{y}_E &= \begin{bmatrix}
+\bm{I}_{d\times d} & \bm{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+\bm{e}_v \\
+\bm{E}_{\varepsilon}
+\end{pmatrix},
+\end{aligned}
+\end{equation}
+with Hamiltonian  
+\[
+H_E = \energy{\bm{\alpha}_v \cdot \bm{e}_v + \bm{A}_{\varepsilon} \cddot \bm{E}_{\varepsilon}}.
+\]
+Recall the pH formulation of the heat equation \eqref{eq:phsysHeat}
+\begin{equation}
+\begin{aligned}
+\begin{bmatrix}
+1 & 0 \\
+\bm{0} & \bm{0} \\
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+\alpha_T \\
+\bm{j}_Q \\
+\end{pmatrix} &= 
+\begin{bmatrix}
+0 & -\div \\
+-\grad & -(T_0 k)^{-1} \\
+\end{bmatrix}
+\begin{pmatrix}
+e_T \\
+\bm{j}_Q \\
+\end{pmatrix} + 
+\begin{bmatrix}
+1 \\
+\bm{0} \\
+\end{bmatrix} u_T, \\
+y_T &= \begin{bmatrix}
+1 & \bm{0} \\
+\end{bmatrix} \begin{pmatrix}
+e_T \\
+\bm{j}_Q \\
+\end{pmatrix},
+\end{aligned}
+\end{equation} 
+with Hamiltonian $H_T$ defined in \eqref{eq:hamHeat}. The linear thermoelastic problem can be expressed as a coupled port-Hamiltonian system.  Consider the following interconnection
+\begin{align}
+\bm{u}_E &= - \Div(\mathcal{I}_\beta \, y_T), \\
+u_T &= - \mathcal{I}_\beta \cddot\Grad(\bm{y}_E). 
+\end{align}
+The interconnection is power preserving as it can be compactly written as 
+\begin{equation*}
+\bm{u}_E = \mathcal{C}_\beta(y_T), \qquad u_T = - \mathcal{C}_\beta^*(\bm{y}_E).
+\end{equation*}
+where the coupling operator $\mathcal{C}_\beta := - \Div(\mathcal{I}_\beta \, \cdot) : L^2(\Omega) \rightarrow L^2(\Omega, \mathbb{R}^d)$ has formal adjoint $ \mathcal{C}_\beta^* =  \mathcal{I}_\beta^* \cddot  \Grad(\cdot) =  \mathcal{I}_\beta \cddot  \Grad(\cdot): L^2(\Omega, \mathbb{R}^3) \rightarrow L^2(\Omega)$ ($\mathcal{I}_\beta$ is self adjoint given its diagonal structure). As a consequence, under the assumption that $\bm{y}_E, y_T$ have compact support, it holds
+\[
+\left\langle u_T, y_T \right\rangle_{L^2(\Omega)} + \left\langle \bm{u}_E, \bm{y}_E \right\rangle_{L^2(\Omega, \mathbb{R}^3)} = 0.
+\]
+If the compact support assumption is removed, it is obtained
+\begin{equation}\label{eq:balIntThElas}
+	\begin{aligned}
+	\left\langle u_T, y_T \right\rangle_{L^2(\Omega)} + \left\langle \bm{u}_E, \bm{y}_E \right\rangle_{L^2(\Omega, \mathbb{R}^3)} &= -\int_\Omega \left\{(\mathcal{I}_\beta \cddot \Grad \bm{e}_v) e_T + \Div(\mathcal{I}_\beta e_T) \cdot \bm{e}_v \right\} \d\Omega, \\
+	&= -\int_{\Omega} \div(e_T \mathcal{I}_\beta \cdot \bm{e}_v ) \d\Omega, \\
+	&= -\int_{\partial \Omega} (e_T \mathcal{I}_\beta \cdot \bm{n}) \cdot \bm{e}_v  \d{S}
+	\end{aligned}
+\end{equation}
+Using the expression of $y_T, \bm{y}_E$, considering that $T_0$ is constant and applying Schwarz theorem for smooth function, the inputs are equal to
+\begin{equation*}
+\bm{u}_E =  \Div(\bm{\Sigma}_T), \qquad u_T = - \mathcal{I}_\beta \cddot  \Grad(\bm{v}) = - \mathcal{I}_\beta \cddot  \diffp{\bm{\varepsilon}}{t} .
+\end{equation*}
+
+The coupled thermoelastic problem can now be written as
+\begin{equation}
+\begin{bmatrix}
+\bm{1} & \bm{0} & \bm{0} & \bm{0}\\
+\bm{0} & \bm{1} & \bm{0} & \bm{0}\\
+0 & 0 & 1 & 0\\
+\bm{0} & \bm{0} & \bm{0} & \bm{0}\\
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+\bm{\alpha}_v \\
+\bm{A}_\varepsilon \\
+{\alpha}_T \\
+\bm{j}_Q \\
+\end{pmatrix} = 
+\begin{bmatrix}
+\bm{0} & \Div & - \Div(\mathcal{I}_\beta \, \cdot) & \bm{0}\\
+\Grad & \bm{0} & \bm{0} & \bm{0} \\
+- \mathcal{I}_\beta \cddot  \Grad(\cdot) & 0 & 0 & -\div \\
+\bm{0} & \bm{0} & -\grad & - (T_0 \mathcal{K})^{-1} \\
+\end{bmatrix}
+\begin{pmatrix}
+\bm{e}_v \\
+\bm{E}_\varepsilon \\
+{e}_T \\
+\bm{j}_Q \\
+\end{pmatrix},
+\end{equation}
+with total energy given by $H=H_E + H_T$. The power balance for each subsystem is given by 
+\begin{align}
+\dot{H}_E &= \int_\Omega \bm{u}_E \cdot \bm{y}_E \d\Omega + \int_{\partial\Omega} \bm{e}_v \cdot (\bm{E}_\varepsilon \cdot \bm{n}) \d{S}, \label{eq:enrateElasU} \\
+\dot{H}_T &\le \int_\Omega u_T \ y_T \d\Omega - \int_{\partial\Omega} \theta \ \bm{j}_Q \cdot \bm{n} \d{S}, \label{eq:enrateHeatU}
+\end{align}
+The overall power balance is easily computed considering Eqs. \eqref{eq:enrateElasU} \eqref{eq:enrateHeatU} and \eqref{eq:balIntThElas}
+\begin{equation}\label{eq:enrateIntThElas}
+\begin{aligned}
+\dot{H} = \dot{H}_E + \dot{H}_T \le \int_{\partial \Omega} \left\{\left[\bm{E}_\varepsilon - e_T \mathcal{I}_\beta \right] \cdot \bm{n}\right\}  \cdot \bm{e}_v  \d{S} - \int_{\partial\Omega} \theta \ \bm{j}_Q \cdot \bm{n} \d{S}
+\end{aligned}
+\end{equation}
+From the power balance the classical boundary conditions are retrieved. This allows defining appropriate boundary operators for the thermoelastic problem
+\begin{equation}
+	\bm{u}_\partial = 
+	\underbrace{\begin{bmatrix}
+	\bm{\gamma}_{0}^{\Gamma_D^E} & \bm{0} & \bm{0} & \bm{0} \\
+	\bm{0} & \bm{\gamma}_n^{\Gamma_N^E} & - \bm{\gamma}_n^{\Gamma_N^E}(\mathcal{I}_\beta\, \cdot )  & \bm{0}  \\ 
+	{0} & {0} & {\gamma}_{0}^{\Gamma_D^T} & {0} \\
+	\bm{0} & \bm{0} & \bm{0} & \bm{\gamma}_{n}^{\Gamma_N^T} \\
+	\end{bmatrix}}_{\mathcal{B}_\partial}
+	\begin{pmatrix}
+	\bm{e}_v \\
+	\bm{E}_\varepsilon \\
+	{e}_T \\
+	\bm{j}_Q \\
+	\end{pmatrix}, \quad 
+	\bm{y}_\partial = 
+	\underbrace{\begin{bmatrix}
+		\bm{0} & \bm{\gamma}_n^{\Gamma_D^E} & - \bm{\gamma}_n^{\Gamma_D^E}(\mathcal{I}_\beta\, \cdot )  & \bm{0}  \\ 
+		\bm{\gamma}_{0}^{\Gamma_N^E} & \bm{0} & \bm{0} & \bm{0} \\
+		\bm{0} & \bm{0} & \bm{0} & \bm{\gamma}_{n}^{\Gamma_D^T} \\
+		{0} & {0} & {\gamma}_{0}^{\Gamma_N^T} & {0} \\
+		\end{bmatrix}}_{\mathcal{B}_\partial}
+	\begin{pmatrix}
+	\bm{e}_v \\
+	\bm{E}_\varepsilon \\
+	{e}_T \\
+	\bm{j}_Q \\
+	\end{pmatrix}.
+\end{equation} 
+
+\begin{equation}
+\begin{aligned}
+\bm{e}_v \text{ known on } \Gamma_D^E \times (0, +\infty), \\
+\left(\bm{E}_\varepsilon - \mathcal{I}_\beta \bm{e}_T \right) \cdot \bm{n} \text{ known on } \Gamma_N^E \times (0, +\infty), \\
+\end{aligned} \qquad
+\begin{aligned}
+\bm{e}_T \text{ known on } \Gamma_D^T \times (0, +\infty), \\
+\bm{j}_Q \cdot \bm{n} \text{ known on } \Gamma_N^T \times (0, +\infty).
 \end{aligned}
 \end{equation}
 
