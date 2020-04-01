@@ -10,30 +10,30 @@ Jules Verne}}
 The first work on this discipline dates back to \cite{duhamel1837}, but it was only more than a century later, thanks to the paper of Biot \cite{biot1956thermoelasticity}, that research on this topic received a new impulse.
 \end{comment}
 
-\section{Port-Hamiltonian linear coupled thermoelasticity}\label{sec:phTher}
+\section{Port-Hamiltonian linear coupled thermoelasticity}\label{sec:phthel}
 In this section, a pH formulation of heat transfer is first introduced. The classical model of thermoelasticity is then recalled. The same model is found by interconnecting the heat equation and the linear elastodynamics problem seen as pHs. It is shown that the interconnection preserves a quadratic functional that plays the role of a fictitious energy. The resulting system is dissipative  with respect to this functional. The proposed construction makes use of the intrinsic modularity of pHs \cite{kurula2010} to derive a multiphysics composing together each physical realm.
 
-\subsection{The heat equation as a pH descriptor system}
+\subsection{The heat equation as a pH descriptor system}\label{sec:phheat}
 Consider the heat equation in a bounded connected set $\Omega \subset \mathbb{R}^d, \, d=\{1,2,3\}$, describing the evolution of the temperature field $T(\bm{x}, t)$
 \begin{equation}\label{eq:heatEq}
-\rho c_V \diffp{T}{t} = \lambda \Delta T + r_Q, \qquad \bm{x} \in \Omega,
+\rho c_\epsilon \diffp{T}{t} = k \Delta T + r_Q, \qquad \bm{x} \in \Omega,
 \end{equation}
-where $\rho, c_V, k, r_Q$ are the mass density, the specific heat density at constant strain, the thermal diffusivity and an heat source. The Dirichlet and Neumann condition of this problem are 
+where $\rho,\, c_\epsilon,\, k,\, r_Q$ are the mass density, the specific heat density at constant strain, the thermal diffusivity and an heat source. The Dirichlet and Neumann condition of this problem are 
 \begin{equation*}
 	\begin{aligned}
 	T \text{ known on } \Gamma_D^T \times (0, +\infty), \qquad \text{Dirichlet condition}, \\
 	-k \, \grad T \cdot \bm{n} \text{ known on } \Gamma_N^T \times (0, +\infty) \qquad \text{Neumann condition},
 	\end{aligned}
 \end{equation*}
-where a partition of the boundary $\partial \Omega = \Gamma_D^T \cup \Gamma_N^T$ has been considered. This model can be put in pH form by means of a canonical interconnection structure ( cf. \cite[Chapter 2]{kotyczka2019numerical}). An algebraic relatioship that describes the Fourier law has to be incorporated in the model. Here, a differential-algebraic formulation is exploited to obtain the same system. \\
+where a partition of the boundary $\partial \Omega = \Gamma_D^T \cup \Gamma_N^T$ has been considered. This model can be put in pH form by means of a canonical interconnection structure ( cf. \cite[Chapter 2]{kotyczka2019numerical}). An algebraic relationship that describes the Fourier law has to be incorporated in the model. Here, a differential-algebraic formulation is exploited to obtain the same system. \\
 
 Let $T_0$ be a constant reference temperature (the introduction of this variables is instrumental for coupled thermoelasticity). The functional 
 \begin{equation*}
-	H_T = \frac{1}{2} \int_\Omega \rho c_V T_0 \left(\frac{T-T_0}{T_0} \right)^2 \d\Omega
+	H_T = \frac{1}{2} \int_\Omega \rho c_\epsilon T_0 \left(\frac{T-T_0}{T_0} \right)^2 \d\Omega
 \end{equation*} 
 has the physical dimension of an energy and represents a Lyapunov functional of this system. Even though it does not represent the internal energy, it has some important properties. Select as energy variable 
 \begin{equation*}
-\alpha_T := \rho c_V (T-T_0),
+\alpha_T := \rho c_\epsilon (T-T_0),
 \end{equation*}
 whose corresponding co-energy is 
 \begin{equation*}
@@ -110,13 +110,13 @@ The power rate is then deduced
 		&\le \int_\Omega u_T \, y_T \d\Omega -\int_{\partial\Omega} e_T \ \bm{j}_Q \cdot \bm{n} \d{S}.
 \end{aligned}
 \end{equation}
-This choice of Hamiltonian allows retrieving the classical boundary conditions and leads to a dissipative system. Other formulations, based on an entropy or internal energy functionals are possible for the heat equation \cite{serhani2019modeling}. Unfortunately these formulations are non linear and their discretization is a difficult task \cite{serhani2019discretization}. 
+This choice of Hamiltonian allows retrieving the classical boundary conditions and leads to a dissipative system. Other formulations, based on an entropy or internal energy functionals are possible for the heat equation \cite{duindam2009,serhani2019modeling}. Unfortunately these formulations are non linear and their discretization is a difficult task \cite{serhani2019discretization}. 
 
 
 \subsection{Classical thermoelasticity}
 The derivation of the classical theory of thermoelasticity is not carried out here. The reader may consult in \cite[Chapter 1]{hetnarski2009thermal} or \cite[Chapter 8]{abeyaratne2012notes} for a detailed discussion on this topic. 
 
-Consider a bounded connected set $\Omega \subset \mathbb{R}^d, \, d=\{1,2,3\}$. The classical equations for linear fully-coupled thermoelasticity for an isotropic thermoelastic material are \cite{carlson1973}
+Consider a bounded connected set $\Omega \subset \mathbb{R}^d, \, d=\{1,2,3\}$. The classical equations for linear fully-coupled thermoelasticity for an isotropic thermoelastic material are \cite{carlson1973,biot1956thermoelasticity}
 \begin{equation}\label{eq:sysThElas}
 \begin{aligned}
 \displaystyle \rho \diffp[2]{\bm{u}}{t} &= \Div(\bm{\Sigma}_{ET}) , \\
@@ -142,7 +142,7 @@ T \text{ known on } \Gamma_D^T \times (0, +\infty), \\
 \end{aligned}
 \end{equation}
 
-\section{Thermoelasticity as two coupled pHs}
+\subsection{Thermoelasticity as two coupled pHs}
 
 Consider again the equation of elasticity on $\Omega \subset \mathbb{R}^d, \, d =\{2, 3\}$ (cf. Eq. \eqref{eq:phsysElas}), together with a distributed input $\bm{u}_E$ that plays the role of a distributed force
 \begin{equation}
@@ -210,10 +210,10 @@ e_T \\
 \end{aligned}
 \end{equation} 
 with Hamiltonian $H_T$ defined in \eqref{eq:hamHeat}. The linear thermoelastic problem can be expressed as a coupled port-Hamiltonian system.  Consider the following interconnection
-\begin{align}
-\bm{u}_E &= - \Div(\mathcal{I}_\beta \, y_T), \\
-u_T &= - \mathcal{I}_\beta \cddot\Grad(\bm{y}_E). 
-\end{align}
+\begin{equation}
+\bm{u}_E = - \Div(\mathcal{I}_\beta \, y_T), \qquad
+u_T = - \mathcal{I}_\beta \cddot\Grad(\bm{y}_E). 
+\end{equation}
 The interconnection is power preserving as it can be compactly written as 
 \begin{equation*}
 \bm{u}_E = \mathcal{C}_\beta(y_T), \qquad u_T = - \mathcal{C}_\beta^*(\bm{y}_E).
@@ -236,7 +236,7 @@ Using the expression of $y_T, \bm{y}_E$, considering that $T_0$ is constant and 
 \end{equation*}
 
 The coupled thermoelastic problem can now be written as
-\begin{equation}
+\begin{equation}\label{eq:phsysElasHeat}
 \begin{bmatrix}
 \bm{1} & \bm{0} & \bm{0} & \bm{0}\\
 \bm{0} & \bm{1} & \bm{0} & \bm{0}\\
@@ -254,7 +254,7 @@ The coupled thermoelastic problem can now be written as
 \bm{0} & \Div & - \Div(\mathcal{I}_\beta \, \cdot) & \bm{0}\\
 \Grad & \bm{0} & \bm{0} & \bm{0} \\
 - \mathcal{I}_\beta \cddot  \Grad(\cdot) & 0 & 0 & -\div \\
-\bm{0} & \bm{0} & -\grad & - (T_0 \mathcal{K})^{-1} \\
+\bm{0} & \bm{0} & -\grad & - (T_0 k)^{-1} \\
 \end{bmatrix}
 \begin{pmatrix}
 \bm{e}_v \\
@@ -275,7 +275,7 @@ The overall power balance is easily computed considering Eqs. \eqref{eq:enrateEl
 \end{aligned}
 \end{equation}
 From the power balance the classical boundary conditions are retrieved. This allows defining appropriate boundary operators for the thermoelastic problem
-\begin{equation}
+\begin{equation}\label{eq:phBCHeatElas}
 	\bm{u}_\partial = 
 	\underbrace{\begin{bmatrix}
 	\bm{\gamma}_{0}^{\Gamma_D^E} & \bm{0} & \bm{0} & \bm{0} \\
@@ -288,14 +288,14 @@ From the power balance the classical boundary conditions are retrieved. This all
 	\bm{E}_\varepsilon \\
 	{e}_T \\
 	\bm{j}_Q \\
-	\end{pmatrix}, \quad 
+	\end{pmatrix}, \; 
 	\bm{y}_\partial = 
 	\underbrace{\begin{bmatrix}
 		\bm{0} & \bm{\gamma}_n^{\Gamma_D^E} & - \bm{\gamma}_n^{\Gamma_D^E}(\mathcal{I}_\beta\, \cdot )  & \bm{0}  \\ 
 		\bm{\gamma}_{0}^{\Gamma_N^E} & \bm{0} & \bm{0} & \bm{0} \\
 		\bm{0} & \bm{0} & \bm{0} & \bm{\gamma}_{n}^{\Gamma_D^T} \\
 		{0} & {0} & {\gamma}_{0}^{\Gamma_N^T} & {0} \\
-		\end{bmatrix}}_{\mathcal{B}_\partial}
+		\end{bmatrix}}_{\mathcal{C}_\partial}
 	\begin{pmatrix}
 	\bm{e}_v \\
 	\bm{E}_\varepsilon \\
@@ -304,18 +304,75 @@ From the power balance the classical boundary conditions are retrieved. This all
 	\end{pmatrix}.
 \end{equation} 
 
-\begin{equation}
+System \eqref{eq:phsysElasHeat} together with \eqref{eq:phBCHeatElas} is a pH system with boundary control and observation. The classical thermoelastic problem can be modeled as two coupled systems, demonstrated the modularity of the pH paradigm.
+
+
+\section{Thermoelastic bending}
+In this section, the thermoelastic bending of thin beam and plate structure is modeled as coupled interconnection pf pHs. Starting from classical thermoelastic models and introducing a linear approximation of the temperature field, a suitable pH formulation can be obtained.  
+
+
+\subsection{Thermoelastic Euler-Bernoulli beam}
+The model for the linear thermoelastic vibrations of an isotropic thin rod is ruled by equations \cite{chadwick1962propagation,lifshitz2000thermoelastic}
+\begin{equation}\label{eq:heatbeam}
 \begin{aligned}
-\bm{e}_v \text{ known on } \Gamma_D^E \times (0, +\infty), \\
-\left(\bm{E}_\varepsilon - \mathcal{I}_\beta \bm{e}_T \right) \cdot \bm{n} \text{ known on } \Gamma_N^E \times (0, +\infty), \\
-\end{aligned} \qquad
-\begin{aligned}
-\bm{e}_T \text{ known on } \Gamma_D^T \times (0, +\infty), \\
-\bm{j}_Q \cdot \bm{n} \text{ known on } \Gamma_N^T \times (0, +\infty).
+\rho A \diffp[2]{w}{t} &= - EI \diffp[4]{w}{x} - \beta E T_0 \diffp[2]{}{x} \int_{S} z \theta \d{S}, \\
+\rho c_\delta T_0 \diffp{\theta}{t} &= k T_0 \Delta \theta + \beta T_0 E z \diffp[2,1]{w}{x,t}, 
 \end{aligned}
 \end{equation}
+where $w(x,t)$ is the vertical displacement of the beam $I = \int_S z^2 \d{S}$ the second moment of area, $E$ the Young modulus and $A$ the cross section. The constant $c_\delta$ is due to the thermoelastic coupling (cf. \cite{lifshitz2000thermoelastic} for a detailed explanation).  The other terms have meaning than in Section \secref{sec:phthel}. The normalized temperature $\theta(x,y,z,t)$ depends on all spatial coordinates. To derive a coupled pH model, it is assumed that the temperature field can be approximated as 
+\begin{equation}
+	\theta(x,y,z,t) = \theta_0(x,t) + z \theta_1(x,t).
+\end{equation}
+Plugging this approximation into System \eqref{eq:heatbeam}, 
+\begin{equation}\label{eq:heatbeam2}
+\begin{aligned}
+\rho A \diffp[2]{w}{t} &= - EI \diffp[4]{w}{x} - \beta E T_0 I \diffp[2]{}{x} \theta_1, \\
+\rho c_\delta T_0 I \diffp{\theta_1}{t} &= k T_0 I \diffp[2]{\theta_1}{x} + \beta T_0 E I \diffp[2,1]{w}{x,t},
+\end{aligned}
+\end{equation} 
+where the second equation was first multiplied by the $z$ coordinate and then an integrated across the beam cross section. Consider now the following definitions
+\begin{equation}
+	\begin{aligned}
+	\alpha_w = \rho A \partial_t w, \\
+	e_w = \partial_t w, \\
+	\alpha_\kappa = \partial_{xx} w, \\
+	e_\kappa = EI \partial_{xx} w, \\
+	\end{aligned} \qquad 
+	\begin{aligned}
+	\alpha_T = \rho c_\delta  T_0 I \theta_1, \\
+	e_T = \theta_1, \\
+	j_Q = k T_0 I \partial_x \theta_1.
+	\end{aligned}
+\end{equation}
+System \eqref{eq:heatbeam2} can now be rewritten as
+\begin{equation}\label{eq:phsysTEbeam}
+\begin{bmatrix}
+1 & 0 & 0 & 0\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 0\\
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+\alpha_w \\
+\alpha_\kappa \\
+{\alpha}_T \\
+{j}_Q \\
+\end{pmatrix} = 
+\begin{bmatrix}
+{0} & -\partial_{xx} & - \beta T_0 E I \partial_{xx} & {0}\\
+\partial_{xx} & {0} & {0} & {0} \\
+\beta T_0 E I \partial_{xx} & 0 & 0 & -\partial_{x} \\
+{0} & {0} & -\partial_{x} & - (T_0 k)^{-1} \\
+\end{bmatrix}
+\begin{pmatrix}
+e_w \\
+e_\kappa \\
+e_T \\
+{j}_Q \\
+\end{pmatrix}. 
+\end{equation}
+This system is the equivalent of \eqref{eq:phsysElasHeat} for beams bending. This means that it can be obtained starting from each subsystem in pH form by means of an appropriate interconnection.
 
 
-\section{Thermoelastic Euler-Bernoulli beam}
-
-\section{Thermoelastic Kirchhoff plate}
+\subsection{Thermoelastic Kirchhoff plate}
