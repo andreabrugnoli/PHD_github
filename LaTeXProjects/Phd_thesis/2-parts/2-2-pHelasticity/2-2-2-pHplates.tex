@@ -65,9 +65,9 @@ Concerning the shear deformation, the constitutive law reduces to
 \begin{equation}
 \bm{\sigma}_s = G \bm{\gamma},
 \end{equation}
-where $\bm{\sigma}_\alpha := \bm{\Sigma}_{\alpha, 3}$ and $G = \frac{E}{2(1 + \nu)}$ is the shear modulus. In the following sections the most common plate models will be presented and discussed.
+where $\bm{\sigma}_s := \bm{\Sigma}_{\alpha, 3}$ and $G = \frac{E}{2(1 + \nu)}$ is the shear modulus. In the following sections, the most common plate models will be presented.
 
-\subsection{Mindlin-Reissner model}
+\subsection{Mindlin-Reissner model}\label{sec:minClas}
 The Mindlin-Reissner model \cite{reissner1947bending,mindlin1951} represents a first-order shear deformation theory for describing the bending of plate. The in-plane midplane displacement are zero $\bm{u}^0(x,y)=\bm{0}$ for an isotropic plate that experiences only bending. Hence, the displacement field reduces to
 \begin{equation}
 \begin{aligned}
@@ -86,7 +86,7 @@ with $\bm\kappa$ given by \eqref{eq:kappa}. Consequently, the stress tensor read
 \end{equation*}
 where $\bm{\mathcal{D}}_{2D}$ is defined in Eq. \eqref{eq:stiff2D}. \\
 
-Consider an undeformed middle plane of the plate is denoted by $\Omega$. The total domain of the plate is the product $\Omega \times (-h/2, h/2)$, where $h$ is the constant thickness. To effectively reduce the problem from three- to two-dimensional, the stresses have to be integrated along the fibers. Since the stress varies linearly across the thickness, one has to multiply the stress by $z$ before the integration to get a non null contribution. Such a quantity is called bending momenta tensor and is given by 
+Consider an undeformed middle plane of the plate is denoted by $\Omega$. The total domain of the plate is the product $\Omega \times (-h/2, h/2)$, where $h$ is the constant thickness. To effectively reduce the problem from three- to two-dimensional, the stresses have to be integrated along the fibers. Since the stress varies linearly across the thickness, the stress has to be multiplied by $z$ before the integration to get a non null contribution. The resulting quantity is called bending momenta tensor and is given by 
 \begin{equation}\label{eq:momenta}
 \bm{M} :=-\int_{-h/2}^{h/2} z \bm{\Sigma}_{b} \d{z} = \bm{\mathcal{D}}_{b} \, \bm{\kappa}, 
 \end{equation}
@@ -140,7 +140,7 @@ The rotation vector is then related to the vertical displacement $\bm{\theta} = 
 \begin{equation}\label{eq:kappaKir}
 	\bm{\kappa} = \Grad \grad u_z = \Hess u_z.
 \end{equation}
-The focus being on bending behavior, the in-plane displacement of the mid-plane are assumed to be zero $\bm{u}^0(x,y)=\bm{0}$. Hence, the displacement field assumes the form
+Since the focus is on bending behavior, the in-plane displacement of the mid-plane are assumed to be zero $\bm{u}^0(x,y)=\bm{0}$. Hence, the displacement field assumes the form
 \begin{equation}
 \begin{aligned}
 u_x(x,y,z) &= -z \partial_x {u_z}, \\
@@ -215,7 +215,7 @@ e_w &:= \diffd{H}{\alpha_w} = \diffp{w}{t},  \quad &\text{Linear velocity,} \\
 \begin{proposition}
 	The variational derivative of the Hamiltonian with respect to the curvature tensor is the momenta tensor $\diffd{H}{\bm{A}_{\kappa}} = \bm{M}$.
 	\begin{proof}
-		The proof is analogous to one already detailed in Prop. \ref{prop:varder_tens}
+		The proof is analogous to the one already detailed in Prop. \ref{prop:varder_tens}
 	\end{proof}
 \end{proposition}
 
@@ -242,8 +242,6 @@ e_w \\
 \end{pmatrix}.
 \end{equation}
 The first two equations are equivalent to \eqref{eq:classMin}. The last two equations, like \eqref{eq:compderElas} for 3D elasticity, represent the fact the higher order derivatives commute.
-
-
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=0.7\textwidth]{chapter_4/cauchy_law.eps}
@@ -256,8 +254,7 @@ The first two equations are equivalent to \eqref{eq:classMin}. The last two equa
 	\caption{Reference frames and notations.}
 	\label{fig:plate_ref}
 \end{figure}
-
-We shall now establish the total energy balance in terms of boundary variables. Those will then be part of the underlying Stokes-Dirac structure of this model. The energy rate reads
+We shall now establish the total energy balance in terms of boundary variables as they will  be part of the underlying Stokes-Dirac structure of this model. The energy rate reads
 \begin{equation}
 \label{eq:enrateMin}
 \begin{aligned}
@@ -468,7 +465,7 @@ The last equation holds for $w \in C^3(\Omega)$.
 		
 		The function have to belong to the operator domain, so for instance $f \in {C}_0^2(\Omega) \in \mathrm{Domain}((\div\Div)^*)$ the space of twice differentiable scalar functions with compact support and $\bm{\Psi}$ can be chosen in the set ${C}_{0}^2(\Omega, \mathbb{S}) \in \mathrm{Domain}(\div\Div)$, the space of twice differentiable symmetric tensors with compact support on $\Omega$. A classical result is the fact that the adjoint of the vector divergence is $\mathrm{div}^* = -\mathrm{grad}$ as stated in \cite{zwart2015wave}. By theorem \ref{th:adjDiv}, it holds $\mathrm{Div}^* = -\mathrm{Grad}$. Considering that $\div\Div = \div \circ \Div$ is the composition of two different operators and that the adjoint of a composed operator is the adjoint of each operator in reverse order, i.e. $(B \circ C)^* = C^* \circ B^*$, then it can be stated
 		\begin{equation*}
-		(\div\Div)^* = (\div \circ \Div)^* = {\Div}^* \circ {\div}^* = \Grad \circ \grad.
+		(\div \circ \Div)^* = {\Div}^* \circ {\div}^* = \Grad \circ \grad.
 		\end{equation*}  
 		Since only formal adjoints are being looked for, this concludes the proof.
 	\end{proof}
@@ -577,7 +574,7 @@ e_w \\
 where $\bm\gamma_{0}^{\Gamma_*}a = a\vert_{\Gamma_*}$ and  $\gamma_{1}^{\Gamma_*}a = \partial_{\bm{n}} a \vert_{\Gamma_*}$ denote the standard and the normal derivative trace over the set $\Gamma_*$ respectively. The symbol $\gamma_{nn, 1}^{\Gamma_*}$ denotes the map $\gamma_{nn, 1}^{\Gamma_*}\bm{A} = -\bm{n} \cdot \Div \bm{A} - \partial_{\bm{s}} (\bm{A} \cddot (\bm{n} \otimes \bm{s}))\vert_{\Gamma_*},$, while $\gamma_{nn}^{\Gamma_*}\bm{A} = \bm{A} \cddot (\bm{n} \otimes \bm{n})\vert_{\Gamma_*}$ indicates the normal-normal trace of a tensor-valued function.
 
 \begin{remark}
-	The interconnection structure $\mathcal{J}$ in \eqref{eq:phsysKir} resembles that of the Bernoulli beam \cite{cardoso2017}. The double divergence and the double gradient coincide, in dimension one, with the second derivative.
+	The interconnection structure $\mathcal{J}$ in \eqref{eq:phsysKir} resembles that of the Bernoulli beam \cite{cardoso2017}. The double divergence and the Hessian coincide, in dimension one, with the second derivative.
 \end{remark}
 
 \begin{theorem}[Stokes-Dirac structure for the Kirchhoff plate]\label{th:stdirKir}
@@ -700,7 +697,7 @@ To get a port-Hamiltonian formulation, the following energy variable are chosen
 	\bm{A}_{\varepsilon^0} &= \bm{\varepsilon}^0,
 	\end{aligned} \qquad
 	\begin{aligned}
-	{\alpha}_w &= \rho h \diffp{\bm{u}_z}{t}, \\
+	{\alpha}_w &= \rho h \diffp{{u}_z}{t}, \\
 	\bm{A}_{\kappa} &= \bm{\kappa},
 	\end{aligned} \qquad
 	\begin{aligned}
@@ -722,7 +719,7 @@ e_w &:= \diffd{H}{\bm\alpha_u} = \diffp{\bm{u}^0}{t},\\
 \bm{E}_{\kappa} &:= \diffd{H}{\bm{A}_{\varepsilon^0}} = \bm{N},\\
 \end{aligned} \qquad
 \begin{aligned}
-e_w &:= \diffd{H}{\alpha_w} = \diffp{w}{t}, \\
+e_w &:= \diffd{H}{\alpha_w} = \diffp{u_z}{t}, \\
 \bm{E}_{\kappa} &:= \diffd{H}{\bm{A}_{\kappa}} = \bm{M}, \\
 \end{aligned} \qquad
 \begin{aligned}
@@ -785,7 +782,7 @@ e_w \\
 \bm{A}_{\varepsilon^0} \\
 \bm{A}_\kappa \\
 \bm\alpha_{\gamma} \\
-\end{pmatrix}
+\end{pmatrix}.
 \end{equation}
 Again appropriate boundary variables and a suitable Stokes-Dirac structure can be found for this model. The final formulation is just a superposition of systems \eqref{eq:phsysElas} and \eqref{eq:phsysMin}.
 
@@ -812,7 +809,7 @@ To get a port-Hamiltonian formulation, the following energy variable are chosen
 \bm{A}_{\varepsilon^0} &= \bm{\varepsilon}^0,
 \end{aligned} \qquad
 \begin{aligned}
-{\alpha}_w &= \rho h \diffp{\bm{u}_z}{t}, \\
+{\alpha}_w &= \rho h \diffp{{u}_z}{t}, \\
 \bm{A}_{\kappa} &= \bm{\kappa}.
 \end{aligned} 
 \end{equation} 
@@ -830,7 +827,7 @@ e_w &:= \diffd{H}{\bm\alpha_u} = \diffp{\bm{u}^0}{t},\\
 \bm{E}_{\kappa} &:= \diffd{H}{\bm{A}_{\varepsilon^0}} = \bm{N},\\
 \end{aligned} \qquad
 \begin{aligned}
-e_w &:= \diffd{H}{\alpha_w} = \diffp{w}{t}, \\
+e_w &:= \diffd{H}{\alpha_w} = \diffp{u_z}{t}, \\
 \bm{E}_{\kappa} &:= \diffd{H}{\bm{A}_{\kappa}} = \bm{M}, \\
 \end{aligned} 
 \end{equation}
@@ -876,7 +873,7 @@ e_w \\
 \alpha_w \\
 \bm{A}_{\varepsilon^0} \\
 \bm{A}_\kappa \\
-\end{pmatrix}
+\end{pmatrix}.
 \end{equation}
 The energy rate provides the appropriate boundary conditions from which one can construct the Stokes-Dirac structure. The necessary computations are not performed here as the final result is just a juxtaposition of systems \eqref{eq:phsysElas}, \eqref{eq:phsysKir}.
 
@@ -885,4 +882,4 @@ The energy rate provides the appropriate boundary conditions from which one can 
 
 In this chapter, a pH formulation for the most commonly used plate models has been detailed. Many open questions remain. In particular, how to generalize the results to shell problems, for which the domain is a surface embedded in the three dimensional space (a manifold). Computations get more involved in this case since the usage of differential geometry concepts is unavoidable. These models are important since they are widely used in the aerospace industry and ubiquitous in nature. \\
 
-The reformulation of plate models using the language of differential geometry is another open research topic. Indeed, while for the Mindlin plate it should be possible to use vector-valued forms to obtain an equivalent system, for the Kirchhoff plate the task appears more involved. An interesting reference that can be provide some ideas in this direction is \cite{yao2011modeling}. 
+The reformulation of plate models using the language of differential geometry is another open research topic. Indeed, while for the Mindlin plate it should be possible to use vector-valued forms to obtain an equivalent system, for the Kirchhoff plate the task appears more involved. An interesting reference that can provide some ideas in this direction is \cite{yao2011modeling}. 

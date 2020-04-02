@@ -11,21 +11,21 @@ The first work on this discipline dates back to \cite{duhamel1837}, but it was o
 \end{comment}
 
 \section{Port-Hamiltonian linear coupled thermoelasticity}\label{sec:phthel}
-In this section, a pH formulation of heat transfer is first introduced. The classical model of thermoelasticity is then recalled. The same model is found by interconnecting the heat equation and the linear elastodynamics problem seen as pHs. It is shown that the interconnection preserves a quadratic functional that plays the role of a fictitious energy. The resulting system is dissipative  with respect to this functional. The proposed construction makes use of the intrinsic modularity of pHs \cite{kurula2010} to derive a multiphysics composing together each physical realm.
+In this section, a pH formulation of heat transfer is first introduced. The classical model of thermoelasticity is then recalled. The same model is found by interconnecting the heat equation and the linear elastodynamics problem seen as pHs. It is shown that the interconnection preserves a quadratic functional that plays the role of a fictitious energy. The resulting system is dissipative  with respect to this functional. The construction makes use of the intrinsic modularity of pHs \cite{kurula2010}.
 
 \subsection{The heat equation as a pH descriptor system}\label{sec:phheat}
 Consider the heat equation in a bounded connected set $\Omega \subset \mathbb{R}^d, \, d=\{1,2,3\}$, describing the evolution of the temperature field $T(\bm{x}, t)$
 \begin{equation}\label{eq:heatEq}
-\rho c_\epsilon \diffp{T}{t} = k \Delta T + r_Q, \qquad \bm{x} \in \Omega,
+\rho c_\epsilon \diffp{T}{t} = k \Delta T + r_Q, \qquad \quad \bm{x} \in \Omega,
 \end{equation}
-where $\rho,\, c_\epsilon,\, k,\, r_Q$ are the mass density, the specific heat density at constant strain, the thermal diffusivity and an heat source. The Dirichlet and Neumann condition of this problem are 
+where $\rho,\, c_\epsilon,\, k,\, r_Q$ are the mass density, the specific heat density at constant strain, the thermal diffusivity and an heat source. Symbol $\Delta$ denotes the Laplacian in $\mathbb{R}^d$.The Dirichlet and Neumann condition of this problem are 
 \begin{equation*}
 	\begin{aligned}
 	T \text{ known on } \Gamma_D^T \times (0, +\infty), \qquad \text{Dirichlet condition}, \\
 	-k \, \grad T \cdot \bm{n} \text{ known on } \Gamma_N^T \times (0, +\infty) \qquad \text{Neumann condition},
 	\end{aligned}
 \end{equation*}
-where a partition of the boundary $\partial \Omega = \Gamma_D^T \cup \Gamma_N^T$ has been considered. This model can be put in pH form by means of a canonical interconnection structure ( cf. \cite[Chapter 2]{kotyczka2019numerical}). An algebraic relationship that describes the Fourier law has to be incorporated in the model. Here, a differential-algebraic formulation is exploited to obtain the same system. \\
+where a partition of the boundary $\partial \Omega = \Gamma_D^T \cup \Gamma_N^T$ has been considered. This model can be put in pH form by means of a canonical interconnection structure and algebraic relationship that describes the Fourier law has to be incorporated in the model (cf. \cite[Chapter 2]{kotyczka2019numerical}). Here, a differential-algebraic formulation is exploited to obtain the same system. \\
 
 Let $T_0$ be a constant reference temperature (the introduction of this variables is instrumental for coupled thermoelasticity). The functional 
 \begin{equation*}
@@ -37,7 +37,7 @@ has the physical dimension of an energy and represents a Lyapunov functional of 
 \end{equation*}
 whose corresponding co-energy is 
 \begin{equation*}
-	e_T := \diffd{H_T}{\alpha_T} = \frac{\alpha_T}{\rho c_V T_0} = \frac{T-T_0}{T_0} =: \theta.
+	e_T := \diffd{H_T}{\alpha_T} = \frac{\alpha_T}{\rho c_\epsilon T_0} = \frac{T-T_0}{T_0} =: \theta.
 \end{equation*}
 Introducing the heat flux $\bm{j}_Q := -k \grad T$ as additional variable, the heat equation \eqref{eq:heatEq} is equivalently reformulated as
 \begin{equation}\label{eq:phsysHeat}
@@ -110,17 +110,17 @@ The power rate is then deduced
 		&\le \int_\Omega u_T \, y_T \d\Omega -\int_{\partial\Omega} e_T \ \bm{j}_Q \cdot \bm{n} \d{S}.
 \end{aligned}
 \end{equation}
-This choice of Hamiltonian allows retrieving the classical boundary conditions and leads to a dissipative system. Other formulations, based on an entropy or internal energy functionals are possible for the heat equation \cite{duindam2009,serhani2019modeling}. Unfortunately these formulations are non linear and their discretization is a difficult task \cite{serhani2019discretization}. 
+This choice of Hamiltonian allows retrieving the classical boundary conditions and leads to a dissipative system. Other formulations, based on an entropy or internal energy functionals, are possible for the heat equation \cite{duindam2009,serhani2019modeling}. These provide an accrescent or a lossless system. Unfortunately these formulations are non linear and their discretization is a difficult task \cite{serhani2019discretization}. 
 
 
 \subsection{Classical thermoelasticity}
 The derivation of the classical theory of thermoelasticity is not carried out here. The reader may consult in \cite[Chapter 1]{hetnarski2009thermal} or \cite[Chapter 8]{abeyaratne2012notes} for a detailed discussion on this topic. 
 
-Consider a bounded connected set $\Omega \subset \mathbb{R}^d, \, d=\{1,2,3\}$. The classical equations for linear fully-coupled thermoelasticity for an isotropic thermoelastic material are \cite{carlson1973,biot1956thermoelasticity}
+Consider a bounded connected set $\Omega \subset \mathbb{R}^d, \, d=\{1,2,3\}$. The classical equations for linear fully-coupled thermoelasticity for an isotropic thermoelastic material are \cite{biot1956thermoelasticity,carlson1973}
 \begin{equation}\label{eq:sysThElas}
 \begin{aligned}
 \displaystyle \rho \diffp[2]{\bm{u}}{t} &= \Div(\bm{\Sigma}_{ET}) , \\
-\displaystyle \rho c_V \diffp{T}{t} &= -\div(\bm{j}_Q) - \mathcal{I}_\beta \cddot \displaystyle\diffp{\bm{\varepsilon}}{t}, \\
+\displaystyle \rho c_\epsilon \diffp{T}{t} &= -\div(\bm{j}_Q) - \mathcal{I}_\beta \cddot \displaystyle\diffp{\bm{\varepsilon}}{t}, \\
 \bm{\Sigma}_{ET} &= \bm{\Sigma}_E + \bm{\Sigma}_{T}, \\
 \bm{\Sigma}_E &= 2\mu \bm{\varepsilon} + \lambda \Tr(\bm{\varepsilon}) \bm{I}_{d\times d}, \\
 \bm{\Sigma}_T &= - \mathcal{I}_\beta \theta,  \\
@@ -129,8 +129,8 @@ Consider a bounded connected set $\Omega \subset \mathbb{R}^d, \, d=\{1,2,3\}$. 
 \end{aligned}
 \end{equation}
 For simplicity  the coupling term
-\[\mathcal{I}_\beta:=T_0 \beta(2\mu + d \lambda)\bm{I}_{d\times d} \]
-has been introduced. Field $\bm{u}$ is the displacement, $\bm{\varepsilon}$ is the infinitesimal strain tensor, $\bm{\Sigma}_E, \bm{\Sigma}_T$ are the stress tensor contribution due to mechanical deformation and a thermal field. Coefficients $\lambda, \mu$ are the Lam\'e parameters,  and $\beta$ the thermal expansion coefficient. Given a partition of the boundary $\partial \Omega = \Gamma_D^E \cup \Gamma_N^E = \Gamma_D^T \cup \Gamma_N^T$ for the elastic and thermal domain. The general homogeneous boundary conditions read 
+\[\mathcal{C}_\beta:=T_0 \beta(2\mu + d \lambda)\bm{I}_{d\times d} \]
+has been introduced. Field $\bm{u}$ is the displacement, $\bm{\varepsilon}$ is the infinitesimal strain tensor, $\bm{\Sigma}_E, \bm{\Sigma}_T$ are the stress tensor contribution due to mechanical deformation and a thermal field. Coefficients $\lambda,\, \mu$ are the Lam\'e parameters,  and $\beta$ the thermal expansion coefficient. Given a partition of the boundary $\partial \Omega = \Gamma_D^E \cup \Gamma_N^E = \Gamma_D^T \cup \Gamma_N^T$ for the elastic and thermal domain. The general boundary conditions read 
 \begin{equation}
 \begin{aligned}
 \bm{u} \text{ known on } \Gamma_D^E \times (0, +\infty), \\
@@ -141,6 +141,7 @@ T \text{ known on } \Gamma_D^T \times (0, +\infty), \\
 \bm{j}_Q \cdot \bm{n} \text{ known on } \Gamma_N^T \times (0, +\infty).
 \end{aligned}
 \end{equation}
+In the following section an equivalent system is constructed by interconnecting the heat equation and the elastodynamics system in a structured manner.
 
 \subsection{Thermoelasticity as two coupled pHs}
 
@@ -211,28 +212,28 @@ e_T \\
 \end{equation} 
 with Hamiltonian $H_T$ defined in \eqref{eq:hamHeat}. The linear thermoelastic problem can be expressed as a coupled port-Hamiltonian system.  Consider the following interconnection
 \begin{equation}
-\bm{u}_E = - \Div(\mathcal{I}_\beta \, y_T), \qquad
-u_T = - \mathcal{I}_\beta \cddot\Grad(\bm{y}_E). 
+\bm{u}_E = - \Div(\mathcal{C}_\beta \, y_T), \qquad
+u_T = - \mathcal{C}_\beta \cddot\Grad(\bm{y}_E). 
 \end{equation}
 The interconnection is power preserving as it can be compactly written as 
 \begin{equation*}
-\bm{u}_E = \mathcal{C}_\beta(y_T), \qquad u_T = - \mathcal{C}_\beta^*(\bm{y}_E).
+\bm{u}_E = \mathcal{A}_\beta(y_T), \qquad u_T = - \mathcal{A}_\beta^*(\bm{y}_E),
 \end{equation*}
-where the coupling operator $\mathcal{C}_\beta := - \Div(\mathcal{I}_\beta \, \cdot) : L^2(\Omega) \rightarrow L^2(\Omega, \mathbb{R}^d)$ has formal adjoint $ \mathcal{C}_\beta^* =  \mathcal{I}_\beta^* \cddot  \Grad(\cdot) =  \mathcal{I}_\beta \cddot  \Grad(\cdot): L^2(\Omega, \mathbb{R}^3) \rightarrow L^2(\Omega)$ ($\mathcal{I}_\beta$ is self adjoint given its diagonal structure). As a consequence, under the assumption that $\bm{y}_E, y_T$ have compact support, it holds
+where the coupling operator $\mathcal{A}_\beta := - \Div(\mathcal{C}_\beta \, \cdot) : L^2(\Omega) \rightarrow L^2(\Omega, \mathbb{R}^d)$ has formal adjoint $ \mathcal{A}_\beta^* =  \mathcal{C}_\beta^* \cddot  \Grad(\cdot) =  \mathcal{C}_\beta \cddot  \Grad(\cdot): L^2(\Omega, \mathbb{R}^3) \rightarrow L^2(\Omega)$ ($\mathcal{C}_\beta$ is self adjoint given its diagonal structure). As a consequence, under the assumption that $\bm{y}_E, y_T$ have compact support, it holds
 \[
 \left\langle u_T, y_T \right\rangle_{L^2(\Omega)} + \left\langle \bm{u}_E, \bm{y}_E \right\rangle_{L^2(\Omega, \mathbb{R}^3)} = 0.
 \]
 If the compact support assumption is removed, it is obtained
 \begin{equation}\label{eq:balIntThElas}
 	\begin{aligned}
-	\left\langle u_T, y_T \right\rangle_{L^2(\Omega)} + \left\langle \bm{u}_E, \bm{y}_E \right\rangle_{L^2(\Omega, \mathbb{R}^3)} &= -\int_\Omega \left\{(\mathcal{I}_\beta \cddot \Grad \bm{e}_v) e_T + \Div(\mathcal{I}_\beta e_T) \cdot \bm{e}_v \right\} \d\Omega, \\
-	&= -\int_{\Omega} \div(e_T \mathcal{I}_\beta \cdot \bm{e}_v ) \d\Omega, \\
-	&= -\int_{\partial \Omega} (e_T \mathcal{I}_\beta \cdot \bm{n}) \cdot \bm{e}_v  \d{S}
+	\left\langle u_T, y_T \right\rangle_{L^2(\Omega)} + \left\langle \bm{u}_E, \bm{y}_E \right\rangle_{L^2(\Omega, \mathbb{R}^3)} &= -\int_\Omega \left\{(\mathcal{C}_\beta \cddot \Grad \bm{e}_v) e_T + \Div(\mathcal{C}_\beta e_T) \cdot \bm{e}_v \right\} \d\Omega, \\
+	&= -\int_{\Omega} \div(e_T \mathcal{C}_\beta \cdot \bm{e}_v ) \d\Omega, \\
+	&= -\int_{\partial \Omega} (e_T \mathcal{C}_\beta \cdot \bm{n}) \cdot \bm{e}_v  \d{S}.
 	\end{aligned}
 \end{equation}
 Using the expression of $y_T, \bm{y}_E$, considering that $T_0$ is constant and applying Schwarz theorem for smooth function, the inputs are equal to
 \begin{equation*}
-\bm{u}_E =  \Div(\bm{\Sigma}_T), \qquad u_T = - \mathcal{I}_\beta \cddot  \Grad(\bm{v}) = - \mathcal{I}_\beta \cddot  \diffp{\bm{\varepsilon}}{t} .
+\bm{u}_E =  \Div(\bm{\Sigma}_T), \qquad u_T = - \mathcal{C}_\beta \cddot  \Grad(\bm{v}) = - \mathcal{C}_\beta \cddot  \diffp{\bm{\varepsilon}}{t} .
 \end{equation*}
 
 The coupled thermoelastic problem can now be written as
@@ -251,9 +252,9 @@ The coupled thermoelastic problem can now be written as
 \bm{j}_Q \\
 \end{pmatrix} = 
 \begin{bmatrix}
-\bm{0} & \Div & - \Div(\mathcal{I}_\beta \, \cdot) & \bm{0}\\
+\bm{0} & \Div & - \Div(\mathcal{C}_\beta \, \cdot) & \bm{0}\\
 \Grad & \bm{0} & \bm{0} & \bm{0} \\
-- \mathcal{I}_\beta \cddot  \Grad(\cdot) & 0 & 0 & -\div \\
+- \mathcal{C}_\beta \cddot  \Grad(\cdot) & 0 & 0 & -\div \\
 \bm{0} & \bm{0} & -\grad & - (T_0 k)^{-1} \\
 \end{bmatrix}
 \begin{pmatrix}
@@ -271,7 +272,7 @@ with total energy given by $H=H_E + H_T$. The power balance for each subsystem i
 The overall power balance is easily computed considering Eqs. \eqref{eq:enrateElasU} \eqref{eq:enrateHeatU} and \eqref{eq:balIntThElas}
 \begin{equation}\label{eq:enrateIntThElas}
 \begin{aligned}
-\dot{H} = \dot{H}_E + \dot{H}_T \le \int_{\partial \Omega} \left\{\left[\bm{E}_\varepsilon - e_T \mathcal{I}_\beta \right] \cdot \bm{n}\right\}  \cdot \bm{e}_v  \d{S} - \int_{\partial\Omega} \theta \ \bm{j}_Q \cdot \bm{n} \d{S}
+\dot{H} = \dot{H}_E + \dot{H}_T \le \int_{\partial \Omega} \left\{\left[\bm{E}_\varepsilon - e_T \mathcal{C}_\beta \right] \cdot \bm{n}\right\}  \cdot \bm{e}_v  \d{S} - \int_{\partial\Omega} \theta \ \bm{j}_Q \cdot \bm{n} \d{S}.
 \end{aligned}
 \end{equation}
 From the power balance the classical boundary conditions are retrieved. This allows defining appropriate boundary operators for the thermoelastic problem
@@ -279,7 +280,7 @@ From the power balance the classical boundary conditions are retrieved. This all
 	\bm{u}_\partial = 
 	\underbrace{\begin{bmatrix}
 	\bm{\gamma}_{0}^{\Gamma_D^E} & \bm{0} & \bm{0} & \bm{0} \\
-	\bm{0} & \bm{\gamma}_n^{\Gamma_N^E} & - \bm{\gamma}_n^{\Gamma_N^E}(\mathcal{I}_\beta\, \cdot )  & \bm{0}  \\ 
+	\bm{0} & \bm{\gamma}_n^{\Gamma_N^E} & - \bm{\gamma}_n^{\Gamma_N^E}(\mathcal{C}_\beta\, \cdot )  & \bm{0}  \\ 
 	{0} & {0} & {\gamma}_{0}^{\Gamma_D^T} & {0} \\
 	\bm{0} & \bm{0} & \bm{0} & \bm{\gamma}_{n}^{\Gamma_N^T} \\
 	\end{bmatrix}}_{\mathcal{B}_\partial}
@@ -291,7 +292,7 @@ From the power balance the classical boundary conditions are retrieved. This all
 	\end{pmatrix}, \; 
 	\bm{y}_\partial = 
 	\underbrace{\begin{bmatrix}
-		\bm{0} & \bm{\gamma}_n^{\Gamma_D^E} & - \bm{\gamma}_n^{\Gamma_D^E}(\mathcal{I}_\beta\, \cdot )  & \bm{0}  \\ 
+		\bm{0} & \bm{\gamma}_n^{\Gamma_D^E} & - \bm{\gamma}_n^{\Gamma_D^E}(\mathcal{C}_\beta\, \cdot )  & \bm{0}  \\ 
 		\bm{\gamma}_{0}^{\Gamma_N^E} & \bm{0} & \bm{0} & \bm{0} \\
 		\bm{0} & \bm{0} & \bm{0} & \bm{\gamma}_{n}^{\Gamma_D^T} \\
 		{0} & {0} & {\gamma}_{0}^{\Gamma_N^T} & {0} \\
@@ -304,45 +305,43 @@ From the power balance the classical boundary conditions are retrieved. This all
 	\end{pmatrix}.
 \end{equation} 
 
-System \eqref{eq:phsysElasHeat} together with \eqref{eq:phBCHeatElas} is a pH system with boundary control and observation. The classical thermoelastic problem can be modeled as two coupled systems, demonstrated the modularity of the pH paradigm.
+System \eqref{eq:phsysElasHeat} together with \eqref{eq:phBCHeatElas} is a pH system with boundary control and observation. Indeed, the classical thermoelastic problem can be modeled as two coupled systems, demonstrating the modularity of the pH paradigm.
 
 
-\section{Thermoelastic bending}
-In this section, the thermoelastic bending of thin beam and plate structure is modeled as coupled interconnection pf pHs. Starting from classical thermoelastic models and introducing a linear approximation of the temperature field, a suitable pH formulation can be obtained.  
+\section{Thermoelastic port-Hamiltonian bending}
+In this section, the thermoelastic bending of thin beam and plate structures is described as coupled interconnection pf pHs. Starting from classical thermoelastic models and introducing a linear approximation of the temperature field along the thickness coordinate, a suitable pH formulation can be obtained.  
 
 
-\subsection{Thermoelastic Euler-Bernoulli beam}
+\subsection{Thermoelastic port-Hamiltonian Euler-Bernoulli beam}
 The model for the linear thermoelastic vibrations of an isotropic thin rod is ruled by equations \cite{chadwick1962propagation,lifshitz2000thermoelastic}
 \begin{equation}\label{eq:heatbeam}
 \begin{aligned}
 \rho A \diffp[2]{w}{t} &= - EI \diffp[4]{w}{x} - \beta E T_0 \diffp[2]{}{x} \int_{S} z \theta \d{S}, \\
-\rho c_\delta T_0 \diffp{\theta}{t} &= k T_0 \Delta \theta + \beta T_0 E z \diffp[2,1]{w}{x,t}, 
+\rho c_{\epsilon, B} T_0 \diffp{\theta}{t} &= k T_0 \Delta \theta + \beta T_0 E z \diffp[2,1]{w}{x,t}, 
 \end{aligned}
 \end{equation}
-where $w(x,t)$ is the vertical displacement of the beam $I = \int_S z^2 \d{S}$ the second moment of area, $E$ the Young modulus and $A$ the cross section. The constant $c_\delta$ is due to the thermoelastic coupling (cf. \cite{lifshitz2000thermoelastic} for a detailed explanation).  The other terms have meaning than in Section \secref{sec:phthel}. The normalized temperature $\theta(x,y,z,t)$ depends on all spatial coordinates. To derive a coupled pH model, it is assumed that the temperature field can be approximated as 
+where $w(x,t)$ is the vertical displacement of the beam $I = \int_S z^2 \d{S}$ the second moment of area, $E$ the Young modulus and $A$ the cross section. The constant $c_{\epsilon, B}$ is due to the thermoelastic coupling (cf. \cite{chadwick1962propagation} for a detailed explanation).  The other terms have meaning than in Section \secref{sec:phthel}. Since the normalized temperature $\theta(x,y,z,t)$ depends on all spatial coordinates, the symbol $\Delta = \partial_{xx} + \partial_{yy} + \partial_{zz}$ is the Laplacian in three dimensions. To derive a coupled pH model, it is assumed that the temperature field can be approximated as 
 \begin{equation}
-	\theta(x,y,z,t) = \theta_0(x,t) + z \theta_1(x,t).
+	\theta(x,y,z,t) \approx \theta_0(x,t) + z \theta_1(x,t).
 \end{equation}
-Plugging this approximation into System \eqref{eq:heatbeam}, 
+Plugging this approximation into System \eqref{eq:heatbeam}, it is computed
 \begin{equation}\label{eq:heatbeam2}
 \begin{aligned}
-\rho A \diffp[2]{w}{t} &= - EI \diffp[4]{w}{x} - \beta E T_0 I \diffp[2]{}{x} \theta_1, \\
-\rho c_\delta T_0 I \diffp{\theta_1}{t} &= k T_0 I \diffp[2]{\theta_1}{x} + \beta T_0 E I \diffp[2,1]{w}{x,t},
+\rho A \diffp[2]{w}{t} &= - EI \diffp[4]{w}{x} - C_\beta \diffp[2]{}{x} \theta_1, \\
+\rho c_{\epsilon, B} T_0 I \diffp{\theta_1}{t} &= k T_0 I \diffp[2]{\theta_1}{x} + C_\beta \diffp[2,1]{w}{x,t},
 \end{aligned}
 \end{equation} 
-where the second equation was first multiplied by the $z$ coordinate and then an integrated across the beam cross section. The contribution due to $\theta_0$ disappears since the axis passes through the centroid of the cross section. Consider now the following definitions
+where $C_{\beta, B} :=  \beta T_0 E  I$. The second equation was first multiplied by the $z$ coordinate and then integrated across the beam cross section. Since the $x$ axis passes through the centroid of the cross section, the contribution due to $\theta_0$ disappears. Consider the Hamiltonian functional
 \begin{equation}
-	\begin{aligned}
-	\alpha_w = \rho A \partial_t w, \\
-	e_w = \partial_t w, \\
-	\alpha_\kappa = \partial_{xx} w, \\
-	e_\kappa = EI \partial_{xx} w, \\
-	\end{aligned} \qquad 
-	\begin{aligned}
-	\alpha_T = \rho c_\delta  T_0 I \theta_1, \\
-	e_T = \theta_1, \\
-	j_Q = k T_0 I \partial_x \theta_1.
-	\end{aligned}
+H = H_E + H_T = \energy{\rho A \left(\diffp{w}{t}\right)^2 + E I \left(\diffp[2]{w}{x} \right)^2 + \rho c_{\epsilon, B} T_0 I \theta_1^2}.
+\end{equation}
+The energy variables are chosen to make the Hamiltonian functional quadratic
+\begin{equation}
+\alpha_w = \rho A \partial_t w, \qquad \alpha_\kappa = \partial_{xx} w, \qquad \alpha_T = \rho c_{\epsilon, B}  T_0 I \theta_1.
+\end{equation}
+The corresponding co-energy variables evaluate to
+\begin{equation}
+	e_w := \diffd{H}{\alpha_w} = \partial_t w, \qquad e_\kappa := \diffd{H}{\alpha_\kappa} = EI \partial_{xx} w, \qquad 	e_T := \diffd{H}{\alpha_T} = \theta_1. 
 \end{equation}
 System \eqref{eq:heatbeam2} can now be rewritten as
 \begin{equation}\label{eq:phsysTEbeam}
@@ -360,19 +359,95 @@ System \eqref{eq:heatbeam2} can now be rewritten as
 {j}_Q \\
 \end{pmatrix} = 
 \begin{bmatrix}
-{0} & -\partial_{xx} & - \beta T_0 E I \partial_{xx} & {0}\\
+{0} & -\partial_{xx} & - C_{\beta, B} \partial_{xx} & {0}\\
 \partial_{xx} & {0} & {0} & {0} \\
-\beta T_0 E I \partial_{xx} & 0 & 0 & -\partial_{x} \\
-{0} & {0} & -\partial_{x} & - (T_0 k)^{-1} \\
+C_{\beta, B} \partial_{xx} & 0 & 0 & -\partial_{x} \\
+{0} & {0} & -\partial_{x} & - (k T_0 I)^{-1} \\
 \end{bmatrix}
 \begin{pmatrix}
 e_w \\
 e_\kappa \\
 e_T \\
 {j}_Q \\
-\end{pmatrix}. 
+\end{pmatrix}, 
 \end{equation}
-This system is the equivalent of \eqref{eq:phsysElasHeat} for beams bending. This means that it can be obtained starting from each subsystem in pH form by means of an appropriate interconnection.
+where $j_Q = -k T_0 I \partial_x \theta_1$ is the heat flux. This system is the equivalent of \eqref{eq:phsysElasHeat} for bending of beams. Hence, following the same reasoning, it can be obtained starting from each subsystem in pH form by means of an appropriate interconnection.
+\subsection{Thermoelastic port-Hamiltonian Kirchhoff plate}
+For the bending of thin plate, several different models have been proposed \cite{chadwick1962propagation,lagnese1989,simmonds1999,norris2006}. Here, the Chadwick model \cite{chadwick1962propagation} is recovered:
+\begin{equation}\label{eq:heatplate}
+\begin{aligned}
+\rho h \diffp[2]{w}{t} &= -D \Delta^2 w + D \beta (1+\nu) T_0 \Delta \Theta, \\
+\rho c_{\epsilon, P} T_0 \diffp{\theta}{t} &= - k T_0 (\Delta \theta + \partial_{zz} \theta) + \frac{\beta T_0 E z}{1-\nu}  \Delta (\partial_t w),
+\end{aligned}
+\end{equation} 
+where $w(x,y,t)$ is the vertical deflection, $h$ the plate thickness, $D = \frac{E h^3}{12(1-\nu^2)}$ the bending rigidity, $\nu$ the Poisson modulus and $c_{\epsilon, P}$ a constant (depending on the heat capacity at constant strain and other coupling parameters, cf. \cite{chadwick1962propagation}). Symbol $\Delta = \partial_{xx} + \partial_{yy}$ is the in plane Laplacian and 
+\[\Theta:= \frac{1}{I_h} \int_{-h/2}^{h/2} z \theta \d{z}, \where I_h:=\frac{h^3}{12}  \]
+is the first moment of the normalized temperature. The same linear approximation for the  temperature field is introduced
+\begin{equation}
+\theta(x,y,z,t) \approx \theta_0(x,y,t) + z \theta_1(x,y,t).
+\end{equation}
+Consequently, $\Theta$ approximates to $\Theta \approx \theta_1$. Analogously to what was done for the Euler-Bernoulli beam the heat equation is manipulated (multiplication by $z$ and integration over the plate thickness), to obtain
+\begin{equation}\label{eq:heatplate2}
+\begin{aligned}
+\rho h \diffp[2]{w}{t} &= -D \Delta^2 w + C_{\beta, P} \Delta \theta_1, \\
+{\rho c_{\epsilon, P} T_0 I_h} \diffp{\theta_1}{t} &= - {k T_0 I_h} \Delta \theta_1 +  C_{\beta, P} \Delta (\partial_t w),
+\end{aligned}
+\end{equation} 
+where $C_{\beta, P} := D \beta (1+\nu) T_0$ is the coupling parameter. The Hamiltonian functional equals
+\begin{equation}
+H = H_E + H_T = \energy{\rho h \left(\diffp{w}{t}\right)^2 + (\bm{\mathcal{D}}_b \Hess w) : \Hess w + {\rho c_{\epsilon, P} T_0 I_h} \theta_1^2},
+\end{equation}
+where $\bm{\mathcal{D}}_b$ was defined in \eqref{eq:Db} (cf. Sec. \secref{sec:minClas}). The energy and co-energy variables are
+\begin{equation}
+\begin{aligned}[t]
+\alpha_w &= \rho h \partial_t w, \\
+e_w &= \partial_t w,
+\end{aligned} \qquad 
+\begin{aligned}[t]
+\bm{A}_\kappa &= \Hess w, \\
+\bm{E}_\kappa &=  \bm{\mathcal{D}}_b \Hess w, \\
+\end{aligned} \qquad 
+\begin{aligned}[t]
+\alpha_T &= {\rho c_{\epsilon, P} T_0 I_h} \;  \theta_1, \\
+e_T & = \theta_1.
+\end{aligned}
+\end{equation}
+System \eqref{eq:heatplate2} is rewritten as
+\begin{equation}\label{eq:phsysTEplate}
+\begin{bmatrix}
+1 & 0 & 0 & 0\\
+\bm{0} & \bm{1} & \bm{0} & \bm{0} \\
+0 & 0 & 1 & 0\\
+\bm{0} & \bm{0} & \bm{0} & \bm{0} \\
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+\alpha_w \\
+\bm{A}_\kappa \\
+{\alpha}_T \\
+\bm{j}_Q \\
+\end{pmatrix} = 
+\begin{bmatrix}
+{0} & -\div \circ \Div & - C_{\beta, P} \Delta & {0}\\
+\Grad \circ \grad & \bm{0} & \bm{0} & {0} \\
+C_{\beta, P} \Delta & 0 & 0 & -\div \\
+\bm{0} & \bm{0} & -\grad & - (k T_0 I_h)^{-1} \\
+\end{bmatrix}
+\begin{pmatrix}
+e_w \\
+\bm{E}_\kappa \\
+e_T \\
+\bm{j}_Q \\
+\end{pmatrix},
+\end{equation}
+where $\bm{j}_Q = -{k T_0 I_h} \grad \theta_1$ is the heat flux. The final system reproduces the same structured coupling already observed for \eqref{eq:phsysElasHeat}, \eqref{eq:phsysTEbeam}.
+
+\section{Conclusion}
+In this chapter, it was shown how to derive linear thermoelastic problem as coupled pHs. This is especially interesting for the simulation of thermoelastic phenomena: each subsystem can be discretized separately and then coupled to the other using the discretized coupling operator. \\
+
+To achieve a suitable formulation for the bending of plates and beams a linear approximation was introduced. However, if higher order theories are used for the bending behavior, the approximation of temperature field modifies accordingly, allowing for a better representation of temperature trend along the thickness.
 
 
-\subsection{Thermoelastic Kirchhoff plate}
+
+
+
