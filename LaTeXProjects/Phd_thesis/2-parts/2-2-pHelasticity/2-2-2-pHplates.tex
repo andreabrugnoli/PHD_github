@@ -110,7 +110,7 @@ where $\rho$ is the mass density. The Hamilton principle states that
 The final result is the following system of PDEs (for the detailed computations see \cite[Chapter 10]{reddy2006theory})
 \begin{equation}\label{eq:classMin}
 \begin{aligned}
-\rho \diffp[2]{u_z}{t} &= \div \bm{q}, \qquad (x,y) \in \Omega, \\
+\rho h \diffp[2]{u_z}{t} &= \div \bm{q}, \qquad (x,y) \in \Omega, \\
 \frac{\rho h^3}{12} \diffp[2]{\bm{\theta}}{t} &=\Div \bm{M} + \bm{q},
 \end{aligned}
 \end{equation}
@@ -160,23 +160,23 @@ E_{\text{kin}} &= \frac{1}{2}  \int_{\Omega} \int_{-h/2}^{h/2} \rho \, \norm{\pa
 \begin{remark}[Rotational  energy]\label{rmk:rotary}
 For the kinetic energy the rotational contribution 
 \begin{equation*}
-E_{\text{rot}} =  \frac{1}{2}  \int_{\Omega} \int_{-h/2}^{h/2} \left\{\rho \, (\partial_t u_x)^2 + (\partial_t u_y)^2 \right\} \d{\Omega} \d{z} = \frac{h^3}{24} \int_{\Omega} \left\{\rho \, (\partial_{tx} u_z)^2 + (\partial_{ty} u_z)^2 \right\} \d{\Omega} = O(h^3),
+E_{\text{rot}} =  \frac{1}{2}  \int_{\Omega} \int_{-h/2}^{h/2} \left\{\rho \, (\partial_t u_x)^2 + (\partial_t u_y)^2 \right\} \d{\Omega} \d{z} = \frac{h^3}{24} \int_{\Omega} \rho \left\{ \, (\partial_{tx} u_z)^2 + (\partial_{ty} u_z)^2 \right\} \d{\Omega} = O(h^3),
 \end{equation*}
 is neglected given the small thickness assumption.
 \end{remark}
 The final result from the Hamilton's principle is the following PDE (for the detailed computations the reader may consult \cite[Chapter 3]{reddy2006theory})
 \begin{equation}\label{eq:classKir}
-\rho \diffp[2]{u_z}{t} = - \div\Div \bm{M}, \qquad (x,y) \in \Omega.
+\rho h \diffp[2]{u_z}{t} = - \div\Div \bm{M}, \qquad (x,y) \in \Omega.
 \end{equation}
 Considering that $\bm{M}= \bm{\mathcal{D}}_b\, \Hess{u_z}$ one obtains
 \begin{equation*}
-\rho \diffp[2]{u_z}{t} = - D_b \Delta^2 u_z, \qquad (x,y) \in \Omega,
+\rho h \diffp[2]{u_z}{t} = - D_b \Delta^2 u_z, \qquad (x,y) \in \Omega,
 \end{equation*}
 where $\Delta^2 = \diffp[4]{}{x} + 2\diffp[2]{}{x}\diffp[2]{}{y} + \diffp[4]{}{y}$ is the bilaplacian. Appropriate boundary conditions for this problem will be detailed in \ref{sec:pHkirchh}.
 
 
 \section{Port-Hamiltonian formulation of plates}
-In this section the pH formulation of the Mindlin and Kirchhoff plate models is detailed. In \cite{macchelli2005mindlin}, the Mindlin plate model was put in pH form by appropriate selection of the energy variables. However, the final system does not consider the nature of the different variables that come into play, leading to a non intrinsic final formulation. Additionally, this model was presented using the jet bundle formalism in \cite{schoberl2017mindlin}. The Kirchhoff model was never explored in the pH framework and represents an original contribution of this thesis. The interested reader can find in \cite{rafetseder2018siam} a rigorous mathematical treatment of the biharmonic problem and its decomposition in 2D geometries (the 3D, that does not relate to plate bending, is treated in \cite{pauly2018divdiv}), but only for the static case. 
+In this section the pH formulation of the Mindlin and Kirchhoff plate models is detailed. In \cite{macchelli2005mindlin}, the Mindlin plate model was put in pH form by appropriate selection of the energy variables. However, the final system does not consider the nature of the different variables that come into play, leading to a non intrinsic final formulation. Additionally, this model was presented using the jet bundle formalism in \cite{schoberl2017mindlin}. The Kirchhoff model was never explored in the pH framework and represents an original contribution of this thesis. The interested reader can find in \cite{rafetseder2018siam} a rigorous mathematical treatment of the biharmonic problem and its decomposition in 2D geometries, but only for the static case (the 3D case, that does not relate to plate bending, is treated in \cite{pauly2018divdiv}). 
 
 \subsection{Port-Hamiltonian Mindlin plate}\label{sec:pHmin}
 Let $w:= u_z$ denote the vertical displacement of the plate. Consider a bounded, connected domain $\Omega \subset \mathbb{R}^2$ and the Hamiltonian (total energy)
@@ -684,9 +684,9 @@ E_{\text{def}} &= \energy{\bm{N} \cddot \bm{\varepsilon}^0 + \bm{M} \cddot \bm{\
 By using the Hamilton principle the equations of motion are retrieved (see \cite[Chapter~3]{reddy2003mechanics} for an exhaustive explanation)
 \begin{equation}\label{eq:sysLamMin}
 	\begin{aligned}
-	\diffp[2]{\bm{u}^0}{t} &= \Div \bm{N}, \\
-	\diffp[2]{{u}_z}{t} &= \div \bm{q}, \\
-	\diffp[2]{\bm{\theta}}{t} &= \Div \bm{M} + \bm{q}, \\
+	\rho h \diffp[2]{\bm{u}^0}{t} &= \Div \bm{N}, \\
+	\rho h \diffp[2]{{u}_z}{t} &= \div \bm{q}, \\
+	\frac{\rho h^3}{12}\diffp[2]{\bm{\theta}}{t} &= \Div \bm{M} + \bm{q}, \\
 	\end{aligned}	
 \end{equation}
 where $\bm{N}, \, \bm{M}, \, \bm{q}$ are defined in Eqs. \eqref{eq:NM_laminated}, \eqref{eq:q_laminated}. 
@@ -797,8 +797,8 @@ E_{\text{def}} &= \energy{\bm{N} \cddot \bm{\varepsilon}^0 + \bm{M} \cddot \bm{\
 where $\bm{\kappa}$ is defined in Eq. \eqref{eq:kappa}. Furthermore, as stated in Remark \ref{rmk:rotary}, the rotational contribution in the kinetic energy has been neglected. The equations of motion are (see \cite[Chapter~3]{reddy2003mechanics} for an exhaustive explanation)
 \begin{equation}\label{eq:sysLamKir}
 \begin{aligned}
-\diffp[2]{\bm{u}^0}{t} &= \Div \bm{N}, \\
-\diffp[2]{{u}_z}{t} &= -\div\Div \bm{M}, 
+\rho h \diffp[2]{\bm{u}^0}{t} &= \Div \bm{N}, \\
+\rho h \diffp[2]{{u}_z}{t} &= -\div\Div \bm{M}, 
 \end{aligned}	
 \end{equation}
 where $\bm{N}, \, \bm{M}$ are defined in Eqs. \eqref{eq:NM_laminated}. 
