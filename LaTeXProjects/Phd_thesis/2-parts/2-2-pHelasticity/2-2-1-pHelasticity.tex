@@ -10,7 +10,7 @@ In this section, the main concepts behind a deformable continuum are briefly rec
 
 \subsection{Non linear formulation of elasticity}
 
-The bounded region of $\mathbb{R}^d \; (d=2, 3)$ occupied by a solid is called configuration. The reference configuration $\Omega$ is the domain that a bodies occupies at the initial state. To describe how the body deforms in time the deformation map $\bm\Phi: \Omega \times [0, T_f] \rightarrow \Omega' \subset \mathbb{R}^d$ is introduced. This map is differentiable and orientation preserving and the image of $\Omega$ under $\bm\Phi(\cdot, t) \; \forall t \in [0, T_f]$ is called the deformed configuration $\Omega_t$. Given a specific point in the reference frame its image is denoted by $\bm{y} = \bm{\Phi}(\bm{x}, t)$. The gradient of the deformation map is called the deformation gradient $\bm{F}:=\nabla_x\bm{\Phi} = \diffp{\bm{y}}{\bm{x}}$. A rigid deformation maps a point $\bm{x} \in \Omega \rightarrow \bm{A}(t) \bm{x} + \bm{b}(t)$, where $\bm{A}(t)$ is an orthogonal matrix and $\bm{b}(t)$ an $\mathbb{R}^d$ vector. A differentiable deformation map $\bm\Phi$ is a rigid deformation iff $\bm{F}^\top \bm{F} - \bm{I} = 0$,  where $\bm{I}$ is the identity in $\mathbb{R}^{d\times d}$ (for the proof see \cite{ciarlet1988mathematical}, page 44). For this reason, a suitable measure of the deformation is the Green-St.Venant strain tensor $\frac{1}{2} (\bm{F}^\top \bm{F} - \bm{I})$.  \\
+The bounded region of $\mathbb{R}^d \; (d=2, 3)$ occupied by a solid is called configuration. The reference configuration $\Omega$ is the domain that a bodies occupies at the initial state. To describe how the body deforms in time the deformation map $\bm\Phi: \Omega \times [0, T_f] \rightarrow \Omega' \subset \mathbb{R}^d$ is introduced. This map is differentiable and orientation preserving, and the image of $\Omega$ under $\bm\Phi(\cdot, t) \; \forall t \in [0, T_f]$ is called the deformed configuration $\Omega_t$. Given a specific point in the reference frame its image is denoted by $\bm{y} = \bm{\Phi}(\bm{x}, t)$. The gradient of the deformation map is called the deformation gradient $\bm{F}:=\nabla_x\bm{\Phi} = \diffp{\bm{y}}{\bm{x}}$. A rigid deformation maps a point $\bm{x} \in \Omega \rightarrow \bm{A}(t) \bm{x} + \bm{b}(t)$, where $\bm{A}(t)$ is an orthogonal matrix and $\bm{b}(t) \in \mathbb{R}^d$ a vector. A differentiable deformation map $\bm\Phi$ is a rigid deformation iff $\bm{F}^\top \bm{F} - \bm{I} = 0$,  where $\bm{I}$ is the identity in $\mathbb{R}^{d\times d}$ (for the proof see \cite{ciarlet1988mathematical}, page 44). For this reason, a suitable measure of the deformation is the Green-St.Venant strain tensor $\frac{1}{2} (\bm{F}^\top \bm{F} - \bm{I})$.  \\
 A quantity of interest is the displacement $\bm{u}: \Omega \times [0, T_f] \rightarrow \mathbb{R}^d$ with respect to the reference configuration. It is defined as $\bm{u}(\bm{x}, t) = \bm{\Phi}(\bm{x}, t) - \bm{x}$. The gradient of the displacement verifies $\nabla_x \bm{u} = \bm{F} - \bm{I}$. The strain tensor can now be written in terms of the displacement
 \begin{equation*}
 \begin{aligned}
@@ -23,11 +23,11 @@ or in components
 \frac{1}{2} ({F}_{ik}^\top {F}_{kj} - {I}_{ij}) = \frac{1}{2} \left(\diffp{u_i}{x_j} + \diffp{u_j}{x_i} + \diffp{u_i}{x_j}\diffp{u_j}{x_i}\right).
 \end{equation*}
 
-To state the balance laws the actual deformed configuration is considered. The linear and angular momentum in a subdomain $\omega_t \subset \Omega_t$ are computed as 
+To state the balance laws the actual deformed configuration is considered. The linear and angular momenta in a subdomain $\omega_t \subset \Omega_t$ are computed as 
 \begin{equation*}
-\int_{\omega_t} \rho \, \bm{v} \d{\omega_t}, \qquad \int_{\omega_t} \rho \, \bm{y} \times \bm{v} \d{\omega_t},
+\int_{\omega_t} \rho \, \bm{v} \d{\omega_t}, \quad\text{and}\quad \int_{\omega_t} \rho \, \bm{y} \times \bm{v} \d{\omega_t},
 \end{equation*}
-where $\rho$ is the mass density and the velocity $\bm{v} = \frac{D\bm{u}}{Dt}(\bm{y},t) = \diffp{\bm{u}}{t} + (\nabla_x \bm{u}) \cdot \bm{v}$ is material time derivative of the displacement (see \cite[Chapter 1]{abeyaratne2012notes}).  Let $\omega_{t, 1},\, \omega_{t, 2}$ be two subregions in a deformed continuum $\Omega_t$ with contacting surface $S_{12}$. There is a force acting on this surface for a continuum that is called stress vector or traction. If $\bm{n}$ is the outward normal at $\bm{y}$ on $S_{12}$ with respect to $\omega_{t, 1}$, then the surface force that $\omega_{t, 1}$ exerts on $\omega_{t, 2}$ is denoted by $\bm{t}(\bm{y}, \bm{n}) \in \mathbb{R}^d$. By the Newton third law, the surface force that $\omega_{t, 2}$ applies on $\omega_{t, 1}$ is given by $\bm{t}(\bm{y}, -\bm{n}) = - \bm{t}(\bm{y}, \bm{n})$. It is assumed that the linear and angular momentum balance hold for any subregion $\omega_t \in \Omega_t$ 
+where $\rho$ is the mass density and the velocity $\bm{v} = \frac{D\bm{u}}{Dt}(\bm{y},t) = \diffp{\bm{u}}{t} + (\nabla_x \bm{u}) \cdot \bm{v}$ is the material time derivative of the displacement (see \cite[Chapter 1]{abeyaratne2012notes}).  Let $\omega_{t, 1},\, \omega_{t, 2}$ be two subregions in a deformed continuum $\Omega_t$ with contacting surface $S_{12}$. There is a force acting on this surface for a continuum that is called stress vector or traction. If $\bm{n}$ is the outward normal at $\bm{y}$ on $S_{12}$ with respect to $\omega_{t, 1}$, then the surface force that $\omega_{t, 1}$ exerts on $\omega_{t, 2}$ is denoted by $\bm{t}(\bm{y}, \bm{n}) \in \mathbb{R}^d$. By the Newton third law, the surface force that $\omega_{t, 2}$ applies on $\omega_{t, 1}$ is given by $\bm{t}(\bm{y}, -\bm{n}) = - \bm{t}(\bm{y}, \bm{n})$. It is assumed that the linear and angular momentum balance hold for any subregion $\omega_t \in \Omega_t$ 
 \begin{align*}
 	\diff{}{t} \int_{\omega_t} \rho \bm{v} \d{\omega_t} &= \int_{\partial \omega_t} \bm{t}(\bm{y}, \bm{n}) \d{S} + \int_{\omega_t} \bm{f} \d{\omega_t}, \\
 	\diff{}{t} \int_{\omega_t} \rho\bm{y} \times \bm{v} \d{\omega_t} &= \int_{\partial \omega_t} \bm{y} \times \bm{t}(\bm{y}, \bm{n}) \d{S} + \int_{\omega_t} \bm{y} \times \bm{f} \d{\omega_t}, \\
@@ -43,14 +43,14 @@ The set $\mathbb{S}=\mathbb{R}^{d\times d}_{\mathrm{sym}}$ denotes the field of 
 \int_{\partial \omega_t} \bm{\Sigma} \, \bm{n} \d{S} = \int_{\omega_t} \nabla_y \cdot\bm{\Sigma} \d{\omega_t},
 \end{equation*}
 where $\nabla_y \cdot$ is the tensor divergence with respect to the deformed configuration, $\nabla_y \cdot\bm{\Sigma} = \sum_{i=1}^{d}\diffp{\Sigma_{ij}}{y_i}$.
-Because the considered subregion $\omega_t$ is arbitrary, using the linear balance momentum and the conservation of mass the following PDE is found
+Because the considered subregion $\omega_t$ is arbitrary, using the linear balance momentum and the conservation of mass, the following PDE is found
 \begin{equation*}
 	\rho \frac{D\bm{v}}{Dt} - \nabla_y \cdot{\bm{\Sigma}} = \bm{f}, \qquad \bm{y} \in \Omega_t.
 \end{equation*}
-This equation is written with respect to the deformed configuration $\Omega_t$. For a detailed derivation of this equation the reader may consult \cite[Chapter 4]{abeyaratne2012notes}. To obtain a closed formulation, the constitutive law, namely the link between $\bm{\Sigma}$ and the strain tensor $\frac{1}{2} (\bm{F}^\top \bm{F} - \bm{I})$, has to be introduced. In the next such relation will be investigated for the case of linear elasticity.
+This equation is written with respect to the deformed configuration $\Omega_t$. For a detailed derivation of this equation the reader may consult \cite[Chapter 4]{abeyaratne2012notes}. To obtain a closed formulation, the constitutive law, namely the link between $\bm{\Sigma}$ and the strain tensor $\frac{1}{2} (\bm{F}^\top \bm{F} - \bm{I})$, has to be introduced. In the next section such relation will be investigated for the case of linear elasticity.
 
 \subsection{The linear elastodynamics problem}\label{sec:linElas}
-Whenever deformations are small, $\norm{\nabla_x\bm{u}} \ll 1$, then the reference and deformed configurations are almost indistinguishable $\bm{y} = \bm{x} + \bm{u} = \bm{x}  + O(\nabla_x\bm{u}) \approx \bm{x}$. This allows to write the linear momentum balance in the reference configuration
+Whenever deformations are small, $\norm{\nabla_x\bm{u}} \ll 1$, then the reference and deformed configurations are almost indistinguishable $\bm{y} = \bm{x} + \bm{u} = \bm{x}  + O(\nabla_x\bm{u}) \approx \bm{x}$. This allows writing the linear momentum balance in the reference configuration
 \begin{equation*}
 	\rho \diffp{\bm{v}}{t}(\bm{x, t}) - \Div(\bm\Sigma(\bm{x}, t)) = \bm{f}, \qquad \bm{x} \in \Omega.
 \end{equation*}
@@ -68,7 +68,7 @@ The linearized strain tensor (also called infinitesimal strain tensor) is the sy
 \bm{\varepsilon} := \Grad\bm{u}, \where \Grad\bm{u} = \frac{1}{2}\left[\nabla_x \bm{u} + (\nabla_x \bm{u})^\top\right].
 \end{equation}
 
-To obtain a closed system of equations, it is now necessary to characterize the relation between stress and strain. This relation is normally called \textit{constitutive law}. In the following, the particular case of elastic materials is considered. These are able to resist distorting excitations and return to its original size and shape when these are removed. For this class of materials, the stress tensor is solely determined by the deformed configuration at a given time (Hooke's law)
+To obtain a closed system of equations, it is now necessary to characterize the relation between stress and strain. This relation is normally called \textit{constitutive law}. In the following, the particular case of elastic materials is considered. These are able to resist distorting excitations and return to its original size and shape when these excitations are removed. For this class of materials, the stress tensor is solely determined by the deformed configuration at a given time (Hooke's law)
 \begin{equation*}
 \bm{\Sigma}(\bm{x}) = \bm{\mathcal{D}}(\bm{x}) \, \bm{\varepsilon}(\bm{u}(\bm{x})).
 \end{equation*}
@@ -92,7 +92,7 @@ and conversely
 \lambda =\frac {E \nu }{(1+\nu )(1-2\nu )}, \qquad
 \mu = \frac{E}{2(1+\nu)}.
 \end{equation}
-The stiffness and compliant tensor assume the expressions
+The stiffness and compliant tensor are expressed as
 \begin{align}
 	\bm{\mathcal{D}}(\cdot) &= \frac{E}{1+\nu} \left[(\cdot) + \frac{\nu}{1-2\nu}\Tr(\cdot)\bm{I}\right], \label{eq:stiff3D} \vspace{3pt}\\
 	\bm{\mathcal{C}}(\cdot) &= \frac{1+\nu}{E}\left[(\cdot) - \frac{\nu}{1+\nu(d-2)}\Tr(\cdot)\bm{I}\right].
@@ -101,11 +101,11 @@ The linear elastodynamics problem is formulated through a vector-valued PDE
 \begin{equation}\label{eq:lin_elastodyn}
 \rho \diffp[2]{\bm{u}}{t} - \Div(\bm{\mathcal{D}} \Grad \bm{u}) = \bm{f}.
 \end{equation}  
-The classical elastodynamics problem is expressed in terms of the displacement as the unknown. This PDE goes together with appropriate boundary conditions that will be specified in \ref{sec:pHelas}.
+The classical elastodynamics problem is expressed considering the displacement $\bm{u}$ as the unknown. This PDE goes together with appropriate boundary conditions that will be specified in \ref{sec:pHelas}.
 
 \section{Port-Hamiltonian systems}
 
-Before introducing the pH formulation of the elastodynamics problem, the main concept behind this formalism are recalled. First, the concept of Stokes-Dirac structure is presented. This is normally introduced by making use of a differential geometry approach. The interested reader may consult \cite[Chapter 2]{kotyczka2019numerical}. Despite being really insightful in terms of geometrical structure, this approach does not encompass the case of higher-order differential operators. An extension in this sense is still an open question. Since bending problems in elasticity introduce higher-order differential operators, the language of PDE will be privileged over the one of differential forms. To have the most suitable definition of Stokes-Dirac structure for flexible systems, the approach adopted in \cite{macchelli2004modelling} is here recovered. \\
+Before introducing the pH formulation of the elastodynamics problem, the main concepts behind this formalism are recalled. First, the concept of Stokes-Dirac structure is presented. This notion was first introduced in the literature by making use of a differential geometry approach \cite{vanderschaft2002}. Despite being really insightful in terms of geometrical structure, this approach does not encompass the case of higher-order differential operators. An extension in this sense is still an open question. Since bending problems in elasticity introduce higher-order differential operators, the language of PDE will be privileged over the one of differential forms. To have the most suitable definition of Stokes-Dirac structure for flexible systems, the approach adopted in \cite{macchelli2004modelling} is here recovered. \\
 
 Second, distributed port-Hamiltonian systems are introduced, in connection with the underlying Stokes-Dirac structure. PHs as boundary control systems have been analyzed deeply in one geometrical dimension \cite{zwart2012,legorrec2005}. Here, a more general definition is given. The complete characterization of pH in arbitrary dimension is still an open research field. Two notable exceptions (\cite{zwart2015wave,skrepek2019wellposedness}) provide partial answers to this problem. The first demonstrate the well-posedness of the linear wave equation in arbitrary geometrical dimensions. The second generalizes this result to treat the case of generic first order linear pHs in arbitrary geometrical dimensions.
 
@@ -117,7 +117,7 @@ In the section the concept of Stokes-Dirac structure for distributed, i.e. infin
 \subsubsection{Dirac Structures}
 Consider a  finite dimensional space ${F}$ over the field $\mathbb{R}$ and ${E} \equiv {F}'$ its dual, i.e. the space of linear operator $\mathbf{e} : {F} \rightarrow \mathbb{R}$. The elements of $\mathit{F}$ are called flows, while the elements of ${E}$ are called efforts. Those are port variables and their combination gives the power flowing inside the system. The space ${B} = {F} \times {E}$ is called the bond space of power variables. Therefore the power is defined as  $\left\langle \mathbf{e}, \mathbf{f} \right\rangle = \bm{e}(\mathbf{f})$, where $\left\langle \mathbf{e} , \mathbf{f} \right\rangle$ is the dual product between $\mathbf{f}$ and $\mathbf{e}$.
 \begin{definition}[\cite{courant1990}, Def. 1.1.1]
-	Given the finite-dimensional space ${F}$ and its dual ${E}$ with respect to the inner product $\left\langle \cdot , \cdot \right\rangle : {F} \times {E} \rightarrow \mathbb{R}$, define the symmetric bilinear form:
+	Given the finite-dimensional space ${F}$ and its dual ${E}$ with respect to the inner product $\left\langle \cdot , \cdot \right\rangle : {F} \times {E} \rightarrow \mathbb{R}$, consider the symmetric bilinear form:
 	\begin{equation}
 	\bilprod{(\mathbf{f}_1, \mathbf{e}_1)}{(\mathbf{f}_2, \mathbf{e}_2)} := \inner{\mathbf{e}_1}{\mathbf{f}_2} +  \inner{\mathbf{e}_2}{\mathbf{f}_1}, \where (\mathbf{f}_i, \mathbf{e}_i) \in {B}, \; i = 1, 2
 	\end{equation}
@@ -153,7 +153,7 @@ where $ H(\mathbf{x}) : X \rightarrow \mathbb{R} $, the Hamiltonian, is a real-v
 &\mathbf{e}_e &= \mathbf{y}. \\
 \end{aligned}
 \end{equation}
-With this choice of the port variables system \eqref{eq:finitePH} defines, by Proposition \ref{prop:Dirac}, a Dirac structure. Dissipation and distributed forces can be included and the corresponding system defines an extended Dirac structure, once the proper port variables have been introduced.
+With this choice of the port variables, system \eqref{eq:finitePH} defines, by Proposition \ref{prop:Dirac}, a Dirac structure. Dissipation and distributed forces can be included and the corresponding system defines an extended Dirac structure, once the proper port variables have been introduced.
 
 \subsubsection{Constant matrix differential operators}
 
@@ -261,10 +261,10 @@ A distributed conservative port-Hamiltonian system is defined by a set of variab
 \bm{e} &:= \displaystyle \diffd{H}{\bm{\alpha}}.
 \end{aligned}
 \end{equation}
-The unknowns $\bm{\alpha}$ are called energy variables in the port-Hamiltonian framework, the formally skew-adjoint operator $\mathcal{J}$ is named interconnection operator (see appendix \ref{app:math}, Def. \ref{def:foradj} for a precise definition of formal skew adjointness). $\mathcal{B}_\partial, \mathcal{C}_\partial$ are boundary operator, that provide the boundary input $\bm{u}_\partial$ and output $\bm{y}_\partial$. The variational derivative of the Hamiltonian define the co-energy variables $\bm{e}$.
+The unknowns $\bm{\alpha}$ are called energy variables in the port-Hamiltonian framework, the formally skew-adjoint operator $\mathcal{J}$ is named interconnection operator (see appendix \ref{app:math}, Def. \ref{def:foradj} for a precise definition of formal skew adjointness). $\mathcal{B}_\partial, \mathcal{C}_\partial$ are boundary operators, that provide the boundary input $\bm{u}_\partial$ and output $\bm{y}_\partial$. The variational derivative of the Hamiltonian defines the co-energy variables $\bm{e}$.
 
 \begin{remark}
-	It will become clear in this section that the effort variable of the Stokes-Dirac structure are indeed equivalent to the co-energy variables of the pH system. This justifies using the same notation for both.
+	It will become clear in this section that the effort variables of the Stokes-Dirac structure are indeed equivalent to the co-energy variables of the pH system. This justifies using the same notation for both.
 \end{remark}
 
 \begin{definition}[Variational derivative, Def. 4.1 in \cite{olver1993}]
@@ -285,11 +285,11 @@ If the integrand does not contain derivative of the argument $\bm{\alpha}$ then 
 \end{remark}
 
 
-Conservative port-Hamiltonian systems possess a peculiar property. The energy rate is given by the power due to the boundary ports $\bm{u}_\partial, \bm{y}_\partial$
+Conservative port-Hamiltonian systems possess a peculiar property: the energy rate is given by the power due to the boundary ports $\bm{u}_\partial, \bm{y}_\partial$
 \begin{equation}\label{eq:enrate}
 \begin{aligned}
 \dot{H} &= \int_{\Omega} \diffd{H}{\bm{\alpha}} \cdot \diffp{\bm{\alpha}}{t} \d{\Omega} =\inner[\Omega]{\dder{H}{\bm{\alpha}}}{\pder{\bm{\alpha}}{t}}, \qquad \text{Stokes theorem}\\
-&=\int_{\partial \Omega} \bm{u}_\partial \cdot \bm{y}_\partial \d{S} =\inner[\partial \Omega]{\bm{u}_\partial}{\bm{y}_\partial},
+&=\int_{\partial \Omega} \bm{u}_\partial \cdot \bm{y}_\partial \d{S} =\inner[\partial \Omega]{\bm{u}_\partial}{\bm{y}_\partial}.
 \end{aligned}
 \end{equation} 
 From the energy rate, the structural power balance is obtained
@@ -355,7 +355,7 @@ From the energy rate it is possible to identify the boundary variables.
  &= \int_{\Omega} \div(e_p \, \bm{e}_v) \d\Omega, \qquad &\text{Stokes theorem}, \\
  &= \int_{\partial \Omega} e_p \, \bm{e}_v\cdot\bm{n} \d{S} = \inner[\partial\Omega]{e_p}{\bm{e}_v \cdot\bm{n}}.
 \end{align*}
-The boundary term $\inner[\partial\Omega]{e_p}{\bm{e}_v}$ pairs two power variables. One is taken as control input, the other plays the role of power-conjugated output. The assignment of these roles to the boundary power variables is referred to as causality of the boundary port \cite[Chapter~2]{kotyczka2019numerical}. Under uniform causality assumption, either $e_p$ or $\bm{e}_v$ can assume the role of (distributed) boundary input, but not both. This leads to two possible selection:
+The boundary term $\inner[\partial\Omega]{e_p}{\bm{e}_v}$ pairs two power variables. One is taken as control input, the other plays the role of power-conjugated output. The assignment of these roles to the boundary power variables is referred to as causality of the boundary port \cite[Chapter~2]{kotyczka2019numerical}. Under uniform causality assumption, either $e_p$ or $\bm{e}_v$ can assume the role of (distributed) boundary input, but not both. This leads to two possible selections:
 \begin{itemize}
 	\item {First case} ${u}_\partial = e_p, \quad {y}_\partial = \bm{e}_v \cdot\bm{n}$. \\
 	This imposes the variable $e_p:= \partial_t w$ as boundary input and corresponds to a classical Dirichlet condition.
@@ -365,7 +365,7 @@ The boundary term $\inner[\partial\Omega]{e_p}{\bm{e}_v}$ pairs two power variab
 \end{itemize} 
 
 
-\subsubsection{2D shallow water equations}
+\subsubsection{2D shallow water equations}\label{sec:shallowwater}
 This formulation may be found in \cite[Section 6.2.]{cardoso2016}. This model describes a thin fluid layer of constant density in hydrostatic balance, like the propagation of a tsunami wave far from shore. Consider an open bounded connected set $\Omega \subset \mathbb{R}^2$ and a constant bed profile. The mass conservation implies
 \begin{equation*}
 \diffp{h}{t} + \div(h\bm{v}) = 0,
@@ -391,7 +391,7 @@ The last term on the right side can be rewritten
 \end{bmatrix}
 \bm{v},
 \end{equation*}
-with $\omega = \partial_x v_y - \partial_y v_x$ the local vorticity term. To derive a suitable pH formulation the energy, made up of kinetic and potential contribution, has to be invoked
+with $\omega = \partial_x v_y - \partial_y v_x$ the local vorticity term. To derive a suitable pH formulation, the total energy, made up of kinetic and potential contribution, has to be invoked
 \begin{equation*}
 H = \frac{1}{2} \int_\Omega \left\{\rho h \norm{\bm{v}}^2 + \rho g h^2 \right\}  \d\Omega.
 \end{equation*}
@@ -453,7 +453,7 @@ Again two possible cases of homogeneous boundary causality arise:
 In this section a port-Hamiltonian formulation for elasticity is deduced from the classical elastodynamics problem. It must be appointed that already in the seventies a purely hyperbolic formulation for elasticity was detailed \cite{hughes1978classical}. The missing point is the clear connection with the theory of Hamiltonian PDEs. An Hamiltonian formulation can be found in \cite[Chapter 16]{grinfield2015}, but without any connection to the concept of Stokes-Dirac structure induced by the underlying geometry. \\
 
 \subsection{Energy and co-energy variables}
-Consider an open connected set $\Omega \subset \mathbb{R}^d, \; d=(2,3)$. The displacement within a deformable continuum are given by Eq. \eqref{eq:lin_elastodyn}. 
+Consider an open connected set $\Omega \subset \mathbb{R}^d, \; d=(2,3)$. The displacement within a deformable continuum is given by Eq. \eqref{eq:lin_elastodyn}. 
 \begin{equation}
 \rho \diffp[2]{\bm{u}}{t} - \Div(\bm{\mathcal{D}} \Grad \bm{u}) =0, \qquad \bm{x} \in \Omega.
 \end{equation}
@@ -732,7 +732,7 @@ Linear elasticity falls within the assumption of \cite{skrepek2019wellposedness}
 \section{Conclusion}
 In this chapter, the pH formulation of elasticity have been obtained. This model represents a generalization of the wave equation to higher dimensional variables. This leads to the introduction of symmetric tensorial quantities describing the state of stress and deformation within the body. \\
 For a plane continuum with moderate thickness, it is possible to
-reduce the general three-dimensional mode to two uncoupled system: one representing the in plane behavior ruled by 2D elasticity and one representing the out-of-plane deflection. This will be the object of the next chapter dedicated to the study of a pH formulation of plate bending. It is important to remember that plate models are just particular cases of three-dimensional elasticity.
+reduce the general three-dimensional mode to two uncoupled systems: one representing the in plane behavior ruled by 2D elasticity and one representing the out-of-plane deflection. This will be the object of the next chapter dedicated to the study of a pH formulation of plate bending. It is important to remember that plate models are just particular cases of three-dimensional elasticity.
 
 
 

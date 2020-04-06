@@ -1,9 +1,72 @@
 \chapter{Partitioned finite element method}
 
+\epigraph{Every truth is simple\dots is that not doubly a lie?}{\textit{Twilight of the Idols \\ Friedrich Nietzsche}}
+
+\lettrine{\color{theme}{D}}iscretization is the process of transferring continuous models into discrete counterparts. The discrete model should be faithful to the continuous one. To this aim, it is usually essential that the main properties of the continuous system are preserved at the discrete level. An algorithm that is capable of conserving properties at the discrete level is called structure-preserving \cite{christiansen2011}. In this chapter, a finite element method to spatially discretize infinite-dimensional pHs into finite-dimensional ones is illustrated.
 
 \section{General procedure}
+A discrete version of a infinite-dimensional pH system is meant to preserve the underlying properties related to power continuity. To achieve this purpose, the discretization procedure consists of two steps \cite{kotyczka2018weak}:
+\begin{itemize}
+	\item Finite-dimensional approximation of the Stokes-Dirac structure, i.e. the formally skew symmetric differential operator that defines the structure. The duality of the power variables has to be mapped onto the finite approximation. The subspace of the discrete variables will be represented by a Dirac structure. 
+	\item The Hamiltonian requires as well a suitable discretization, which gives rise to a discrete Hamiltonian. 
+\end{itemize} 
+A structure-preserving discretization is able to construct an equivalent pH system that possess the structural properties of the original model:
+\begin{tcbraster}[raster columns=2, raster equal height]
+\begin{tcolorbox}[width=0.4\textwidth, nobeforeafter, colframe=theme,title=Infinite dimensional pH system]%%
+	PDE with distributed inputs:
+	\begin{align*}
+	\diffp{\bm{\alpha}}{t}(\bm{x}, t) &= \mathcal{J} {\displaystyle \diffd{H}{\bm{\alpha}}}+ \mathcal{B} \textcolor{red}{\bm{u}(\bm{x}, t)}, \\
+	\textcolor{red}{\bm{y}(\bm{x}, t)} &= \mathcal{B}^* {\displaystyle \diffd{H}{\bm{\alpha}}}.
+	\end{align*}
+	Boundary conditions: 
+	\[\textcolor{blue}{\bm{u}_\partial} = \mathcal{B}_\partial{\displaystyle \diffd{H}{\bm{\alpha}}}, \quad \textcolor{blue}{\bm{y}_\partial} = \mathcal{C}_\partial {\displaystyle \diffd{H}{\bm{\alpha}}}. \]
+	Power balance (Stokes Theorem): 
+	\[ \dot{H} = \displaystyle \int_{\partial \Omega} \textcolor{blue}{\bm{u}_\partial} \cdot \textcolor{blue}{\bm{y}_\partial} \d{S} +  \int_{\Omega} \textcolor{red}{\bm{u}} \cdot \textcolor{red}{\bm{y}} \d{\Omega}.
+	\]
+\end{tcolorbox} 
+\begin{tcolorbox}[width=0.4\textwidth, nobeforeafter,  colframe=theme,title=Structure-preserving discretization]%%
+	Resulting ODE:
+	\begin{align*}
+	\dot{\bm{\alpha}}_d &= \mathbf{J} \, {\nabla {H}_d} + \mathbf{B}_d \textcolor{red}{\mathbf{u}_d} + \mathbf{B}_\partial \textcolor{blue}{\mathbf{u}_\partial}, \\
+	\textcolor{red}{\mathbf{y}_d} &= \mathbf{B}_d^\top \, {\nabla {H}_d}, \\
+	\textcolor{blue}{\mathbf{y}_\partial} &= \mathbf{B}_\partial^\top \,{\nabla {H}_d}.
+	\end{align*}
+	Discretized Hamiltonian:
+	\[
+	H_d := H(\bm{\alpha} \equiv \bm{\alpha}_d).
+	\]
+	Power balance: 
+	\[ \dot{H} = \textcolor{blue}{\mathbf{u}_\partial^\top \mathbf{y}_\partial} +  \textcolor{red}{\mathbf{u}_d^\top \mathbf{y}_d}.
+	\]
+\end{tcolorbox}
+\end{tcbraster}
+\vspace{.5cm}
+In this work the partitioned finite element method (PFEM), originally presented in \cite{cardoso2018pfem,cardoso2019partitioned}, is chosen to obtain discretized counterparts of dpHs. This procedure boils down to three simple steps
+\begin{enumerate}
+	\item The system is written in weak form; 
+	\item An integration by parts is applied to highlight the appropriate boundary control;
+	\item A Galerkin method is employed to obtain a finite-dimensional system.
+\end{enumerate}
+
+Once the system has been put into weak form, a subset of the equations is integrated by parts, so that boundary variables are naturally included into the formulation and appear as control inputs, the collocated outputs being defined accordingly. The discretization of energy and co-energy variables (and the associated test functions) leads directly to a full rank representation for the finite-dimensional port-Hamiltonian system. The case of mixed boundary conditions requires additional care and will be treated in a subsequent section \secref{sec:mixedbc}. This approach makes possible the usage of FEM software, like FEniCS \cite{logg2012}, or Firedrake \cite{rathgeber2017firedrake}.
 
 \subsection{Non-linear case}
+Consider a generic pH system
+\begin{equation}
+\begin{aligned}
+\diffp{\bm{\alpha}}{t} &= \mathcal{J}\displaystyle \bm{e}, \vspace{3pt}\\
+\bm{u}_\partial &= \mathcal{B}_\partial  \displaystyle \bm{e}, \vspace{3pt}\\
+\bm{y}_\partial &= \mathcal{C}_\partial \displaystyle \bm{e}, \vspace{3pt}\\
+\bm{e} &:= \displaystyle \diffd{H}{\bm{\alpha}}.
+\end{aligned}
+\end{equation}
+
+The non linearities are assumed to pertain only to the Hamiltonian  and not to the interconnection operator:
+\begin{assumption}
+	The differential skew-symmetric operator $\mathcal{J}$ is assumed to be linear. 
+\end{assumption}
+The Hamiltonian functional is supposed to be positive non linear in the energy variables.
+
 
 \subsection{Linear case}
 
@@ -13,7 +76,7 @@
 \section{Connection with mixed finite elements}
 
 
-\section{Inhomogeneous boundary conditions}
+\section{Inhomogeneous boundary conditions}\label{sec:mixedbc}
 
 \subsection{Solution using Lagrange multipliers}
 

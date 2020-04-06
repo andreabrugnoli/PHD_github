@@ -219,11 +219,7 @@ The interconnection is power preserving as it can be compactly written as
 \begin{equation*}
 \bm{u}_E = \mathcal{A}_\beta(y_T), \qquad u_T = - \mathcal{A}_\beta^*(\bm{y}_E),
 \end{equation*}
-where the coupling operator $\mathcal{A}_\beta := - \Div(\mathcal{C}_\beta \, \cdot) : L^2(\Omega) \rightarrow L^2(\Omega, \mathbb{R}^d)$ has formal adjoint $ \mathcal{A}_\beta^* =  \mathcal{C}_\beta^* \cddot  \Grad(\cdot) =  \mathcal{C}_\beta \cddot  \Grad(\cdot): L^2(\Omega, \mathbb{R}^3) \rightarrow L^2(\Omega)$ ($\mathcal{C}_\beta$ is self adjoint given its diagonal structure). As a consequence, under the assumption that $\bm{y}_E, y_T$ have compact support, it holds
-\[
-\left\langle u_T, y_T \right\rangle_{L^2(\Omega)} + \left\langle \bm{u}_E, \bm{y}_E \right\rangle_{L^2(\Omega, \mathbb{R}^3)} = 0.
-\]
-If the compact support assumption is removed, it is obtained
+where the coupling operator $\mathcal{A}_\beta := - \Div(\mathcal{C}_\beta \, \cdot) : L^2(\Omega) \rightarrow L^2(\Omega, \mathbb{R}^d)$ has formal adjoint $ \mathcal{A}_\beta^* =  \mathcal{C}_\beta^* \cddot  \Grad(\cdot) =  \mathcal{C}_\beta \cddot  \Grad(\cdot): L^2(\Omega, \mathbb{R}^3) \rightarrow L^2(\Omega)$ ($\mathcal{C}_\beta$ is self adjoint given its diagonal structure). As a consequence, under the assumption that $\bm{y}_E, y_T$ have compact support, it holds $\left\langle u_T, y_T \right\rangle_{L^2(\Omega)} + \left\langle \bm{u}_E, \bm{y}_E \right\rangle_{L^2(\Omega, \mathbb{R}^3)} = 0$. If the compact support assumption is removed, it is obtained
 \begin{equation}\label{eq:balIntThElas}
 	\begin{aligned}
 	\left\langle u_T, y_T \right\rangle_{L^2(\Omega)} + \left\langle \bm{u}_E, \bm{y}_E \right\rangle_{L^2(\Omega, \mathbb{R}^3)} &= -\int_\Omega \left\{(\mathcal{C}_\beta \cddot \Grad \bm{e}_v) e_T + \Div(\mathcal{C}_\beta e_T) \cdot \bm{e}_v \right\} \d\Omega, \\
@@ -320,7 +316,7 @@ The model for the linear thermoelastic vibrations of an isotropic thin rod is ru
 \rho c_{\epsilon, B} T_0 \diffp{\theta}{t} &= k T_0 \Delta \theta + \beta T_0 E z \diffp[2,1]{w}{x,t}, 
 \end{aligned}
 \end{equation}
-where $w(x,t)$ is the vertical displacement of the beam $I = \int_S z^2 \d{S}$ the second moment of area, $E$ the Young modulus and $A$ the cross section. The constant $c_{\epsilon, B}$ is due to the thermoelastic coupling (cf. \cite{chadwick1962propagation} for a detailed explanation).  The other terms have meaning than in Section \secref{sec:phthel}. Since the normalized temperature $\theta(x,y,z,t)$ depends on all spatial coordinates, the symbol $\Delta = \partial_{xx} + \partial_{yy} + \partial_{zz}$ is the Laplacian in three dimensions. To derive a coupled pH model, it is assumed that the temperature field can be approximated as 
+where $w(x,t)$ is the vertical displacement of the beam $I = \int_S z^2 \d{S}$ the second moment of area, $E$ the Young modulus and $A$ the cross section. The constant $c_{\epsilon, B}$ is due to the thermoelastic coupling (cf. \cite{chadwick1962propagation} for a detailed explanation).  The other terms have meaning than in Section \secref{sec:phthel}. Since the normalized temperature $\theta(x,y,z,t)$ depends on all spatial coordinates, the symbol $\Delta = \partial_{xx} + \partial_{yy} + \partial_{zz}$ is the Laplacian in three dimensions. To derive a coupled pH model, it is assumed that the temperature field can be approximated by the Taylor expansion 
 \begin{equation}
 	\theta(x,y,z,t) \approx \theta_0(x,t) + z \theta_1(x,t).
 \end{equation}
@@ -440,7 +436,11 @@ e_T \\
 \bm{j}_Q \\
 \end{pmatrix},
 \end{equation}
-where $\bm{j}_Q = -{k T_0 I_h} \grad \theta_1$ is the heat flux. The final system reproduces the same structured coupling already observed for \eqref{eq:phsysElasHeat}, \eqref{eq:phsysTEbeam}.
+where $\bm{j}_Q = -{k T_0 I_h} \grad \theta_1$ is the heat flux. The final system reproduces the same structured coupling already observed for \eqref{eq:phsysElasHeat}, \eqref{eq:phsysTEbeam}. Generic boundary conditions for this problem \cite{avalos2000} are obtained by considering the total energy rate. 
+
+\begin{remark}
+The contribution $\theta_0$ of the temperature field can be included if the in-plane behavior (namely the axial contribution in the beam case and the membrane one for plates) is considered. Similarly to what was done in Sec. \secref{sec:lamAnis}, a generic anisotropic thermoelastic material can be modeled by considering both the membrane and bending behavior.
+\end{remark}
 
 \section{Conclusion}
 In this chapter, it was shown how to derive linear thermoelastic problem as coupled pHs. This is especially interesting for the simulation of thermoelastic phenomena: each subsystem can be discretized separately and then coupled to the other using the discretized coupling operator. \\
