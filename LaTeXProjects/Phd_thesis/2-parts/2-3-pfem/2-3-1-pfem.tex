@@ -2,7 +2,9 @@
 
 \epigraph{Every truth is simple\dots is that not doubly a lie?}{\textit{Twilight of the Idols \\ Friedrich Nietzsche}}
 
-\lettrine{\color{theme}{D}}iscretization is the process of transferring continuous models into discrete counterparts. The discrete model should be faithful to the continuous one. To this aim, it is usually essential that the main properties of the continuous system are preserved at the discrete level. An algorithm that is capable of conserving properties at the discrete level is called structure-preserving \cite{christiansen2011}. In this chapter, a finite element method to spatially discretize infinite-dimensional pHs into finite-dimensional ones is illustrated.
+\minitoc
+
+\lettrine{\color{theme}{D}}iscretization is the process of transferring continuous models into discrete counterparts. The discrete model should be faithful to the continuous one. To this aim, it is usually essential that the main properties of the continuous system are preserved at the discrete level. An algorithm that is capable of conserving properties at the discrete level is called structure-preserving \cite{christiansen2011}. In this chapter, a finite element method to spatially discretize infinite-dimensional pHs into finite-dimensional ones in a structure preserving manner is illustrated.
 
 \section{General procedure}
 A discrete version of a infinite-dimensional pH system is meant to preserve the underlying properties related to power continuity. To achieve this purpose, the discretization procedure consists of two steps \cite{kotyczka2018weak}:
@@ -41,46 +43,100 @@ A structure-preserving discretization is able to construct an equivalent pH syst
 \end{tcolorbox}
 \end{tcbraster}
 \vspace{.5cm}
-In this work the partitioned finite element method (PFEM), originally presented in \cite{cardoso2018pfem,cardoso2019partitioned}, is chosen to obtain discretized counterparts of dpHs. This procedure boils down to three simple steps
+In this work the partitioned finite element method (PFEM), originally presented in \cite{cardoso2018pfem,cardoso2019partitioned}, is chosen to obtain discretized models of dpHs. This procedure boils down to three simple steps
 \begin{enumerate}
 	\item The system is written in weak form; 
 	\item An integration by parts is applied to highlight the appropriate boundary control;
 	\item A Galerkin method is employed to obtain a finite-dimensional system.
 \end{enumerate}
 
-Once the system has been put into weak form, a subset of the equations is integrated by parts, so that boundary variables are naturally included into the formulation and appear as control inputs, the collocated outputs being defined accordingly. The discretization of energy and co-energy variables (and the associated test functions) leads directly to a full rank representation for the finite-dimensional port-Hamiltonian system. The case of mixed boundary conditions requires additional care and will be treated in a subsequent section \secref{sec:mixedbc}. This approach makes possible the usage of FEM software, like FEniCS \cite{logg2012}, or Firedrake \cite{rathgeber2017firedrake}.
+Once the system has been put into weak form, a subset of the equations is integrated by parts, so that boundary variables are naturally included into the formulation and appear as control inputs, the collocated outputs being defined accordingly. The discretization of energy and co-energy variables (and the associated test functions) leads directly to a full rank representation for the finite-dimensional port-Hamiltonian system.  This approach makes possible the usage of FEM software, like FEniCS \cite{logg2012}, or Firedrake \cite{rathgeber2017firedrake}. \\
+
+Despite the many advantages, this methodology allows obtaining a canonical pH finite dimensional system only under a uniform causality assumption. The case of mixed boundary conditions requires additional care and will be treated in a subsequent section \secref{sec:mixedbc}.
 
 \subsection{Non-linear case}
-Consider a generic pH system
-\begin{equation}
-\begin{aligned}
-\diffp{\bm{\alpha}}{t} &= \mathcal{J}\displaystyle \bm{e}, \vspace{3pt}\\
+Given an open connected set $\Omega \in \mathbb{R}^d, d= \{1,2,3\}$, consider a generic pH system defined on~$\Omega$
+\begin{equation}\label{eq:phsys2}
+\begin{aligned}[t]
+\partial_t {\bm{\alpha}} &= \mathcal{J}\displaystyle \bm{e}, \vspace{3pt}\\
 \bm{u}_\partial &= \mathcal{B}_\partial  \displaystyle \bm{e}, \vspace{3pt}\\
 \bm{y}_\partial &= \mathcal{C}_\partial \displaystyle \bm{e}, \vspace{3pt}\\
-\bm{e} &:= \displaystyle \diffd{H}{\bm{\alpha}}.
+\bm{e} &:= \displaystyle \delta_{\bm{\alpha}}H.
+\end{aligned} \qquad
+\begin{aligned}[t]
+&\bm{\alpha} \in X, \\
+&\bm{u}_\partial \in L^2(\partial \Omega, \mathbb{R}^m), \\
+&\bm{y}_\partial \in L^2(\partial \Omega, \mathbb{R}^m),
 \end{aligned}
 \end{equation}
+The Hilbert space $X$, whose inner product is denoted by $\inner[X]{\cdot}{\cdot}$, is an appropriate Cartesian product of $L^2$ spaces which account for the nature of each variable (that can be a scalar, a vector or a tensor). \\
 
-The non linearities are assumed to pertain only to the Hamiltonian  and not to the interconnection operator:
-\begin{assumption}
-	The differential skew-symmetric operator $\mathcal{J}$ is assumed to be linear. 
+To applied this methodology the non linearities are restricted to the Hamiltonian and a uniform causality condition is supposed to characterize the system. These hypotheses are resumed in the following assumptions
+\begin{assumption}\label{ass:linJ}
+	Consider system \eqref{eq:phsys2}. It is assumed that the Hilbert space $X$ admits the splitting $X = X_1 \times X_2$ (meaning that the system does not consist of a single scalar equation). The operator $\mathcal{J}$ is assumed to be skew-symmetric (or formally skew-adjoint) and linear:
+	\begin{equation}\label{eq:assJ}
+	\mathcal{J} = \mathcal{J}_{\text{a}} + \mathcal{J}_{\text{d}},
+	\end{equation}
+	where $\mathcal{J}_{\text{a}}$ is the algebraic contribution (a skew-symmetric matrix) and $\mathcal{J}_{\text{d}}$ the differential contribution. Since $\mathcal{J}$ is skew-symmetric on $X$, the linear differential operator $\mathcal{J}_{\text{d}}$ can be expressed as
+	\begin{equation}\label{eq:assJd}
+	\mathcal{J}_{\text{d}} = 
+	\begin{bmatrix}
+	0 & -\mathcal{L}^* \\
+	\mathcal{L} & 0 \\
+	\end{bmatrix} = \mathcal{J}_{\text{d}, 1} + \mathcal{J}_{\text{d}, 2}, \qquad 
+	\begin{aligned}
+	&\mathcal{L}^* : X_2 \rightarrow X_1, \\
+	&\mathcal{L}\;\, : X_1 \rightarrow X_2, \\
+	\end{aligned}
+	\end{equation}
+	where $\mathcal{L}^*$ denotes the formal adjoint of the linear differential operator $\mathcal{L}$ and 
+	\begin{equation*}
+		\mathcal{J}_{\text{d}, 1}:= \begin{bmatrix}
+		0 & -\mathcal{L}^* \\
+		0 & 0 \\
+		\end{bmatrix}, \qquad 
+		\mathcal{J}_{\text{d}, 2} := \begin{bmatrix}
+		0 & 0 \\
+		\mathcal{L} & 0 \\
+		\end{bmatrix}.
+	\end{equation*}
+	The operator $\mathcal{L}$ can be either a first order or a second order differential operator. In the latter case it can be expressed as $\mathcal{L} = \mathcal{L}_1 \circ \mathcal{L}_2$. By definition $\mathcal{J}_{\text{d}, 1} = - \mathcal{J}_{\text{d}, 2}^*$.
 \end{assumption}
-The Hamiltonian functional is supposed to be positive non linear in the energy variables.
+\begin{assumption}\label{ass:operBC}
+	Given $\bm{a} = \in X$ and $\bm{b} \in X$ the boundary operators $\mathcal{B}_\partial, \, \mathcal{C}_\partial$ are assumed to verify either
+	\begin{equation}
+	\inner[X]{\bm{a}}{\mathcal{J}_{\text{d}, 1}\, \bm{b}} +\inner[X]{\mathcal{J}_{\text{d}, 2}\, \bm{a}}{\bm{b}} = \inner[L^2(\partial \Omega, \mathbb{R}^m)]{C_\partial \bm{a}}{B_\partial  \bm{b}},
+	\end{equation}
+	or 
+	\begin{equation}
+	\inner[X]{\bm{a}}{\mathcal{J}_{\text{d}, 2}\, \bm{b}} +\inner[X]{\mathcal{J}_{\text{d}, 1}\, \bm{a}}{\bm{b}} = \inner[L^2(\partial \Omega, \mathbb{R}^m)]{C_\partial \bm{a}}{B_\partial \bm{b}}.
+	\end{equation}
+\end{assumption}
 
+The Hamiltonian functional is allowed to non linear in the energy variables. 
 
+\paragraph{Step 1} Consider the weak form of system \eqref{eq:phsys2}
+\begin{equation}
+\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} = \inner[X]{\bm{v}}{\mathcal{J} \bm{e}}.
+\end{equation}
+The weak form is obtained by taking the $L^2$ inner product introducing an appropriate test function $\bm{v} \in X$ and integrating over the domain $\Omega$. From equations \eqref{eq:assJ}, \eqref{eq:assJd}, one gets 
+\begin{equation}
+\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} = \inner[X]{\bm{v}}{(\mathcal{J}_a + \mathcal{J}_{d, 1} + \mathcal{J}_{d, 2}) \bm{e}}.
+\end{equation}
+\paragraph{Step 1} Next the integration by part has to be carried out
 \subsection{Linear case}
 
 \subsection{Examples}
-
-
-\section{Connection with mixed finite elements}
-
 
 \section{Inhomogeneous boundary conditions}\label{sec:mixedbc}
 
 \subsection{Solution using Lagrange multipliers}
 
 \subsection{Virtual domain decomposition}
+
+
+\section{Connection with mixed finite elements}
+
 
 
 

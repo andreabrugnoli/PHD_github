@@ -311,26 +311,28 @@ then system \eqref{eq:phsys} defines a Stokes Dirac structure by Proposition \re
 
 \subsubsection{Wave equation}\label{sec:waveeq}
 
-Given an in open bounded connected set $\Omega \subset \mathbb{R}^2$ with Lipschitz continuous boundary $\partial\Omega$, the vibrations of a drum can be described by the following model
+Given an in open bounded connected set $\Omega \subset \mathbb{R}^2$ with Lipschitz continuous boundary $\partial\Omega$, the propagation of sound in air can be described by the following model \cite{trenchant2018}
 \begin{equation}\label{eq:waveeq}
-\rho \partial_{tt} w(\bm{x}, t) = T \Delta w(\bm{x}, t), \qquad \bm{x}\in \Omega, \quad \Delta = \div\grad,
+\begin{aligned}
+\chi_s \partial_{t} p(\bm{x}, t) &=-\div \bm{v}, \\
+\mu_0 \partial_{t} \bm{v}(\bm{x}, t) &= -\grad p, \\
+\end{aligned}
 \end{equation}
-where the scalar fields $\rho, \, T$ are the mass density and the drum tension respectively.
-The scalar field $w \in \mathbb{R}$ represents the drum vertical deflection . The Hamiltonian (total energy) reads
+where the scalar fields $\chi_s, \, \mu_0$ are the constant adiabatic compressibility factor and the steady state mass density respectively. The scalar field and vector field $p \in \mathbb{R}, \, \bm{v} \in \mathbb{R}^2$ represents the variation of pressure and velocity from the steady state. The Hamiltonian (total energy) reads
 \begin{equation*}
-H = \frac{1}{2} \int_{\Omega} \left\{\rho(\partial_t w)^2 + \norm{T \nabla w}^2 \right\} \d\Omega.
+H = \frac{1}{2} \int_{\Omega} \left\{\chi_s p^2 + {\mu_0}\norm{\bm{v}}^2 \right\} \d\Omega.
 \end{equation*}
 To recast \eqref{eq:waveeq} in pH form the energy variables has to be introduced $\bm{\alpha} = [\alpha_p, \, \bm{\alpha}_v]^\top$
 \begin{equation*}
-\alpha_p := \rho \partial_t w, \qquad \bm{\alpha}_v := \nabla w.
+\alpha_p := \chi_s p, \qquad \bm{\alpha}_v := \mu_0 \bm{v}.
 \end{equation*} 
-The Hamiltonian is now a quadratic function of the energy variable
+The Hamiltonian is rewritten as
 \begin{equation*}
-H = \frac{1}{2} \int_{\Omega} \left\{\frac{1}{\rho}\alpha_p^2 + \norm{T \bm{\alpha}_v}^2 \right\} \d\Omega.
+H = \frac{1}{2} \int_{\Omega} \left\{\frac{1}{\chi_s}\alpha_p^2 + \frac{1}{\mu_0} \norm{\bm{\alpha}_v}^2 \right\} \d\Omega.
 \end{equation*}
 By definition, the co-energy are 
 \begin{equation*}
-e_p = \diffd{H}{\alpha_p} = \frac{1}{\rho}\alpha_p, \qquad \bm{e}_v = \diffd{H}{\bm{\alpha}_v} = T \bm{\alpha}_v.
+e_p = \diffd{H}{\alpha_p} = \frac{1}{\chi_s}\alpha_p = p, \qquad \bm{e}_v = \diffd{H}{\bm{\alpha}_v} = \frac{1}{\mu_0} \bm{\alpha}_v = \bm{v}.
 \end{equation*}
 Equation \eqref{eq:waveeq} can be recast in port-Hamiltonian form
 \begin{equation*}
@@ -340,8 +342,8 @@ Equation \eqref{eq:waveeq} can be recast in port-Hamiltonian form
 \bm{\alpha}_v \\
 \end{pmatrix} = 
 \begin{bmatrix}
-0 & \div \\
-\grad & \bm{0}
+0 & -\div \\
+-\grad & \bm{0}
 \end{bmatrix}
 \begin{pmatrix}
 e_p \\
@@ -358,12 +360,66 @@ From the energy rate it is possible to identify the boundary variables.
 The boundary term $\inner[\partial\Omega]{e_p}{\bm{e}_v}$ pairs two power variables. One is taken as control input, the other plays the role of power-conjugated output. The assignment of these roles to the boundary power variables is referred to as causality of the boundary port \cite[Chapter~2]{kotyczka2019numerical}. Under uniform causality assumption, either $e_p$ or $\bm{e}_v$ can assume the role of (distributed) boundary input, but not both. This leads to two possible selections:
 \begin{itemize}
 	\item {First case} ${u}_\partial = e_p, \quad {y}_\partial = \bm{e}_v \cdot\bm{n}$. \\
-	This imposes the variable $e_p:= \partial_t w$ as boundary input and corresponds to a classical Dirichlet condition.
+	This imposes the variable $e_p:= p$ as boundary input and corresponds to a classical Dirichlet condition.
 	
 	\item {Second case} ${u}_\partial = \bm{e}_v \cdot\bm{n}, \quad {y}_\partial = e_p$. \\
-	This imposes the variable $\bm{e}_v \cdot\bm{n}:= \partial_{\bm{n}} w$ as boundary input and corresponds to a classical Neumann condition.
+	This imposes the variable $\bm{e}_v \cdot\bm{n}:= \bm{v}\cdot \bm{n}$ as boundary input and corresponds to a Neumann condition.
 \end{itemize} 
 
+\subsubsection{Euler Bernoulli beam}\label{sec:beamEB}
+The Euler-Bernoulli beam is the one-dimensional equivalent of the Kirchhoff-Love plate.  This model consists of one PDE, describing the vertical displacement along the beam length:
+\begin{equation}
+\rho(x) \diffp[2]{w}{t}(x,t) + \displaystyle \diffp[2]{}{x} \left( EI(x) \diffp[2]{w}{x} \right) = 0, \quad x \in \Omega=\{0, L\},
+\end{equation}
+where ${w}(x,t)$ is the transverse displacement of the beam. The coefficients $\rho(x), E(x)$ and $I(x)$  are the mass per unit length, Young's modulus of elasticity and the moment of inertia of a cross section. The energy variables are then chosen as follows:
+\begin{equation}
+\alpha_{w}= \rho(x) \diffp{w}{t}(x,t),  \quad \text{Linear Momentum},\quad
+\alpha_{\kappa} = \diffp[2]{w}{x}(x,t), \quad \text{Curvature}. \
+\end{equation}
+
+Those variables are collected in the vector $\bm{\alpha} = (\alpha_{w}, \, \alpha_{\kappa})^T $, so that the Hamiltonian can be written as a quadratic functional in the energy variables: 
+\begin{equation}
+H = \energy{\frac{1}{\rho} \alpha_{w}^2 + EI \alpha_\kappa^2}
+\end{equation}
+
+The co-energy variables are found by computing the variational derivative of the Hamiltonian:
+\begin{equation}
+\begin{aligned}
+e_{w} &:= \diffd{H}{\alpha_w} = \diffp{w}{t}(x,t) ,  &\quad \text{Vertical velocity}, \\
+e_{\kappa} &:= \diffd{H}{\alpha_{\kappa}} =EI(x) \diffp[2]{w}{x}(x,t),  &\quad \text{Flexural momentum}. \\
+\end{aligned}
+\end{equation}
+The underlying interconnection structure is then found to be:
+\begin{equation}
+\diffp{}{t}\begin{pmatrix}
+\alpha_w \\ \alpha_\kappa \\
+\end{pmatrix} = \begin{bmatrix}
+0 & -\partial_{xx} \\
+\partial_{xx} & 0 \\
+\end{bmatrix} \begin{pmatrix}
+e_w \\ e_\kappa \\
+\end{pmatrix}.
+\end{equation}
+
+The power flow gives access to the boundary variables:
+\begin{equation}
+\begin{aligned}
+\dot{H} &= \int_{\Omega} \left\{e_w \partial_t \alpha_w + e_\kappa \partial_t \alpha_\kappa \right\}  \d{\Omega}, \\
+&= \int_{\Omega} \left\{-e_w \partial_{xx}e_\kappa + e_\kappa \partial_{xx} e_w \right\} \d{\Omega}, \qquad \text{Integration by parts}, \\
+&= \int_{\partial\Omega}\{-e_w \partial_{x}e_\kappa + e_\kappa \partial_{x} e_w \} \d{s}= \inner[\partial\Omega]{-e_w}{\partial_{x}e_\kappa} + \inner[\partial\Omega]{e_\kappa}{\partial_{x}e_w}
+\end{aligned}
+\end{equation}
+Since the system is of differential order two, two pairing appears, giving rise to four combination of uniform boundary causality
+\begin{itemize}
+	\item {First case} ${u}_{\partial, 1} = e_w, \quad {u}_{\partial, 2} = \partial_x e_w, \quad {y}_{\partial, 1} = -\partial_{x}e_\kappa, \quad {y}_{\partial, 2} = e_\kappa$. \\
+	This imposes the vertical $e_w:= \partial_t w$ and angular velocity $\partial_x e_w:= \partial_{xt} w$ as boundary inputs. If the inputs are null a clamped boundary condition is obtained.
+	\item {Second case} ${u}_{\partial, 1} = e_w, \quad {u}_{\partial, 2} = e_\kappa, \quad {y}_{\partial, 1} = -\partial_{x}e_\kappa, \quad {y}_{\partial, 2} = \partial_x e_w$. \\
+	This imposes the vertical velocity and flexural momentum $e_\kappa:= EI \partial_{xx} w$ as boundary inputs.  Zero inputs lead to a simply supported condition is found.
+	\item {Third case} ${u}_{\partial, 1} = -\partial_{x}e_\kappa , \quad {u}_{\partial, 2} = e_\kappa, \quad {y}_{\partial, 1} = e_w, \quad {y}_{\partial, 2} = \partial_x e_w$. \\
+	This imposes the shear force $\partial_{x}e_\kappa:= \partial_{x}(EI \partial_{xx}w)$ and flexural momentum as boundary inputs. Null inputs correspond to a free condition.
+	\item {Forth case} ${u}_{\partial, 1} = -\partial_{x}e_\kappa , \quad {u}_{\partial, 2} = \partial_{x}e_w, \quad {y}_{\partial, 1} = e_w, \quad {y}_{\partial, 2} = e_\kappa$. \\
+	This imposes the shear force and angular velocity as boundary inputs.
+\end{itemize} 
 
 \subsubsection{2D shallow water equations}\label{sec:shallowwater}
 This formulation may be found in \cite[Section 6.2.]{cardoso2016}. This model describes a thin fluid layer of constant density in hydrostatic balance, like the propagation of a tsunami wave far from shore. Consider an open bounded connected set $\Omega \subset \mathbb{R}^2$ and a constant bed profile. The mass conservation implies
