@@ -52,7 +52,7 @@ In this work the partitioned finite element method (PFEM), originally presented 
 
 Once the system has been put into weak form, a subset of the equations is integrated by parts, so that boundary variables are naturally included into the formulation and appear as control inputs, the collocated outputs being defined accordingly. The discretization of energy and co-energy variables (and the associated test functions) leads directly to a full rank representation for the finite-dimensional port-Hamiltonian system.  This approach makes possible the usage of FEM software, like FEniCS \cite{logg2012}, or Firedrake \cite{rathgeber2017firedrake}. \\
 
-Despite the many advantages, this methodology allows obtaining a canonical pH finite dimensional system only under a uniform causality assumption. The case of mixed boundary conditions requires additional care and will be treated in a subsequent section \secref{sec:mixedbc}.
+Despite the many advantages, this methodology allows obtaining a canonical pH finite dimensional system only under a uniform causality assumption. The case of mixed boundary conditions requires additional care and will be treated in the subsequent Section \secref{sec:mixedbc}.
 
 \subsection{Non-linear case}
 Given an open connected set $\Omega \in \mathbb{R}^d, d= \{1,2,3\}$, consider a generic pH system defined on~$\Omega$
@@ -69,11 +69,12 @@ Given an open connected set $\Omega \in \mathbb{R}^d, d= \{1,2,3\}$, consider a 
 &\bm{y}_\partial \in L^2(\partial \Omega, \mathbb{R}^m),
 \end{aligned}
 \end{equation}
-The Hilbert space $X$, whose inner product is denoted by $\inner[X]{\cdot}{\cdot}$, is an appropriate Cartesian product of $L^2$ spaces which account for the nature of each variable (that can be a scalar, a vector or a tensor). \\
+The Hilbert space $X$, whose inner product is denoted by $\inner[X]{\cdot}{\cdot}$, is an appropriate Cartesian product of $L^2$ spaces which account for the nature of each variable (that can be scalar, vectorial or tensorial quantities). \\
 
 To applied this methodology the non linearities are restricted to the Hamiltonian and a uniform causality condition is supposed to characterize the system. These hypotheses are resumed in the following assumptions
+
 \begin{assumption}\label{ass:linJ}
-	Consider system \eqref{eq:phsys2}. It is assumed that the Hilbert space $X$ admits the splitting $X = X_1 \times X_2$ (meaning that the system does not consist of a single scalar equation). The operator $\mathcal{J}$ is assumed to be skew-symmetric (or formally skew-adjoint) and linear:
+	Consider system \eqref{eq:phsys2}. It is assumed that the Hilbert space $X$ admits the splitting $X = X_1 \times X_2$ (meaning that the system does not consist of a single scalar equation). The operator $\mathcal{J}$ is assumed to be skew-symmetric (or formally skew-adjoint) on $X$ and linear:
 	\begin{equation}\label{eq:assJ}
 	\mathcal{J} = \mathcal{J}_{\text{a}} + \mathcal{J}_{\text{d}},
 	\end{equation}
@@ -102,15 +103,44 @@ To applied this methodology the non linearities are restricted to the Hamiltonia
 	\end{equation*}
 	The operator $\mathcal{L}$ can be either a first order or a second order differential operator. In the latter case it can be expressed as $\mathcal{L} = \mathcal{L}_1 \circ \mathcal{L}_2$. By definition $\mathcal{J}_{\text{d}, 1} = - \mathcal{J}_{\text{d}, 2}^*$.
 \end{assumption}
+
+From parametrization \ref{eq:assJd} and Theorem \ref{th:rogers}, given $(\bm{u}, \, \bm{v}) \in X_1 \times X_2 = X$, it can be stated
+
+\begin{equation}
+{(\mathcal{L}\, \bm{u})}\cdot {\bm{v}} - {\bm{u}} \cdot {(\mathcal{L}^* \, \bm{v})} = \div \widetilde{\mathcal{A}}_{\mathcal{L}}(\bm{u}, \bm{v}), \\
+\end{equation}
+Then, the boundary operators are supposed to fulfill the following assumption, that guarantees a uniform causality condition.
+
 \begin{assumption}\label{ass:operBC}
-	Given $\bm{a} = \in X$ and $\bm{b} \in X$ the boundary operators $\mathcal{B}_\partial, \, \mathcal{C}_\partial$ are assumed to verify either
-	\begin{equation}
+	Given $\bm{a} = (\bm{a}_1, \, \bm{a}_2) \in X_1 \times X_2 = X$ and $\bm{b}  = (\bm{b}_1, \, \bm{b}_2) \in X_1 \times X_2 = X$ the boundary operators $\mathcal{B}_\partial, \, \mathcal{C}_\partial$ are assumed to verify, in an exclusive manner, either
+	\begin{equation}\label{eq:ass1BC}
 	\inner[X]{\bm{a}}{\mathcal{J}_{\text{d}, 1}\, \bm{b}} +\inner[X]{\mathcal{J}_{\text{d}, 2}\, \bm{a}}{\bm{b}} = \inner[L^2(\partial \Omega, \mathbb{R}^m)]{C_\partial \bm{a}}{B_\partial  \bm{b}},
 	\end{equation}
 	or 
-	\begin{equation}
+	\begin{equation}\label{eq:ass2BC}
 	\inner[X]{\bm{a}}{\mathcal{J}_{\text{d}, 2}\, \bm{b}} +\inner[X]{\mathcal{J}_{\text{d}, 1}\, \bm{a}}{\bm{b}} = \inner[L^2(\partial \Omega, \mathbb{R}^m)]{C_\partial \bm{a}}{B_\partial \bm{b}}.
 	\end{equation}
+	
+	These are  equivalent to
+	\begin{align}
+	&\text{Condition } \eqref{eq:ass1BC} \implies \quad
+	\inner[X_2]{\mathcal{L}\, \bm{a}_1}{\bm{b}_2} - \inner[X_1]{\bm{a}_1}{\mathcal{L}^* \, \bm{b}_2} = \inner[L^2(\partial \Omega, \mathbb{R}^m)]{C_{\partial, 1} \bm{a}_1}{B_{\partial, 2}  \bm{b}_2}, \\
+	&\text{Condition } \eqref{eq:ass2BC} \implies \quad
+	\inner[X_2]{\bm{a}_2}{\mathcal{L}\,\bm{b}_1} - \inner[X_1]{\mathcal{L}^* \, \bm{a}_2}{\bm{b}_1} = \inner[L^2(\partial \Omega, \mathbb{R}^m)]{C_{\partial, 2} \bm{a}_2}{B_{\partial, 1} \bm{b}_1}.
+	\end{align}
+	Than means that the boundary operators are parametrized as 
+	\begin{align}
+	\text{Condition } \eqref{eq:ass1BC} \implies \quad B_\partial = \begin{bmatrix}
+	B_{\partial, 1} & 0 \\
+	\end{bmatrix}, \quad C_\partial = \begin{bmatrix}
+	0 & C_{\partial, 2} \\
+	\end{bmatrix}, \\
+	\text{Condition } \eqref{eq:ass2BC} \implies \quad B_\partial = \begin{bmatrix}
+	0 & B_{\partial, 2} \\
+	\end{bmatrix}, \quad C_\partial = \begin{bmatrix}
+	C_{\partial, 1} & 0 \\
+	\end{bmatrix},
+	\end{align}
 \end{assumption}
 
 The Hamiltonian functional is allowed to non linear in the energy variables. 
