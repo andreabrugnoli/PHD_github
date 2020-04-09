@@ -17,7 +17,7 @@ from matplotlib import cm
 
 matplotlib.rcParams['text.usetex'] = True
 
-n = 40 #int(input("Number of elements for side: "))
+n = 5 #int(input("Number of elements for side: "))
 deg = 1 #int(input('Degree for FE: '))
 nreq = 10
 

@@ -27,7 +27,7 @@ To state the balance laws the actual deformed configuration is considered. The l
 \begin{equation*}
 \int_{\omega_t} \rho \, \bm{v} \d{\omega_t}, \quad\text{and}\quad \int_{\omega_t} \rho \, \bm{y} \times \bm{v} \d{\omega_t},
 \end{equation*}
-where $\rho$ is the mass density and the velocity $\bm{v} = \frac{D\bm{u}}{Dt}(\bm{y},t) = \diffp{\bm{u}}{t} + (\nabla_x \bm{u}) \cdot \bm{v}$ is the material time derivative of the displacement (see \cite[Chapter 1]{abeyaratne2012notes}).  Let $\omega_{t, 1},\, \omega_{t, 2}$ be two subregions in a deformed continuum $\Omega_t$ with contacting surface $S_{12}$. There is a force acting on this surface for a continuum that is called stress vector or traction. If $\bm{n}$ is the outward normal at $\bm{y}$ on $S_{12}$ with respect to $\omega_{t, 1}$, then the surface force that $\omega_{t, 1}$ exerts on $\omega_{t, 2}$ is denoted by $\bm{t}(\bm{y}, \bm{n}) \in \mathbb{R}^d$. By the Newton third law, the surface force that $\omega_{t, 2}$ applies on $\omega_{t, 1}$ is given by $\bm{t}(\bm{y}, -\bm{n}) = - \bm{t}(\bm{y}, \bm{n})$. It is assumed that the linear and angular momentum balance hold for any subregion $\omega_t \in \Omega_t$ 
+where $\rho$ is the mass density and the velocity $\bm{v} = \frac{D\bm{u}}{Dt}(\bm{y},t) = \diffp{\bm{u}}{t}(\bm{x},t)$ is the material time derivative of the displacement (see \cite[Chapter 1]{abeyaratne2012notes}).  Let $\omega_{t, 1},\, \omega_{t, 2}$ be two subregions in a deformed continuum $\Omega_t$ with contacting surface $S_{12}$. There is a force acting on this surface for a continuum that is called stress vector or traction. If $\bm{n}$ is the outward normal at $\bm{y}$ on $S_{12}$ with respect to $\omega_{t, 1}$, then the surface force that $\omega_{t, 1}$ exerts on $\omega_{t, 2}$ is denoted by $\bm{t}(\bm{y}, \bm{n}) \in \mathbb{R}^d$. By the Newton third law, the surface force that $\omega_{t, 2}$ applies on $\omega_{t, 1}$ is given by $\bm{t}(\bm{y}, -\bm{n}) = - \bm{t}(\bm{y}, \bm{n})$. It is assumed that the linear and angular momentum balance hold for any subregion $\omega_t \in \Omega_t$ 
 \begin{align*}
 	\diff{}{t} \int_{\omega_t} \rho \bm{v} \d{\omega_t} &= \int_{\partial \omega_t} \bm{t}(\bm{y}, \bm{n}) \d{S} + \int_{\omega_t} \bm{f} \d{\omega_t}, \\
 	\diff{}{t} \int_{\omega_t} \rho\bm{y} \times \bm{v} \d{\omega_t} &= \int_{\partial \omega_t} \bm{y} \times \bm{t}(\bm{y}, \bm{n}) \d{S} + \int_{\omega_t} \bm{y} \times \bm{f} \d{\omega_t}, \\
@@ -179,28 +179,30 @@ The definition of formal adjoint is such that the integration by parts formula i
 \begin{equation*}
 \int_{\Omega} \bm{a} \cdot (\mathcal{L}\bm{b}) \d\Omega = \int_{\Omega} (\mathcal{L}^*\bm{a}) \cdot \bm{b} \d\Omega,
 \end{equation*}
-where $\bm{a} \in C^{\infty}_0(\Omega, \mathbb{R}^{q_u}), \; \bm{b} \in C^{\infty}_0(\Omega, \mathbb{R}^{q_v})$ are smooth functions with compact support. This corresponds to the adjoint definition for an operator between $L^2$ spaces of square integrable functions
+where $\bm{a} \in C^{\infty}_0(\Omega, \mathbb{R}^{q_u}), \; \bm{b} \in C^{\infty}_0(\Omega, \mathbb{R}^{q_v})$ are smooth functions with compact support. This corresponds to the adjoint definition for a bounded operator between $L^2$ spaces of square integrable functions
 \begin{equation*}
 \inner[L^2(\Omega, \mathbb{R}^{q_v})]{\bm{a}}{\mathcal{L}\bm{b}} = \inner[L^2(\Omega, \mathbb{R}^{q_u})]{\mathcal{L}^*\bm{a}}{\bm{b}}.
 \end{equation*}
-That means that, contrarily to the adjoint of an operator, the formal adjoint definition does not regard the actual domain of the operator nor the boundary conditions. For example, the differential operators $\div,\, \grad$ are unbounded in the ${L}^2$ topology. Whenever unbounded operators are considered, it is important to define their domain. To avoid the need of specifying domains, the notion of formal adjoint can be evoked. The formal adjoint respects the integration by parts formula and is defined only for sufficiently smooth functions with compact support. In this sense $\div, \grad$ are formally skew-adjoint, since for smooth functions with compact support, it holds
+That means that, contrarily to the adjoint of an operator, the formal adjoint definition does not regard the actual domain of the operator nor the boundary conditions. For example, the differential operators $\div,\, \grad$ are unbounded in the ${L}^2$ topology. Whenever unbounded operators are considered, it is important to define their domain. To avoid the need of specifying domains, the notion of formal adjoint is used. The formal adjoint respects the integration by parts formula and is defined only for sufficiently smooth functions with compact support. In this sense the formal adjoint of $\div$  is $-\grad$, since for smooth functions with compact support, it holds
 \begin{equation*}
 \left\langle \bm{y}, \, \grad({x}) \right\rangle_{{L}^2(\Omega, \mathbb{R}^{3})} 
 \underbrace{=}_{\text{I.B.P.}} -\left\langle\div(\bm{y}), \, {x} \right\rangle_{{L}^2(\Omega, \mathbb{R})},
 \end{equation*}
-for $\bm{Y} \in C_0^\infty(\Omega, \mathbb{R}^{n}), \; {x} \in C_0^\infty(\Omega)$ (I.B.P. stands for integration by parts). The definition of the domain of the operators, that requires the knowledge of the boundary conditions, has not been specified. 
+for $\bm{y} \in C_0^\infty(\Omega, \mathbb{R}^{n}), \; {x} \in C_0^\infty(\Omega)$ (I.B.P. stands for integration by parts). The definition of the domain of the operators, that requires the knowledge of the boundary conditions, has not been specified. 
 \end{remark}
 
+When $q_u=q_v=q \implies U \equiv V = W$, formal skew-adjoint operators can be defined: 
 \begin{definition}
 	\label{def:skewOp}
-	Let $W = C^{\infty}(\Omega, \mathbb{R}^{q})$ be the space of vector-valued smooth functions and $\mathcal{J}: W \rightarrow W$ a constant matrix differential operator. Then, $\mathcal{J}$ is formally skew-adjoint (or skew-symmetric) if and only if $\mathcal{J} = -\mathcal{J}^*$. This corresponds to the algebraic condition
+	Let $W = C^{\infty}(\Omega, \mathbb{R}^{q})$ be the space of vector-valued smooth functions and $\mathcal{J}: W \rightarrow W$ a constant matrix differential operator. Then, $\mathcal{J}$ is formally skew-adjoint (or skew-symmetric) if and only if $\mathcal{J} = -\mathcal{J}^*$. This corresponds to the algebraic condition on $q \times q$ square matrices
 	\begin{equation}
 	\bm{P}_{\alpha} = (-1)^{|\alpha| + 1} \bm{P}_{\alpha}^\top, \quad \forall \alpha.
 	\end{equation}
 \end{definition}
-An important relation between a differential operator and its adjoint is expressed by the following theorem.
+An important relation between a differential operator and its adjoint is expressed by the following theorem, valid for operators between spaces of different dimensions.
+
 \begin{theorem}[\cite{rogers2004pde}, Chapter 9, theorem 9.37]\label{th:rogers}
-	Consider a matrix differential operator $\mathcal{L}$ and let $\mathcal{L}^*$ denote its formal adjoint. Then, for each function $\bm{u} \in {U}$ and $\bm{v} \in {V}$:
+	Consider a matrix differential operator $\mathcal{L} : U \rightarrow V$ and let $\mathcal{L}^*$ denote its formal adjoint. Then, for each function $\bm{u} \in {U}$ and $\bm{v} \in {V}$:
 	\begin{equation}
 	\int_{\Omega} \left( \bm{v}^\top \mathcal{L} \bm{u} - \bm{u}^\top \mathcal{L}^* \bm{v}\right) \d\Omega= \int_{\partial \Omega} \widetilde{\mathcal{A}}_{\mathcal{L}}(\bm{u}, \bm{v}) \d{S},
 	\end{equation}
@@ -242,7 +244,7 @@ From this proposition, if $(\bm{f}, \bm{e}, \bm{z}) \in  D_{\mathcal{J}}$, then 
 \end{equation}
 
 
-This  relation expresses the  power  conservation property of the Stokes–Dirac structure. It states the relation between the variation of internal energy (the integral on the domain $\Omega$) with the power flowing through the boundary (the integral over $\partial\Omega$). Thanks to the power conservation property dpHs always dispose of an associated Stokes Dirac structure. This concept can be extended to consider dissipation or distributed forces. To this aim, it is necessary to include additional ports to account for the power exchange due to these effects (see Theorem 3.4 \cite{macchelli2004modelling}). 
+This  relation expresses the  power  conservation property of the Stokes–Dirac structure. It states the relation between the variation of internal energy (the integral on the domain $\Omega$) with the power flowing through the boundary (the integral over $\partial\Omega$). Thanks to the power conservation property dpHs always dispose of an associated Stokes-Dirac structure. This concept can be extended to consider dissipation or distributed forces. To this aim, it is necessary to include additional ports to account for the power exchange due to these effects (see Theorem 3.4 \cite{macchelli2004modelling}). 
 
 
 \begin{remark}
@@ -252,7 +254,7 @@ This  relation expresses the  power  conservation property of the Stokes–Dirac
 
 \subsection{Distributed port-Hamiltonian systems}
 
-A distributed conservative port-Hamiltonian system is defined by a set of variables that describes the unknowns, by a formally skew-adjoint differential operator, an energy functional and a set of boundary inputs and corresponding conjugated outputs. Such a system is described by the following set of equations
+A distributed lossless port-Hamiltonian system is defined by a set of variables that describes the unknowns, by a formally skew-adjoint differential operator, an energy functional and a set of boundary inputs and corresponding conjugated outputs. Such a system is described by the following set of equations
 \begin{equation}\label{eq:phsys}
 \begin{aligned}
 \diffp{\bm{\alpha}}{t} &= \mathcal{J}\displaystyle \bm{e}, \vspace{3pt}\\
@@ -261,7 +263,7 @@ A distributed conservative port-Hamiltonian system is defined by a set of variab
 \bm{e} &:= \displaystyle \diffd{H}{\bm{\alpha}}.
 \end{aligned}
 \end{equation}
-The unknowns $\bm{\alpha}$ are called energy variables in the port-Hamiltonian framework, the formally skew-adjoint operator $\mathcal{J}$ is named interconnection operator (see appendix \ref{app:math}, Def. \ref{def:foradj} for a precise definition of formal skew adjointness). $\mathcal{B}_\partial, \mathcal{C}_\partial$ are boundary operators, that provide the boundary input $\bm{u}_\partial$ and output $\bm{y}_\partial$. The variational derivative of the Hamiltonian defines the co-energy variables $\bm{e}$.
+The unknowns $\bm{\alpha}$ are called energy variables in the port-Hamiltonian framework, the formally skew-adjoint operator $\mathcal{J}$ is named interconnection operator (see Def. \ref{def:skewOp} for a precise definition of formal skew adjointness). $\mathcal{B}_\partial, \mathcal{C}_\partial$ are boundary operators, that provide the boundary input $\bm{u}_\partial$ and output $\bm{y}_\partial$ \cite[Chapter 4]{tucsnak2009observation}. The variational derivative of the Hamiltonian defines the co-energy variables $\bm{e}$.
 
 \begin{remark}
 	It will become clear in this section that the effort variables of the Stokes-Dirac structure are indeed equivalent to the co-energy variables of the pH system. This justifies using the same notation for both.
@@ -285,7 +287,7 @@ If the integrand does not contain derivative of the argument $\bm{\alpha}$ then 
 \end{remark}
 
 
-Conservative port-Hamiltonian systems possess a peculiar property: the energy rate is given by the power due to the boundary ports $\bm{u}_\partial, \bm{y}_\partial$
+Lossless port-Hamiltonian systems possess a peculiar property: the energy rate is given by the power due to the boundary ports $\bm{u}_\partial, \bm{y}_\partial$
 \begin{equation}\label{eq:enrate}
 \begin{aligned}
 \dot{H} &= \int_{\Omega} \diffd{H}{\bm{\alpha}} \cdot \diffp{\bm{\alpha}}{t} \d{\Omega} =\inner[\Omega]{\dder{H}{\bm{\alpha}}}{\pder{\bm{\alpha}}{t}}, \qquad \text{Stokes theorem}\\
@@ -307,11 +309,11 @@ If the flow, effort and boundary variables are chosen to be
 \bm{f}:= -\partial_t \bm{\alpha}, \quad \bm{e}:=\delta_{\bm\alpha} H, \quad \bm{z}:=(\bm{u}_\partial, \, \bm{y}_\partial), 
 \end{equation}
 
-then system \eqref{eq:phsys} defines a Stokes Dirac structure by Proposition \ref{prop:StokesDirac}.  In this rather informal treatment of dpHs, no rigorous characterization whatsoever has been introduced for operators $\mathcal{B_\partial,\, C_\partial}$ in system \eqref{eq:phsys}. A formal characterization of these operators has been given in \cite{legorrec2005} for pH of generic order only in one geometrical dimensional. In the following examples it is shown that from the power balance appropriate boundary variables can be defined.
+then system \eqref{eq:phsys} defines a Stokes-Dirac structure by Proposition \ref{prop:StokesDirac}.  In this rather informal treatment of dpHs, no rigorous characterization whatsoever has been introduced for operators $\mathcal{B_\partial,\, C_\partial}$ in system \eqref{eq:phsys}. A formal characterization of these operators has been given in \cite{legorrec2005} for pH of generic order only in one geometrical dimensional. In the following examples it is shown that from the power balance appropriate boundary variables can be defined.
 
 \subsubsection{Wave equation}\label{sec:waveeq}
 
-Given an in open bounded connected set $\Omega \subset \mathbb{R}^2$ with Lipschitz continuous boundary $\partial\Omega$, the propagation of sound in air can be described by the following model \cite{trenchant2018}
+Given an open bounded connected set $\Omega \subset \mathbb{R}^2$ with Lipschitz continuous boundary $\partial\Omega$, the propagation of sound in air can be described by the following model \cite{trenchant2018}
 \begin{equation}\label{eq:waveeq}
 \begin{aligned}
 \chi_s \partial_{t} p(\bm{x}, t) &=-\div \bm{v}, \\
@@ -357,7 +359,7 @@ From the energy rate it is possible to identify the boundary variables.
  &= \int_{\Omega} \div(e_p \, \bm{e}_v) \d\Omega, \qquad &\text{Stokes theorem}, \\
  &= \int_{\partial \Omega} e_p \, \bm{e}_v\cdot\bm{n} \d{S} = \inner[\partial\Omega]{e_p}{\bm{e}_v \cdot\bm{n}}.
 \end{align*}
-The boundary term $\inner[\partial\Omega]{e_p}{\bm{e}_v}$ pairs two power variables. One is taken as control input, the other plays the role of power-conjugated output. The assignment of these roles to the boundary power variables is referred to as causality of the boundary port \cite[Chapter~2]{kotyczka2019numerical}. Under uniform causality assumption, either $e_p$ or $\bm{e}_v$ can assume the role of (distributed) boundary input, but not both. This leads to two possible selections:
+The boundary term $\inner[\partial\Omega]{e_p}{\bm{e}_v}$ pairs two power variables. One is taken as control input, the other plays the role of power-conjugated output. The assignment of these roles to the boundary power variables is referred to as causality of the boundary port \cite{kotyczka2018weak},\cite[Chapter~2]{kotyczka2019numerical}. Under uniform causality assumption, either $e_p$ or $\bm{e}_v$ can assume the role of (distributed) boundary input, but not both. This leads to two possible selections:
 \begin{itemize}
 	\item {First case} ${u}_\partial = e_p, \quad {y}_\partial = \bm{e}_v \cdot\bm{n}$. \\
 	This imposes the variable $e_p:= p$ as boundary input and corresponds to a classical Dirichlet condition.
@@ -438,7 +440,7 @@ where $\nabla \times$ is the rotational of $\bm{v}$ (also denoted $\curl \bm{v}$
 \begin{equation*}
 \diffp{\rho \bm{v}}{t} = -\nabla\left(\frac{1}{2}\rho \norm{\bm{v}}^2 + \rho g h\right) - \rho (\nabla \times \bm{v}) \times \bm{v}.
 \end{equation*}
-The last term on the right side can be rewritten
+The last term on the right-hand side can be rewritten
 \begin{equation*}
 \rho (\nabla \times \bm{v}) \times \bm{v} =   
 \begin{bmatrix}
@@ -495,10 +497,10 @@ Despite the non-standard formulation, the energy rate provides anyway the bounda
 &= -\int_{\partial \Omega} e_h \, \bm{e}_v\cdot\bm{n} \d{S} = -\inner[\partial\Omega]{e_h}{\bm{e}_v \cdot\bm{n}}.
 \end{align*}
 
-Again two possible cases of homogeneous boundary causality arise:
+Again two possible cases of uniform boundary causality arise:
 \begin{itemize}
 	\item {First case} ${u}_\partial = e_h, \quad {y}_\partial = \bm{e}_v \cdot\bm{n}$. \\
-	This imposes the variable $e_h:= h$ as boundary input ans corresponds to a given water level for a fluid boundary.
+	This imposes the variable $e_h:= h$ as boundary input and corresponds to a given water level for a fluid boundary.
 	
 	\item {Second case} ${u}_\partial = \bm{e}_v \cdot\bm{n}, \quad {y}_\partial = e_p$. \\
 	This imposes the variable $\bm{e}_v \cdot\bm{n}:= h \bm{v} \cdot \bm{n}$ as boundary input and corresponds to a given volumetric flow rate.
@@ -506,7 +508,7 @@ Again two possible cases of homogeneous boundary causality arise:
 
 \section{Port-Hamiltonian formulation of linear elasticity}\label{sec:pHelas}
 
-In this section a port-Hamiltonian formulation for elasticity is deduced from the classical elastodynamics problem. It must be appointed that already in the seventies a purely hyperbolic formulation for elasticity was detailed \cite{hughes1978classical}. The missing point is the clear connection with the theory of Hamiltonian PDEs. An Hamiltonian formulation can be found in \cite[Chapter 16]{grinfield2015}, but without any connection to the concept of Stokes-Dirac structure induced by the underlying geometry. \\
+In this section a port-Hamiltonian formulation for elasticity is deduced from the classical elastodynamics problem. It must be highlighted that already in the seventies a purely hyperbolic formulation for elasticity was detailed \cite{hughes1978classical}. The missing point is the clear connection with the theory of Hamiltonian PDEs. An Hamiltonian formulation can be found in \cite[Chapter 16]{grinfield2015}, but without any connection to the concept of Stokes-Dirac structure induced by the underlying geometry. \\
 
 \subsection{Energy and co-energy variables}
 Consider an open connected set $\Omega \subset \mathbb{R}^d, \; d=(2,3)$. The displacement within a deformable continuum is given by Eq. \eqref{eq:lin_elastodyn}. 
@@ -517,7 +519,7 @@ The contribution of the body force $\bm{f}$ has been removed for ease of present
 \begin{equation}
 	H = \energy{\rho \norm{\partial_t \bm{u}}^2 + \bm{\Sigma} \cddot \bm{\varepsilon}}.
 \end{equation}
-The notation $\bm{A}\cddot \bm{B} = \Tr(\bm{A}^\top\bm{B}) = A_{ij} B_{ij}$ denotes the tensor contraction. Recall that $\bm{\varepsilon}= \Grad{\bm{u}}$ and $\bm{\Sigma}=\bm{\mathcal{D}}\bm{\varepsilon}$. The energy variables are then the linear momentum and the deformation field
+The notation $\bm{A}\cddot \bm{B} = \Tr(\bm{A}^\top\bm{B}) = \sum_{i, j} A_{ij} B_{ij}$ denotes the tensor contraction. Recall that $\bm{\varepsilon}= \Grad{\bm{u}}$ and $\bm{\Sigma}=\bm{\mathcal{D}}\bm{\varepsilon}$. The energy variables are then the linear momentum and the deformation field
 \begin{equation*}
 \bm{\alpha}_v = \rho \bm{v}, \qquad \bm{A}_{\varepsilon} = \bm{\varepsilon},
 \end{equation*}
@@ -534,6 +536,10 @@ The tensor-valued co-energy $\bm{E}_\varepsilon$ is obtained by taking the varia
 \begin{proposition}\label{prop:varder_tens}
 	The variational derivative of the Hamiltonian with respect to the strain tensor is the stress tensor $\delta_{\bm{A}_{\varepsilon}}H = \bm{\Sigma}$.
 	\begin{proof}
+		Let $\mathbb{S}: \mathbb{R}^{d\times d}_{\text{sym}}$ be the space of symmetric tensor and  $L^2(\Omega, \mathbb{S})$ the space of the square integrable symmetric tensors endowed with the tensor contraction as inner product
+		\begin{equation}\label{eq:normL2sym}
+		\inner[L^2(\Omega, \mathbb{S})]{\bm{A}}{\bm{B}} = \int_{\Omega} \bm{A} \cddot \bm{B} \d\Omega. 
+		\end{equation}
 		The contribution due to the deformation part in Hamiltonian is given by:		\begin{equation*}
 		H_{\mathrm{def}}(\bm{A}_{\varepsilon}) = \frac{1}{2} \int_{\Omega} (\bm{\mathcal{D}} \bm{A}_{\varepsilon}) \cddot \bm{A}_{\varepsilon}  \; \d\Omega. 
 		\end{equation*}
@@ -554,10 +560,7 @@ The tensor-valued co-energy $\bm{E}_\varepsilon$ is obtained by taking the varia
 		\end{equation*}
 		By definition of  variational derivative it can be written:
 		\begin{equation*}H_{\mathrm{def}}(\bar{\bm{A}}_{\varepsilon} + \eta \bm{\Delta}\bm{A}_{\varepsilon}) = H_{\mathrm{def}}(\bar{\bm{A}}_{\varepsilon}) + \eta \inner[L^2(\Omega, \mathbb{S})]{\diffd{H}{\bm{A}_{\varepsilon}}}{\bm{\Delta}\bm{A}_{\varepsilon}} + O(\eta^2), \end{equation*}
-		where $L^2(\Omega, \mathbb{S})$ is the space of the square integrable $\mathbb{R}^{d\times d}$ symmetric tensors endowed with the tensor contraction as inner product
-		\begin{equation}\label{eq:normL2sym}
-		\inner[L^2(\Omega, \mathbb{S})]{\bm{A}}{\bm{B}} = \int_{\Omega} \bm{A} \cddot \bm{B} \d\Omega. 
-		\end{equation}
+		
 		Then, by identification 
 		\begin{equation*}
 		\diffd{H_{\mathrm{def}}}{\bm{A}_{\varepsilon}} = \bm{\mathcal{D}} \bar{\bm{A}}_{\varepsilon} = \bm{\Sigma}.
@@ -593,12 +596,12 @@ The first equation of the system is the conservation of linear momentum. The sec
 \end{aligned}
 \end{equation}
 
-Assuming that $\bm{u} \in C^2$, higher order derivatives commute (Schwarz theorem). Hence, the equation is verified. The following theorem ensures the differential operator is formally skew-adjoint (one can also find this result in \cite[Lemma 3.3]{pauly2020elasticity}). 
+Assuming that $\bm{u} \in C^2$, higher order derivatives commute (Schwarz theorem). Hence, the equation is verified. The following theorem ensures the differential operator is formally skew-adjoint (one can also find this result in the recent article \cite[Lemma 3.3]{pauly2020elasticity}, available as arXiv preprint). 
 
 \begin{theorem}\label{th:adjDiv}
 	The formal adjoint of the tensor divergence $\mathrm{Div}$ is $- \mathrm{Grad}$, the opposite of the symmetric gradient.
 	\begin{proof}
-		The space of symmetric tensor field in $\mathbb{R}^{d\times d}$ is denoted by $\mathbb{S}$, whereas the space of vector field in $\mathbb{R}^{d}$ is denoted by $\mathbb{V}$. Let us consider the Hilbert space of the square integrable symmetric tensors $L^2(\Omega, \mathbb{S})$ with scalar product is defined in \eqref{eq:normL2sym}. Moreover consider the Hilbert space of the square integrable vector function $L^2(\Omega, \mathbb{V})$, endowed with the usual scalar product:
+		We denote by $\mathbb{V} = \mathbb{R}^{d}$ the space of vector field in $\mathbb{R}^{d}$ and by $\mathbb{S} = \mathbb{R}^{d\times d}$ hte space of symmetric tensor field in $\mathbb{R}^{d\times d}$. Let us consider the Hilbert space of the square integrable symmetric tensors $L^2(\Omega, \mathbb{S})$ with scalar product is defined in \eqref{eq:normL2sym}. Moreover consider the Hilbert space of the square integrable vector function $L^2(\Omega, \mathbb{V})$, endowed with the usual scalar product:
 		\begin{equation*}
 		\left\langle \bm{a} , \bm{b} \right\rangle_{L^2(\Omega, \mathbb{V})} = \int_{\Omega}  \bm{a} \cdot \bm{b} \; \d\Omega = \int_{\Omega} \bm{a}^\top \bm{b}\; \d\Omega, \quad \forall \bm{a}, \bm{b} \in L^2(\Omega, \mathbb{V}). 
 		\end{equation*}
@@ -652,7 +655,7 @@ The boundary values are then found by evaluating the energy rate
 \begin{equation}\label{eq:enrateElas}
 \begin{aligned}
 \dot{H} &= \int_{\Omega} \left\{ \bm{e}_v \cdot \partial_t \bm\alpha_v + \bm{E}_\varepsilon \cddot \partial_t \bm{A}_\varepsilon \right\} \d\Omega, \\
-&= \int_{\Omega} \left\{\bm{e}_v \cdot \Div \bm{E}_\varepsilon + \bm{E}_\varepsilon \cddot \Grad \bm{e}_v \right\}\d\Omega, \qquad &\text{Chain rule},\\
+&= \int_{\Omega} \left\{\bm{e}_v \cdot \Div \bm{E}_\varepsilon + \bm{E}_\varepsilon \cddot \Grad \bm{e}_v \right\}\d\Omega, \qquad &\text{Chain rule for tensors, cf. Appendix},\\
 &= \int_{\Omega} \div(\bm{E}_\varepsilon \cdot \bm{e}_v) \d\Omega, \qquad &\text{Stokes theorem (see \cite[Chapter 1]{boffi2013mixed})}, \\
 &= \int_{\partial \Omega} \bm{e}_v \cdot (\bm{E}_\varepsilon\cdot\bm{n}) \d{S} = \inner[\partial\Omega]{\bm{e}_v}{\bm{E}_\varepsilon \cdot\bm{n}}.
 \end{aligned}
@@ -664,7 +667,7 @@ The boundary values are then found by evaluating the energy rate
 \caption{A 2D continuum with Neumann and Dirichlet boundary conditions}
 \label{fig:bc_elas2D}
 \end{figure}
-The imposition of the velocity field along the boundary $\bm{e}_v = \partial_t \bm{u}$ corresponds to a Dirichlet condition. Setting $\bm{E}_\varepsilon \cdot\bm{n} = \bm{\Sigma} \cdot \bm{n} = \bm{t}$ corresponds to a Neumann condition. Consider a partition of the boundary $\partial\Omega = \Gamma_N \cup \Gamma_D$ and $\Gamma_N \cap \Gamma_D =  \{\emptyset\}$, where a Dirichlet and a Neumann condition applies on the subset $\Gamma_D$ and $\Gamma_N$ respectively (see Fig. \ref{fig:bc_elas2D}). Then the final pH formulation reads
+The imposition of the velocity field along the boundary $\bm{e}_v = \partial_t \bm{u}$ corresponds to a Dirichlet condition. Setting $\bm{E}_\varepsilon \cdot\bm{n} = \bm{\Sigma} \cdot \bm{n}$ (the traction) corresponds to a Neumann condition. Consider a partition of the boundary $\partial\Omega = \Gamma_N \cup \Gamma_D$ and $\Gamma_N \cap \Gamma_D =  \{\emptyset\}$, where a Dirichlet and a Neumann condition applies on the subset $\Gamma_D$ and $\Gamma_N$ respectively (see Fig. \ref{fig:bc_elas2D}). Then the final pH formulation reads
 
 \begin{equation}\label{eq:phsysElas}
 \begin{aligned}
@@ -761,7 +764,7 @@ Consider the splitting of the boundary $\partial\Omega = \Gamma_N \cup \Gamma_D$
 	=& +\int_{\Gamma_N} \left\{\bm{e}_{\partial, 2} \cdot (\bm{\mathcal{E}}_\varepsilon \cdot \bm{n}) + \bm{\epsilon}_v \cdot \bm{f}_{\partial, 2}\right\}  \d{S}, \\
 	&+ \int_{\Gamma_D} \left\{\bm{f}_{\partial, 1} \cdot (\bm{\mathcal{E}}_\varepsilon \cdot \bm{n}) + \bm{\epsilon}_v \cdot \bm{e}_{\partial, 1}\right\}  \d{S},
 \end{align*}
-where the elements of the vectors $\bm{f}_{\partial} = (\bm{f}_{\partial, 1}, \bm{f}_{\partial, 2}), \; \bm{e}_{\partial} = (\bm{e}_{\partial, 1}, \bm{e}_{\partial, 2})$ have been considering. By expanding of the terms $\inner[F_\partial]{\bm{e}_{\partial}}{\bm{\phi}_{\partial}} +  \inner[F_\partial]{\bm{\epsilon}_{\partial}}{\bm{f}_{\partial}}$ and given the fact that $\bm{e}_\partial, \, \bm{f}_\partial$ have arbitrary values then
+where the elements of the vectors $\bm{f}_{\partial} = (\bm{f}_{\partial, 1}, \bm{f}_{\partial, 2}), \; \bm{e}_{\partial} = (\bm{e}_{\partial, 1}, \bm{e}_{\partial, 2})$ have been considered. By expanding of the terms $\inner[F_\partial]{\bm{e}_{\partial}}{\bm{\phi}_{\partial}} +  \inner[F_\partial]{\bm{\epsilon}_{\partial}}{\bm{f}_{\partial}}$ and given the fact that $\bm{e}_\partial, \, \bm{f}_\partial$ have arbitrary values then
 \begin{equation*}
 \bm{\phi}_{\partial} = \begin{bmatrix}
 \bm\gamma_{0}^{\Gamma_D} & \bm{0} \\
