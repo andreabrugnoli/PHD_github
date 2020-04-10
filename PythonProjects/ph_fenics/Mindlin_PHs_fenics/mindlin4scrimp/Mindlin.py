@@ -30,8 +30,8 @@ import time
 
 
         
-class Wave_2D:
-    #%% CONSTRUCTOR
+class Mindlin:
+    #% CONSTRUCTOR
     def __init__(self):
         """
         Constructor for the Wave_2D class
@@ -149,33 +149,18 @@ class Wave_2D:
     
     ## Method.
     #  @param self The object pointer.
-    def Set_Damping(self, damp=[], Rtime_func=None, Z=None, Y=None, eps=None, k11=None, k12=None, k22=None, uKV_included=False, **kwargs):
+    def Set_Damping(self, damp=[], Rtime_func=None, eps=None,  **kwargs):
         if Rtime_func is not None :
             self.dynamic_R = True
             self.Rtime = Rtime_func
         else : self.dynamic_R = False
                 
         self.damp = damp
-        
-        if 'impedance' in self.damp or 'impedance_mbc' in self.damp :
-            self.Z = Expression(Z, degree=2,\
-                                x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
-                                **kwargs)
-
-        if 'admittance' in self.damp :
-            self.Y = Expression(Y, degree=2,\
-                                x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
-                                **kwargs)
-
-        if 'internal' in self.damp :
+      
+       if 'internal' in self.damp :
             self.eps = Expression(eps, degree=2,\
                                   x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
-                                  **kwargs)
-        if 'KV' in self.damp :
-            self.kappa = Expression( ( (k11, k12), (k12, k22) ), degree=2, \
-                                x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
-                                **kwargs)
-            self.uKV_included = uKV_included
+                                  **kwargs)0
         
         print('Damping:', ((len(damp)*'%1s,  ') % tuple(damp))[:-3])
         print('Damping: OK')
@@ -188,14 +173,12 @@ class Wave_2D:
     
     ## Method.
     #  @param self The object pointer.    
-    def Set_Mixed_Boundaries(self, C=[], SSH=[], F=[]):
+    def Set_Mixed_Boundaries(self, C=[], F=[]):
         self.C = C
-        self.SSH= SSH
         self.F = F
         self.set_mixed_boundaries = 1
     
         print('Clamped condition:', (len(C)*'%s,  ' % tuple(C))[:-3])
-        print('Simply supported hard:', (len(SSH)*'%s,  ' % tuple(SSH))[:-3])
         print('Free condition:', (len(F)*'%s,  ' % tuple(F))[:-3])
         print('Mixed Boundaries: OK')
         print(40*'-', '\n')
@@ -519,8 +502,7 @@ class Wave_2D:
             self.Vb = VectorFunctionSpace(self.Msh, family_b, rb, dim = 3)
             
         # Orders
-        self.rq = rq
-        self.rp = rp
+        self.r = r
         self.rb = rb
         
         # DOFs
@@ -541,9 +523,14 @@ class Wave_2D:
         coord_qw = self.Vqw.tabulate_dof_coordinates()
         
         self.dofs_Vpw = self.Vpw.dofmap().dofs()
-        self.dofs_Vpth = self.Vpth.sub(1).dofmap().dofs()
-        self.dofs_Vqth = self.Vqth.sub(2).dofmap().dofs()
-        self.dofs_Vqw = self.Vqw.sub(3).dofmap().dofs()
+        self.dofs_Vpth = self.Vpth.dofmap().dofs()
+        
+        self.dofs_Vp = np.concatenate((self.dofs_Vpw, self.dofs_Vpth))
+        
+        self.dofs_Vqth = self.Vqth.dofmap().dofs()
+        self.dofs_Vqw = self.Vqw.dofmap().dofs()
+        
+        self.dofs_Vq = np.concatenate((self.dofs_Vqth, self.dofs_Vqw))
         
         # Explicit coordinates
         self.xpw = coord_pw[:,0]
@@ -565,7 +552,7 @@ class Wave_2D:
         # Boundary DOFs for control and observation: necessary for B matrix        
         coord_b = self.Vb.tabulate_dof_coordinates()
         def Get_Associated_DOFs(SubDomain, Space):
-            BC = DirichletBC(Space, '0', SubDomain)
+            BC = DirichletBC(Space, ('0', '0', '0'), SubDomain)
             bndr_dofs = []
             for key in BC.get_boundary_values().keys() :
                 bndr_dofs.append(key)
@@ -654,10 +641,11 @@ class Wave_2D:
         M_pet = assemble(m).mat()
 
         self.M = csr_matrix(M_pet.getValuesCSR()[::-1])
-        self.Mpw = self.M[self.dofs_Vpw, :][:, self.dofs_Vpw]
-        self.Mpth = self.M[self.dofs_Vpth, :][:, self.dofs_Vpth]
-        self.Mqth = self.M[self.dofs_Vqth, :][:, self.dofs_Vqth]
-        self.Mqw = self.M[self.dofs_Vqw, :][:, self.dofs_Vqw]
+        
+#        self.Mpw = self.M[self.dofs_Vpw, :][:, self.dofs_Vpw]
+#        self.Mpth = self.M[self.dofs_Vpth, :][:, self.dofs_Vpth]
+#        self.Mqth = self.M[self.dofs_Vqth, :][:, self.dofs_Vqth]
+#        self.Mqw = self.M[self.dofs_Vqw, :][:, self.dofs_Vqw]
         
         # Stiffness matrices
         
@@ -685,42 +673,11 @@ class Wave_2D:
                                          + dot(vpth, self.tanext)*u_Mns *ds).mat()
         self.B = csr_matrix(B_pet.getValuesCSR()[::-1])[:,self.b_ind] 
         
-        
+        if 'internal' in self.damp :
+            self.R = csr_matrix(assemble( self.eps * vpw * epw * dx).mat().getValuesCSR()[::-1])
         # Dissipation matrix
-#        self.R = np.zeros((self.Nsys, self.Nsys))
-#    
-#        if 'impedance' in self.damp :
-#            self.Mz = assemble( self.Z * ab * vb * ds).array()[self.b_ind,:][:,self.b_ind]
-#            self.Rz = self.B @ linalg.solve(self.Mb, self.Mz) @ linalg.solve(self.Mb, self.B.T)
-#            self.R += linalg.block_diag(self.Rz, Zerop)
-#            
-#        if 'admittance' in self.damp :
-#            self.My = assemble( self.Y * ab * vb * ds).array()[self.b_ind,:][:,self.b_ind]
-#            self.Ry = self.B @ linalg.solve(self.Mb, self.My) @ linalg.solve(self.Mb, self.B.T)
-#            self.R += linalg.block_diag(Zeroq, self.Ry)
-#
-#        if 'internal' in self.damp :
-#            self.Ri = assemble( self.eps * ap_tl * vp_tl * dx).array()
-#            self.R += linalg.block_diag(Zeroq, self.Ri)
-#
-#        if 'KV' in self.damp :
-#            kappa_itrp = interpolate(self.kappa, TensorFunctionSpace(self.Msh, 'P', 6))
-#            self.Rkv = assemble( dot(self.kappa * grad(ap_tl), grad(vp_tl)) * dx).array() 
-#            if not self.uKV_included :
-#                self.Rkv += - assemble(dot(self.kappa * grad(ap_tl), self.norext) * vp_tl * ds).array()
-#            self.R += linalg.block_diag(Zeroq, self.Rkv)
-#            
-#            self.MR = assemble( dot(aq_tl, vq_tl) * dx).array()
-#            self.Mkappa = assemble( dot(self.kappa * aq_tl, vq_tl) * dx).array()
-#            self.G = assemble( - dot(aq_tl, grad(vp_tl)) * dx).array()
-#            self.C = assemble( dot(aq_tl, self.norext) * vp_tl * ds).array()
-#            
-#    
-#        if self.dynamic_R :
-#            def Rtime(t):
-#                return self.R * self.Rtime(t)
-#            self.Rdyn = Rtime 
-    
+       self.R = csr_matrix((self.Nsys,self.Nsys))
+       
         self.assembly = 1
         
         pass
@@ -754,87 +711,94 @@ class Wave_2D:
                 self.Gamma_4.append(i)
         
         # Indexes of each boundary
-        self.C_index = []
-        self.SSH_index = []
-        self.F_index = []
+        self.D_index = []
+        self.N_index = []
         
-        if 'G1' in self.C :
-            self.C_index += self.Gamma_1
-        elif 'G1' in self.SSH:
-            self.SSH_index += self.Gamma_1
-        elif 'G1' in self.F:
-            self.F_index += self.Gamma_1
+        if 'G1' in self.D :
+            self.D_index += self.Gamma_1
+        elif 'G1' in self.N:
+            self.N_index += self.Gamma_1
 
-        if 'G2' in self.C :
-            self.C_index += self.Gamma_2
-        elif 'G2' in self.SSH :
-            self.SSH_index += self.Gamma_2
-        elif 'G2' in self.F :
-            self.F_index += self.Gamma_2
+        if 'G2' in self.D :
+            self.D_index += self.Gamma_2
+        elif 'G2' in self.N :
+            self.N_index += self.Gamma_2
             
-        if 'G3' in self.C :
-            self.C_index += self.Gamma_3
-        elif 'G3' in self.SSH :
-            self.SSH_index += self.Gamma_3
-        elif 'G3' in self.F :
-            self.F_index += self.Gamma_3
+        if 'G3' in self.D :
+            self.D_index += self.Gamma_3
+        elif 'G3' in self.N :
+            self.N_index += self.Gamma_3
             
-        if 'G4' in self.C :
-            self.C_index += self.Gamma_4
-        elif 'G4' in self.SSH :
-            self.SSH_index += self.Gamma_4
-        elif 'G4' in self.F :
-            self.F_index += self.Gamma_4
+        if 'G4' in self.D :
+            self.D_index += self.Gamma_4
+        elif 'G4' in self.N :
+            self.N_index += self.Gamma_4
 
         # Remove common indexes
-        for i in self.C_index :
-           if i in self.SSH_index :
-               self.SSH_index.remove(i)
-           if i in self.F_index :
-               self.F_index.remove(i)
-        for i in self.F_index :
-           if i in self.SSH_index :
-               self.SSH_index.remove(i)       
-                
-        self.C_index = list(np.unique(np.array(self.C_index)))     
-        self.SSH_index = list(np.unique(np.array(self.SSH_index)))
-        self.F_index = list(np.unique(np.array(self.F_index)))      
+        for i in self.D_index :
+           if i in self.N_index :
+               self.N_index.remove(i)
 
-        self.Nb_C, self.Nb_SSH, self.Nb_F = len(self.C_index),\
-                        len(self.SSH_index), len(self.F_index)
+                
+        self.D_index = list(np.unique(np.array(self.D_index)))     
+        self.N_index = list(np.unique(np.array(self.N_index)))      
+
+        self.Nb_D, self.Nb_N = len(self.D_index), len(self.N_index)
         
         # New Boundary Matrices
-        aq_tl, vp_tl = TrialFunction(self.Vq), TestFunction(self.Vp)
-        ab, vb = TrialFunction(self.Vb), TestFunction(self.Vb)
+        v = TestFunction(self.V)
+        vpw, vpth, vqth, vqw = split(v)
         
-        self.Mb_D = assemble( ab * vb * ds ).array()[self.D_index, :][:, self.D_index]
-        self.Mb_N = assemble( ab * vb * ds ).array()[self.N_index, :][:, self.N_index]
-        self.Mb_Z = assemble( ab * vb * ds ).array()[self.Z_index, :][:, self.Z_index]
+        e = TrialFunction(self.V)
+        epw, epth, eqth, eqw = split(e)
+        
+        vb = TestFunction(self.Vb)
+        ub = TrialFunction(self.Vb)
+        
+        v_wt, v_omn, v_oms = split(vb)
+        u_qn, u_Mnn, u_Mns = split(ub)
+        
+        self.Mb_D = csr_matrix(assemble( dot(vb, ub) * ds ).mat()\
+                               .getValuesCSR()[::-1])[self.D_index, :][:, self.D_index]
+        self.Mb_N = csr_matrix(assemble( dot(vb, ub) * ds )\
+                               .mat().getValuesCSR()[::-1])[self.N_index, :][:, self.N_index]
 
-        self.B_D = assemble( ab * vp_tl * ds ).array()[:, self.D_index]
-        self.B_Dext = np.concatenate(([np.zeros((self.Nq, self.Nb_D)), self.B_D]))    
 
-        self.B_N = assemble( ab * vp_tl * ds ).array()[:, self.N_index]
-        self.B_Next = np.concatenate(([np.zeros((self.Nq, self.Nb_N)), self.B_N]))
+        self.B_D = csr_matrix(assemble(vpw * u_qn * ds + dot(vpth, self.norext)*u_Mnn *ds\
+                    + dot(vpth, self.tanext)*u_Mns *ds).mat().getValuesCSR()[::-1])[:, self.D_index]
         
-        self.B_Z = assemble( ab * vp_tl * ds ).array()[:, self.Z_index]
-        
-        try : self.MZ = assemble( ab * self.Z * vb * ds ).array()[self.Z_index, :][:, self.Z_index]
-        except : self.MZ = assemble( ab * vb * ds ).array()[self.Z_index, :][:, self.Z_index]
-        self.Rz = self.B_Z @ linalg.solve(self.MZ, self.B_Z.T)
-        self.R += linalg.block_diag(np.zeros((self.Nq,self.Nq)), self.Rz)
-    
+        self.B_N = csr_matrix(assemble(vpw * u_qn * ds + dot(vpth, self.norext)*u_Mnn *ds\
+                    + dot(vpth, self.tanext)*u_Mns *ds).mat().getValuesCSR()[::-1])[:, self.N_index]
+
         # Lagrange multiplier initial data
-        self.B_normal_D = assemble( dot(aq_tl, self.norext) * vb * ds ).array()[self.D_index, :]
+        self.B_normal_D = csr_matrix(assemble(v_wt * epw * ds + v_omn*dot(epth, self.norext) *ds\
+                    + v_oms*dot(epth, self.tanext) *ds).mat().getValuesCSR()[::-1])[self.D_index, :]
 
         self.assembly = 1
         
-        print('Nb_D=', self.Nb_D, ',\t Nb_N=', self.Nb_N, ',\t Nb_Z=', self.Nb_Z)
+        print('Nb_D=', self.Nb_D, ',\t Nb_N=', self.Nb_N)
         print('DOFsysDAE=', self.Nsys + self.Nb_D)
         print('DAE system: OK')
         print(40*'-', '\n')
         
         pass
+    
+    ## Method.
+    #  @param self The object pointer. 
+    def Simplectic_Splitting(self):
+        
+        dofs_Vp, dofs_Vq = self.dofs_Vp, self.dofs_Vq
+        
+        Mp = self.M[dofs_Vp, :][:, dofs_Vp]
+        Mq = self.M[dofs_Vq, :][:, dofs_Vq]
+        
+        D1 = self.J[:,dofs_Vq][dofs_Vp, :]
+        D2 = self.J[:,dofs_Vp][dofs_Vq, :]
+        
+        self.Rp = self.R[dofs_Vp, :][:, dofs_Vp]
+        self.Bp = self.B[dofs_Vp, :]
+        
+        return Mp, Mq, D1, D2, RP, Bp
     
 
         
@@ -863,17 +827,18 @@ class Wave_2D:
     # @param self The object pointer.
     def Spectrum(self, k=10, xl=None, figsize=(8,6.5), method='sparse', **kwargs):
         if method == 'sparse' :
-            JR = csc_matrix(self.J - self.R)
-            M_sparse = csc_matrix(self.M)  
 #            try :   
 #                JR = bmat( [ [JR, csc_matrix(self.B_Dext)], [-csc_matrix(self.B_Dext).T, None] ] )
 #        #            M_sparse = block_diag((M_sparse, csc_matrix((self.Nb_D,self.Nb_D))))
 #                M_sparse = csc_matrix(block_diag((M_sparse, csc_matrix(self.Mb_D) )))
 #            except :    pass
-            eigen_values, self.eigenv_vectors = eigs(JR, M=M_sparse, k=k)
+            eigen_values, self.eigenv_vectors = eigs(self.J -self.R, M=self.M, k=k)
         
         if method == 'dense' :
-            eigen_values = linalg.eigvals(self.J - self.R, self.M)
+            J_dense = self.J.todense()
+            R_dense = self.R.todense()
+            M_dense = self.M.todense()
+            eigen_values = linalg.eigvals(J_dense - R_dense, M_dense)
             k = self.Nsys
 
         self.eigen_values_Real, self.eigen_values_Imag = eigen_values.real, eigen_values.imag
@@ -933,8 +898,14 @@ class Wave_2D:
                 "The FE approximation spaces must be selected first"
        
         if not self.init_by_vector :
-            self.W0  = interpolate(self.W_0, self.Vp).vector()[:]
-            self.Aq0 = interpolate(self.Aq_0, self.Vq).vector()[:]
+            exp_int0 = (self.Apw_0, self.Apth_0, self.Aqth_0, self.Aqw_0)
+            
+            
+            self.W0  = interpolate(W0_all, self.Vp).vector()[:]
+            
+            self.Th0  = interpolate(Th0_all, self.Vp).vector()[:]
+            
+            self.Apw0 = interpolate(self.Apw_0, self.Vpw).vector()[:]
             self.Ap0 = interpolate(self.Ap_0, self.Vp).vector()[:]
             self.A0  = np.concatenate((self.Aq0, self.Ap0))
 
@@ -1096,7 +1067,7 @@ class Wave_2D:
                 Sys = facto.solve(self.M + self.dt * (1-theta) * (self.J-self.Rdyn(self.tspan[n])))          
                 Sys_ctrl = facto.solve(self.dt* self.Bext)
                 print('Inversion: OK \n')
-                
+                 = TrialFunction(self.Vq)
             A[:,n+1] = Sys @ A[:,n] + Sys_ctrl @ self.Ub(self.tspan[n+1])
             
             # Progress bar
