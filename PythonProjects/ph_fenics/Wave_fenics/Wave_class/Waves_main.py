@@ -1,5 +1,5 @@
 
-from Mindlin_PHs_fenics.mindlin4scrimp.Mindlin_class import Mindlin
+from Waves import Wave_2D
 import numpy as np
 from scipy.sparse import csc_matrix, block_diag
 from math import *
@@ -8,7 +8,7 @@ import sys, timeit
 
 
 #%% Constructor
-Wtest = Mindlin()
+Wtest = Wave_2D()
 Wtest()
 self = Wtest
 #%%
@@ -21,18 +21,33 @@ y0, yL = 0, 1
 Wtest.Set_Rectangular_Domain(x0, xL, y0, yL)
 
 ### Physical paramters
-Rho = 'cos(x[0])+1'
-h = '0.1'
-E = '1e12'
-nu = '0.3'
-k  = '5/6'
+## Mass density
+Rho = 'cos(x[0])+1' #5 * x[0] * (xL - x[0]) * x[1] * (yL - x[1]) + 1' # '1' # 
 
-Wtest.Set_Physical_Parameters(Rho, h, E, nu, k)
+## Young's modulus
+T11 = 'x[0]+2' 
+T12 = 'x[1]' # '0' # 
+T22 = 'x[0]+x[1]+1' # '1' # 
+
+Wtest.Set_Physical_Parameters(Rho, T11, T12, T22)
+
+### Damping
+## Impedance coefficient
+#Z = '''( abs(x[0]) <= DOLFIN_EPS ? 1 : 0 )
+#        + ( abs(x[1]) <= DOLFIN_EPS ? 1 : 0 )
+#        + ( abs(xL - x[0]) <= DOLFIN_EPS ? .1 : 0 )
+#        + ( abs(yL - x[1]) <= DOLFIN_EPS ? 10 : 0 )'''
+Z   = '1'
+Y   = '''( abs(x[0]) <= DOLFIN_EPS ? x[1]*(1-x[1]) : 0 )
+        + ( abs(x[1]) <= DOLFIN_EPS ? sin(x[0]*(xL-x[0])) : 0 )
+        + ( abs(xL - x[0]) <= DOLFIN_EPS ? 5*x[1]*(1-x[1]) : 0 )
+        + ( abs(yL - x[1]) <= DOLFIN_EPS ? 0 : 0 )'''
 
 ## Internal damping coefficient
 eps = '4 * x[0] * (xL - x[0]) * x[1] * (yL - x[1])'
 
-Wtest.Set_Damping(damp=['internal'], eps=eps)
+Wtest.Set_Damping(damp=['internal'], \
+              Z=Z, Y=Y, eps=eps)
 
 ### Final time 
 tf = 6
@@ -45,11 +60,11 @@ Wtest.Set_Initial_Final_Time(initial_time=0, final_time=tf)
 Wtest.Set_Gmsh_Mesh('rectangle.xml', rfn_num=1)
 
 ### Finite elements spaces
-Wtest.Set_Finite_Elements_Spaces()
+Wtest.Set_Finite_Elements_Spaces(family_q='RT', family_p='P', family_b='P', rq=1, rp=2, rb=2)
 
 ### Assembly    
 #Wtest.Assembly_Mixed_BC() 
-Wtest.Assembly()
+Wtest.Assembly(formulation='Grad')
 #%%
 
 #%% Environement
@@ -121,3 +136,4 @@ if anime :
     Wtest.Moving_Quiver(Aq, step=step, title='Strain', figsize=(15,7.5), cmap=plt.cm.plasma)#, save=True)               
     Wtest.Moving_Plot(Ham, Wtest.tspan,  step=step, title='Hamiltonian', figsize=(8,7.5), save=True)
 End = timeit.default_timer()
+

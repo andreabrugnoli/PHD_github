@@ -14,7 +14,8 @@ from mshr import *
 import numpy as np
 import scipy.linalg as linalg
 import scipy.integrate as integrate
-from scipy.sparse import csc_matrix, csr_matrix, save_npz, bmat, block_diag
+from scipy.sparse import csc_matrix, csr_matrix, save_npz,\
+ bmat, block_diag, hstack, vstack
 from scipy.sparse.linalg import factorized, spsolve, eigs
 from scikits import umfpack
 
@@ -31,7 +32,7 @@ import time
 
         
 class Mindlin:
-    #% CONSTRUCTOR
+    #%% CONSTRUCTOR
     def __init__(self):
         """
         Constructor for the Wave_2D class
@@ -66,7 +67,7 @@ class Mindlin:
 
     #%% Call method
     def __call__(self):
-        print('Minplin plate as port-Hamiltonian system: created by Andrea Burgnoli')
+        print('Mindlin plate as port-Hamiltonian system: created by Andrea Brugnoli')
         print(40*'-', '\n')
         pass 
 
@@ -157,10 +158,10 @@ class Mindlin:
                 
         self.damp = damp
       
-       if 'internal' in self.damp :
+        if 'internal' in self.damp:
             self.eps = Expression(eps, degree=2,\
-                                  x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
-                                  **kwargs)0
+              x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
+              **kwargs)
         
         print('Damping:', ((len(damp)*'%1s,  ') % tuple(damp))[:-3])
         print('Damping: OK')
@@ -187,20 +188,41 @@ class Mindlin:
     
     ## Method.
     #  @param self The object pointer.
-    def Set_Boundary_Control(self, Ub_tm0, Ub_sp0, Ub_tm1=lambda t : 0, Ub_sp1='0', **kwargs):
+    def Set_Boundary_Control(self, Ub_tm0, Ub_sp0, Ub_tm1=lambda t : np.as_array([0,0,0]),\
+                             Ub_sp1=('0','0','0'), **kwargs):
         """
         Set boundary control as callable time functions and regular FeniCS expression
         u_\partial(t,x) = Ub_tm0(t) * Ub_sp0(x) + Ub_tm1(t) + Ub_sp1(x)
         """
-        self.Ub_tm0 = Ub_tm0
+        self.Ub1_tm0 = Ub_tm0[0]
+        self.Ub2_tm0 = Ub_tm0[1]
+        self.Ub3_tm0 = Ub_tm0[2]
 
-        self.Ub_sp0_Expression = Expression(Ub_sp0, degree=2,\
+        self.Ub1_sp0_Expression = Expression(Ub_sp0[0], degree=2,\
                                               x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
                                               **kwargs)
         
-        self.Ub_tm1 = Ub_tm1
+        self.Ub2_sp0_Expression = Expression(Ub_sp0[1], degree=2,\
+                                              x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
+                                              **kwargs)
+        
+        self.Ub3_sp0_Expression = Expression(Ub_sp0[2], degree=2,\
+                                              x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
+                                              **kwargs)
+        
+        self.Ub1_tm1 = Ub_tm1[0]
+        self.Ub2_tm1 = Ub_tm1[1]
+        self.Ub3_tm1 = Ub_tm1[2]
 
-        self.Ub_sp1_Expression = Expression(Ub_sp1, degree=2,\
+        self.Ub1_sp1_Expression = Expression(Ub_sp1[0], degree=2,\
+                                              x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
+                                              **kwargs)
+        
+        self.Ub2_sp1_Expression = Expression(Ub_sp1[1], degree=2,\
+                                              x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
+                                              **kwargs)
+        
+        self.Ub3_sp1_Expression = Expression(Ub_sp1[2], degree=2,\
                                               x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
                                               **kwargs)
         self.set_boundary_control = 1
@@ -212,26 +234,52 @@ class Mindlin:
     
     ## Method.
     #  @param self The object pointer.
-    def Set_Mixed_BC_Dirichlet(self, Ub_tm0, Ub_sp0, Ub_tm1=lambda t : 0, Ub_sp1='0',\
-                               Ub_tm0_dir=lambda t : 0, Ub_tm1_dir=lambda t : 0, **kwargs):
+    def Set_Mixed_BC_Dirichlet(self, Ub_tm0, Ub_sp0, Ub_tm1=lambda t : np.as_array([0,0,0]),\
+                               Ub_sp1=('0','0','0'), Ub_tm0_dir=lambda t : np.as_array([0,0,0]),\
+                               Ub_tm1_dir=lambda t : np.as_array([0,0,0]), **kwargs):
         """
         Set boundary control as callable time functions and regular FeniCS expression
         u_\partial(t,x) = Ub_tm0(t) * Ub_sp0(x) + Ub_tm1(t) + Ub_sp1(x)
         """
-        self.Ub_tm0_D = Ub_tm0
+        self.Ub1_tm0_D = Ub_tm0[0]
+        self.Ub2_tm0_D = Ub_tm0[1]
+        self.Ub3_tm0_D = Ub_tm0[2]
 
-        self.Ub_sp0_D_Expression = Expression(Ub_sp0, degree=2,\
+        self.Ub1_sp0_D_Expression = Expression(Ub_sp0[0], degree=2,\
                                               x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
                                               **kwargs)
         
-        self.Ub_tm1_D = Ub_tm1
-
-        self.Ub_sp1_D_Expression = Expression(Ub_sp1, degree=2,\
+        self.Ub2_sp0_D_Expression = Expression(Ub_sp0[1], degree=2,\
                                               x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
                                               **kwargs)
-        self.Ub_tm0_D_dir = Ub_tm0_dir
-        self.Ub_tm1_D_dir = Ub_tm1_dir
         
+        self.Ub3_sp0_D_Expression = Expression(Ub_sp0[2], degree=2,\
+                                              x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
+                                              **kwargs)
+        
+        self.Ub1_tm1_D = Ub_tm1[0]
+        self.Ub2_tm1_D = Ub_tm1[1]
+        self.Ub3_tm1_D = Ub_tm1[2]
+
+        self.Ub1_sp1_D_Expression = Expression(Ub_sp1[0], degree=2,\
+                                              x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
+                                              **kwargs)
+        
+        self.Ub2_sp1_D_Expression = Expression(Ub_sp1[1], degree=2,\
+                                              x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
+                                              **kwargs)
+        
+        self.Ub3_sp1_D_Expression = Expression(Ub_sp1[2], degree=2,\
+                                              x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
+                                              **kwargs)
+        
+        self.Ub1_tm0_D_dir = Ub_tm0_dir[0]
+        self.Ub2_tm0_D_dir = Ub_tm0_dir[1]
+        self.Ub3_tm0_D_dir = Ub_tm0_dir[2]
+        
+        self.Ub1_tm1_D_dir = Ub_tm1_dir[0]
+        self.Ub2_tm1_D_dir = Ub_tm1_dir[1]
+        self.Ub3_tm1_D_dir = Ub_tm1_dir[2]     
         
         self.set_dirichlet_boundary_control = 1
         
@@ -240,22 +288,44 @@ class Mindlin:
     
     ## Method.
     #  @param self The object pointer.
-    def Set_Mixed_BC_Normal(self, Ub_tm0, Ub_sp0, Ub_tm1=lambda t : 0, Ub_sp1='0', **kwargs):
+    def Set_Mixed_BC_Normal(self, Ub_tm0, Ub_sp0, Ub_tm1=lambda t : np.as_array([0,0,0]),\
+                            Ub_sp1=('0','0','0'), **kwargs):
         """
         Set boundary control as callable time functions and regular FeniCS expression
         u_\partial(t,x) = Ub_tm0(t) * Ub_sp0(x) + Ub_tm1(t) + Ub_sp1(x)
         """
-        self.Ub_tm0_N = Ub_tm0
+        self.Ub1_tm0_N = Ub_tm0[0]
+        self.Ub2_tm0_N = Ub_tm0[1]
+        self.Ub3_tm0_N = Ub_tm0[2]
 
-        self.Ub_sp0_N_Expression = Expression(Ub_sp0, degree=2,\
+        self.Ub1_sp0_N_Expression = Expression(Ub_sp0[0], degree=2,\
                                               x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
                                               **kwargs)
         
-        self.Ub_tm1_N = Ub_tm1
-
-        self.Ub_sp1_N_Expression = Expression(Ub_sp1, degree=2,\
+        self.Ub2_sp0_N_Expression = Expression(Ub_sp0[1], degree=2,\
                                               x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
                                               **kwargs)
+        
+        self.Ub3_sp0_N_Expression = Expression(Ub_sp0[2], degree=2,\
+                                              x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
+                                              **kwargs)
+        
+        self.Ub1_tm1_N = Ub_tm1[0]
+        self.Ub2_tm1_N = Ub_tm1[1]
+        self.Ub3_tm1_N = Ub_tm1[2]
+
+        self.Ub1_sp1_N_Expression = Expression(Ub_sp1[0], degree=2,\
+                                              x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
+                                              **kwargs)
+        
+        self.Ub2_sp1_N_Expression = Expression(Ub_sp1[1], degree=2,\
+                                              x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
+                                              **kwargs)
+        
+        self.Ub3_sp1_N_Expression = Expression(Ub_sp1[2], degree=2,\
+                                              x0=self.x0, xL=self.xL, y0=self.y0, yL=self.yL,\
+                                              **kwargs)
+        
         self.set_normal_boundary_control = 1
 
         pass 
@@ -375,7 +445,8 @@ class Mindlin:
         self.Nv = self.Msh.num_vertices()
         
         self.norext   = FacetNormal(self.Msh)
-        
+        self.tanext = as_vector([-self.norext[1], self.norext[0]])
+
         print('Mesh:', 'hmax=', round(self.Msh.hmax(),3),'Nv=', self.Msh.num_vertices())
         print('Mesh: OK')
         print(40*'-', '\n')
@@ -420,7 +491,8 @@ class Mindlin:
         # Mesh
         self.Msh = Msh
         self.norext   = FacetNormal(self.Msh)
-        
+        self.tanext = as_vector([-self.norext[1], self.norext[0]])
+
         # Explicit coordinates
         self.xv = Msh.coordinates()[:,0]
         self.yv = Msh.coordinates()[:,1]
@@ -475,7 +547,7 @@ class Mindlin:
     #  @param family_qth The element for alpha_kap
     #  @param family_qw The element for alpha_gam
 
-    def Set_Finite_Elements_Spaces(self, r, family_b, rb):        
+    def Set_Finite_Elements_Spaces(self, r=1, family_b='CG', rb=1):        
         """
         Set the finite element approximation spaces related to the space discretization of the PDE
         """
@@ -489,17 +561,19 @@ class Mindlin:
         
         
         element = MixedElement([P_pw, P_pth, P_qth, P_qw])
-        self.V = FunctionSpace(mesh, element)
+        V = FunctionSpace(self.Msh, element)
             
-        self.Vpw = V.sub(0)
-        self.Vpth = V.sub(1)
-        self.Vqth = V.sub(2)
-        self.Vqw = V.sub(3)
+        self.V = V
+        
+        self.Vpw = self.V.sub(0)
+        self.Vpth = self.V.sub(1)
+        self.Vqth = self.V.sub(2)
+        self.Vqw = self.V.sub(3)
   
         if rb == 0 :
-            self.Vb = VectorFunctionSpace(self.Msh, 'CR', 1, dim = 3)
+            self.Vb = FunctionSpace(self.Msh, 'CR', 1)
         else :
-            self.Vb = VectorFunctionSpace(self.Msh, family_b, rb, dim = 3)
+            self.Vb = FunctionSpace(self.Msh, family_b, rb)
             
         # Orders
         self.r = r
@@ -510,17 +584,11 @@ class Mindlin:
         self.Npth = self.Vpth.dim()
         
         self.Nqth = self.Vqth.dim()
-        self.Nqw = self.Vpw.dim()
+        self.Nqw = self.Vqw.dim()
 
         self.Np = self.Npw + self.Npth
         self.Nq = self.Nqth + self.Nqw
-        self.Nsys = self.Npw + self.Npth + self.Nqth + self.Nqw
-        
-        coord_pw = self.Vpw.tabulate_dof_coordinates()
-        coord_pth = self.Vpth.tabulate_dof_coordinates()
-        
-        coord_qth = self.Vqth.tabulate_dof_coordinates()
-        coord_qw = self.Vqw.tabulate_dof_coordinates()
+        self.Nsys = self.V.dim()
         
         self.dofs_Vpw = self.Vpw.dofmap().dofs()
         self.dofs_Vpth = self.Vpth.dofmap().dofs()
@@ -533,17 +601,20 @@ class Mindlin:
         self.dofs_Vq = np.concatenate((self.dofs_Vqth, self.dofs_Vqw))
         
         # Explicit coordinates
-        self.xpw = coord_pw[:,0]
-        self.ypw = coord_pw[:,1]
+        coord = self.V.tabulate_dof_coordinates()
+
         
-        self.xpth = coord_pth[:,0]
-        self.ypth = coord_pth[:,1]
+        self.xpw = coord[self.dofs_Vpw,0]
+        self.ypw = coord[self.dofs_Vpw,1]
         
-        self.xqth = coord_qth[:,0]
-        self.yqth = coord_qth[:,1] 
+        self.xpth = coord[self.dofs_Vpth,0]
+        self.ypth = coord[self.dofs_Vpth,1]
         
-        self.xqw = coord_qw[:,0]
-        self.yqw = coord_qw[:,1] 
+        self.xqth = coord[self.dofs_Vqth,0]
+        self.yqth = coord[self.dofs_Vqth,1] 
+        
+        self.xqw = coord[self.dofs_Vqw,0]
+        self.yqw = coord[self.dofs_Vqw,1] 
         
         # Boundary DOFs for control and observation: necessary for B matrix        
         coord_b  = self.Vb.tabulate_dof_coordinates()
@@ -552,7 +623,11 @@ class Mindlin:
         # Boundary DOFs for control and observation: necessary for B matrix        
         coord_b = self.Vb.tabulate_dof_coordinates()
         def Get_Associated_DOFs(SubDomain, Space):
-            BC = DirichletBC(Space, ('0', '0', '0'), SubDomain)
+            dim_space = Space.num_sub_spaces()
+            if dim_space == 0:
+                BC = DirichletBC(Space, '0', SubDomain)
+            else:
+                BC = DirichletBC(Space, ('0',)*dim_space, SubDomain)
             bndr_dofs = []
             for key in BC.get_boundary_values().keys() :
                 bndr_dofs.append(key)
@@ -560,6 +635,7 @@ class Mindlin:
             return bndr_dofs
         b_ind = Get_Associated_DOFs('on_boundary', self.Vb)
         self.b_ind = b_ind
+        
 
         # Exlpicit information about boundary DOFs 
         self.coord_b_full = coord_b
@@ -615,11 +691,11 @@ class Mindlin:
         
         ub = TrialFunction(self.Vb)
         
-        u_qn, u_Mnn, u_Mns = splt(ub)
+        u_qn, u_Mnn, u_Mns = TrialFunction(self.Vb), TrialFunction(self.Vb), TrialFunction(self.Vb)
 
         vb = TestFunction(self.Vb)
         
-        v_wt, w_omn, v_oms = split(vb)
+        v_wt, w_omn, v_oms = TestFunction(self.Vb), TestFunction(self.Vb), TestFunction(self.Vb)
         
         alpw = self.rho * self.h * epw
         alpth = (self.rho * self.h ** 3) / 12. * epth
@@ -627,20 +703,22 @@ class Mindlin:
         alqth = 12. / (self.E * self.h ** 3) * ((1+self.nu)*eqth\
                         - self.nu * Identity(2) * tr(eqth))
 
-        alqw = 2 * (1 + self.nu) / (self.E * self.h * self.k) * e_qw
+        alqw = 2 * (1 + self.nu) / (self.E * self.h * self.k) * eqw
         
         # Mass matrices
         mpw = vpw * alpw * dx
-        mpth = dot(vpth * alpth) * dx
+        mpth = dot(vpth, alpth) * dx
 
         mqth = inner(vqth, alqth) * dx
         mqw = dot(vqw, alqw) * dx
         
         m = mpw + mpth + mqth + mqw
         
-        M_pet = assemble(m).mat()
+        M_pet = PETScMatrix()
+        
+        assemble(m, M_pet)
 
-        self.M = csr_matrix(M_pet.getValuesCSR()[::-1])
+        self.M = csr_matrix(M_pet.mat().getValuesCSR()[::-1])
         
 #        self.Mpw = self.M[self.dofs_Vpw, :][:, self.dofs_Vpw]
 #        self.Mpth = self.M[self.dofs_Vpth, :][:, self.dofs_Vpth]
@@ -649,34 +727,48 @@ class Mindlin:
         
         # Stiffness matrices
         
-        j_grad = dot(v_qw, grad(e_pw)) * dx
-        j_gradIP = -dot(grad(v_pw), e_qw) * dx
+        j_grad = dot(vqw, grad(epw)) * dx
+        j_gradIP = -dot(grad(vpw), eqw) * dx
         
-        j_gradSym = inner(v_qth, sym(grad(e_pth)) ) * dx
-        j_gradSymIP = -inner(sym(grad(v_pth)), e_qth) * dx
+        j_gradSym = inner(vqth, sym(grad(epth)) ) * dx
+        j_gradSymIP = -inner(sym(grad(vpth)), eqth) * dx
         
-        j_Id = dot(v_pth, e_qw) * dx
-        j_IdIP = -dot(v_qw, e_pth) * dx
+        j_Id = dot(vpth, eqw) * dx
+        j_IdIP = -dot(vqw, epth) * dx
         
         j_allgrad = j_grad + j_gradIP + j_gradSym + j_gradSymIP + j_Id + j_IdIP
         
-        J_pet = assemble(j_allgrad).mat()
+        J_pet = PETScMatrix()
+        assemble(j_allgrad, J_pet)
         
-        self.J = csr_matrix(J_pet.getValuesCSR()[::-1])
+        self.J = csr_matrix(J_pet.mat().getValuesCSR()[::-1])
         # Boundary matrices
+        Mb_pet = PETScMatrix()
+        assemble(dot(vb, ub) * ds, Mb_pet)
+        self.Mb = csr_matrix(Mb_pet.mat().getValuesCSR()[::-1])[self.b_ind,:][:,self.b_ind]
         
-        Mb_pet = assemble( dot(vb, ub) * ds).mat()
-        self.Mb = csr_matrix(Mb_pet.getValuesCSR()[::-1])[self.b_ind,:][:,self.b_ind]
+        B_pet1, B_pet2, B_pet3 = PETScMatrix(), PETScMatrix(), PETScMatrix()
+        assemble(vpw * u_qn * ds, B_pet1)
+        assemble(dot(vpth, self.norext)*u_Mnn*ds, B_pet2)
+        assemble(dot(vpth, self.tanext)*u_Mns *ds, B_pet3)
         
+        self.B1 = csr_matrix(B_pet1.mat().getValuesCSR()[::-1])[:,self.b_ind] 
+        self.B2 = csr_matrix(B_pet2.mat().getValuesCSR()[::-1])[:,self.b_ind] 
+        self.B3 = csr_matrix(B_pet3.mat().getValuesCSR()[::-1])[:,self.b_ind] 
         
-        B_pet = assemble(vpw * u_qn * ds + dot(vpth, self.norext)*u_Mnn *ds\
-                                         + dot(vpth, self.tanext)*u_Mns *ds).mat()
-        self.B = csr_matrix(B_pet.getValuesCSR()[::-1])[:,self.b_ind] 
+        self.Bext = hstack([self.B1, self.B2, self.B3])
         
+        self.R = csr_matrix((self.Nsys,self.Nsys))
+        R_pet = PETScMatrix()
+        assemble(vpw*epw*dx, R_pet)
         if 'internal' in self.damp :
-            self.R = csr_matrix(assemble( self.eps * vpw * epw * dx).mat().getValuesCSR()[::-1])
-        # Dissipation matrix
-       self.R = csr_matrix((self.Nsys,self.Nsys))
+            self.Ri = csr_matrix(R_pet.mat().getValuesCSR()[::-1])
+            self.R += self.Ri
+        
+        if self.dynamic_R :
+            def Rtime(t):
+                return self.R * self.Rtime(t)
+            self.Rdyn = Rtime 
        
         self.assembly = 1
         
@@ -755,24 +847,54 @@ class Mindlin:
         vb = TestFunction(self.Vb)
         ub = TrialFunction(self.Vb)
         
-        v_wt, v_omn, v_oms = split(vb)
-        u_qn, u_Mnn, u_Mns = split(ub)
+        v_wt, v_omn, v_oms = TestFunction(self.Vb), TestFunction(self.Vb), TestFunction(self.Vb)
+        u_qn, u_Mnn, u_Mns = TrialFunction(self.Vb), TrialFunction(self.Vb), TrialFunction(self.Vb)
         
-        self.Mb_D = csr_matrix(assemble( dot(vb, ub) * ds ).mat()\
-                               .getValuesCSR()[::-1])[self.D_index, :][:, self.D_index]
-        self.Mb_N = csr_matrix(assemble( dot(vb, ub) * ds )\
+        Mb1_N = csr_matrix(assemble( dot(vb, ub) * ds )\
                                .mat().getValuesCSR()[::-1])[self.N_index, :][:, self.N_index]
-
-
-        self.B_D = csr_matrix(assemble(vpw * u_qn * ds + dot(vpth, self.norext)*u_Mnn *ds\
-                    + dot(vpth, self.tanext)*u_Mns *ds).mat().getValuesCSR()[::-1])[:, self.D_index]
         
-        self.B_N = csr_matrix(assemble(vpw * u_qn * ds + dot(vpth, self.norext)*u_Mnn *ds\
-                    + dot(vpth, self.tanext)*u_Mns *ds).mat().getValuesCSR()[::-1])[:, self.N_index]
+        self.Mb_N = block_diag((Mb1_N, Mb1_N, Mb1_N))
+        
+        Mb1_D = csr_matrix(assemble( dot(vb, ub) * ds ).mat()\
+                               .getValuesCSR()[::-1])[self.D_index, :][:, self.D_index]
+        
+        self.Mb_D = block_diag((Mb1_D, Mb1_D, Mb1_D))
+
+
+        self.B1_N = csr_matrix(assemble(vpw * u_qn * ds).mat()\
+                               .getValuesCSR()[::-1])[:, self.N_index]
+
+        self.B2_N = csr_matrix(assemble(dot(vpth, self.norext)*u_Mnn *ds).mat()\
+                               .getValuesCSR()[::-1])[:, self.N_index]
+        
+        self.B3_N = csr_matrix(assemble(dot(vpth, self.tanext)*u_Mns *ds).mat()\
+                               .getValuesCSR()[::-1])[:, self.N_index]
+        
+        self.B_Next = hstack([self.B1_N, self.B2_N, self.B3_N])
+        
+        self.B1_D = csr_matrix(assemble(vpw * u_qn * ds).mat()\
+                               .getValuesCSR()[::-1])[:, self.D_index]
+        
+        self.B2_D = csr_matrix(assemble(dot(vpth, self.norext)*u_Mnn *ds).mat()\
+                               .getValuesCSR()[::-1])[:, self.D_index]
+        
+        self.B3_D = csr_matrix(assemble(dot(vpth, self.tanext)*u_Mns *ds).mat()\
+                               .getValuesCSR()[::-1])[:, self.D_index]
+
+        self.B_Dext = hstack([self.B1_D, self.B2_D, self.B3_D])
 
         # Lagrange multiplier initial data
-        self.B_normal_D = csr_matrix(assemble(v_wt * epw * ds + v_omn*dot(epth, self.norext) *ds\
-                    + v_oms*dot(epth, self.tanext) *ds).mat().getValuesCSR()[::-1])[self.D_index, :]
+        
+        self.B1_normal_D = csr_matrix(assemble(v_wt * dot(eqw, self.norext) * ds)\
+                                      .mat().getValuesCSR()[::-1])[self.D_index, :]
+
+        self.B2_normal_D = csr_matrix(assemble(v_omn*inner(eqth, outer(self.norext, self.norext))*ds)\
+                                      .mat().getValuesCSR()[::-1])[self.D_index, :]
+
+        self.B3_normal_D = csr_matrix(assemble(v_oms*inner(eqth, outer(self.norext, self.tanext))*ds)\
+                                      .mat().getValuesCSR()[::-1])[self.D_index, :]
+        
+        self.B_normal_D = hstack([self.B1_normal_D, self.B2_normal_D, self.B3_normal_D])
 
         self.assembly = 1
         
@@ -792,13 +914,16 @@ class Mindlin:
         Mp = self.M[dofs_Vp, :][:, dofs_Vp]
         Mq = self.M[dofs_Vq, :][:, dofs_Vq]
         
-        D1 = self.J[:,dofs_Vq][dofs_Vp, :]
-        D2 = self.J[:,dofs_Vp][dofs_Vq, :]
+        Dp = self.J[:,dofs_Vq][dofs_Vp, :]
+        Dq = self.J[:,dofs_Vp][dofs_Vq, :]
         
         self.Rp = self.R[dofs_Vp, :][:, dofs_Vp]
+        self.Rq = self.R[dofs_Vq, :][:, dofs_Vq]
+
         self.Bp = self.B[dofs_Vp, :]
+        self.Bq = self.B[dofs_Vq, :]
         
-        return Mp, Mq, D1, D2, RP, Bp
+        return Mp, Mq, Dp, Dq, Rp, Rq, Bp, Bq
     
 
         
@@ -868,19 +993,77 @@ class Mindlin:
                 "The FE approximation spaces must be selected first"
        
         if self.set_mixed_boundaries == 0 : 
-            self.Ub_sp0 = interpolate(self.Ub_sp0_Expression, self.Vb).vector()[self.b_ind]
-            self.Ub_sp1 = interpolate(self.Ub_sp1_Expression, self.Vb).vector()[self.b_ind]
-            self.Ub = lambda t : self.Ub_sp0 * self.Ub_tm0(t) + self.Ub_sp1 + self.Ub_tm1(t) * np.ones(self.Nb)
+            self.Ub1_sp0 = interpolate(self.Ub1_sp0_Expression, self.Vb).vector()[self.b_ind]
+            self.Ub2_sp0 = interpolate(self.Ub2_sp0_Expression, self.Vb).vector()[self.b_ind]
+            self.Ub3_sp0 = interpolate(self.Ub3_sp0_Expression, self.Vb).vector()[self.b_ind]
+            
+            self.Ub_sp0 = lambda t : np.concatenate((self.Ub1_sp0 * self.Ub1_tm0(t),
+                                             self.Ub2_sp0 * self.Ub2_tm0(t),
+                                             self.Ub3_sp0 * self.Ub3_tm0(t),), axis=0)
+           
+            self.Ub1_sp1 = interpolate(self.Ub1_sp1_Expression, self.Vb).vector()[self.b_ind]
+            self.Ub2_sp1 = interpolate(self.Ub2_sp1_Expression, self.Vb).vector()[self.b_ind]
+            self.Ub3_sp1 = interpolate(self.Ub3_sp1_Expression, self.Vb).vector()[self.b_ind]
+            
+            self.Ub_sp1 = np.concatenate((self.Ub1_sp1, self.Ub2_sp1, self.Ub3_sp1), axis=0)
+
+            self.Ub_tm1 = lambda t : np.concatenate((np.ones(self.Nb) * self.Ub1_tm1(t),
+                                             np.ones(self.Nb) * self.Ub2_tm1(t),
+                                             np.ones(self.Nb) * self.Ub3_tm1(t)), axis=0)
+            
+            self.Ub = lambda t : self.Ub_sp0(t) + self.Ub_sp1 + self.Ub_tm1(t)
         
         if self.set_mixed_boundaries == 1 :
-            self.Ub_sp0_D = interpolate(self.Ub_sp0_D_Expression, self.Vb).vector()[self.D_index]
-            self.Ub_sp1_D = interpolate(self.Ub_sp1_D_Expression, self.Vb).vector()[self.D_index]
-            self.Ub_D = lambda t : self.Ub_sp0_D * self.Ub_tm0_D(t) + self.Ub_sp1_D + self.Ub_tm1_D(t) * np.ones(self.Nb_D)
-            self.Ub_D_dir = lambda t : self.Ub_sp0_D * self.Ub_tm0_D_dir(t) + self.Ub_tm1_D_dir(t) * np.ones(self.Nb_D)
+            self.Ub1_sp0_D = interpolate(self.Ub1_sp0_D_Expression, self.Vb).vector()[self.D_index]
+            self.Ub2_sp0_D = interpolate(self.Ub2_sp0_D_Expression, self.Vb).vector()[self.D_index]
+            self.Ub3_sp0_D = interpolate(self.Ub3_sp0_D_Expression, self.Vb).vector()[self.D_index]
+            
+            self.Ub_sp0_D = lambda t : np.concatenate((self.Ub1_sp0_D * self.Ub1_tm0_D(t),
+                                             self.Ub2_sp0_D * self.Ub2_tm0_D(t),
+                                             self.Ub3_sp0_D * self.Ub3_tm0_D(t)), axis=0)
+            
+            self.Ub1_sp1_D = interpolate(self.Ub1_sp1_D_Expression, self.Vb).vector()[self.D_index]
+            self.Ub2_sp1_D = interpolate(self.Ub2_sp1_D_Expression, self.Vb).vector()[self.D_index]
+            self.Ub3_sp1_D = interpolate(self.Ub3_sp1_D_Expression, self.Vb).vector()[self.D_index]
+            
+            self.Ub_sp1_D = np.concatenate((self.Ub1_sp1_D, self.Ub2_sp1_D,
+                                             self.Ub3_sp1_D), axis=0)
+            
+            self.Ub_tm1_D = lambda t : np.concatenate((np.ones(self.Nb_D) * self.Ub1_tm1(t),
+                                             np.ones(self.Nb_D) * self.Ub2_tm1(t),
+                                             np.ones(self.Nb_D) * self.Ub3_tm1(t)), axis=0)
+            
+            self.Ub_D = lambda t : self.Ub_sp0_D(t) + self.Ub_sp1_D + self.Ub_tm1_D(t)
+            
+            self.Ub_sp0_D_dir = lambda t : np.concatenate((self.Ub1_sp0_D * self.Ub1_tm0_D_dir(t),
+                                             self.Ub2_sp0_D * self.Ub2_tm0_D_dir(t),
+                                             self.Ub3_sp0_D * self.Ub3_tm0_D_dir(t)), axis=0)
+            
+            self.Ub_tm1_D_dir = lambda t : np.concatenate((np.ones(self.Nb_D) * self.Ub1_tm1_dir(t),
+                                             np.ones(self.Nb_D) * self.Ub2_tm1_dir(t),
+                                             np.ones(self.Nb_D) * self.Ub3_tm1_dir(t)), axis=0)
+            
+            self.Ub_D_dir = lambda t : self.Ub_sp0_D_dir(t) + self.Ub_tm1_D_dir(t)
 
-            self.Ub_sp0_N = interpolate(self.Ub_sp0_N_Expression, self.Vb).vector()[self.N_index]
-            self.Ub_sp1_N = interpolate(self.Ub_sp1_N_Expression, self.Vb).vector()[self.N_index]
-            self.Ub_N = lambda t : self.Ub_sp0_N * self.Ub_tm0_N(t) + self.Ub_sp1_N + self.Ub_tm1_N(t) * np.ones(self.Nb_N)            
+            self.Ub1_sp0_N = interpolate(self.Ub1_sp0_N_Expression, self.Vb).vector()[self.N_index]
+            self.Ub2_sp0_N = interpolate(self.Ub2_sp0_N_Expression, self.Vb).vector()[self.N_index]
+            self.Ub3_sp0_N = interpolate(self.Ub3_sp0_N_Expression, self.Vb).vector()[self.N_index]
+            
+            self.Ub_sp0_N = lambda t : np.concatenate((self.Ub1_sp0_N * self.Ub1_tm0_N(t),
+                                             self.Ub2_sp0_N * self.Ub2_tm0_N(t),
+                                             self.Ub3_sp0_N * self.Ub3_tm0_N(t)), axis=0)
+            
+            self.Ub1_sp1_N = interpolate(self.Ub1_sp1_N_Expression, self.Vb).vector()[self.N_index]
+            self.Ub2_sp1_N = interpolate(self.Ub2_sp1_N_Expression, self.Vb).vector()[self.N_index]
+            self.Ub3_sp1_N = interpolate(self.Ub3_sp1_N_Expression, self.Vb).vector()[self.N_index]
+            
+            self.Ub_sp1_N = np.concatenate((self.Ub1_sp1_N, self.Ub2_sp1_N, self.Ub3_sp1_N), axis=0)
+            
+            self.Ub_tm1_N = lambda t : np.concatenate((np.ones(self.Nb_N) * self.Ub1_tm1_N(t),
+                                             np.ones(self.Nb_N) * self.Ub2_tm1_N(t),
+                                             np.ones(self.Nb_N) * self.Ub3_tm1_N(t)), axis=0)
+            
+            self.Ub_N = lambda t : self.Ub_sp0_N(t) + self.Ub_sp1_N + self.Ub_tm1_N(t)            
 
         self.project_boundary_control = 1
         
@@ -898,17 +1081,20 @@ class Mindlin:
                 "The FE approximation spaces must be selected first"
        
         if not self.init_by_vector :
-            exp_int0 = (self.Apw_0, self.Apth_0, self.Aqth_0, self.Aqw_0)
             
+            self.W0  = interpolate(self.W_0, self.Vpw.collapse()).vector()[:]
             
-            self.W0  = interpolate(W0_all, self.Vp).vector()[:]
+            Apw0 = interpolate(self.Apw_0, self.Vpw.collapse()).vector()[:]
+            Apth0 = interpolate(self.Apw_0, self.Vpth.collapse()).vector()[:]
+            Aqth0 = interpolate(self.Apw_0, self.Vqth.collapse()).vector()[:]
+            Aqw0 = interpolate(self.Apw_0, self.Vqw.collapse()).vector()[:]
             
-            self.Th0  = interpolate(Th0_all, self.Vp).vector()[:]
+            self.A0  = np.zeros((self.Nsys, ))
+            self.A0[self.dofs_Vpw] = Apw0
+            self.A0[self.dofs_Vpth] = Apth0
+            self.A0[self.dofs_Vqth] = Aqth0
+            self.A0[self.dofs_Vqw] = Aqw0
             
-            self.Apw0 = interpolate(self.Apw_0, self.Vpw).vector()[:]
-            self.Ap0 = interpolate(self.Ap_0, self.Vp).vector()[:]
-            self.A0  = np.concatenate((self.Aq0, self.Ap0))
-
         if self.project_boundary_control == 1 : print('Project BC: OK')
         print('Project init data: OK')
         print(40*'-', '\n')
@@ -984,55 +1170,68 @@ class Mindlin:
         
         print('Factorization and inversion, this may take a while ...')
         
+        Np = self.Np
         Nq = self.Nq
         
-        Mq_sparse = csc_matrix(self.M[:Nq, :Nq])
-        Mp_sparse = csc_matrix(self.M[Nq:, Nq:])
-        M_sparse  = block_diag((Mq_sparse, Mp_sparse))
-        D         = csc_matrix(self.J[:Nq, Nq:])
-        Rq        = csc_matrix(self.R[:Nq, :Nq])
-        Rp        = csc_matrix(self.R[Nq:, Nq:])
-        Bext      = csc_matrix(self.Bext)
-        facto_q   = umfpack.UmfpackLU(Mq_sparse)
-        facto_p   = umfpack.UmfpackLU(Mp_sparse)
+        Mp, Mq, Dp, Dq, Rp, Rq, Bp, Bq = self.Simplectic_Splitting()
+        Mpq = block_diag(Mp, Mq)
+
+        facto_p   = umfpack.UmfpackLU(Mp)       
+        facto_q   = umfpack.UmfpackLU(Mq)
         
         print('Factorization: OK')
-        
-        Sys_q, Sys_R_q, Sys_ctrl_q = facto_q.solve(D), facto_q.solve(Rq), facto_q.solve(Bext[:Nq, :]) 
-        Sys_p, Sys_R_p, Sys_ctrl_p = - facto_p.solve(D.T), facto_p.solve(Rp), facto_p.solve(Bext[Nq:, :])
-        
+
+        Sys_p, Sys_R_p, Sys_ctrl_p = facto_p.solve(Dp), facto_p.solve(Rp),\
+                                        facto_p.solve(Bp)        
+        Sys_q, Sys_R_q, Sys_ctrl_q = facto_q.solve(Dq), facto_q.solve(Rq),\
+                                        facto_q.solve(Bq)
+                                        
         print('Inversion: OK \n')
         
         # Solution and Hamiltonian versus time
         A   = np.zeros( (self.Nsys, self.Nt+1) )
 
+
         # Initialization
-        A[:,0] = self.A0
+        A0p = self.A0[self.dofs_Vp]
+        A0q = self.A0[self.dofs_Vq]
+        
+        A[:,0] = np.concatenate((A0p, A0q))
       
         # Time loop
         dt = self.dt
         Ub = self.Ub
         t = self.tspan
         for n in range(self.Nt):   
-            Aq = A[:Nq, n]
-            Ap = A[Nq:, n]
             
-            Aqq = Aq + dt/2 * (Sys_q @ Ap - Sys_R_q @ Aq + Sys_ctrl_q @ (Ub(t[n+1]) + Ub(t[n]))/2)
-            Apn = Ap + dt * (Sys_p @ Aqq - Sys_R_p @ Ap + Sys_ctrl_p @ (Ub(t[n+1]) + Ub(t[n]))/2)
+            Ap_n = A[:Np, n]
+            Aq_n = A[Np:, n]
+
+            
+            Aqq = Aq_n + dt/2 * (Sys_q @ Ap_n - Sys_R_q @ Aq_n + Sys_ctrl_q @ (Ub(t[n+1]) + Ub(t[n]))/2)
+            Apn = Ap_n + dt * (Sys_p @ Aqq - Sys_R_p @ Ap_n + Sys_ctrl_p @ (Ub(t[n+1]) + Ub(t[n]))/2)
             Aqn = Aqq + dt/2 * (Sys_q @ Apn - Sys_R_q @ Aqq + Sys_ctrl_q @ (Ub(t[n+1]) + Ub(t[n]))/2)
             
-            A[:Nq, n+1] = Aqn
-            A[Nq:, n+1] = Apn
+            A[:Np, n+1] = Apn
+
+            A[Np:, n+1] = Aqn
                     
             # Progress bar
             perct = int(n/(self.Nt-1) * 100)  
             bar = ('Time-stepping SV : |' + '#' * int(perct/2) + ' ' + str(perct) + '%' + '|')
             sys.stdout.write('\r' + bar)
         print('\n integration completed \n')
+        
+        Ham = np.array([ 1/2 * A[:,n] @ Mpq @ A[:,n] for n in range(self.Nt+1) ])
 
-        Ham = np.array([ 1/2 * A[:,n] @ M_sparse @ A[:,n] for n in range(self.Nt+1) ])
+        A_p = A[:Np, :]
+        A_q = A[Np:, :]
 
-        return A, Ham
+        A_reordered = np.zeros_like(A)
+        A_reordered[self.dofs_Vp, :] = A_p
+        A_reordered[self.dofs_Vq, :] = A_q
+        
+        return A_reordered,  Ham
     
     ## Method.
     #  @param self The object pointer.       
@@ -1067,7 +1266,6 @@ class Mindlin:
                 Sys = facto.solve(self.M + self.dt * (1-theta) * (self.J-self.Rdyn(self.tspan[n])))          
                 Sys_ctrl = facto.solve(self.dt* self.Bext)
                 print('Inversion: OK \n')
-                 = TrialFunction(self.Vq)
             A[:,n+1] = Sys @ A[:,n] + Sys_ctrl @ self.Ub(self.tspan[n+1])
             
             # Progress bar
@@ -1259,9 +1457,7 @@ class Mindlin:
     def Integration_DAE_Assimulo(self, **kwargs):
         Nsys, Nb_D = self.Nsys, self.Nb_D
         Ub_N, Ub_D, Ub_D_dir = self.Ub_N, self.Ub_D, self.Ub_D_dir
-        
-        Nq, Np = self.Nq, self.Np
-        
+                
         self.M_sparse = csc_matrix(self.M)
         facto = umfpack.UmfpackLU(self.M_sparse)
         Sys = facto.solve(csc_matrix(self.J - self.R))
@@ -1272,8 +1468,8 @@ class Mindlin:
 
         
         def PHDAE(t,y,yd):
-            res_0 = np.zeros(Nsys)
-            res_1 = np.zeros(Nb_D)
+#            res_0 = np.zeros(Nsys)
+#            res_1 = np.zeros(Nb_D)
             
             res_0 = yd[:Nsys] - Sys @ y[:Nsys] - Sys_Ctrl_N @ Ub_N(t) - Sys_Ctrl_D @ y[Nsys:] 
             res_1 = Ub_D_dir(t) - Sys_Ctrl_DT @ yd[:Nsys] 
@@ -1281,7 +1477,7 @@ class Mindlin:
             return np.concatenate((res_0, res_1))
         
         # The initial conditons
-        y0 =  np.block([self.A0, linalg.solve(self.Mb_D, self.B_normal_D @ self.A0[:Nq] ) ])# Initial conditions
+        y0 =  np.block([self.A0, linalg.solve(self.Mb_D, self.B_normal_D @ self.A0 ) ])# Initial conditions
         yd0 = np.zeros(self.Nsys+Nb_D) # Initial conditions
             
         def handle_result(solver, t ,y, yd):
@@ -1327,12 +1523,12 @@ class Mindlin:
         self.B_Dext_sparse = csc_matrix(self.B_Dext)
         self.B_Next_sparse = csc_matrix(self.B_Next)
         
-        M_spraseLU = umfpack.UmfpackLU(self.M_sparse)
+        M_sparseLU = umfpack.UmfpackLU(self.M_sparse)
         
         Sys        = M_spraseLU.solve(self.JR)
         Sys_Ctrl_N = M_spraseLU.solve(self.B_Next_sparse)
         
-        BDMinvBDT = self.B_Dext_sparse.T @ M_spraseLU.solve(self.B_Dext_sparse) 
+        BDMinvBDT = self.B_Dext_sparse.T @ M_sparseLU.solve(self.B_Dext_sparse) 
         
         prefix         = M_spraseLU.solve(self.B_Dext_sparse)
         Sys_Ctrl_D     = prefix @ linalg.solve(BDMinvBDT, self.Mb_D)
@@ -1379,14 +1575,14 @@ class Mindlin:
         self.B_Dext_sparse = csc_matrix(self.B_Dext)
         self.B_Next_sparse = csc_matrix(self.B_Next)
         
-        M_spraseLU = umfpack.UmfpackLU(self.M_sparse)
+        M_sparseLU = umfpack.UmfpackLU(self.M_sparse)
         
-        Sys        = M_spraseLU.solve(self.JR)
-        Sys_Ctrl_N = M_spraseLU.solve(self.B_Next_sparse)
+        Sys        = M_sparseLU.solve(self.JR)
+        Sys_Ctrl_N = M_sparseLU.solve(self.B_Next_sparse)
         
-        BDMinvBDT = self.B_Dext_sparse.T @ M_spraseLU.solve(self.B_Dext_sparse) 
+        BDMinvBDT = self.B_Dext_sparse.T @ M_sparseLU.solve(self.B_Dext_sparse) 
         
-        prefix         = M_spraseLU.solve(self.B_Dext_sparse)
+        prefix         = M_sparseLU.solve(self.B_Dext_sparse)
         Sys_Ctrl_D     = prefix @ linalg.solve(BDMinvBDT, self.Mb_D)
         Sys_Aug        = - prefix @ linalg.solve(BDMinvBDT, self.B_Dext.T) @ Sys
         Sys_Ctrl_N_Aug = - prefix @ linalg.solve(BDMinvBDT, self.B_Dext.T) @ Sys_Ctrl_N
@@ -1400,36 +1596,58 @@ class Mindlin:
         Nq = self.Nq
         Np = self.Np
         
-        Sys_AUG_qq          = Sys_AUG[:Nq, :Nq]
-        Sys_AUG_qp          = Sys_AUG[:Nq, Nq:]
-        Sys_AUG_pq          = Sys_AUG[Nq:, :Nq]
-        Sys_AUG_pp          = Sys_AUG[Nq:, Nq:]
+        dofs_Vp = self.dofs_Vp
+        dofs_Vq = self.dofs_Vq
         
-        Sys_Ctrl_N_AUG_q    = Sys_Ctrl_N_AUG[:Nq]
-        Sys_Ctrl_N_AUG_p    = Sys_Ctrl_N_AUG[Nq:]        
+        Sys_AUG_qq          = Sys_AUG[dofs_Vq, :][:, dofs_Vq]
+        Sys_AUG_qp          = Sys_AUG[dofs_Vq, :][:, dofs_Vp]
+        Sys_AUG_pq          = Sys_AUG[dofs_Vp, :][:, dofs_Vq]
+        Sys_AUG_pp          = Sys_AUG[dofs_Vp, :][:, dofs_Vp]
         
-        Sys_Ctrl_D_q        = Sys_Ctrl_D[:Nq]
-        Sys_Ctrl_D_p        = Sys_Ctrl_D[Nq:]
+        Sys_Ctrl_N_AUG_q    = Sys_Ctrl_N_AUG[dofs_Vq]
+        Sys_Ctrl_N_AUG_p    = Sys_Ctrl_N_AUG[dofs_Vp]        
         
+        Sys_Ctrl_D_q        = Sys_Ctrl_D[dofs_Vq]
+        Sys_Ctrl_D_p        = Sys_Ctrl_D[dofs_Vp]
         
-        A = np.zeros((self.Nsys, self.Nt+1))
+        A_pq = np.zeros((self.Nsys, self.Nt+1))
         
-        A[:,0] = self.A0
+        A0p = self.A0[self.dofs_Vp]
+        A0q = self.A0[self.dofs_Vq]
+        
+        A_pq[:,0] = np.concatenate((A0p, A0q))
+        
         
         t  = self.tspan
         dt = self.dt
         
         for k in range(self.Nt):
-
-            App         = A[Nq:, k] + dt/2 * (Sys_AUG_pq @ A[:Nq, k] + Sys_AUG_pp @ A[Nq:, k] + Sys_Ctrl_N_AUG_p @ self.Ub_N(t[k]) + Sys_Ctrl_D_p @ self.Ub_D_dir(t[k]))   
-            A[:Nq, k+1] = A[:Nq, k] + dt * (Sys_AUG_qq @ A[:Nq, k] + Sys_AUG_qp @ App + Sys_Ctrl_N_AUG_q @ self.Ub_N(t[k]) + Sys_Ctrl_D_q @ self.Ub_D_dir(t[k])) 
-            A[Nq:, k+1] = App + dt/2 * (Sys_AUG_pq @ A[:Nq, k+1] + Sys_AUG_pp @ App + Sys_Ctrl_N_AUG_p @ self.Ub_N(t[k]) + Sys_Ctrl_D_p @ self.Ub_D_dir(t[k]))  
+            
+            Ap_k = A[:Np, k]
+            Aq_k = A[Np:, k]
+            
+            App         = Ap_k + dt/2 * (Sys_AUG_pq @ Aq_k + Sys_AUG_pp @ Ap_k \
+                                         +Sys_Ctrl_N_AUG_p @ self.Ub_N(t[k]) \
+                                         + Sys_Ctrl_D_p @ self.Ub_D_dir(t[k]))   
+            Aqn = Aq_k + dt * (Sys_AUG_qq @ Ap_k + Sys_AUG_qp @ App \
+                                         + Sys_Ctrl_N_AUG_q @ self.Ub_N(t[k]) \
+                                         + Sys_Ctrl_D_q @ self.Ub_D_dir(t[k])) 
+            Apn = App + dt/2 * (Sys_AUG_pq @ Aqn + Sys_AUG_pp @ App + Sys_Ctrl_N_AUG_p @ self.Ub_N(t[k]) + Sys_Ctrl_D_p @ self.Ub_D_dir(t[k]))  
         
+            A_pq[:Np, n+1] = Apn
+            A_pq[Np:, n+1] = Aqn
             # Progress bar
             perct = int(k/(self.Nt-1) * 100)  
             bar = ('Time-stepping SV2Augmented : |' + '#' * int(perct/2) + ' ' + str(perct) + '%' + '|')
             sys.stdout.write('\r' + bar)
+            
+        A_p = A_pq[:Np, :]
+        A_q = A_pq[Np:, :]
 
+        A = np.zeros_like(A_pq)
+        A[self.dofs_Vp, :] = A_p
+        A[self.dofs_Vq, :] = A_q
+        
         Ham = np.array([1/2 * A[:,k] @ self.M_sparse @ A[:,k] for k in range(self.Nt+1)])
 
         print('\n intergation completed \n')
@@ -1495,80 +1713,18 @@ class Mindlin:
         
         return A, Ham
 
-    ## Method.
-    #  @param self The object pointer.    
-    def Integration_Extended_KV(self, **kwargs):
-        Nsys, Nq, Np = self.Nsys, self.Nq, self.Np
-
-        
-        def PHDAE(t,y,yd):
-            res_0 = np.zeros(Nq)
-            res_1 = np.zeros(Np)
-            res_2 = np.zeros(Nq)
-            res_3 = np.zeros(Nq)
-            res_0 = self.Mq @ yd[:Nq] - ( self.D @ y[Nq:Nq+Np] + self.B @ self.Ub(t)  )
-            res_1 = self.Mp @ yd[Nq:Nq+Np] - ( -self.D.T @ y[:Nq] + self.G @ y[Nq+Np+Nq:] + self.C @ y[Nq+Np+Nq:])
-            res_2 = self.MR @ y[Nq+Np:Nq+Np+Nq] - (-self.G.T @ y[Nq:Nq+Np])
-            res_3 = self.MR @ y[Nq+Np:Nq+Np+Nq] - (self.Mkappa @ y[Nq+Np+Nq:])
-            
-            return np.concatenate((res_0, res_1, res_2, res_3))
-        
-        # The initial conditons
-        y0 =  np.block([self.A0, self.Aq0, self.Aq0 ])# Initial conditions
-        yd0 = np.zeros(Nq + Np + Nq + Nq) # Initial conditions
-            
-        def handle_result(solver, t ,y, yd):
-            global order
-            order.append(solver.get_last_order())
-            
-            solver.t_sol.extend([t])
-            solver.y_sol.extend([y])
-            solver.yd_sol.extend([yd])   
-
-        # Create an Assimulo implicit problem
-        imp_mod = Implicit_Problem(PHDAE, y0, yd0, name='PHDAE')
-           
-        # Set the algebraic components
-        imp_mod.algvar = list( np.block([np.ones(Nq+Np), np.zeros(Nq+Nq)]) ) 
-        
-        # Create an Assimulo implicit solver (IDA)
-        imp_sim = IDA(imp_mod) #Create a IDA solver
-         
-        # Sets the paramters
-        imp_sim.atol = 1e-6 #Default 1e-6
-        imp_sim.rtol = 1e-6 #Default 1e-6
-        imp_sim.suppress_alg = True #Suppres the algebraic variables on the error test
-        imp_sim.report_continuously = True
-             
-        # Let Sundials find consistent initial conditions by use of 'IDA_YA_YDP_INIT'
-        imp_sim.make_consistent('IDA_YA_YDP_INIT')
-         
-        # Simulate
-        t, y, yd = imp_sim.simulate(self.tfinal, self.tinit, self.tspan ) 
-        A = y[:,:Nq+Np].T
-        
-        # Hamiltonian
-        Ham = np.zeros(self.Nt+1)
-        for i in range(self.Nt+1):
-            Ham[i] = 1/2 * A[:,i] @ self.M @ A[:,i]
-        
-        return A, Ham
-
-    
- 
     
     ## Method.
     #  @param self The object pointer.   
     def Get_Deflection(self, A):
         # Get p variables
-        Ap = A[self.Nq:,:]
-        rho = interpolate(self.rho, self.Vp).vector()[:]
+        Ap = A[self.dofs_Vpw,:]
                 
         w      = np.zeros((self.Np,self.Nt+1))
         w[:,0] = self.W0[:]
             
         for n in range(self.Nt):
-            w[:,n+1] = w[:,n] + self.dt * 1/rho[:] * .5 * (  Ap[:,n+1] +  Ap[:,n] ) 
+            w[:,n+1] = w[:,n] + self.dt * 0.5 * (Ap[:,n+1] + Ap[:,n] ) 
             perct       = int(n/(self.Nt-1) * 100)  
             bar         = ('Get deflection \t' + '|' + '#' * int(perct/2) + ' ' + str(perct) + '%' + '|')
             sys.stdout.write('\r' + bar)
@@ -1605,8 +1761,10 @@ class Mindlin:
 
         if figure : plt.figure(figsize=figsize)
         plot(self.Msh, **kwargs)
-        plt.plot(self.xp, self.yp, 'o', label='Dof of $p$ variables')
-        plt.plot(self.xq, self.yq, '^', label='Dof of $q$ variables')
+        plt.plot(self.xpw, self.ypw, 'o', label='Dof of $e_w$ variables')
+        plt.plot(self.xpth, self.ypth, '*', label='Dof of $e_{\theta}$ variables')
+        plt.plot(self.xqth, self.yqth, '-', label='Dof of $E_{\kappa}$ variables')
+        plt.plot(self.xqw, self.yqw, '^', label='Dof of $e_{\gamma}$ variables')
         plt.plot(self.xb, self.yb, 'ko', label='Dof of $\partial$ variables')
         plt.title('Mesh with associated DOFs, $Nq=$'+ str(self.Nq)+ ', $Np=$'+ str(self.Np)+ ', $N_\partial=$'+ str(self.Nb) + ', $Nv=$' + str( self.Msh.num_vertices()) )
         plt.legend()
@@ -1806,223 +1964,3 @@ class Mindlin:
                 wframe = plot(temp_vec, title=title+', t='+str(np.round(self.tspan[i],2))+'/'+str(self.tfinal), **kwargs)
                 plt.pause(.001)
             
-    #%%
- 
-"""
-#%% MAIN TESTS
-if __name__ == '__main__' :
-    import os 
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-
-    
-    # Constructor
-    Wtest = Wave_2D()
-    self = Wtest
-
-
-    # Problem definition
-    x0, xL = 0, 2
-    y0, yL = 0, 1
-    
-    tf = 5
-    dt = 1e-3
-    
-    rho = 'x[0]*x[0] - x[1]*x[1] + 2' # '5 * x[0] * (xL - x[0]) * x[1] * (yL - x[1]) + 1' # '1' # 
-    T11 = 'cos(x[0]*x[1]) + 4' # 'x[0]*x[0]+1' # '1' # 
-    T12 = ' x[1]' # '0' # 
-    T22 = 'abs(x[0]-x[1])+2' # '1' # 
-
-            
-    # Problem definition
-    Wtest.Set_Rectangular_Domain(x0, xL, y0, yL)
-    Wtest.Set_Physical_Parameters(rho, T11, T12, T22)
-
-    # Mixed boundaries problem
-#    Wtest.Set_Mixed_Boundaries( Dir=['G1'], Nor=['G3'], Imp=['G2', 'G4'])
-#    Wtest.Set_Mixed_Boundaries( Dir=['G1', 'G2', 'G4'], Nor=['G3'], Imp=[])
-#    Wtest.Set_Mixed_Boundaries( Dir=['G1'], Nor=['G3', 'G2', 'G4'], Imp=[])      
-    Wtest.Set_Mixed_Boundaries( Dir=['G4'], Nor=['G1'], Imp=['G2'])
-        
-    
-    # Boundary control
-    Wtest.Set_Boundary_Control(Ub_tm0=lambda t:  np.sin( 2 * 2*pi/tf *t) * 25 ,\
-                               Ub_sp0='x[0] * x[1] * (1-x[1])')
-    
-    # Mixed boundary control
-    Wtest.Set_Mixed_BC_Dirichlet(Ub_tm0=lambda t : 0 * np.sin( 2 * 2*pi/tf *t) * 25 ,\
-                               Ub_sp0='20', 
-                               Ub_tm0_dir = lambda t : 0)
-    
-    Wtest.Set_Mixed_BC_Normal(Ub_tm0=lambda t:  np.sin( 5 * 2*pi/tf *t) * 50 ,\
-                               Ub_sp0='x[1] * sin(pi*(1-x[1]))')    
-
-    
-    # Damping
-    Z = '''( abs(x[0]) <= DOLFIN_EPS ? 1 : 0 )
-            + ( abs(x[1]) <= DOLFIN_EPS ? 1 : 0 )
-            + ( abs(xL - x[0]) <= DOLFIN_EPS ? 1 : 0 )
-            + ( abs(yL - x[1]) <= DOLFIN_EPS ? 10 : 0 )'''
-    eps = ' 25 * x[0] * (xL-x[0]) * x[1] * (yL-x[1])'
-    k11 = '(x[0]+x[1]+1)/6'#'1' # 'x[0] + x[1] +1' #    '1' # 
-    k12 =  'x[1]/6' # '0' # '0' #
-    k22 =  'x[0]+ x[1] + 1' #   '1' #
-    
-
-    def imp_t_func(t):
-        if t <= 2: return 0
-        else : return 1
-    Wtest.Set_Damping(damp=['impedance_mbc', 'internal'], Rtime_func=None, \
-                  Z=Z, eps=eps, k11=k11, k12=k12, k22=k22)
-    
-    
-    # Initial data
-    Wtest.Set_Initial_Data(Aq_0_1='0', Aq_0_2='0', Ap_0='0', W_0='0')   
-
-    
-    
-        
-    Wtest.Set_Initial_Final_Time(initial_time=0, final_time=tf)
-
-    # Check problem definition
-    Wtest.Check_Problem_Definition()
-
-    Wtest.Generate_Mesh(23)#, structured_mesh=True)
-#    Wtest.Set_Gmsh_Mesh('rectangle.xml', rfn_num=3)
-    Wtest.Set_Finite_Elements_Spaces(family_q='RT', family_p='P', family_b='P', rq=0, rp=1, rb=1)
-#    Wtest.Plot_Mesh_with_DOFs()
-#    Wtest.Assembly(formulation='Grad')
-    Wtest.Assembly_Mixed_BC()
-#    plt.figure()
-#    plot(Wtest.Msh)
-#    plt.plot(self.coord_b_full[self.D_index,0], self.coord_b_full[self.D_index,1], 'x', markeredgewidth=2)
-#    plt.plot(self.coord_b_full[self.N_index,0], self.coord_b_full[self.N_index,1], 'x', markeredgewidth=2)
-#    plt.plot(self.coord_b_full[self.Z_index,0], self.coord_b_full[self.Z_index,1], '+', markeredgewidth=3)
-    
-    # Spectrum
-#    Wtest.Spectrum(k=self.Nsys-2)
-
-#    plt.figure()
-#    plt.plot(np.linspace(0,self.Nsys)-.5, self.Nq * np.ones(50)-.5, 'k')
-#    plt.plot(self.Nq * np.ones(50)-.5, np.linspace(0,self.Nsys)-.5, 'k-')
-#    plt.spy(csc_matrix(self.J), color='r', label='J')
-#    plt.spy(csc_matrix(self.M), color='b', label='M')
-#    plt.legend()
-    
-        
-    # Projections
-#    ampl, sX, sY, X0, Y0  = 10, Wtest.xL/6, Wtest.yL/6, Wtest.xL/2, Wtest.yL/2 
-#    gau_Aq_0_1 = '-ampl * 2 * (x[0]-X0)/sX * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
-#    gau_Aq_0_2 = '-ampl * 2 * (x[0]-Y0)/sY * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
-#    gau_Ap_0 = 'rho * ampl * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
-#    gau_W_0 = 'ampl * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
-#    Wtest.Project_Initial_Data(Aq_0_1=gau_Aq_0_1, Aq_0_2=gau_Aq_0_2, Ap_0=gau_Ap_0, W_0=gau_W_0, ampl=ampl, sX=sX, sY=sY, X0=X0, Y0=Y0, rho=Wtest.rho)
-
-    
-#    powx, powy = 3, 3
-#    sin_Aq_0_1 = '-2 * pi * powx * (xL - 2*x[0]) * pow(x[0]*(xL-x[0]), powx-1) * pow(x[1]*(yL-x[1]), powy) \
-#                     * sin ( 2 * pi * pow(x[0]*(xL-x[0]), powx) * pow(x[1]*(yL-x[1]), powy) )'
-#    sin_Aq_0_2 = '-2 * pi * pow(x[0]*(xL-x[0]), powx) * powy * (yL - 2*x[1]) * pow(x[1]*(yL-x[1]), powy-1) \
-#                      * sin ( 2 * pi * pow(x[0]*(xL-x[0]), powx) * pow(x[1]*(yL-x[1]), powy) )'
-#    sin_Ap_0 = 'rho * cos ( 2 * pi * pow(x[0]*(xL-x[0]), powx) * pow(x[1]*(yL-x[1]), powy) )'
-#    sin_W_0 = 'cos ( 2 * pi * pow(x[0]*(xL-x[0]), powx) * pow(x[1]*(yL-x[1]), powy) )'
-#    Wtest.Project_Initial_Data(Aq_0_1=sin_Aq_0_1, Aq_0_2=sin_Aq_0_2, Ap_0=sin_Ap_0, W_0=sin_W_0, powx=powx, powy=powy, rho=Wtest.rho)
-      
-
-
-    
-    Wtest.Project_Boundary_Control()
-    Wtest.Project_Initial_Data()
-    Wtest.Set_Time_Setting(dt)
-
-    A, Ham = Wtest.Time_Integration('DAE:RK4Augmented')  
-    
-    Aq = A[:Wtest.Nq,:]
-    Ap = A[Wtest.Nq:,:]    
-    w = Wtest.Get_Deflection(A)
-    Wtest.Plot_Hamiltonian(Wtest.tspan, Ham, linewidth=3)
-    step = 50
-    Wtest.Moving_Trisurf(A[Wtest.Nq:,:], step=step, title='Linear momentum', figsize=(12,6.5), cmap=plt.cm.cividis)#, save=True)
-
-
-    sys.exit()
-    
-
-    
-
-#    A, Ham = Wtest.Integration_RK4_DAE_extended()
-
-    # Time integration    
-#    A, Ham = Wtest.Time_Integration('ODE:RK4')#('ODE:Scipy', method='RK45', t_eval=Wtest.tspan) #('ODE:CN2') 
-#    A, Ham = Wtest.Integration_Extended_KV()
-    
-    
-
-
-    sys.exit('Animation part to run separatly')   
-    Wtest.Set_Video_Writer()
-    Wtest.Moving_Trisurf(w, step=step, title='Deflection', figsize=(12,6.5), cmap=plt.cm.cividis)#, save=True)
-    Wtest.Moving_Trisurf(A[Wtest.Nq:,:], step=step, title='Linear momentum', figsize=(12,6.5), cmap=plt.cm.cividis)#, save=True)
-    Wtest.Moving_Quiver(A[:Wtest.Nq,:], step=step, title='Strain', figsize=(10,6.5), cmap=plt.cm.cividis)#, save=True)               
-    Wtest.Moving_Plot(Ham, Wtest.tspan,  step=step, title='Hamiltonian')#, save=True)
-
-    Wtest.Plot_Hamiltonian_RE(Wtest.tspan, Ham)
-
-#%%   
-    sys.exit()
-        
-    
-    Apf = Function(Wtest.Vp)
-    Apf.vector()[range(Wtest.Np)] = Ap[range(Wtest.Np),-1]
-    plot(Apf, cmap=plt.cm.CMRmap)
-    plot(Wtest.Msh, linewidth=.125)
-    
-    
-    
-    
-    fig, ax = plt.subplots()
-    wframe = None
-    ax.set_xlabel('x coordinate')
-    ax.set_ylabel('y coordinate')
-    for i in range(0, Nt+1, step):
-        if wframe:
-            ax.collections.remove(wframe)
-        wframe = ax.tricontourf(Wtest.xp, Wtest.yp, Ap[:,-1], cmap=plt.cm.jet, levels=np.linspace(Ap.min(), Ap.max(), 100)) 
-        plt.pause(.001)
-    cs = ax.tricontourf(Wtest.xp, Wtest.yp, Ap[:,-1], cmap=plt.cm.jet, levels=np.linspace(Ap.min(), Ap.max(), 100)) 
-    fig.colorbar(cs, ax=ax, shrink=0.9)
-    plot(Wtest.Msh, linewidth=.125)
-    
-    
-    
-    
-    fig=plt.figure(figsize=(10.5,  4.2))
-    plt.xlabel('x coordinate')
-    plt.ylabel('y coordinate')
-    Apf = Function(Wtest.Vp)
-    Aqf = Function(Wtest.Vq)
-    Vmin=(Ap).min()
-    Vmax=(Ap).max()
-    Levels=np.linspace(Vmin,Vmax, 100)
-    step = 50
-    interval = list(range(0, Wtest.Nt+1, step));    interval.append(Wtest.Nt);  interval=np.unique(interval)
-    for i in interval:
-        Apf.vector()[range(Wtest.Np)] = Ap[range(Wtest.Np), i]
-        Aqf.vector()[range(Wtest.Nq)] = -Aq[range(Wtest.Nq), i]
-        p = plot(Apf, vmin=Vmin, vmax=Vmax, levels=Levels, cmap=plt.cm.plasma)
-        if i == 0:
-            plt.colorbar(p)
-        qui = plot(Aqf, width=.0025, mode="glyphs", cmap='Greens', clim = (Aq.min()/linalg.norm(Aq), Aq.max()/linalg.norm(Aq)))
-        plot(Wtest.Msh, linewidth=.25)
-    #        margin = .125
-        plt.xlim([-.1, 2.1])
-        plt.ylim([-.25, 1.1])
-        plt.pause(1e-200)
-        if i == interval[-1]:
-            break
-        plt.cla()
-    
-    
-    
-    ' conda config --set auto_activate_base false '    
-"""
-    
