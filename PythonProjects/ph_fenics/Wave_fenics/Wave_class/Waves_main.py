@@ -127,13 +127,16 @@ w = Wtest.Get_Deflection(A)
 ### Simulation time
 
 ### Animations
-anime = False
+anime = True
 step = 50
 if anime :
     Wtest.Set_Video_Writer()
-    Wtest.Moving_Trisurf(w, step=step, title='Deflection', figsize=(18,7.5), cmap=plt.cm.plasma)#, save=True)
-    Wtest.Moving_Trisurf(Ap, step=step, title='Linear momentum', cmap=plt.cm.plasma)#, figsize=(20,7.5) )#, save=True)
-    Wtest.Moving_Quiver(Aq, step=step, title='Strain', figsize=(15,7.5), cmap=plt.cm.plasma)#, save=True)               
-    Wtest.Moving_Plot(Ham, Wtest.tspan,  step=step, title='Hamiltonian', figsize=(8,7.5), save=True)
+    Wtest.Moving_Trisurf(w, step=step, title='Deflection', figsize=(18,7.5), cmap=plt.cm.plasma) #, save=True)
+    Wtest.Moving_Trisurf(Ap, step=step, title='Linear momentum', cmap=plt.cm.plasma) #, figsize=(20,7.5), save=True)
+    Wtest.Moving_Quiver(Aq, step=step, title='Strain', figsize=(15,7.5), cmap=plt.cm.plasma) #, save=True)               
+    Wtest.Moving_Plot(Ham, Wtest.tspan,  step=step, title='Hamiltonian', figsize=(8,7.5)) #, save=True)
+
+plt.show()
+
 End = timeit.default_timer()
 
