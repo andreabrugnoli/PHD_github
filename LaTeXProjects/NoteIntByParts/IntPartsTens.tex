@@ -1,6 +1,35 @@
-\chapter{Mathematical tools}
-\label{app:math}
+\documentclass[A4]{article}
+\usepackage{amsmath,amssymb}
+\usepackage[left=4cm, right=4cm]{geometry}
+\usepackage{bm}
 
+\DeclareMathOperator*{\grad}{grad}
+\DeclareMathOperator*{\Grad}{Grad}
+\DeclareMathOperator*{\Div}{Div}
+\renewcommand{\div}{\operatorname{div}}
+\DeclareMathOperator*{\Hess}{Hess}
+\DeclareMathOperator*{\curl}{curl}
+\DeclareMathOperator{\Tr}{Tr}
+
+\newtheorem{proof}{Proof}
+
+
+\makeatletter \renewcommand\d[1]{\ensuremath{%
+		\;\mathrm{d}#1\@ifnextchar\d{\!}{}}}
+\makeatother
+
+% inner products
+\def\onedot{$\mathsurround0pt\ldotp$}
+\def\cddot{% two dots stacked vertically
+	\mathbin{\vcenter{\baselineskip.67ex
+			\hbox{\onedot}\hbox{\onedot}}%
+}}
+
+\title{Integration by parts for tensors}
+\author{Andrea Brugnoli}
+\begin{document}
+	\maketitle
+	
 \section{Differential operators}
 
 The space of all, symmetric and skew-symmetric $d\times d$ matrices are denoted by $\mathbb{M},\, \mathbb{S},\, \mathbb{K}$ respectively. The space of $\mathbb{R}^d$ vectors is denoted by $\mathbb{V}$. $\Omega \subset \mathbb{R}^d$ is an open connected set. For a scalar field $u: \Omega \rightarrow \mathbb{R}$ the gradient is defined as 
@@ -30,26 +59,7 @@ The double divergence of a tensor field $\bm{U}$ is then a scalar field defined 
 \div(\Div(\bm U)):= \sum_{i = 1}^d \sum_{j = 1}^d \partial_{x_i} \partial_{x_j} u_{ij}.
 \end{equation*}
 
-\begin{definition}[Formal adjoint, Def. 5.80 \cite{rogers2004pde}]\label{def:foradj}
-	Consider the differential operator defined on $\Omega$
-	\begin{equation}
-	\mathcal{L}(\bm{x}, \partial) =\sum_{|\alpha| \le k} a_\alpha(\bm{x})\partial^\alpha,
-	\end{equation}
-	where $\alpha := (\alpha_1, \dots , \alpha_d)$ is a multi-index of order $|\alpha| := \sum_{i=1}^d \alpha_i$, $a_\alpha$ are a set of  real scalars and $\partial^{\alpha} := \partial_{x_1}^{\alpha_1} \dots \partial_{x_d}^{\alpha_d}$ is a differential operator of order $|\alpha|$ resulting from a combination of spatial derivatives. The formal adjoint of $\mathcal{L}$ is the operator defined by
-	\begin{equation}
-	\mathcal{L}^*(\bm{x}, \partial)u = \sum_{|\alpha| \le k} (-1)^\alpha \partial^\alpha(a_\alpha(\bm{x}) u(\bm{x})).
-	\end{equation}
-\end{definition}
-The importance of this definition lies in the fact that
-\begin{equation}\label{eq:propadj}
-\inner[\Omega]{\phi}{ \mathcal{L}(\bm{x}, \partial)\psi} = \inner[\Omega]{\mathcal{L}^*(\bm{x}, \partial)\phi}{\psi}
-\end{equation}
-for every $\phi, \psi \in C^\infty_0(\Omega)$. If the assumption of compact support is removed, then \eqref{eq:propadj} no longer holds; instead the integration by parts yields additional terms involving integrals over the boundary $\partial\Omega$. However, these boundary terms vanish if $\phi$ and $\psi$ satisfy certain restrictions on the boundary. 
-
-
 \section{Integration by parts}
-
-\paragraph{Integration by parts for tensors} 
 
 Consider a smooth tensor-valued function $\bm{A} \in \mathbb{R}^{d\times d}$ and vector-valued function $\bm{b} \in \mathbb{V}=\mathbb{R}^d$. The following integration by parts formula holds
 \begin{equation}\label{eq:intbypartsTens}
@@ -57,16 +67,16 @@ Consider a smooth tensor-valued function $\bm{A} \in \mathbb{R}^{d\times d}$ and
 \end{equation}
 where $\bm{n}$ is the outward normal at the boundary and $\d{S}$ the infinitesimal surface.
 \begin{proof}
-Consider the components expression of Eq. \eqref{eq:intbypartsTens}
-\begin{equation}
-\begin{aligned}
-\int_{\Omega} \left\{\Div(\bm{A}) \cdot \bm{b} + \bm{A} \cddot \grad(\bm{b}) \right\}  \d{\Omega} &=\int_{\Omega} \sum_{i=1}^{d}\sum_{j = 1}^{d}\left\{(\partial_{x_i}{A}_{ij}){b}_j + {A}_{ij} (\partial_{x_i}{b}_j) \right\}  \d{\Omega}, \\
-&= \int_{\Omega} \sum_{i=1}^{d}\sum_{j = 1}^{d}\partial_{x_i}({A}_{ij} {b}_j) \d{\Omega} = \int_{\Omega} \div(\bm{A} \bm{b}) \d{\Omega}, \\
-&= \int_{\partial\Omega} \sum_{i=1}^{d}\sum_{j = 1}^{d} (n_i A_{ij}) {b}_j \d{S} = \int_{\partial\Omega} (\bm{A}^\top \bm{n}) \cdot \bm{b} \d{S}.
-\end{aligned}
-\end{equation}
+	Consider the components expression of Eq. \eqref{eq:intbypartsTens}
+	\begin{equation}
+	\begin{aligned}
+	\int_{\Omega} \left\{\Div(\bm{A}) \cdot \bm{b} + \bm{A} \cddot \grad(\bm{b}) \right\}  \d{\Omega} &=\int_{\Omega} \sum_{i=1}^{d}\sum_{j = 1}^{d}\left\{(\partial_{x_i}{A}_{ij}){b}_j + {A}_{ij} (\partial_{x_i}{b}_j) \right\}  \d{\Omega}, \\
+	&= \int_{\Omega} \sum_{i=1}^{d}\sum_{j = 1}^{d}\partial_{x_i}({A}_{ij} {b}_j) \d{\Omega} = \int_{\Omega} \div(\bm{A} \bm{b}) \d{\Omega}, \\
+	&= \int_{\partial\Omega} \sum_{i=1}^{d}\sum_{j = 1}^{d} (n_i A_{ij}) {b}_j \d{S} = \int_{\partial\Omega} (\bm{A}^\top \bm{n}) \cdot \bm{b} \d{S}.
+	\end{aligned}
+	\end{equation}
 \end{proof} 
-The previous result can be specialized for symmetric tensor field \cite[Chapter 1]{boffi2013mixed}. Consider a smooth tensor-valued function $\bm{M} \in \mathbb{S} = \mathbb{R}^{d\times d}_{\text{sym}}$ and vector-valued function $\bm{b} \in \mathbb{V}=\mathbb{R}^d$. Then, it holds
+The previous result can be specialized for symmetric tensor field (see Chapter 1 of book mixed element by Boffi etc 2013). Consider a smooth tensor-valued function $\bm{M} \in \mathbb{S} = \mathbb{R}^{d\times d}_{\text{sym}}$ and vector-valued function $\bm{b} \in \mathbb{V}=\mathbb{R}^d$. Then, it holds
 \begin{equation}\label{eq:intbypartsSymTens}
 \int_{\Omega} \left\{\Div(\bm{S}) \cdot \bm{b} + \bm{M} \cddot \Grad(\bm{b}) \right\}  \d{\Omega} = \int_{\Omega} \div(\bm{M} \bm{b}) \d{\Omega} = \int_{\partial\Omega} (\bm{M} \, \bm{n}) \cdot  \bm{b} \d{S}.
 \end{equation}
@@ -75,10 +85,10 @@ The previous result can be specialized for symmetric tensor field \cite[Chapter 
 	\begin{equation}
 	\int_{\Omega} \left\{\Div(\bm{M}) \cdot \bm{b} + \bm{M} \cddot \Grad(\bm{b}) \right\}  \d{\Omega} =\int_{\Omega} \sum_{i=1}^{d}\sum_{j = 1}^{d}\left\{(\partial_{x_i}{M}_{ij}){b}_j + {M}_{ij} \frac{1}{2}(\partial_{x_i}{b}_j + \partial_{x_j}{b}_i) \right\}  \d{\Omega}, 
 	\end{equation}
-	The term ${M}_{ij} \frac{1}{2}(\partial_{x_i}{b}_j + \partial_{x_j}{b}_i)$ can be manipulated exploiting the symmetry of the tensor $\bm{M}$
+	The term ${M}_{ij} \frac{1}{2}(\partial_{x_i}{b}_j + \partial_{x_j}{b}_i)$ can be manipulated exploiting the symmetry of the tensor~$\bm{M}$
 	\begin{equation}
 	\begin{aligned}
-	 \sum_{i=1}^{d}\sum_{j = 1}^{d} \frac{1}{2}({M}_{ij} \partial_{x_i}{b}_j + {M}_{ij} \partial_{x_j}{b}_i) &=  \sum_{i=1}^{d}\sum_{j = 1}^{d} \frac{1}{2} ({M}_{ij} \partial_{x_i}{b}_j + {M}_{ji} \partial_{x_i}{b}_j), \\
+	\sum_{i=1}^{d}\sum_{j = 1}^{d} \frac{1}{2}({M}_{ij} \partial_{x_i}{b}_j + {M}_{ij} \partial_{x_j}{b}_i) &=  \sum_{i=1}^{d}\sum_{j = 1}^{d} \frac{1}{2} ({M}_{ij} \partial_{x_i}{b}_j + {M}_{ji} \partial_{x_i}{b}_j), \\
 	&=  \sum_{i=1}^{d}\sum_{j = 1}^{d} \frac{1}{2}({M}_{ij} + {M}_{ji}) \partial_{x_i}{b}_j \qquad \text{Since $\bm{M}$ is symmetric}, \\
 	&= \sum_{i=1}^{d}\sum_{j = 1}^{d} {M}_{ij} \partial_{x_i}{b}_j= \bm{M} \cddot \grad(\bm{b})
 	\end{aligned}
@@ -97,3 +107,4 @@ The previous result can be specialized for symmetric tensor field \cite[Chapter 
 	\end{equation}
 	This concludes the proof.
 \end{proof} 
+\end{document}

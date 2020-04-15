@@ -113,7 +113,9 @@ Mindlin_test.Set_Time_Setting(time_step=1e-6)
 ### Method
 method = 'ODE:Scipy'
 #method = 'ODE:RK4'
-
+#method ='ODE:SV'
+#method ='ODE:CN2' 
+#method ='ODE:Assimulo'
 #%%
 
 #%% Time-stepping

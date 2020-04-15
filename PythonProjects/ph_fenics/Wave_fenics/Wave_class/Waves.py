@@ -1363,9 +1363,17 @@ class Wave_2D:
         
         for k in range(self.Nt):
 
-            App         = A[Nq:, k] + dt/2 * (Sys_AUG_pq @ A[:Nq, k] + Sys_AUG_pp @ A[Nq:, k] + Sys_Ctrl_N_AUG_p @ self.Ub_N(t[k]) + Sys_Ctrl_D_p @ self.Ub_D_dir(t[k]))   
-            A[:Nq, k+1] = A[:Nq, k] + dt * (Sys_AUG_qq @ A[:Nq, k] + Sys_AUG_qp @ App + Sys_Ctrl_N_AUG_q @ self.Ub_N(t[k]) + Sys_Ctrl_D_q @ self.Ub_D_dir(t[k])) 
-            A[Nq:, k+1] = App + dt/2 * (Sys_AUG_pq @ A[:Nq, k+1] + Sys_AUG_pp @ App + Sys_Ctrl_N_AUG_p @ self.Ub_N(t[k]) + Sys_Ctrl_D_p @ self.Ub_D_dir(t[k]))  
+            App         = A[Nq:, k] + dt/2 * (Sys_AUG_pq @ A[:Nq, k] \
+                           + Sys_AUG_pp @ A[Nq:, k] + Sys_Ctrl_N_AUG_p @ self.Ub_N(t[k])\
+                           + Sys_Ctrl_D_p @ self.Ub_D_dir(t[k]))   
+            
+            A[:Nq, k+1] = A[:Nq, k] + dt * (Sys_AUG_qq @ A[:Nq, k] \
+                     + Sys_AUG_qp @ App + Sys_Ctrl_N_AUG_q @ self.Ub_N(t[k]) \
+                     + Sys_Ctrl_D_q @ self.Ub_D_dir(t[k])) 
+            
+            A[Nq:, k+1] = App + dt/2 * (Sys_AUG_pq @ A[:Nq, k+1] + Sys_AUG_pp @ App\
+                         + Sys_Ctrl_N_AUG_p @ self.Ub_N(t[k])\
+                         + Sys_Ctrl_D_p @ self.Ub_D_dir(t[k]))  
         
             # Progress bar
             perct = int(k/(self.Nt-1) * 100)  

@@ -377,8 +377,12 @@ class Mindlin:
             self.Aqth0           = Aqth0
             self.Aqw0            = Aqw0
             
-            self.A0             = np.concatenate((self.Apw0,self.Apth0,\
-                                                  self.Aqth0, self.Aqw0 ))
+            self.A0             = np.zeros(self.Nsys)
+            self.A0[self.dofs_Vpw] = Apw0
+            self.A0[self.dofs_Vpth] = Apth0
+            self.A0[self.dofs_Vqth] = Aqth0
+            self.A0[self.dofs_Vqw] = Aqw0
+            
             self.init_by_vector = True
 
         self.set_initial_data = 1
@@ -893,7 +897,7 @@ class Mindlin:
         assemble( vb* ub * ds, Mb1_N_pet)
         Mb1_N = csr_matrix(Mb1_N_pet.mat().getValuesCSR()[::-1])[self.N_index, :][:, self.N_index]
         
-        self.Mb_N = block_diag((Mb1_N, Mb1_N, Mb1_N))
+        self.Mb_N = csr_matrix(block_diag((Mb1_N, Mb1_N, Mb1_N)))
         
         Mb1_D_pet = PETScMatrix()
         
@@ -1061,8 +1065,10 @@ class Mindlin:
             
             self.Ub = lambda t : self.Ub_sp0(t) + self.Ub_sp1 + self.Ub_tm1(t)
         
-        if self.set_mixed_boundaries == 1 and self.set_dirichlet_boundary_control==1 \
-        and self.set_normal_boundary_control==1:
+        if self.set_mixed_boundaries == 1:
+            assert self.set_dirichlet_boundary_control==1 and self.set_normal_boundary_control==1, \
+            "The Dirichlet and Neumann control have to be imposed first"
+            
             self.Ub1_sp0_D = interpolate(self.Ub1_sp0_D_Expression, self.Vb).vector()[self.D_index]
             self.Ub2_sp0_D = interpolate(self.Ub2_sp0_D_Expression, self.Vb).vector()[self.D_index]
             self.Ub3_sp0_D = interpolate(self.Ub3_sp0_D_Expression, self.Vb).vector()[self.D_index]
@@ -1139,12 +1145,14 @@ class Mindlin:
             
             Apw0 = interpolate(self.Apw_0, self.Vpw.collapse()).vector()[:]
             Apth0 = interpolate(self.Apth_0, self.Vpth.collapse()).vector()[:]
+            
             Aqth0 = interpolate(self.Aqth_0, self.Vqth.collapse()).vector()[:]
             Aqw0 = interpolate(self.Aqw_0, self.Vqw.collapse()).vector()[:]
             
             self.A0  = np.zeros((self.Nsys, ))
             self.A0[self.dofs_Vpw] = Apw0
             self.A0[self.dofs_Vpth] = Apth0
+            
             self.A0[self.dofs_Vqth] = Aqth0
             self.A0[self.dofs_Vqw] = Aqw0
             
@@ -1661,6 +1669,7 @@ class Mindlin:
         Sys_AUG_pp          = Sys_AUG[dofs_Vp, :][:, dofs_Vp]
         
         Sys_Ctrl_N_AUG_q    = Sys_Ctrl_N_AUG[dofs_Vq]
+        
         Sys_Ctrl_N_AUG_p    = Sys_Ctrl_N_AUG[dofs_Vp]        
         
         Sys_Ctrl_D_q        = Sys_Ctrl_D[dofs_Vq]
@@ -1685,13 +1694,17 @@ class Mindlin:
             App         = Ap_k + dt/2 * (Sys_AUG_pq @ Aq_k + Sys_AUG_pp @ Ap_k \
                                          +Sys_Ctrl_N_AUG_p @ self.Ub_N(t[k]) \
                                          + Sys_Ctrl_D_p @ self.Ub_D_dir(t[k]))   
-            Aqn = Aq_k + dt * (Sys_AUG_qq @ Ap_k + Sys_AUG_qp @ App \
+            
+            Aqn = Aq_k + dt * (Sys_AUG_qq @ Aq_k + Sys_AUG_qp @ App \
                                          + Sys_Ctrl_N_AUG_q @ self.Ub_N(t[k]) \
                                          + Sys_Ctrl_D_q @ self.Ub_D_dir(t[k])) 
-            Apn = App + dt/2 * (Sys_AUG_pq @ Aqn + Sys_AUG_pp @ App + Sys_Ctrl_N_AUG_p @ self.Ub_N(t[k]) + Sys_Ctrl_D_p @ self.Ub_D_dir(t[k]))  
+            
+            Apn = App + dt/2 * (Sys_AUG_pq @ Aqn + Sys_AUG_pp @ App \
+                                + Sys_Ctrl_N_AUG_p @ self.Ub_N(t[k])\
+                                + Sys_Ctrl_D_p @ self.Ub_D_dir(t[k]))  
         
-            A_pq[:Np, n+1] = Apn
-            A_pq[Np:, n+1] = Aqn
+            A_pq[:Np, k+1] = Apn
+            A_pq[Np:, k+1] = Aqn
             # Progress bar
             perct = int(k/(self.Nt-1) * 100)  
             bar = ('Time-stepping SV2Augmented : |' + '#' * int(perct/2) + ' ' + str(perct) + '%' + '|')

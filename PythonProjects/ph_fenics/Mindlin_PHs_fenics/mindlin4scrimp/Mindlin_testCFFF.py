@@ -31,16 +31,19 @@ Mindlin_test.Set_Rectangular_Domain(x0, xL, y0, yL)
 #Mindlin_test.Set_Physical_Parameters(rho, h, E, nu, k, init_by_value=False)
 # 
 E = 10**12
-nu = 0.3
 rho = 2600
-h=0.1
+#E = 1
+#rho = 1
+
+nu = 0.3
+h=1
 k=5/6
 
 Mindlin_test.Set_Physical_Parameters(rho, h, E, nu, k, init_by_value=True)
 
 ## Internal damping coefficient
 #eps = '4 * x[0] * (xL - x[0]) * x[1] * (yL - x[1])'
-eps = '10000'
+eps = '0'
 
 Mindlin_test.Set_Damping(damp=['internal'], eps=eps)
 
@@ -84,12 +87,12 @@ ampl, sX, sY, X0, Y0  = 1, Mindlin_test.xL/6, Mindlin_test.yL/6,\
 #gau_W_0 = 'ampl * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
 #Th_0_1 = '0'
 #Th_0_2 = '0'
-#gau_Apw_0 = 'rho * ampl * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
+gau_Apw_0 = 'pow(x[0], 3)' # 'rho * ampl * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
 #gau_Aqw_0_1 = '-ampl * 2 * (x[0]-X0)/sX * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
 #gau_Aqw_0_2 = '-ampl * 2 * (x[0]-Y0)/sY * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
 
 Mindlin_test.Set_Initial_Data(W_0='0', Th_0_1='0', Th_0_2='0',\
-                         Apw_0='0', Apth1_0='0', Apth2_0='0',\
+                         Apw_0=gau_Apw_0, Apth1_0='0', Apth2_0='0',\
                          Aqth11_0='0', Aqth12_0='0', Aqth22_0='0',\
                          Aqw1_0='0', Aqw2_0='0',\
                          ampl=ampl, sX=sX, sY=sY, X0=X0, Y0=Y0, rho=Mindlin_test.rho)
@@ -111,9 +114,9 @@ Mindlin_test.Project_Initial_Data()
 Mindlin_test.Set_Time_Setting(time_step=1e-6)
 
 ### Method
-#method = 'DAE:Assimulo'
-method = 'DAE:RK4Augmented'
-#method = 'ODE:RK4'
+method = 'DAE:Assimulo'
+#method = 'DAE:RK4Augmented'
+#method = 'DAE:SV2Augmented'
 
 #%%
 
