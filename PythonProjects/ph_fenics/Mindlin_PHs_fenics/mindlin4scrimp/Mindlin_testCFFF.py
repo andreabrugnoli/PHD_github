@@ -1,5 +1,5 @@
 
-from Mindlin_class import Mindlin
+from Mindlin_class_Correct import Mindlin
 import numpy as np
 from scipy.sparse import csc_matrix, block_diag
 from math import *
@@ -30,13 +30,13 @@ Mindlin_test.Set_Rectangular_Domain(x0, xL, y0, yL)
 #
 #Mindlin_test.Set_Physical_Parameters(rho, h, E, nu, k, init_by_value=False)
 # 
-E = 10**12
-rho = 2600
+E = 7*10**10
+rho = 2700
 #E = 1
 #rho = 1
 
 nu = 0.3
-h=1
+h=0.1
 k=5/6
 
 Mindlin_test.Set_Physical_Parameters(rho, h, E, nu, k, init_by_value=True)
@@ -63,20 +63,22 @@ Mindlin_test.Generate_Mesh(5, structured_mesh=True)
 Mindlin_test.Set_Finite_Elements_Spaces(r=1)
 
 ### Assembly    
-Mindlin_test.Set_Mixed_Boundaries(Dir=['G1'], Nor=['G2', 'G3', 'G4'])
+Mindlin_test.Set_Mixed_Boundaries(Dir=['G1', 'G2'], Nor=['G3', 'G4'])
 Mindlin_test.Assembly_Mixed_BC() 
 
-#from scikits import umfpack
-#facto = umfpack.UmfpackLU(self.M)
 ##%% Environement
 #### Boundary control
-#def Ub_tm0(t):
-#    if t <= 2:
-#        return np.sin( 2 * 2*pi/tf *t) * 100 
-#    else: return 0
+def Ub_tm0(t):
+    if t <= 2:
+        return np.sin( 2 * 2*pi/tf *t) * 100 
+    else: return 0
 Ub_tm0 = lambda t:  np.array([(1-np.exp(-t/tf))*(t<=0.1*tf), 0, 0])
 Mindlin_test.Set_Mixed_BC_Normal(Ub_tm0=Ub_tm0 ,\
-                           Ub_sp0=('1.', '0','0'))
+                           Ub_sp0=('0.', '0','0'))
+
+#
+#Mindlin_test.Set_Mixed_BC_Normal(Ub_tm0=lambda t: np.array([0,0,0]) ,\
+#                           Ub_sp0=('0.', '0','0'))
 
 Mindlin_test.Set_Mixed_BC_Dirichlet(Ub_tm0=np.array([0,0,0]), Ub_sp0=('0', '0','0'))
 
@@ -87,7 +89,7 @@ ampl, sX, sY, X0, Y0  = 1, Mindlin_test.xL/6, Mindlin_test.yL/6,\
 #gau_W_0 = 'ampl * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
 #Th_0_1 = '0'
 #Th_0_2 = '0'
-gau_Apw_0 = 'pow(x[0], 3)' # 'rho * ampl * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
+gau_Apw_0 = 'x[0]*x[1]' # 'rho * ampl * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
 #gau_Aqw_0_1 = '-ampl * 2 * (x[0]-X0)/sX * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
 #gau_Aqw_0_2 = '-ampl * 2 * (x[0]-Y0)/sY * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
 
@@ -114,9 +116,11 @@ Mindlin_test.Project_Initial_Data()
 Mindlin_test.Set_Time_Setting(time_step=1e-6)
 
 ### Method
-method = 'DAE:Assimulo'
+#method = 'ODE:RK4'
+
+#method = 'DAE:Assimulo'
 #method = 'DAE:RK4Augmented'
-#method = 'DAE:SV2Augmented'
+method = 'DAE:SV2Augmented'
 
 #%%
 
@@ -125,7 +129,7 @@ method = 'DAE:Assimulo'
 A, Ham = Mindlin_test.Time_Integration(method)  
 Mindlin_test.Plot_Hamiltonian(Mindlin_test.tspan, Ham, linewidth=3)
 
-
+v = A[self.dofs_Vpw]
 
 
 

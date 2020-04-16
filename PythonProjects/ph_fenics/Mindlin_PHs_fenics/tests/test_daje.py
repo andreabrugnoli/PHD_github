@@ -17,8 +17,6 @@ from AnimateSurf import animate2D
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as animation
 
-n_sim = 2
-
 n = 5
 deg = 1
 
@@ -197,9 +195,7 @@ J_pl = assemble(j).array()
 M_pl = assemble(m).array()
 
 
-if n_sim == 1:
-    bc_input = 'CFFF'
-else: bc_input = 'CFCF'
+bc_input = 'CFFF'
 
 # bc_input = input('Select Boundary Condition:')
 
@@ -247,19 +243,9 @@ n_mul = len(bd_dofs_mul)
 # Force applied at the right boundary
 
 
-g = Constant(10)
 force = Expression("0.", degree=4, lx = l_x, A = 10**5)
 
-#force = Expression("A*sin(2*pi/lx*x[0])", degree=4, lx = l_x, A = 10**5)
-# force = Constant(1e6)
-# f_p = v_pw * force * ds(2)
-f_p1 = - v_pw * rho * h * g * dx
-f_p2 = v_pw * force * ds(3) - v_pw * force * ds(4)
-
-if n_sim == 1:
-    f_p = f_p1
-else:
-    f_p = f_p2
+f_p = v_pw * force * ds(3) - v_pw * force * ds(4)
 
 F_int = assemble(f_p).get_local()
 
@@ -282,7 +268,7 @@ Rsys = P @ Rint
 Fsys = P @ F_int
 
 t0 = 0.0
-t_fin = 1e-3
+t_fin = 1e-2
 t_span = [t0, t_fin]
 
 def sys(t,y):
@@ -292,16 +278,10 @@ def sys(t,y):
     dydt = invMint @ ( (Jsys - Rsys) @ y + Fsys *bool_f)
     return dydt
 
-
-#init_con = Expression(('sin(2*pi*x[0])*sin(2*pi*(x[0]-lx))*sin(2*pi*x[1])*sin(2*pi*(x[1]-ly))', \
-#                      '0', '0', '0', '0', '0', '0', '0', '0'), degree=4, lx=l_x, ly=l_y)
-
-init_con = Expression(('x[0]', \
-                      '0', '0', '0', '0', '0', '0', '0', '0'), degree=4, lx=l_x, ly=l_y)
+init_con = Expression(('100*x[0]','0', '0', '0', '0', '0', '0', '0', '0'), degree=4, lx=l_x, ly=l_y)
 e_pl0 = Function(V)
 e_pl0.assign(interpolate(init_con, V))
-y0 = np.zeros(n_V,)
-# y0[:n_pl] = e_pl0.vector().get_local()
+y0 = e_pl0.vector().get_local()
 
 t_ev = np.linspace(t0,t_fin, num=100)
 sol = integrate.solve_ivp(sys, t_span, y0, method='RK45', vectorized=False, t_eval=t_ev)
@@ -317,24 +297,17 @@ w = np.zeros(e_pw.shape)
 w[:, 0] = w0
 w_old = w[:, 0]
 
-Vw = FunctionSpace(mesh, P_pw)
-h_Ep = Function(Vw)
-Ep = np.zeros((n_ev,))
 
 dt_ev = np.diff(t_ev)
 for i in range(1, n_ev):
     w[:, i] = w_old + 0.5 * (e_pw[:, i - 1] + e_pw[:, i]) * dt_ev[i-1]
     w_old = w[:, i]
-    h_Ep.vector()[:] = np.ascontiguousarray(w[:, i], dtype='float')
-    Ep[i] = assemble(rho * g * h * h_Ep * dx)
+
 
 x = dofVpw_x[:, 0]
 y = dofVpw_x[:, 1]
 
-if n_sim == 1:
-    w_mm = w * 1000000
-else:
-    w_mm = w * 1000
+w_mm = w * 1000
 
 minZ = w_mm.min()
 maxZ = w_mm.max()
@@ -348,18 +321,10 @@ for i in range(n_ev):
 
 fig = plt.figure()
 plt.plot(t_ev, H_vec, 'b-', label='Hamiltonian (J)')
-# plt.plot(t_ev, Ep, 'r-', label = 'Potential Energy (J)')
-# plt.plot(t_ev, H_vec + Ep, 'g-', label = 'Total Energy (J)')
 plt.xlabel(r'{Time} (s)', fontsize=fntsize)
-# plt.ylabel(r'{Hamiltonian} (J)',fontsize=fntsize)
 plt.title(r"Hamiltonian trend",
           fontsize=fntsize)
 plt.legend(loc='upper left')
-
-
-path_out = "/home/a.brugnoli/Plots_Videos/Mindlin_plots/Temp_Simulation/Article_Min/"
-plt.savefig(path_out + "Sim" +str(n_sim) + "Hamiltonian.eps", format="eps")
-
 
 anim = animate2D(x, y, w_mm, t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \
                          zlabel='$w [mm]$', title = 'Vertical Displacement')
@@ -367,7 +332,7 @@ anim = animate2D(x, y, w_mm, t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \
 plt.show()
 
 
-save_figs = True
+save_figs = False
 if save_figs:
     n_fig = 4
     tol = 1e-6
@@ -390,5 +355,4 @@ if save_figs:
         ax.w_zaxis.set_major_formatter(FormatStrFormatter('%3.2f' ))
 
         ax.plot_trisurf(x, y, w_mm[:,index], **surf_opts)
-        plt.savefig(path_out + "Sim" + str(n_sim) + "t" + str(index + 1) + ".eps", format="eps")
         # plt.show()

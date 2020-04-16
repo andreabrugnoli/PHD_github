@@ -44,7 +44,8 @@ Y   = '''( abs(x[0]) <= DOLFIN_EPS ? x[1]*(1-x[1]) : 0 )
         + ( abs(yL - x[1]) <= DOLFIN_EPS ? 0 : 0 )'''
 
 ## Internal damping coefficient
-eps = '4 * x[0] * (xL - x[0]) * x[1] * (yL - x[1])'
+#eps = '4 * x[0] * (xL - x[0]) * x[1] * (yL - x[1])'
+eps = '0'
 
 Wtest.Set_Damping(damp=['internal'], \
               Z=Z, Y=Y, eps=eps)
@@ -64,7 +65,25 @@ Wtest.Set_Finite_Elements_Spaces(family_q='RT', family_p='P', family_b='P', rq=1
 
 ### Assembly    
 #Wtest.Assembly_Mixed_BC() 
-Wtest.Assembly(formulation='Grad')
+#Wtest.Assembly(formulation='Grad')
+Wtest.Set_Mixed_Boundaries(Dir=['G1'], Nor=['G2', 'G3', 'G4'])
+Wtest.Assembly_Mixed_BC() 
+
+#from scikits import umfpack
+#facto = umfpack.UmfpackLU(self.M)
+##%% Environement
+#### Boundary control
+#def Ub_tm0(t):
+#    if t <= 2:
+#        return np.sin( 2 * 2*pi/tf *t) * 100 
+#    else: return 0
+#Ub_tm0 = lambda t:  (1-np.exp(-t/tf))*(t<=0.1*tf)
+#Wtest.Set_Mixed_BC_Normal(Ub_tm0=Ub_tm0 ,\
+#                           Ub_sp0='1.')
+Wtest.Set_Mixed_BC_Normal(Ub_tm0=lambda t: 0. ,\
+                           Ub_sp0='0')
+
+Wtest.Set_Mixed_BC_Dirichlet(Ub_tm0=lambda t: 0., Ub_sp0='0')
 #%%
 
 #%% Environement
@@ -79,10 +98,14 @@ Wtest.Set_Boundary_Control(Ub_tm0=Ub_tm0 ,\
 
 # Gaussian initial datas
 ampl, sX, sY, X0, Y0  = 10, Wtest.xL/6, Wtest.yL/6, Wtest.xL/2, Wtest.yL/2 
-gau_Aq_0_1 = '-ampl * 2 * (x[0]-X0)/sX * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
-gau_Aq_0_2 = '-ampl * 2 * (x[0]-Y0)/sY * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
-gau_Ap_0 = 'rho * ampl * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
-gau_W_0 = 'ampl * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
+#gau_Aq_0_1 = '-ampl * 2 * (x[0]-X0)/sX * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
+#gau_Aq_0_2 = '-ampl * 2 * (x[0]-Y0)/sY * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
+#gau_Ap_0 = 'rho * ampl * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
+#gau_W_0 = 'ampl * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
+gau_Aq_0_1 = '0'
+gau_Aq_0_2 = '0'
+gau_Ap_0 = 'pow(x[0], 3)'
+gau_W_0 = '0'
 Wtest.Set_Initial_Data(Aq_0_1=gau_Aq_0_1, Aq_0_2=gau_Aq_0_2, Ap_0=gau_Ap_0, W_0=gau_W_0,\
                        ampl=ampl, sX=sX, sY=sY, X0=X0, Y0=Y0, rho=Wtest.rho)   
 
@@ -103,9 +126,9 @@ Wtest.Project_Initial_Data()
 Wtest.Set_Time_Setting(time_step=1e-3)
 
 ### Method
-#method = 'ODE:RK4'
-method ='ODE:Assimulo'
-
+#method = 'DAE:Assimulo'
+#method = 'DAE:RK4Augmented'
+method = 'DAE:SV2Augmented'
 #%%
 
 #%% Time-stepping
@@ -129,7 +152,7 @@ w = Wtest.Get_Deflection(A)
 ### Simulation time
 
 ### Animations
-anime = True
+anime = False
 step = 50
 if anime :
     Wtest.Set_Video_Writer()
@@ -141,4 +164,5 @@ if anime :
 plt.show()
 
 End = timeit.default_timer()
+
 

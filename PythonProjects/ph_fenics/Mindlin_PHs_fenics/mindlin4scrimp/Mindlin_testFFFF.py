@@ -1,5 +1,5 @@
 
-from Mindlin_class import Mindlin
+from Mindlin_class_Correct import Mindlin
 import numpy as np
 from scipy.sparse import csc_matrix, block_diag
 from math import *
@@ -30,9 +30,9 @@ Mindlin_test.Set_Rectangular_Domain(x0, xL, y0, yL)
 #
 #Mindlin_test.Set_Physical_Parameters(rho, h, E, nu, k, init_by_value=False)
 # 
-E = 10**12
+E = 7*10**10
 nu = 0.3
-rho = 2600
+rho = 2700
 h=0.1
 k=5/6
 
@@ -40,7 +40,7 @@ Mindlin_test.Set_Physical_Parameters(rho, h, E, nu, k, init_by_value=True)
 
 ## Internal damping coefficient
 #eps = '4 * x[0] * (xL - x[0]) * x[1] * (yL - x[1])'
-eps = '10000'
+eps = '0'
 
 Mindlin_test.Set_Damping(damp=['internal'], eps=eps)
 
@@ -71,12 +71,12 @@ Mindlin_test.Assembly()
 #    if t <= 2:
 #        return np.sin( 2 * 2*pi/tf *t) * 100 
 #    else: return 0
-Ub_tm0 = lambda t:  np.array([(1-np.exp(-t/tf))*(t<=0.1*tf), 0, 0])
-Mindlin_test.Set_Boundary_Control(Ub_tm0=Ub_tm0 ,\
-                           Ub_sp0=('1.', '0','0'))
+#Ub_tm0 = lambda t:  np.array([(1-np.exp(-t/tf))*(t<=0.1*tf), 0, 0])
+#Mindlin_test.Set_Boundary_Control(Ub_tm0=Ub_tm0 ,\
+#                           Ub_sp0=('1.', '0','0'))
 
-print(Ub_tm0(0.5*tf))
-
+Mindlin_test.Set_Boundary_Control(Ub_tm0=lambda t: np.array([0,0,0]) ,\
+                           Ub_sp0=('0.', '0','0'))
 # Gaussian initial datas
 ampl, sX, sY, X0, Y0  = 1, Mindlin_test.xL/6, Mindlin_test.yL/6,\
                      Mindlin_test.xL/2, Mindlin_test.yL/2 
@@ -84,7 +84,7 @@ ampl, sX, sY, X0, Y0  = 1, Mindlin_test.xL/6, Mindlin_test.yL/6,\
 gau_W_0 = 'ampl * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
 Th_0_1 = '0'
 Th_0_2 = '0'
-gau_Apw_0 = 'rho * ampl * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
+gau_Apw_0 = 'x[0]'
 #gau_Aqw_0_1 = '-ampl * 2 * (x[0]-X0)/sX * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
 #gau_Aqw_0_2 = '-ampl * 2 * (x[0]-Y0)/sY * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
 
@@ -111,10 +111,10 @@ Mindlin_test.Project_Initial_Data()
 Mindlin_test.Set_Time_Setting(time_step=1e-6)
 
 ### Method
-method = 'ODE:Scipy'
+#method = 'ODE:Scipy'
 #method = 'ODE:RK4'
 #method ='ODE:SV'
-#method ='ODE:CN2' 
+method ='ODE:CN2' 
 #method ='ODE:Assimulo'
 #%%
 
@@ -124,7 +124,7 @@ A, Ham = Mindlin_test.Time_Integration(method)
 Mindlin_test.Plot_Hamiltonian(Mindlin_test.tspan, Ham, linewidth=3)
 
 
-
+v = A[self.dofs_Vpw]
 
 
 #%% Post-processing analysis
@@ -139,7 +139,7 @@ w = Mindlin_test.Get_Deflection(A)
 ### Simulation time
 
 ### Animations
-anime = True
+anime = False
 step = 50
 if anime :
     Mindlin_test.Set_Video_Writer()
