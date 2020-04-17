@@ -1,5 +1,5 @@
 
-from Mindlin_class_Wrong import Mindlin
+from Mindlin_class_Correct import Mindlin
 import numpy as np
 from scipy.sparse import csc_matrix, block_diag
 from math import *
@@ -48,7 +48,7 @@ eps = '0'
 Mindlin_test.Set_Damping(damp=['internal'], eps=eps)
 
 ### Final time 
-tf = 0.01
+tf = 0.001
 Mindlin_test.Set_Initial_Final_Time(initial_time=0, final_time=tf)
 #%%
 
@@ -63,22 +63,22 @@ Mindlin_test.Generate_Mesh(5, structured_mesh=True)
 Mindlin_test.Set_Finite_Elements_Spaces(r=1)
 
 ### Assembly    
-Mindlin_test.Set_Mixed_Boundaries(Dir=['G1', 'G2'], Nor=['G3', 'G4'])
+Mindlin_test.Set_Mixed_Boundaries(Dir=['G1'], Nor=['G2', 'G3', 'G4'])
 Mindlin_test.Assembly_Mixed_BC() 
 
 ##%% Environement
 #### Boundary control
-def Ub_tm0(t):
-    if t <= 2:
-        return np.sin( 2 * 2*pi/tf *t) * 100 
-    else: return 0
-Ub_tm0 = lambda t:  np.array([(1-np.exp(-t/tf))*(t<=0.1*tf), 0, 0])
-Mindlin_test.Set_Mixed_BC_Normal(Ub_tm0=Ub_tm0 ,\
-                           Ub_sp0=('0.', '0','0'))
-
-#
-#Mindlin_test.Set_Mixed_BC_Normal(Ub_tm0=lambda t: np.array([0,0,0]) ,\
+#def Ub_tm0(t):
+#    if t <= 2:
+#        return np.sin( 2 * 2*pi/tf *t) * 100 
+#    else: return 0
+#Ub_tm0 = lambda t:  np.array([(1-np.exp(-t/tf))*(t<=0.1*tf), 0, 0])
+#Mindlin_test.Set_Mixed_BC_Normal(Ub_tm0=Ub_tm0 ,\
 #                           Ub_sp0=('0.', '0','0'))
+
+
+Mindlin_test.Set_Mixed_BC_Normal(Ub_tm0=lambda t: np.array([0,0,0]) ,\
+                           Ub_sp0=('0.', '0','0'))
 
 Mindlin_test.Set_Mixed_BC_Dirichlet(Ub_tm0=np.array([0,0,0]), Ub_sp0=('0', '0','0'))
 

@@ -6,7 +6,7 @@
 
 \lettrine{\color{theme}{D}}iscretization is the process of transferring continuous models into discrete counterparts. The discrete model should be faithful to the continuous one. To this aim, it is usually essential that the main properties of the continuous system are preserved at the discrete level. An algorithm that is capable of conserving properties at the discrete level is called structure-preserving \cite{christiansen2011}. In this chapter, a finite element method to spatially discretize infinite-dimensional pHs into finite-dimensional ones in a structure preserving manner is illustrated.
 
-\section{General procedure}
+\section{Discretization under uniform boundary condition}
 A discrete version of a infinite-dimensional pH system is meant to preserve the underlying properties related to power continuity. To achieve this purpose, the discretization procedure consists of two steps \cite{kotyczka2018weak}:
 \begin{itemize}
 	\item Finite-dimensional approximation of the Stokes-Dirac structure, i.e. the formally skew symmetric differential operator that defines the structure. The duality of the power variables has to be mapped onto the finite approximation. The subspace of the discrete variables will be represented by a Dirac structure. 
@@ -43,18 +43,18 @@ A structure-preserving discretization is able to construct an equivalent pH syst
 \end{tcolorbox}
 \end{tcbraster}
 \vspace{.5cm}
-In this work the partitioned finite element method (PFEM), originally presented in \cite{cardoso2018pfem,cardoso2019partitioned}, is chosen to obtain discretized models of dpHs. This procedure boils down to three simple steps
+In this thesis the partitioned finite element method (PFEM), originally presented in \cite{cardoso2018pfem,cardoso2019partitioned}, is chosen to obtain discretized models of dpHs. This procedure boils down to three simple steps
 \begin{enumerate}
 	\item The system is written in weak form; 
 	\item An integration by parts is applied to highlight the appropriate boundary control;
 	\item A Galerkin method is employed to obtain a finite-dimensional system.
 \end{enumerate}
 
-Once the system has been put into weak form, a subset of the equations is integrated by parts, so that boundary variables are naturally included into the formulation and appear as control inputs, the collocated outputs being defined accordingly. The discretization of energy and co-energy variables (and the associated test functions) leads directly to a full rank representation for the finite-dimensional port-Hamiltonian system.  This approach makes possible the usage of FEM software, like FEniCS \cite{logg2012}, or Firedrake \cite{rathgeber2017firedrake}. \\
+Once the system has been put into weak form, a subset of the equations is integrated by parts, so that boundary variables are naturally included into the formulation and appear as control inputs, the collocated outputs being defined accordingly. The discretization of energy and co-energy variables (and the associated test functions) leads directly to a full rank representation for the finite-dimensional pH system.  This approach makes possible the usage of FEM software, like FEniCS \cite{logg2012}, or Firedrake \cite{rathgeber2017firedrake}. \\
 
 Despite the many advantages, this methodology allows obtaining a canonical pH finite dimensional system only under a uniform causality assumption. The case of mixed boundary conditions requires additional care and will be treated in the subsequent Section \secref{sec:mixedbc}.
 
-\subsection{Non-linear case}
+\subsection{General procedure}
 Given an open connected set $\Omega \in \mathbb{R}^d, d= \{1,2,3\}$, consider a generic pH system defined on~$\Omega$
 \begin{equation}\label{eq:phsys2}
 \begin{aligned}[t]
@@ -65,11 +65,11 @@ Given an open connected set $\Omega \in \mathbb{R}^d, d= \{1,2,3\}$, consider a 
 \end{aligned} \qquad
 \begin{aligned}[t]
 &\bm{\alpha} \in X, \\
-&\bm{u}_\partial \in L^2(\partial \Omega, \mathbb{R}^m), \\
-&\bm{y}_\partial \in L^2(\partial \Omega, \mathbb{R}^m),
+&\bm{u}_\partial \in \mathbb{R}^m, \\
+&\bm{y}_\partial \in \mathbb{R}^m,
 \end{aligned}
 \end{equation}
-The Hilbert space $X$, whose inner product is denoted by $\inner[X]{\cdot}{\cdot}$, is an appropriate Cartesian product of $L^2$ spaces which account for the nature of each variable (that can be scalar, vectorial or tensorial quantities). \\
+The Hilbert space $X$, whose inner product is denoted by $\inner[X]{\cdot}{\cdot}$, is an appropriate Cartesian product of $L^2$ spaces which account for the nature of each variable (that can be scalar, vectorial or tensorial quantities). The Hamiltonian functional is allowed to non linear in the energy variables. \\
 
 To applied this methodology the non linearities are restricted to the Hamiltonian and a uniform causality condition is supposed to characterize the system. These hypotheses are resumed in the following assumptions
 
@@ -104,56 +104,51 @@ To applied this methodology the non linearities are restricted to the Hamiltonia
 	The operator $\mathcal{L}$ can be either a first order or a second order differential operator. In the latter case it can be expressed as $\mathcal{L} = \mathcal{L}_1 \circ \mathcal{L}_2$. By definition $\mathcal{J}_{\text{d}, 1} = - \mathcal{J}_{\text{d}, 2}^*$.
 \end{assumption}
 
-From parametrization \ref{eq:assJd} and Theorem \ref{th:rogers}, given $(\bm{u}, \, \bm{v}) \in X_1 \times X_2 = X$, it can be stated
-
+From Theorem \ref{th:rogers}, given $(\bm{v}, \, \bm{u}) \in X_1 \times X_2 = X$, it holds
 \begin{equation}
-{(\mathcal{L}\, \bm{u})}\cdot {\bm{v}} - {\bm{u}} \cdot {(\mathcal{L}^* \, \bm{v})} = \div \widetilde{\mathcal{A}}_{\mathcal{L}}(\bm{u}, \bm{v}), \\
+{\bm{u}} \cdot {(\mathcal{L}\, \bm{v})}  - {(\mathcal{L}^* \, \bm{u})} \cdot {\bm{v}} = \div \widetilde{\mathcal{A}}_{\mathcal{L}}(\bm{v}, \bm{u}), \\
 \end{equation}
-Then, the boundary operators are supposed to fulfill the following assumption, that guarantees a uniform causality condition.
+The integration by part formula provides 
+\begin{equation}
+ \inner[X_2]{\bm{u}}{\mathcal{L}\,\bm{v}} - \inner[X_1]{\mathcal{L}^* \, \bm{u}}{\bm{v}} = \inner[L^2(\partial \Omega, \mathbb{R}^m)]{\mathcal{N}_{\partial, 2} \bm{u}}{\mathcal{N}_{\partial, 1} \bm{v}}. \label{eq:intbypartsJ} 
+\end{equation}
+The boundary operators are then supposed to fulfill the following assumption, that guarantees a uniform causality condition.
 
 \begin{assumption}\label{ass:operBC}
-	Given $\bm{a} = (\bm{a}_1, \, \bm{a}_2) \in X_1 \times X_2 = X$ and $\bm{b}  = (\bm{b}_1, \, \bm{b}_2) \in X_1 \times X_2 = X$ the boundary operators $\mathcal{B}_\partial, \, \mathcal{C}_\partial$ are assumed to verify, in an exclusive manner, either
+	 The boundary operators $\mathcal{B}_\partial, \, \mathcal{C}_\partial$ are assumed to verify, in an exclusive manner, either
 	\begin{equation}\label{eq:ass1BC}
-	\inner[X]{\bm{a}}{\mathcal{J}_{\text{d}, 1}\, \bm{b}} +\inner[X]{\mathcal{J}_{\text{d}, 2}\, \bm{a}}{\bm{b}} = \inner[L^2(\partial \Omega, \mathbb{R}^m)]{C_\partial \bm{a}}{B_\partial  \bm{b}},
+	\mathcal{B}_\partial = \begin{bmatrix}
+	0 & \mathcal{N}_{\partial, 2} \\
+	\end{bmatrix}, \quad 
+	\mathcal{C}_\partial = \begin{bmatrix}
+	\mathcal{N}_{\partial, 1} & 0 \\
+	\end{bmatrix}
 	\end{equation}
 	or 
 	\begin{equation}\label{eq:ass2BC}
-	\inner[X]{\bm{a}}{\mathcal{J}_{\text{d}, 2}\, \bm{b}} +\inner[X]{\mathcal{J}_{\text{d}, 1}\, \bm{a}}{\bm{b}} = \inner[L^2(\partial \Omega, \mathbb{R}^m)]{C_\partial \bm{a}}{B_\partial \bm{b}}.
+	\mathcal{B}_\partial = \begin{bmatrix}
+	\mathcal{N}_{\partial, 1} & 0 \\
+	\end{bmatrix}, \quad \mathcal{C}_\partial = \begin{bmatrix}
+	0 & \mathcal{N}_{\partial, 2} \\
+	\end{bmatrix}
 	\end{equation}
-	
-	These are  equivalent to
-	\begin{align}
-	&\text{Condition } \eqref{eq:ass1BC} \implies \quad
-	\inner[X_2]{\mathcal{L}\, \bm{a}_1}{\bm{b}_2} - \inner[X_1]{\bm{a}_1}{\mathcal{L}^* \, \bm{b}_2} = \inner[L^2(\partial \Omega, \mathbb{R}^m)]{C_{\partial, 1} \bm{a}_1}{B_{\partial, 2}  \bm{b}_2}, \\
-	&\text{Condition } \eqref{eq:ass2BC} \implies \quad
-	\inner[X_2]{\bm{a}_2}{\mathcal{L}\,\bm{b}_1} - \inner[X_1]{\mathcal{L}^* \, \bm{a}_2}{\bm{b}_1} = \inner[L^2(\partial \Omega, \mathbb{R}^m)]{C_{\partial, 2} \bm{a}_2}{B_{\partial, 1} \bm{b}_1}.
-	\end{align}
-	Than means that the boundary operators are parametrized as 
-	\begin{align}
-	\text{Condition } \eqref{eq:ass1BC} \implies \quad B_\partial = \begin{bmatrix}
-	B_{\partial, 1} & 0 \\
-	\end{bmatrix}, \quad C_\partial = \begin{bmatrix}
-	0 & C_{\partial, 2} \\
-	\end{bmatrix}, \\
-	\text{Condition } \eqref{eq:ass2BC} \implies \quad B_\partial = \begin{bmatrix}
-	0 & B_{\partial, 2} \\
-	\end{bmatrix}, \quad C_\partial = \begin{bmatrix}
-	C_{\partial, 1} & 0 \\
-	\end{bmatrix},
-	\end{align}
+	where the operators $\mathcal{N}_{\partial, 1}, \; \mathcal{N}_{\partial, 2}$ are defined by the integration by part formula \eqref{eq:intbypartsJ}. 
+
 \end{assumption}
-
-The Hamiltonian functional is allowed to non linear in the energy variables. 
-
+We are now in a position to illustrate the methodology. 
 \paragraph{Step 1} Consider the weak form of system \eqref{eq:phsys2}
 \begin{equation}
 \inner[X]{\bm{v}}{\partial_t \bm{\alpha}} = \inner[X]{\bm{v}}{\mathcal{J} \bm{e}}.
 \end{equation}
 The weak form is obtained by taking the $L^2$ inner product introducing an appropriate test function $\bm{v} \in X$ and integrating over the domain $\Omega$. From equations \eqref{eq:assJ}, \eqref{eq:assJd}, one gets 
 \begin{equation}
-\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} = \inner[X]{\bm{v}}{(\mathcal{J}_a + \mathcal{J}_{d, 1} + \mathcal{J}_{d, 2}) \bm{e}}.
+\begin{aligned}
+\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} &= \inner[X]{\bm{v}}{\mathcal{J} \bm{e}}, \\
+\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} &= \inner[X]{\bm{v}}{\mathcal{J}_a\bm{e}} + \inner[X]{\bm{v}}{\mathcal{J}_{d, 1}\bm{e}} + \inner[X]{\bm{v}}{\mathcal{J}_{d, 2} \bm{e}}, &\text{Assumption \ref{ass:linJ}} \\
+\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} &=  \inner[X]{\bm{v}}{\mathcal{J}_a\bm{e}} +  \inner[X_1]{\bm{v}_1}{-\mathcal{L}^*\bm{e}_2} + \inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1} , \\
+\end{aligned}
 \end{equation}
-\paragraph{Step 1} Next the integration by part has to be carried out
+\paragraph{Step 2} Next the integration by part has to be carried out. The choice is dictated by the boundary control to be imposed on the system.
 \subsection{Linear case}
 
 \subsection{Examples}

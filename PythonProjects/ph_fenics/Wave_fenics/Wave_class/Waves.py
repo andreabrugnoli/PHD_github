@@ -1408,7 +1408,7 @@ class Wave_2D:
         
         Sys = Mfacto.solve_sparse(JR)
         
-        Sys_ext = JR - B_D_sparse @ BMBfacto.solve_sparse(B_D_sparse.T) @ JR
+        Sys_ext = JR - B_D_sparse @ BMBfacto.solve_sparse(B_D_sparse.T) @ Sys
         Sys_ext = Mfacto.solve_sparse(Sys_ext)
         
         Sys_N = B_N_sparse - B_D_sparse @ \

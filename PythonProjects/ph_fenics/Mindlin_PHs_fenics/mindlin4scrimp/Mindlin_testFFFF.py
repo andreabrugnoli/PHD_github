@@ -1,5 +1,5 @@
 
-from Mindlin_class_Correct import Mindlin
+from Mindlin_class_Wrong import Mindlin
 import numpy as np
 from scipy.sparse import csc_matrix, block_diag
 from math import *

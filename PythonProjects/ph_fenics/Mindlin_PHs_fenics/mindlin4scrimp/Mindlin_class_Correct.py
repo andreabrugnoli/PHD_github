@@ -800,19 +800,8 @@ class Mindlin:
         
         self.Assembly()
         
-        def Get_Associated_DOFs(SubDomain, Space):
-            dim_space = Space.num_sub_spaces()
-            if dim_space == 0:
-                BC = DirichletBC(Space, '0', SubDomain)
-            else:
-                BC = DirichletBC(Space, ('0',)*dim_space, SubDomain)
-            bndr_dofs = []
-            for key in BC.get_boundary_values().keys() :
-                bndr_dofs.append(key)
-            bndr_dofs = sorted(list(set(bndr_dofs)))
-            return bndr_dofs
-
         x0, xL, y0, yL = self.x0, self.xL, self.y0, self.yL
+        
         class Left(SubDomain):
             def inside(self, x, on_boundary):
                 return abs(x[0] - x0) < DOLFIN_EPS and on_boundary
@@ -828,10 +817,6 @@ class Mindlin:
         class Upper(SubDomain):
             def inside(self, x, on_boundary):
                 return abs(x[1] - yL) < DOLFIN_EPS and on_boundary
-        
-        class AllBoundary(SubDomain):
-            def inside(self, x, on_boundary):
-                return on_boundary
         
         # Boundary conditions on displacement
         left = Left()
@@ -889,7 +874,7 @@ class Mindlin:
         Mb1_D = csr_matrix(Mb1_D_pet.mat().getValuesCSR()[::-1])        
         rows_Mb1_D, cols_Mb1_D = csr_matrix.nonzero(Mb1_D)
         self.D_index = np.array(list(set(cols_Mb1_D)))   
-        self.Nb_D = len( self.D_index)
+        self.Nb_D = len(self.D_index)
 
         Mb1_D = Mb1_D[:, self.D_index][self.D_index, :]
         
@@ -1160,7 +1145,6 @@ class Mindlin:
         exp_A0 = Expression(tuple_A0, degree=2, **self.init_data)
         
         self.A0 = interpolate(exp_A0, self.V).vector()[:]
-           
             
         if self.project_boundary_control == 1 : print('Project BC: OK')
         print('Project init data: OK')

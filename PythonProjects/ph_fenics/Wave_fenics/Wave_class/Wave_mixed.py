@@ -104,7 +104,7 @@ ampl, sX, sY, X0, Y0  = 10, Wtest.xL/6, Wtest.yL/6, Wtest.xL/2, Wtest.yL/2
 #gau_W_0 = 'ampl * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
 gau_Aq_0_1 = '0'
 gau_Aq_0_2 = '0'
-gau_Ap_0 = 'pow(x[0], 3)'
+gau_Ap_0 = 'pow(x[0], 1)'
 gau_W_0 = '0'
 Wtest.Set_Initial_Data(Aq_0_1=gau_Aq_0_1, Aq_0_2=gau_Aq_0_2, Ap_0=gau_Ap_0, W_0=gau_W_0,\
                        ampl=ampl, sX=sX, sY=sY, X0=X0, Y0=Y0, rho=Wtest.rho)   
@@ -152,7 +152,7 @@ w = Wtest.Get_Deflection(A)
 ### Simulation time
 
 ### Animations
-anime = False
+anime = True
 step = 50
 if anime :
     Wtest.Set_Video_Writer()

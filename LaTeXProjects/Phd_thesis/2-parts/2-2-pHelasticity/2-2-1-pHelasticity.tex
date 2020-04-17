@@ -667,7 +667,7 @@ The boundary values are then found by evaluating the energy rate
 \caption{A 2D continuum with Neumann and Dirichlet boundary conditions}
 \label{fig:bc_elas2D}
 \end{figure}
-The imposition of the velocity field along the boundary $\bm{e}_v = \partial_t \bm{u}$ corresponds to a Dirichlet condition. Setting $\bm{E}_\varepsilon \, \bm{n} = \bm{\Sigma} \,  \bm{n}$ (the traction) corresponds to a Neumann condition. Consider a partition of the boundary $\partial\Omega = \Gamma_N \cup \Gamma_D$ and $\Gamma_N \cap \Gamma_D =  \{\emptyset\}$, where a Dirichlet and a Neumann condition applies on the subset $\Gamma_D$ and $\Gamma_N$ respectively (see Fig. \ref{fig:bc_elas2D}). Then the final pH formulation reads
+The imposition of the velocity field along the boundary $\bm{e}_v = \partial_t \bm{u}$ corresponds to a Dirichlet condition. Setting $\bm{E}_\varepsilon \, \bm{n} = \bm{\Sigma} \,  \bm{n}$ (the traction) corresponds to a Neumann condition. Consider a partition of the boundary $\partial\Omega = \overline{\Gamma}_N \cup \overline{\Gamma}_D$ and $\Gamma_N \cap \Gamma_D =  \{\emptyset\}$, where a Dirichlet and a Neumann condition applies on the open subset $\Gamma_D$ and $\Gamma_N$ respectively (see Fig. \ref{fig:bc_elas2D}). Then the final pH formulation reads
 
 \begin{equation}\label{eq:phsysElas}
 \begin{aligned}
@@ -706,7 +706,7 @@ The imposition of the velocity field along the boundary $\bm{e}_v = \partial_t \
 \end{equation}
 where $\bm\gamma_{0}^{\Gamma_*}$ denotes the trace over the set $\Gamma_*$, namely $\bm\gamma_{0}^{\Gamma_*}\bm{e}_v = \bm{e}_v\vert_{\Gamma_*}$. Furthermore, $\bm\gamma_{n}^{\Gamma_*}$ denotes the normal trace over the set $\Gamma_*$, namely $\bm\gamma_{n}^{\Gamma_*}\bm{E}_\varepsilon = \bm{E}_\varepsilon \bm{n}\vert_{\Gamma_*}$.
 
-\begin{theorem}[Stokes-Dirac structure for elastodynamics] \label{th:stdirElas}
+\begin{conjecture}[Stokes-Dirac structure for elastodynamics] \label{conj:stdirElas}
 Let $H^{\Grad}(\Omega, \mathbb{V})$ the space of vectors with symmetric gradient in $L^2(\Omega, \mathbb{S})$ and $H^{\Div}  (\Omega, \mathbb{S})$ denote the space of symmetric tensors with divergence in $L^2(\Omega, \mathbb{V})$. Consider the following definitions
 \begin{align*}
 H &:= H^{\Grad}(\Omega, \mathbb{V}) \times H^{\Div}(\Omega, \mathbb{S}), \\
@@ -731,8 +731,13 @@ where
 \begin{equation*}
 \inner[F_\partial]{(\bm{a}, \, \bm{b})}{(\bm{c}, \, \bm{d})} = \int_{\Gamma_D} \bm{a} \cdot \bm{c} \d{S} + \int_{\Gamma_N} \bm{b} \cdot \bm{d} \d{S}, \quad \bm{a},\ \bm{b},\ \bm{c},\ \bm{d} \in \mathbb{V}. 
 \end{equation*}
-\begin{proof}
-A Stokes-Dirac is characterized by the fact that ${D}_{\mathcal{J}} = {D}_{\mathcal{J}}^\perp$. Then one has to show that ${D}_{\mathcal{J}} \subset {D}_{\mathcal{J}}^\perp$ and ${D}_{\mathcal{J}}^\perp \subset {D}_{\mathcal{J}}$. The proof is found by employing the integration by parts formula  already used in \eqref{eq:enrateElas}. The main steps of Theorem 3.6 in \cite{legorrec2005} are followed here. \\
+
+\begin{paragraph}{Crucial points to obtain a rigorous proof}
+	The crucial point that needs to be elucidated is where the boundary variables live. These variables belong to the fractional Sobolev spaces $H^{\frac{1}{2}}(\partial\Omega, \mathbb{V}), \, H^{-\frac{1}{2}}(\partial\Omega, \mathbb{V})$ linked by duality with respect to the pivot space $L^2(\partial\Omega, \mathbb{V})$. This is why a $L^2$ inner product has been assumed as boundary inner product. \\
+	Furthermore, the partition of the boundary due to the non uniform boundary control complicates the proof, since one has to properly connect the two partitions at the interconnection points.
+\end{paragraph}
+\begin{paragraph}{Elements to support the conjecture}
+A Stokes-Dirac is characterized by the fact that ${D}_{\mathcal{J}} = {D}_{\mathcal{J}}^\perp$. Then one has to show that ${D}_{\mathcal{J}} \subset {D}_{\mathcal{J}}^\perp$ and ${D}_{\mathcal{J}}^\perp \subset {D}_{\mathcal{J}}$. The main steps of Theorem 3.6 in \cite{legorrec2005} are followed here to support the substantiation of the conjecture. The integration by parts formula is applied as in \eqref{eq:enrateElas}. \\
 
 \textit{Step 1}. To show that ${D}_{\mathcal{J}} \subset {D}_{\mathcal{J}}^\perp$, take $(\bm{f}, \, \bm{f}_\partial, \, \bm{e}, \, \bm{e}_\partial) \in {D}_{\mathcal{J}}$. Then
 \begin{align*}
@@ -758,7 +763,7 @@ It follows that $\bm{\epsilon} \in H$ and $\bm{\phi}=-\mathcal{J}\bm{\epsilon}$.
 0 &=-\inner[F]{\bm{e}}{\mathcal{J}\bm{\epsilon}} - \inner[F]{\mathcal{J}\bm{e}}{\bm{\epsilon}}+ \inner[F_\partial]{\bm{e}_{\partial}}{\bm{\phi}_{\partial}} +  \inner[F_\partial]{\bm{\epsilon}_{\partial}}{\bm{f}_{\partial}}, \\
 &=-\int_{\partial\Omega} \left\{\bm{e}_v \cdot (\bm{\mathcal{E}}_\varepsilon \, \bm{n}) + \bm{\epsilon}_v \cdot (\bm{{E}}_\varepsilon \, \bm{n})\right\}  \d{S} + \inner[F_\partial]{\bm{e}_{\partial}}{\bm{\phi}_{\partial}} +  \inner[F_\partial]{\bm{\epsilon}_{\partial}}{\bm{f}_{\partial}}
 \end{align*}
-Consider the splitting of the boundary $\partial\Omega = \Gamma_N \cup \Gamma_D$
+Consider the splitting of the boundary $\partial\Omega = \overline{\Gamma}_N \cup \overline{\Gamma}_D$
 \begin{align*}
 	\int_{\partial\Omega} \left\{\bm{e}_v \cdot (\bm{\mathcal{E}}_\varepsilon \cdot \bm{n}) + \bm{\epsilon}_v \cdot (\bm{{E}}_\varepsilon \cdot \bm{n})\right\}  \d{S} 
 	=& +\int_{\Gamma_N} \left\{\bm{e}_{\partial, 2} \cdot (\bm{\mathcal{E}}_\varepsilon \cdot \bm{n}) + \bm{\epsilon}_v \cdot \bm{f}_{\partial, 2}\right\}  \d{S}, \\
@@ -783,9 +788,10 @@ where the elements of the vectors $\bm{f}_{\partial} = (\bm{f}_{\partial, 1}, \b
 \bm{\mathcal{E}}_\varepsilon
 \end{pmatrix},
 \end{equation*}
-meaning that ${D}_{\mathcal{J}}^\perp \subset {D}_{\mathcal{J}}$. This concludes the proof. 
-\end{proof}
-\end{theorem}
+meaning that ${D}_{\mathcal{J}}^\perp \subset {D}_{\mathcal{J}}$. 
+\end{paragraph}
+
+\end{conjecture}
 Linear elasticity falls within the assumption of \cite{skrepek2019wellposedness}. Therefore, it is a well posed boundary control pH system. A question that naturally arises is how to reformulate this system using the language of differential geometry. This is possible through the usage of vector-valued differential forms. The interested reader may consult \cite{brezzi2008mixed}.
 
 \section{Conclusion}
