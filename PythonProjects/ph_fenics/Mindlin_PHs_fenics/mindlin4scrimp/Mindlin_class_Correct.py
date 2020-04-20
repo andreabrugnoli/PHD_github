@@ -120,7 +120,7 @@ class Mindlin:
     #  @param E : The Young modulus
     #  @param nu : The Poisson ratio
     #  @param k : The shear correction factor
-    def Set_Physical_Parameters(self, rho, h, E, nu, k, init_by_value=False, **kwargs):
+    def Set_Physical_Parameters(self, rho=2600, h=0.1, E=7*10**10, nu=0.3, k=5/6, init_by_value=True, **kwargs):
         """
         Set the physical parameters as a FeniCS expression related to the PDE
         """

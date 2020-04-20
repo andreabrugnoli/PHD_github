@@ -55,26 +55,24 @@ Once the system has been put into weak form, a subset of the equations is integr
 Despite the many advantages, this methodology allows obtaining a canonical pH finite dimensional system only under a uniform causality assumption. The case of mixed boundary conditions requires additional care and will be treated in the subsequent Section \secref{sec:mixedbc}.
 
 \subsection{General procedure}
-Given an open connected set $\Omega \in \mathbb{R}^d, d= \{1,2,3\}$, consider a generic pH system defined on~$\Omega$
-\begin{equation}\label{eq:phsys2}
-\begin{aligned}[t]
-\partial_t {\bm{\alpha}} &= \mathcal{J}\displaystyle \bm{e}, \vspace{3pt}\\
-\bm{u}_\partial &= \mathcal{B}_\partial  \displaystyle \bm{e}, \vspace{3pt}\\
-\bm{y}_\partial &= \mathcal{C}_\partial \displaystyle \bm{e}, \vspace{3pt}\\
-\bm{e} &:= \displaystyle \delta_{\bm{\alpha}}H.
-\end{aligned} \qquad
-\begin{aligned}[t]
-&\bm{\alpha} \in X, \\
-&\bm{u}_\partial \in \mathbb{R}^m, \\
-&\bm{y}_\partial \in \mathbb{R}^m,
-\end{aligned}
-\end{equation}
-The Hilbert space $X$, whose inner product is denoted by $\inner[X]{\cdot}{\cdot}$, is an appropriate Cartesian product of $L^2$ spaces which account for the nature of each variable (that can be scalar, vectorial or tensorial quantities). The Hamiltonian functional is allowed to non linear in the energy variables. \\
+Given an open connected set $\Omega \in \mathbb{R}^d,\, d= \{1,2,3\}$, consider a generic pH system defined on~$\Omega$
+\begin{align}
+\partial_t {\bm{\alpha}} &= \mathcal{J}\displaystyle \bm{e}, \qquad \;\;\, \bm{\alpha} \in X, \label{eq:pHsys_dyn} \vspace{3pt}\\
+\bm{u}_\partial &= \mathcal{B}_\partial  \displaystyle \bm{e}, \qquad \bm{u}_\partial \in \mathbb{R}^m \label{eq:pHsys_u} \vspace{3pt}\\
+\bm{y}_\partial &= \mathcal{C}_\partial \displaystyle \bm{e}, \qquad \; \bm{y}_\partial \in \mathbb{R}^m \label{eq:pHsys_y} \vspace{3pt}\\
+\bm{e} :&= \displaystyle \delta_{\bm{\alpha}}H, \qquad \;\; \bm{e} \in \Dom(\mathcal{J}). \label{eq:pHsys_const}
+\end{align}
+The Hilbert space $X$, whose inner product is denoted by $\inner[X]{\cdot}{\cdot}$, is an appropriate Cartesian product of $L^2$ spaces which account for the nature of each variable (that can be scalar, vectorial or tensorial quantities). The Hamiltonian functional of Eq. \eqref{eq:pHsys_const} is allowed to be non linear in the energy variables
+\begin{equation*}
+H = \int_\Omega \mathcal{H}(\bm{\alpha}) \d\Omega,
+\end{equation*}
+where $\mathcal{H}(\bm{\alpha}): X \rightarrow \mathbb{R}$ is a non linear function.
+ \\
 
 To applied this methodology the non linearities are restricted to the Hamiltonian and a uniform causality condition is supposed to characterize the system. These hypotheses are resumed in the following assumptions
 
 \begin{assumption}\label{ass:linJ}
-	Consider system \eqref{eq:phsys2}. It is assumed that the Hilbert space $X$ admits the splitting $X = X_1 \times X_2$ (meaning that the system does not consist of a single scalar equation). The operator $\mathcal{J}$ is assumed to be skew-symmetric (or formally skew-adjoint) on $X$ and linear:
+	Consider system \eqref{eq:pHsys_dyn}. It is assumed that the Hilbert space $X$ admits the splitting $X = X_1 \times X_2$ (meaning that the system does not consist of a single scalar equation). The operator $\mathcal{J}$ is assumed to be skew-symmetric (or formally skew-adjoint) on $X$ and linear:
 	\begin{equation}\label{eq:assJ}
 	\mathcal{J} = \mathcal{J}_{\text{a}} + \mathcal{J}_{\text{d}},
 	\end{equation}
@@ -104,19 +102,27 @@ To applied this methodology the non linearities are restricted to the Hamiltonia
 	The operator $\mathcal{L}$ can be either a first order or a second order differential operator. In the latter case it can be expressed as $\mathcal{L} = \mathcal{L}_1 \circ \mathcal{L}_2$. By definition $\mathcal{J}_{\text{d}, 1} = - \mathcal{J}_{\text{d}, 2}^*$.
 \end{assumption}
 
-From Theorem \ref{th:rogers}, given $(\bm{v}, \, \bm{u}) \in X_1 \times X_2 = X$, it holds
+From Theorem \ref{th:rogers}, given $(\bm{u}_1, \, \bm{u}_2) \in \Dom(\mathcal{L}) \times \Dom(\mathcal{L}^*) \subset X_1 \times X_2 = X$, it holds
 \begin{equation}
-{\bm{u}} \cdot {(\mathcal{L}\, \bm{v})}  - {(\mathcal{L}^* \, \bm{u})} \cdot {\bm{v}} = \div \widetilde{\mathcal{A}}_{\mathcal{L}}(\bm{v}, \bm{u}), \\
+{\bm{u}_2} \cdot {(\mathcal{L}\, \bm{u}_1)}  - {(\mathcal{L}^* \, \bm{u}_2)} \cdot {\bm{u}_1} = \div \widetilde{\mathcal{A}}_{\mathcal{L}}(\bm{u}_1, \bm{u}_2). \\
 \end{equation}
 The integration by part formula provides 
 \begin{equation}
- \inner[X_2]{\bm{u}}{\mathcal{L}\,\bm{v}} - \inner[X_1]{\mathcal{L}^* \, \bm{u}}{\bm{v}} = \inner[L^2(\partial \Omega, \mathbb{R}^m)]{\mathcal{N}_{\partial, 2} \bm{u}}{\mathcal{N}_{\partial, 1} \bm{v}}. \label{eq:intbypartsJ} 
+ \inner[X_2]{\bm{u}_2}{\mathcal{L}\,\bm{u}_1} - \inner[X_1]{\mathcal{L}^* \, \bm{u}_2}{\bm{u}_1} = \inner[X_\partial]{\mathcal{N}_{\partial, 1} \bm{u}_1}{\mathcal{N}_{\partial, 2} \bm{u}_2}. \label{eq:intbypartsJ} 
 \end{equation}
-The boundary operators are then supposed to fulfill the following assumption, that guarantees a uniform causality condition.
+where $X_\partial = L^2(\partial \Omega, \mathbb{R}^m)$. The boundary operators are then supposed to fulfill the following assumption, that guarantees a uniform causality condition.
 
 \begin{assumption}\label{ass:operBC}
-	 The boundary operators $\mathcal{B}_\partial, \, \mathcal{C}_\partial$ are assumed to verify, in an exclusive manner, either
-	\begin{equation}\label{eq:ass1BC}
+	 The boundary operators $\mathcal{B}_\partial, \, \mathcal{C}_\partial$ of Eqs. \eqref{eq:pHsys_u}, \eqref{eq:pHsys_y}, are assumed to verify, in an exclusive manner, either
+	 \begin{equation}\label{eq:assB1C2}
+	 \mathcal{B}_\partial = \begin{bmatrix}
+	 \mathcal{N}_{\partial, 1} & 0 \\
+	 \end{bmatrix}, \quad \mathcal{C}_\partial = \begin{bmatrix}
+	 0 & \mathcal{N}_{\partial, 2} \\
+	 \end{bmatrix}
+	 \end{equation}
+	or 
+	\begin{equation}\label{eq:assB2C1}
 	\mathcal{B}_\partial = \begin{bmatrix}
 	0 & \mathcal{N}_{\partial, 2} \\
 	\end{bmatrix}, \quad 
@@ -124,31 +130,151 @@ The boundary operators are then supposed to fulfill the following assumption, th
 	\mathcal{N}_{\partial, 1} & 0 \\
 	\end{bmatrix}
 	\end{equation}
-	or 
-	\begin{equation}\label{eq:ass2BC}
-	\mathcal{B}_\partial = \begin{bmatrix}
-	\mathcal{N}_{\partial, 1} & 0 \\
-	\end{bmatrix}, \quad \mathcal{C}_\partial = \begin{bmatrix}
-	0 & \mathcal{N}_{\partial, 2} \\
-	\end{bmatrix}
-	\end{equation}
 	where the operators $\mathcal{N}_{\partial, 1}, \; \mathcal{N}_{\partial, 2}$ are defined by the integration by part formula \eqref{eq:intbypartsJ}. 
 
 \end{assumption}
 We are now in a position to illustrate the methodology. 
-\paragraph{Step 1} Consider the weak form of system \eqref{eq:phsys2}
+\paragraph{Step 1} First consider the weak form of system \eqref{eq:pHsys_dyn}
 \begin{equation}
 \inner[X]{\bm{v}}{\partial_t \bm{\alpha}} = \inner[X]{\bm{v}}{\mathcal{J} \bm{e}}.
 \end{equation}
-The weak form is obtained by taking the $L^2$ inner product introducing an appropriate test function $\bm{v} \in X$ and integrating over the domain $\Omega$. From equations \eqref{eq:assJ}, \eqref{eq:assJd}, one gets 
+The weak form is obtained by taking the $L^2$ inner product introducing an appropriate test function $\bm{v} \in X$ and integrating over the domain $\Omega$. Introducing Assumption \ref{ass:linJ}, one obtains
+
+\begin{align}
+\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} &= \inner[X]{\bm{v}}{\mathcal{J} \bm{e}}, &\text{Eq. \eqref{eq:assJ}}\\
+\bm{\inner[X]{\bm{v}}{\partial_t \bm{\alpha}}} &= \inner[X]{\bm{v}}{\mathcal{J}_a\bm{e}} + \inner[X]{\bm{v}}{\mathcal{J}_{d, 1}\bm{e}} + \inner[X]{\bm{v}}{\mathcal{J}_{d, 2} \bm{e}}, &\text{Eq. \eqref{eq:assJd}} \\
+\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} &=  \inner[X]{\bm{v}}{\mathcal{J}_a\bm{e}} -  \inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2} + \inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1}. \label{eq:weak_dyn}
+\end{align}
+
+To obtain a closed system, the constitutive law \eqref{eq:pHsys_const} and the output variables are put in weak form
+\begin{align}
+\inner[X]{\bm{v}}{\delta_{\bm{\alpha}} H} &= \inner[X]{\bm{v}}{\bm{e}}, \\
+\inner[X_\partial]{\bm{v}_\partial}{\bm{y}_\partial} &= \inner[X_\partial]{\bm{v}_\partial}{\mathcal{C}_\partial \bm{e}},
+\end{align}
+where the test function $\bm{v}_\partial \in X_\partial = L^2(\partial \Omega, \mathbb{R}^m)$ is defined on the boundary $\partial\Omega$.
+
+\paragraph{Step 2} Next the integration by part has to be carried out. The choice is dictated by the boundary control to be imposed on the system. Consider again Eq. \eqref{eq:weak_dyn}. The integration by parts can be carried out either on term $-\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2}$, or on term $\inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1}$. Depending o which line undergoes the integration by parts (this explains the name Partitioned Finite Element method), two structure preserving weak forms are obtained. These differ by the boundary causality imposed to the system. 
+
+\subparagraph{Integration by parts of the term $-\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2}$}
+ In this case case, using Eq. \eqref{eq:intbypartsJ}, it is obtained 
 \begin{equation}
+	-\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2} = -\inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[X_\partial]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\mathcal{N}_{\partial, 2} \bm{e}_2}.
+\end{equation}
+Then the weak form of the system dynamics  reads 
+\begin{equation}\label{eq:weak_dyn_intJ1}
+	\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} =  \inner[X]{\bm{v}}{\mathcal{J}_a\bm{e}} -\inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1} + \inner[X_\partial]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\mathcal{N}_{\partial, 2} \bm{e}_2}. 
+\end{equation}
+The following proposition is crucial as the lossless character of the infinite-dimensional system (due to the formally skew-adjoint operator) translates into an equivalent property for the corresponding bilinear form in the weak form.
+\begin{proposition}
+Given the Hilbert space $H_\mathcal{L} = \Dom(\mathcal{L}) \times X_2$ and variables $\bm{v} = (\bm{v}_1, \bm{v}_2) \in H_\mathcal{L}, \; \bm{e} = (\bm{e}_1, \bm{e}_2) \in H_\mathcal{L}$, the bilinear form 
+\begin{equation*}
 \begin{aligned}
-\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} &= \inner[X]{\bm{v}}{\mathcal{J} \bm{e}}, \\
-\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} &= \inner[X]{\bm{v}}{\mathcal{J}_a\bm{e}} + \inner[X]{\bm{v}}{\mathcal{J}_{d, 1}\bm{e}} + \inner[X]{\bm{v}}{\mathcal{J}_{d, 2} \bm{e}}, &\text{Assumption \ref{ass:linJ}} \\
-\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} &=  \inner[X]{\bm{v}}{\mathcal{J}_a\bm{e}} +  \inner[X_1]{\bm{v}_1}{-\mathcal{L}^*\bm{e}_2} + \inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1} , \\
+j_\mathcal{L}: H_\mathcal{L} \times H_\mathcal{L} &\longrightarrow \mathbb{R}, \\
+(\bm{v}, \bm{e}) &\longrightarrow -\inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1}
+\end{aligned}
+\end{equation*}
+is skew-symmetric.
+\begin{proof}
+The proof is obtained by the following computation
+\begin{equation*}
+\begin{aligned}
+j_\mathcal{L}(\bm{v}, \bm{e}) &= -\inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1}, \\
+&= - \left( - \inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1} + \inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2}\right), \\
+&= - \left( - \inner[X_2]{\mathcal{L}\bm{e}_1}{\bm{v}_2} + \inner[X_2]{\bm{e}_2}{\mathcal{L}\bm{v}_1}\right) = - j_\mathcal{L}(\bm{e}, \bm{v}).
+\end{aligned}
+\end{equation*}
+\end{proof}
+\end{proposition}
+
+Now assume that the system satisfies the boundary causality condition \eqref{eq:assB2C1}, i.e.  
+\begin{equation*}
+	\bm{u}_\partial=\mathcal{N}_{\partial, 2} \bm{e}_2, \qquad \bm{y}_\partial=\mathcal{N}_{\partial, 1} \bm{e}_1
+\end{equation*}. 
+Then, this choice of the integration by parts lead to the following weak formulation
+\begin{equation}\label{eq:weak_sys_intJ1}
+	\begin{aligned}
+	\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} &=  \inner[X]{\bm{v}}{\mathcal{J}_a\bm{e}} -\inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1} + \inner[L^2(\partial \Omega, \mathbb{R}^m)]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\bm{u}_\partial}, \\
+	\inner[X]{\bm{v}}{\delta_{\bm{\alpha}} H} &= \inner[X]{\bm{v}}{\bm{e}}, \\
+	\inner[X_\partial]{\bm{v}_\partial}{\bm{y}_\partial} &= \inner[X_\partial]{\bm{v}_\partial}{\mathcal{N}_{\partial, 1}\bm{e}_2}.
+	\end{aligned}
+\end{equation}
+
+\subparagraph{Integration by parts of the term $\inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1}$}
+Using Eq. \eqref{eq:intbypartsJ}, it is obtained 
+\begin{equation}
+\inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1} = \inner[X_1]{\mathcal{L}^*\bm{v}_2}{\bm{e}_1} + \inner[X_\partial]{\mathcal{N}_{\partial, 2} \bm{v}_2}{\mathcal{N}_{\partial, 1} \bm{e}_1}.
+\end{equation}
+Then the weak form of the system dynamics  reads 
+\begin{equation}\label{eq:weak_dyn_intJ2}
+\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} =  \inner[X]{\bm{v}}{\mathcal{J}_a\bm{e}} -\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2} + \inner[X_1]{\mathcal{L}^*\bm{v}_2}{\bm{e}_1} + \inner[X_\partial]{\mathcal{N}_{\partial, 2} \bm{v}_2}{\mathcal{N}_{\partial, 1} \bm{e}_1}. 
+\end{equation}
+Again the bilinear form arising from the formally skew-adjoint operator is skew-symmetric.
+\begin{proposition}
+	Given the Hilbert space $H_{-\mathcal{L}^*} = X_1 \times \Dom(-\mathcal{L}^*)$ and variables $\bm{v} = (\bm{v}_1, \bm{v}_2) \in H_{-\mathcal{L}^*}, \; \bm{e} = (\bm{e}_1, \bm{e}_2) \in H_{-\mathcal{L}^*}$, the bilinear form 
+	\begin{equation*}
+	\begin{aligned}
+	j_{-\mathcal{L}^*}: H_{-\mathcal{L}^*} \times H_{-\mathcal{L}^*} &\longrightarrow \mathbb{R}, \\
+	(\bm{v}, \bm{e}) &\longrightarrow -\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2} + \inner[X_1]{\mathcal{L}^*\bm{v}_2}{\bm{e}_1}
+	\end{aligned}
+	\end{equation*}
+	is skew-symmetric.
+	\begin{proof}
+		The proof follows from the computation
+		\begin{equation*}
+		\begin{aligned}
+		j_{-\mathcal{L}^*}(\bm{v}, \bm{e}) &= -\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2} + \inner[X_1]{\mathcal{L}^*\bm{v}_2}{\bm{e}_1}, \\
+		&= - \left(-\inner[X_1]{\mathcal{L}^*\bm{v}_2}{\bm{e}_1} + \inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2}\right), \\
+		&= - \left(-\inner[X_1]{\bm{e}_1}{\mathcal{L}^*\bm{v}_2} + \inner[X_1]{\mathcal{L}^*\bm{e}_2}{\bm{v}_1}\right) = - j_{-\mathcal{L}^*}(\bm{e}, \bm{v}).
+		\end{aligned}
+		\end{equation*}
+	\end{proof}
+\end{proposition}
+
+Now assume that the system satisfies the boundary causality condition \eqref{eq:assB1C2}, i.e.  
+\begin{equation*}
+\bm{u}_\partial=\mathcal{N}_{\partial, 1} \bm{e}_1, \qquad \bm{y}_\partial=\mathcal{N}_{\partial, 2} \bm{e}_2
+\end{equation*}. 
+Then, the final weak formulation reads
+\begin{equation}\label{eq:weak_sys_intJ2}
+\begin{aligned}
+\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} &=  \inner[X]{\bm{v}}{\mathcal{J}_a\bm{e}} -\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2} + \inner[X_1]{\mathcal{L}^*\bm{v}_2}{\bm{e}_1} + \inner[X_\partial]{\mathcal{N}_{\partial, 2} \bm{v}_2}{\bm{u}_{\partial}}, \\
+\inner[X]{\bm{v}}{\delta_{\bm{\alpha}} H} &= \inner[X]{\bm{v}}{\bm{e}}, \\
+\inner[X_\partial]{\bm{v}_\partial}{\bm{y}_\partial} &= \inner[X_\partial]{\bm{v}_\partial}{\mathcal{N}_{\partial, 2}\bm{e}_2}.
 \end{aligned}
 \end{equation}
-\paragraph{Step 2} Next the integration by part has to be carried out. The choice is dictated by the boundary control to be imposed on the system.
+
+\paragraph{Galerkin discretization}
+To conclude the illustration of this methodology, consider a Galerkin discretization is introduced. This means that corresponding test and trial functions are discretized using the same basis
+\begin{equation}\label{eq:approx_ve}
+\begin{aligned}
+\bm{v}_1 \approx \sum_{i=1}^{n_1} \bm{\phi}_1^i v_1^i, \\
+\bm{v}_2 \approx \sum_{i=1}^{n_2} \bm{\phi}_2^i v_2^i, 
+\end{aligned} \qquad 
+\begin{aligned}
+\bm{\alpha}_1 \approx \sum_{i=1}^{n_1} \bm{\phi}_1^i \alpha_1^i, \\
+\bm{\alpha}_2 \approx \sum_{i=1}^{n_2} \bm{\phi}_2^i \alpha_2^i. 
+\end{aligned} \qquad 
+\begin{aligned}
+\bm{e}_1 \approx \sum_{i=1}^{n_1} \bm{\phi}_1^i e_1^i, \\
+\bm{e}_2 \approx \sum_{i=1}^{n_2} \bm{\phi}_2^i e_2^i. 
+\end{aligned}
+\end{equation}
+A finite dimensional approximation is introduced for the boundary variables as well
+\begin{equation}\label{eq:approx_boundar}
+\bm{v}_\partial \approx \sum_{i=1}^{n_\partial} \bm{\phi}_\partial^i v_\partial^i, \qquad
+\bm{u}_\partial \approx \sum_{i=1}^{n_\partial} \bm{\phi}_\partial^i u_\partial^i, \qquad
+\bm{y}_\partial \approx \sum_{i=1}^{n_\partial} \bm{\phi}_\partial^i y_\partial^i.
+\end{equation}
+Plugging the approximation into the weak form \eqref{eq:weak_sys_intJ1} and consider that the resulting equation holds $\forall \, v_1^i,\, v_2^j,\, v_\partial^k \; (i\in\left\{1,n_1\right\}, \; j\in\left\{1,n_2\right\}, \; k\in\left\{1,n_\partial\right\})$, the finite dimensional system is obtained
+
+\begin{equation}
+\begin{aligned}
+\mathbf{M}\dot{\bm{\alpha}}_d &= \mathbf{J}^{\mathcal{L}} \mathbf{e} + \mathbf{B}^{\mathcal{L}}_\partial \mathbf{u}_\partial, \\
+\inner[X]{\bm{v}}{\delta_{\bm{\alpha}} H} &= \inner[X]{\bm{v}}{\bm{e}}, \\
+\inner[X_\partial]{\bm{v}_\partial}{\bm{y}_\partial} &= \inner[X_\partial]{\bm{v}_\partial}{\mathcal{N}_{\partial, 1}\bm{e}_2}.
+\end{aligned}
+\end{equation}
+
 \subsection{Linear case}
 
 \subsection{Examples}
