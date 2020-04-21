@@ -211,9 +211,10 @@ An important relation between a differential operator and its adjoint is express
 	\bm{v}^\top \mathcal{L} \bm{u} - \bm{u}^\top \mathcal{L}^* \bm{v} = \mathrm{div} \, \widetilde{\mathcal{A}}_{\mathcal{L}}(\bm{u}, \bm{v}).
 	\end{equation}
 \end{theorem}
-It is important to note that $\widetilde{\mathcal{A}}_{\mathcal{L}}$ is a constant differential operator. The quantity $\widetilde{\mathcal{A}}_{\mathcal{L}}(\bm{u}, \bm{v})$ is a constant linear combination of the functions $\bm{u}$ and $\bm{v}$ together with their spatial derivatives up to a certain order and depending on $\mathcal{L}$.
-\begin{corollary}
-	Consider a skew-symmetric differential operator $\mathcal{J}$. Then, for each function $\bm{u}, \, \bm{v} \in W$:
+It is important to note that $\widetilde{\mathcal{A}}_{\mathcal{L}}$ is a constant differential operator. The quantity $\widetilde{\mathcal{A}}_{\mathcal{L}}(\bm{u}, \bm{v})$ is a constant linear combination of the functions $\bm{u}$ and $\bm{v}$ together with their spatial derivatives up to a certain order and depending on $\mathcal{L}$. 
+
+\begin{corollary} 
+		Consider a skew-symmetric differential operator $\mathcal{J}$. Then, for each function $\bm{u}, \, \bm{v} \in W$:
 	\begin{equation}
 	\int_{\Omega} \left( \bm{v}^\top \mathcal{J} \bm{u} + \bm{u}^\top \mathcal{J} \bm{v}\right) \d\Omega= \int_{\partial \Omega} \widetilde{\mathcal{A}}_{\mathcal{J}}(\bm{u}, \bm{v}) \d{S},
 	\end{equation}
@@ -244,7 +245,7 @@ From this proposition, if $(\bm{f}, \bm{e}, \bm{z}) \in  D_{\mathcal{J}}$, then 
 \end{equation}
 
 
-This  relation expresses the  power  conservation property of the Stokes–Dirac structure. It states the relation between the variation of internal energy (the integral on the domain $\Omega$) with the power flowing through the boundary (the integral over $\partial\Omega$). Thanks to the power conservation property dpHs always dispose of an associated Stokes-Dirac structure. This concept can be extended to consider dissipation or distributed forces. To this aim, it is necessary to include additional ports to account for the power exchange due to these effects (see Theorem 3.4 \cite{macchelli2004modelling}). 
+This  relation expresses the  power  conservation property of the Stokes–Dirac structure. It states the relation between the variation of internal energy (the integral on the domain~$\Omega$) with the power flowing through the boundary (the integral over~$\partial\Omega$). Thanks to the power conservation property dpHs always dispose of an associated Stokes-Dirac structure. This concept can be extended to consider dissipation or distributed forces. To this aim, it is necessary to include additional ports to account for the power exchange due to these effects (see Theorem 3.4 \cite{macchelli2004modelling}). 
 
 
 \begin{remark}
@@ -290,13 +291,12 @@ If the integrand does not contain derivative of the argument $\bm{\alpha}$ then 
 Lossless port-Hamiltonian systems possess a peculiar property: the energy rate is given by the power due to the boundary ports $\bm{u}_\partial, \bm{y}_\partial$
 \begin{equation}\label{eq:enrate}
 \begin{aligned}
-\dot{H} &= \int_{\Omega} \diffd{H}{\bm{\alpha}} \cdot \diffp{\bm{\alpha}}{t} \d{\Omega} =\inner[\Omega]{\dder{H}{\bm{\alpha}}}{\pder{\bm{\alpha}}{t}}, \qquad \text{Stokes theorem}\\
-&=\int_{\partial \Omega} \bm{u}_\partial \cdot \bm{y}_\partial \d{S} =\inner[\partial \Omega]{\bm{u}_\partial}{\bm{y}_\partial}.
+\dot{H} &= \int_{\Omega} \diffd{H}{\bm{\alpha}} \cdot \diffp{\bm{\alpha}}{t} \d{\Omega} \stackrel{\text{Stokes theorem}}{=} \int_{\partial \Omega} \bm{u}_\partial \cdot \bm{y}_\partial \d{S} \
 \end{aligned}
 \end{equation} 
 From the energy rate, the structural power balance is obtained
 \begin{equation}\label{eq:strpow}
--\inner[\Omega]{\dder{H}{\bm{\alpha}}}{\pder{\bm{\alpha}}{t}} + \inner[\partial \Omega]{\bm{u}_\partial}{\bm{y}_\partial} = 0
+-\int_{\Omega} \diffd{H}{\bm{\alpha}} \cdot \diffp{\bm{\alpha}}{t} \d{\Omega} + \int_{\partial \Omega} \bm{u}_\partial \cdot \bm{y}_\partial \d{S} = 0
 \end{equation}
 
 
@@ -458,15 +458,15 @@ As energy variable the fluid height and the linear momentum are chosen
 \alpha_h = h, \qquad \bm{\alpha}_v = \rho \bm{v}.
 \end{equation*}
 The Hamiltonian is a non separable functional of the energy variables
-\begin{equation*}
+\begin{equation}\label{eq:H_shwater}
 H(\alpha_h, \bm{\alpha}_v) = \frac{1}{2} \int_\Omega \frac{1}{\rho} \alpha_h \norm{\bm{\alpha}_v}^2 + \rho g \alpha_h^2 \d\Omega.
-\end{equation*}
+\end{equation}
 The co-energy variables are given by
-\begin{equation*}
+\begin{equation}\label{eq:e_shwater}
 e_h := \diffd{H}{\alpha_h} = \frac{1}{2 \rho} \norm{\bm{\alpha}_v}^2 + \rho g \alpha_h, \qquad \bm{e}_v := \diffd{H}{\bm{\alpha}_v} = \frac{1}{\rho} \alpha_h \bm{\alpha}_v.
-\end{equation*}
+\end{equation}
 The mass and momentum conservation are then rewritten as follows
-\begin{equation*}
+\begin{equation}\label{eq:pHsys_shwater}
 \diffp{}{t}
 \begin{pmatrix}
 \alpha_h \\
@@ -480,7 +480,7 @@ The mass and momentum conservation are then rewritten as follows
 e_h \\
 \bm{e}_v \\
 \end{pmatrix},
-\end{equation*}
+\end{equation}
 The gyroscopic skew-symmetric term $\mathcal{G}$ introduces a non-linearity as it depends on the energy variables
 \begin{equation*}
 \mathcal{G}(\alpha_h, \bm{\alpha}_v) = \frac{\omega}{\alpha_h} \begin{bmatrix}
