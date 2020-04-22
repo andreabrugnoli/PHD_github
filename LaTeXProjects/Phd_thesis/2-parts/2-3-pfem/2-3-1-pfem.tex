@@ -57,13 +57,21 @@ Despite the many advantages, this methodology allows obtaining a canonical pH fi
 
 \subsection{General procedure}
 Given an open connected set $\Omega \in \mathbb{R}^d,\, d= \{1,2,3\}$, consider a generic pH system defined on~$\Omega$
+\begin{subequations}
+\label{eq:pHsys_2}
 \begin{align}
 \partial_t {\bm{\alpha}} &= \mathcal{J}\displaystyle \bm{e}, \qquad \;\;\, \bm{\alpha} \in X, \label{eq:pHsys_dyn} \vspace{3pt}\\
-\bm{u}_\partial &= \mathcal{B}_\partial  \displaystyle \bm{e}, \qquad \bm{u}_\partial \in \mathbb{R}^m \label{eq:pHsys_u} \vspace{3pt}\\
-\bm{y}_\partial &= \mathcal{C}_\partial \displaystyle \bm{e}, \qquad \; \bm{y}_\partial \in \mathbb{R}^m \label{eq:pHsys_y} \vspace{3pt}\\
-\bm{e} :&= \displaystyle \delta_{\bm{\alpha}}H, \qquad \;\; \bm{e} \in H^\mathcal{J}. \label{eq:pHsys_const}
+\bm{e} :&= \displaystyle \delta_{\bm{\alpha}}H, \qquad \;\; \bm{e} \in H^\mathcal{J}, \label{eq:pHsys_const} \\
+\bm{u}_\partial &= \mathcal{B}_\partial  \displaystyle \bm{e}, \qquad \bm{u}_\partial \in \mathbb{R}^m, \label{eq:pHsys_u} \vspace{3pt}\\
+\bm{y}_\partial &= \mathcal{C}_\partial \displaystyle \bm{e}, \qquad \; \bm{y}_\partial \in \mathbb{R}^m. \label{eq:pHsys_y} \vspace{3pt}
 \end{align}
-The Hilbert space $X$, whose inner product is denoted by $\inner[X]{\cdot}{\cdot}$, is an appropriate Cartesian product of $L^2$ spaces which account for the nature of each variable (that can be scalar, vectorial or tensorial quantities). Its precise definition depends on the example upon consideration. The Hilbert space $H^\mathcal{J}$ is defined to be 
+\end{subequations}
+The Hilbert space $X$, whose inner product is denoted by $\inner[X]{\cdot}{\cdot}$, is an appropriate Cartesian product of $L^2$ spaces which account for the nature of each variable (that can be scalar, vectorial or tensorial quantities). Its precise definition depends on the example upon consideration. For scalars $(a,b) \in L^2(\Omega)$, vectors $(\bm{a}, \bm{b})\in L^2(\Omega, \mathbb{R}^d)$ and tensors  $(\bm{A}, \bm{B}) \in L^2(\Omega,\mathbb{R}^{d\times d})$ the $L^2$ inner product is given by 
+\begin{equation}
+\inner[L^2(\Omega)]{a}{b} = \int_{\Omega} a b \d\Omega, \qquad \inner[L^2(\Omega, \mathbb{R}^d)]{\bm{a}}{\bm{b}} = \int_{\Omega} \bm{a} \cdot \bm{b} \d\Omega, \qquad \inner[L^2(\Omega, \mathbb{R}^{d \times d})]{\bm{A}}{\bm{B}} = \int_{\Omega} \bm{A} \cddot \bm{B} \d\Omega.
+\end{equation} 
+
+ The Hilbert space $H^\mathcal{J}$ is defined to be 
 \begin{equation}
 	H^\mathcal{J} :=\left\{\bm{u} \in X \vert \; \mathcal{J}\bm{u} \in X  \right\}.
 \end{equation}
@@ -77,7 +85,7 @@ where $\mathcal{H}(\bm{\alpha}): X \rightarrow \mathbb{R}$ is a non linear funct
 To applied this methodology the non linearities are restricted to the Hamiltonian and a uniform causality condition is supposed to characterize the system. It is required as well that the system admits a splitting of the variables. This requirement is always encounter in the following examples. These hypotheses are resumed in the following assumptions.
 
 \begin{assumption}\label{ass:linJ}
-	Consider system \eqref{eq:pHsys_dyn}. It is assumed that the Hilbert space $X$ admits the splitting $X = X_1 \times X_2$ (meaning that the system does not consist of a single scalar equation). The operator $\mathcal{J}$ is assumed to be skew-symmetric (or formally skew-adjoint) on $X$ and linear:
+	Consider system \eqref{eq:pHsys_dyn}. It is assumed that the Hilbert space $X$ admits the splitting $X = X_1 \times X_2$ (meaning that the system is made up of two main blocks). The operator $\mathcal{J}$ is assumed to be skew-symmetric (or formally skew-adjoint) on $X$ and linear:
 	\begin{equation}\label{eq:assJ}
 	\mathcal{J} = \mathcal{J}_{{a}} + \mathcal{J}_{{d}},
 	\end{equation}
@@ -92,7 +100,7 @@ To applied this methodology the non linearities are restricted to the Hamiltonia
 		&\bm{L}\;\, : X_1 \rightarrow X_2, \\
 		\end{aligned}
 	\end{equation}
-	where $\bm{L}$ is a matrix (a bounded operator). 	Analogously, he linear differential operator $\mathcal{J}_{{d}}$ is assumed to be of the form
+	where $\bm{L}$ is a matrix (a bounded operator). 	Analogously, the linear differential operator $\mathcal{J}_{{d}}$ is assumed to be of the form
 	\begin{equation}\label{eq:assJd}
 	\mathcal{J}_{\text{d}} = 
 	\begin{bmatrix}
@@ -120,22 +128,19 @@ From Theorem \ref{th:rogers}, given $(\bm{u}_1, \, \bm{u}_2) \in H^\mathcal{L} \
 \inner[X_2]{\bm{u}_2}{\mathcal{L}\, \bm{u}_1}  - \inner[X_1]{\mathcal{L}^* \, \bm{u}_2} {\bm{u}_1} = \int_{\Omega }\div\widetilde{\mathcal{A}}_{\mathcal{L}}(\bm{u}_1, \bm{u}_2) \d\Omega. \\
 \end{equation}
 The integration by part formula provides 
-\begin{equation}
-\inner[X_2]{\bm{u}_2}{\mathcal{L}\,\bm{u}_1} - \inner[X_1]{\mathcal{L}^* \, \bm{u}_2}{\bm{u}_1} = \inner[X_\partial]{\mathcal{N}_{\partial, 1} \bm{u}_1}{\mathcal{N}_{\partial, 2} \bm{u}_2}. \label{eq:intbypartsJ} 
+\begin{equation}\label{eq:intbypartsJ} 
+\inner[X_2]{\bm{u}_2}{\mathcal{L}\,\bm{u}_1} - \inner[X_1]{\mathcal{L}^* \, \bm{u}_2}{\bm{u}_1} = \inner[X_\partial]{\mathcal{N}_{\partial, 1} \bm{u}_1}{\mathcal{N}_{\partial, 2} \bm{u}_2}, \where X_\partial = L^2(\partial \Omega, \mathbb{R}^m). 
 \end{equation}
-where $X_\partial = L^2(\partial \Omega, \mathbb{R}^m)$. The boundary operators are then supposed to fulfill the following assumption, that guarantees a uniform causality condition.
+
+\begin{remark}
+	The integration by part formula establishes a duality pairing between Sobolev spaces. This duality pairing is then compatible with an $L^2$ inner product in presence of a rigged Hilbert space (Gelfand triple). Without entering into technical details, we shall always use this equivalence of representation. Therefore, the boundary integrals are  expressed as $L^2$ inner product over the boundary. 
+\end{remark}
+
+ The boundary operators are then supposed to fulfill the following assumption, that guarantees a uniform causality condition.
 
 
 \begin{assumption}\label{ass:operBC}
 	The boundary operators $\mathcal{B}_\partial, \, \mathcal{C}_\partial$ of Eqs. \eqref{eq:pHsys_u}, \eqref{eq:pHsys_y}, are assumed to verify, in an exclusive manner, either
-	\begin{equation}\label{eq:assB1C2}
-	\mathcal{B}_\partial = \begin{bmatrix}
-	\mathcal{N}_{\partial, 1} & 0 \\
-	\end{bmatrix}, \quad \mathcal{C}_\partial = \begin{bmatrix}
-	0 & \mathcal{N}_{\partial, 2} \\
-	\end{bmatrix}
-	\end{equation}
-	or 
 	\begin{equation}\label{eq:assB2C1}
 	\mathcal{B}_\partial = \begin{bmatrix}
 	0 & \mathcal{N}_{\partial, 2} \\
@@ -144,32 +149,82 @@ where $X_\partial = L^2(\partial \Omega, \mathbb{R}^m)$. The boundary operators 
 	\mathcal{N}_{\partial, 1} & 0 \\
 	\end{bmatrix}
 	\end{equation}
+	or 
+	\begin{equation}\label{eq:assB1C2}
+	\mathcal{B}_\partial = \begin{bmatrix}
+	\mathcal{N}_{\partial, 1} & 0 \\
+	\end{bmatrix}, \quad \mathcal{C}_\partial = \begin{bmatrix}
+	0 & \mathcal{N}_{\partial, 2} \\
+	\end{bmatrix}
+	\end{equation}
 	where the operators $\mathcal{N}_{\partial, 1}, \; \mathcal{N}_{\partial, 2}$ are defined by the integration by part formula \eqref{eq:intbypartsJ}. 
 
 \end{assumption}
 
-
-We are now in a position to illustrate the methodology. 
-\paragraph{Step 1} First consider the weak form of system \eqref{eq:pHsys_dyn}
-\begin{equation}
-\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} = \inner[X]{\bm{v}}{\mathcal{J} \bm{e}}.
+Thanks to Assumption \ref{ass:linJ}, \ref{ass:operBC}, System \eqref{eq:pHsys_2} is rewritten as 
+\begin{subequations}
+	\label{eq:pHsys_ass} 
+	\begin{align}
+	\partial_t \begin{pmatrix}
+	{\bm{\alpha}}_1 \\ {\bm{\alpha}}_2
+	\end{pmatrix} &= \begin{bmatrix}
+	0 & -\bm{L}^\top - \mathcal{L}^* \\
+	\bm{L} + \mathcal{L} & 0 \\
+	\end{bmatrix}\begin{pmatrix}
+	\bm{e}_1 \\ \bm{e}_2
+	\end{pmatrix} , \qquad \begin{aligned}
+	\bm{\alpha}_1 \in X_1, 	\\
+	\bm{\alpha}_2 \in X_2, 
+	\end{aligned} \label{eq:pHsys_dyn_ass} \vspace{3pt}\\
+	\begin{pmatrix}
+	\bm{e}_1 \\ \bm{e}_2
+	\end{pmatrix} &:= \begin{pmatrix}
+	\delta_{\bm{\alpha}_1}H \\ \delta_{\bm{\alpha}_2}H
+	\end{pmatrix} , \qquad \begin{aligned}
+	\bm{e}_1 &\in H^\mathcal{L}, 	\\
+	\bm{e}_2 &\in H^{-\mathcal{L}^*}.
+	\end{aligned} \label{eq:pHsys_const_ass} 
+	\end{align}
+\end{subequations}
+Then if Eq. \eqref{eq:assB2C1} holds the boundary variables equal 
+\begin{equation}\label{eq:pHsys_assB2C1}
+\bm{u}_\partial = \mathcal{N}_2 \displaystyle \bm{e}_2, \qquad  \bm{y}_\partial = \mathcal{N}_1 \displaystyle \bm{e}_1, \qquad  \bm{u}_\partial,\, \bm{y}_\partial \in \mathbb{R}^m.
 \end{equation}
-The weak form is obtained by taking the $L^2$ inner product introducing an appropriate test function $\bm{v} \in X$ and integrating over the domain $\Omega$. Introducing Assumption \ref{ass:linJ}, one obtains
+
+Otherwise, if Eq. \eqref{eq:assB1C2} holds, then
+\begin{equation}\label{eq:pHsys_assB1C2}
+\bm{u}_\partial = \mathcal{N}_1 \displaystyle \bm{e}_1, \qquad 
+\bm{y}_\partial = \mathcal{N}_2 \displaystyle \bm{e}_2, \qquad  \bm{u}_\partial,\, \bm{y}_\partial \in \mathbb{R}^m. 
+\end{equation}
+In both cases, the power balance reads
+\begin{equation}\label{eq:powbal_2}
+\begin{aligned}
+\dot{H} &= \inner[X_1]{\bm{e}_1}{\partial_{t} \bm{\alpha}_1} + \inner[X_2]{\bm{e}_2}{\partial_{t} \bm{\alpha}_2}, \\
+&=\inner[X_1]{\bm{e}_1}{-\mathcal{L}^* \bm{e}_2} + \inner[X_2]{\bm{e}_2}{\mathcal{L} \bm{e}_1}, \\
+&= \inner[X_\partial]{\mathcal{N}_{\partial, 1} \bm{e}_1}{\mathcal{N}_{\partial, 2} \bm{e}_2}, \\
+&= \inner[X_\partial]{\bm{y}_\partial}{\bm{u}_\partial}.
+\end{aligned}
+\end{equation}
+We are now in a position to illustrate the methodology. 
+\paragraph{Step 1} First consider the weak form of system \eqref{eq:pHsys_dyn_ass}, obtained by taking the $L^2$ inner product introducing an appropriate test function $\bm{v} = (\bm{v}_1, \bm{v}_2) \in X_1 \times X_2 = X$ and integrating over the domain $\Omega$
+\begin{equation}\label{eq:weak_dyn}
+\begin{aligned}
+\inner[X_1]{\bm{v}_1}{\partial_t \bm{\alpha}_1} &= -  \langle{\bm{v}_1},\,{\bm{L}^\top \bm{e}_2}\rangle_{X_1} -  \inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2}, \\
+\inner[X_2]{\bm{v}_2}{\partial_t \bm{\alpha}_2} &= \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1}+ \inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1}.
+\end{aligned}
+\end{equation}
 
 
-\begin{align}
-\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} &= \inner[X]{\bm{v}}{\mathcal{J} \bm{e}}, \\
-{\inner[X]{\bm{v}}{\partial_t \bm{\alpha}}} &\stackrel{\text{Eq. \eqref{eq:assJ}}}{=} \inner[X]{\bm{v}}{\mathcal{J}_a\bm{e}} + \inner[X]{\bm{v}}{\mathcal{J}_{d}\bm{e}}, \\  
-\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} &\stackrel{\text{Eqs. \eqref{eq:assJa} \eqref{eq:assJd}}}{=} -  \langle{\bm{v}_1},\,{\bm{L}^\top \bm{e}_2}\rangle_{X_1} + \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1}-  \inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2} + \inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1}. \label{eq:weak_dyn}
-\end{align}
 
-
-To obtain a closed system, the constitutive law \eqref{eq:pHsys_const} and the output variables are put in weak form
-\begin{align}
-\inner[X]{\bm{v}}{\bm{e}}&= \inner[X]{\bm{v}}{\delta_{\bm{\alpha}} H}, \\
+To obtain a closed system, the constitutive law \eqref{eq:pHsys_const_ass} and the output variables \eqref{eq:pHsys_y} are put in weak form
+\begin{equation}
+\begin{aligned}
+\inner[X_1]{\bm{v}_1}{\bm{e}_1}&= \inner[X_1]{\bm{v}_1}{\delta_{\bm{\alpha}_1} H}, \\
+\inner[X_2]{\bm{v}_2}{\bm{e}_2}&= \inner[X_2]{\bm{v}_2}{\delta_{\bm{\alpha}_2} H}, \\
 \inner[X_\partial]{\bm{v}_\partial}{\bm{y}_\partial} &= \inner[X_\partial]{\bm{v}_\partial}{\mathcal{C}_\partial \bm{e}},
-\end{align}
-where the test function $\bm{v}_\partial \in X_\partial = L^2(\partial \Omega, \mathbb{R}^m)$ is defined on the boundary $\partial\Omega$.
+\end{aligned}
+\end{equation}
+where the test function $\bm{v}_\partial \in X_\partial = L^2(\partial \Omega, \mathbb{R}^m)$ is defined on the boundary $\partial\Omega$ and $\mathcal{C}_\partial$ is defined either by Eq. \eqref{eq:assB2C1} or  \eqref{eq:assB1C2}.
 
 
 \paragraph{Step 2} Next the integration by part has to be carried out. The choice is dictated by the boundary control to be imposed on the system. Consider again Eq. \eqref{eq:weak_dyn}. The integration by parts can be carried out either on term $-\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2}$, or on term $\inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1}$. Depending o which line undergoes the integration by parts (this explains the name Partitioned Finite Element method), two structure preserving weak forms are obtained. These differ by the boundary causality imposed to the system. 
@@ -182,7 +237,10 @@ In this case case, using Eq. \eqref{eq:intbypartsJ}, it is obtained
 \end{equation}
 Then the weak form of the system dynamics  reads 
 \begin{equation}\label{eq:weak_dyn_intJ1}
-\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} =   -\langle{\bm{v}_1},\, {\bm{L}^\top \bm{e}_2}\rangle_{X_1} + \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1} -\inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1} + \inner[X_\partial]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\mathcal{N}_{\partial, 2} \bm{e}_2}. 
+\begin{aligned}
+\inner[X_1]{\bm{v}_1}{\partial_t \bm{\alpha}_1} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1}  -\inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[X_\partial]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\bm{u}_\partial}, \\
+\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} &=   \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1} + \inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1},
+\end{aligned}
 \end{equation}
 The following proposition is crucial as the lossless character of the infinite-dimensional system (due to the formally skew-adjoint operator) translates into an equivalent property for the corresponding bilinear form in the weak form.
 \begin{proposition}
@@ -206,15 +264,13 @@ The following proposition is crucial as the lossless character of the infinite-d
 	\end{proof}
 \end{proposition}
 
-Now assume that the system satisfies the boundary causality condition \eqref{eq:assB2C1}, i.e.  
-\begin{equation*}
-\bm{u}_\partial=\mathcal{N}_{\partial, 2} \bm{e}_2, \qquad \bm{y}_\partial=\mathcal{N}_{\partial, 1} \bm{e}_1
-\end{equation*}. 
-Then, this choice of the integration by parts lead to the following weak formulation
+Now assume that the system satisfies the boundary causality condition \ref{eq:pHsys_assB2C1}. Then, this choice of the integration by parts lead to the following weak formulation
 \begin{equation}\label{eq:weak_sys_intJ1}
 \begin{aligned}
-\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1} + \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1} -\inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1} + \inner[X_\partial]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\bm{u}_\partial}, \\
-\inner[X]{\bm{v}}{\bm{e}}&=\inner[X]{\bm{v}}{\delta_{\bm{\alpha}} H}, \\
+\inner[X_1]{\bm{v}_1}{\partial_t \bm{\alpha}_1} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1}  -\inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[X_\partial]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\bm{u}_\partial}, \\
+\inner[X_2]{\bm{v}_2}{\partial_t \bm{\alpha}_2} &=   \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1} + \inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1}, \\
+\inner[X_1]{\bm{v}_1}{\bm{e}_1}&= \inner[X_1]{\bm{v}_1}{\delta_{\bm{\alpha}_1} H}, \\
+\inner[X_2]{\bm{v}_2}{\bm{e}_2}&= \inner[X_2]{\bm{v}_2}{\delta_{\bm{\alpha}_2} H}, \\
 \inner[X_\partial]{\bm{v}_\partial}{\bm{y}_\partial} &= \inner[X_\partial]{\bm{v}_\partial}{\mathcal{N}_{\partial, 1}\bm{e}_2}.
 \end{aligned}
 \end{equation}
@@ -226,7 +282,10 @@ Using Eq. \eqref{eq:intbypartsJ}, it is obtained
 \end{equation}
 Then the weak form of the system dynamics  reads 
 \begin{equation}\label{eq:weak_dyn_intJ2}
-\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} =   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1} + \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1} -\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2} + \inner[X_1]{\mathcal{L}^*\bm{v}_2}{\bm{e}_1} + \inner[X_\partial]{\mathcal{N}_{\partial, 2} \bm{v}_2}{\mathcal{N}_{\partial, 1} \bm{e}_1}. 
+\begin{aligned}
+\inner[X_1]{\bm{v}_1}{\partial_t \bm{\alpha}_1} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1}  -\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2}, \\
+\inner[X_2]{\bm{v}_2}{\partial_t \bm{\alpha}_2} &=   \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1}  + \inner[X_1]{\mathcal{L}^*\bm{v}_2}{\bm{e}_1} + \inner[X_\partial]{\mathcal{N}_{\partial, 2} \bm{v}_2}{\bm{u}_{\partial}}, \\
+\end{aligned}
 \end{equation}
 Again the bilinear form arising from the formally skew-adjoint operator is skew-symmetric.
 \begin{proposition}
@@ -250,15 +309,13 @@ Again the bilinear form arising from the formally skew-adjoint operator is skew-
 	\end{proof}
 \end{proposition}
 
-Now assume that the system satisfies the boundary causality condition \eqref{eq:assB1C2}, i.e.  
-\begin{equation*}
-\bm{u}_\partial=\mathcal{N}_{\partial, 1} \bm{e}_1, \qquad \bm{y}_\partial=\mathcal{N}_{\partial, 2} \bm{e}_2
-\end{equation*}. 
-Then, the final weak formulation reads
+Now assume that the system satisfies the boundary causality condition \eqref{eq:pHsys_assB1C2}. Then, the final weak formulation reads
 \begin{equation}\label{eq:weak_sys_intJ2}
 \begin{aligned}
-\inner[X]{\bm{v}}{\partial_t \bm{\alpha}} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1} + \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1} -\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2} + \inner[X_1]{\mathcal{L}^*\bm{v}_2}{\bm{e}_1} + \inner[X_\partial]{\mathcal{N}_{\partial, 2} \bm{v}_2}{\bm{u}_{\partial}}, \\
-\inner[X]{\bm{v}}{\bm{e}}&= \inner[X]{\bm{v}}{\delta_{\bm{\alpha}} H}, \\
+\inner[X_1]{\bm{v}_1}{\partial_t \bm{\alpha}_1} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1}  -\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2}, \\
+\inner[X_2]{\bm{v}_2}{\partial_t \bm{\alpha}_2} &=   \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1}  + \inner[X_1]{\mathcal{L}^*\bm{v}_2}{\bm{e}_1} + \inner[X_\partial]{\mathcal{N}_{\partial, 2} \bm{v}_2}{\bm{u}_{\partial}}, \\
+\inner[X_1]{\bm{v}_1}{\bm{e}_1}&= \inner[X_1]{\bm{v}_1}{\delta_{\bm{\alpha}_1} H}, \\
+\inner[X_2]{\bm{v}_2}{\bm{e}_2}&= \inner[X_2]{\bm{v}_2}{\delta_{\bm{\alpha}_2} H}, \\
 \inner[X_\partial]{\bm{v}_\partial}{\bm{y}_\partial} &= \inner[X_\partial]{\bm{v}_\partial}{\mathcal{N}_{\partial, 2}\bm{e}_2}.
 \end{aligned}
 \end{equation}
@@ -267,23 +324,23 @@ Then, the final weak formulation reads
 To conclude the illustration of this methodology, consider a Galerkin discretization is introduced. This means that corresponding test and trial functions are discretized using the same basis
 \begin{equation}\label{eq:approx_ve}
 \begin{aligned}
-\bm{v}_1 \approx \sum_{i=1}^{n_1} \bm{\phi}_1^i v_1^i, \\
-\bm{v}_2 \approx \sum_{i=1}^{n_2} \bm{\phi}_2^i v_2^i, 
+\bm{v}_1 \approx \sum_{i=1}^{n_1} \bm{\phi}_1^i(\bm{x}) v_1^i, \\
+\bm{v}_2 \approx \sum_{i=1}^{n_2} \bm{\phi}_2^i(\bm{x}) v_2^i, 
 \end{aligned} \qquad 
 \begin{aligned}
-\bm{\alpha}_1 \approx \sum_{i=1}^{n_1} \bm{\phi}_1^i \alpha_1^i, \\
-\bm{\alpha}_2 \approx \sum_{i=1}^{n_2} \bm{\phi}_2^i \alpha_2^i. 
+\bm{\alpha}_1 \approx \sum_{i=1}^{n_1} \bm{\phi}_1^i(\bm{x}) \alpha_1^i(t), \\
+\bm{\alpha}_2 \approx \sum_{i=1}^{n_2} \bm{\phi}_2^i(\bm{x}) \alpha_2^i(t). 
 \end{aligned} \qquad 
 \begin{aligned}
-\bm{e}_1 \approx \sum_{i=1}^{n_1} \bm{\phi}_1^i e_1^i, \\
-\bm{e}_2 \approx \sum_{i=1}^{n_2} \bm{\phi}_2^i e_2^i. 
+\bm{e}_1 \approx \sum_{i=1}^{n_1} \bm{\phi}_1^i(\bm{x}) e_1^i(t), \\
+\bm{e}_2 \approx \sum_{i=1}^{n_2} \bm{\phi}_2^i(\bm{x}) e_2^i(t), 
 \end{aligned}
 \end{equation}
-A finite dimensional approximation is introduced for the boundary variables as well
+where $\bm{x} \in \Omega$. The boundary variables are approximated as well
 \begin{equation}\label{eq:approx_boundar}
-\bm{v}_\partial \approx \sum_{i=1}^{n_\partial} \bm{\phi}_\partial^i v_\partial^i, \qquad
-\bm{u}_\partial \approx \sum_{i=1}^{n_\partial} \bm{\phi}_\partial^i u_\partial^i, \qquad
-\bm{y}_\partial \approx \sum_{i=1}^{n_\partial} \bm{\phi}_\partial^i y_\partial^i.
+\bm{v}_\partial \approx \sum_{i=1}^{n_\partial} \bm{\phi}_\partial^i(\bm{x}) v_\partial^i, \qquad
+\bm{u}_\partial \approx \sum_{i=1}^{n_\partial} \bm{\phi}_\partial^i(\bm{x}) u_\partial^i(t), \qquad
+\bm{y}_\partial \approx \sum_{i=1}^{n_\partial} \bm{\phi}_\partial^i(\bm{x}) y_\partial^i(t), \qquad \bm{x} \in \partial\Omega.
 \end{equation}
 \subparagraph{Discretization of the weak form \eqref{eq:weak_sys_intJ1}}
 Plugging the approximation into the weak form \eqref{eq:weak_sys_intJ1} and consider that the resulting equation holds $\forall \, v_1^i,\, v_2^j,\, v_\partial^k \; (i\in\left\{1,n_1\right\}, \; j\in\left\{1,n_2\right\}, \; k\in\left\{1,n_\partial\right\})$, the finite dimensional system is obtained
@@ -294,18 +351,18 @@ Plugging the approximation into the weak form \eqref{eq:weak_sys_intJ1} and cons
 \mathbf{M}_1 & \mathbf{0} \\
 \mathbf{0} & \mathbf{M}_2 \\
 \end{bmatrix}
-\begin{bmatrix}
+\begin{pmatrix}
 \dot{\bm{\alpha}}_{d, 1} \\
 \dot{\bm{\alpha}}_{d, 2} \\
-\end{bmatrix}
+\end{pmatrix}
 &= \begin{bmatrix}
 \mathbf{0} & -\mathbf{D}_{0}^\top - \mathbf{D}_{\mathcal{L}}^\top \\
 \mathbf{D}_{0} + \mathbf{D}_{\mathcal{L}} & \mathbf{0} \\
 \end{bmatrix} 
-\begin{bmatrix}
+\begin{pmatrix}
 \mathbf{e}_{1} \\
 \mathbf{e}_{2} \\
-\end{bmatrix} + 
+\end{pmatrix} + 
 \begin{bmatrix}
 \mathbf{B}_1\\
 \mathbf{0}\\
@@ -315,35 +372,35 @@ Plugging the approximation into the weak form \eqref{eq:weak_sys_intJ1} and cons
 \mathbf{M}_1 & \mathbf{0} \\
 \mathbf{0} & \mathbf{M}_2 \\
 \end{bmatrix}
-\begin{bmatrix}
+\begin{pmatrix}
 \mathbf{e}_{1} \\
 \mathbf{e}_{2} \\
-\end{bmatrix}
+\end{pmatrix}
 &= \begin{bmatrix}
 \partial_{\bm{\alpha}_{d, 1}} H_d(\bm{\alpha}_d)\\
 \partial_{\bm{\alpha}_{d, 2}} H_d(\bm{\alpha}_d)\\
 \end{bmatrix}, \\
 \mathbf{M}_\partial {\mathbf{y}_\partial} &= \begin{bmatrix}
 \mathbf{B}_1^\top & \mathbf{0}
-\end{bmatrix}\begin{bmatrix}
+\end{bmatrix}\begin{pmatrix}
 \mathbf{e}_{1} \\
 \mathbf{e}_{2} \\
-\end{bmatrix}.
+\end{pmatrix}.
 \end{aligned}
 \end{equation}
 Vectors $\bm{\alpha}_{d, 1},\, \bm{\alpha}_{d, 2}, \, \mathbf{e}_{1}, \, \mathbf{e}_{2}, \, \mathbf{u}_\partial, \, \mathbf{y}_\partial$ are given by the column-wise concatenation of their respective degrees of freedom. The matrices are defined as follows 
 \begin{equation}
 \begin{aligned}
-M_1^{ij} &= \inner[X_1]{\phi_1^i}{\phi_1^j}, \\
-M_2^{ij} &= \inner[X_2]{\phi_2^i}{\phi_2^j}, \\
+M_1^{ij} &= \inner[X_1]{\bm\phi_1^i}{\bm\phi_1^j}, \\
+M_2^{ij} &= \inner[X_2]{\bm\phi_2^i}{\bm\phi_2^j}, \\
 \end{aligned}\quad
 \begin{aligned}
-{D}_{0}^{ji} &= \inner[X_2]{\phi_2^j}{\bm{L}\phi_1^i}, \\
-{D}_{\mathcal{L}}^{ji} &= \inner[X_2]{\phi_2^j}{\mathcal{L}\phi_1^i}, 
+{D}_{0}^{ji} &= \inner[X_2]{\bm\phi_2^j}{\bm{L}\bm\phi_1^i}, \\
+{D}_{\mathcal{L}}^{ji} &= \inner[X_2]{\bm\phi_2^j}{\mathcal{L}\bm\phi_1^i}, 
 \end{aligned}\quad  
 \begin{aligned}
-{B}_{1}^{ik} = \inner[X_\partial]{\phi_1^i}{\phi_\partial^k}, \\
-M_\partial^{lk} = \inner[X_\partial]{\phi_\partial^l}{\phi_\delta^k}
+{B}_{1}^{ik} = \inner[X_\partial]{\bm\phi_1^i}{\bm\phi_\partial^k}, \\
+M_\partial^{lk} = \inner[X_\partial]{\bm\phi_\partial^l}{\bm\phi_\delta^k},
 \end{aligned}
 \end{equation}
 where $i \in \left\{1, n_1\right\}, \; j \in \left\{1, n_2\right\}, \; l \in \left\{1, n_\partial \right\}, \; k \in \left\{1, n_\partial \right\}$. Introducing the definitions
@@ -354,18 +411,18 @@ where $i \in \left\{1, n_1\right\}, \; j \in \left\{1, n_2\right\}, \; l \in \le
 the discretized gradient of the Hamiltonian read
 \begin{equation}
 \begin{aligned}
-\partial_{{\alpha}_{d, 1}^i} H_d(\bm{\alpha}_d) &= \inner[X_1]{\phi_1^i}{\delta_{\bm{\alpha}_{d, 1}} H_d}, \qquad i \in \left\{1, n_1\right\}, \\
-\partial_{{\alpha}_{d, 2}^j} H_d(\bm{\alpha}_d) &= \inner[X_2]{\phi_2^j}{\delta_{\bm{\alpha}_{d, 2}} H_d}, \qquad j \in \left\{1, n_2\right\}.
+\partial_{{\alpha}_{d, 1}^i} H_d(\bm{\alpha}_d) &= \inner[X_1]{\bm\phi_1^i}{\delta_{\bm{\alpha}_{d, 1}} H_d}, \qquad i \in \left\{1, n_1\right\}, \\
+\partial_{{\alpha}_{d, 2}^j} H_d(\bm{\alpha}_d) &= \inner[X_2]{\bm\phi_2^j}{\delta_{\bm{\alpha}_{d, 2}} H_d}, \qquad j \in \left\{1, n_2\right\}.
 \end{aligned}
 \end{equation}
-A pH system in canonical form can be found observing that Sys. \eqref{eq:pHsys_findim_J1} is compactly rewritten as 
+A pH system in canonical form is found observing that Sys. \eqref{eq:pHsys_findim_J1} is compactly rewritten as 
 \begin{align}
-\mathbf{M} \dot{\bm{\alpha}}_{d} &= \mathbf{J}_{\mathcal{L}} \mathbf{e} + \mathbf{B}\mathbf{u}_\partial, \label{eq:pHfindim_dyn1} \\
-\mathbf{M} \mathbf{e} &= \nabla H_d(\bm{\alpha}_d), \label{eq:pHfindin_e}\\
+\mathbf{M} \dot{\bm{\alpha}}_{d} &= \mathbf{J}_{\mathcal{L}} \mathbf{e} + \mathbf{B}\mathbf{u}_\partial, \label{eq:pH_findim_dyn1} \\
+\mathbf{M} \mathbf{e} &= \nabla H_d(\bm{\alpha}_d), \label{eq:pH_findin_e}\\
 \mathbf{M}_\partial {\mathbf{y}_\partial} &= \mathbf{B}^\top \mathbf{e},
 \end{align}
 
-where $\bm{\alpha}_{d}= [\bm{\alpha}_{d, 1}^\top \; \bm{\alpha}_{d, 2}^\top]^\top, \; \mathbf{e}= [\mathbf{e}_1^\top \; \mathbf{e}_2^\top]^\top, \; \nabla H_d(\bm{\alpha}_d) = [\partial_{\bm{\alpha}_{d, 1}}^\top H_d(\bm{\alpha}_d) \; \partial_{\bm{\alpha}_{d, 2}}^\top H_d(\bm{\alpha}_d)]^\top$ and 
+where $\bm{\alpha}_{d}= (\bm{\alpha}_{d, 1}^\top \;\; \bm{\alpha}_{d, 2}^\top)^\top, \; \mathbf{e}= (\mathbf{e}_1^\top \;\; \mathbf{e}_2^\top)^\top, \; \nabla H_d(\bm{\alpha}_d) = (\partial_{\bm{\alpha}_{d, 1}}^\top H_d(\bm{\alpha}_d) \;\; \partial_{\bm{\alpha}_{d, 2}}^\top H_d(\bm{\alpha}_d))^\top$ and 
 \begin{equation}
 \mathbf{M} = \begin{bmatrix}
 \mathbf{M}_1 & \mathbf{0} \\
@@ -381,7 +438,7 @@ where $\bm{\alpha}_{d}= [\bm{\alpha}_{d, 1}^\top \; \bm{\alpha}_{d, 2}^\top]^\to
 \mathbf{0}\\
 \end{bmatrix}.
 \end{equation}
-Plugging \eqref{eq:pHfindin_e} into \eqref{eq:pHfindim_dyn1}, a pH system in canonical form is obtained
+Plugging \eqref{eq:pH_findin_e} into \eqref{eq:pH_findim_dyn1}, a pH system in canonical form is obtained
 \begin{equation}
 	\begin{aligned}
 	\dot{\bm{\alpha}}_{d} &= \mathbf{J}\, \nabla H_d(\bm{\alpha}_d) + \mathbf{B}\, \mathbf{u}_\partial,\\
@@ -392,6 +449,16 @@ Plugging \eqref{eq:pHfindin_e} into \eqref{eq:pHfindim_dyn1}, a pH system in can
 	\where \widehat{\mathbf{y}}_\partial &= \mathbf{M}_\partial \mathbf{y}_\partial.
 	\end{aligned}
 \end{equation}
+The structure preserving character of the method is evident from the preservation, at the discrete level of the power balance. The finite dimensional counterpart of the energy rate is given by
+\begin{equation}
+\begin{aligned}
+\dot{H}_d &= \nabla^\top H_d(\bm{\alpha}_d) \dot{\bm{\alpha}}_d, \\
+&= \nabla^\top H_d(\bm{\alpha}_d) \mathbf{J}\, \nabla H_d(\bm{\alpha}_d) + \nabla^\top H_d(\bm{\alpha}_d) \mathbf{B}\, \mathbf{u}_\partial, \qquad \text{Skew-symmetry of }\mathbf{J} \\
+&= \widehat{\mathbf{y}}_\partial^\top \mathbf{u}_\partial.
+\end{aligned}
+\end{equation}
+This result mimics its infinite dimensional equivalent \eqref{eq:powbal_2}.
+
 \subparagraph{Discretization of the weak form \eqref{eq:weak_sys_intJ2}}
 Plugging the approximation into the weak form \eqref{eq:weak_sys_intJ2} a finite dimensional system with a different causality is obtained
 
@@ -401,18 +468,18 @@ Plugging the approximation into the weak form \eqref{eq:weak_sys_intJ2} a finite
 \mathbf{M}_1 & \mathbf{0} \\
 \mathbf{0} & \mathbf{M}_2 \\
 \end{bmatrix}
-\begin{bmatrix}
+\begin{pmatrix}
 \dot{\bm{\alpha}}_{d, 1} \\
 \dot{\bm{\alpha}}_{d, 2} \\
-\end{bmatrix}
+\end{pmatrix}
 &= \begin{bmatrix}
 \mathbf{0} & -\mathbf{D}_{0}^\top + \mathbf{D}_{-\mathcal{L}^*} \\
 \mathbf{D}_{0} - \mathbf{D}_{-\mathcal{L}^*}^\top & \mathbf{0} \\
 \end{bmatrix} 
-\begin{bmatrix}
+\begin{pmatrix}
 \mathbf{e}_{1} \\
 \mathbf{e}_{2} \\
-\end{bmatrix} + 
+\end{pmatrix} + 
 \begin{bmatrix}
 \mathbf{0}\\
 \mathbf{B}_2\\
@@ -422,55 +489,183 @@ Plugging the approximation into the weak form \eqref{eq:weak_sys_intJ2} a finite
 \mathbf{M}_1 & \mathbf{0} \\
 \mathbf{0} & \mathbf{M}_2 \\
 \end{bmatrix}
-\begin{bmatrix}
+\begin{pmatrix}
 \mathbf{e}_{1} \\
 \mathbf{e}_{2} \\
-\end{bmatrix}
-&= \begin{bmatrix}
-\nabla_{\bm{\alpha}_{d, 1}} H_d(\bm{\alpha}_d)\\
-\nabla_{\bm{\alpha}_{d, 2}} H_d(\bm{\alpha}_d)\\
-\end{bmatrix}, \\
+\end{pmatrix}
+&= \begin{pmatrix}
+\partial_{\bm{\alpha}_{d, 1}} H_d(\bm{\alpha}_d)\\
+\partial_{\bm{\alpha}_{d, 2}} H_d(\bm{\alpha}_d)\\
+\end{pmatrix}, \\
 \mathbf{M}_\partial {\mathbf{y}_\partial} &= 
 \begin{bmatrix}
 \mathbf{0} & \mathbf{B}_2^\top 
-\end{bmatrix}\begin{bmatrix}
+\end{bmatrix}\begin{pmatrix}
 \mathbf{e}_{1} \\
 \mathbf{e}_{2} \\
-\end{bmatrix}.
+\end{pmatrix}.
 \end{aligned}
 \end{equation}
 The differences with respect to formulation \eqref{eq:pHsys_findim_J1} reside in matrices $\mathbf{D}_{-\mathcal{L}^*}, \; \mathbf{B}_2$, whose definitions are
 \begin{equation}
-{D}_{-\mathcal{L}^*}^{ij} = \inner[X_1]{\phi_1^i}{\mathcal{-L^*}\phi_2^j}, \qquad B_2^{ik} = \inner[X_\partial]{\phi_2^i}{\phi_{\partial}^k} \qquad i \in \left\{1, n_1\right\}, \; j \in \left\{1, n_2\right\},\; k \in \left\{1, n_\partial \right\}.
+{D}_{-\mathcal{L}^*}^{ij} = \inner[X_1]{\bm\phi_1^i}{\mathcal{-L^*}\bm\phi_2^j}, \qquad B_2^{ik} = \inner[X_\partial]{\bm\phi_2^i}{\bm\phi_{\partial}^k} \qquad i \in \left\{1, n_1\right\}, \; j \in \left\{1, n_2\right\},\; k \in \left\{1, n_\partial \right\}.
 \end{equation}
 System \eqref{eq:pHsys_findim_J2} can be put in canonical form by replacing the co-energy variables by the discretized gradient.
 
-\paragraph{Example: the irrotational shallow water equation}
-Consider as an example the shallow water equations detailed in Sec \secref{sec:shallowwater}. If the flow is irrotational, then $\nabla \times \bm{v} = 0$.
-
+\paragraph{Example: the irrotational shallow water equations}
+Consider as an example the shallow water equations detailed in Sec. \secref{sec:shallowwater}.  The flow is assumed to be irrotational ($\nabla \times \bm{v} = 0$). As a consequence the term $\bm{\mathcal{G}}$ in Eq. \eqref{eq:pHsys_shwater} vanishes.
+To fulfill Assumption \ref{ass:operBC}, the incoming volumetric flow is known at the boundary. This imposes a uniform Neumann condition. This lead to the following boundary control system, defined on an open connected set $\Omega \subset \mathbb{R}^2$
 \begin{equation}
+\begin{aligned}
 \diffp{}{t}
 \begin{pmatrix}
 \alpha_h \\
 \bm{\alpha}_v \\
-\end{pmatrix} = 
+\end{pmatrix} &= -
 \begin{bmatrix}
-0 & -\div \\
--\grad & \mathcal{G}
+0 & \div \\
+\grad & \bm{0}
 \end{bmatrix}
 \begin{pmatrix}
 e_h \\
 \bm{e}_v \\
-\end{pmatrix},
+\end{pmatrix}, \\
+\begin{pmatrix}
+e_h  \\
+\bm{e}_v
+\end{pmatrix}
+&:=
+\begin{pmatrix}
+\delta_{\alpha_h} H\\
+\delta_{\bm{\alpha}_v} H
+\end{pmatrix} = 
+\begin{pmatrix}
+\frac{1}{2 \rho} \norm{\bm{\alpha}_v}^2 + \rho g \alpha_h, \\
+\frac{1}{\rho} \alpha_h \bm{\alpha}_v.
+\end{pmatrix}, \\
+{u}_\partial &= - \bm{e}_v \cdot\bm{n}, \\
+{y}_\partial &= {e}_h, \\
+\end{aligned} \qquad 
+\begin{aligned}
+\alpha_h &\in L^2(\Omega), \\
+\bm{\alpha}_v &\in L^2(\Omega, \mathbb{R}^2), \\
+e_h &\in H^1(\Omega), \\
+\bm{e}_v &\in H^{\div}(\Omega, \mathbb{R}^2), \\
+u_\partial &\in \mathbb{R}, \\
+y_\partial &\in \mathbb{R},
+\end{aligned}
 \end{equation} 
+where the Hamiltonian is a non linear functional in the energy variables 
 \begin{equation*}
-H(\alpha_h, \bm{\alpha}_v) = \frac{1}{2} \int_\Omega \frac{1}{\rho} \alpha_h \norm{\bm{\alpha}_v}^2 + \rho g \alpha_h^2 \d\Omega.
+H(\alpha_h, \bm{\alpha}_v) = \energy{\frac{1}{\rho} \alpha_h \norm{\bm{\alpha}_v}^2 + \rho g \alpha_h^2}.
 \end{equation*}
+The energy and co-energy variables are related to the physical variables (fluid height and velocity) through Eqs. \eqref{eq:alpha_shwater}, \eqref{eq:e_shwater}. In this case $X_1 = L^2(\Omega),\; X_2 = L^2(\Omega, \mathbb{R}^2)$ and $\mathcal{L} = \grad, \; -\mathcal{L}^* = \div$. This implies $H^{\mathcal{L}} = H^1(\Omega), \; H^{-\mathcal{L}^*} = H^{\div}(\Omega, \mathbb{R}^2)$. As shown in \eqref{eq:enrate_shwater}, the energy rate is given by 
+\begin{equation}
+\dot{H} = - \inner[L^2(\Omega, \mathbb{R}^2)]{\bm{e}_v}{\grad e_h} - \inner[L^2(\Omega)]{\div \bm{e}_v}{e_h} = \inner[L^2(\partial\Omega)]{- \bm{e}_v \cdot\bm{n}}{e_h},
+\end{equation}
+meaning that $X_\partial = L^2(\partial\Omega)$. The boundary operators are therefore given by 
+\begin{equation}
+\begin{aligned}
+u_\partial &= \mathcal{B}_\partial (e_h \;\; \bm{e}_v)^\top = \mathcal{N}_{\partial, 2} \bm{e}_v = -\bm\gamma_{n} \bm{e}_v = -\bm{e}_v \cdot \bm{n}\vert_{\partial\Omega}, \\ 
+y_\partial &=\mathcal{C}_\partial (e_h \;\; \bm{e}_v)^\top = \mathcal{N}_{\partial, 1} {e}_h = \gamma_{0} {e}_h = {e}_h\vert_{\partial\Omega}.
+\end{aligned}
+\end{equation}
+This system represents a particular example of the general formulation of the general framework \eqref{eq:pHsys_ass}, together with boundary conditions \eqref{eq:pHsys_assB2C1}. To obtain a finite dimensional system, the test variables $v_h,\; \bm{v}_v$ are introduced and the integration by parts is performed on the $-\mathcal{L}^* = \div$ operator, leading to the weak form 
 
-The co-energy variables are given by
-\begin{equation*}
-e_h := \diffd{H}{\alpha_h} = \frac{1}{2 \rho} \norm{\bm{\alpha}_v}^2 + \rho g \alpha_h, \qquad \bm{e}_v := \diffd{H}{\bm{\alpha}_v} = \frac{1}{\rho} \alpha_h \bm{\alpha}_v.
-\end{equation*}
+\begin{equation}\label{eq:weak_sys_shwater_grad}
+\begin{aligned}
+\inner[L^2(\Omega)]{{v}_h}{\partial_t {\alpha}_h} &=  \inner[L^2(\Omega, \mathbb{R}^2)]{\grad {v}_h}{\bm{e}_v} + \inner[L^2(\partial\Omega)]{\gamma_{0} {v}_h}{\bm{u}_\partial}, \\
+\inner[L^2(\Omega, \mathbb{R}^2)]{\bm{v}_v}{\partial_t \bm{\alpha}_v} &=   -\inner[L^2(\Omega, \mathbb{R}^2)]{\bm{v}_v}{\grad e_h}, \\
+\inner[L^2(\Omega)]{{v}_h}{{e}_h}&= \inner[L^2(\Omega)]{v_h}{\frac{1}{2 \rho} \norm{\bm{\alpha}_v}^2 + \rho g \alpha_h}, \\
+\inner[L^2(\Omega, \mathbb{R}^2)]{\bm{v}_v}{\bm{e}_v}&= \inner[L^2(\Omega, \mathbb{R}^2)]{\bm{v}_v}{\frac{1}{\rho} \alpha_h \bm{\alpha}_v}, \\
+\inner[L^2(\partial\Omega)]{{v}_\partial}{{y}_\partial} &= \inner[L^2(\partial\Omega)]{{v}_\partial}{\gamma_0 {e}_h}.
+\end{aligned}
+\end{equation}
+Introducing a Galerkin approximation
+\begin{equation}\label{eq:approx_ve_shwater}
+\begin{aligned}
+	{v}_h &\approx \sum_{i=1}^{n_1} {\phi}_h^i(\bm{x}) v_h^i, \\
+	\bm{v}_v &\approx \sum_{i=1}^{n_2} \bm{\phi}_v^i(\bm{x}) v_v^i, \\
+	{v}_\partial &\approx \sum_{i=1}^{n_\partial} {\phi}_\partial^i(\bm{s}) v_\partial^i
+\end{aligned} \qquad 
+\begin{aligned}
+	{\alpha}_h &\approx \sum_{i=1}^{n_1} {\phi}_h^i(\bm{x}) \alpha_h^i(t), \\
+	\bm{\alpha}_v &\approx \sum_{i=1}^{n_2} \bm{\phi}_v^i(\bm{x}) \alpha_v^i(t), \\
+	{u}_\partial &\approx \sum_{i=1}^{n_\partial} {\phi}_\partial^i(\bm{s}) u_\partial^i(t)
+\end{aligned} \qquad 
+\begin{aligned}
+	{e}_h &\approx \sum_{i=1}^{n_1} {\phi}_h^i(\bm{x}) e_h^i(t), \quad \bm{x} \in \Omega, \\
+	\bm{e}_v &\approx \sum_{i=1}^{n_2} \bm{\phi}_v^i(\bm{x}) e_v^i(t), \quad \bm{x} \in \Omega,\\
+	\bm{y}_\partial &\approx \sum_{i=1}^{n_\partial} {\phi}_\partial^i(\bm{s}) y_\partial^i(t), \quad \bm{s} \in \partial\Omega,
+\end{aligned}
+\end{equation}
+the finite dimensional system is obtained
+\begin{equation}\label{eq:pHsys_findim_shwater}
+\begin{aligned}
+\begin{bmatrix}
+\mathbf{M}_h & \mathbf{0} \\
+\mathbf{0} & \mathbf{M}_v \\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\bm{\alpha}}_{d, h} \\
+\dot{\bm{\alpha}}_{d, v} \\
+\end{pmatrix}
+&= -\begin{bmatrix}
+\mathbf{0} &  - \mathbf{D}_{\grad}^\top \\
+\mathbf{D}_{\grad} & \mathbf{0} \\
+\end{bmatrix} 
+\begin{pmatrix}
+\mathbf{e}_{h} \\
+\mathbf{e}_{v} \\
+\end{pmatrix} + 
+\begin{bmatrix}
+\mathbf{B}_h \\
+\mathbf{0}\\
+\end{bmatrix}
+\mathbf{u}_\partial, \\
+\begin{bmatrix}
+\mathbf{M}_h & \mathbf{0} \\
+\mathbf{0} & \mathbf{M}_v \\
+\end{bmatrix}
+\begin{pmatrix}
+\mathbf{e}_{h} \\
+\mathbf{e}_{v} \\
+\end{pmatrix}
+&= \begin{bmatrix}
+\partial_{\bm{\alpha}_{d, h}} H_d(\bm{\alpha}_{d, h},\; \bm{\alpha}_{d, v})\\
+\partial_{\bm{\alpha}_{d, v}} H_d(\bm{\alpha}_{d, h},\; \bm{\alpha}_{d, v})\\
+\end{bmatrix}, \\
+\mathbf{M}_\partial {\mathbf{y}_\partial} &= \begin{bmatrix}
+\mathbf{B}_h^\top & \mathbf{0}
+\end{bmatrix}\begin{pmatrix}
+\mathbf{e}_{h} \\
+\mathbf{e}_{v} \\
+\end{pmatrix}.
+\end{aligned}
+\end{equation}
+The matrices are defined as follows 
+\begin{equation}
+\begin{aligned}
+M_h^{ij} &= \inner[L^2(\Omega)]{\phi_h^i}{\phi_h^j}, \\
+M_v^{ij} &= \inner[L^2(\Omega, \mathbb{R}^2)]{\bm\phi_v^i}{\bm\phi_v^j}, \\
+M_\partial^{lk} &= \inner[L^2(\partial\Omega)]{\phi_\partial^l}{\phi_\delta^k},
+\end{aligned}\quad
+\begin{aligned}
+{D}_{\grad}^{ji} &= \inner[L^2(\Omega, \mathbb{R}^2)]{\bm\phi_v^j}{\grad \phi_h^i}, \\
+{B}_{h}^{ik} &= \inner[L^2(\partial\Omega)]{\phi_h^i}{\phi_\partial^k}, \\
+\end{aligned}
+\end{equation}
+where $i \in \left\{1, n_1\right\}, \; j \in \left\{1, n_2\right\}, \; l \in \left\{1, n_\partial \right\}, \; k \in \left\{1, n_\partial \right\}$. 
+The discretized gradient of the Hamiltonian read
+\begin{equation}
+\begin{aligned}
+\partial_{{\alpha}_{d, h}^i} H_d(\bm{\alpha}_{d, h},\; \bm{\alpha}_{d, v}) &= \inner[L^2(\Omega)]{\bm\phi_h^i}{\frac{1}{2 \rho} \norm{\sum_{i=1}^{n_2} \bm{\phi}_v^i \alpha_v^i}^2 + \rho g \sum_{i=1}^{n_1} {\phi}_h^i \alpha_h^i}, \qquad i \in \left\{1, n_1\right\}, \\
+\partial_{{\alpha}_{d, v}^j} H_d(\bm{\alpha}_{d, h},\; \bm{\alpha}_{d, v}) &= \inner[L^2(\Omega, \mathbb{R}^2)]{\bm\phi_v^j}{\frac{1}{\rho} \left(\sum_{i=1}^{n_1} {\phi}_h^i \alpha_h^i\right) \left(\sum_{i=1}^{n_2} \bm{\phi}_v^i \alpha_v^i \right)}, \qquad j \in \left\{1, n_2\right\}.
+\end{aligned}
+\end{equation}
+
+
+
 \subsection{Linear case}
 
 \subsection{Examples}

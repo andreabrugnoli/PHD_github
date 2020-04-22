@@ -451,15 +451,15 @@ The last term on the right-hand side can be rewritten
 \end{equation*}
 with $\omega = \partial_x v_y - \partial_y v_x$ the local vorticity term. To derive a suitable pH formulation, the total energy, made up of kinetic and potential contribution, has to be invoked
 \begin{equation*}
-H = \frac{1}{2} \int_\Omega \left\{\rho h \norm{\bm{v}}^2 + \rho g h^2 \right\}  \d\Omega.
+H = \energy{\rho h \norm{\bm{v}}^2 + \rho g h^2}.
 \end{equation*}
 As energy variable the fluid height and the linear momentum are chosen
-\begin{equation*}
+\begin{equation}\label{eq:alpha_shwater}
 \alpha_h = h, \qquad \bm{\alpha}_v = \rho \bm{v}.
-\end{equation*}
+\end{equation}
 The Hamiltonian is a non separable functional of the energy variables
 \begin{equation}\label{eq:H_shwater}
-H(\alpha_h, \bm{\alpha}_v) = \frac{1}{2} \int_\Omega \frac{1}{\rho} \alpha_h \norm{\bm{\alpha}_v}^2 + \rho g \alpha_h^2 \d\Omega.
+H(\alpha_h, \bm{\alpha}_v) = \energy{\frac{1}{\rho} \alpha_h \norm{\bm{\alpha}_v}^2 + \rho g \alpha_h^2}.
 \end{equation}
 The co-energy variables are given by
 \begin{equation}\label{eq:e_shwater}
@@ -474,28 +474,30 @@ The mass and momentum conservation are then rewritten as follows
 \end{pmatrix} = 
 \begin{bmatrix}
 0 & -\div \\
--\grad & \mathcal{G}
+-\grad & \bm{\mathcal{G}}
 \end{bmatrix}
 \begin{pmatrix}
 e_h \\
 \bm{e}_v \\
 \end{pmatrix},
 \end{equation}
-The gyroscopic skew-symmetric term $\mathcal{G}$ introduces a non-linearity as it depends on the energy variables
+The gyroscopic skew-symmetric term $\bm{\mathcal{G}}$ introduces a non-linearity as it depends on the energy variables
 \begin{equation*}
-\mathcal{G}(\alpha_h, \bm{\alpha}_v) = \frac{\omega}{\alpha_h} \begin{bmatrix}
+\bm{\mathcal{G}}(\alpha_h, \bm{\alpha}_v) = \frac{\omega}{\alpha_h} \begin{bmatrix}
 0 & -1 \\
 1 & 0 \\
 \end{bmatrix}, \qquad \omega = \partial_x \alpha_{v, y} - \partial_y \alpha_{v, x}.
 \end{equation*}
 Despite the non-standard formulation, the energy rate provides anyway the boundary variables
-\begin{align*}
+\begin{equation}\label{eq:enrate_shwater}
+\begin{aligned}
 \dot{H} &= +\int_{\Omega} \left\{ e_h \, \partial_t \alpha_h + \bm{e}_v \cdot \partial_t \bm{\alpha}_v \right\} \d\Omega, \\
 &= -\int_{\Omega} \left\{ e_h \, \div \bm{e}_v + \bm{e}_v \cdot (\grad e_h - \mathcal{G} \bm{e}_v) \right\} \d\Omega, \qquad &\text{skew-symmetry of }\mathcal{G}, \\
 &= -\int_{\Omega} \left\{e_h \, \div \bm{e}_v + \bm{e}_v \cdot \grad e_h \right\}\d\Omega, \qquad &\text{Chain rule},  \\
 &= -\int_{\Omega} \div(e_h \, \bm{e}_v) \d\Omega, \qquad &\text{Stokes theorem}, \\
 &= -\int_{\partial \Omega} e_h \, \bm{e}_v\cdot\bm{n} \d{S} = -\inner[\partial\Omega]{e_h}{\bm{e}_v \cdot\bm{n}}.
-\end{align*}
+\end{aligned}
+\end{equation}
 
 Again two possible cases of uniform boundary causality arise:
 \begin{itemize}
