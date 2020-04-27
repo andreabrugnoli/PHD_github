@@ -100,7 +100,7 @@ To applied this methodology the non linearities are restricted to the Hamiltonia
 		&\bm{L}\;\, : X_1 \rightarrow X_2, \\
 		\end{aligned}
 	\end{equation}
-	where $\bm{L}$ is a matrix (a bounded operator). 	Analogously, the linear differential operator $\mathcal{J}_{{d}}$ is assumed to be of the form
+	where $\bm{L}$ is a bounded operator. 	Analogously, the linear differential operator $\mathcal{J}_{{d}}$ is assumed to be of the form
 	\begin{equation}\label{eq:assJd}
 	\mathcal{J}_{\text{d}} = 
 	\begin{bmatrix}
@@ -112,8 +112,7 @@ To applied this methodology the non linearities are restricted to the Hamiltonia
 	&\mathcal{L}\;\, : X_1 \rightarrow X_2, \\
 	\end{aligned}
 	\end{equation}
-	where $\mathcal{L}^*$ denotes the formal adjoint of the linear differential operator $\mathcal{L}$.
-	The operator $\mathcal{L}$ is unbounded and  can be either a first order or a second order differential operator. In the latter case it can be expressed as $\mathcal{L} = \mathcal{L}_1 \circ \mathcal{L}_2$. Given the splitting $X_1 \times X_2 = X$ the Hilbert space $H^\mathcal{J}$ can be split as well as 
+	where $\mathcal{L}^*$ denotes the formal adjoint of the linear differential operator $\mathcal{L}$. 	The operator $\mathcal{L}$ is unbounded and  can be either a first or a second order differential operator. In the latter case it can be expressed as $\mathcal{L} = \mathcal{L}_1 \circ \mathcal{L}_2$. Given the splitting $X_1 \times X_2 = X$ the Hilbert space $H^\mathcal{J}$ can be split as well as 
 	\begin{equation}
 		H^\mathcal{J} = H^\mathcal{L} \times H^\mathcal{-L^*}, \qquad
 		\begin{aligned}
@@ -512,7 +511,7 @@ System \eqref{eq:pHsys_findim_J2} can be put in canonical form by replacing the 
 
 \paragraph{Example: the irrotational shallow water equations}
 Consider as an example the shallow water equations detailed in Sec. \secref{sec:shallowwater}.  The flow is assumed to be irrotational ($\nabla \times \bm{v} = 0$). As a consequence the term $\bm{\mathcal{G}}$ in Eq. \eqref{eq:pHsys_shwater} vanishes.
-To fulfill Assumption \ref{ass:operBC}, the incoming volumetric flow is known at the boundary. This imposes a uniform Neumann condition. This lead to the following boundary control system, defined on an open connected set $\Omega \subset \mathbb{R}^2$
+To fulfill Assumption \ref{ass:operBC}, the incoming volumetric flow is known at the boundary, so that a uniform Neumann condition is imposed. This lead to the following boundary control system, defined on an open connected set $\Omega \subset \mathbb{R}^2$
 \begin{equation}
 \begin{aligned}
 \diffp{}{t}
@@ -712,7 +711,7 @@ From equation \eqref{eq:H_coenergy}, the power balance reads
 &= \inner[X_\partial]{\bm{y}_\partial}{\bm{u}_\partial}.
 \end{aligned}
 \end{equation}
-To get a finite dimensional approximation the same procedure detailed in Sec. \secref{sec:pfem_gen} is followed. The only difference is that there is no need to discretize the constitutive relations as those are already incorporate in the dynamics. 
+To get a finite dimensional approximation the same procedure detailed in Sec. \secref{sec:pfem_gen} is followed. The only difference is that there is no need to discretize the constitutive relations as those are already incorporated in the dynamics. 
 
 Once the system is put into weak form, if the operator $\mathcal{-L^*}$ is integrated by parts, one obtains the weak form 
 \begin{equation}\label{eq:weak_linsys_intJ1}
@@ -803,12 +802,19 @@ If the Galerkin approximation is applied to the weak form \eqref{eq:weak_linsys_
 \end{aligned}
 \end{equation}
 
-\subsection{Some examples of linear flexible structures}
+\subsection{Linear flexible structures}
 
 In this section, some linear example from the elasticity realms are considered. We restrict the discussion to linear problems. This case is anyway significant, as these examples are frequently encountered in engineering applications. 
 
+
 \subsubsection{Euler-Bernoulli beam}
-We reconsider the example discussed in Sec. \secref{sec:beamEB}. Given an interval $\Omega = (0, \, L)$, a thin beam under free boundary condition can be modeled in terms of co-energy variables by the following system
+We reconsider the example discussed in Sec. \secref{sec:beamEB}. The relation between energy and co-energy variables is given by Eqs. \eqref{eq:alpha_EB}, \eqref{eq:e_EB}
+\begin{equation}
+\alpha_w = \rho A \ e_w, \qquad \alpha_\kappa = \frac{1}{EI}\ e_\kappa
+\end{equation}
+The coefficients $\rho, A, E$ and $I$  are the mass density, the cross section area, Young's modulus of elasticity and the moment of inertia of the cross section. 
+
+\paragraph{Control through forces and torques} Given an interval $\Omega = (0, \, L)$, a thin beam under free boundary condition (forces and torques imposed at the boundary) can be modeled in terms of co-energy variables by the following system
 
 \begin{subequations}\label{eq:pHlinsys_EB1}
 \begin{align}
@@ -841,16 +847,17 @@ e_w \\ e_\kappa \\
 \end{pmatrix}, \qquad \quad \, \bm{y}_\partial \in \mathbb{R}^4.
 \end{align}
 \end{subequations}
-The coefficients $\rho, E$ and $I$  are the mass per unit length, Young's modulus of elasticity and the moment of inertia of a cross section.  The boundary operator $\bm\gamma_0, \, \bm\gamma_{1}$ denote the trace and the first derivative trace along the boundary. In a one-dimensional domain the boundary degenerates to two single points
+The boundary operator $\bm\gamma_0, \, \bm\gamma_{1}$ denote the trace and the first derivative trace along the boundary. In a one-dimensional domain the boundary degenerates to two single points
 \begin{equation}
 	\bm\gamma_0 a = a\vert_{\partial\Omega} = \begin{pmatrix}
 	-a(0) \\ +a(L)
 	\end{pmatrix}, \qquad \bm\gamma_1 a = \partial_x a\vert_{\partial\Omega} = \begin{pmatrix}
 	-\partial_x a(0) \\ +\partial_x a(L)
-	\end{pmatrix}
+	\end{pmatrix}.
 \end{equation}
-In this case $\mathcal{L} = \partial_{xx}$ and $X_1 = X_2 = L^2(\Omega), \; X_\partial = \mathbb{R}^4$. The boundary operators $N_{\partial, 1}, \, N_{\partial, 2}$ read
+In this case $X_1 = X_2 = L^2(\Omega), \; X_\partial = \mathbb{R}^4$. The operators $\mathcal{L}, \, N_{\partial, 1}, \, N_{\partial, 2}$ read
 \begin{equation}
+\mathcal{L} = \partial_{xx}, \qquad 
 N_{\partial, 1} = \begin{bmatrix}
 \bm\gamma_1 \\ \bm\gamma_0
 \end{bmatrix}, \qquad 
@@ -869,7 +876,7 @@ Applying twice the integration by parts formula, one obtains the power balance
 \dot{H} &= \inner[L^2(\Omega)]{e_w}{\rho A \ \partial_{t} e_w} + \inner[L^2(\Omega)]{e_\kappa}{(E I)^{-1} \ \partial_{t} e_\kappa}, \\
 &=\inner[L^2(\Omega)]{e_w}{-\partial_{xx} e_\kappa} + \inner[L^2(\Omega)]{e_\kappa}{\partial_{xx} e_w}, \\
 &=\inner[\mathbb{R}^2]{\bm\gamma_{1} e_w}{\bm\gamma_{0} e_\kappa} + \inner[\mathbb{R}^2]{\bm\gamma_{0} e_w}{-\bm\gamma_{1} e_\kappa}, \\
-&= \inner[\mathbb{R}^4]{\bm{y}_\partial}{\bm{u}_\partial}
+&= \inner[\mathbb{R}^4]{\bm{y}_\partial}{\bm{u}_\partial}.
 \end{aligned}
 \end{equation}
 Given the test functions $v_w, \; v_\kappa$, the weak form is readily obtained as 
@@ -933,7 +940,9 @@ The $\mathbf{B}_w$ is composed of four column vectors $\mathbf{B}_w = [\mathbf{b
 \begin{equation}
 {b}_w^{1,i} = -\partial_x \phi_w^i(0), \qquad {b}_w^{2,i} = \partial_x \phi_w^i(L), \qquad {b}_w^{3,i} = -\phi_w^i(0), \qquad {b}_w^{4,i} = \phi_w^i(L), \qquad i \in \{1, n_w\}.
 \end{equation}
-Equivalently, the second line of Eq. \eqref{eq:pHdyn_EB1} could have been integrated by parts to control trough the linear and angular velocities at the extremities. Consider the system with the opposite causality
+
+\paragraph{Control through linear and angular velocities}
+Equivalently, the second line of Eq. \eqref{eq:pHdyn_EB1} could have been integrated by parts to control trough the linear and angular velocities at the extremities. Consider the system with known forces and torques at the extremities
 \begin{subequations}\label{eq:pHlinsys_EB2}
 	\begin{align}
 	\begin{bmatrix}
@@ -1016,17 +1025,17 @@ The $\mathbf{B}_\kappa$ is composed of four column vectors $\mathbf{B}_\kappa = 
 
 Indeed, to lower the regularity requirement for the finite elements employed in the discretization, both lines can be integrated by parts. This will be discussed in Chap. \ref{ch:conv}.
 
-\subsubsection{Kirchhoff plate}
-The link beetween the energy and co-energy variables for the Kirchhoff model is the following
+\subsubsection{Kirchhoff plate}\label{sec:discr_Kir}
+The link beetween the energy and co-energy variables for the isotropic Kirchhoff model is the following \eqref{eq:alpha_Kirchh}
 \begin{equation}
-\alpha_w ={\rho h}e_w , \qquad \bm{A}_{\kappa} = \bm{\mathcal{C}}_b\bm{E}_{\kappa}
+\alpha_w ={\rho h}e_w , \qquad \bm{A}_{\kappa} = \bm{\mathcal{C}}_b\bm{E}_{\kappa}, \where \bm{\mathcal{C}}_b :=  \bm{\mathcal{D}}_b^{-1}
 \end{equation}
-where the bending compliance is given by 
-\begin{equation}
-\bm{\mathcal{C}}_b = \bm{\mathcal{D}}_b^{-1} = \frac{12}{E h^3}[(1 + \nu)(\cdot) - \nu \Tr(\cdot)\bm{I}_{2\times 2}].
+where $\rho$ is the mass density, $h$ the plate thickness and $\bm{\mathcal{D}}_b$, the bending rigidity tensor, cf. Eq. \eqref{eq:Db}. The bending compliance is given by 
+\begin{equation}\label{eq:bend_compliace}
+\bm{\mathcal{C}}_b = \frac{12}{E h^3}[(1 + \nu)(\cdot) - \nu \Tr(\cdot)\bm{I}_{2\times 2}].
 \end{equation}
-Given an open connected set $\Omega\subset \mathbb{R}^2$, the Kirchoff plate model \eqref{eq:phsysKir} in co-energy form controlled by forces and momenta is then expressed as 
-\begin{subequations}\label{eq:pHlinsys_K1}
+Given an open connected set $\Omega\subset \mathbb{R}^2$, the Kirchhoff plate model \eqref{eq:phsysKir} in co-energy form controlled by forces and momenta is then expressed as 
+\begin{subequations}\label{eq:pHlinsys_Kir1}
 \begin{align}
 \begin{bmatrix}
 \rho h & 0 \\
@@ -1047,7 +1056,7 @@ e_w \\
 \end{pmatrix}, \qquad
 \begin{aligned}
 e_w &\in H^2(\Omega),  \\
-\bm{E}_\kappa &\in H^{\div\Div}(\Omega,\mathbb{S}), \label{eq:pHdyn_K1} \\
+\bm{E}_\kappa &\in H^{\div\Div}(\Omega,\mathbb{R}^{2\times 2}_{\text{sym}}), \label{eq:pHdyn_Kir1} \\
 \end{aligned} 
  \vspace{3pt}\\
 \bm{u}_\partial  &= 
@@ -1069,20 +1078,21 @@ e_w \\
 \end{pmatrix}, \qquad\quad\; \bm{y}_\partial \in \mathbb{R}^2,
 \end{align}
 \end{subequations}
-where $\mathbb{S}=\mathbb{R}^{2\times 2}_{\text{sym}}$. We recall the expressions of the trace maps
+We recall the expressions of the trace maps
 \begin{equation}
 \begin{aligned}
-\gamma_{nn, 1}\bm{A} &= -\bm{n} \cdot \Div \bm{A} - \partial_{\bm{s}} (\bm{A} \cddot (\bm{n} \otimes \bm{s}))\vert_{\partial\Omega}, \\
-\gamma_{nn}\bm{A} &= \bm{A} \cddot (\bm{n} \otimes \bm{n})\vert_{\partial\Omega},
-\end{aligned} \qquad 
-\begin{aligned}
 \gamma_{0}a &= a\vert_{\partial\Omega}, \\
-\gamma_{1}a &= \partial_{\bm{n}} a \vert_{\partial\Omega}.
+\gamma_{1}a &= \partial_{\bm{n}} a \vert_{\partial\Omega},
+\end{aligned}\qquad
+\begin{aligned}
+\gamma_{nn, 1}\bm{A} &= -\bm{n} \cdot \Div \bm{A} - \partial_{\bm{s}} (\bm{A} \cddot (\bm{n} \otimes \bm{s}))\vert_{\partial\Omega}, \\
+\gamma_{nn}\bm{A} &= \bm{A} \cddot (\bm{n} \otimes \bm{n})\vert_{\partial\Omega}.
 \end{aligned}
 \end{equation}
 
-In this case $\mathcal{L}= \Hess, \; X_1=L^2(\Omega), \;  X_2=L^2(\Omega, \mathbb{S}),\; X_\partial = L^2(\partial\Omega, \mathbb{R}^2)$. The boundary operators $N_{\partial, 1}, \, N_{\partial, 2}$ are
+The Hilbert spaces here considered are $X_1=L^2(\Omega), \;  X_2=L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}}),\; X_\partial = L^2(\partial\Omega, \mathbb{R}^2)$. The  operators $\mathcal{L}, \, N_{\partial, 1}, \, N_{\partial, 2}$ are
 \begin{equation}
+\mathcal{L}= \Hess, \qquad
 N_{\partial, 1} = \begin{bmatrix}
 \gamma_0 \\ \gamma_1
 \end{bmatrix}, \qquad 
@@ -1091,11 +1101,11 @@ N_{\partial, 2} = \begin{bmatrix}
 \end{bmatrix}.
 \end{equation}
 
-The energy rate is retrieve from Eq. \eqref{eq:enrateKir} $\dot{H} = \inner[L^2(\partial\Omega, \mathbb{R}^2)]{\bm{y}_\partial}{\bm{u}_\partial}$. Introducing the test functions $(v_w,\, \bm{V}_\kappa)$ and integrating by parts twice the first line of \eqref{eq:pHdyn_K1} one gets 
+The energy rate from Eq. \eqref{eq:enrateKir} equals $\dot{H} = \inner[L^2(\partial\Omega, \mathbb{R}^2)]{\bm{y}_\partial}{\bm{u}_\partial}$. Introducing the test functions $(v_w,\, \bm{V}_\kappa)$ and integrating by parts twice the first line of \eqref{eq:pHdyn_Kir1} one gets 
 \begin{equation}
 \begin{aligned}
-\inner[L^2(\Omega)]{v_w}{\rho h \partial_t e_w} &= -\inner[L^2(\Omega, \mathbb{S})]{\Hess v_w}{\bm{E}_\kappa} + \inner[L^2(\partial\Omega)]{\gamma_0 v_w}{{u}_{q_n}} + \inner[L^2(\partial\Omega)]{\gamma_0 v_w}{{u}_{M_{nn}}}, \\
-\inner[L^2(\Omega, \mathbb{S})]{\bm{V}_\kappa}{\bm{\mathcal{C}_b} \partial_t \bm{V}_\kappa} &= \inner[L^2(\Omega, \mathbb{S})]{\bm{V}_\kappa}{\Hess e_w}. \\
+\inner[L^2(\Omega)]{v_w}{\rho h \partial_t e_w} &= -\inner[L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}})]{\Hess v_w}{\bm{E}_\kappa} + \inner[L^2(\partial\Omega)]{\gamma_0 v_w}{{u}_{\partial, 1}} + \inner[L^2(\partial\Omega)]{\gamma_1 v_w}{{u}_{\partial, 2}}, \\
+\inner[L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}})]{\bm{V}_\kappa}{\bm{\mathcal{C}_b} \partial_t \bm{V}_\kappa} &= \inner[L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}})]{\bm{V}_\kappa}{\Hess e_w}. \\
 \end{aligned}
 \end{equation}
 Introducing a Galerkin discretization for test and efforts functions
@@ -1111,14 +1121,15 @@ e_w &= \sum_{i = 1}^{n_w} \phi_w^i e_w^i,
 \begin{aligned}
 \bm{v}_\partial &= \sum_{i = 1}^{n_\partial} \bm\phi_\partial^i v_\partial^i, \\
 \bm{u}_\partial &= \sum_{i = 1}^{n_\partial} \bm\phi_\partial^i u_\partial^i,
-\end{aligned}
+\end{aligned} \qquad
+\bm{y}_\partial = \sum_{i = 1}^{n_\partial} \bm\phi_\partial^i y_\partial^i.
 \end{equation} 
 the following finite dimensional system is obtained
 \begin{equation}
 \begin{aligned}
 \begin{bmatrix}
 \mathbf{M}_{\rho h} & \mathbf{0} \\
-\mathbf{0} & \mathbf{M}_{\mathcal{C}_b} \\
+\mathbf{0} & \mathbf{M}_{\bm{\mathcal{C}}_b} \\
 \end{bmatrix}
 \begin{pmatrix}
 \dot{\mathbf{e}}_{w} \\
@@ -1133,12 +1144,13 @@ the following finite dimensional system is obtained
 \mathbf{e}_{\kappa} \\
 \end{pmatrix} + 
 \begin{bmatrix}
-\mathbf{B}_w\\
-\mathbf{0}\\
+\mathbf{B}_w & \mathbf{B}_{\partial_{\bm{n}} w}\\
+\mathbf{0} & \mathbf{0}\\
 \end{bmatrix}
 \mathbf{u}_\partial, \\
 \mathbf{M}_\partial {\mathbf{y}_\partial} &= \begin{bmatrix}
-\mathbf{B}_w^\top & \mathbf{0}
+\mathbf{B}_w^\top & \mathbf{0} \\
+\mathbf{B}_{\partial_{\bm{n}} w}^\top & \mathbf{0} \\
 \end{bmatrix}\begin{pmatrix}
 \mathbf{e}_{w} \\
 \mathbf{e}_{\kappa} \\
@@ -1149,16 +1161,361 @@ The matrices $\mathbf{M}_{\rho h}, \; \mathbf{M}_{\mathcal{C}_b}, \;
 \mathbf{D}_{\Hess}$ are defined as ($i, j \in \{1, n_w\}, \; m, n \in \{1, n_\kappa\}$)
 \begin{equation}
 M_{\rho h}^{ij} = \inner[L^2(\Omega)]{\phi_w^i}{\rho h \phi_w^j}, \quad
-M_{\mathcal{C}_b}^{mn} = \inner[L^2(\Omega, \mathbb{S})]{\bm\Phi_\kappa^m}{\bm{\mathcal{C}}_b \bm\Phi_\kappa^n}, \quad D_{\Hess}^{mi} = \inner[L^2(\Omega)]{\bm\Phi_\kappa^m}{\Hess \phi_w^i}.
+M_{\bm{\mathcal{C}}_b}^{mn} = \inner[L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}})]{\bm\Phi_\kappa^m}{\bm{\mathcal{C}}_b \bm\Phi_\kappa^n}, \quad D_{\Hess}^{mi} = \inner[L^2(\Omega)]{\bm\Phi_\kappa^m}{\Hess \phi_w^i}.
 \end{equation}
-The $\mathbf{B}_w$ is composed of two blocks $\mathbf{B}_w = [\mathbf{B}_w^{{q}_n} \; \mathbf{B}_w^{M_{nn}}]$
+Matrices $\mathbf{B}_w, \; \mathbf{B}_{\partial_{\bm{n}} w}$ are given by
 \begin{equation}
-{B}_w^{q_n,il} = \inner[L^2(\partial\Omega)]{\gamma_0 \phi_w^i}{\phi_{\partial, 1}^l}, \qquad {B}_w^{M_{nn},il} = \inner[L^2(\partial\Omega)]{\gamma_1 \phi_w^i}{\phi_{\partial, 2}^l}, \qquad i \in \{1, n_w\}, \; l \in \{1, n_\partial\}.
+{B}_w^{il} = \inner[L^2(\partial\Omega)]{\gamma_0 \phi_w^i}{\phi_{\partial, 1}^l}, \qquad {B}_{\partial_{\bm{n}} w}^{il} = \inner[L^2(\partial\Omega)]{\gamma_1 \phi_w^i}{\phi_{\partial, 2}^l}, \qquad l \in \{1, n_\partial\}.
 \end{equation}
-Equivalently, the second line of Eq. \eqref{eq:pHdyn_K1} can be integrated by parts twice to obtain a discretized system whose input are the linear velocity and the angular velocity at the boundary. However, while for the $H^2$ space conforming finite elements are available, for the $H^{\div\Div}$ no conforming finite elements have been proposed. This makes the discretization unfeasible. To handle a mixed boundary control, Lagrange multipliers may be used (cf. Section \secref{sec:lagrMul}).
+Equivalently, the second line of Eq. \eqref{eq:pHdyn_Kir1} can be integrated by parts twice to obtain a discretized system whose input are the linear velocity and the angular velocity at the boundary. However, while for the $H^2$ space conforming finite elements are available, for the $H^{\div\Div}$ no conforming finite elements have been proposed. This makes the discretization unfeasible. To handle a mixed boundary control, Lagrange multipliers may be used (cf. Section \secref{sec:lagrMul}).
 
 \subsubsection{Mindlin plate}
+Using Eqs. \eqref{eq:alpha_Min} and \eqref{eq:e_Min}, the relation between co-energy and energy variables for the isotropic Mindlin plate is found to be
+\begin{equation}
+\begin{aligned}
+\alpha_w &= \rho h e_w, \\
+\bm{A}_{\kappa} &= \bm{\mathcal{C}}_b \bm{E}_\kappa,\\
+\end{aligned} \qquad
+\begin{aligned}
+\bm{\alpha}_{\theta} &= I_\theta \bm{e}_\theta,\\
+\bm{\alpha}_{\gamma} &= C_s \bm{e}_{\gamma}, \\
+\end{aligned} \qquad
+\begin{aligned}
+I_\theta &:= {\rho h^3}/{12},\\
+C_s &:= {1}/{(kGh)}, \\
+\end{aligned}
+\end{equation}
+where $k$ is the shear correction factor, $G$ the shear modulus. The other variables have the same meaning as in Sec. \secref{sec:discr_Kir}. 
 
+\paragraph{Control through forces and torques} A pH representation in co-energy variables with known forces and momenta at the boundary is given by the system
+
+\begin{subequations}\label{eq:phlinsys_Min1}
+\begin{align}
+\begin{bmatrix}
+\rho h  & 0  & 0  & 0 \\
+\bm{0} & I_\theta &  \bm{0} & \bm{0}\\
+\bm{0}  & \bm{0}  & \bm{\mathcal{C}}_b  & \bm{0}\\
+\bm{0} & \bm{0} &  \bm{0} & C_s \\
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+e \\
+\bm{e}_\theta \\
+\bm{E}_\kappa \\
+\bm{e}_{\gamma} \\
+\end{pmatrix} &= 
+\begin{bmatrix}
+	0  & 0  & 0  & \div \\
+	\bm{0} & \bm{0} &  \Div & \bm{I}_{2 \times 2}\\
+	\bm{0}  & \Grad  & \bm{0}  & \bm{0}\\
+	\grad & -\bm{I}_{2 \times 2} &  \bm{0} & \bm{0} \\
+	\end{bmatrix}
+\begin{pmatrix}
+e_w \\
+\bm{e}_{\theta} \\
+\bm{E}_{\kappa} \\
+\bm{e}_{\gamma} \\
+\end{pmatrix}, \quad
+\begin{aligned}
+e_w &\in H^1(\Omega), \\
+\bm{e}_{\theta} &\in H^{\Grad}(\Omega, \mathbb{R}^2), \\
+\bm{E}_{\kappa} &\in H^{\Div}(\Omega,\mathbb{R}^{2\times 2}_{\text{sym}}), \\
+\bm{e}_{\gamma} &\in H^{\div}(\Omega,\mathbb{R}^2), \\
+\end{aligned} \label{eq:pHdyn_Min1}  \\
+\bm{u}_\partial &= 
+	\begin{bmatrix}
+	{0} &  {0} & {0} & \gamma_{n} \\
+	{0} &  {0} & \gamma_{nn} & {0} \\
+	{0} &  {0} & \gamma_{ns} & {0} \\
+	\end{bmatrix}
+\begin{pmatrix}
+e_w \\
+\bm{e}_{\theta} \\
+\bm{E}_{\kappa} \\
+\bm{e}_{\gamma} \\
+\end{pmatrix}, \qquad \bm{u}_\partial \in \mathbb{R}^3, \\
+\bm{y}_\partial &= 
+	\begin{bmatrix}
+	\gamma_{0} & {0} & {0} & {0} \\
+	{0} & \gamma_{n} & {0} & {0} \\
+	{0} & \gamma_{s} & {0} & {0} \\
+	\end{bmatrix}
+\begin{pmatrix}
+e_w \\
+\bm{e}_{\theta} \\
+\bm{E}_{\kappa} \\
+\bm{e}_{\gamma} \\
+\end{pmatrix}, \qquad\;\; \bm{y}_\partial \in \mathbb{R}^3.
+\end{align}
+\end{subequations}
+The trace operators are defined as
+\begin{equation}
+\gamma_{0}a = a\vert_{\partial\Omega}, \qquad
+\begin{aligned}
+\gamma_{n}\bm{a} &= \bm{a} \cdot \bm{n}\vert_{\partial\Omega}, \\
+\gamma_{s}\bm{a} &= \bm{a} \cdot \bm{s}\vert_{\partial\Omega},
+\end{aligned}  \qquad 
+\begin{aligned}
+\gamma_{nn}\bm{A} &= \bm{A} \cddot (\bm{n} \otimes \bm{n})\vert_{\partial\Omega}, \\
+\gamma_{ns}\bm{A} &= \bm{A} \cddot (\bm{n} \otimes \bm{s})\vert_{\partial\Omega}.
+\end{aligned}
+\end{equation}
+
+For this example, the Hilbert spaces under consideration are $X_1 = L^2(\Omega) \times L^2(\Omega, \mathbb{R}^2), \; X_2 = L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}}) \times L^2(\Omega, \mathbb{R}^2), \; X_\partial = L^2(\Omega, \mathbb{R}^3)$. The $\bm{L}, \; \mathcal{L}, \; \mathcal{N}_{\partial, 1}, \; \mathcal{N}_{\partial, 1}$ operators are 
+\begin{equation}
+\bm{L} = \begin{bmatrix}
+\bm{0}  & \bm{0}  \\
+\bm{0} & -\bm{I}_{2 \times 2} \\
+\end{bmatrix}, \qquad
+\mathcal{L} = \begin{bmatrix}
+\bm{0} & \Grad\\
+\grad & \bm{0}\\
+\end{bmatrix}, \qquad
+\mathcal{N}_{\partial, 1} = \begin{bmatrix}
+\gamma_0 & 0 \\ 
+0 & \gamma_n \\
+0 & \gamma_s \\
+\end{bmatrix}, \qquad 
+\mathcal{N}_{\partial, 2} = \begin{bmatrix}
+0 & \gamma_{n}  \\
+\gamma_{nn} & 0 \\
+\gamma_{ns} & 0\\
+\end{bmatrix}.
+\end{equation}
+
+The energy rate is retrieved from Eq. \eqref{eq:enrateMin} $\dot{H} = \inner[L^2(\partial\Omega, \mathbb{R}^2)]{\bm{y}_\partial}{\bm{u}_\partial}$. Introducing the test functions $(v_w,\, \bm{v}_\theta, \, \bm{V}_\kappa, \, \bm{v}_\gamma)$ and integrating by parts the first two lines of \eqref{eq:pHdyn_Min1} one gets 
+\begin{equation}
+\begin{aligned}
+\inner[L^2(\Omega)]{v_w}{\rho h \partial_t e_w} &= -\inner[L^2(\Omega, \mathbb{R}^{2})]{\grad v_w}{\bm{e}_\theta} + \inner[L^2(\partial\Omega)]{\gamma_0 v_w}{{u}_{\partial, 1}}, \\
+\inner[L^2(\Omega, \mathbb{R}^{2})]{\bm{v}_\theta}{I_\theta \partial_t \bm{e}_\theta} &= -\inner[L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}})]{\Grad \bm{v}_\theta}{\bm{E}_\kappa} + \inner[L^2(\Omega)]{\bm{v}_\theta}{\bm{e}_\gamma} + \inner[L^2(\partial\Omega, \mathbb{R}^2)]{\bm\gamma_0 \bm{v}_\theta}{\bm\gamma_n \bm{E}_{\kappa}}, \\
+\inner[L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}})]{\bm{V}_\kappa}{\bm{\mathcal{C}_b} \partial_t \bm{E}_\kappa} &= \inner[L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}})]{\bm{V}_\kappa}{\Grad \bm{e}_\theta}, \\
+\inner[L^2(\Omega, \mathbb{R}^{2})]{\bm{v}_\gamma}{C_s \partial_t \bm{e}_\gamma} &= \inner[L^2(\Omega, \mathbb{R}^{2})]{\bm{v}_\gamma}{\grad e_w} - \inner[L^2(\Omega, \mathbb{R}^{2})]{\bm{v}_\gamma}{\bm{e}_\theta}. \\
+\end{aligned}
+\end{equation}
+The term $\inner[L^2(\partial\Omega, \mathbb{R}^2)]{\bm\gamma_0 \bm{v}_\theta}{\bm{u}_{\partial,2}}$ can be decomposed in its tangential and normal components
+\begin{equation}
+	\inner[L^2(\partial\Omega, \mathbb{R}^2)]{\bm\gamma_0 \bm{v}_\theta}{\bm\gamma_n \bm{E}_{\kappa}} = \inner[L^2(\partial\Omega)]{\bm\gamma_n \bm{v}_\theta}{\bm{u}_{\partial,2}} + \inner[L^2(\partial\Omega)]{\bm\gamma_s \bm{v}_\theta}{\bm{u}_{\partial,3}}
+\end{equation}
+Introducing a Galerkin discretization for test and efforts functions
+\begin{equation}\label{eq:approx_vebMin}
+\begin{aligned}
+v_w &= \sum_{i = 1}^{n_w} \phi_w^i v_w^i, \\
+e_w &= \sum_{i = 1}^{n_w} \phi_w^i e_w^i, \\
+\end{aligned} \qquad
+\begin{aligned}
+\bm{v}_\theta &= \sum_{i = 1}^{n_\theta} \bm\phi_\theta^i v_\theta^i, \\
+\bm{e}_\theta &= \sum_{i = 1}^{n_\theta} \bm\phi_\theta^i e_\theta^i,
+\end{aligned} \qquad
+\begin{aligned}
+\bm{V}_\kappa &= \sum_{i = 1}^{n_\kappa} \bm\Phi_\kappa^i v_\kappa^i, \\
+\bm{E}_\kappa &= \sum_{i = 1}^{n_\kappa} \bm\Phi_\kappa^i e_\kappa^i, \\
+\end{aligned} \qquad
+\begin{aligned}
+\bm{v}_\gamma &= \sum_{i = 1}^{n_\gamma} \bm\phi_\gamma^i v_\gamma^i, \\
+\bm{e}_\gamma &= \sum_{i = 1}^{n_\gamma} \bm\phi_\gamma^i e_\gamma^i,
+\end{aligned} \qquad
+\begin{aligned}
+\bm{v}_\partial &= \sum_{i = 1}^{n_\partial} \bm\phi_\partial^i v_\partial^i, \\
+\bm{u}_\partial &= \sum_{i = 1}^{n_\partial} \bm\phi_\partial^i u_\partial^i, \\
+\bm{y}_\partial &= \sum_{i = 1}^{n_\partial} \bm\phi_\partial^i y_\partial^i.
+\end{aligned}
+\end{equation} 
+the following finite dimensional system is obtained
+\begin{equation}
+\begin{aligned}
+\mathrm{Diag}\begin{bmatrix}
+\mathbf{M}_{\rho h}\\
+\mathbf{M}_{I_\theta}\\
+\mathbf{M}_{\bm{\mathcal{C}}_b}\\
+\mathbf{M}_{{C}_s} \\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\mathbf{e}}_{w} \\
+\dot{\mathbf{e}}_{\theta} \\
+\dot{\mathbf{e}}_{\kappa} \\
+\dot{\mathbf{e}}_{\gamma} \\
+\end{pmatrix}
+&= \begin{bmatrix}
+\mathbf{0} & \mathbf{0} & \mathbf{0} & -\mathbf{D}_{\grad}^\top \\
+\mathbf{0} & \mathbf{0} & -\mathbf{D}_{\Grad}^\top & -\mathbf{D}_{0}^\top \\
+\mathbf{0} & \mathbf{D}_{\Grad} & \mathbf{0} & \mathbf{0}\\
+\mathbf{D}_{\grad} & \mathbf{D}_{0} & \mathbf{0} & \mathbf{0}\\
+\end{bmatrix} 
+\begin{pmatrix}
+{\mathbf{e}}_{w} \\
+{\mathbf{e}}_{\theta} \\
+{\mathbf{e}}_{\kappa} \\
+{\mathbf{e}}_{\gamma} \\
+\end{pmatrix} + 
+\begin{bmatrix}
+\mathbf{B}_w & \mathbf{0} & \mathbf{0} \\
+\mathbf{0} & \mathbf{B}_{\theta_n} & \mathbf{B}_{\theta_s}\\
+\mathbf{0} & \mathbf{0} & \mathbf{0} \\
+\mathbf{0} & \mathbf{0} & \mathbf{0} \\
+\end{bmatrix}
+\mathbf{u}_\partial, \\
+\mathbf{M}_\partial {\mathbf{y}_\partial} &= \begin{bmatrix}
+\mathbf{B}_w^\top & \mathbf{0} & \mathbf{0} & \mathbf{0} \\
+\mathbf{0} & \mathbf{B}_{\theta_n}^\top & \mathbf{0} & \mathbf{0}\\ 
+\mathbf{0} & \mathbf{0} & \mathbf{B}_{\theta_s}^\top & \mathbf{0}\\
+\end{bmatrix}
+\begin{pmatrix}
+{\mathbf{e}}_{w} \\
+{\mathbf{e}}_{\theta} \\
+{\mathbf{e}}_{\kappa} \\
+{\mathbf{e}}_{\gamma} \\
+\end{pmatrix}.
+\end{aligned}
+\end{equation}
+The notation $\mathrm{Diag}$ denotes a block diagonal matrix. The mass matrices $\mathbf{M}_{\rho h}, \; \mathbf{M}_{I_\theta}, \; \mathbf{M}_{\bm{\mathcal{C}}_b}, \; \mathbf{M}_{{C}_s}$ are computed as
+\begin{equation}
+\begin{aligned}
+M_{\rho h}^{ij} &= \inner[L^2(\Omega)]{\phi_w^i}{\rho h \phi_w^j}, \\
+M_{I_\theta}^{mn} &= \inner[L^2(\Omega, \mathbb{R}^{2})]{\phi_\kappa^m}{I_\theta \phi_\kappa^n},
+\end{aligned} \qquad
+\begin{aligned}
+\quad M_{\mathcal{C}_b}^{pq} &= \inner[L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}})]{\bm\Phi_\kappa^p}{\bm{\mathcal{C}}_b \bm\Phi_\kappa^q}, \\
+M_{C_s}^{rs} &= \inner[L^2(\Omega, \mathbb{R}^{2})]{\bm\phi_\gamma^r}{C_s \bm\phi_\gamma^s}, 
+\end{aligned}
+\end{equation}
+where $i, j \in \{1, n_w\}, \; m, n \in \{1, n_\theta\}, \, p, q \in \{1, n_\kappa\}, \; r, s \in \{1, n_\gamma\}$. Matrices $\mathbf{D}_{\grad}, \; \mathbf{D}_{\Grad}, \; \mathbf{D}_{0}$ assume the form
+\begin{equation}
+\begin{aligned}
+D_{\grad}^{rj} &= \inner[L^2(\Omega, \mathbb{R}^2)]{\bm\phi_\gamma^r}{\grad \phi_w^j}, \\ D_{\Grad}^{pn} &= \inner[L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}})]{\bm\Phi_\kappa^p}{\Grad \bm\phi_\theta^n},
+\end{aligned} \quad
+D_{0}^{rn} = -\inner[L^2(\Omega, \mathbb{R}^2)]{\bm\phi_\gamma^r}{\bm\phi_\theta^n}.
+\end{equation}
+
+
+Matrix $\mathbf{B}_w, \, \mathbf{B}_{\theta_n}, \, \mathbf{B}_{\theta_s}$ are computed as ($l \in \{1, n_\partial\}$)
+\begin{equation}
+{B}_w^{il} = \inner[L^2(\partial\Omega)]{\gamma_0 \phi_w^i}{\phi_{\partial, 1}^l}, \qquad {B}_{\theta_n}^{ml} = \inner[L^2(\partial\Omega)]{\gamma_n \bm\phi_\theta^m}{\phi_{\partial, 2}^l},  \qquad {B}_{\theta_s}^{ml} = \inner[L^2(\partial\Omega)]{\gamma_s \bm\phi_\theta^m}{\phi_{\partial, 3}^l}.
+\end{equation}
+
+\paragraph{Control through linear and angular velocities} If instead the opposite causality is considered, the continuous system read
+\begin{subequations}\label{eq:phlinsys_Min2}
+	\begin{align}
+	\begin{bmatrix}
+	\rho h  & 0  & 0  & 0 \\
+	\bm{0} & I_\theta &  \bm{0} & \bm{0}\\
+	\bm{0}  & \bm{0}  & \bm{\mathcal{C}}_b  & \bm{0}\\
+	\bm{0} & \bm{0} &  \bm{0} & C_s \\
+	\end{bmatrix}
+	\diffp{}{t}
+	\begin{pmatrix}
+	e \\
+	\bm{e}_\theta \\
+	\bm{E}_\kappa \\
+	\bm{e}_{\gamma} \\
+	\end{pmatrix} &= 
+	\begin{bmatrix}
+	0  & 0  & 0  & \div \\
+	\bm{0} & \bm{0} &  \Div & \bm{I}_{2 \times 2}\\
+	\bm{0}  & \Grad  & \bm{0}  & \bm{0}\\
+	\grad & -\bm{I}_{2 \times 2} &  \bm{0} & \bm{0} \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	e_w \\
+	\bm{e}_{\theta} \\
+	\bm{E}_{\kappa} \\
+	\bm{e}_{\gamma} \\
+	\end{pmatrix},  \label{eq:pHdyn_Min2}  \\
+	\bm{u}_\partial &= 
+	\begin{bmatrix}
+	\gamma_{0} & {0} & {0} & {0} \\
+	{0} & \gamma_{n} & {0} & {0} \\
+	{0} & \gamma_{s} & {0} & {0} \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	e_w \\
+	\bm{e}_{\theta} \\
+	\bm{E}_{\kappa} \\
+	\bm{e}_{\gamma} \\
+	\end{pmatrix}, \qquad\;\; \bm{u}_\partial \in \mathbb{R}^3, \\
+	\bm{y}_\partial &= 
+	\begin{bmatrix}
+	{0} &  {0} & {0} & \gamma_{n} \\
+	{0} &  {0} & \gamma_{nn} & {0} \\
+	{0} &  {0} & \gamma_{ns} & {0} \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	e_w \\
+	\bm{e}_{\theta} \\
+	\bm{E}_{\kappa} \\
+	\bm{e}_{\gamma} \\
+	\end{pmatrix}, \qquad \bm{y}_\partial \in \mathbb{R}^3.
+	\end{align}
+\end{subequations}
+integrating by parts the last two lines of \eqref{eq:pHdyn_Min2} one gets 
+\begin{equation}
+\begin{aligned}
+\inner[L^2(\Omega)]{v_w}{\rho h \partial_t e_w} &= \inner[L^2(\Omega, \mathbb{R}^{2})]{v_w}{\div \bm{e}_\theta}, \\
+\inner[L^2(\Omega, \mathbb{R}^{2})]{\bm{v}_\theta}{I_\theta \partial_t \bm{e}_\theta} &= \inner[L^2(\Omega, \mathbb{R}^{2})]{\bm{v}_\theta}{\Div \bm{E}_\kappa} + \inner[L^2(\Omega)]{\bm{v}_\theta}{\bm{e}_\gamma} , \\
+\inner[L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}})]{\bm{V}_\kappa}{\bm{\mathcal{C}_b} \partial_t \bm{E}_\kappa} &= -\inner[L^2(\Omega, \mathbb{R}^{2})]{\Div \bm{V}_\kappa}{\bm{e}_\theta} + \inner[L^2(\partial\Omega, \mathbb{R}^2)]{\bm\gamma_n \bm{V}_\kappa}{\bm\gamma_0 \bm{e}_{\theta}}, \\
+\inner[L^2(\Omega, \mathbb{R}^{2})]{\bm{v}_\gamma}{C_s \partial_t \bm{e}_\gamma} &= -\inner[L^2(\Omega)]{\div \bm{v}_\gamma}{e_w} - \inner[L^2(\Omega, \mathbb{R}^{2})]{\bm{v}_\gamma}{\bm{e}_\theta}  + \inner[L^2(\partial\Omega)]{\gamma_0 v_w}{{u}_{\partial, 1}}. \\
+\end{aligned}
+\end{equation}
+The term $\inner[L^2(\partial\Omega, \mathbb{R}^2)]{\bm\gamma_n \bm{V}_\kappa}{\bm\gamma_0 \bm{e}_{\theta}}$ can be decomposed in its tangential and normal components
+\begin{equation}
+\inner[L^2(\partial\Omega, \mathbb{R}^2)]{\bm\gamma_n \bm{V}_\kappa}{\bm\gamma_0 \bm{e}_{\theta}} = \inner[L^2(\partial\Omega)]{\gamma_{nn} \bm{V}_\kappa}{\bm{u}_{\partial,2}} + \inner[L^2(\partial\Omega)]{\gamma_{ns} \bm{V}_\kappa}{\bm{u}_{\partial,3}}
+\end{equation}
+Plugging approximation \eqref{eq:approx_vebMin} into this system, one computes
+\begin{equation}
+\begin{aligned}
+\mathrm{Diag}\begin{bmatrix}
+\mathbf{M}_{\rho h}\\
+\mathbf{M}_{I_\theta}\\
+\mathbf{M}_{\bm{\mathcal{C}}_b}\\
+\mathbf{M}_{{C}_s} \\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\mathbf{e}}_{w} \\
+\dot{\mathbf{e}}_{\theta} \\
+\dot{\mathbf{e}}_{\kappa} \\
+\dot{\mathbf{e}}_{\gamma} \\
+\end{pmatrix}
+&= \begin{bmatrix}
+\mathbf{0} & \mathbf{0} & \mathbf{0} & \mathbf{D}_{\div} \\
+\mathbf{0} & \mathbf{0} & \mathbf{D}_{\Div} & -\mathbf{D}_{0}^\top \\
+\mathbf{0} & -\mathbf{D}_{\Div}^\top & \mathbf{0} & \mathbf{0}\\
+-\mathbf{D}_{\div}^\top & \mathbf{D}_{0} & \mathbf{0} & \mathbf{0}\\
+\end{bmatrix} 
+\begin{pmatrix}
+{\mathbf{e}}_{w} \\
+{\mathbf{e}}_{\theta} \\
+{\mathbf{e}}_{\kappa} \\
+{\mathbf{e}}_{\gamma} \\
+\end{pmatrix} + 
+\begin{bmatrix}
+\mathbf{0} & \mathbf{0} & \mathbf{0} \\
+\mathbf{0} & \mathbf{0} & \mathbf{0} \\
+\mathbf{0} & \mathbf{B}_{M_{nn}} & \mathbf{B}_{M_{ns}}\\
+\mathbf{B}_{q_n} & \mathbf{0} & \mathbf{0} \\
+\end{bmatrix}
+\mathbf{u}_\partial, \\
+\mathbf{M}_\partial {\mathbf{y}_\partial} &= \begin{bmatrix}
+\mathbf{0} & \mathbf{0} & \mathbf{0} & \mathbf{B}_{q_n}^\top \\
+\mathbf{0} & \mathbf{0} & \mathbf{B}_{M_{nn}}^\top & \mathbf{0} \\ 
+\mathbf{0} & \mathbf{0} & \mathbf{B}_{M_{ns}}^\top & \mathbf{0} \\ 
+\end{bmatrix}
+\begin{pmatrix}
+{\mathbf{e}}_{w} \\
+{\mathbf{e}}_{\theta} \\
+{\mathbf{e}}_{\kappa} \\
+{\mathbf{e}}_{\gamma} \\
+\end{pmatrix}.
+\end{aligned}
+\end{equation}
+Matrices $\mathbf{D}_{\div}, \; \mathbf{D}_{\Div}$ assume the form ($i, j \in \{1, n_w\}, \; m, n \in \{1, n_\theta\}, \, p, q \in \{1, n_\kappa\}, \; r, s \in \{1, n_\gamma\}$)
+\begin{equation}
+D_{\div}^{is} = \inner[L^2(\Omega)]{\phi_w^i}{\div \bm\phi_\gamma^s}, \qquad D_{\Div}^{mq} = \inner[L^2(\Omega, \mathbb{R}^2)]{\bm\phi_\theta^m}{\Div \bm\Phi_\kappa^q}.
+\end{equation}
+Matrix $\mathbf{B}_{q_n}, \, \mathbf{B}_{M_{nn}}, \, \mathbf{B}_{M_{ns}}$ are computed as ($l \in \{1, n_\partial\}$)
+\begin{equation}
+{B}_{q_n}^{pl} = \inner[L^2(\partial\Omega)]{\gamma_n \bm\phi_\gamma^p}{\phi_{\partial, 1}^l}, \quad {B}_{M_{nn}}^{ml} = \inner[L^2(\partial\Omega)]{\gamma_{nn} \bm\Phi_\kappa^p}{\phi_{\partial, 2}^l},  \quad {B}_{\theta_s}^{ml} = \inner[L^2(\partial\Omega)]{\gamma_{ns} \bm\Phi_\kappa^m}{\phi_{\partial, 3}^l}.
+\end{equation}
+
+Constructing stable mixed finite element for this kind of discretization is a difficult task \cite{arnold2002mixed}. For this reason, many finite element discretization imposes the symmetry of the stress tensor weakly \cite{arnold2007mixed}. To actually implement the discretization, in Chap. \ref{ch:conv} the Mindlin plate problem is going to be reformulated so that the momenta tensor is only weakly symmetric. 
 
 
 \section{Mixed boundary conditions}\label{sec:mixedbc}
