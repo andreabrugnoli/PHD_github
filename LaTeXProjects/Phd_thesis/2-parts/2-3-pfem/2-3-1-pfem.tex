@@ -70,6 +70,10 @@ The Hilbert space $X$, whose inner product is denoted by $\inner[X]{\cdot}{\cdot
 \begin{equation}
 \inner[L^2(\Omega)]{a}{b} = \int_{\Omega} a b \d\Omega, \qquad \inner[L^2(\Omega, \mathbb{R}^d)]{\bm{a}}{\bm{b}} = \int_{\Omega} \bm{a} \cdot \bm{b} \d\Omega, \qquad \inner[L^2(\Omega, \mathbb{R}^{d \times d})]{\bm{A}}{\bm{B}} = \int_{\Omega} \bm{A} \cddot \bm{B} \d\Omega.
 \end{equation} 
+For scalars ${a}_\partial, {b}_\partial \in L^2(\partial\Omega)$ and vectors  $\bm{a}_\partial, \bm{b}_\partial \in L^2(\partial\Omega, \mathbb{R}^m)$ defined on the boundary the inner product is defined as
+\begin{equation}
+\inner[L^2(\partial\Omega)]{a_\partial}{b_\partial} = \int_{\partial\Omega} a_\partial b_\partial \d{S}, \qquad \inner[L^2(\partial\Omega, \mathbb{R}^m)]{\bm{a}_\partial}{\bm{b}_\partial} = \int_{\partial\Omega} \bm{a}_\partial \cdot \bm{b}_\partial \d{S}.
+\end{equation} 
 
  The Hilbert space $H^\mathcal{J}$ is defined to be 
 \begin{equation}
@@ -439,7 +443,7 @@ Plugging \eqref{eq:pH_findin_e} into \eqref{eq:pH_findim_dyn1}, a pH system in c
 	\where \widehat{\mathbf{y}}_\partial &= \mathbf{M}_\partial \mathbf{y}_\partial.
 	\end{aligned}
 \end{equation}
-The structure preserving character of the method is evident from the preservation, at the discrete level of the power balance. The finite dimensional counterpart of the energy rate is given by
+The structure preserving character of the method is evident from the preservation at the discrete level of the power balance. The finite dimensional counterpart of the energy rate is given by
 \begin{equation}
 \begin{aligned}
 \dot{H}_d &= \nabla^\top H_d(\bm{\alpha}_d) \dot{\bm{\alpha}}_d, \\
@@ -556,11 +560,11 @@ The energy and co-energy variables are related to the physical variables (fluid 
 meaning that $X_{\partial\Omega} = L^2(\partial\Omega)$. The boundary operators are therefore given by 
 \begin{equation}
 \begin{aligned}
-u_\partial &= \mathcal{B}_\partial (e_h \;\; \bm{e}_v)^\top = \mathcal{N}_{\partial, 2} \bm{e}_v = -\bm\gamma_{n} \bm{e}_v = -\bm{e}_v \cdot \bm{n}\vert_{\partial\Omega}, \\ 
-y_\partial &=\mathcal{C}_\partial (e_h \;\; \bm{e}_v)^\top = \mathcal{N}_{\partial, 1} {e}_h = \gamma_{0} {e}_h = {e}_h\vert_{\partial\Omega}.
+u_\partial &= \mathcal{N}_{\partial, 2} \bm{e}_v = -\gamma_{n} \bm{e}_v = -\bm{e}_v \cdot \bm{n}\vert_{\partial\Omega}, \\ 
+y_\partial &= \mathcal{N}_{\partial, 1} {e}_h = \gamma_{0} {e}_h = {e}_h\vert_{\partial\Omega}.
 \end{aligned}
 \end{equation}
-This system represents a particular example of the general formulation of the general framework \eqref{eq:pHsys_ass}, together with boundary conditions \eqref{eq:pHsys_assB2C1}. To obtain a finite dimensional system, the test variables $v_h,\; \bm{v}_v$ are introduced and the integration by parts is performed on the $-\mathcal{L}^* = \div$ operator, leading to the weak form 
+This system represents a particular example of the general formulation of the general framework \eqref{eq:pHsys_ass}, together with boundary conditions \eqref{eq:pHsys_assB2C1}. To obtain a finite dimensional system, the test variables $v_h,\; \bm{v}_v$ are introduced and the integration by parts is performed on the $\div$ operator, leading to the weak form 
 
 \begin{equation}\label{eq:weak_sys_shwater_grad}
 \begin{aligned}
@@ -715,7 +719,7 @@ Whereas if Eq. \eqref{eq:assB1C2} holds, then
 \bm{y}_\partial = \mathcal{N}_2 \displaystyle \bm{e}_2, \qquad  \bm{u}_\partial,\, \bm{y}_\partial \in \mathbb{R}^m. 
 \end{equation}
 From equation \eqref{eq:H_coenergy}, the power balance reads
-\begin{equation}
+\begin{equation}\label{eq:powbal_lin}
 \begin{aligned}
 \dot{H} &= \inner[X_1]{\bm{e}_1}{\mathcal{M}_1 \partial_{t} \bm{e}_1} + \inner[X_2]{\bm{e}_2}{\mathcal{M}_2 \partial_{t} \bm{e}_2}, \\
 &=\inner[X_1]{\bm{e}_1}{-\mathcal{L}^* \bm{e}_2} + \inner[X_2]{\bm{e}_2}{\mathcal{L} \bm{e}_1}, \\
@@ -777,8 +781,8 @@ After introducing a Galerkin approximation as in \eqref{eq:approx_vaeb}, the dis
 \end{equation}
 The only difference with respect to Eq. \eqref{eq:pHsys_findim_J1} concerns the mass matrices
 \begin{equation}
-M_1^{ij} = \inner[X_1]{\bm\phi_1^i}{\mathcal{M}_1 \bm\phi_1^j}, \qquad
-M_2^{mn} = \inner[X_2]{\bm\phi_2^m}{\mathcal{M}_2 \bm\phi_2^n} \qquad i, j \in \{1, n_1\}, \; m,n \in \{1, n_2\}. 
+M_{\mathcal{M}_1}^{ij} = \inner[X_1]{\bm\phi_1^i}{\mathcal{M}_1 \bm\phi_1^j}, \qquad
+M_{\mathcal{M}_2}^{mn} = \inner[X_2]{\bm\phi_2^m}{\mathcal{M}_2 \bm\phi_2^n} \qquad i, j \in \{1, n_1\}, \; m,n \in \{1, n_2\}. 
 \end{equation}
 If the Galerkin approximation is applied to the weak form \eqref{eq:weak_linsys_intJ2}, it is obtained
 \begin{equation}\label{eq:pHlinsys_findim_J2}
@@ -813,7 +817,15 @@ If the Galerkin approximation is applied to the weak form \eqref{eq:weak_linsys_
 \end{pmatrix}.
 \end{aligned}
 \end{equation}
-
+In both cases, it is easy to verify that the Hamiltonian
+\begin{equation}
+H_d = \frac{1}{2} {\mathbf{e}}_1^\top \mathbf{M}_{\mathcal{M}_1} {\mathbf{e}}_1 + \frac{1}{2} {\mathbf{e}}_2^\top \mathbf{M}_{\mathcal{M}_2} {\mathbf{e}}_2,
+\end{equation}
+once differentiated in time, provides the energy rate
+\begin{equation}
+\dot{H}_d = \mathbf{y}_\partial^\top \mathbf{M}_\partial \mathbf{u}_\partial = \widehat{\mathbf{y}}_\partial^\top \mathbf{u}_\partial, \where \widehat{\mathbf{y}}_\partial:=\mathbf{M}_\partial \mathbf{y}_\partial.
+\end{equation}
+This result mimics its finite dimensional counterpart \eqref{eq:powbal_lin}.
 \subsection{Linear flexible structures}
 
 In this section, some linear example from the elasticity realms are considered. We restrict the discussion to linear problems. This case is anyway significant, as these examples are frequently encountered in engineering applications. 
@@ -1538,7 +1550,7 @@ This finite dimensional system represents a purely mixed discretization of the p
 
 
 \section{Mixed boundary conditions}\label{sec:mixedbc}
-In this section the assumption of uniform boundary condition \ref{ass:operBC} is removed. This allows considering general non homogeneous boundary conditions. To tackle this, two methodologies are proposed. One introduces Lagrange multipliers to enforce the mixed causality. Differential algebraic port-Hamiltonian systems (pHDAE) have been introduced in \cite{beattie2018linear} for linear systems and in \cite{morandin2019} for non linear systems. This enriched description share all the crucial features of ordinary pHs, but easily account for algebraic constraints, time-dependent transformations and explicit dependence on time in the Hamiltonian. The other method employs a domain decomposition technique to interconnect systems with different causalities. \\
+In this section the assumption of uniform boundary condition \ref{ass:operBC} is removed. This allows considering general non homogeneous boundary conditions. To tackle this, two methodologies are proposed. One introduces Lagrange multipliers to enforce the mixed causality. Finite dimensional differential algebraic port-Hamiltonian systems (pHDAE) have been introduced in \cite{beattie2018linear} for linear systems and in \cite{morandin2019} for non linear systems. This enriched description share all the crucial features of ordinary pHs, but easily account for algebraic constraints, time-dependent transformations and explicit dependence on time in the Hamiltonian. The other method employs a domain decomposition technique to interconnect systems with different causalities. \\
 
 \begin{comment}
 The first solution can be applied to incorporate all possible mixed boundary conditions in a systematic manner. However the finite element discretization is required to satisfy the inf-sup condition. The simulation in time of resulting system is harder, since the algebraic constrains pose additional difficulties.  \\
@@ -1546,8 +1558,24 @@ The first solution can be applied to incorporate all possible mixed boundary con
 The second solution requires suitable finite elements for both kind of discretization detailed in Sec. \ref{sec:pfem_gen}. Some particular cases of boundary control cannot be handled nevertheless. The interface that separates the domain is an additional degree of freedom, as it can be freely drawn. 
 \end{comment}
 
-We will restrict the illustration to the linear case. The open connected set $\Omega \subset \mathbb{R}^d, \; d=\{1,2,3\}$, with Lipschitz boundary $\partial\Omega$ represent the spatial domain. The boundary is split into two partition $\partial\Omega = \overline{\Gamma}_1 \cup \overline{\Gamma}_2, \; \Gamma_1 \cap \Gamma_2 = \{\emptyset\}$ Consider now the following boundary control linear pH system in co-energy form 
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.5\textwidth]{part_3/bound_part.eps}
+	\caption{Partition of boundary into two connected sets.}
+	\label{fig:bound_part}
+\end{figure}
 
+We will limit the illustration to the linear case. The open connected set $\Omega \subset \mathbb{R}^d, \; d=\{1,2,3\}$, with Lipschitz boundary $\partial\Omega$ represent the spatial domain. The boundary is split into two partition $\partial\Omega = \overline{\Gamma}_1 \cup \overline{\Gamma}_2, \; \Gamma_1 \cap \Gamma_2 = \{\emptyset\}$. For ease of presentation, $\Gamma_1, \; \Gamma_2$ are considered to be connected, cf. Fig. \ref{fig:bound_part}. Disconnected sets can be handled as well. For scalars ${a}_{\partial, 1}, {b}_{\partial, 1} \in L^2(\Gamma_1), \; {a}_{\partial, 2}, {b}_{\partial, 2} \in L^2(\Gamma_2)$ and  vectors  $\bm{a}_{\partial, 1}, \bm{b}_{\partial, 1} \in L^2(\Gamma_1, \mathbb{R}^m), \; \bm{a}_{\partial, 2}, \bm{b}_{\partial, 2} \in L^2(\Gamma_2, \mathbb{R}^m)$ defined on the boundary partition $\Gamma_1, \; \Gamma_2$ the inner product is defined as
+\begin{equation}
+\begin{aligned}
+\inner[L^2(\Gamma_1)]{a_{\partial, 1}}{b_{\partial, 1}} = \int_{\Gamma_1} a_{\partial, 1} b_{\partial, 1} \d{\Gamma_1}, \qquad \inner[L^2(\Gamma_1, \mathbb{R}^m)]{\bm{a}_{\partial, 1}}{\bm{b}_{\partial, 1}} = \int_{\Gamma_1} \bm{a}_{\partial, 1} \cdot \bm{b}_{\partial, 1} \d{\Gamma_1}, \\
+\inner[L^2(\Gamma_2)]{a_{\partial, 2}}{b_{\partial, 2}} = \int_{\Gamma_2} a_{\partial, 2} b_{\partial, 2} \d{\Gamma_2}, \qquad \inner[L^2(\Gamma_2, \mathbb{R}^m)]{\bm{a}_{\partial, 2}}{\bm{b}_{\partial, 2}} = \int_{\Gamma_2} \bm{a}_{\partial, 2} \cdot \bm{b}_{\partial, 2} \d{\Gamma_2}.  \\
+\end{aligned}
+\end{equation}   
+
+Consider now the following boundary control linear pH system in co-energy form 
+\begin{subequations}
+	\label{eq:pHlinsys_mixed}
 \begin{align}
 \begin{bmatrix}
 \mathcal{M}_1 & 0 \\
@@ -1591,16 +1619,199 @@ We will restrict the illustration to the linear case. The open connected set $\O
 \bm{y}_{\partial, 2} \in \mathbb{R}^{m}.
 \end{aligned}
 \end{align}
+\end{subequations}
+
  The operator $\mathcal{N}_{\partial, *}^{\Gamma_\circ}$ with $*, \circ \in \{1, 2\}$ represent the restriction of operator $\mathcal{N}_{\partial, *}$, defined in Eq. \eqref{eq:intbypartsJ}, over the subset $\Gamma_\circ$. The boundary inputs and output are now vectors $\mathbb{R}^{2m}$. This does not mean that the boundary conditions have been doubled, but only that the components of $\bm{u}_\partial, \bm{y}_\partial$ are only defined on the subsets $\Gamma_1, \; \Gamma_2$ of the overall boundary. Given the additive property of the integral, it is possible to write
-\begin{equation}
+\begin{equation}\label{eq:split_bdterm}
 \begin{aligned}
 \inner[X_{\partial\Omega}]{\mathcal{N}_{\partial, 1}\bm{e}_1}{\mathcal{N}_{\partial, 2}\bm{e}_2} &= \inner[X_{\Gamma_1}]{\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{e}_1}{\mathcal{N}_{\partial, 2}^{\Gamma_1}\bm{e}_2} + \inner[X_{\Gamma_2}]{\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{e}_1}{\mathcal{N}_{\partial, 2}^{\Gamma_2}\bm{e}_2}, \\
-&= \inner[X_{\Gamma_1}]{\bm{u}_{\partial, 1}}{\bm{y}_{\partial, 1}} + \inner[X_{\Gamma_2}]{\bm{u}_{\partial, 2}}{\bm{y}_{\partial, 2}},
+&= \inner[X_{\Gamma_1}]{\bm{u}_{\partial, 1}}{\bm{y}_{\partial, 1}} + \inner[X_{\Gamma_2}]{\bm{y}_{\partial, 2}}{\bm{u}_{\partial, 2}},
 \end{aligned} 
 \end{equation}
-where $X_{\partial\Omega}= L^2(\partial\Omega,\mathbb{R}^m), \; X_{\Gamma_1}= L^2(\Gamma_1,\mathbb{R}^m), \; X_{\Gamma_2}= L^2(\Gamma_2,\mathbb{R}^m)$.
+where $X_{\partial\Omega}= L^2(\partial\Omega,\mathbb{R}^m), \; X_{\Gamma_1}= L^2(\Gamma_1,\mathbb{R}^m), \; X_{\Gamma_2}= L^2(\Gamma_2,\mathbb{R}^m)$. The continuous power balance is obtained using Eqs. \eqref{eq:powbal_lin} and \eqref{eq:split_bdterm}
+\begin{equation}\label{eq:powbal_mixed}
+	\dot{H} = \inner[X_{\Gamma_1}]{\bm{u}_{\partial, 1}}{\bm{y}_{\partial, 1}} + \inner[X_{\Gamma_2}]{\bm{y}_{\partial, 2}}{\bm{u}_{\partial, 2}}.
+\end{equation}
+ 
 
 \subsection{Solution using Lagrange multipliers}\label{sec:lagrMul}
+This solution consists in introducing a Lagrange multiplier for the boundary control that does not arise in the weak form. To illustrate the idea, consider again the weak form \ref{eq:weak_linsys_intJ1} (obtained by integration by parts of the $\mathcal{-L^*}$ partitioned) of Sys. \ref{eq:pHlinsys_mixed}
+
+\begin{equation}\label{eq:pHlinsys_mixed_weak}
+\begin{aligned}
+\inner[X_1]{\bm{v}_1}{\mathcal{M}_1 \partial_t \bm{e}_1} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1}  -\inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[X_{\partial\Omega}]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\mathcal{N}_{\partial, 2}\bm{e}_2}, \\
+\inner[X_2]{\bm{v}_2}{\mathcal{M}_2 \partial_t \bm{e}_2} &=   \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1} + \inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1}, \\
+\end{aligned}
+\end{equation}
+The term $\inner[X_{\partial\Omega}]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\mathcal{N}_{\partial, 2}\bm{e}_2}$ can be split into the two boundary contributions, as in Eq. \eqref{eq:split_bdterm}. The variable  $\bm{y}_{\partial, 1}$ plays here the role of a Lagrange multiplier $\bm{y}_{\partial, 1}=\bm{\lambda}_{\partial, 1}$
+\begin{equation}\label{eq:bdterm_mixed}
+\begin{aligned}
+\inner[X_{\partial\Omega}]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\mathcal{N}_{\partial, 2}\bm{e}_2} &= \inner[X_{\Gamma_1}]{\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{v}_1}{\mathcal{N}_{\partial, 2}^{\Gamma_1}\bm{e}_2} + \inner[X_{\Gamma_2}]{\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{v}_1}{\mathcal{N}_{\partial, 2}^{\Gamma_2}\bm{e}_2}, \\
+&= \inner[X_{\Gamma_1}]{\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{v}_1}{\bm{y}_{\partial, 1}} + \inner[X_{\Gamma_2}]{\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{v}_1}{\bm{u}_{\partial, 2}}, \\
+&= \inner[X_{\Gamma_1}]{\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{v}_1}{\bm{\lambda}_{\partial, 1}} + \inner[X_{\Gamma_2}]{\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{v}_1}{\bm{u}_{\partial, 2}}, \\
+\end{aligned}
+\end{equation}
+If test function $\bm{v}_{\partial, 1}, \; \bm{v}_{\partial, 2} \in X_{\Gamma_1} \times X_{\Gamma_2}$ are introduced, the input and outputs definitions
+\begin{equation}
+\bm{u}_{\partial, 1}=\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{e}_{1}, \qquad \bm{y}_{\partial, 1}=\bm{\lambda}_{\partial, 1}, \qquad \bm{y}_{\partial, 2}=\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{e}_{1}
+\end{equation}  
+can be put into weak form to obtain
+\begin{equation}\label{eq:inpout_mixed}
+\begin{aligned}
+\inner[X_{\Gamma_1}]{\bm{v}_{\partial, 1}}{\bm{u}_{\partial, 1}} &= \inner[X_{\Gamma_1}]{\bm{v}_{\partial, 1}}{\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{e}_{1}}, \\
+\inner[X_{\Gamma_1}]{\bm{v}_{\partial, 1}}{\bm{y}_{\partial, 1}} &= \inner[X_{\Gamma_1}]{\bm{v}_{\partial, 1}}{\bm{\lambda}_{\partial, 1}}, \\
+\inner[X_{\Gamma_1}]{\bm{v}_{\partial, 2}}{\bm{y}_{\partial, 2}} &= \inner[X_{\Gamma_1}]{\bm{v}_{\partial, 2}}{\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{e}_{1}}, \\
+\end{aligned}
+\end{equation}
+As usual, a Galerkin approximation is introduced    
+\begin{equation}\label{eq:approx_vaeb_mixed}
+\begin{aligned}
+\bm{v}_1 &\approx \sum_{i=1}^{n_1} \bm{\phi}_1^i(\bm{x}) v_1^i, \\
+\bm{v}_2 &\approx \sum_{i=1}^{n_2} \bm{\phi}_2^i(\bm{x}) v_2^i, \\
+\end{aligned}  \qquad 
+\begin{aligned}
+\bm{e}_1 &\approx \sum_{i=1}^{n_1} \bm{\phi}_1^i(\bm{x}) e_1^i(t), \\
+\bm{e}_2 &\approx \sum_{i=1}^{n_2} \bm{\phi}_2^i(\bm{x}) e_2^i(t),  \\
+\end{aligned} \qquad 
+\begin{aligned}
+\bm{\triangle}_{\partial, 1} &\approx \sum_{i=1}^{n_{\partial, 1}} \bm{\phi}_{\partial, 1}^i(\bm{s}_1) \triangle_{\partial, 1}^i, \quad \bm{s}_1 \in \Gamma_1, \\
+\bm{\square}_{\partial, 2} &\approx \sum_{i=1}^{n_{\partial, 2}} \bm{\phi}_{\partial, 2}^i(\bm{s}_2) \square_\partial^i(t), \quad \bm{s}_2 \in \Gamma_2.
+\end{aligned}
+\end{equation}
+where $\triangle$ stays for ${u}, {y}, {\lambda}$ and $\square$ for ${u}, {y}$. Replacing the approximation $\ref{eq:approx_vaeb_mixed}$ into Eqs. \ref{eq:pHlinsys_mixed_weak}, \ref{eq:bdterm_mixed}, \ref{eq:inpout_mixed}, the following system differential-algebraic system is obtained
+\begin{equation}\label{eq:pHsys_infdim_mult}
+\begin{aligned}
+\mathrm{Diag}
+\begin{bmatrix}
+\mathbf{M}_{\mathcal{M}_1}\\
+\mathbf{M}_{\mathcal{M}_2}\\
+\mathbf{0}\\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\mathbf{e}}_{1} \\
+\dot{\mathbf{e}}_{2} \\
+\dot{\bm{\lambda}}_{\partial, 1} \\
+\end{pmatrix}
+&= \begin{bmatrix}
+\mathbf{0} & -\mathbf{D}_{0}^\top - \mathbf{D}_{\mathcal{L}}^\top & \mathbf{B}_{1, \Gamma_1}\\
+\mathbf{D}_{0} + \mathbf{D}_{\mathcal{L}} & \mathbf{0} \\
+-\mathbf{B}_{1, \Gamma_1}^\top & \mathbf{0} & \mathbf{0} \\
+\end{bmatrix} 
+\begin{pmatrix}
+\mathbf{e}_{1} \\
+\mathbf{e}_{2} \\
+{\bm{\lambda}}_{\partial, 1} \\
+\end{pmatrix} + 
+\begin{bmatrix}
+\mathbf{0} & \mathbf{B}_{1, \Gamma_2} \\
+\mathbf{0} & \mathbf{0} \\
+\mathbf{M}_{\partial, 1} & \mathbf{0} \\
+\end{bmatrix}
+\begin{bmatrix}
+\mathbf{u}_{\partial, 1} \\
+\mathbf{u}_{\partial, 2} \\
+\end{bmatrix}, \\
+\begin{bmatrix}
+\mathbf{M}_{\partial, 1} & \mathbf{0} \\
+\mathbf{0} & \mathbf{M}_{\partial, 2} \\
+\end{bmatrix}
+\begin{pmatrix}
+\mathbf{y}_{\partial, 1} \\
+\mathbf{y}_{\partial, 2} \\
+\end{pmatrix}
+&= \begin{bmatrix}
+\mathbf{0} & \mathbf{0} & \mathbf{M}_{\partial, 1} \\
+\mathbf{B}_{1, \Gamma_2}^\top & \mathbf{0} & \mathbf{0} \\
+\end{bmatrix}\begin{pmatrix}
+\mathbf{e}_{1} \\
+\mathbf{e}_{2} \\
+{\bm{\lambda}}_{\partial, 1} \\
+\end{pmatrix}.
+\end{aligned}
+\end{equation}
+Apart for matrices $\mathbf{M}_{\partial, 1}, \mathbf{M}_{\partial, 2}, \mathbf{B}_{1, \Gamma_1}, \mathbf{B}_{1, \Gamma_2}$,
+\begin{equation}
+\begin{aligned}
+{M}_{\partial, 1}^{lk} = \inner[X_{\Gamma_1}]{\bm{\phi}_{\partial, 1}^l}{\bm{\phi}_{\partial, 1}^k}, \quad (l,k) \in \{1,n_{\partial, 1}\}, \\
+{M}_{\partial, 2}^{fg} = \inner[X_{\Gamma_2}]{\bm{\phi}_{\partial, 2}^f}{\bm{\phi}_{\partial, 2}^g}, \quad (f,g) \in \{1,n_{\partial, 2}\},\\
+\end{aligned}  \qquad
+\begin{aligned}
+{B}_{1, \Gamma_1}^{ik} = \inner[X_{\Gamma_1}]{\bm{\phi}_{1}^i}{\bm{\phi}_{\partial, 1}^k}, \\
+{B}_{1, \Gamma_2}^{ig} = \inner[X_{\Gamma_2}]{\bm{\phi}_{1}^i}{\bm{\phi}_{\partial, 2}^g}, \\
+\end{aligned} \quad i \in \{1,n_1\},
+\end{equation} 
+the other matrices keep the same definition as in \eqref{eq:pHlinsys_findim_J1}. As in \cite{beattie2018linear}, the discretized Hamiltonian is then defined as
+\begin{equation}
+H_d = \frac{1}{2} \mathbf{e}_1^\top \mathbf{M}_{\mathcal{M}_1} \mathbf{e}_1 + \frac{1}{2} \mathbf{e}_2^\top \mathbf{M}_{\mathcal{M}_2} \mathbf{e}_2.
+\end{equation}
+The discrete power balance then equals
+\begin{equation}
+\begin{aligned}
+\dot{H}_d &= \mathbf{e}_1^\top \mathbf{M}_{\mathcal{M}_1} \dot{\mathbf{e}}_1 + \mathbf{e}_2^\top \mathbf{M}_{\mathcal{M}_2} \dot{\mathbf{e}}_2, \\
+&= -\mathbf{e}_1^\top (\mathbf{D}_0+\mathbf{D}_\mathcal{L})^\top {\mathbf{e}}_2 + \mathbf{e}_2^\top (\mathbf{D}_0+\mathbf{D}_\mathcal{L}) {\mathbf{e}}_1 + \mathbf{e}_1^\top (\mathbf{B}_{1, \Gamma_1} \bm{\lambda}_{\partial, 1} + \mathbf{B}_{1, \Gamma_2} \mathbf{u}_{\partial, 2} ), \\
+&= \mathbf{y}_{\partial, 1}^\top \mathbf{M}_{\partial, 1} \mathbf{u}_{\partial, 1} + \mathbf{y}_{\partial, 2}^\top \mathbf{M}_{\partial, 2} \mathbf{u}_{\partial, 2}, \\
+&= \widehat{\mathbf{y}}_{\partial, 1}^\top \mathbf{u}_{\partial, 1} + \widehat{\mathbf{y}}_{\partial, 2}^\top \mathbf{u}_{\partial, 2}, \where \widehat{\mathbf{y}}_{\partial, 1} :=\mathbf{M}_{\partial, 1} \mathbf{y}_{\partial, 1}, \; \widehat{\mathbf{y}}_{\partial, 2} :=\mathbf{M}_{\partial, 2} \mathbf{y}_{\partial, 2}.
+\end{aligned}
+\end{equation}
+This result is the finite dimensional equivalent of \eqref{eq:powbal_mixed}.
+
+Equivalently, the weak form Eq.\ref{eq:weak_linsys_intJ2} may be used as a starting point. The computation follows in a completely analogous manner. The only difference is that $\bm{y}_{\partial, 2}=\bm{\lambda}_{\partial, 2}$ plays the role of the Lagrange multiplier. The final finite dimensional system then is given by
+\begin{equation}
+\begin{aligned}
+\mathrm{Diag}
+\begin{bmatrix}
+\mathbf{M}_{\mathcal{M}_1}\\
+\mathbf{M}_{\mathcal{M}_2}\\
+\mathbf{0}\\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\mathbf{e}}_{1} \\
+\dot{\mathbf{e}}_{2} \\
+\dot{\bm{\lambda}}_{\partial, 2} \\
+\end{pmatrix}
+&= \begin{bmatrix}
+\mathbf{0} & -\mathbf{D}_{0}^\top + \mathbf{D}_ {-\mathcal{L}^*} & \mathbf{0}\\
+\mathbf{D}_{0} - \mathbf{D}_ {-\mathcal{L}^*}^\top & \mathbf{0} & \mathbf{B}_{2, \Gamma_2} \\
+\mathbf{0} & -\mathbf{B}_{2, \Gamma_2}^\top & \mathbf{0}  \\
+\end{bmatrix} 
+\begin{pmatrix}
+\mathbf{e}_{1} \\
+\mathbf{e}_{2} \\
+{\bm{\lambda}}_{\partial, 2} \\
+\end{pmatrix} + 
+\begin{bmatrix}
+\mathbf{0} & \mathbf{0} \\
+ \mathbf{B}_{2, \Gamma_1} & \mathbf{0} \\
+\mathbf{0} & \mathbf{M}_{\partial, 2} \\
+\end{bmatrix}
+\begin{bmatrix}
+\mathbf{u}_{\partial, 1} \\
+\mathbf{u}_{\partial, 2} \\
+\end{bmatrix}, \\
+\begin{bmatrix}
+\mathbf{M}_{\partial, 1} & \mathbf{0} \\
+\mathbf{0} & \mathbf{M}_{\partial, 2} \\
+\end{bmatrix}
+\begin{pmatrix}
+\mathbf{y}_{\partial, 1} \\
+\mathbf{y}_{\partial, 2} \\
+\end{pmatrix}
+&= \begin{bmatrix}
+\mathbf{0} & \mathbf{B}_{2, \Gamma_1}^\top & \mathbf{0} \\
+\mathbf{0} & \mathbf{0} & \mathbf{M}_{\partial, 2} \\
+\end{bmatrix}\begin{pmatrix}
+\mathbf{e}_{1} \\
+\mathbf{e}_{2} \\
+{\bm{\lambda}}_{\partial, 2} \\
+\end{pmatrix}.
+\end{aligned}
+\end{equation}
+where $\mathbf{B}_{2, \Gamma_1}, \mathbf{B}_{2, \Gamma_2}$ are given by
+\begin{equation}
+{B}_{2, \Gamma_1}^{mk} = \inner[X_{\Gamma_1}]{\bm{\phi}_{2}^m}{\bm{\phi}_{\partial, 1}^k}, \quad
+{B}_{2, \Gamma_2}^{mg} = \inner[X_{\Gamma_2}]{\bm{\phi}_{2}^m}{\bm{\phi}_{\partial, 2}^g}, 
+ \quad m \in \{1,n_2\},\; k \in \{1,n_{\partial, 1}\},\; g \in \{1,n_{\partial, 2}\}.
+\end{equation} 
 
 
 \subsection{Virtual domain decomposition}\label{sec:vdd}
