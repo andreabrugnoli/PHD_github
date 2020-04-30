@@ -66,7 +66,7 @@ Given an open connected set $\Omega \in \mathbb{R}^d,\, d= \{1,2,3\}$, consider 
 \bm{y}_\partial &= \mathcal{C}_\partial \displaystyle \bm{e}, \qquad \; \bm{y}_\partial \in \mathbb{R}^m. \label{eq:pHsys_y} \vspace{3pt}
 \end{align}
 \end{subequations}
-The Hilbert space $X$, whose inner product is denoted by $\inner[X]{\cdot}{\cdot}$, is an appropriate Cartesian product of $L^2$ spaces which account for the nature of each variable (that can be scalar, vectorial or tensorial quantities). Its precise definition depends on the example upon consideration. For scalars $(a,b) \in L^2(\Omega)$, vectors $(\bm{a}, \bm{b})\in L^2(\Omega, \mathbb{R}^d)$ and tensors  $(\bm{A}, \bm{B}) \in L^2(\Omega,\mathbb{R}^{d\times d})$ the $L^2$ inner product is given by 
+The Hilbert space $X$, whose inner product is denoted by $\inner[X]{\cdot}{\cdot}$, is an appropriate Cartesian product of $L^2(\Omega)$ spaces which account for the nature of each variable (that can be scalar, vectorial or tensorial quantities). Its precise definition depends on the example upon consideration. For scalars $(a,b) \in L^2(\Omega)$, vectors $(\bm{a}, \bm{b})\in L^2(\Omega, \mathbb{R}^d)$ and tensors  $(\bm{A}, \bm{B}) \in L^2(\Omega,\mathbb{R}^{d\times d})$ the $L^2$ inner product is given by 
 \begin{equation}
 \inner[L^2(\Omega)]{a}{b} = \int_{\Omega} a b \d\Omega, \qquad \inner[L^2(\Omega, \mathbb{R}^d)]{\bm{a}}{\bm{b}} = \int_{\Omega} \bm{a} \cdot \bm{b} \d\Omega, \qquad \inner[L^2(\Omega, \mathbb{R}^{d \times d})]{\bm{A}}{\bm{B}} = \int_{\Omega} \bm{A} \cddot \bm{B} \d\Omega.
 \end{equation} 
@@ -74,8 +74,8 @@ For scalars ${a}_\partial, {b}_\partial \in L^2(\partial\Omega)$ and vectors  $\
 \begin{equation}
 \inner[L^2(\partial\Omega)]{a_\partial}{b_\partial} = \int_{\partial\Omega} a_\partial b_\partial \d{S}, \qquad \inner[L^2(\partial\Omega, \mathbb{R}^m)]{\bm{a}_\partial}{\bm{b}_\partial} = \int_{\partial\Omega} \bm{a}_\partial \cdot \bm{b}_\partial \d{S}.
 \end{equation} 
-
- The Hilbert space $H^\mathcal{J}$ is defined to be 
+For simplicity both $L^2(\partial\Omega)$ and $L^2(\partial\Omega, , \mathbb{R}^m)$ are denoted by $L^2(\partial\Omega)$ in the inner product notation, since the use of bold letters clearly distinguishes vectors from scalars.
+The Hilbert space $H^\mathcal{J}$ is defined to be 
 \begin{equation}
 	H^\mathcal{J} :=\left\{\bm{u} \in X \vert \; \mathcal{J}\bm{u} \in X  \right\}.
 \end{equation}
@@ -131,7 +131,7 @@ The boundary operators are then supposed to fulfill the following assumption, th
 \begin{assumption}\label{ass:operBC}
 	Assume that there exist  two boundary operators $\mathcal{N}_{\partial, 1}, \; \mathcal{N}_{\partial, 2}$ such that for $(\bm{u}_1, \bm{u}_2) \in H^\mathcal{L} \times H^\mathcal{-L^*}$ a general integration by parts formula holds
 	\begin{equation}\label{eq:intbypartsJ} 
-	\inner[X_2]{\bm{u}_2}{\mathcal{L}\,\bm{u}_1} - \inner[X_1]{\mathcal{L}^* \, \bm{u}_2}{\bm{u}_1} = \inner[X_{\partial\Omega}]{\mathcal{N}_{\partial, 1} \bm{u}_1}{\mathcal{N}_{\partial, 2} \bm{u}_2}, \where X_{\partial\Omega} = L^2(\partial \Omega, \mathbb{R}^m). 
+	\inner[X_2]{\bm{u}_2}{\mathcal{L}\,\bm{u}_1} - \inner[X_1]{\mathcal{L}^* \, \bm{u}_2}{\bm{u}_1} = \inner[L^2(\partial \Omega)]{\mathcal{N}_{\partial, 1} \bm{u}_1}{\mathcal{N}_{\partial, 2} \bm{u}_2}. 
 	\end{equation}
 	The boundary operators $\mathcal{B}_\partial, \, \mathcal{C}_\partial$ of Eqs. \eqref{eq:pHsys_u}, \eqref{eq:pHsys_y}, are then assumed to verify, in an exclusive manner, either
 	\begin{equation}\label{eq:assB2C1}
@@ -197,8 +197,8 @@ In both cases, the power balance reads
 \begin{aligned}
 \dot{H} &= \inner[X_1]{\bm{e}_1}{\partial_{t} \bm{\alpha}_1} + \inner[X_2]{\bm{e}_2}{\partial_{t} \bm{\alpha}_2}, \\
 &=\inner[X_1]{\bm{e}_1}{-\mathcal{L}^* \bm{e}_2} + \inner[X_2]{\bm{e}_2}{\mathcal{L} \bm{e}_1}, \\
-&= \inner[X_{\partial\Omega}]{\mathcal{N}_{\partial, 1} \bm{e}_1}{\mathcal{N}_{\partial, 2} \bm{e}_2}, \\
-&= \inner[X_{\partial\Omega}]{\bm{y}_\partial}{\bm{u}_\partial}.
+&= \inner[L^2(\partial \Omega)]{\mathcal{N}_{\partial, 1} \bm{e}_1}{\mathcal{N}_{\partial, 2} \bm{e}_2}, \\
+&= \inner[L^2(\partial \Omega)]{\bm{y}_\partial}{\bm{u}_\partial}.
 \end{aligned}
 \end{equation}
 We are now in a position to illustrate the methodology. 
@@ -217,10 +217,10 @@ To obtain a closed system, the constitutive law \eqref{eq:pHsys_const_ass} and t
 \begin{aligned}
 \inner[X_1]{\bm{v}_1}{\bm{e}_1}&= \inner[X_1]{\bm{v}_1}{\delta_{\bm{\alpha}_1} H}, \\
 \inner[X_2]{\bm{v}_2}{\bm{e}_2}&= \inner[X_2]{\bm{v}_2}{\delta_{\bm{\alpha}_2} H}, \\
-\inner[X_{\partial\Omega}]{\bm{v}_\partial}{\bm{y}_\partial} &= \inner[X_{\partial\Omega}]{\bm{v}_\partial}{\mathcal{C}_\partial \bm{e}},
+\inner[L^2(\partial \Omega)]{\bm{v}_\partial}{\bm{y}_\partial} &= \inner[L^2(\partial \Omega)]{\bm{v}_\partial}{\mathcal{C}_\partial \bm{e}},
 \end{aligned}
 \end{equation}
-where the test function $\bm{v}_\partial \in X_{\partial\Omega} = L^2(\partial \Omega, \mathbb{R}^m)$ is defined on the boundary $\partial\Omega$ and $\mathcal{C}_\partial$ is defined either by Eq. \eqref{eq:assB2C1} or  \eqref{eq:assB1C2}.
+where the test function $\bm{v}_\partial \in L^2(\partial \Omega, \mathbb{R}^m)$ is defined on the boundary $\partial\Omega$ and $\mathcal{C}_\partial$ is defined either by Eq. \eqref{eq:assB2C1} or  \eqref{eq:assB1C2}.
 
 
 \paragraph{Step 2} Next the integration by part has to be carried out. The choice is dictated by the boundary control to be imposed on the system. Consider again Eq. \eqref{eq:weak_dyn}. The integration by parts can be carried out either on term $-\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2}$, or on term $\inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1}$. Depending o which line undergoes the integration by parts (this explains the name Partitioned Finite Element method), two structure preserving weak forms are obtained. These differ by the boundary causality imposed to the system. 
@@ -229,12 +229,12 @@ where the test function $\bm{v}_\partial \in X_{\partial\Omega} = L^2(\partial \
 \subparagraph{Integration by parts of the term $-\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2}$}
 In this case case, using Eq. \eqref{eq:intbypartsJ}, it is obtained 
 \begin{equation}
--\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2} = -\inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[X_{\partial\Omega}]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\mathcal{N}_{\partial, 2} \bm{e}_2}.
+-\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2} = -\inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[L^2(\partial \Omega)]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\mathcal{N}_{\partial, 2} \bm{e}_2}.
 \end{equation}
 Then the weak form of the system dynamics  reads 
 \begin{equation}\label{eq:weak_dyn_intJ1}
 \begin{aligned}
-\inner[X_1]{\bm{v}_1}{\partial_t \bm{\alpha}_1} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1}  -\inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[X_{\partial\Omega}]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\bm{u}_\partial}, \\
+\inner[X_1]{\bm{v}_1}{\partial_t \bm{\alpha}_1} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1}  -\inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[L^2(\partial \Omega)]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\bm{u}_\partial}, \\
 \inner[X]{\bm{v}}{\partial_t \bm{\alpha}} &=   \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1} + \inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1},
 \end{aligned}
 \end{equation}
@@ -263,24 +263,24 @@ The following proposition is crucial as the lossless character of the infinite-d
 Now assume that the system satisfies the boundary causality condition \ref{eq:pHsys_assB2C1}. Then, this choice of the integration by parts lead to the following weak formulation
 \begin{equation}\label{eq:weak_sys_intJ1}
 \begin{aligned}
-\inner[X_1]{\bm{v}_1}{\partial_t \bm{\alpha}_1} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1}  -\inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[X_{\partial\Omega}]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\bm{u}_\partial}, \\
+\inner[X_1]{\bm{v}_1}{\partial_t \bm{\alpha}_1} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1}  -\inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[L^2(\partial \Omega)]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\bm{u}_\partial}, \\
 \inner[X_2]{\bm{v}_2}{\partial_t \bm{\alpha}_2} &=   \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1} + \inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1}, \\
 \inner[X_1]{\bm{v}_1}{\bm{e}_1}&= \inner[X_1]{\bm{v}_1}{\delta_{\bm{\alpha}_1} H}, \\
 \inner[X_2]{\bm{v}_2}{\bm{e}_2}&= \inner[X_2]{\bm{v}_2}{\delta_{\bm{\alpha}_2} H}, \\
-\inner[X_{\partial\Omega}]{\bm{v}_\partial}{\bm{y}_\partial} &= \inner[X_{\partial\Omega}]{\bm{v}_\partial}{\mathcal{N}_{\partial, 1}\bm{e}_2}.
+\inner[L^2(\partial \Omega)]{\bm{v}_\partial}{\bm{y}_\partial} &= \inner[L^2(\partial \Omega)]{\bm{v}_\partial}{\mathcal{N}_{\partial, 1}\bm{e}_2}.
 \end{aligned}
 \end{equation}
 
 \subparagraph{Integration by parts of the term $\inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1}$}
 Using Eq. \eqref{eq:intbypartsJ}, it is obtained 
 \begin{equation}
-\inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1} = \inner[X_1]{\mathcal{L}^*\bm{v}_2}{\bm{e}_1} + \inner[X_{\partial\Omega}]{\mathcal{N}_{\partial, 2} \bm{v}_2}{\mathcal{N}_{\partial, 1} \bm{e}_1}.
+\inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1} = \inner[X_1]{\mathcal{L}^*\bm{v}_2}{\bm{e}_1} + \inner[L^2(\partial \Omega)]{\mathcal{N}_{\partial, 2} \bm{v}_2}{\mathcal{N}_{\partial, 1} \bm{e}_1}.
 \end{equation}
 Then the weak form of the system dynamics  reads 
 \begin{equation}\label{eq:weak_dyn_intJ2}
 \begin{aligned}
 \inner[X_1]{\bm{v}_1}{\partial_t \bm{\alpha}_1} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1}  -\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2}, \\
-\inner[X_2]{\bm{v}_2}{\partial_t \bm{\alpha}_2} &=   \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1}  + \inner[X_1]{\mathcal{L}^*\bm{v}_2}{\bm{e}_1} + \inner[X_{\partial\Omega}]{\mathcal{N}_{\partial, 2} \bm{v}_2}{\bm{u}_{\partial}}, \\
+\inner[X_2]{\bm{v}_2}{\partial_t \bm{\alpha}_2} &=   \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1}  + \inner[X_1]{\mathcal{L}^*\bm{v}_2}{\bm{e}_1} + \inner[L^2(\partial \Omega)]{\mathcal{N}_{\partial, 2} \bm{v}_2}{\bm{u}_{\partial}}, \\
 \end{aligned}
 \end{equation}
 Again the bilinear form arising from the formally skew-adjoint operator is skew-symmetric.
@@ -309,10 +309,10 @@ Now assume that the system satisfies the boundary causality condition \eqref{eq:
 \begin{equation}\label{eq:weak_sys_intJ2}
 \begin{aligned}
 \inner[X_1]{\bm{v}_1}{\partial_t \bm{\alpha}_1} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1}  -\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2}, \\
-\inner[X_2]{\bm{v}_2}{\partial_t \bm{\alpha}_2} &=   \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1}  + \inner[X_1]{\mathcal{L}^*\bm{v}_2}{\bm{e}_1} + \inner[X_{\partial\Omega}]{\mathcal{N}_{\partial, 2} \bm{v}_2}{\bm{u}_{\partial}}, \\
+\inner[X_2]{\bm{v}_2}{\partial_t \bm{\alpha}_2} &=   \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1}  + \inner[X_1]{\mathcal{L}^*\bm{v}_2}{\bm{e}_1} + \inner[L^2(\partial \Omega)]{\mathcal{N}_{\partial, 2} \bm{v}_2}{\bm{u}_{\partial}}, \\
 \inner[X_1]{\bm{v}_1}{\bm{e}_1}&= \inner[X_1]{\bm{v}_1}{\delta_{\bm{\alpha}_1} H}, \\
 \inner[X_2]{\bm{v}_2}{\bm{e}_2}&= \inner[X_2]{\bm{v}_2}{\delta_{\bm{\alpha}_2} H}, \\
-\inner[X_{\partial\Omega}]{\bm{v}_\partial}{\bm{y}_\partial} &= \inner[X_{\partial\Omega}]{\bm{v}_\partial}{\mathcal{N}_{\partial, 2}\bm{e}_2}.
+\inner[L^2(\partial \Omega)]{\bm{v}_\partial}{\bm{y}_\partial} &= \inner[L^2(\partial \Omega)]{\bm{v}_\partial}{\mathcal{N}_{\partial, 2}\bm{e}_2}.
 \end{aligned}
 \end{equation}
 
@@ -393,8 +393,8 @@ M_2^{mn} &= \inner[X_2]{\bm\phi_2^m}{\bm\phi_2^n}, \\
 {D}_{\mathcal{L}}^{mi} &= \inner[X_2]{\bm\phi_2^m}{\mathcal{L}\bm\phi_1^i}, 
 \end{aligned}\quad  
 \begin{aligned}
-{B}_{1}^{ik} = \inner[X_{\partial\Omega}]{\bm\phi_1^i}{\bm\phi_\partial^k}, \\
-M_\partial^{lk} = \inner[X_{\partial\Omega}]{\bm\phi_\partial^l}{\bm\phi_\delta^k},
+{B}_{1}^{ik} = \inner[L^2(\partial \Omega)]{\bm\phi_1^i}{\bm\phi_\partial^k}, \\
+M_\partial^{lk} = \inner[L^2(\partial \Omega)]{\bm\phi_\partial^l}{\bm\phi_\delta^k},
 \end{aligned}
 \end{equation}
 where $i, j \in \left\{1, n_1\right\}, \; m,n \in \left\{1, n_2\right\}, \; l, k \in \left\{1, n_\partial \right\}$. Introducing the definitions
@@ -555,9 +555,9 @@ H(\alpha_h, \bm{\alpha}_v) = \energy{\frac{1}{\rho} \alpha_h \norm{\bm{\alpha}_v
 \end{equation*}
 The energy and co-energy variables are related to the physical variables (fluid height and velocity) through Eqs. \eqref{eq:alpha_shwater}, \eqref{eq:e_shwater}. In this case $X_1 = L^2(\Omega),\; X_2 = L^2(\Omega, \mathbb{R}^2)$ and $\mathcal{L} = \grad, \; -\mathcal{L}^* = \div$. This implies $H^{\mathcal{L}} = H^1(\Omega), \; H^{-\mathcal{L}^*} = H^{\div}(\Omega, \mathbb{R}^2)$. As shown in \eqref{eq:enrate_shwater}, the energy rate is given by 
 \begin{equation}
-\dot{H} = - \inner[L^2(\Omega, \mathbb{R}^2)]{\bm{e}_v}{\grad e_h} - \inner[L^2(\Omega)]{\div \bm{e}_v}{e_h} = \inner[L^2(\partial\Omega)]{- \bm{e}_v \cdot\bm{n}}{e_h},
+\dot{H} = - \inner[L^2(\Omega, \mathbb{R}^2)]{\bm{e}_v}{\grad e_h} - \inner[L^2(\Omega)]{\div \bm{e}_v}{e_h} = \inner[L^2(\partial\Omega)]{- \bm{e}_v \cdot\bm{n}}{e_h}.
 \end{equation}
-meaning that $X_{\partial\Omega} = L^2(\partial\Omega)$. The boundary operators are therefore given by 
+The boundary operators are therefore given by 
 \begin{equation}
 \begin{aligned}
 u_\partial &= \mathcal{N}_{\partial, 2} \bm{e}_v = -\gamma_{n} \bm{e}_v = -\bm{e}_v \cdot \bm{n}\vert_{\partial\Omega}, \\ 
@@ -723,8 +723,8 @@ From equation \eqref{eq:H_coenergy}, the power balance reads
 \begin{aligned}
 \dot{H} &= \inner[X_1]{\bm{e}_1}{\mathcal{M}_1 \partial_{t} \bm{e}_1} + \inner[X_2]{\bm{e}_2}{\mathcal{M}_2 \partial_{t} \bm{e}_2}, \\
 &=\inner[X_1]{\bm{e}_1}{-\mathcal{L}^* \bm{e}_2} + \inner[X_2]{\bm{e}_2}{\mathcal{L} \bm{e}_1}, \\
-&= \inner[X_{\partial\Omega}]{\mathcal{N}_{\partial, 1} \bm{e}_1}{\mathcal{N}_{\partial, 2} \bm{e}_2}, \\
-&= \inner[X_{\partial\Omega}]{\bm{y}_\partial}{\bm{u}_\partial}.
+&= \inner[L^2(\partial \Omega)]{\mathcal{N}_{\partial, 1} \bm{e}_1}{\mathcal{N}_{\partial, 2} \bm{e}_2}, \\
+&= \inner[L^2(\partial \Omega)]{\bm{y}_\partial}{\bm{u}_\partial}.
 \end{aligned}
 \end{equation}
 To get a finite dimensional approximation the same procedure detailed in Sec. \secref{sec:pfem_gen} is followed. The only difference is that there is no need to discretize the constitutive relations as those are already incorporated in the dynamics. 
@@ -732,9 +732,9 @@ To get a finite dimensional approximation the same procedure detailed in Sec. \s
 Once the system is put into weak form, if the operator $\mathcal{-L^*}$ is integrated by parts, one obtains the weak form 
 \begin{equation}\label{eq:weak_linsys_intJ1}
 \begin{aligned}
-\inner[X_1]{\bm{v}_1}{\mathcal{M}_1 \partial_t \bm{e}_1} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1}  -\inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[X_{\partial\Omega}]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\bm{u}_\partial}, \\
+\inner[X_1]{\bm{v}_1}{\mathcal{M}_1 \partial_t \bm{e}_1} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1}  -\inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[L^2(\partial \Omega)]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\bm{u}_\partial}, \\
 \inner[X_2]{\bm{v}_2}{\mathcal{M}_2 \partial_t \bm{e}_2} &=   \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1} + \inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1}, \\
-\inner[X_{\partial\Omega}]{\bm{v}_\partial}{\bm{y}_\partial} &= \inner[X_{\partial\Omega}]{\bm{v}_\partial}{\mathcal{N}_{\partial, 1}\bm{e}_2}.
+\inner[L^2(\partial \Omega)]{\bm{v}_\partial}{\bm{y}_\partial} &= \inner[L^2(\partial \Omega)]{\bm{v}_\partial}{\mathcal{N}_{\partial, 1}\bm{e}_2}.
 \end{aligned}
 \end{equation}
 
@@ -742,8 +742,8 @@ Otherwise, if operator $\mathcal{L}$ is integrated by parts, it is found
 \begin{equation}\label{eq:weak_linsys_intJ2}
 \begin{aligned}
 \inner[X_1]{\bm{v}_1}{\mathcal{M}_1 \partial_t \bm{e}_1} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1}  -\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2}, \\
-\inner[X_2]{\bm{v}_2}{\mathcal{M}_2 \partial_t \bm{e}_2} &=   \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1}  + \inner[X_1]{\mathcal{L}^*\bm{v}_2}{\bm{e}_1} + \inner[X_{\partial\Omega}]{\mathcal{N}_{\partial, 2} \bm{v}_2}{\bm{u}_{\partial}}, \\
-\inner[X_{\partial\Omega}]{\bm{v}_\partial}{\bm{y}_\partial} &= \inner[X_{\partial\Omega}]{\bm{v}_\partial}{\mathcal{N}_{\partial, 2}\bm{e}_2}.
+\inner[X_2]{\bm{v}_2}{\mathcal{M}_2 \partial_t \bm{e}_2} &=   \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1}  + \inner[X_1]{\mathcal{L}^*\bm{v}_2}{\bm{e}_1} + \inner[L^2(\partial \Omega)]{\mathcal{N}_{\partial, 2} \bm{v}_2}{\bm{u}_{\partial}}, \\
+\inner[L^2(\partial \Omega)]{\bm{v}_\partial}{\bm{y}_\partial} &= \inner[L^2(\partial \Omega)]{\bm{v}_\partial}{\mathcal{N}_{\partial, 2}\bm{e}_2}.
 \end{aligned}
 \end{equation}
 After introducing a Galerkin approximation as in \eqref{eq:approx_vaeb}, the discretized version of the weak form \eqref{eq:weak_linsys_intJ1} reads
@@ -879,7 +879,7 @@ The boundary operator $\bm\gamma_0, \, \bm\gamma_{1}$ denote the trace and the f
 	-\partial_x a(0) \\ +\partial_x a(L)
 	\end{pmatrix}.
 \end{equation}
-In this case $X_1 = X_2 = L^2(\Omega), \; X_{\partial\Omega} = \mathbb{R}^4$. The operators $\mathcal{L}, \, N_{\partial, 1}, \, N_{\partial, 2}$ read
+In this case $X_1 = X_2 = L^2(\Omega)$. The operators $\mathcal{L}, \, N_{\partial, 1}, \, N_{\partial, 2}$ read
 \begin{equation}
 \mathcal{L} = \partial_{xx}, \qquad 
 N_{\partial, 1} = \begin{bmatrix}
@@ -1114,7 +1114,7 @@ We recall the expressions of the trace maps
 \end{aligned}
 \end{equation}
 
-The Hilbert spaces here considered are $X_1=L^2(\Omega), \;  X_2=L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}}),\; X_{\partial\Omega} = L^2(\partial\Omega, \mathbb{R}^2)$. The  operators $\mathcal{L}, \, N_{\partial, 1}, \, N_{\partial, 2}$ are
+The Hilbert spaces here considered are $X_1=L^2(\Omega), \;  X_2=L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}})$. The  operators $\mathcal{L}, \, N_{\partial, 1}, \, N_{\partial, 2}$ are
 \begin{equation}
 \mathcal{L}= \Hess, \qquad
 N_{\partial, 1} = \begin{bmatrix}
@@ -1292,7 +1292,7 @@ The trace operators are defined as
 \end{aligned}
 \end{equation}
 
-For this example, the Hilbert spaces under consideration are $X_1 = L^2(\Omega) \times L^2(\Omega, \mathbb{R}^2), \; X_2 = L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}}) \times L^2(\Omega, \mathbb{R}^2), \; X_{\partial\Omega} = L^2(\Omega, \mathbb{R}^3)$. The $\bm{L}, \; \mathcal{L}, \; \mathcal{N}_{\partial, 1}, \; \mathcal{N}_{\partial, 1}$ operators are 
+For this example, the Hilbert spaces under consideration are $X_1 = L^2(\Omega) \times L^2(\Omega, \mathbb{R}^2), \; X_2 = L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}}) \times L^2(\Omega, \mathbb{R}^2)$. The $\bm{L}, \; \mathcal{L}, \; \mathcal{N}_{\partial, 1}, \; \mathcal{N}_{\partial, 1}$ operators are 
 \begin{equation}
 \bm{L} = \begin{bmatrix}
 \bm{0}  & \bm{0}  \\
@@ -1552,12 +1552,6 @@ This finite dimensional system represents a purely mixed discretization of the p
 \section{Mixed boundary conditions}\label{sec:mixedbc}
 In this section the assumption of uniform boundary condition \ref{ass:operBC} is removed. This allows considering general non homogeneous boundary conditions. To tackle this, two methodologies are proposed. One introduces Lagrange multipliers to enforce the mixed causality. Finite dimensional differential algebraic port-Hamiltonian systems (pHDAE) have been introduced in \cite{beattie2018linear} for linear systems and in \cite{morandin2019} for non linear systems. This enriched description share all the crucial features of ordinary pHs, but easily account for algebraic constraints, time-dependent transformations and explicit dependence on time in the Hamiltonian. The other method employs a domain decomposition technique to interconnect systems with different causalities. \\
 
-\begin{comment}
-The first solution can be applied to incorporate all possible mixed boundary conditions in a systematic manner. However the finite element discretization is required to satisfy the inf-sup condition. The simulation in time of resulting system is harder, since the algebraic constrains pose additional difficulties.  \\
-
-The second solution requires suitable finite elements for both kind of discretization detailed in Sec. \ref{sec:pfem_gen}. Some particular cases of boundary control cannot be handled nevertheless. The interface that separates the domain is an additional degree of freedom, as it can be freely drawn. 
-\end{comment}
-
 \begin{figure}[tb]
 	\centering
 	\includegraphics[width=0.5\textwidth]{part_3/bound_part.eps}
@@ -1565,12 +1559,9 @@ The second solution requires suitable finite elements for both kind of discretiz
 	\label{fig:bound_part}
 \end{figure}
 
-We will limit the illustration to the linear case. The open connected set $\Omega \subset \mathbb{R}^d, \; d=\{1,2,3\}$, with Lipschitz boundary $\partial\Omega$ represent the spatial domain. The boundary is split into two partition $\partial\Omega = \overline{\Gamma}_1 \cup \overline{\Gamma}_2, \; \Gamma_1 \cap \Gamma_2 = \{\emptyset\}$. For ease of presentation, $\Gamma_1, \; \Gamma_2$ are considered to be connected, cf. Fig. \ref{fig:bound_part}. Disconnected sets can be handled as well. For scalars ${a}_{\partial, 1}, {b}_{\partial, 1} \in L^2(\Gamma_1), \; {a}_{\partial, 2}, {b}_{\partial, 2} \in L^2(\Gamma_2)$ and  vectors  $\bm{a}_{\partial, 1}, \bm{b}_{\partial, 1} \in L^2(\Gamma_1, \mathbb{R}^m), \; \bm{a}_{\partial, 2}, \bm{b}_{\partial, 2} \in L^2(\Gamma_2, \mathbb{R}^m)$ defined on the boundary partition $\Gamma_1, \; \Gamma_2$ the inner product is defined as
+We will limit the illustration to the linear case. The open connected set $\Omega \subset \mathbb{R}^d, \; d=\{1,2,3\}$, with Lipschitz boundary $\partial\Omega$ represent the spatial domain. The boundary is split into two partition $\partial\Omega = \overline{\Gamma}_1 \cup \overline{\Gamma}_2, \; \Gamma_1 \cap \Gamma_2 = \{\emptyset\}$. For ease of presentation, $\Gamma_1, \; \Gamma_2$ are considered to be connected, cf. Fig. \ref{fig:bound_part}. Disconnected sets can be handled as well. For scalars ${a}_{\partial, *}, {b}_{\partial, *} \in L^2(\Gamma_*)$ and  vectors  $\bm{a}_{\partial, *}, \bm{b}_{\partial, *} \in L^2(\Gamma_*, \mathbb{R}^m)$ defined on the boundary partition $\Gamma_*$ the inner product is defined as
 \begin{equation}
-\begin{aligned}
-\inner[L^2(\Gamma_1)]{a_{\partial, 1}}{b_{\partial, 1}} = \int_{\Gamma_1} a_{\partial, 1} b_{\partial, 1} \d{\Gamma_1}, \qquad \inner[L^2(\Gamma_1, \mathbb{R}^m)]{\bm{a}_{\partial, 1}}{\bm{b}_{\partial, 1}} = \int_{\Gamma_1} \bm{a}_{\partial, 1} \cdot \bm{b}_{\partial, 1} \d{\Gamma_1}, \\
-\inner[L^2(\Gamma_2)]{a_{\partial, 2}}{b_{\partial, 2}} = \int_{\Gamma_2} a_{\partial, 2} b_{\partial, 2} \d{\Gamma_2}, \qquad \inner[L^2(\Gamma_2, \mathbb{R}^m)]{\bm{a}_{\partial, 2}}{\bm{b}_{\partial, 2}} = \int_{\Gamma_2} \bm{a}_{\partial, 2} \cdot \bm{b}_{\partial, 2} \d{\Gamma_2}.  \\
-\end{aligned}
+\inner[L^2(\Gamma_*)]{a_{\partial, *}}{b_{\partial, *}} = \int_{\Gamma_*} a_{\partial, *} b_{\partial, *} \d{\Gamma_*}, \qquad \inner[L^2(\Gamma_*, \mathbb{R}^m)]{\bm{a}_{\partial, *}}{\bm{b}_{\partial, *}} = \int_{\Gamma_*} \bm{a}_{\partial, *} \cdot \bm{b}_{\partial, *} \d{\Gamma_*}.  
 \end{equation}   
 
 Consider now the following boundary control linear pH system in co-energy form 
@@ -1624,13 +1615,13 @@ Consider now the following boundary control linear pH system in co-energy form
  The operator $\mathcal{N}_{\partial, *}^{\Gamma_\circ}$ with $*, \circ \in \{1, 2\}$ represent the restriction of operator $\mathcal{N}_{\partial, *}$, defined in Eq. \eqref{eq:intbypartsJ}, over the subset $\Gamma_\circ$. The boundary inputs and output are now vectors $\mathbb{R}^{2m}$. This does not mean that the boundary conditions have been doubled, but only that the components of $\bm{u}_\partial, \bm{y}_\partial$ are only defined on the subsets $\Gamma_1, \; \Gamma_2$ of the overall boundary. Given the additive property of the integral, it is possible to write
 \begin{equation}\label{eq:split_bdterm}
 \begin{aligned}
-\inner[X_{\partial\Omega}]{\mathcal{N}_{\partial, 1}\bm{e}_1}{\mathcal{N}_{\partial, 2}\bm{e}_2} &= \inner[X_{\Gamma_1}]{\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{e}_1}{\mathcal{N}_{\partial, 2}^{\Gamma_1}\bm{e}_2} + \inner[X_{\Gamma_2}]{\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{e}_1}{\mathcal{N}_{\partial, 2}^{\Gamma_2}\bm{e}_2}, \\
-&= \inner[X_{\Gamma_1}]{\bm{u}_{\partial, 1}}{\bm{y}_{\partial, 1}} + \inner[X_{\Gamma_2}]{\bm{y}_{\partial, 2}}{\bm{u}_{\partial, 2}},
+\inner[L^2(\partial \Omega)]{\mathcal{N}_{\partial, 1}\bm{e}_1}{\mathcal{N}_{\partial, 2}\bm{e}_2} &= \inner[L^2(\Gamma_1)]{\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{e}_1}{\mathcal{N}_{\partial, 2}^{\Gamma_1}\bm{e}_2} + \inner[L^2({\Gamma_2})]{\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{e}_1}{\mathcal{N}_{\partial, 2}^{\Gamma_2}\bm{e}_2}, \\
+&= \inner[L^2({\Gamma_1})]{\bm{u}_{\partial, 1}}{\bm{y}_{\partial, 1}} + \inner[L^2({\Gamma_2})]{\bm{y}_{\partial, 2}}{\bm{u}_{\partial, 2}}.
 \end{aligned} 
 \end{equation}
-where $X_{\partial\Omega}= L^2(\partial\Omega,\mathbb{R}^m), \; X_{\Gamma_1}= L^2(\Gamma_1,\mathbb{R}^m), \; X_{\Gamma_2}= L^2(\Gamma_2,\mathbb{R}^m)$. The continuous power balance is obtained using Eqs. \eqref{eq:powbal_lin} and \eqref{eq:split_bdterm}
+The continuous power balance is obtained using Eqs. \eqref{eq:powbal_lin} and \eqref{eq:split_bdterm}
 \begin{equation}\label{eq:powbal_mixed}
-	\dot{H} = \inner[X_{\Gamma_1}]{\bm{u}_{\partial, 1}}{\bm{y}_{\partial, 1}} + \inner[X_{\Gamma_2}]{\bm{y}_{\partial, 2}}{\bm{u}_{\partial, 2}}.
+	\dot{H} = \inner[L^2({\Gamma_1})]{\bm{u}_{\partial, 1}}{\bm{y}_{\partial, 1}} + \inner[L^2({\Gamma_2})]{\bm{y}_{\partial, 2}}{\bm{u}_{\partial, 2}}.
 \end{equation}
  
 
@@ -1639,28 +1630,28 @@ This solution consists in introducing a Lagrange multiplier for the boundary con
 
 \begin{equation}\label{eq:pHlinsys_mixed_weak}
 \begin{aligned}
-\inner[X_1]{\bm{v}_1}{\mathcal{M}_1 \partial_t \bm{e}_1} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1}  -\inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[X_{\partial\Omega}]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\mathcal{N}_{\partial, 2}\bm{e}_2}, \\
+\inner[X_1]{\bm{v}_1}{\mathcal{M}_1 \partial_t \bm{e}_1} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1}  -\inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[L^2({\partial\Omega})]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\mathcal{N}_{\partial, 2}\bm{e}_2}, \\
 \inner[X_2]{\bm{v}_2}{\mathcal{M}_2 \partial_t \bm{e}_2} &=   \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1} + \inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1}, \\
 \end{aligned}
 \end{equation}
-The term $\inner[X_{\partial\Omega}]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\mathcal{N}_{\partial, 2}\bm{e}_2}$ can be split into the two boundary contributions, as in Eq. \eqref{eq:split_bdterm}. The variable  $\bm{y}_{\partial, 1}$ plays here the role of a Lagrange multiplier $\bm{y}_{\partial, 1}=\bm{\lambda}_{\partial, 1}$
+The term $\inner[L^2({\partial\Omega})]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\mathcal{N}_{\partial, 2}\bm{e}_2}$ can be split into the two boundary contributions, as in Eq. \eqref{eq:split_bdterm}. The variable  $\bm{y}_{\partial, 1}$ plays here the role of a Lagrange multiplier $\bm{y}_{\partial, 1}=\bm{\lambda}_{\partial, 1}$
 \begin{equation}\label{eq:bdterm_mixed}
 \begin{aligned}
-\inner[X_{\partial\Omega}]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\mathcal{N}_{\partial, 2}\bm{e}_2} &= \inner[X_{\Gamma_1}]{\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{v}_1}{\mathcal{N}_{\partial, 2}^{\Gamma_1}\bm{e}_2} + \inner[X_{\Gamma_2}]{\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{v}_1}{\mathcal{N}_{\partial, 2}^{\Gamma_2}\bm{e}_2}, \\
-&= \inner[X_{\Gamma_1}]{\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{v}_1}{\bm{y}_{\partial, 1}} + \inner[X_{\Gamma_2}]{\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{v}_1}{\bm{u}_{\partial, 2}}, \\
-&= \inner[X_{\Gamma_1}]{\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{v}_1}{\bm{\lambda}_{\partial, 1}} + \inner[X_{\Gamma_2}]{\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{v}_1}{\bm{u}_{\partial, 2}}, \\
+\inner[L^2({\partial\Omega})]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\mathcal{N}_{\partial, 2}\bm{e}_2} &= \inner[L^2(\Gamma_1)]{\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{v}_1}{\mathcal{N}_{\partial, 2}^{\Gamma_1}\bm{e}_2} + \inner[L^2(\Gamma_2)]{\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{v}_1}{\mathcal{N}_{\partial, 2}^{\Gamma_2}\bm{e}_2}, \\
+&= \inner[L^2(\Gamma_1)]{\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{v}_1}{\bm{y}_{\partial, 1}} + \inner[L^2(\Gamma_2)]{\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{v}_1}{\bm{u}_{\partial, 2}}, \\
+&= \inner[L^2(\Gamma_1)]{\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{v}_1}{\bm{\lambda}_{\partial, 1}} + \inner[L^2(\Gamma_2)]{\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{v}_1}{\bm{u}_{\partial, 2}}, \\
 \end{aligned}
 \end{equation}
-If test function $\bm{v}_{\partial, 1}, \; \bm{v}_{\partial, 2} \in X_{\Gamma_1} \times X_{\Gamma_2}$ are introduced, the input and outputs definitions
+If test function $\bm{v}_{\partial, 1}, \; \bm{v}_{\partial, 2} \in L^2(\Gamma_1) \times L^2(\Gamma_2)$ are introduced, the input and outputs definitions
 \begin{equation}
 \bm{u}_{\partial, 1}=\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{e}_{1}, \qquad \bm{y}_{\partial, 1}=\bm{\lambda}_{\partial, 1}, \qquad \bm{y}_{\partial, 2}=\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{e}_{1}
 \end{equation}  
 can be put into weak form to obtain
 \begin{equation}\label{eq:inpout_mixed}
 \begin{aligned}
-\inner[X_{\Gamma_1}]{\bm{v}_{\partial, 1}}{\bm{u}_{\partial, 1}} &= \inner[X_{\Gamma_1}]{\bm{v}_{\partial, 1}}{\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{e}_{1}}, \\
-\inner[X_{\Gamma_1}]{\bm{v}_{\partial, 1}}{\bm{y}_{\partial, 1}} &= \inner[X_{\Gamma_1}]{\bm{v}_{\partial, 1}}{\bm{\lambda}_{\partial, 1}}, \\
-\inner[X_{\Gamma_1}]{\bm{v}_{\partial, 2}}{\bm{y}_{\partial, 2}} &= \inner[X_{\Gamma_1}]{\bm{v}_{\partial, 2}}{\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{e}_{1}}, \\
+\inner[L^2(\Gamma_1)]{\bm{v}_{\partial, 1}}{\bm{u}_{\partial, 1}} &= \inner[L^2(\Gamma_1)]{\bm{v}_{\partial, 1}}{\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{e}_{1}}, \\
+\inner[L^2(\Gamma_1)]{\bm{v}_{\partial, 1}}{\bm{y}_{\partial, 1}} &= \inner[L^2(\Gamma_1)]{\bm{v}_{\partial, 1}}{\bm{\lambda}_{\partial, 1}}, \\
+\inner[L^2(\Gamma_1)]{\bm{v}_{\partial, 2}}{\bm{y}_{\partial, 2}} &= \inner[L^2(\Gamma_1)]{\bm{v}_{\partial, 2}}{\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{e}_{1}}, \\
 \end{aligned}
 \end{equation}
 As usual, a Galerkin approximation is introduced    
@@ -1732,19 +1723,19 @@ where $\triangle$ stays for ${u}, {y}, {\lambda}$ and $\square$ for ${u}, {y}$. 
 Apart for matrices $\mathbf{M}_{\partial, 1}, \mathbf{M}_{\partial, 2}, \mathbf{B}_{1, \Gamma_1}, \mathbf{B}_{1, \Gamma_2}$,
 \begin{equation}
 \begin{aligned}
-{M}_{\partial, 1}^{lk} = \inner[X_{\Gamma_1}]{\bm{\phi}_{\partial, 1}^l}{\bm{\phi}_{\partial, 1}^k}, \quad (l,k) \in \{1,n_{\partial, 1}\}, \\
-{M}_{\partial, 2}^{fg} = \inner[X_{\Gamma_2}]{\bm{\phi}_{\partial, 2}^f}{\bm{\phi}_{\partial, 2}^g}, \quad (f,g) \in \{1,n_{\partial, 2}\},\\
+{M}_{\partial, 1}^{lk} = \inner[L^2(\Gamma_1)]{\bm{\phi}_{\partial, 1}^l}{\bm{\phi}_{\partial, 1}^k}, \quad (l,k) \in \{1,n_{\partial, 1}\}, \\
+{M}_{\partial, 2}^{fg} = \inner[L^2(\Gamma_2)]{\bm{\phi}_{\partial, 2}^f}{\bm{\phi}_{\partial, 2}^g}, \quad (f,g) \in \{1,n_{\partial, 2}\},\\
 \end{aligned}  \qquad
 \begin{aligned}
-{B}_{1, \Gamma_1}^{ik} = \inner[X_{\Gamma_1}]{\bm{\phi}_{1}^i}{\bm{\phi}_{\partial, 1}^k}, \\
-{B}_{1, \Gamma_2}^{ig} = \inner[X_{\Gamma_2}]{\bm{\phi}_{1}^i}{\bm{\phi}_{\partial, 2}^g}, \\
+{B}_{1, \Gamma_1}^{ik} = \inner[L^2(\Gamma_1)]{\bm{\phi}_{1}^i}{\bm{\phi}_{\partial, 1}^k}, \\
+{B}_{1, \Gamma_2}^{ig} = \inner[L^2(\Gamma_2)]{\bm{\phi}_{1}^i}{\bm{\phi}_{\partial, 2}^g}, \\
 \end{aligned} \quad i \in \{1,n_1\},
 \end{equation} 
-the other matrices keep the same definition as in \eqref{eq:pHlinsys_findim_J1}. As in \cite{beattie2018linear}, the discretized Hamiltonian is then defined as
+the other matrices keep the same definition as in \eqref{eq:pHlinsys_findim_J1}. The discrete Hamiltonian, whose expressive is \cite{beattie2018linear}
 \begin{equation}
 H_d = \frac{1}{2} \mathbf{e}_1^\top \mathbf{M}_{\mathcal{M}_1} \mathbf{e}_1 + \frac{1}{2} \mathbf{e}_2^\top \mathbf{M}_{\mathcal{M}_2} \mathbf{e}_2.
 \end{equation}
-The discrete power balance then equals
+gives rise to the discrete power balance
 \begin{equation}
 \begin{aligned}
 \dot{H}_d &= \mathbf{e}_1^\top \mathbf{M}_{\mathcal{M}_1} \dot{\mathbf{e}}_1 + \mathbf{e}_2^\top \mathbf{M}_{\mathcal{M}_2} \dot{\mathbf{e}}_2, \\
@@ -1808,16 +1799,45 @@ Equivalently, the weak form Eq.\ref{eq:weak_linsys_intJ2} may be used as a start
 \end{equation}
 where $\mathbf{B}_{2, \Gamma_1}, \mathbf{B}_{2, \Gamma_2}$ are given by
 \begin{equation}
-{B}_{2, \Gamma_1}^{mk} = \inner[X_{\Gamma_1}]{\bm{\phi}_{2}^m}{\bm{\phi}_{\partial, 1}^k}, \quad
-{B}_{2, \Gamma_2}^{mg} = \inner[X_{\Gamma_2}]{\bm{\phi}_{2}^m}{\bm{\phi}_{\partial, 2}^g}, 
- \quad m \in \{1,n_2\},\; k \in \{1,n_{\partial, 1}\},\; g \in \{1,n_{\partial, 2}\}.
+{B}_{2, \Gamma_1}^{mk} = \inner[L^2(\Gamma_1)]{\bm{\phi}_{2}^m}{\bm{\phi}_{\partial, 1}^k}, \quad
+{B}_{2, \Gamma_2}^{mg} = \inner[L^2(\Gamma_2)]{\bm{\phi}_{2}^m}{\bm{\phi}_{\partial, 2}^g}, 
+ \quad .
 \end{equation} 
-
+where $m \in \{1,n_2\},\; k \in \{1,n_{\partial, 1}\},\; g \in \{1,n_{\partial, 2}\}$. This solution can be applied to incorporate all possible mixed boundary conditions in a systematic manner. However the finite element discretization is required to satisfy the inf-sup condition. The simulation in time of resulting system is harder, since the algebraic constrains pose additional difficulties.
 
 \subsection{Virtual domain decomposition}\label{sec:vdd}
+If the domain is split into subdomains with different causalities, then the interconnection od the two provides a final system with the correct boundary conditions. To illustrate the idea, in Fig. \ref{fig:dom_part} the splitting of the domain is accomplished by introducing the interface $\Gamma_{12}$, that can be freely chosen. However, as a general guideline, it has be such that the meshing of the subdomains generate regular triangles.  
+
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.5\textwidth]{part_3/dom_part.eps}
+	\caption{Splitting of the domain into $\Omega_1, \; \Omega_2$.}
+	\label{fig:dom_part}
+\end{figure}
+
+To obtain a final system with the desired causality, the weak form has to carried separately on each subdomain. In particular, on subdomain $\Omega_1$ the $\mathcal{L}$ operator is integrated by parts, whereas on subdomain $\Omega_2$ the $-\mathcal{L}^2$ operator undergoes the integration by parts. As a result on subdomains $\Omega_1, \; (\Omega_2)$ the boundary input $\bm{u}_{\partial, 1}, \; (\bm{u}_{\partial, 2})$ explicitly appears. Let $X_1({\Omega_1}), \; X_1({\Omega_2})$ be the $X_1$ space restricted to the subdomain $\Omega_1, \; \Omega_2$, as analogously let $X_2({\Omega_1}), \; X_2({\Omega_2})$ the restriction of $X_2$ to $\Omega_1, \; \Omega_2$ respectively. Then Sys. \eqref{eq:pHlinsys_mixed} is put into weak form on the two subdomains. For the $\Omega_1$ contribution, it is obtained
+
+\begin{equation}\label{eq:pHlinsys_weak_Om1}
+\begin{aligned}
+\inner[X_1({\Omega_1})]{\bm{v}_1}{\mathcal{M}_1 \partial_t \bm{e}_1} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1({\Omega_1})}  -\inner[X_1({\Omega_1})]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2}  \\
+\inner[X_2({\Omega_1})]{\bm{v}_2}{\mathcal{M}_2 \partial_t \bm{e}_2} &=   \inner[X_2({\Omega_1})]{\bm{v}_2}{\bm{L}\bm{e}_1} + \inner[X_1({\Omega_1})]{\mathcal{L}^*\bm{v}_2}{\bm{e}_1} + \inner[L^2(\partial\Omega_1)]{\mathcal{N}_{\partial, 2} \bm{v}_2}{\mathcal{N}_{\partial, 1}\bm{e}_1}. \\
+\end{aligned}
+\end{equation}
+
+For $\Omega_2$, we get
+\begin{equation}\label{eq:pHlinsys_weak_Om2}
+\begin{aligned}
+\inner[X_1(\Omega_2)]{\bm{v}_1}{\mathcal{M}_1 \partial_t \bm{e}_1} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1(\Omega_2)}  -\inner[X_2(\Omega_2)]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[L^2(\partial\Omega_2)]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\mathcal{N}_{\partial, 2}\bm{e}_2}, \\
+\inner[X_2(\Omega_2)]{\bm{v}_2}{\mathcal{M}_2 \partial_t \bm{e}_2} &=   \inner[X_2(\Omega_2)]{\bm{v}_2}{\bm{L}\bm{e}_1} + \inner[X_2(\Omega_2)]{\bm{v}_2}{\mathcal{L}\bm{e}_1}, \\
+\end{aligned}
+\end{equation}
+Since $\partial\Omega_1 = \Gamma_1 \cup \Gamma_{12}$ and $\partial\Omega_2 = \Gamma_2 \cup \Gamma_{12}$, the boundary terms $\inner[L^2(\partial\Omega_1)]{\mathcal{N}_{\partial, 2} \bm{v}_2}{\mathcal{N}_{\partial, 1}\bm{e}_1}, \; \inner[L^2(\partial\Omega_2)]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\mathcal{N}_{\partial, 2}\bm{e}_2}$ and can be split to give
 
 
-\section{Connection with mixed finite elements}
+The second solution requires suitable finite elements for both kind of discretization detailed in Sec. \ref{sec:pfem_gen}. Some particular cases of boundary control cannot be handled nevertheless. The interface that separates the domain is an additional degree of freedom, as it can be freely drawn. 
+
+
+\section{Conclusion}
 
 
 

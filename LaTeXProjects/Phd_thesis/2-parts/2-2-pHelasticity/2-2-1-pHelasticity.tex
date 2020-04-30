@@ -52,11 +52,11 @@ This equation is written with respect to the deformed configuration $\Omega_t$. 
 \subsection{The linear elastodynamics problem}\label{sec:linElas}
 Whenever deformations are small, $\norm{\nabla_x\bm{u}} \ll 1$, then the reference and deformed configurations are almost indistinguishable $\bm{y} = \bm{x} + \bm{u} = \bm{x}  + O(\nabla_x\bm{u}) \approx \bm{x}$. This allows writing the linear momentum balance in the reference configuration
 \begin{equation*}
-	\rho \diffp{\bm{v}}{t}(\bm{x, t}) - \Div(\bm\Sigma(\bm{x}, t)) = \bm{f}, \qquad \bm{x} \in \Omega.
+	\rho \diffp{\bm{v}}{t}(\bm{x, t}) - \Div \bm\Sigma(\bm{x}, t) = \bm{f}, \qquad \bm{x} \in \Omega.
 \end{equation*}
 The material derivative simplifies to a partial one. The operator $\Div$ is the divergence of a tensor field with respect to the reference configuration (see Appendix \ref{app:math} for a description of the differential operators)
 \begin{equation*}
-\Div(\bm\Sigma(\bm{x}, t)) = \nabla_x \cdot \bm\Sigma(\bm{x}, t) = \left(\sum_{i=1}^{d}\diffp{\Sigma_{ij}}{x_i}\right)_{1 \leq j \leq d}.
+\Div \bm\Sigma(\bm{x}, t) = \nabla_x \cdot \bm\Sigma(\bm{x}, t) = \left(\sum_{i=1}^{d}\diffp{\Sigma_{ij}}{x_i}\right)_{1 \leq j \leq d}.
 \end{equation*}
 Furthermore, the non-linear terms in the Green-St. Venant strain tensor can be dropped
 \begin{equation*}
@@ -220,13 +220,13 @@ Assuming that $\bm{u} \in C^2$, higher order derivatives commute (Schwarz theore
 		\end{aligned}
 		\end{equation*}
 		such that \begin{equation*}
-		\left\langle \Div \bm{\Psi} , \bm{\phi} \right\rangle_{L^2(\Omega, \mathbb{V})} = \left\langle \bm{\Psi} , \Div{}^* \bm{\phi} \right\rangle_{L^2(\Omega, \mathbb{S})},
+		\inner[{L^2(\Omega, \mathbb{V})}]{\Div \bm{\Psi}}{\bm{\phi}}  = \inner[{L^2(\Omega, \mathbb{S})}]{\bm{\Psi}} {\Div{}^* \bm{\phi}},
 		\begin{aligned} \qquad
 		&\forall \bm{\Psi} \in \Dom(\Div) \subset L^2(\Omega, \mathbb{S}) \\
 		&\forall \bm{\phi} \in \Dom(\Div{}^*) \subset L^2(\Omega, \mathbb{V})
 		\end{aligned}
 		\end{equation*}
-		Now let us take $\bm{\Psi} \in {C}_0^1(\Omega, \mathbb{S}) \subset \mathrm{Domain}(\Div)$ the space of differentiable symmetric tensors with compact support in~$\Omega$. Additionally $\bm{\phi}$ will belong to ${C}_0^1(\Omega, \mathbb{V}) \subset \mathrm{Domain}(\Div{}^*)$, the space of differentiable vector functions with compact support in~$\Omega$. Then
+		Now let us take $\bm{\Psi} \in {C}_0^1(\Omega, \mathbb{S}) \subset \mathrm{Domain}(\Div)$ the space of differentiable symmetric tensors with compact support in~$\Omega$. Additionally $\bm{\phi}$ will belong to ${C}_0^1(\Omega, \mathbb{V}) \subset \mathrm{Dom}(\Div{}^*)$, the space of differentiable vector functions with compact support in~$\Omega$. Then
 		\begin{equation*}
 		\begin{aligned}
 		\left\langle \Div\bm{\Psi} , \bm{\phi} \right\rangle_{L^2(\Omega, \mathbb{V})} &= \int_{\Omega}  \bm{\psi} \cdot \bm{\phi} \; \d\Omega, \\
@@ -242,8 +242,8 @@ Assuming that $\bm{u} \in C^2$, higher order derivatives commute (Schwarz theore
 		\end{equation*}
 		Thus $\bm{\Phi}=\Grad \bm{\phi} \in L^2(\Omega, \mathbb{S})$ and it can be stated that:
 		\begin{align*}
-		\left\langle \Div\bm{\Psi} , \bm{\phi} \right\rangle_{L^2(\Omega, \mathbb{V})} &= - \int_{\Omega} \sum_{i,j} \Psi_{ij} \frac{1}{2} \left(\diffp{\phi_i}{x_j} + \diffp{\phi_j}{x_i}  \right) \;\d\Omega \\
-		&= - \int_{\Omega} \sum_{i,j} \Psi_{ij} \Phi_{ij} \;\d\Omega = \left\langle \bm{\Psi} , -\Grad \bm{\phi} \right\rangle_{L^2(\Omega, \mathbb{S})}.
+		\inner[L^2(\Omega, \mathbb{V})]{\Div\bm{\Psi}}{\bm{\phi}} &= - \int_{\Omega} \sum_{i,j} \Psi_{ij} \frac{1}{2} \left(\diffp{\phi_i}{x_j} + \diffp{\phi_j}{x_i}  \right) \;\d\Omega \\
+		&= - \int_{\Omega} \sum_{i,j} \Psi_{ij} \Phi_{ij} \;\d\Omega = \inner[L^2(\Omega, \mathbb{S})]{\bm{\Psi}}{-\Grad \bm{\phi}}.
 		\end{align*}
 
 		It can be concluded that the formal adjoint of $\Div$ is $\Div{}^* = -\Grad$.
