@@ -50,9 +50,9 @@ In this thesis the partitioned finite element method (PFEM), originally presente
 	\item A Galerkin method is employed to obtain a finite-dimensional system.
 \end{enumerate}
 
-Once the system has been put into weak form, a subset of the equations is integrated by parts, so that boundary variables are naturally included into the formulation and appear as control inputs, the collocated outputs being defined accordingly. The discretization of energy and co-energy variables (and the associated test functions) leads directly to a full rank representation for the finite-dimensional pH system.  This approach makes possible the usage of FEM software, like FEniCS \cite{logg2012}, or Firedrake \cite{rathgeber2017firedrake}. \\
+Once the system has been put into weak form, a subset of the equations is integrated by parts, so that boundary variables are naturally included into the formulation and appear as control inputs, the collocated outputs being defined accordingly. The discretization of energy and co-energy variables (and the associated test functions) leads directly to a full rank representation for the finite-dimensional pH system.  This approach makes possible the usage of FEM software, like FEniCS \cite{logg2012}, or Firedrake \cite{rathgeber2017firedrake}. The procedure is universal, as it relies on a general integration by parts formula that characterizes multi-dimensional pHs. This is why the methodology is illustrated in all its generality and then detailed for some particular examples.  \\
 
-Despite the many advantages, this methodology allows obtaining a canonical pH finite dimensional system only under a uniform causality assumption. The case of mixed boundary conditions requires additional care and will be treated in the subsequent Section \secref{sec:mixedbc}.
+This methodology is easily applicable under a uniform causality assumption. The case of mixed boundary conditions requires additional care and will be treated in the subsequent Section \secref{sec:mixedbc}.
 
 
 \subsection{General procedure}\label{sec:pfem_gen}
@@ -140,7 +140,7 @@ The boundary operators are then supposed to fulfill the following assumption, th
 	\end{bmatrix}, \quad 
 	\mathcal{C}_\partial = \begin{bmatrix}
 	\mathcal{N}_{\partial, 1} & 0 \\
-	\end{bmatrix}
+	\end{bmatrix},
 	\end{equation}
 	or 
 	\begin{equation}\label{eq:assB1C2}
@@ -148,9 +148,8 @@ The boundary operators are then supposed to fulfill the following assumption, th
 	\mathcal{N}_{\partial, 1} & 0 \\
 	\end{bmatrix}, \quad \mathcal{C}_\partial = \begin{bmatrix}
 	0 & \mathcal{N}_{\partial, 2} \\
-	\end{bmatrix}
+	\end{bmatrix}.
 	\end{equation}
-	where the operators $\mathcal{N}_{\partial, 1}, \; \mathcal{N}_{\partial, 2}$ are defined by the integration by part formula \eqref{eq:intbypartsJ}. 
 
 \end{assumption}
 
@@ -671,7 +670,7 @@ The additional assumption required to make the system linear is introduced.
 	\begin{equation}
 		H = \frac{1}{2} \inner[X_1]{\bm{\alpha}_{1}}{\mathcal{Q}_1\bm{\alpha}_{1}} + \frac{1}{2} \inner[X_2]{\bm{\alpha}_{2}}{\mathcal{Q}_2\bm{\alpha}_{2}},
 	\end{equation}
-	where $\mathcal{Q}_1, \, \mathcal{Q}_2$ are bounded symmetric operators, verifying
+	where $\mathcal{Q}_1, \, \mathcal{Q}_2$ are symmetric operators, bounded from below and above
 	\begin{equation*}
 	m_1 \bm{I}_1 \le\mathcal{Q}_1 \le M_1 \bm{I}_1, \qquad  m_2 \bm{I}_2 \le \mathcal{Q}_2 \le M_2 \bm{I}_2.
 	\end{equation*} 
@@ -681,7 +680,7 @@ Because of assumption \ref{ass:quadHam}, the co-energy variables are given by
 \begin{equation}\label{eq:e_lin}
 	\bm{e}_1 := \delta_{\alpha_1} H = \mathcal{Q}_1 \bm{\alpha}_1, \qquad \bm{e}_2 := \delta_{\alpha_2} H = \mathcal{Q}_2 \bm{\alpha}_2
 \end{equation}
-Since $\mathcal{Q}_1, \, \mathcal{Q}_2$ are positive bounded symmetric operators, it is possible to invert them to obtain
+Since $\mathcal{Q}_1, \, \mathcal{Q}_2$ are bounded from below and above operators, it is possible to invert them to obtain
 \begin{equation}\label{eq:alpha_lin}
 \bm{\alpha}_1 = \mathcal{Q}_1^{-1}\bm{e}_1 = \mathcal{M}_1\bm{e}_1, \qquad  \bm{\alpha}_2 = \mathcal{Q}_2^{-1} \bm{e}_2 = \mathcal{M}_2 \bm{e}_2, \qquad \mathcal{M}_1 := \mathcal{Q}_1^{-1}, \; \mathcal{M}_2 := \mathcal{Q}_2^{-1}.
 \end{equation}
@@ -1550,7 +1549,9 @@ This finite dimensional system represents a purely mixed discretization of the p
 
 
 \section{Mixed boundary conditions}\label{sec:mixedbc}
-In this section the assumption of uniform boundary condition \ref{ass:operBC} is removed. This allows considering general non homogeneous boundary conditions. To tackle this, two methodologies are proposed. One introduces Lagrange multipliers to enforce the mixed causality. Finite dimensional differential algebraic port-Hamiltonian systems (pHDAE) have been introduced in \cite{beattie2018linear} for linear systems and in \cite{morandin2019} for non linear systems. This enriched description share all the crucial features of ordinary pHs, but easily account for algebraic constraints, time-dependent transformations and explicit dependence on time in the Hamiltonian. The other method employs a domain decomposition technique to interconnect systems with different causalities. \\
+In this section the assumption of uniform boundary condition \ref{ass:operBC} is removed. This allows considering general non homogeneous boundary conditions. The discretization of Stokes-Dirac structure under mixed causality has been already treated in \cite{kotyczka2018weak}. However, to satisfy the power balance at a discrete level, some additional parameters are introduced. This makes the employment of this methodology not simple and really dependent on the considered application. Furthermore, elasticity models do not fall within the required assumptions. \\
+
+We propose here two methodologies to tackle mixed boundary conditions within the Partitioned Finite Element Method. One introduces Lagrange multipliers, and therefore algebraic constraints, to enforce the mixed causality. Finite dimensional differential algebraic port-Hamiltonian systems (pHDAE) have been introduced in \cite{beattie2018linear} for linear systems and in \cite{morandin2019} for non linear systems. This enriched description share all the crucial features of ordinary pHs, but easily account for algebraic constraints, time-dependent transformations and explicit dependence on time in the Hamiltonian. The other method employs a domain decomposition technique to interconnect systems with different causalities. \\
 
 \begin{figure}[tb]
 	\centering
@@ -1582,7 +1583,7 @@ Consider now the following boundary control linear pH system in co-energy form
 \end{pmatrix} , \qquad \begin{aligned}
 \bm{e}_1 &\in H^{\mathcal{L}}, 	\\
 \bm{e}_2 &\in H^{-\mathcal{L}^*}.
-\end{aligned}\\
+\end{aligned} \label{eq:pHlinsys_dyn_mixed}\\
 \begin{pmatrix}
 \bm{u}_{\partial, 1}\\
 \bm{u}_{\partial, 2}\\
@@ -1666,11 +1667,11 @@ As usual, a Galerkin approximation is introduced
 \end{aligned} \qquad 
 \begin{aligned}
 \bm{\triangle}_{\partial, 1} &\approx \sum_{i=1}^{n_{\partial, 1}} \bm{\phi}_{\partial, 1}^i(\bm{s}_1) \triangle_{\partial, 1}^i, \quad \bm{s}_1 \in \Gamma_1, \\
-\bm{\square}_{\partial, 2} &\approx \sum_{i=1}^{n_{\partial, 2}} \bm{\phi}_{\partial, 2}^i(\bm{s}_2) \square_\partial^i(t), \quad \bm{s}_2 \in \Gamma_2.
+\bm{\square}_{\partial, 2} &\approx \sum_{i=1}^{n_{\partial, 2}} \bm{\phi}_{\partial, 2}^i(\bm{s}_2) \square_{\partial, 2}^i(t), \quad \bm{s}_2 \in \Gamma_2.
 \end{aligned}
 \end{equation}
-where $\triangle$ stays for ${u}, {y}, {\lambda}$ and $\square$ for ${u}, {y}$. Replacing the approximation $\ref{eq:approx_vaeb_mixed}$ into Eqs. \ref{eq:pHlinsys_mixed_weak}, \ref{eq:bdterm_mixed}, \ref{eq:inpout_mixed}, the following system differential-algebraic system is obtained
-\begin{equation}\label{eq:pHsys_infdim_mult}
+where $\triangle$ stays for $v, u, y, {\lambda}$ and $\square$ for $v, u, y$. Replacing the approximation $\ref{eq:approx_vaeb_mixed}$ into Eqs. \ref{eq:pHlinsys_mixed_weak}, \ref{eq:bdterm_mixed}, \ref{eq:inpout_mixed}, the following system differential-algebraic system is obtained
+\begin{equation}\label{eq:pHsys_infdim_mult1}
 \begin{aligned}
 \mathrm{Diag}
 \begin{bmatrix}
@@ -1685,7 +1686,7 @@ where $\triangle$ stays for ${u}, {y}, {\lambda}$ and $\square$ for ${u}, {y}$. 
 \end{pmatrix}
 &= \begin{bmatrix}
 \mathbf{0} & -\mathbf{D}_{0}^\top - \mathbf{D}_{\mathcal{L}}^\top & \mathbf{B}_{1, \Gamma_1}\\
-\mathbf{D}_{0} + \mathbf{D}_{\mathcal{L}} & \mathbf{0} \\
+\mathbf{D}_{0} + \mathbf{D}_{\mathcal{L}} & \mathbf{0} & \mathbf{0} \\
 -\mathbf{B}_{1, \Gamma_1}^\top & \mathbf{0} & \mathbf{0} \\
 \end{bmatrix} 
 \begin{pmatrix}
@@ -1741,13 +1742,13 @@ gives rise to the discrete power balance
 \dot{H}_d &= \mathbf{e}_1^\top \mathbf{M}_{\mathcal{M}_1} \dot{\mathbf{e}}_1 + \mathbf{e}_2^\top \mathbf{M}_{\mathcal{M}_2} \dot{\mathbf{e}}_2, \\
 &= -\mathbf{e}_1^\top (\mathbf{D}_0+\mathbf{D}_\mathcal{L})^\top {\mathbf{e}}_2 + \mathbf{e}_2^\top (\mathbf{D}_0+\mathbf{D}_\mathcal{L}) {\mathbf{e}}_1 + \mathbf{e}_1^\top (\mathbf{B}_{1, \Gamma_1} \bm{\lambda}_{\partial, 1} + \mathbf{B}_{1, \Gamma_2} \mathbf{u}_{\partial, 2} ), \\
 &= \mathbf{y}_{\partial, 1}^\top \mathbf{M}_{\partial, 1} \mathbf{u}_{\partial, 1} + \mathbf{y}_{\partial, 2}^\top \mathbf{M}_{\partial, 2} \mathbf{u}_{\partial, 2}, \\
-&= \widehat{\mathbf{y}}_{\partial, 1}^\top \mathbf{u}_{\partial, 1} + \widehat{\mathbf{y}}_{\partial, 2}^\top \mathbf{u}_{\partial, 2}, \where \widehat{\mathbf{y}}_{\partial, 1} :=\mathbf{M}_{\partial, 1} \mathbf{y}_{\partial, 1}, \; \widehat{\mathbf{y}}_{\partial, 2} :=\mathbf{M}_{\partial, 2} \mathbf{y}_{\partial, 2}.
+&= \widehat{\mathbf{y}}_{\partial, 1}^\top \mathbf{u}_{\partial, 1} + \widehat{\mathbf{y}}_{\partial, 2}^\top \mathbf{u}_{\partial, 2}, \where \widehat{\mathbf{y}}_{\partial, 1} :=\mathbf{M}_{\partial, 1} \mathbf{y}_{\partial, 1}, \quad \widehat{\mathbf{y}}_{\partial, 2} :=\mathbf{M}_{\partial, 2} \mathbf{y}_{\partial, 2}.
 \end{aligned}
 \end{equation}
 This result is the finite dimensional equivalent of \eqref{eq:powbal_mixed}.
 
 Equivalently, the weak form Eq.\ref{eq:weak_linsys_intJ2} may be used as a starting point. The computation follows in a completely analogous manner. The only difference is that $\bm{y}_{\partial, 2}=\bm{\lambda}_{\partial, 2}$ plays the role of the Lagrange multiplier. The final finite dimensional system then is given by
-\begin{equation}
+\begin{equation}\label{eq:pHsys_infdim_mult2}
 \begin{aligned}
 \mathrm{Diag}
 \begin{bmatrix}
@@ -1797,16 +1798,16 @@ Equivalently, the weak form Eq.\ref{eq:weak_linsys_intJ2} may be used as a start
 \end{pmatrix}.
 \end{aligned}
 \end{equation}
-where $\mathbf{B}_{2, \Gamma_1}, \mathbf{B}_{2, \Gamma_2}$ are given by
+where $\mathbf{B}_{2, \Gamma_1}, \; \mathbf{B}_{2, \Gamma_2}$ are given by
 \begin{equation}
 {B}_{2, \Gamma_1}^{mk} = \inner[L^2(\Gamma_1)]{\bm{\phi}_{2}^m}{\bm{\phi}_{\partial, 1}^k}, \quad
 {B}_{2, \Gamma_2}^{mg} = \inner[L^2(\Gamma_2)]{\bm{\phi}_{2}^m}{\bm{\phi}_{\partial, 2}^g}, 
  \quad .
 \end{equation} 
-where $m \in \{1,n_2\},\; k \in \{1,n_{\partial, 1}\},\; g \in \{1,n_{\partial, 2}\}$. This solution can be applied to incorporate all possible mixed boundary conditions in a systematic manner. However the finite element discretization is required to satisfy the inf-sup condition. The simulation in time of resulting system is harder, since the algebraic constrains pose additional difficulties.
+where $m \in \{1,n_2\},\; k \in \{1,n_{\partial, 1}\},\; g \in \{1,n_{\partial, 2}\}$. This solution can be applied to incorporate all possible mixed boundary conditions in a systematic manner. However the finite element discretization is required to satisfy the inf-sup condition. Simulating the resulting system is harder, since the algebraic constrains pose additional difficulties for the time integration.
 
 \subsection{Virtual domain decomposition}\label{sec:vdd}
-If the domain is split into subdomains with different causalities, then the interconnection od the two provides a final system with the correct boundary conditions. To illustrate the idea, in Fig. \ref{fig:dom_part} the splitting of the domain is accomplished by introducing the interface $\Gamma_{12}$, that can be freely chosen. However, as a general guideline, it has be such that the meshing of the subdomains generate regular triangles.  
+Since the boundary are supposed to be connected set, a single interface is sufficient to obtain a system with the desired boundary conditions. In Fig. \ref{fig:dom_part} the splitting of the domain is accomplished by introducing the interface $\Gamma_{12}$, that can be freely chosen. However, as a general guideline, it has be such that the meshing of the subdomains generate regular triangles.  
 
 \begin{figure}[tb]
 	\centering
@@ -1815,7 +1816,56 @@ If the domain is split into subdomains with different causalities, then the inte
 	\label{fig:dom_part}
 \end{figure}
 
-To obtain a final system with the desired causality, the weak form has to carried separately on each subdomain. In particular, on subdomain $\Omega_1$ the $\mathcal{L}$ operator is integrated by parts, whereas on subdomain $\Omega_2$ the $-\mathcal{L}^2$ operator undergoes the integration by parts. As a result on subdomains $\Omega_1, \; (\Omega_2)$ the boundary input $\bm{u}_{\partial, 1}, \; (\bm{u}_{\partial, 2})$ explicitly appears. Let $X_1({\Omega_1}), \; X_1({\Omega_2})$ be the $X_1$ space restricted to the subdomain $\Omega_1, \; \Omega_2$, as analogously let $X_2({\Omega_1}), \; X_2({\Omega_2})$ the restriction of $X_2$ to $\Omega_1, \; \Omega_2$ respectively. Then Sys. \eqref{eq:pHlinsys_mixed} is put into weak form on the two subdomains. For the $\Omega_1$ contribution, it is obtained
+The idea is based on the fact that System \ref{eq:pHlinsys_mixed} can be split into two systems with uniform causality.  The following set of boundary variables is used for $\Omega_1$ subdomain
+
+\begin{equation} \label{eq:bc_Om1} 
+\begin{pmatrix}
+\bm{u}_{\partial, 1}\\
+\bm{u}_{\partial, 1}^{\Gamma_{12}}\\
+\end{pmatrix} = \begin{bmatrix}
+\mathcal{N}_{\partial, 1}^{\Gamma_1} & 0\\
+\mathcal{N}_{\partial, 1}^{\Gamma_{12}} & 0 \\
+\end{bmatrix} \begin{pmatrix}
+\bm{e}_1 \\ \bm{e}_2
+\end{pmatrix}, \qquad
+\begin{pmatrix}
+\bm{y}_{\partial, 1}\\
+\bm{y}_{\partial, 1}^{\Gamma_{12}} \\
+\end{pmatrix} = \begin{bmatrix}
+0 & \mathcal{N}_{\partial, 2}^{\Gamma_1} \\
+0 & \mathcal{N}_{\partial, 2}^{\Gamma_{12}} \\
+\end{bmatrix} \begin{pmatrix}
+\bm{e}_1 \\ \bm{e}_2
+\end{pmatrix}.
+\end{equation}
+Whereas for the $\Omega_2$ subdomain, the boundary variables are
+\begin{equation} \label{eq:bc_Om2}
+\begin{pmatrix}
+\bm{u}_{\partial, 2}\\
+\bm{u}_{\partial, 2}^{\Gamma_{12}}\\
+\end{pmatrix} = \begin{bmatrix}
+0 & \mathcal{N}_{\partial, 2}^{\Gamma_2}\\
+0 & \mathcal{N}_{\partial, 2}^{\Gamma_{12}} \\
+\end{bmatrix} \begin{pmatrix}
+\bm{e}_1 \\ \bm{e}_2
+\end{pmatrix}, \qquad
+\begin{pmatrix}
+\bm{y}_{\partial, 2}\\
+\bm{y}_{\partial, 2}^{\Gamma_{12}}\\
+\end{pmatrix} = \begin{bmatrix}
+\mathcal{N}_{\partial, 1}^{\Gamma_1} & 0 \\
+\mathcal{N}_{\partial, 1}^{\Gamma_{12}}  & 0 \\
+\end{bmatrix} \begin{pmatrix}
+\bm{e}_1 \\ \bm{e}_2
+\end{pmatrix}.
+\end{equation}
+The following relations then hold.
+\begin{equation}\label{eq:int_var}
+\bm{u}_{\partial, 1}^{\Gamma_{12}} =\pm \bm{y}_{\partial, 2}^{\Gamma_{12}}, \qquad \bm{u}_{\partial, 2}^{\Gamma_{12}} = \mp \bm{y}_{\partial, 1}^{\Gamma_{12}}.
+\end{equation}
+The plus or minus sign is due to the fact that either $\mathcal{N}_{\partial, 1}^{\Gamma_{12}}$ or $\mathcal{N}_{\partial, 2}^{\Gamma_{12}}$ contains a scalar product with the outgoing normal at ${\Gamma_{12}}$ (that has opposite direction depending on which subdomain is considered). These relations are at the core of the methodology,^ since they state the equivalence between a problem with mixed causalities and the interconnection of two problems with uniform causality.   \\
+
+To obtain a final system with the desired causality, the weak form has to be carried out separately on each subdomain. In particular, on subdomain $\Omega_1$ the $\mathcal{L}$ operator is integrated by parts, whereas on subdomain $\Omega_2$ the $-\mathcal{L}^*$ operator undergoes the integration by parts. Consequently, on subdomains $\Omega_1 \; (\Omega_2)$ the boundary input $\bm{u}_{\partial, 1} \; (\bm{u}_{\partial, 2})$ explicitly appears. Let $X_1({\Omega_*})$ be the $X_1$ space restricted to the subdomain $\Omega_*$, and let $X_2({\Omega_*})$ be the restriction of $X_2$ to $\Omega_*$ for $* \in \{1,2\}$. The weak form of the dynamics \eqref{eq:pHlinsys_dyn_mixed} for the $\Omega_1$ contribution reads
 
 \begin{equation}\label{eq:pHlinsys_weak_Om1}
 \begin{aligned}
@@ -1831,10 +1881,246 @@ For $\Omega_2$, we get
 \inner[X_2(\Omega_2)]{\bm{v}_2}{\mathcal{M}_2 \partial_t \bm{e}_2} &=   \inner[X_2(\Omega_2)]{\bm{v}_2}{\bm{L}\bm{e}_1} + \inner[X_2(\Omega_2)]{\bm{v}_2}{\mathcal{L}\bm{e}_1}, \\
 \end{aligned}
 \end{equation}
-Since $\partial\Omega_1 = \Gamma_1 \cup \Gamma_{12}$ and $\partial\Omega_2 = \Gamma_2 \cup \Gamma_{12}$, the boundary terms $\inner[L^2(\partial\Omega_1)]{\mathcal{N}_{\partial, 2} \bm{v}_2}{\mathcal{N}_{\partial, 1}\bm{e}_1}, \; \inner[L^2(\partial\Omega_2)]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\mathcal{N}_{\partial, 2}\bm{e}_2}$ and can be split to give
+Since $\partial\Omega_1 = \overline{\Gamma}_1 \cup \overline\Gamma_{12}$ and $\partial\Omega_2 = \overline\Gamma_2 \cup \overline\Gamma_{12}$, the boundary terms can be decomposed 
+\begin{equation}\label{eq:bdsplit_Om1}
+\begin{aligned}
+\inner[L^2(\partial\Omega_1)]{\mathcal{N}_{\partial, 2} \bm{v}_2}{\mathcal{N}_{\partial, 1}\bm{e}_1} &= \inner[L^2(\Gamma_1)]{\mathcal{N}_{\partial, 2} \bm{v}_2}{\mathcal{N}_{\partial, 1}\bm{e}_1} + \inner[L^2(\Gamma_{12})]{\mathcal{N}_{\partial, 2} \bm{v}_2}{\mathcal{N}_{\partial, 1}\bm{e}_1}, \\
+&= \inner[L^2(\Gamma_1)]{\mathcal{N}_{\partial, 2}^{\Gamma_1} \bm{v}_2}{\mathcal{N}_{\partial, 1}^{\Gamma_1} \bm{e}_1} + \inner[L^2(\Gamma_{12})]{\mathcal{N}_{\partial, 2}^{\Gamma_{12}} \bm{v}_2}{\mathcal{N}_{\partial, 1}^{\Gamma_{12}}\bm{e}_1}, \\
+&= \inner[L^2(\Gamma_1)]{\mathcal{N}_{\partial, 2}^{\Gamma_1} \bm{v}_2}{\bm{u}_{\partial, 1}} + \inner[L^2(\Gamma_{12})]{\mathcal{N}_{\partial, 2}^{\Gamma_{12}} \bm{v}_2}{\bm{u}_{\partial, 1}^{\Gamma_{12}}}.
+\end{aligned}
+\end{equation}
+Analogously, for the remaining boundary term we find
+\begin{equation}\label{eq:bdsplit_Om2}
+\begin{aligned}
+\inner[L^2(\partial\Omega_2)]{\mathcal{N}_{\partial,1} \bm{v}_1}{\mathcal{N}_{\partial, 2}\bm{e}_2} = \inner[L^2(\Gamma_2)]{\mathcal{N}_{\partial, 1}^{\Gamma_2} \bm{v}_1}{\bm{u}_{\partial, 2}} + \inner[L^2(\Gamma_{12})]{\mathcal{N}_{\partial, 1}^{\Gamma_{12}} \bm{v}_1}{\bm{u}_{\partial, 2}^{\Gamma_{12}}}.
+\end{aligned}
+\end{equation}
+A Galerkin approximation, analogous to \eqref{eq:approx_vaeb_mixed}, is used for each subdomain
+\begin{equation}
+\begin{aligned}
+\bm{v}_{1, 1} &\approx \sum_{i=1}^{n_{1, 1}} \bm{\phi}_{1, 1}^i(\bm{x}_1) v_{1, 1}^i, \quad \bm{x}_1 \in \Omega_1, \\
+\bm{v}_{2, 1} &\approx \sum_{i=1}^{n_{2, 1}} \bm{\phi}_{2, 1}^i(\bm{x}_1) v_{2, 1}^i, \\
+\bm{e}_{1, 1} &\approx \sum_{i=1}^{n_{1, 1}} \bm{\phi}_{1, 1}^i(\bm{x}_1) e_{1, 1}^i(t), \\
+\bm{e}_{2, 1} &\approx \sum_{i=1}^{n_{2, 1}} \bm{\phi}_{2, 1}^i(\bm{x}_1) e_{2, 1}^i(t),  \\
+\end{aligned}  \qquad 
+\begin{aligned}
+\bm{v}_{1, 2} &\approx \sum_{i=1}^{n_{1, 2}} \bm{\phi}_{1, 2}^i(\bm{x}_2) v_{1, 2}^i, \quad \bm{x}_2 \in \Omega_2, \\
+\bm{v}_{2, 2} &\approx \sum_{i=1}^{n_{2, 2}} \bm{\phi}_{2, 2}^i(\bm{x}_2) v_{2, 2}^i, \\
+\bm{e}_{1, 2} &\approx \sum_{i=1}^{n_{1, 2}} \bm{\phi}_{1, 2}^i(\bm{x}_2) e_{1, 2}^i(t), \\
+\bm{e}_{2, 2} &\approx \sum_{i=1}^{n_{2, 2}} \bm{\phi}_{2, 2}^i(\bm{x}_2) e_{2, 2}^i(t).  \\
+\end{aligned} 
+\end{equation}
+For the boundary variables, additional terms for the common interface are needed 
+\begin{equation}\label{eq:approx_vuy_int}
+\begin{aligned}
+\bm{\square}_{\partial, 1} &\approx \sum_{i=1}^{n_{\partial, 1}} \bm{\phi}_{\partial, 1}^i(\bm{s}_1) \square_{\partial, 1}^i(t), \quad \bm{s}_1 \in \Gamma_1, \\
+\bm{\square}_{\partial, 2} &\approx \sum_{i=1}^{n_{\partial, 2}} \bm{\phi}_{\partial, 2}^i(\bm{s}_2) \square_{\partial, 2}^i(t), \quad \bm{s}_2 \in \Gamma_2.
+\end{aligned} \qquad
+\begin{aligned}
+\bm{\square}_{\partial, 1}^{\Gamma_{12}} &\approx \sum_{i=1}^{n_{\partial, 12}} \bm{\phi}_{\partial, 12}^i(\bm{s}_{12}) \square_{\partial, 1}^{i, \Gamma_{12}}(t), \\
+\bm{\square}_{\partial, 2}^{\Gamma_{12}}  &\approx \sum_{i=1}^{n_{\partial, 12}} \bm{\phi}_{\partial, 12}^i(\bm{s}_{12}) \square_{\partial, 2}^{i, \Gamma_{12}}(t), 
+\end{aligned} \quad \bm{s}_{12} \in \Gamma_{12}.
+\end{equation}
+where $\square$ stays for $v,\, u,\, y$. Notice that the same basis functions $\bm{\phi}_{\partial, 12}$ are used for both interface variables. This is necessary in order to dispose of the same degrees of freedom for the interconnection.
 
 
-The second solution requires suitable finite elements for both kind of discretization detailed in Sec. \ref{sec:pfem_gen}. Some particular cases of boundary control cannot be handled nevertheless. The interface that separates the domain is an additional degree of freedom, as it can be freely drawn. 
+
+Replacing approximations $\ref{eq:approx_vaeb_mixed}, \ref{eq:approx_vuy_int}$ into Eqs. \ref{eq:pHlinsys_weak_Om1}, \ref{eq:bdsplit_Om1}, \ref{eq:bc_Om1}, a finite dimensional system for the $\Omega_1$ subdomain is obtained
+
+
+\begin{equation}\label{eq:pHlinsys_findim_Om1}
+\begin{aligned}
+\begin{bmatrix}
+\mathbf{M}_{\mathcal{M}_1}^{\Omega_1} & \mathbf{0} \\
+\mathbf{0} & \mathbf{M}_{\mathcal{M}_2}^{\Omega_1} \\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\mathbf{e}}_{1, 1} \\
+\dot{\mathbf{e}}_{2, 1} \\
+\end{pmatrix}
+&= \begin{bmatrix}
+\mathbf{0} & -\mathbf{D}_{0}^{\Omega_1 \top}+ \mathbf{D}_{-\mathcal{L}^*}^{\Omega_1} \\
+\mathbf{D}_{0}^{\Omega_1} - \mathbf{D}_{-\mathcal{L}^*}^{\Omega_1 \top} & \mathbf{0} \\
+\end{bmatrix} 
+\begin{pmatrix}
+\mathbf{e}_{1, 1} \\
+\mathbf{e}_{2, 1} \\
+\end{pmatrix} + 
+\begin{bmatrix}
+\mathbf{0} & \mathbf{0}\\
+\mathbf{B}_{2, \Gamma_1}^{\Omega_1} & \mathbf{B}_{2, \Gamma_{12}}^{\Omega_1}\\
+\end{bmatrix}
+\begin{pmatrix}
+\mathbf{u}_{\partial, 1} \\
+\mathbf{u}_{\partial, 1}^{\Gamma_{12}} \\
+\end{pmatrix}, \\
+\begin{bmatrix}
+\mathbf{M}_{\partial, 1} & \mathbf{0}  \\
+\mathbf{0} & \mathbf{M}_{\partial, 12} \\
+\end{bmatrix}
+\begin{pmatrix}
+\mathbf{y}_{\partial, 1} \\
+\mathbf{y}_{\partial, 1}^{\Gamma_{12}} \\
+\end{pmatrix}
+  &= 
+\begin{bmatrix}
+\mathbf{0} & \mathbf{B}_{2, \Gamma_1}^{\Omega_1 \top}\\
+\mathbf{0} & \mathbf{B}_{2, \Gamma_{12}}^{\Omega_1 \top} \\
+\end{bmatrix}\begin{pmatrix}
+\mathbf{e}_{1, 1} \\
+\mathbf{e}_{2, 1} \\
+\end{pmatrix}.
+\end{aligned}
+\end{equation}
+The mass and interconnection operator matrices are the restriction to the subdomain of the matrices given in \eqref{eq:pHsys_infdim_mult2}
+\begin{equation}
+\begin{aligned}
+{M}_{\mathcal{M}_1}^{\Omega_1, ij} &= \inner[X_1(\Omega_1)]{\bm{\phi}_{1, 1}^i}{\mathcal{M}_1\bm{\phi}_{1, 1}^j}, \\
+{M}_{\mathcal{M}_2}^{\Omega_1, mn} &= \inner[X_2(\Omega_1)]{\bm{\phi}_{2, 1}^m}{\mathcal{M}_2\bm{\phi}_{2, 1}^n}, 
+\end{aligned} \quad 
+\begin{aligned}
+{D}_{0}^{\Omega_1, mj} &= \inner[X_2(\Omega_1)]{\bm{\phi}_{2, 1}^i}{\bm{L}\bm{\phi}_{1, 1}^j}, \\
+{D}_{-\mathcal{L}^*}^{\Omega_1, in} &= \inner[X_1(\Omega_1)]{\bm{\phi}_{1, 1}^m}{-\mathcal{L}^*\bm{\phi}_{2, 1}^n}, 
+\end{aligned} \quad
+\begin{aligned}
+i,j &\in \{1,n_{1, 1}\}, \\
+m,n &\in \{1,n_{2, 1}\}.
+\end{aligned}
+\end{equation} 
+Matrices $\mathbf{M}_{\partial, 1}$ is constructed as in Eq. \eqref{eq:pHsys_infdim_mult2}. Matrix $\mathbf{M}_{\partial, 12}$ is similarly built 
+\begin{equation}
+{M}_{\partial, 12}^{lk} =\inner[L^2(\Gamma_{12})]{\bm{\phi}_{\partial, 12}^l}{\bm{\phi}_{\partial, {12}}^k}, \qquad l,k \in \{1,n_{\partial, 12}\}.
+\end{equation}
+The novel matrices  $\mathbf{B}_{2, \Gamma_1}^{\Omega_1}, \; \mathbf{B}_{1, \Gamma_{12}}^{\Omega_1}$ have elements
+\begin{equation}
+\begin{aligned}
+{B}_{2, \Gamma_1}^{\Omega_1, mh} &= \inner[L^2(\Gamma_{1})]{\bm{\phi}_{2, 1}^m}{\bm{\phi}_{\partial, 1}^h}, \\
+{B}_{2, \Gamma_{12}}^{\Omega_1, mk} &= \inner[L^2(\Gamma_{12})]{\bm{\phi}_{2, 1}^m}{\bm{\phi}_{\partial, 12}^k}, 
+\end{aligned} \qquad 
+\begin{aligned}
+m \in \{1,n_{2, 1}\}, \quad h &\in \{1,n_{\partial, 1}\}, \\
+k &\in \{1,n_{\partial, 12}\}.
+\end{aligned}
+\end{equation} 
+
+
+If instead the approximations are plugged into  Eqs. \ref{eq:pHlinsys_weak_Om2}, \ref{eq:bdsplit_Om2}, \ref{eq:bc_Om2}, a finite dimensional system for the $\Omega_2$ subdomain is computed
+
+\begin{equation}\label{eq:pHlinsys_findim_Om2}
+\begin{aligned}
+\begin{bmatrix}
+\mathbf{M}_{\mathcal{M}_1}^{\Omega_2} & \mathbf{0} \\
+\mathbf{0} & \mathbf{M}_{\mathcal{M}_2}^{\Omega_2} \\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\mathbf{e}}_{1, 2} \\
+\dot{\mathbf{e}}_{2, 2} \\
+\end{pmatrix}
+&= \begin{bmatrix}
+\mathbf{0} & -\mathbf{D}_{0}^{\Omega_2 \top} - \mathbf{D}_{\mathcal{L}}^{\Omega_2 \top} \\
+\mathbf{D}_{0}^{\Omega_2} + \mathbf{D}_{\mathcal{L}}^{\Omega_2} & \mathbf{0} \\
+\end{bmatrix} 
+\begin{pmatrix}
+\mathbf{e}_{1, 2} \\
+\mathbf{e}_{2, 2} \\
+\end{pmatrix} + 
+\begin{bmatrix}
+\mathbf{B}_{1, \Gamma_2}^{\Omega_2} & \mathbf{B}_{1, \Gamma_{12}}^{\Omega_2}\\
+\mathbf{0} & \mathbf{0}\\
+\end{bmatrix}
+\begin{pmatrix}
+\mathbf{u}_{\partial, 2} \\
+\mathbf{u}_{\partial, 2}^{\Gamma_{12}} \\
+\end{pmatrix}, \\
+\begin{bmatrix}
+\mathbf{M}_{\partial, 2} & \mathbf{0}  \\
+\mathbf{0} & \mathbf{M}_{\partial, 12} \\
+\end{bmatrix}
+\begin{pmatrix}
+\mathbf{y}_{\partial, 2} \\
+\mathbf{y}_{\partial, 2}^{\Gamma_{12}} \\
+\end{pmatrix}
+&= 
+\begin{bmatrix}
+\mathbf{B}_{1, \Gamma_2}^{\Omega_2 \top} & \mathbf{0} \\
+\mathbf{B}_{1, \Gamma_{12}}^{\Omega_2 \top} & \mathbf{0} \\
+\end{bmatrix}\begin{pmatrix}
+\mathbf{e}_{1, 2} \\
+\mathbf{e}_{2, 2} \\
+\end{pmatrix}.
+\end{aligned}
+\end{equation}
+
+The mass and interconnection operator matrices are the restriction to the subdomain of the matrices given in \eqref{eq:pHsys_infdim_mult1}
+\begin{equation}
+\begin{aligned}
+{M}_{\mathcal{M}_1}^{\Omega_2, ij} &= \inner[X_1(\Omega_2)]{\bm{\phi}_{1, 2}^i}{\mathcal{M}_1\bm{\phi}_{1, 2}^j}, \\
+{M}_{\mathcal{M}_2}^{\Omega_2, mn} &= \inner[X_2(\Omega_2)]{\bm{\phi}_{2, 2}^m}{\mathcal{M}_2\bm{\phi}_{2, 2}^n}, 
+\end{aligned} \quad 
+\begin{aligned}
+{D}_{0}^{\Omega_2, mj} &= \inner[X_2(\Omega_2)]{\bm{\phi}_{2, 2}^i}{\bm{L}\bm{\phi}_{1, 2}^j}, \\
+{D}_{\mathcal{L}}^{\Omega_2, mj} &= \inner[X_2(\Omega_2)]{\bm{\phi}_{2, 2}^m}{\mathcal{L}\bm{\phi}_{1, 2}^n}, 
+\end{aligned}\quad
+\begin{aligned}
+i,j &\in \{1,n_{1, 2}\}, \\
+m,n &\in \{1,n_{2, 2}\}.
+\end{aligned}
+\end{equation} 
+Matrix $\mathbf{M}_{\partial, 2}$ is constructed as in \eqref{eq:pHsys_infdim_mult1}. The elements of matrices  $\mathbf{B}_{1, \Gamma_2}, \; \mathbf{B}_{1, \Gamma_{12}}$ are computed as
+\begin{equation}
+\begin{aligned}
+{B}_{1, \Gamma_{2}}^{ig} &= \inner[L^2(\Gamma_{2})]{\bm{\phi}_{1, 2}^i}{\bm{\phi}_{\partial, 2}^g},  \\
+{B}_{1, \Gamma_{12}}^{ik} &= \inner[L^2(\Gamma_{12})]{\bm{\phi}_{1, 2}^i}{\bm{\phi}_{\partial, 12}^k}, 
+\end{aligned} \qquad 
+\begin{aligned}
+i \in \{1,n_{1, 2}\}, \quad g &\in \{1,n_{\partial, 2}\}, \\
+k &\in \{1,n_{\partial, 12}\}.
+\end{aligned}
+\end{equation} 
+
+Systems \eqref{eq:pHlinsys_findim_Om1}, \eqref{eq:pHlinsys_findim_Om2} are compactly rewritten as 
+
+\begin{tcbraster}[raster columns=2, raster equal height]
+	\begin{tcolorbox}[width=0.48\textwidth, nobeforeafter, colframe=cyan,title=System \eqref{eq:pHlinsys_findim_Om1},  coltitle=black]%%
+	\begin{equation}\label{eq:pHfindim_Om1}
+	\begin{aligned}
+	\mathbf{M}_{\Omega_1}
+	\dot{\mathbf{e}}_{\Omega_1}
+	= \mathbf{J}_{\Omega_1} {\mathbf{e}}_{\Omega_1} + 
+	\mathbf{B}_{\Gamma_1}^{\Omega_1} \textcolor{blue}{\mathbf{u}_{\partial, 1}} + \mathbf{B}_{\Gamma_{12}}^{\Omega_1}
+	\textcolor{violet}{\mathbf{u}_{\partial, 1}^{\Gamma_{12}}}, \\
+	\mathbf{M}_{\partial, 1} \textcolor{blue}{\mathbf{y}_{\partial, 1}} = \mathbf{B}_{\Gamma_1}^{\Omega_1 \top} \mathbf{e}_{\Omega_1}, \\
+	\mathbf{M}_{\partial, 12} \textcolor{violet}{\mathbf{y}_{\partial, 1}^{\Gamma_{12}}} = \mathbf{B}_{\Gamma_{12}}^{\Omega_1 \top} \mathbf{e}_{\Omega_1}.
+	\end{aligned}
+	\end{equation}
+	\end{tcolorbox} 
+	\begin{tcolorbox}[width=0.48\textwidth, nobeforeafter,  colframe=lightyellow,title=System \eqref{eq:pHlinsys_findim_Om2}, coltitle=black]%%
+	\begin{equation}\label{eq:pHfindim_Om2}
+	\begin{aligned}
+	\mathbf{M}_{\Omega_2}
+	\dot{\mathbf{e}}_{\Omega_2}
+	= \mathbf{J}_{\Omega_2} {\mathbf{e}}_{\Omega_2} + 
+	\mathbf{B}_{\Gamma_2}^{\Omega_2} \textcolor{red}{\mathbf{u}_{\partial, 2}} + \mathbf{B}_{\Gamma_{12}}^{\Omega_2}
+	\textcolor{violet}{\mathbf{u}_{\partial, 2}^{\Gamma_{12}}}, \\
+	\mathbf{M}_{\partial, 2} \textcolor{red}{\mathbf{y}_{\partial, 2}} = \mathbf{B}_{\Gamma_2}^{\Omega_2 \top} \mathbf{e}_{\Omega_2}, \\
+	\mathbf{M}_{\partial, 12} \textcolor{violet}{\mathbf{y}_{\partial, 2}^{\Gamma_{12}}} = \mathbf{B}_{\Gamma_{12}}^{\Omega_2 \top} \mathbf{e}_{\Omega_2}.
+	\end{aligned}
+	\end{equation}
+	\end{tcolorbox}
+\end{tcbraster}
+
+To obtain a system with the desired causality, an interconnection is employed to connect the two Systems \eqref{eq:pHfindim_Om1}, \eqref{eq:pHfindim_Om2} along the shared boundary $\Gamma_{12}$. Given \eqref{eq:int_var}, the interconnection is computed as
+\begin{equation}\label{eq:int_discrvar}
+\begin{aligned}
+{\mathbf{u}_{\partial, 1}^{\Gamma_{12}}} &= \pm {\mathbf{y}_{\partial, 2}^{\Gamma_{12}}}= \pm \mathbf{M}_{\partial, 12}^{-1} \mathbf{B}_{\Gamma_{12}}^{\Omega_2 \top} \mathbf{e}_{\Omega_2}, \\ {\mathbf{u}_{\partial, 2}^{\Gamma_{12}}} &= \mp {\mathbf{y}_{\partial, 2}^{\Gamma_{12}}}=\mp \mathbf{M}_{\partial, 12}^{-1} \mathbf{B}_{\Gamma_{12}}^{\Omega_1 \top} \mathbf{e}_{\Omega_1}, 
+\end{aligned}
+\end{equation}
+This corresponds to a classical gyrator interconnection of pH system.
+
+
+
+
+This solution requires suitable finite elements for both kind of discretization detailed in Sec. \ref{sec:pfem_gen}. Some particular cases of boundary control cannot be handled nevertheless. The interface that separates the domain is an additional degree of freedom, as it can be freely drawn. 
 
 
 \section{Conclusion}
