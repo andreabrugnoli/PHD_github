@@ -4,7 +4,7 @@
 
 \minitoc
 
-\lettrine{\color{theme}{D}}iscretization is the process of transferring continuous models into discrete counterparts. The discrete model should be faithful to the continuous one. To this aim, it is usually essential that the main properties of the continuous system are preserved at the discrete level. An algorithm that is capable of conserving properties at the discrete level is called structure-preserving \cite{christiansen2011}. In this chapter, a finite element method to spatially discretize infinite-dimensional pHs into finite-dimensional ones in a structure preserving manner is illustrated.
+\lettrine{\color{theme}{D}}iscretization is the process of transferring continuous models into discrete counterparts. The discrete model should be faithful to the continuous one. To this aim, it is usually essential that the main properties of the continuous system are preserved at the discrete level. An algorithm that is capable of conserving properties at the discrete level is called structure-preserving \cite{christiansen2011}. In this chapter, a method to spatially discretize infinite-dimensional pHs into finite-dimensional ones in a structure preserving manner is illustrated.
 
 \section{Discretization under uniform boundary condition}
 A discrete version of a infinite-dimensional pH system is meant to preserve the underlying properties related to power continuity. To achieve this purpose, the discretization procedure consists of two steps \cite{kotyczka2018weak}:
@@ -17,20 +17,20 @@ A structure-preserving discretization is able to construct an equivalent pH syst
 	\begin{tcolorbox}[width=0.4\textwidth, nobeforeafter, colframe=theme,title=Infinite dimensional pH system]%%
 		PDE with distributed inputs:
 		\begin{align*}
-		\diffp{\bm{\alpha}}{t}(\bm{x}, t) &= \mathcal{J} {\displaystyle \diffd{H}{\bm{\alpha}}}+ \mathcal{B} \textcolor{red}{\bm{u}(\bm{x}, t)}, \\
-		\textcolor{red}{\bm{y}(\bm{x}, t)} &= \mathcal{B}^* {\displaystyle \diffd{H}{\bm{\alpha}}}.
+		\diffp{\bm{\alpha}}{t}(\bm{x}, t) &= \mathcal{J} {\displaystyle \diffd{H}{\bm{\alpha}}}+ \mathcal{B} \textcolor{red}{\bm{u}_\Omega(\bm{x}, t)}, \\
+		\textcolor{red}{\bm{y}_\Omega(\bm{x}, t)} &= \mathcal{B}^* {\displaystyle \diffd{H}{\bm{\alpha}}}.
 		\end{align*}
 		Boundary conditions: 
 		\[\textcolor{blue}{\bm{u}_\partial} = \mathcal{B}_\partial{\displaystyle \diffd{H}{\bm{\alpha}}}, \quad \textcolor{blue}{\bm{y}_\partial} = \mathcal{C}_\partial {\displaystyle \diffd{H}{\bm{\alpha}}}. \]
 		Power balance (Stokes Theorem): 
-		\[ \dot{H} = \displaystyle \int_{\partial \Omega} \textcolor{blue}{\bm{u}_\partial} \cdot \textcolor{blue}{\bm{y}_\partial} \d{S} +  \int_{\Omega} \textcolor{red}{\bm{u}} \cdot \textcolor{red}{\bm{y}} \d{\Omega}.
+		\[ \dot{H} = \displaystyle \int_{\partial \Omega} \textcolor{blue}{\bm{u}_\partial} \cdot \textcolor{blue}{\bm{y}_\partial} \d{S} +  \int_{\Omega} \textcolor{red}{\bm{u}_\Omega} \cdot \textcolor{red}{\bm{y}_\Omega} \d{\Omega}.
 		\]
 	\end{tcolorbox} 
 	\begin{tcolorbox}[width=0.4\textwidth, nobeforeafter,  colframe=theme,title=Structure-preserving discretization]%%
 		Resulting ODE:
 		\begin{align*}
-		\dot{\bm{\alpha}}_d &= \mathbf{J} \, {\nabla {H}_d} + \mathbf{B}_d \textcolor{red}{\mathbf{u}_d} + \mathbf{B}_\partial \textcolor{blue}{\mathbf{u}_\partial}, \\
-		\textcolor{red}{\mathbf{y}_d} &= \mathbf{B}_d^\top \, {\nabla {H}_d}, \\
+		\dot{\bm{\alpha}}_d &= \mathbf{J} \, {\nabla {H}_d} + \mathbf{B}_\Omega \textcolor{red}{\mathbf{u}_\Omega} + \mathbf{B}_\partial \textcolor{blue}{\mathbf{u}_\partial}, \\
+		\textcolor{red}{\mathbf{y}_\Omega} &= \mathbf{B}_\Omega^\top \, {\nabla {H}_d}, \\
 		\textcolor{blue}{\mathbf{y}_\partial} &= \mathbf{B}_\partial^\top \,{\nabla {H}_d}.
 		\end{align*}
 		Discretized Hamiltonian:
@@ -38,16 +38,16 @@ A structure-preserving discretization is able to construct an equivalent pH syst
 		H_d := H(\bm{\alpha} \equiv \bm{\alpha}_d).
 		\]
 		Power balance: 
-		\[ \dot{H} = \textcolor{blue}{\mathbf{u}_\partial^\top \mathbf{y}_\partial} +  \textcolor{red}{\mathbf{u}_d^\top \mathbf{y}_d}.
+		\[ \dot{H} = \textcolor{blue}{\mathbf{u}_\partial^\top \mathbf{y}_\partial} +  \textcolor{red}{\mathbf{u}_\Omega^\top \mathbf{y}_\Omega}.
 		\]
 	\end{tcolorbox}
 \end{tcbraster}
 \vspace{.5cm}
-In this thesis the partitioned finite element method (PFEM), originally presented in \cite{cardoso2018pfem,cardoso2019partitioned}, is chosen to obtain discretized models of dpHs. This procedure boils down to three simple steps
+In this thesis the Partitioned Finite Element Method (PFEM), originally presented in \cite{cardoso2018pfem,cardoso2019partitioned}, is chosen to obtain discretized models of dpHs. This procedure boils down to three simple steps
 \begin{enumerate}
 	\item The system is written in weak form; 
 	\item An integration by parts is applied to highlight the appropriate boundary control;
-	\item A Galerkin method is employed to obtain a finite-dimensional system.
+	\item A Galerkin method is employed to obtain a finite-dimensional system. For the approximation basis the finite element method is here employed but spectral methods can be used as well.
 \end{enumerate}
 
 Once the system has been put into weak form, a subset of the equations is integrated by parts, so that boundary variables are naturally included into the formulation and appear as control inputs, the collocated outputs being defined accordingly. The discretization of energy and co-energy variables (and the associated test functions) leads directly to a full rank representation for the finite-dimensional pH system.  This approach makes possible the usage of FEM software, like FEniCS \cite{logg2012}, or Firedrake \cite{rathgeber2017firedrake}. The procedure is universal, as it relies on a general integration by parts formula that characterizes multi-dimensional pHs. This is why the methodology is illustrated in all its generality and then detailed for some particular examples.  \\
@@ -86,7 +86,7 @@ H = \int_\Omega \mathcal{H}(\bm{\alpha}) \d\Omega,
 where $\mathcal{H}(\bm{\alpha}): X \rightarrow \mathbb{R}$ is a non linear function.
 \\
 
-To applied this methodology the non linearities are restricted to the Hamiltonian and a uniform causality condition is supposed to characterize the system. It is required as well that the system admits a splitting of the variables. This requirement is always encounter in the following examples. These hypotheses are resumed in the following assumptions.
+To applied this methodology the non linearities are restricted to the Hamiltonian and a uniform causality condition is supposed to characterize the system. It is required as well that the system admits a partition of the variables. This requirement is always encounter in the following examples. These hypotheses are resumed in the following assumptions.
 
 \begin{assumption}\label{ass:linJ}
 	Consider system \eqref{eq:pHsys_dyn}. It is assumed that the Hilbert space $X$ admits the splitting $X = X_1 \times X_2$ (meaning that the system is made up of two main blocks). The operator $\mathcal{J}$ is assumed to be skew-symmetric (or formally skew-adjoint) on $X$ and linear:
@@ -116,7 +116,7 @@ To applied this methodology the non linearities are restricted to the Hamiltonia
 	&\mathcal{L}\;\, : X_1 \rightarrow X_2, \\
 	\end{aligned}
 	\end{equation}
-	where $\mathcal{L}^*$ denotes the formal adjoint of the linear differential operator $\mathcal{L}$. 	The operator $\mathcal{L}$ is unbounded and  can be either a first or a second order differential operator. In the latter case it can be expressed as $\mathcal{L} = \mathcal{L}_1 \circ \mathcal{L}_2$. Given the splitting $X_1 \times X_2 = X$ the Hilbert space $H^\mathcal{J}$ can be split as well as 
+	where $\mathcal{L}^*$ denotes the formal adjoint of the linear differential operator $\mathcal{L}$. 	The operator $\mathcal{L}$ is unbounded and  can be either a first or a second order differential operator (in the latter case it can be expressed as $\mathcal{L} = \mathcal{L}_1 \circ \mathcal{L}_2$). Given the splitting $X_1 \times X_2 = X$ the Hilbert space $H^\mathcal{J}$ can be split as well as 
 	\begin{equation}
 		H^\mathcal{J} = H^\mathcal{L} \times H^\mathcal{-L^*}, \qquad
 		\begin{aligned}
@@ -153,7 +153,7 @@ The boundary operators are then supposed to fulfill the following assumption, th
 
 \end{assumption}
 
-\begin{remark}
+\begin{remark}[Duality pairing for rigged Hilbert spaces]
 	The integration by part formula establishes a duality pairing between Sobolev spaces. This duality pairing is then compatible with an $L^2$ inner product in presence of a rigged Hilbert space (Gelfand triple). Without entering into technical details, we shall always use this equivalence of representation. Therefore, the boundary integrals are  expressed as $L^2$ inner product over the boundary. 
 \end{remark}
 
@@ -182,11 +182,11 @@ Thanks to Assumption \ref{ass:linJ}, System \eqref{eq:pHsys_2} is rewritten as
 	\end{aligned} \label{eq:pHsys_const_ass} 
 	\end{align}
 \end{subequations}
-Then thanks to Assumption \ref{ass:operBC} the boundary variables are given by 
+In light of Assumption \ref{ass:operBC}, if Eq. \eqref{eq:assB2C1} holds the boundary variables are given by 
 \begin{equation}\label{eq:pHsys_assB2C1}
-\bm{u}_\partial = \mathcal{N}_2 \displaystyle \bm{e}_2, \qquad  \bm{y}_\partial = \mathcal{N}_1 \displaystyle \bm{e}_1, \qquad  \bm{u}_\partial,\, \bm{y}_\partial \in \mathbb{R}^m,
+\bm{u}_\partial = \mathcal{N}_2 \displaystyle \bm{e}_2, \qquad  \bm{y}_\partial = \mathcal{N}_1 \displaystyle \bm{e}_1, \qquad  \bm{u}_\partial,\, \bm{y}_\partial \in \mathbb{R}^m.
 \end{equation}
-if Eq. \eqref{eq:assB2C1} holds. Otherwise, if Eq. \eqref{eq:assB1C2} applies, then
+Otherwise, if Eq. \eqref{eq:assB1C2} applies, then
 \begin{equation}\label{eq:pHsys_assB1C2}
 \bm{u}_\partial = \mathcal{N}_1 \displaystyle \bm{e}_1, \qquad 
 \bm{y}_\partial = \mathcal{N}_2 \displaystyle \bm{e}_2, \qquad  \bm{u}_\partial,\, \bm{y}_\partial \in \mathbb{R}^m. 
@@ -222,7 +222,7 @@ To obtain a closed system, the constitutive law \eqref{eq:pHsys_const_ass} and t
 where the test function $\bm{v}_\partial \in L^2(\partial \Omega, \mathbb{R}^m)$ is defined on the boundary $\partial\Omega$ and $\mathcal{C}_\partial$ is defined either by Eq. \eqref{eq:assB2C1} or  \eqref{eq:assB1C2}.
 
 
-\paragraph{Step 2} Next the integration by part has to be carried out. The choice is dictated by the boundary control to be imposed on the system. Consider again Eq. \eqref{eq:weak_dyn}. The integration by parts can be carried out either on term $-\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2}$, or on term $\inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1}$. Depending o which line undergoes the integration by parts (this explains the name Partitioned Finite Element method), two structure preserving weak forms are obtained. These differ by the boundary causality imposed to the system. 
+\paragraph{Step 2} Next the integration by part has to be carried out. The choice is dictated by the boundary control to be imposed on the system. Consider again Eq. \eqref{eq:weak_dyn}. The integration by parts can be carried out either on term $-\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2}$, or on term $\inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1}$. Depending on which line undergoes the integration by parts (this is why the name Partitioned Finite Element method), two structure preserving weak forms are obtained. These differ by the boundary causality imposed to the system. 
 
 
 \subparagraph{Integration by parts of the term $-\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2}$}
@@ -501,7 +501,7 @@ Plugging the approximation into the weak form \eqref{eq:weak_sys_intJ2} a finite
 \end{equation}
 The differences with respect to formulation \eqref{eq:pHsys_findim_J1} reside in matrices $\mathbf{D}_{-\mathcal{L}^*}, \; \mathbf{B}_2$, whose definitions are
 \begin{equation}
-{D}_{-\mathcal{L}^*}^{im} = \inner[X_1]{\bm\phi_1^i}{\mathcal{-L^*}\bm\phi_2^m}, \qquad B_2^{mk} = \inner[X_{\partial\Omega}]{\bm\phi_2^m}{\bm\phi_{\partial}^k} \qquad i \in \left\{1, n_1\right\}, \; m \in \left\{1, n_2\right\},\; k \in \left\{1, n_\partial \right\}.
+{D}_{-\mathcal{L}^*}^{im} = \inner[X_1]{\bm\phi_1^i}{\mathcal{-L^*}\bm\phi_2^m}, \quad B_2^{mk} = \inner[X_{\partial\Omega}]{\bm\phi_2^m}{\bm\phi_{\partial}^k}, \quad i \in \left\{1, n_1\right\}, \; m \in \left\{1, n_2\right\},\; k \in \left\{1, n_\partial \right\}.
 \end{equation}
 System \eqref{eq:pHsys_findim_J2} can be put in canonical form by replacing the co-energy variables by the discretized gradient.
 
@@ -661,9 +661,9 @@ One possible finite element discretization for this problem can be found in \cit
 
 
 \subsection{Linear case}
-The general framework detailed in Sec. \ref{sec:pfem_gen} is valid for both linear and non linear system. However, in the linear case a major simplification occurs since the constitutive law connecting energy and co-energy variables is easily invertible. This allows using only to describe the dynamics using the co-energy variables only. \\
+The general framework detailed in Sec. \ref{sec:pfem_gen} is valid for both linear and non linear system. However, in the linear case a major simplification occurs since the constitutive law connecting energy and co-energy variables is easily invertible. This allows a description based on co-energy variables only. \\
 
-The additional assumption required to make the system linear is introduced.
+To make the system linear, The additional assumption is introduced.
 
 \begin{assumption}\label{ass:quadHam}
 	The Hamiltonian is assumed to be a positive quadratic functional in the energy variables $\bm{\alpha}_1, \, \bm{\alpha}_2$. Furthermore, the Hamiltonian is considered to be separable  with respect to $\bm{\alpha}_1, \, \bm{\alpha}_2$ (this hypothesis is always met for the systems under consideration). Therefore, it can be expressed as 
@@ -676,7 +676,7 @@ The additional assumption required to make the system linear is introduced.
 	\end{equation*} 
 \end{assumption}
 
-Because of assumption \ref{ass:quadHam}, the co-energy variables are given by 
+Because of Assumption \ref{ass:quadHam}, the co-energy variables are given by 
 \begin{equation}\label{eq:e_lin}
 	\bm{e}_1 := \delta_{\alpha_1} H = \mathcal{Q}_1 \bm{\alpha}_1, \qquad \bm{e}_2 := \delta_{\alpha_2} H = \mathcal{Q}_2 \bm{\alpha}_2
 \end{equation}
@@ -737,7 +737,7 @@ Once the system is put into weak form, if the operator $\mathcal{-L^*}$ is integ
 \end{aligned}
 \end{equation}
 
-Otherwise, if operator $\mathcal{L}$ is integrated by parts, it is found  
+Otherwise, if operator $\mathcal{L}$ is integrated by parts, it is computed  
 \begin{equation}\label{eq:weak_linsys_intJ2}
 \begin{aligned}
 \inner[X_1]{\bm{v}_1}{\mathcal{M}_1 \partial_t \bm{e}_1} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1}  -\inner[X_1]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2}, \\
@@ -1037,9 +1037,9 @@ Replacing a Galerkin approximation, it is obtained
 \end{pmatrix}.
 \end{aligned}
 \end{equation}
-The matrice $\mathbf{D}_{-\partial_{xx}}$ is defined as ($i, \in \{1, n_w\}, \; m \in \{1, n_\kappa\}$)
+The matrix $\mathbf{D}_{-\partial_{xx}}$ is defined as 
 \begin{equation}
-D_{-\partial_{xx}}^{im} = \inner[L^2(\Omega)]{\phi_w^i}{-\partial_{xx}\phi_\kappa^m}.
+D_{-\partial_{xx}}^{im} = \inner[L^2(\Omega)]{\phi_w^i}{-\partial_{xx}\phi_\kappa^m}, \qquad i, \in \{1, n_w\}, \; m \in \{1, n_\kappa\}.
 \end{equation}
 The $\mathbf{B}_\kappa$ is composed of four column vectors $\mathbf{B}_\kappa = [\mathbf{b}_\kappa^{1} \; \mathbf{b}_\kappa^{2} \; \mathbf{b}_\kappa^3 \; \mathbf{b}_\kappa^4]$
 \begin{equation}
@@ -1195,9 +1195,9 @@ This kind of discretization requires $H^2$ conforming element. The construction 
 
 To lower the regularity requirement for the finite elements many non conforming discretization have been proposed. The most employed is the Hellan-Herrmann-Johnson element \cite{arnold1985mixed,blum1990}. However, this method does not handle generic non homogeneous boundary conditions. Given the unavailability of the boundary for interconnections, the modularity feature of pHs cannot be fully exploited. \\
 
-Equivalently, the second line of Eq. \eqref{eq:pHdyn_Kir1} can be integrated by parts twice to obtain a discretized system whose input are the linear velocity and the angular velocity at the boundary. However, while for the $H^2$ space conforming finite elements are available, for the $H^{\div\Div}$ no conforming finite elements have been proposed. This makes the discretization unfeasible. 
-
-
+\begin{remark}[On the $H^{\div\Div}$ space]\label{rmk:HdivDiv}
+	Equivalently, the second line of Eq. \eqref{eq:pHdyn_Kir1} can be integrated by parts twice to obtain a discretized system whose input are the linear velocity and the angular velocity at the boundary. However, while for the $H^2$ space conforming finite elements are available, for the $H^{\div\Div}$ no conforming finite elements have been proposed. This makes the discretization unfeasible. 
+\end{remark}
 
 \subsubsection{Mindlin plate}
 Using Eqs. \eqref{eq:alpha_Min} and \eqref{eq:e_Min}, the relation between co-energy and energy variables for the isotropic Mindlin plate is found to be
@@ -1291,7 +1291,11 @@ The trace operators are defined as
 \end{aligned}
 \end{equation}
 
-For this example, the Hilbert spaces under consideration are $X_1 = L^2(\Omega) \times L^2(\Omega, \mathbb{R}^2), \; X_2 = L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}}) \times L^2(\Omega, \mathbb{R}^2)$. The $\bm{L}, \; \mathcal{L}, \; \mathcal{N}_{\partial, 1}, \; \mathcal{N}_{\partial, 1}$ operators are 
+For this example, the Hilbert spaces under consideration are 
+\begin{equation*}
+X_1 = L^2(\Omega) \times L^2(\Omega, \mathbb{R}^2), \qquad X_2 = L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}}) \times L^2(\Omega, \mathbb{R}^2). 
+\end{equation*}
+The $\bm{L}, \; \mathcal{L}, \; \mathcal{N}_{\partial, 1}, \; \mathcal{N}_{\partial, 1}$ operators are 
 \begin{equation}
 \bm{L} = \begin{bmatrix}
 \bm{0}  & \bm{0}  \\
@@ -1476,7 +1480,7 @@ Matrix $\mathbf{B}_w, \, \mathbf{B}_{\theta_n}, \, \mathbf{B}_{\theta_s}$ are co
 	\end{pmatrix}, \qquad \bm{y}_\partial \in \mathbb{R}^3.
 	\end{align}
 \end{subequations}
-integrating by parts the last two lines of \eqref{eq:pHdyn_Min2} one gets 
+Integrating by parts the last two lines of \eqref{eq:pHdyn_Min2} one gets 
 \begin{equation}
 \begin{aligned}
 \inner[L^2(\Omega)]{v_w}{\rho h \partial_t e_w} &= \inner[L^2(\Omega, \mathbb{R}^{2})]{v_w}{\div \bm{e}_\gamma}, \\
@@ -1549,9 +1553,9 @@ This finite dimensional system represents a purely mixed discretization of the p
 
 
 \section{Mixed boundary conditions}\label{sec:mixedbc}
-In this section the assumption of uniform boundary condition \ref{ass:operBC} is removed. This allows considering general non homogeneous boundary conditions. The discretization of Stokes-Dirac structure under mixed causality has been already treated in \cite{kotyczka2018weak}. However, to satisfy the power balance at a discrete level, some additional parameters are introduced. This makes the employment of this methodology not simple and really dependent on the considered application. Furthermore, elasticity models do not fall within the required assumptions. \\
+In this section Assumption \ref{ass:operBC} on uniform boundary condition is modified to account for general non homogeneous boundary conditions. The discretization of Stokes-Dirac structure under mixed causality has been already treated in \cite{kotyczka2018weak}. However, to satisfy the power balance at a discrete level, some additional parameters are introduced. This makes the employment of this methodology not simple and dependent on the considered application. Furthermore, elasticity models do not fall within the required assumptions. \\
 
-We propose here two methodologies to tackle mixed boundary conditions within the Partitioned Finite Element Method. One introduces Lagrange multipliers, and therefore algebraic constraints, to enforce the mixed causality. Finite dimensional differential algebraic port-Hamiltonian systems (pHDAE) have been introduced in \cite{beattie2018linear} for linear systems and in \cite{morandin2019} for non linear systems. This enriched description share all the crucial features of ordinary pHs, but easily account for algebraic constraints, time-dependent transformations and explicit dependence on time in the Hamiltonian. The other method employs a domain decomposition technique to interconnect systems with different causalities. \\
+We propose here two methodologies to tackle mixed boundary conditions within the Partitioned Finite Element Method. The first introduces Lagrange multipliers, and therefore algebraic constraints, to enforce the mixed causality. Finite dimensional differential algebraic port-Hamiltonian systems (pHDAE) have been introduced in \cite{beattie2018linear} for linear systems and in \cite{morandin2019} for non linear systems. This enriched description share all the crucial features of ordinary pHs, but easily account for algebraic constraints, time-dependent transformations and explicit dependence on time in the Hamiltonian. The second method employs a domain decomposition technique to interconnect systems with different causalities. For the sake of simplicity The illustration is restrained to the linear case. \\
 
 \begin{figure}[tb]
 	\centering
@@ -1560,7 +1564,12 @@ We propose here two methodologies to tackle mixed boundary conditions within the
 	\label{fig:bound_part}
 \end{figure}
 
-We will limit the illustration to the linear case. The open connected set $\Omega \subset \mathbb{R}^d, \; d=\{1,2,3\}$, with Lipschitz boundary $\partial\Omega$ represent the spatial domain. The boundary is split into two partition $\partial\Omega = \overline{\Gamma}_1 \cup \overline{\Gamma}_2, \; \Gamma_1 \cap \Gamma_2 = \{\emptyset\}$. For ease of presentation, $\Gamma_1, \; \Gamma_2$ are considered to be connected, cf. Fig. \ref{fig:bound_part}. Disconnected sets can be handled as well. For scalars ${a}_{\partial, *}, {b}_{\partial, *} \in L^2(\Gamma_*)$ and  vectors  $\bm{a}_{\partial, *}, \bm{b}_{\partial, *} \in L^2(\Gamma_*, \mathbb{R}^m)$ defined on the boundary partition $\Gamma_*$ the inner product is defined as
+The open connected set $\Omega \subset \mathbb{R}^d, \; d=\{1,2,3\}$, with Lipschitz boundary $\partial\Omega$ represent the spatial domain. The boundary is split into two partition $\partial\Omega = \overline{\Gamma}_1 \cup \overline{\Gamma}_2, \; \Gamma_1 \cap \Gamma_2 = \{\emptyset\}$. The set $\Gamma_1, \; \Gamma_2$ are considered to be connected, cf. Fig. \ref{fig:bound_part}.
+
+\begin{remark}[Connectedness of $\Gamma_1, \Gamma_2$]
+	Disconnected set can be handled as well. This requires the introduction of an heavy notation and complicates the illustration. For sake of simplicity, the connectedness hypothesis is then made.
+\end{remark}
+For scalars ${a}_{\partial, *}, {b}_{\partial, *} \in L^2(\Gamma_*)$ and  vectors  $\bm{a}_{\partial, *}, \bm{b}_{\partial, *} \in L^2(\Gamma_*, \mathbb{R}^m)$ defined on the boundary partition $\Gamma_*$ the inner product is defined as
 \begin{equation}
 \inner[L^2(\Gamma_*)]{a_{\partial, *}}{b_{\partial, *}} = \int_{\Gamma_*} a_{\partial, *} b_{\partial, *} \d{\Gamma_*}, \qquad \inner[L^2(\Gamma_*, \mathbb{R}^m)]{\bm{a}_{\partial, *}}{\bm{b}_{\partial, *}} = \int_{\Gamma_*} \bm{a}_{\partial, *} \cdot \bm{b}_{\partial, *} \d{\Gamma_*}.  
 \end{equation}   
@@ -1582,7 +1591,7 @@ Consider now the following boundary control linear pH system in co-energy form
 \bm{e}_1 \\ \bm{e}_2
 \end{pmatrix} , \qquad \begin{aligned}
 \bm{e}_1 &\in H^{\mathcal{L}}, 	\\
-\bm{e}_2 &\in H^{-\mathcal{L}^*}.
+\bm{e}_2 &\in H^{-\mathcal{L}^*},
 \end{aligned} \label{eq:pHlinsys_dyn_mixed}\\
 \begin{pmatrix}
 \bm{u}_{\partial, 1}\\
@@ -1613,7 +1622,10 @@ Consider now the following boundary control linear pH system in co-energy form
 \end{align}
 \end{subequations}
 
- The operator $\mathcal{N}_{\partial, *}^{\Gamma_\circ}$ with $*, \circ \in \{1, 2\}$ represent the restriction of operator $\mathcal{N}_{\partial, *}$, defined in Eq. \eqref{eq:intbypartsJ}, over the subset $\Gamma_\circ$. The boundary inputs and output are now vectors $\mathbb{R}^{2m}$. This does not mean that the boundary conditions have been doubled, but only that the components of $\bm{u}_\partial, \bm{y}_\partial$ are only defined on the subsets $\Gamma_1, \; \Gamma_2$ of the overall boundary. Given the additive property of the integral, it is possible to write
+ The operator $\mathcal{N}_{\partial, *}^{\Gamma_\circ}$ with $*, \circ \in \{1, 2\}$ represent now the restriction of operator $\mathcal{N}_{\partial, *}$, defined in Eq. \eqref{eq:intbypartsJ}, over the subset $\Gamma_\circ$.  The boundary inputs and output are now vectors $\mathbb{R}^{2m}$. This does not mean that the boundary conditions have been doubled, but only that the components of $\bm{u}_\partial, \bm{y}_\partial$ are only defined on the subsets $\Gamma_1, \; \Gamma_2$ of the overall boundary. This corresponds to a slight modification of Assumption \ref{ass:operBC}.
+ 
+ 
+Given the additive property of the integral, it is possible to write
 \begin{equation}\label{eq:split_bdterm}
 \begin{aligned}
 \inner[L^2(\partial \Omega)]{\mathcal{N}_{\partial, 1}\bm{e}_1}{\mathcal{N}_{\partial, 2}\bm{e}_2} &= \inner[L^2(\Gamma_1)]{\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{e}_1}{\mathcal{N}_{\partial, 2}^{\Gamma_1}\bm{e}_2} + \inner[L^2({\Gamma_2})]{\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{e}_1}{\mathcal{N}_{\partial, 2}^{\Gamma_2}\bm{e}_2}, \\
@@ -1627,12 +1639,12 @@ The continuous power balance is obtained using Eqs. \eqref{eq:powbal_lin} and \e
  
 
 \subsection{Solution using Lagrange multipliers}\label{sec:lagrMul}
-This solution consists in introducing a Lagrange multiplier for the boundary control that does not arise in the weak form. To illustrate the idea, consider again the weak form \ref{eq:weak_linsys_intJ1} (obtained by integration by parts of the $\mathcal{-L^*}$ partitioned) of Sys. \ref{eq:pHlinsys_mixed}
+This solution introduces a Lagrange multiplier for the boundary control that does not arise explicitly in the weak form. To illustrate the idea, consider again the weak form \ref{eq:weak_linsys_intJ1} (obtained by integration by parts of the $\mathcal{-L^*}$ partition) of Sys. \ref{eq:pHlinsys_mixed}
 
 \begin{equation}\label{eq:pHlinsys_mixed_weak}
 \begin{aligned}
 \inner[X_1]{\bm{v}_1}{\mathcal{M}_1 \partial_t \bm{e}_1} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1}  -\inner[X_2]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[L^2({\partial\Omega})]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\mathcal{N}_{\partial, 2}\bm{e}_2}, \\
-\inner[X_2]{\bm{v}_2}{\mathcal{M}_2 \partial_t \bm{e}_2} &=   \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1} + \inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1}, \\
+\inner[X_2]{\bm{v}_2}{\mathcal{M}_2 \partial_t \bm{e}_2} &=   \inner[X_2]{\bm{v}_2}{\bm{L}\bm{e}_1} + \inner[X_2]{\bm{v}_2}{\mathcal{L}\bm{e}_1}. \\
 \end{aligned}
 \end{equation}
 The term $\inner[L^2({\partial\Omega})]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\mathcal{N}_{\partial, 2}\bm{e}_2}$ can be split into the two boundary contributions, as in Eq. \eqref{eq:split_bdterm}. The variable  $\bm{y}_{\partial, 1}$ plays here the role of a Lagrange multiplier $\bm{y}_{\partial, 1}=\bm{\lambda}_{\partial, 1}$
@@ -1645,14 +1657,14 @@ The term $\inner[L^2({\partial\Omega})]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\mat
 \end{equation}
 If test function $\bm{v}_{\partial, 1}, \; \bm{v}_{\partial, 2} \in L^2(\Gamma_1) \times L^2(\Gamma_2)$ are introduced, the input and outputs definitions
 \begin{equation}
-\bm{u}_{\partial, 1}=\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{e}_{1}, \qquad \bm{y}_{\partial, 1}=\bm{\lambda}_{\partial, 1}, \qquad \bm{y}_{\partial, 2}=\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{e}_{1}
+\bm{u}_{\partial, 1}=\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{e}_{1}, \qquad \bm{y}_{\partial, 1}=\bm{\lambda}_{\partial, 1}, \qquad \bm{y}_{\partial, 2}=\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{e}_{1},
 \end{equation}  
 can be put into weak form to obtain
 \begin{equation}\label{eq:inpout_mixed}
 \begin{aligned}
 \inner[L^2(\Gamma_1)]{\bm{v}_{\partial, 1}}{\bm{u}_{\partial, 1}} &= \inner[L^2(\Gamma_1)]{\bm{v}_{\partial, 1}}{\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{e}_{1}}, \\
 \inner[L^2(\Gamma_1)]{\bm{v}_{\partial, 1}}{\bm{y}_{\partial, 1}} &= \inner[L^2(\Gamma_1)]{\bm{v}_{\partial, 1}}{\bm{\lambda}_{\partial, 1}}, \\
-\inner[L^2(\Gamma_1)]{\bm{v}_{\partial, 2}}{\bm{y}_{\partial, 2}} &= \inner[L^2(\Gamma_1)]{\bm{v}_{\partial, 2}}{\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{e}_{1}}, \\
+\inner[L^2(\Gamma_1)]{\bm{v}_{\partial, 2}}{\bm{y}_{\partial, 2}} &= \inner[L^2(\Gamma_1)]{\bm{v}_{\partial, 2}}{\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{e}_{1}}. \\
 \end{aligned}
 \end{equation}
 As usual, a Galerkin approximation is introduced    
@@ -1670,7 +1682,7 @@ As usual, a Galerkin approximation is introduced
 \bm{\square}_{\partial, 2} &\approx \sum_{i=1}^{n_{\partial, 2}} \bm{\phi}_{\partial, 2}^i(\bm{s}_2) \square_{\partial, 2}^i(t), \quad \bm{s}_2 \in \Gamma_2.
 \end{aligned}
 \end{equation}
-where $\triangle$ stays for $v, u, y, {\lambda}$ and $\square$ for $v, u, y$. Replacing the approximation $\ref{eq:approx_vaeb_mixed}$ into Eqs. \ref{eq:pHlinsys_mixed_weak}, \ref{eq:bdterm_mixed}, \ref{eq:inpout_mixed}, the following system differential-algebraic system is obtained
+where $\triangle$ stays for $v, u, y, {\lambda}$ and $\square$ for $v, u, y$. Replacing the approximation $\ref{eq:approx_vaeb_mixed}$ into Eqs. \ref{eq:pHlinsys_mixed_weak}, \ref{eq:bdterm_mixed}, \ref{eq:inpout_mixed}, the following differential-algebraic system is constructed
 \begin{equation}\label{eq:pHsys_infdim_mult1}
 \begin{aligned}
 \mathrm{Diag}
@@ -1732,7 +1744,7 @@ Apart for matrices $\mathbf{M}_{\partial, 1}, \mathbf{M}_{\partial, 2}, \mathbf{
 {B}_{1, \Gamma_2}^{ig} = \inner[L^2(\Gamma_2)]{\bm{\phi}_{1}^i}{\bm{\phi}_{\partial, 2}^g}, \\
 \end{aligned} \quad i \in \{1,n_1\},
 \end{equation} 
-the other matrices keep the same definition as in \eqref{eq:pHlinsys_findim_J1}. The discrete Hamiltonian, whose expressive is \cite{beattie2018linear}
+the other matrices keep the same definition as in \eqref{eq:pHlinsys_findim_J1}. The discrete Hamiltonian, whose expression is \cite{beattie2018linear}
 \begin{equation}
 H_d = \frac{1}{2} \mathbf{e}_1^\top \mathbf{M}_{\mathcal{M}_1} \mathbf{e}_1 + \frac{1}{2} \mathbf{e}_2^\top \mathbf{M}_{\mathcal{M}_2} \mathbf{e}_2.
 \end{equation}
@@ -1802,19 +1814,29 @@ where $\mathbf{B}_{2, \Gamma_1}, \; \mathbf{B}_{2, \Gamma_2}$ are given by
 \begin{equation}
 {B}_{2, \Gamma_1}^{mk} = \inner[L^2(\Gamma_1)]{\bm{\phi}_{2}^m}{\bm{\phi}_{\partial, 1}^k}, \quad
 {B}_{2, \Gamma_2}^{mg} = \inner[L^2(\Gamma_2)]{\bm{\phi}_{2}^m}{\bm{\phi}_{\partial, 2}^g}, 
- \quad .
 \end{equation} 
 where $m \in \{1,n_2\},\; k \in \{1,n_{\partial, 1}\},\; g \in \{1,n_{\partial, 2}\}$. This solution can be applied to incorporate all possible mixed boundary conditions in a systematic manner. However the finite element discretization is required to satisfy the inf-sup condition. Simulating the resulting system is harder, since the algebraic constrains pose additional difficulties for the time integration.
 
 \subsection{Virtual domain decomposition}\label{sec:vdd}
-Since the boundary are supposed to be connected set, a single interface is sufficient to obtain a system with the desired boundary conditions. In Fig. \ref{fig:dom_part} the splitting of the domain is accomplished by introducing the interface $\Gamma_{12}$, that can be freely chosen. However, as a general guideline, it has be such that the meshing of the subdomains generate regular triangles.  
+Since the boundary subsets $\Gamma_1, \; \Gamma_2$ are supposed to be connected set, a single interface is sufficient to decompose the system appropriately. In Fig. \ref{fig:dom_part} the splitting of the domain is accomplished by introducing the interface $\Gamma_{12}$. This separation line can be freely drawn. 
 
-\begin{figure}[tb]
-	\centering
-	\includegraphics[width=0.5\textwidth]{part_3/dom_part.eps}
-	\caption{Splitting of the domain into $\Omega_1, \; \Omega_2$.}
-	\label{fig:dom_part}
+
+\begin{figure}[t]
+	\begin{minipage}[b]{0.4\linewidth}
+		\centering
+		\includegraphics[width=0.95\textwidth]{part_3/dom_part.eps}
+		\caption{Splitting of the domain.}
+		\label{fig:dom_part}
+	\end{minipage}
+	\hspace{0.5cm}
+	\begin{minipage}[b]{0.55\linewidth}
+		\centering
+			\includegraphics[width=0.95\textwidth]{part_3/dom_part_int.eps}
+		\caption{Interconnection at the interface $\Gamma_{12}$.}
+		\label{fig:dom_part_int}
+	\end{minipage}
 \end{figure}
+
 
 The idea is based on the fact that System \ref{eq:pHlinsys_mixed} can be split into two systems with uniform causality.  The following set of boundary variables is used for $\Omega_1$ subdomain
 
@@ -1859,11 +1881,11 @@ Whereas for the $\Omega_2$ subdomain, the boundary variables are
 \bm{e}_1 \\ \bm{e}_2
 \end{pmatrix}.
 \end{equation}
-The following relations then hold.
+The following relations then hold (cf. Fig. \ref{fig:dom_part_int})
 \begin{equation}\label{eq:int_var}
 \bm{u}_{\partial, 1}^{\Gamma_{12}} =\pm \bm{y}_{\partial, 2}^{\Gamma_{12}}, \qquad \bm{u}_{\partial, 2}^{\Gamma_{12}} = \mp \bm{y}_{\partial, 1}^{\Gamma_{12}}.
 \end{equation}
-The plus or minus sign is due to the fact that either $\mathcal{N}_{\partial, 1}^{\Gamma_{12}}$ or $\mathcal{N}_{\partial, 2}^{\Gamma_{12}}$ contains a scalar product with the outgoing normal at ${\Gamma_{12}}$ (that has opposite direction depending on which subdomain is considered). These relations are at the core of the methodology,^ since they state the equivalence between a problem with mixed causalities and the interconnection of two problems with uniform causality.   \\
+The plus or minus sign is due to the fact that either $\mathcal{N}_{\partial, 1}^{\Gamma_{12}}$ or $\mathcal{N}_{\partial, 2}^{\Gamma_{12}}$ contains a scalar product with the outgoing normal (or the tangent unit vector) at ${\Gamma_{12}}$ (that has opposite direction depending on which subdomain is considered). These relations are at the core of the methodology, since they state the equivalence between a problem with mixed causalities and the interconnection of two problems with uniform causality.   \\
 
 To obtain a final system with the desired causality, the weak form has to be carried out separately on each subdomain. In particular, on subdomain $\Omega_1$ the $\mathcal{L}$ operator is integrated by parts, whereas on subdomain $\Omega_2$ the $-\mathcal{L}^*$ operator undergoes the integration by parts. Consequently, on subdomains $\Omega_1 \; (\Omega_2)$ the boundary input $\bm{u}_{\partial, 1} \; (\bm{u}_{\partial, 2})$ explicitly appears. Let $X_1({\Omega_*})$ be the $X_1$ space restricted to the subdomain $\Omega_*$, and let $X_2({\Omega_*})$ be the restriction of $X_2$ to $\Omega_*$ for $* \in \{1,2\}$. The weak form of the dynamics \eqref{eq:pHlinsys_dyn_mixed} for the $\Omega_1$ contribution reads
 
@@ -1878,7 +1900,7 @@ For $\Omega_2$, we get
 \begin{equation}\label{eq:pHlinsys_weak_Om2}
 \begin{aligned}
 \inner[X_1(\Omega_2)]{\bm{v}_1}{\mathcal{M}_1 \partial_t \bm{e}_1} &=   -  \langle{\bm{v}_1}, \,{\bm{L}^\top \bm{e}_2}\rangle_{X_1(\Omega_2)}  -\inner[X_2(\Omega_2)]{\mathcal{L}\bm{v}_1}{\bm{e}_2} + \inner[L^2(\partial\Omega_2)]{\mathcal{N}_{\partial, 1} \bm{v}_1}{\mathcal{N}_{\partial, 2}\bm{e}_2}, \\
-\inner[X_2(\Omega_2)]{\bm{v}_2}{\mathcal{M}_2 \partial_t \bm{e}_2} &=   \inner[X_2(\Omega_2)]{\bm{v}_2}{\bm{L}\bm{e}_1} + \inner[X_2(\Omega_2)]{\bm{v}_2}{\mathcal{L}\bm{e}_1}, \\
+\inner[X_2(\Omega_2)]{\bm{v}_2}{\mathcal{M}_2 \partial_t \bm{e}_2} &=   \inner[X_2(\Omega_2)]{\bm{v}_2}{\bm{L}\bm{e}_1} + \inner[X_2(\Omega_2)]{\bm{v}_2}{\mathcal{L}\bm{e}_1}. \\
 \end{aligned}
 \end{equation}
 Since $\partial\Omega_1 = \overline{\Gamma}_1 \cup \overline\Gamma_{12}$ and $\partial\Omega_2 = \overline\Gamma_2 \cup \overline\Gamma_{12}$, the boundary terms can be decomposed 
@@ -1921,9 +1943,10 @@ For the boundary variables, additional terms for the common interface are needed
 \bm{\square}_{\partial, 2}^{\Gamma_{12}}  &\approx \sum_{i=1}^{n_{\partial, 12}} \bm{\phi}_{\partial, 12}^i(\bm{s}_{12}) \square_{\partial, 2}^{i, \Gamma_{12}}(t), 
 \end{aligned} \quad \bm{s}_{12} \in \Gamma_{12}.
 \end{equation}
-where $\square$ stays for $v,\, u,\, y$. Notice that the same basis functions $\bm{\phi}_{\partial, 12}$ are used for both interface variables. This is necessary in order to dispose of the same degrees of freedom for the interconnection.
-
-
+where $\square$ stays for $v,\, u,\, y$. 
+\begin{remark}[Choice of the interface basis functions]
+Notice that the same basis functions $\bm{\phi}_{\partial, 12}$ are used for both interface variables. This is necessary in order to dispose of the same degrees of freedom for the interconnection.
+\end{remark}
 
 Replacing approximations $\ref{eq:approx_vaeb_mixed}, \ref{eq:approx_vuy_int}$ into Eqs. \ref{eq:pHlinsys_weak_Om1}, \ref{eq:bdsplit_Om1}, \ref{eq:bc_Om1}, a finite dimensional system for the $\Omega_1$ subdomain is obtained
 
@@ -2093,6 +2116,8 @@ Systems \eqref{eq:pHlinsys_findim_Om1}, \eqref{eq:pHlinsys_findim_Om2} are compa
 	\mathbf{M}_{\partial, 12} \textcolor{violet}{\mathbf{y}_{\partial, 1}^{\Gamma_{12}}} = \mathbf{B}_{\Gamma_{12}}^{\Omega_1 \top} \mathbf{e}_{\Omega_1}.
 	\end{aligned}
 	\end{equation}
+	with Hamiltonian $H_{d, 1} = \frac{1}{2} {\mathbf{e}}_{\Omega_1}^\top \mathbf{M}_{\Omega_1}
+	{\mathbf{e}}_{\Omega_1}$
 	\end{tcolorbox} 
 	\begin{tcolorbox}[width=0.48\textwidth, nobeforeafter,  colframe=lightyellow,title=System \eqref{eq:pHlinsys_findim_Om2}, coltitle=black]%%
 	\begin{equation}\label{eq:pHfindim_Om2}
@@ -2106,25 +2131,94 @@ Systems \eqref{eq:pHlinsys_findim_Om1}, \eqref{eq:pHlinsys_findim_Om2} are compa
 	\mathbf{M}_{\partial, 12} \textcolor{violet}{\mathbf{y}_{\partial, 2}^{\Gamma_{12}}} = \mathbf{B}_{\Gamma_{12}}^{\Omega_2 \top} \mathbf{e}_{\Omega_2}.
 	\end{aligned}
 	\end{equation}
+	with Hamiltonian $H_{d, 2} = \frac{1}{2} {\mathbf{e}}_{\Omega_2}^\top \mathbf{M}_{\Omega_2}
+	{\mathbf{e}}_{\Omega_2}$
 	\end{tcolorbox}
 \end{tcbraster}
 
-To obtain a system with the desired causality, an interconnection is employed to connect the two Systems \eqref{eq:pHfindim_Om1}, \eqref{eq:pHfindim_Om2} along the shared boundary $\Gamma_{12}$. Given \eqref{eq:int_var}, the interconnection is computed as
+To obtain a system with the desired causality, an interconnection is employed to connect the two Systems \eqref{eq:pHfindim_Om1}, \eqref{eq:pHfindim_Om2} along the shared boundary $\Gamma_{12}$. Given \eqref{eq:int_var}, the gyrator interconnection is computed as
 \begin{equation}\label{eq:int_discrvar}
 \begin{aligned}
 {\mathbf{u}_{\partial, 1}^{\Gamma_{12}}} &= \pm {\mathbf{y}_{\partial, 2}^{\Gamma_{12}}}= \pm \mathbf{M}_{\partial, 12}^{-1} \mathbf{B}_{\Gamma_{12}}^{\Omega_2 \top} \mathbf{e}_{\Omega_2}, \\ {\mathbf{u}_{\partial, 2}^{\Gamma_{12}}} &= \mp {\mathbf{y}_{\partial, 2}^{\Gamma_{12}}}=\mp \mathbf{M}_{\partial, 12}^{-1} \mathbf{B}_{\Gamma_{12}}^{\Omega_1 \top} \mathbf{e}_{\Omega_1}, 
 \end{aligned}
 \end{equation}
-This corresponds to a classical gyrator interconnection of pH system.
+The coupling matrix is then defined by 
+\begin{equation}
+\mathbf{C} := \mathbf{B}_{\Gamma_{12}}^{\Omega_1}\mathbf{M}_{\partial, 12}^{-1} \mathbf{B}_{\Gamma_{12}}^{\Omega_2 \top}.	
+\end{equation}
+Plugging Eq. \eqref{eq:int_discrvar} into \ref{eq:pHfindim_Om1}, \ref{eq:pHfindim_Om2}, the final system with mixed causality is obtained
+
+\begin{equation}\label{eq:pHfindim_intOm12}
+\begin{aligned}
+\begin{bmatrix}
+\mathbf{M}_{\Omega_1} & \mathbf{0} \\
+\mathbf{0} & \mathbf{M}_{\Omega_2} \\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\mathbf{e}}_{\Omega_1} \\
+\dot{\mathbf{e}}_{\Omega_2} \\
+\end{pmatrix}
+&= \begin{bmatrix}
+\mathbf{J}_{\Omega_1} & \pm \mathbf{C}\\
+\mp \mathbf{C}^\top & \mathbf{J}_{\Omega_2} \\
+\end{bmatrix} 
+\begin{pmatrix}
+{\mathbf{e}}_{\Omega_1} \\
+{\mathbf{e}}_{\Omega_2} \\
+\end{pmatrix} + 
+\begin{bmatrix}
+\mathbf{B}_{\Gamma_1}^{\Omega_1} & \mathbf{0}\\
+\mathbf{0} & \mathbf{B}_{\Gamma_2}^{\Omega_2}\\
+\end{bmatrix}
+\begin{pmatrix}
+\mathbf{u}_{\partial, 1} \\
+\mathbf{u}_{\partial, 2}\\
+\end{pmatrix}, \\
+\begin{bmatrix}
+\mathbf{M}_{\partial, 1} & \mathbf{0}  \\
+\mathbf{0} & \mathbf{M}_{\partial, 2} \\
+\end{bmatrix}
+\begin{pmatrix}
+\mathbf{y}_{\partial, 1} \\
+\mathbf{y}_{\partial, 2} \\
+\end{pmatrix}
+&= 
+\begin{bmatrix}
+\mathbf{B}_{\Gamma_1}^{\Omega_1 \top} & \mathbf{0} \\
+\mathbf{0} & \mathbf{B}_{\Gamma_2}^{\Omega_2 \top} \\
+\end{bmatrix}\begin{pmatrix}
+{\mathbf{e}}_{\Omega_1} \\
+{\mathbf{e}}_{\Omega_2} \\
+\end{pmatrix}.
+\end{aligned}
+\end{equation}
+The total Hamiltonian is the sum 
+\begin{equation}
+H_d = H_{d, 1} + H_{d, 2} = \frac{1}{2} {\mathbf{e}}_{\Omega_1}^\top \mathbf{M}_{\Omega_1}
+{\mathbf{e}}_{\Omega_1} + \frac{1}{2} {\mathbf{e}}_{\Omega_2}^\top \mathbf{M}_{\Omega_2}
+{\mathbf{e}}_{\Omega_2}.
+\end{equation}
+
+So, the power rate is 
+\begin{equation}
+\begin{aligned}
+\dot{H}_d &= {\mathbf{e}}_{\Omega_1}^\top \mathbf{M}_{\Omega_1}
+\dot{\mathbf{e}}_{\Omega_1} + {\mathbf{e}}_{\Omega_2}^\top \mathbf{M}_{\Omega_2}
+\dot{\mathbf{e}}_{\Omega_2}, \\
+&= {\mathbf{e}}_{\Omega_1}^\top \mathbf{J}_{\Omega_1} {\mathbf{e}}_{\Omega_1} + {\mathbf{e}}_{\Omega_2}^\top \mathbf{J}_{\Omega_2} {\mathbf{e}}_{\Omega_2} \pm {\mathbf{e}}_{\Omega_1}^\top \mathbf{C} \, {\mathbf{e}}_{\Omega_2} \mp {\mathbf{e}}_{\Omega_2}^\top \mathbf{C}^\top {\mathbf{e}}_{\Omega_1} +  {\mathbf{e}}_{\Omega_1}^\top \mathbf{B}_{\Gamma_1}^{\Omega_1} {\mathbf{u}_{\partial, 1}} + {\mathbf{e}}_{\Omega_2}^\top \mathbf{B}_{\Gamma_2}^{\Omega_2} {\mathbf{u}_{\partial, 2}}, \\
+&= \mathbf{y}_{\partial, 1}^\top \mathbf{M}_{\partial, 1} \mathbf{u}_{\partial, 1} + \mathbf{y}_{\partial, 2}^\top \mathbf{M}_{\partial, 2} \mathbf{u}_{\partial, 2}, \\
+&= \widehat{\mathbf{y}}_{\partial, 1}^\top \mathbf{u}_{\partial, 1} + \widehat{\mathbf{y}}_{\partial, 2}^\top \mathbf{u}_{\partial, 2}, \where \widehat{\mathbf{y}}_{\partial, 1} :=\mathbf{M}_{\partial, 1} \mathbf{y}_{\partial, 1}, \quad \widehat{\mathbf{y}}_{\partial, 2} :=\mathbf{M}_{\partial, 2} \mathbf{y}_{\partial, 2}.
+\end{aligned}
+\end{equation}
+Again this results mimics its corresponding infinite-dimensional \eqref{eq:powbal_mixed}. \\
 
 
-
-
-This solution requires suitable finite elements for both kind of discretization detailed in Sec. \ref{sec:pfem_gen}. Some particular cases of boundary control cannot be handled nevertheless. The interface that separates the domain is an additional degree of freedom, as it can be freely drawn. 
+This technique allows obtaining a system with the correct causality, but has some drawbacks.  
+Suitable finite elements are required for both kind of discretization detailed in Sec. \ref{sec:pfem_gen}, but the two are not always available (see Remark \ref{rmk:HdivDiv}). A numerical convergence analysis of this technique looks rather involved.  Some particular cases of mixed conditions control cannot be handled. In particular, conditions on single components of vector cannot be imposed through this technique. For example, the simply supported condition in beams and plates set to zero tangential component of the traction at the boundary. The interface that separates the domain is an additional degree of freedom, as it can be freely drawn. However, as a general guideline, it has be such that the meshing of the subdomains generate sufficiently regular triangles. 
 
 
 \section{Conclusion}
-
+In this chapter a universal discretization method for multi-dimensional pHs has been detailed. The underlying Assumptions \ref{ass:linJ}, \ref{ass:operBC} are indeed those that characterize the well-posedness of multi-dimensional pHs \cite{skrepek2019wellposedness}.  For the time being, it has being shown that this technique is capable of constructing a finite-dimensional pHs from an infinite-dimensional one. For this reason, it is a structure-preserving method. The questions of numerical convergence and choice of approximation basis (in this thesis the focus is on the finite element method but  spectral methods can be employed as well) are addressed in the next chapter, for the linear case only.
 
 
 
