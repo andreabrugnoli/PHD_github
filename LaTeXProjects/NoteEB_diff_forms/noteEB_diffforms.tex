@@ -1,0 +1,153 @@
+\documentclass{article}
+\usepackage{amsmath,amssymb}
+\usepackage[left=2cm, right=2cm]{geometry}
+\usepackage{bm}
+\usepackage{diffcoeff}
+\usepackage{scrextend}
+\changefontsizes[14pt]{12pt}
+
+
+\DeclareMathOperator*{\grad}{grad}
+\DeclareMathOperator*{\Grad}{Grad}
+\DeclareMathOperator*{\Div}{Div}
+\renewcommand{\div}{\operatorname{div}}
+\DeclareMathOperator*{\Hess}{Hess}
+\DeclareMathOperator*{\curl}{curl}
+\DeclareMathOperator{\Tr}{Tr}
+
+\newtheorem{proof}{Proof}
+
+\newcommand{\inner}[3][]{\ensuremath{\left\langle #2, \, #3 \right\rangle_{#1}}}
+\newcommand{\energy}[1]{\frac{1}{2} \int_{\Omega} \left\{ #1 \right\} \d\Omega}
+
+\makeatletter \renewcommand\d[1]{\ensuremath{%
+		\;\mathrm{d}#1\@ifnextchar\d{\!}{}}}
+\makeatother
+
+% inner products
+\def\onedot{$\mathsurround0pt\ldotp$}
+\def\cddot{% two dots stacked vertically
+	\mathbin{\vcenter{\baselineskip.67ex
+			\hbox{\onedot}\hbox{\onedot}}%
+}}
+
+\title{The Euler-Bernoulli beam in differential form}
+\author{Andrea Brugnoli}
+\begin{document}
+	\maketitle
+	
+\section{Classical formulation}
+
+The Euler-Bernoulli beam model consists of one PDE, describing the vertical displacement along the beam length:
+\begin{equation}
+\rho A(x) \diffp[2]{w}{t}(x,t) + \displaystyle \diffp[2]{}{x} \left( EI(x) \diffp[2]{w}{x} \right) = 0, \quad x \in \Omega=\{0, L\},
+\end{equation}
+where ${w}(x,t)$ is the transverse displacement of the beam. The coefficients $\rho(x), A(x) E(x)$ and $I(x)$  are the mass density, cross section, Young's modulus of elasticity and the moment of inertia of a cross section. The energy variables are then chosen as follows:
+\begin{equation}\label{eq:alpha_EB}
+\alpha_{w}= \rho A(x) \diffp{w}{t}(x,t),  \quad \text{Linear Momentum},\quad
+\alpha_{\kappa} = \diffp[2]{w}{x}(x,t), \quad \text{Curvature}. \
+\end{equation}
+
+Those variables are collected in the vector $\bm{\alpha} = (\alpha_{w}, \, \alpha_{\kappa})^T $, so that the Hamiltonian can be written as a quadratic functional in the energy variables: 
+\begin{equation}
+H = \energy{\frac{1}{\rho A} \alpha_{w}^2 + EI \alpha_\kappa^2}
+\end{equation}
+
+The co-energy variables are found by computing the variational derivative of the Hamiltonian:
+\begin{equation}\label{eq:e_EB}
+\begin{aligned}
+e_{w} &:= \diffd{H}{\alpha_w} = \diffp{w}{t}(x,t) ,  &\quad \text{Vertical velocity}, \\
+e_{\kappa} &:= \diffd{H}{\alpha_{\kappa}} =EI(x) \diffp[2]{w}{x}(x,t),  &\quad \text{Flexural momentum}. \\
+\end{aligned}
+\end{equation}
+The underlying interconnection structure is then found to be:
+\begin{equation}\label{eq:pHsysEB}
+\diffp{}{t}\begin{pmatrix}
+\alpha_w \\ \alpha_\kappa \\
+\end{pmatrix} = \begin{bmatrix}
+0 & -\partial_{xx} \\
+\partial_{xx} & 0 \\
+\end{bmatrix} \begin{pmatrix}
+e_w \\ e_\kappa \\
+\end{pmatrix}.
+\end{equation}
+
+The power flow gives access to the boundary variables:
+\begin{equation}
+\begin{aligned}
+\dot{H} &= \int_{\Omega} \left\{e_w \partial_t \alpha_w + e_\kappa \partial_t \alpha_\kappa \right\}  \d{\Omega}, \\
+&= \int_{\Omega} \left\{-e_w \partial_{xx}e_\kappa + e_\kappa \partial_{xx} e_w \right\} \d{\Omega}, \qquad \text{Integration by parts}, \\
+&= \int_{\partial\Omega}\{-e_w \partial_{x}e_\kappa + e_\kappa \partial_{x} e_w \} \d{s}= \inner[\partial\Omega]{-e_w}{\partial_{x}e_\kappa} + \inner[\partial\Omega]{e_\kappa}{\partial_{x}e_w}
+\end{aligned}
+\end{equation}
+Since the system is of differential order two, two pairing appears, giving rise to four combination of uniform boundary causality
+\begin{itemize}
+	\item {First case} ${u}_{\partial, 1} = e_w, \quad {u}_{\partial, 2} = \partial_x e_w, \quad {y}_{\partial, 1} = -\partial_{x}e_\kappa, \quad {y}_{\partial, 2} = e_\kappa$. \\
+	This imposes the vertical $e_w:= \partial_t w$ and angular velocity $\partial_x e_w:= \partial_{xt} w$ as boundary inputs. If the inputs are null a clamped boundary condition is obtained.
+	\item {Second case} ${u}_{\partial, 1} = e_w, \quad {u}_{\partial, 2} = e_\kappa, \quad {y}_{\partial, 1} = -\partial_{x}e_\kappa, \quad {y}_{\partial, 2} = \partial_x e_w$. \\
+	This imposes the vertical velocity and flexural momentum $e_\kappa:= EI \partial_{xx} w$ as boundary inputs.  Zero inputs lead to a simply supported condition is found.
+	\item {Third case} ${u}_{\partial, 1} = -\partial_{x}e_\kappa , \quad {u}_{\partial, 2} = e_\kappa, \quad {y}_{\partial, 1} = e_w, \quad {y}_{\partial, 2} = \partial_x e_w$. \\
+	This imposes the shear force $\partial_{x}e_\kappa:= \partial_{x}(EI \partial_{xx}w)$ and flexural momentum as boundary inputs. Null inputs correspond to a free condition.
+	\item {Forth case} ${u}_{\partial, 1} = -\partial_{x}e_\kappa , \quad {u}_{\partial, 2} = \partial_{x}e_w, \quad {y}_{\partial, 1} = e_w, \quad {y}_{\partial, 2} = e_\kappa$. \\
+	This imposes the shear force and angular velocity as boundary inputs.
+\end{itemize} 
+
+\section{Differential forms formulation}
+
+The co-energy now are 1-forms $e_w, e_\kappa \in \Lambda^1(\Omega)$ with the flows are 0-forms $f_w= \partial_t \alpha_w, f_\kappa= \partial_t \alpha_\kappa \in \Lambda^0(\Omega)$. To recast \eqref{eq:pHsysEB} using the exterior derivative, the Hodge star operator is needed.
+\begin{equation}
+	*: \Lambda^k(\Omega) \rightarrow \Lambda^{n-k}(\Omega).
+\end{equation}
+For one dimensional domain and using Euclidian coordinates this operator can be either used on 1-forms or 0-forms
+\begin{equation}
+\begin{aligned}
+*: &\Lambda^1(\Omega) \rightarrow \Lambda^0(\Omega), \\
+ &\d{x} \rightarrow 1
+\end{aligned}
+\end{equation}
+ or 
+\begin{equation}
+\begin{aligned}
+*: &\Lambda^0(\Omega) \rightarrow \Lambda^1(\Omega), \\
+&1 \rightarrow \d{x}
+\end{aligned}
+\end{equation}
+Then the equivalent system reads 
+
+\begin{equation}\label{eq:pHsysEB_diff}
+\diffp{}{t}\begin{pmatrix}
+\alpha_w \\ \alpha_\kappa \\
+\end{pmatrix} = \begin{bmatrix}
+0 & -\mathrm{d}{*}\mathrm{d}\\
+\mathrm{d}{*}\mathrm{d} & 0 \\
+\end{bmatrix} \begin{pmatrix}
+e_w \\ e_\kappa \\
+\end{pmatrix}.
+\end{equation}
+\begin{proof}
+	The operator $\d * \d : \Lambda^0(\Omega) \rightarrow \Lambda^1(\Omega)$ is a composition of operators that reads in Euclidean coordinates
+	\begin{equation}
+		\begin{aligned}
+		\mathrm{d}{*}\mathrm{d} e &= \mathrm{d}{*} (\diffp{e}{x} \d{x}), \\
+		         &= \d (\diffp{e}{x}), \\
+		         &= \diffp[2]{e}{x} \d{x}, \\
+		\end{aligned}
+	\end{equation}
+\end{proof}
+The Hamiltonian energy is then 
+\begin{equation}
+\begin{aligned}
+H = \frac{1}{2}  \int_{\Omega} e_w \wedge \alpha_w   + e_\kappa \wedge \alpha_\kappa
+\end{aligned}
+\end{equation}
+
+The power rate then reads 
+\begin{equation}
+\begin{aligned}
+\dot{H} &= \int_{\Omega} e_w \wedge \partial_t \alpha_w   + e_\kappa \wedge \partial_t \alpha_\kappa, \\
+&= \int_{\Omega} e_w \wedge \partial_t \alpha_w   + e_\kappa \wedge \partial_t \alpha_\kappa, \\
+&=\int_{\Omega} -e_w \wedge (\mathrm{d}{*}\mathrm{d} e_w)   + e_\kappa \wedge (\mathrm{d}{*}\mathrm{d} e_\kappa)
+\end{aligned}
+\end{equation}
+
+\end{document}
