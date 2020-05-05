@@ -1567,7 +1567,7 @@ We propose here two methodologies to tackle mixed boundary conditions within the
 The open connected set $\Omega \subset \mathbb{R}^d, \; d=\{1,2,3\}$, with Lipschitz boundary $\partial\Omega$ represent the spatial domain. The boundary is split into two partition $\partial\Omega = \overline{\Gamma}_1 \cup \overline{\Gamma}_2, \; \Gamma_1 \cap \Gamma_2 = \{\emptyset\}$. The set $\Gamma_1, \; \Gamma_2$ are considered to be connected, cf. Fig. \ref{fig:bound_part}.
 
 \begin{remark}[Connectedness of $\Gamma_1, \Gamma_2$]
-	Disconnected set can be handled as well. This requires the introduction of an heavy notation and complicates the illustration. For sake of simplicity, the connectedness hypothesis is then made.
+	Disconnected set can be handled as well. This requires the introduction of an heavy notation and complicates the illustration. For sake of simplicity, the connectedness hypothesis applies.
 \end{remark}
 For scalars ${a}_{\partial, *}, {b}_{\partial, *} \in L^2(\Gamma_*)$ and  vectors  $\bm{a}_{\partial, *}, \bm{b}_{\partial, *} \in L^2(\Gamma_*, \mathbb{R}^m)$ defined on the boundary partition $\Gamma_*$ the inner product is defined as
 \begin{equation}
@@ -1818,7 +1818,7 @@ where $\mathbf{B}_{2, \Gamma_1}, \; \mathbf{B}_{2, \Gamma_2}$ are given by
 where $m \in \{1,n_2\},\; k \in \{1,n_{\partial, 1}\},\; g \in \{1,n_{\partial, 2}\}$. This solution can be applied to incorporate all possible mixed boundary conditions in a systematic manner. However the finite element discretization is required to satisfy the inf-sup condition. Simulating the resulting system is harder, since the algebraic constrains pose additional difficulties for the time integration.
 
 \subsection{Virtual domain decomposition}\label{sec:vdd}
-Since the boundary subsets $\Gamma_1, \; \Gamma_2$ are supposed to be connected set, a single interface is sufficient to decompose the system appropriately. In Fig. \ref{fig:dom_part} the splitting of the domain is accomplished by introducing the interface $\Gamma_{12}$. This separation line can be freely drawn. 
+Since the boundary subsets $\Gamma_1, \; \Gamma_2$ are supposed to be connected set, a single interface is sufficient to decompose the system appropriately. In Fig. \ref{fig:dom_part} the splitting of the domain is accomplished by introducing the interface $\Gamma_{12}$. This separation line that separates the domain is an additional degree of freedom, as it can be freely drawn. If the finite element method is used for the basis functions, the interface should be drawn so that the meshing of the subdomains does not generate excessively skewed triangles. 
 
 
 \begin{figure}[t]
@@ -2214,7 +2214,7 @@ Again this results mimics its corresponding infinite-dimensional \eqref{eq:powba
 
 
 This technique allows obtaining a system with the correct causality, but has some drawbacks.  
-Suitable finite elements are required for both kind of discretization detailed in Sec. \ref{sec:pfem_gen}, but the two are not always available (see Remark \ref{rmk:HdivDiv}). A numerical convergence analysis of this technique looks rather involved.  Some particular cases of mixed conditions control cannot be handled. In particular, conditions on single components of vector cannot be imposed through this technique. For example, the simply supported condition in beams and plates set to zero tangential component of the traction at the boundary. The interface that separates the domain is an additional degree of freedom, as it can be freely drawn. However, as a general guideline, it has be such that the meshing of the subdomains generate sufficiently regular triangles. 
+Suitable finite elements are required for both kind of discretization detailed in Sec. \ref{sec:pfem_gen}, but the two are not always available (see Remark \ref{rmk:HdivDiv}). A rigorous numerical convergence analysis of this technique appears rather involved.  Some cases of mixed conditions, in particular conditions on single components of vectors, cannot be handled by this technique. For example, the simply supported condition in beams and plates imposes zero normal component of the traction at the boundary. Furthermore two different meshes are required and the interconnection has to manipulate carefully the degrees of freedom. This makes the implementation heavier than the Lagrange multiplier solution \secref{sec:lagrMul}.
 
 
 \section{Conclusion}
