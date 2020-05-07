@@ -6,6 +6,9 @@
 \usepackage{scrextend}
 \changefontsizes[14pt]{12pt}
 
+\usepackage{natbib}
+
+
 
 \DeclareMathOperator*{\grad}{grad}
 \DeclareMathOperator*{\Grad}{Grad}
@@ -73,7 +76,7 @@ e_w \\ e_\kappa \\
 \end{equation}
 
 The power flow gives access to the boundary variables:
-\begin{equation}
+\begin{equation}\label{eq:powrateEB}
 \begin{aligned}
 \dot{H} &= \int_{\Omega} \left\{e_w \partial_t \alpha_w + e_\kappa \partial_t \alpha_\kappa \right\}  \d{\Omega}, \\
 &= \int_{\Omega} \left\{-e_w \partial_{xx}e_\kappa + e_\kappa \partial_{xx} e_w \right\} \d{\Omega}, \qquad \text{Integration by parts}, \\
@@ -94,22 +97,22 @@ Since the system is of differential order two, two pairing appears, giving rise 
 
 \section{Differential forms formulation}
 
-The co-energy now are 1-forms $e_w, e_\kappa \in \Lambda^1(\Omega)$ with the flows are 0-forms $f_w= \partial_t \alpha_w, f_\kappa= \partial_t \alpha_\kappa \in \Lambda^0(\Omega)$. To recast \eqref{eq:pHsysEB} using the exterior derivative, the Hodge star operator is needed.
+The co-energy now are 0-forms $e_w, e_\kappa \in \Lambda^0(\Omega)$ whereas the flows are 1-forms $f_w= \partial_t \alpha_w, f_\kappa= \partial_t \alpha_\kappa \in \Lambda^1(\Omega)$. To recast \eqref{eq:pHsysEB} using the exterior derivative, the Hodge star operator is needed.
 \begin{equation}
-	*: \Lambda^k(\Omega) \rightarrow \Lambda^{n-k}(\Omega).
+	*: \Lambda^k(\Omega) \rightarrow \Lambda^{n-k}(\Omega), \qquad \Omega \subset \mathbb{R}^n.
 \end{equation}
-For one dimensional domain and using Euclidian coordinates this operator can be either used on 1-forms or 0-forms
+For one dimensional domains $\Omega \subset \mathbb{R}$ and using Euclidian coordinates, this operator can be either used on 1-forms or 0-forms
 \begin{equation}
 \begin{aligned}
-*: &\Lambda^1(\Omega) \rightarrow \Lambda^0(\Omega), \\
- &\d{x} \rightarrow 1
+*: \Lambda^1(\Omega) &\longrightarrow \Lambda^0(\Omega), \\
+ f(x)\d{x} &\longrightarrow f(x)
 \end{aligned}
 \end{equation}
  or 
 \begin{equation}
 \begin{aligned}
-*: &\Lambda^0(\Omega) \rightarrow \Lambda^1(\Omega), \\
-&1 \rightarrow \d{x}
+*: \Lambda^0(\Omega) &\longrightarrow \Lambda^1(\Omega), \\
+f(x) &\longrightarrow f(x)\d{x}
 \end{aligned}
 \end{equation}
 Then the equivalent system reads 
@@ -128,9 +131,9 @@ e_w \\ e_\kappa \\
 	The operator $\d * \d : \Lambda^0(\Omega) \rightarrow \Lambda^1(\Omega)$ is a composition of operators that reads in Euclidean coordinates
 	\begin{equation}
 		\begin{aligned}
-		\mathrm{d}{*}\mathrm{d} e &= \mathrm{d}{*} (\diffp{e}{x} \d{x}), \\
+		\mathrm{d}{*}\mathrm{d} e &= \mathrm{d}{*} (\diffp{e}{x} \d{x}), \qquad e \in \Lambda^0(\Omega)\\
 		         &= \d (\diffp{e}{x}), \\
-		         &= \diffp[2]{e}{x} \d{x}, \\
+		         &= \diffp[2]{e}{x} \d{x} \in \Lambda^1(\Omega) \\
 		\end{aligned}
 	\end{equation}
 \end{proof}
@@ -140,14 +143,70 @@ The Hamiltonian energy is then
 H = \frac{1}{2}  \int_{\Omega} e_w \wedge \alpha_w   + e_\kappa \wedge \alpha_\kappa
 \end{aligned}
 \end{equation}
+To find the appropriate power balance, consider the integration by parts formula for smooth differential forms $\lambda \in \Lambda^k(\Omega)$ and $\mu \in \Lambda^{n-k-1}(\Omega)$,
+\begin{equation}
+	 \inner{\mathrm{d}{\lambda}}{\mu} = \inner{\Tr\lambda}{\Tr \mu} - (-1)^k \inner{\lambda}{\mathrm{d}\mu}
+\end{equation}
+For uni-dimensional domains $n=1$, and we take $\lambda \in \Lambda^0(\Omega)$ and $\mu \in \Lambda^{0}(\Omega)$, implying
+\begin{equation}
+\begin{aligned}
+\inner{\mathrm{d}{\lambda}}{\mu} = \inner{\Tr\lambda}{\Tr \mu} - \inner{\lambda}{\mathrm{d}\mu}, \\
+\inner{\lambda}{\mathrm{d}\mu} = \inner{\Tr\lambda}{\Tr \mu} - \inner{\mathrm{d}\lambda}{\mu}.
+\end{aligned}
+\end{equation}
+Then we can state
+\begin{equation}\label{eq:int1}
+\inner{-e_w}{\mathrm{d}({*}\mathrm{d} e_\kappa)} = \inner{-\Tr e_w}{\Tr({*}\mathrm{d} e_\kappa)} + \inner{\mathrm{d} e_w}{{*}\mathrm{d} e_\kappa}.
+\end{equation}
+and
+\begin{equation}\label{eq:int2}
+	\inner{e_\kappa}{\mathrm{d}({*}\mathrm{d} e_w)} = \inner{\Tr e_\kappa}{\Tr ({*}\mathrm{d} e_w)} - \inner{\mathrm{d} e_\kappa}{{*}\mathrm{d} e_w},
+\end{equation}
 
 The power rate then reads 
 \begin{equation}
 \begin{aligned}
 \dot{H} &= \int_{\Omega} e_w \wedge \partial_t \alpha_w   + e_\kappa \wedge \partial_t \alpha_\kappa, \\
 &= \int_{\Omega} e_w \wedge \partial_t \alpha_w   + e_\kappa \wedge \partial_t \alpha_\kappa, \\
-&=\int_{\Omega} -e_w \wedge (\mathrm{d}{*}\mathrm{d} e_w)   + e_\kappa \wedge (\mathrm{d}{*}\mathrm{d} e_\kappa)
+&=\int_{\Omega} -e_w \wedge (\mathrm{d}{*}\mathrm{d} e_\kappa)   + e_\kappa \wedge (\mathrm{d}{*}\mathrm{d} e_w), \qquad \text{From \eqref{eq:int1}, \eqref{eq:int2}}\\
+&=\inner{-\Tr e_w}{\Tr({*}\mathrm{d} e_\kappa)} + \inner{\mathrm{d} e_w}{{*}\mathrm{d} e_\kappa} + \inner{\Tr e_\kappa}{\Tr ({*}\mathrm{d} e_w)} - \inner{\mathrm{d} e_\kappa}{{*}\mathrm{d} e_w}
 \end{aligned}
 \end{equation}
 
+The wedge product is such that for $\lambda \in \Lambda^k(\Omega)$ and $\mu \in \Lambda^l(\Omega)$ it holds
+\begin{equation}
+\lambda \wedge \mu = (-1)^{kl} \mu \wedge \lambda
+\end{equation}
+Furthermore, the Hodge star is such that 
+\begin{equation}
+(\alpha, \beta) := \inner{\alpha}{*\beta} =  \inner{*\alpha}{\beta} = (\beta, \alpha), \qquad \alpha, \beta \in \Lambda^k(\Omega)
+\end{equation}
+
+Then for $e_w, e_\kappa \in \Lambda^0$ it holds
+\begin{equation}
+\begin{aligned}
+\inner{\mathrm{d} e_w}{{*}\mathrm{d} e_\kappa} &= \inner{{*} \mathrm{d} e_w}{\mathrm{d} e_\kappa}, \\
+ &= \int_{\Omega} ({*} \mathrm{d} e_w) \wedge (\mathrm{d} e_\kappa), \\
+ &= \int_{\Omega} (\mathrm{d} e_\kappa) \wedge ({*} \mathrm{d} e_w), \\
+ & = \inner{\mathrm{d} e_\kappa}{{*} \mathrm{d} e_w}
+\end{aligned}
+\end{equation}
+It can be then stated
+\begin{equation}
+ \inner{\mathrm{d} e_w}{{*}\mathrm{d} e_\kappa} - \inner{\mathrm{d} e_\kappa}{{*}\mathrm{d} e_w} = 0
+\end{equation}
+The power balance is then
+\begin{equation}
+\dot{H}=\inner{-\Tr e_w}{\Tr({*}\mathrm{d} e_\kappa)}+ \inner{\Tr e_\kappa}{\Tr ({*}\mathrm{d} e_w)}
+\end{equation}
+In vector calculus notation it reads
+\begin{equation}
+\dot{H}=\inner{-\Tr e_w}{\Tr\diffp{e_\kappa}{x}}+ \inner{\Tr e_\kappa}{\Tr \diffp{e_w}{x}} = \inner[\partial\Omega]{-e_w}{\partial_{x}e_\kappa} + \inner[\partial\Omega]{e_\kappa}{\partial_{x}e_w}
+\end{equation}
+Completely equivalent to Eq. \eqref{eq:powrateEB}.
+\nocite*
+\bibliographystyle{unsrt}
+\bibliography{biblio} 
 \end{document}
+
+
