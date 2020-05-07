@@ -198,7 +198,7 @@ In both cases, the power balance reads
 \end{aligned}
 \end{equation}
 We are now in a position to illustrate the methodology. 
-\paragraph{Step 1} First consider the weak form of system \eqref{eq:pHsys_dyn_ass}, obtained by taking the $L^2$ inner product introducing an appropriate test function $\bm{v} = (\bm{v}_1, \bm{v}_2) \in L^2(\Omega, \mathbb{A}) \times L^2(\Omega, \mathbb{B}) = L^2(\Omega, \mathbb{F})$ and integrating over the domain $\Omega$
+\paragraph{Step 1} First consider the weak form of system \eqref{eq:pHsys_dyn_ass}, obtained by taking the $L^2$ inner product introducing an appropriate test function $\bm{v} = (\bm{v}_1, \bm{v}_2) \in \mathbb{A} \times \mathbb{B} = \mathbb{F}$ and integrating over the domain $\Omega$
 \begin{equation}\label{eq:weak_dyn}
 \begin{aligned}
 \inner[L^2(\Omega, \mathbb{A})]{\bm{v}_1}{\partial_t \bm{\alpha}_1} &= -  \langle{\bm{v}_1},\,{\bm{L}^\top \bm{e}_2}\rangle_{L^2(\Omega, \mathbb{A})} -  \inner[L^2(\Omega, \mathbb{A})]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2}, \\
@@ -313,7 +313,7 @@ Now assume that the system satisfies the boundary causality condition \eqref{eq:
 \end{equation}
 
 \paragraph{Galerkin discretization}
-To conclude the illustration of this methodology, consider a Galerkin discretization is introduced. This means that test, energy and co-energy functions are discretized using the same basis. Furthermore the boundary variables are discretized as well using bases defined over the boundary
+To conclude the illustration of this methodology, a Galerkin discretization is introduced. This means that test, energy and co-energy functions are discretized using the same basis. Furthermore the boundary variables are discretized as well using bases defined over the boundary
 \begin{equation}\label{eq:approx_vaeb}
 \begin{aligned}
 \bm{v}_1 &\approx \sum_{i=1}^{n_1} \bm{\phi}_1^i(\bm{x}) v_1^i, \\
@@ -389,8 +389,8 @@ M_2^{mn} &= \inner[L^2(\Omega, \mathbb{B})]{\bm\phi_2^m}{\bm\phi_2^n}, \\
 {D}_{\mathcal{L}}^{mi} &= \inner[L^2(\Omega, \mathbb{B})]{\bm\phi_2^m}{\mathcal{L}\bm\phi_1^i}, 
 \end{aligned}\quad  
 \begin{aligned}
-{B}_{1}^{ik} = \inner[L^2(\partial \Omega, \mathbb{R}^m)]{\bm\phi_1^i}{\bm\phi_\partial^k}, \\
-M_\partial^{lk} = \inner[L^2(\partial \Omega, \mathbb{R}^m)]{\bm\phi_\partial^l}{\bm\phi_\delta^k},
+{B}_{1}^{ik} &= \inner[L^2(\partial \Omega, \mathbb{R}^m)]{\mathcal{N}_{\partial, 1}\bm\phi_1^i}{\bm\phi_\partial^k}, \\
+M_\partial^{lk} &= \inner[L^2(\partial \Omega, \mathbb{R}^m)]{\bm\phi_\partial^l}{\bm\phi_\delta^k},
 \end{aligned}
 \end{equation}
 where $i, j \in \left\{1, n_1\right\}, \; m,n \in \left\{1, n_2\right\}, \; l, k \in \left\{1, n_\partial \right\}$. Introducing the definitions
@@ -498,7 +498,7 @@ Plugging the approximation into the weak form \eqref{eq:weak_sys_intJ2} a finite
 \end{equation}
 The differences with respect to formulation \eqref{eq:pHsys_findim_J1} reside in matrices $\mathbf{D}_{-\mathcal{L}^*}, \; \mathbf{B}_2$, whose definitions are
 \begin{equation}
-{D}_{-\mathcal{L}^*}^{im} = \inner[L^2(\Omega, \mathbb{A})]{\bm\phi_1^i}{\mathcal{-L^*}\bm\phi_2^m}, \quad B_2^{mk} = \inner[L^2(\partial\Omega, , \mathbb{R}^m)]{\bm\phi_2^m}{\bm\phi_{\partial}^k},
+{D}_{-\mathcal{L}^*}^{im} = \inner[L^2(\Omega, \mathbb{A})]{\bm\phi_1^i}{\mathcal{-L^*}\bm\phi_2^m}, \quad B_2^{mk} = \inner[L^2(\partial\Omega, \mathbb{R}^m)]{\mathcal{N}_{\partial, 2}\bm\phi_2^m}{\bm\phi_{\partial}^k},
 \end{equation}
 where $i \in \left\{1, n_1\right\}, \; m \in \left\{1, n_2\right\},\; k \in \left\{1, n_\partial \right\}$. System \eqref{eq:pHsys_findim_J2} can be put in canonical form by replacing the co-energy variables by the discretized gradient.
 
@@ -638,11 +638,11 @@ The matrices are defined as follows
 \begin{aligned}
 M_h^{ij} &= \inner[L^2(\Omega)]{\phi_h^i}{\phi_h^j}, \\
 M_v^{mn} &= \inner[L^2(\Omega, \mathbb{R}^2)]{\bm\phi_v^m}{\bm\phi_v^n}, \\
-M_\partial^{lk} &= \inner[L^2(\partial\Omega)]{\phi_\partial^l}{\phi_\delta^k},
+M_\partial^{lk} &= \inner[L^2(\partial\Omega)]{\phi_\partial^l}{\phi_\partial^k},
 \end{aligned}\quad
 \begin{aligned}
 {D}_{\grad}^{mi} &= \inner[L^2(\Omega, \mathbb{R}^2)]{\bm\phi_v^m}{\grad \phi_h^i}, \\
-{B}_{h}^{ik} &= \inner[L^2(\partial\Omega)]{\phi_h^i}{\phi_\partial^k}, \\
+{B}_{h}^{ik} &= \inner[L^2(\partial\Omega)]{\gamma_0 \phi_h^i}{\phi_\partial^k}, \\
 \end{aligned}
 \end{equation}
 where $i, j \in \left\{1, n_h\right\}, \; m,n \in \left\{1, n_v\right\}, \; l, k \in \left\{1, n_\partial \right\}$. 
@@ -669,10 +669,10 @@ To make the system linear, The additional assumption is introduced.
 	\end{equation}
 	where $\mathcal{Q}_1, \, \mathcal{Q}_2$ are positive symmetric operators, bounded from below and above
 	\begin{equation*}
-	m_1 \bm{I}_1 \le\mathcal{Q}_1 \le M_1 \bm{I}_1, \qquad  m_2 \bm{I}_2 \le \mathcal{Q}_2 \le M_2 \bm{I}_2, \qquad m_1>0, \ m_2>0, \ M_1>0, \ M_2>0,
+	m_1 \bm{I}_\mathbb{A} \le\mathcal{Q}_1 \le M_1 \bm{I}_\mathbb{A}, \qquad  m_2 \bm{I}_\mathbb{B} \le \mathcal{Q}_2 \le M_2 \bm{I}_\mathbb{B}, \qquad m_1>0, \ m_2>0, \ M_1>0, \ M_2>0,
 	\end{equation*} 
 \end{assumption}
-where $\bm{I}_1, \; \bm{I}_2$ are the identity operator in $L^2(\Omega, \mathbb{A}), \; L^2(\Omega, \mathbb{B})$ respectively. 
+where $\bm{I}_\mathbb{A}, \; \bm{I}_2$ are the identity operator in $\mathbb{A}, \; \mathbb{B}$ respectively. 
 Because of Assumption \ref{ass:quadHam}, the co-energy variables are given by 
 \begin{equation}\label{eq:e_lin}
 	\bm{e}_1 := \delta_{\alpha_1} H = \mathcal{Q}_1 \bm{\alpha}_1, \qquad \bm{e}_2 := \delta_{\alpha_2} H = \mathcal{Q}_2 \bm{\alpha}_2
@@ -1733,8 +1733,8 @@ Apart for matrices $\mathbf{M}_{\partial, 1}, \mathbf{M}_{\partial, 2}, \mathbf{
 {M}_{\partial, 2}^{fg} = \inner[L^2(\Gamma_2, \mathbb{R}^m)]{\bm{\phi}_{\partial, 2}^f}{\bm{\phi}_{\partial, 2}^g}, \quad (f,g) \in \{1,n_{\partial, 2}\},\\
 \end{aligned}  \quad
 \begin{aligned}
-{B}_{1, \Gamma_1}^{ik} = \inner[L^2(\Gamma_1, \mathbb{R}^m)]{\bm{\phi}_{1}^i}{\bm{\phi}_{\partial, 1}^k}, \\
-{B}_{1, \Gamma_2}^{ig} = \inner[L^2(\Gamma_2, \mathbb{R}^m)]{\bm{\phi}_{1}^i}{\bm{\phi}_{\partial, 2}^g}, \\
+{B}_{1, \Gamma_1}^{ik} = \inner[L^2(\Gamma_1, \mathbb{R}^m)]{\mathcal{N}_{\partial, 1}^{\Gamma_1}\bm{\phi}_{1}^i}{\bm{\phi}_{\partial, 1}^k}, \\
+{B}_{1, \Gamma_2}^{ig} = \inner[L^2(\Gamma_2, \mathbb{R}^m)]{\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{\phi}_{1}^i}{\bm{\phi}_{\partial, 2}^g}, \\
 \end{aligned} \quad i \in \{1,n_1\},
 \end{equation} 
 the other matrices keep the same definition as in \eqref{eq:pHlinsys_findim_J1}. The discrete Hamiltonian, whose expression is \cite{beattie2018linear}
@@ -1805,8 +1805,8 @@ Equivalently, the weak form Eq.\ref{eq:weak_linsys_intJ2} may be used as a start
 \end{equation}
 where $\mathbf{B}_{2, \Gamma_1}, \; \mathbf{B}_{2, \Gamma_2}$ are given by
 \begin{equation}
-{B}_{2, \Gamma_1}^{mk} = \inner[L^2(\Gamma_1, \mathbb{R}^m)]{\bm{\phi}_{2}^m}{\bm{\phi}_{\partial, 1}^k}, \quad
-{B}_{2, \Gamma_2}^{mg} = \inner[L^2(\Gamma_2, \mathbb{R}^m)]{\bm{\phi}_{2}^m}{\bm{\phi}_{\partial, 2}^g}, 
+{B}_{2, \Gamma_1}^{mk} = \inner[L^2(\Gamma_1, \mathbb{R}^m)]{\mathcal{N}_{\partial, 2}^{\Gamma_1}\bm{\phi}_{2}^m}{\bm{\phi}_{\partial, 1}^k}, \quad
+{B}_{2, \Gamma_2}^{mg} = \inner[L^2(\Gamma_2, \mathbb{R}^m)]{\mathcal{N}_{\partial, 2}^{\Gamma_2}\bm{\phi}_{2}^m}{\bm{\phi}_{\partial, 2}^g}, 
 \end{equation} 
 where $m \in \{1,n_2\},\; k \in \{1,n_{\partial, 1}\},\; g \in \{1,n_{\partial, 2}\}$. This solution can be applied to incorporate all possible mixed boundary conditions in a systematic manner. However the finite element discretization is required to satisfy the inf-sup condition. Simulating the resulting system is harder, since the algebraic constrains pose additional difficulties for the time integration.
 
@@ -2010,8 +2010,8 @@ Matrices $\mathbf{M}_{\partial, 1}$ is constructed as in Eq. \eqref{eq:pHsys_inf
 The novel matrices  $\mathbf{B}_{2, \Gamma_1}^{\Omega_1}, \; \mathbf{B}_{1, \Gamma_{12}}^{\Omega_1}$ have elements
 \begin{equation}
 \begin{aligned}
-{B}_{2, \Gamma_1}^{\Omega_1, mh} &= \inner[L^2(\Gamma_{1}, \mathbb{R}^m)]{\bm{\phi}_{2, 1}^m}{\bm{\phi}_{\partial, 1}^h}, \\
-{B}_{2, \Gamma_{12}}^{\Omega_1, mk} &= \inner[L^2(\Gamma_{12}, \mathbb{R}^m)]{\bm{\phi}_{2, 1}^m}{\bm{\phi}_{\partial, 12}^k}, 
+{B}_{2, \Gamma_1}^{\Omega_1, mh} &= \inner[L^2(\Gamma_{1}, \mathbb{R}^m)]{\mathcal{N}_{\partial, 2}^{\Gamma_1}\bm{\phi}_{2, 1}^m}{\bm{\phi}_{\partial, 1}^h}, \\
+{B}_{2, \Gamma_{12}}^{\Omega_1, mk} &= \inner[L^2(\Gamma_{12}, \mathbb{R}^m)]{\mathcal{N}_{\partial, 2}^{\Gamma_{12}}\bm{\phi}_{2, 1}^m}{\bm{\phi}_{\partial, 12}^k}, 
 \end{aligned} \qquad 
 \begin{aligned}
 m \in \{1,n_{2, 1}\}, \quad h &\in \{1,n_{\partial, 1}\}, \\
@@ -2085,8 +2085,8 @@ m,n &\in \{1,n_{2, 2}\}.
 Matrix $\mathbf{M}_{\partial, 2}$ is constructed as in \eqref{eq:pHsys_infdim_mult1}. The elements of matrices  $\mathbf{B}_{1, \Gamma_2}, \; \mathbf{B}_{1, \Gamma_{12}}$ are computed as
 \begin{equation}
 \begin{aligned}
-{B}_{1, \Gamma_{2}}^{ig} &= \inner[L^2(\Gamma_{2})]{\bm{\phi}_{1, 2}^i}{\bm{\phi}_{\partial, 2}^g},  \\
-{B}_{1, \Gamma_{12}}^{ik} &= \inner[L^2(\Gamma_{12})]{\bm{\phi}_{1, 2}^i}{\bm{\phi}_{\partial, 12}^k}, 
+{B}_{1, \Gamma_{2}}^{ig} &= \inner[L^2(\Gamma_{2})]{\mathcal{N}_{\partial, 1}^{\Gamma_2}\bm{\phi}_{1, 2}^i}{\bm{\phi}_{\partial, 2}^g},  \\
+{B}_{1, \Gamma_{12}}^{ik} &= \inner[L^2(\Gamma_{12})]{\mathcal{N}_{\partial, 1}^{\Gamma_{12}}\bm{\phi}_{1, 2}^i}{\bm{\phi}_{\partial, 12}^k}, 
 \end{aligned} \qquad 
 \begin{aligned}
 i \in \{1,n_{1, 2}\}, \quad g &\in \{1,n_{\partial, 2}\}, \\
