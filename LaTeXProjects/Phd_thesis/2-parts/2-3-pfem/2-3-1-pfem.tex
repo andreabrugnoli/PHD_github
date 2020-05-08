@@ -60,7 +60,7 @@ Given an open connected set $\Omega \in \mathbb{R}^d,\, d \in  \{1,2,3\}$, consi
 \begin{subequations}
 \label{eq:pHsys_2}
 \begin{align}
-\partial_t {\bm{\alpha}} &= \mathcal{J}\displaystyle \bm{e}, \qquad \;\;\, \bm{\alpha} \in L^2(\Omega, \mathbb{F}), \quad \mathcal{J}: L^2(\Omega, \mathbb{F}) \rightarrow L^2(\Omega, \mathbb{F}) \vert \mathcal{J} = - \mathcal{J}^*, \label{eq:pHsys_dyn} \vspace{3pt}\\
+\partial_t {\bm{\alpha}} &= \mathcal{J}\displaystyle \bm{e}, \qquad \;\;\, \bm{\alpha} \in L^2(\Omega, \mathbb{F}), \quad \mathcal{J}: L^2(\Omega, \mathbb{F}) \rightarrow L^2(\Omega, \mathbb{F}) \vert \;  \mathcal{J} = - \mathcal{J}^*, \label{eq:pHsys_dyn} \vspace{3pt}\\
 \bm{e} :&= \displaystyle \delta_{\bm{\alpha}}H, \qquad \;\, \bm{e} \in H^\mathcal{J} :=\left\{\bm{e} \in L^2(\Omega, \mathbb{F}) \vert \; \mathcal{J}\bm{e} \in L^2(\Omega, \mathbb{F})  \right\}, \label{eq:pHsys_const} \\
 \bm{u}_\partial &= \mathcal{B}_\partial  \displaystyle \bm{e}, \qquad \bm{u}_\partial \in \mathbb{R}^m, \label{eq:pHsys_u} \vspace{3pt}\\
 \bm{y}_\partial &= \mathcal{C}_\partial \displaystyle \bm{e}, \qquad \; \bm{y}_\partial \in \mathbb{R}^m. \label{eq:pHsys_y} \vspace{3pt}
@@ -875,8 +875,10 @@ The boundary operator $\bm\gamma_0, \, \bm\gamma_{1}$ denote the trace and the f
 	-\partial_x a(0) \\ +\partial_x a(L)
 	\end{pmatrix}.
 \end{equation}
-In this case $\mathbb{A} = \mathbb{B} = \mathbb{R}$. The operators $\mathcal{L}, \, N_{\partial, 1}, \, N_{\partial, 2}$ read
+In this case $\mathbb{A} = \mathbb{B} = \mathbb{R}$. The operators $\mathcal{M}_1, \, \mathcal{M}_2, \, \mathcal{L}, \, N_{\partial, 1}, \, N_{\partial, 2}$ read
 \begin{equation}
+\mathcal{M}_1 = \rho A, \qquad 
+\mathcal{M}_2 = (EI)^{-1}, \qquad 
 \mathcal{L} = \partial_{xx}, \qquad 
 N_{\partial, 1} = \begin{bmatrix}
 \bm\gamma_1 \\ \bm\gamma_0
@@ -1110,8 +1112,10 @@ We recall the expressions of the trace maps
 \end{aligned}
 \end{equation}
 
-The fields for this examples are $\mathbb{A}=\mathbb{R}, \;  \mathbb{B}=\mathbb{R}^{2\times 2}_{\text{sym}}$. The  operators $\mathcal{L}, \, N_{\partial, 1}, \, N_{\partial, 2}$ are
+In this case, the fields are $\mathbb{A}=\mathbb{R}, \;  \mathbb{B}=\mathbb{R}^{2\times 2}_{\text{sym}}$. The  operators $\mathcal{M}_1, \, \mathcal{M}_2, \, \mathcal{L}, \, N_{\partial, 1}, \, N_{\partial, 2}$ are
 \begin{equation}
+\mathcal{M}_1 = \rho h, \qquad 
+\mathcal{M}_2 = \bm{\mathcal{C}}_b, \qquad 
 \mathcal{L}= \Hess, \qquad
 N_{\partial, 1} = \begin{bmatrix}
 \gamma_0 \\ \gamma_1
@@ -1288,7 +1292,18 @@ The trace operators are defined as
 \end{aligned}
 \end{equation}
 
-The variables assume value in the fields $\mathbb{A} = \mathbb{R} \times \mathbb{R}^2, \; \mathbb{B} =\mathbb{R}^{2\times 2}_{\text{sym}} \times \mathbb{R}^2$. \\ The $\bm{L}, \; \mathcal{L}, \; \mathcal{N}_{\partial, 1}, \; \mathcal{N}_{\partial, 1}$ operators are 
+The variables assume value in the fields $\mathbb{A} = \mathbb{R} \times \mathbb{R}^2, \; \mathbb{B} =\mathbb{R}^{2\times 2}_{\text{sym}} \times \mathbb{R}^2$. The mass operators are given by 
+\begin{equation}
+\mathcal{M}_1 = \begin{bmatrix}
+\rho h & 0 \\
+\bm{0} & I_\theta
+\end{bmatrix}, \qquad 
+\mathcal{M}_2 = \begin{bmatrix}
+\bm{\mathcal{C}}_b & \bm{0} \\
+\bm{0} & C_s
+\end{bmatrix}.
+\end{equation} 
+The $\bm{L}, \; \mathcal{L}, \; \mathcal{N}_{\partial, 1}, \; \mathcal{N}_{\partial, 1}$ operators are 
 \begin{equation}
 \bm{L} = \begin{bmatrix}
 \bm{0}  & \bm{0}  \\
@@ -1309,6 +1324,7 @@ The variables assume value in the fields $\mathbb{A} = \mathbb{R} \times \mathbb
 \gamma_{ns} & 0\\
 \end{bmatrix}.
 \end{equation}
+
 
 The energy rate is retrieved from Eq. \eqref{eq:enrateMin} $\dot{H} = \inner[L^2(\partial\Omega, \mathbb{R}^2)]{\bm{y}_\partial}{\bm{u}_\partial}$. Introducing the test functions $(v_w,\, \bm{v}_\theta, \, \bm{V}_\kappa, \, \bm{v}_\gamma)$ and integrating by parts the first two lines of \eqref{eq:pHdyn_Min1} one gets 
 \begin{equation}
@@ -1384,7 +1400,7 @@ the following finite dimensional system is obtained
 \mathbf{M}_\partial {\mathbf{y}_\partial} &= \begin{bmatrix}
 \mathbf{B}_w^\top & \mathbf{0} & \mathbf{0} & \mathbf{0} \\
 \mathbf{0} & \mathbf{B}_{\theta_n}^\top & \mathbf{0} & \mathbf{0}\\ 
-\mathbf{0} & \mathbf{0} & \mathbf{B}_{\theta_s}^\top & \mathbf{0}\\
+\mathbf{0} & \mathbf{B}_{\theta_s}^\top & \mathbf{0} & \mathbf{0}\\
 \end{bmatrix}
 \begin{pmatrix}
 {\mathbf{e}}_{w} \\
