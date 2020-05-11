@@ -26,6 +26,9 @@ save_res = True
 coeff = 0.95
 h1_vec = np.load(path_res + bc_input + "h1.npy")
 h2_vec = np.load(path_res + bc_input + "h3.npy")
+print("h1:" + str(h1_vec))
+print("h3:" + str(h2_vec))
+
 
 n_h = len(h1_vec)
 v_errInf_r1 = np.load(path_res + bc_input + "v_errInf_r1.npy")
@@ -143,6 +146,8 @@ for i in range(1, n_h):
 v_r1int_max = np.polyfit(np.log(h1_vec), np.log(v_errInf_r1), 1)[0]
 v_r1int_L2 = np.polyfit(np.log(h1_vec), np.log(v_errQuad_r1), 1)[0]
 
+print("Error r=1 for v Linf: " + str(v_errInf_r1))
+print("Error r=1 for v L2: " + str(v_errQuad_r1))
 print("Estimated order of convergence r=1 for v Linf: " + str(v_r1_max))
 print("Interpolated order of convergence r=1 for v Linf: " + str(v_r1int_max))
 print("Estimated order of convergence r=1 for v L2: " + str(v_r1_L2))
@@ -152,6 +157,8 @@ print("")
 v_r2int_max = np.polyfit(np.log(h1_vec), np.log(v_errInf_r2), 1)[0]
 v_r2int_L2 = np.polyfit(np.log(h1_vec), np.log(v_errQuad_r2), 1)[0]
 
+print("Error r=2 for v Linf: " + str(v_errInf_r2))
+print("Error r=2 for v L2: " + str(v_errQuad_r2))
 print("Estimated order of convergence r=2 for v Linf: " + str(v_r2_max))
 print("Interpolated order of convergence r=2 for v Linf: " + str(v_r2int_max))
 print("Estimated order of convergence r=2 for v L2: " + str(v_r2_L2))
@@ -161,6 +168,8 @@ print("")
 v_r3int_max = np.polyfit(np.log(h2_vec), np.log(v_errInf_r3), 1)[0]
 v_r3int_L2 = np.polyfit(np.log(h2_vec), np.log(v_errQuad_r3), 1)[0]
 
+print("Error r=3 for v Linf: " + str(v_errInf_r3))
+print("Error r=3 for v L2: " + str(v_errQuad_r3))
 print("Estimated order of convergence r=3 for v Linf: " + str(v_r3_max))
 print("Interpolated order of convergence r=3 for v Linf: " + str(v_r3int_max))
 print("Estimated order of convergence r=3 for v L2: " + str(v_r3_L2))
@@ -192,6 +201,8 @@ if save_res:
 om_r1int_max = np.polyfit(np.log(h1_vec), np.log(om_errInf_r1), 1)[0]
 om_r1int_L2 = np.polyfit(np.log(h1_vec), np.log(om_errQuad_r1), 1)[0]
 
+print("Error r=1 for om Linf: " + str(om_errInf_r1))
+print("Error r=1 for om L2: " + str(om_errQuad_r1))
 print("Estimated order of convergence r=1 for om Linf: " + str(om_r1_max))
 print("Interpolated order of convergence r=1 for om Linf: " + str(om_r1int_max))
 print("Estimated order of convergence r=1 for om L2: " + str(om_r1_L2))
@@ -201,6 +212,8 @@ print("")
 om_r2int_max = np.polyfit(np.log(h1_vec), np.log(om_errInf_r2), 1)[0]
 om_r2int_L2 = np.polyfit(np.log(h1_vec), np.log(om_errQuad_r2), 1)[0]
 
+print("Error r=2 for om Linf: " + str(om_errInf_r2))
+print("Error r=2 for om L2: " + str(om_errQuad_r2))
 print("Estimated order of convergence r=2 for om Linf: " + str(om_r2_max))
 print("Interpolated order of convergence r=2 for om Linf: " + str(om_r2int_max))
 print("Estimated order of convergence r=2 for om L2: " + str(om_r2_L2))
@@ -210,6 +223,8 @@ print("")
 om_r3int_max = np.polyfit(np.log(h2_vec), np.log(om_errInf_r3), 1)[0]
 om_r3int_L2 = np.polyfit(np.log(h2_vec), np.log(om_errQuad_r3), 1)[0]
 
+print("Error r=3 for om Linf: " + str(om_errInf_r3))
+print("Error r=3 for om L2: " + str(om_errQuad_r3))
 print("Estimated order of convergence r=3 for om Linf: " + str(om_r3_max))
 print("Interpolated order of convergence r=3 for om Linf: " + str(om_r3int_max))
 print("Estimated order of convergence r=3 for om L2: " + str(om_r3_L2))
@@ -232,7 +247,7 @@ plt.plot(np.log(h2_vec), np.log(h2_vec**3) + coeff*(np.log(om_errInf_r3)[-1] - n
 
 plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log($||\bm{e}_\theta - \bm{e}_\theta^h||_{L^\infty H^{\mathrm{Grad}}}$)')
-plt.title(r'$\bm{e}_\theta$ error (BJT element)')
+plt.title(r'$\bm{e}_\theta$ error (CGDG element)')
 plt.legend()
 if save_res:
     plt.savefig(path_fig + bc_input + "_om.eps", format="eps")
@@ -240,6 +255,8 @@ if save_res:
 sig_r1int_max = np.polyfit(np.log(h1_vec), np.log(sig_errInf_r1), 1)[0]
 sig_r1int_L2 = np.polyfit(np.log(h1_vec), np.log(sig_errQuad_r1), 1)[0]
 
+print("Error r=1 for sig Linf: " + str(sig_errInf_r1))
+print("Error r=1 for sig L2: " + str(sig_errQuad_r1))
 print("Estimated order of convergence r=1 for sig Linf: " + str(sig_r1_max))
 print("Interpolated order of convergence r=1 for sig Linf: " + str(sig_r1int_max))
 print("Estimated order of convergence r=1 for sig L2: " + str(sig_r1_L2))
@@ -249,6 +266,8 @@ print("")
 sig_r2int_max = np.polyfit(np.log(h1_vec), np.log(sig_errInf_r2), 1)[0]
 sig_r2int_L2 = np.polyfit(np.log(h1_vec), np.log(sig_errQuad_r2), 1)[0]
 
+print("Error r=2 for sig Linf: " + str(sig_errInf_r2))
+print("Error r=2 for sig L2: " + str(sig_errQuad_r2))
 print("Estimated order of convergence r=2 for sig Linf: " + str(sig_r2_max))
 print("Interpolated order of convergence r=2 for sig Linf: " + str(sig_r2int_max))
 print("Estimated order of convergence r=2 for sig L2: " + str(sig_r2_L2))
@@ -258,6 +277,8 @@ print("")
 sig_r3int_max = np.polyfit(np.log(h2_vec), np.log(sig_errInf_r3), 1)[0]
 sig_r3int_L2 = np.polyfit(np.log(h2_vec), np.log(sig_errQuad_r3), 1)[0]
 
+print("Error r=3 for sig Linf: " + str(sig_errInf_r3))
+print("Error r=3 for sig L2: " + str(sig_errQuad_r3))
 print("Estimated order of convergence r=3 for sig Linf: " + str(sig_r3_max))
 print("Interpolated order of convergence r=3 for sig Linf: " + str(sig_r3int_max))
 print("Estimated order of convergence r=3 for sig L2: " + str(sig_r3_L2))
@@ -289,6 +310,8 @@ if save_res:
 q_r1int_max = np.polyfit(np.log(h1_vec), np.log(q_errInf_r1), 1)[0]
 q_r1int_L2 = np.polyfit(np.log(h1_vec), np.log(q_errQuad_r1), 1)[0]
 
+print("Error r=1 for q Linf: " + str(q_errInf_r1))
+print("Error r=1 for q L2: " + str(q_errQuad_r1))
 print("Estimated order of convergence r=1 for q Linf: " + str(q_r1_max))
 print("Interpolated order of convergence r=1 for q Linf: " + str(q_r1int_max))
 print("Estimated order of convergence r=1 for q L2: " + str(q_r1_L2))
@@ -298,6 +321,8 @@ print("")
 q_r2int_max = np.polyfit(np.log(h1_vec), np.log(q_errInf_r2), 1)[0]
 q_r2int_L2 = np.polyfit(np.log(h1_vec), np.log(q_errQuad_r2), 1)[0]
 
+print("Error r=2 for q Linf: " + str(q_errInf_r2))
+print("Error r=2 for q L2: " + str(q_errQuad_r2))
 print("Estimated order of convergence r=2 for q Linf: " + str(q_r2_max))
 print("Interpolated order of convergence r=2 for q Linf: " + str(q_r2int_max))
 print("Estimated order of convergence r=2 for q L2: " + str(q_r2_L2))
@@ -307,6 +332,8 @@ print("")
 q_r3int_max = np.polyfit(np.log(h2_vec), np.log(q_errInf_r3), 1)[0]
 q_r3int_L2 = np.polyfit(np.log(h2_vec), np.log(q_errQuad_r3), 1)[0]
 
+print("Error r=3 for q Linf: " + str(q_errInf_r3))
+print("Error r=3 for q L2: " + str(q_errQuad_r3))
 print("Estimated order of convergence r=3 for q Linf: " + str(q_r3_max))
 print("Interpolated order of convergence r=3 for q Linf: " + str(q_r3int_max))
 print("Estimated order of convergence r=3 for q L2: " + str(q_r3_L2))
