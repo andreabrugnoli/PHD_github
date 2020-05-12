@@ -2,16 +2,17 @@
 
 \minitoc
 
-\lettrine{\color{theme}{T}}he main mathematical aspects behind the pH formalism are recalled in this chapter. First, the concept of Stokes-Dirac structure is presented. This notion was first introduced in the literature by making use of a differential geometry approach \cite{vanderschaft2002}. Despite being really insightful in terms of geometrical structure, this approach does not encompass the case of higher-order differential operators. An extension in this sense is still an open question. Since bending problems in elasticity introduce higher-order differential operators, the language of PDE will be privileged over the one of differential forms. To have the most suitable definition of Stokes-Dirac structure for flexible systems, the approach adopted in \cite{macchelli2004modelling} is here recovered. \\
+\lettrine{\color{theme}{T}}he main mathematical aspects behind the pH formalism are recalled in this chapter. First, the finite dimensional case is considered. The geometric concept of Dirac structure \cite{courant1990} is first presented. Finite dimensional port-Hamiltonian system are then introduced by making clear their intimate connection with the concept of Dirac structure. Second, the infinite dimensional case is recalled. The equivalent of Dirac structures for the infinite-dimensional case is the concept of Stokes-Dirac structure. Analogously to what happens in the finite-dimensional case, infinite-dimensional (or distributed) port-Hamiltonian systems are intimately related to the concept of Stokes-Dirac structure. \\
 
-Second, distributed port-Hamiltonian systems are introduced, in connection with the underlying Stokes-Dirac structure. PHs as boundary control systems have been analyzed deeply in one geometrical dimension \cite{zwart2012,legorrec2005}. The complete characterization of pH in arbitrary dimension is still an open research field. Two notable exceptions \cite{zwart2015wave,skrepek2019wellposedness} provide partial answers to this problem. The first demonstrate the well-posedness of the linear wave equation in arbitrary geometrical dimensions. The second generalizes this result to treat the case of generic first order linear pHs in arbitrary geometrical dimensions.
+This notion of Stokes-Dirac structure was first introduced in the literature by making use of a differential geometry approach \cite{vanderschaft2002}. Despite being really insightful in terms of geometrical structure, this approach does not encompass the case of higher-order differential operators. An extension in this sense is still an open question. Since bending problems in elasticity introduce higher-order differential operators, the language of PDE will be privileged over the one of differential forms.
 
  
-\section{The Stokes-Dirac structure}
+\section{Finite dimensional setting}
 
-In the section the concept of Stokes-Dirac structure for distributed, i.e. infinite-dimensional, pHs is introduced. First, the finite-dimensional case is considered. Then, to introduce the infinite-dimensional extension of Dirac structure, namely the Stokes-Dirac structure, the differential operators that come into play are characterized. 
+Finite dimensional port-Hamiltonian are characterized by geometrical structures called Dirac structures. It is important to define this geometric concept and see how pHs relate to it. \\
 
-\subsection{Dirac Structures}
+\subsection{Dirac structure}
+
 Consider a  finite dimensional space ${F}$ over the field $\mathbb{R}$ and ${E} \equiv {F}'$ its dual, i.e. the space of linear operator $\mathbf{e} : {F} \rightarrow \mathbb{R}$. The elements of $\mathit{F}$ are called flows, while the elements of ${E}$ are called efforts. Those are port variables and their combination gives the power flowing inside the system. The space ${B} = {F} \times {E}$ is called the bond space of power variables. Therefore the power is defined as  $\left\langle \mathbf{e}, \mathbf{f} \right\rangle = \bm{e}(\mathbf{f})$, where $\left\langle \mathbf{e} , \mathbf{f} \right\rangle$ is the dual product between $\mathbf{f}$ and $\mathbf{e}$.
 \begin{definition}[\cite{courant1990}, Def. 1.1.1]
 	Given the finite-dimensional space ${F}$ and its dual ${E}$ with respect to the inner product $\left\langle \cdot , \cdot \right\rangle : {F} \times {E} \rightarrow \mathbb{R}$, consider the symmetric bilinear form:
@@ -27,13 +28,15 @@ This definition can be extended to consider distributed forces and dissipation \
 	Consider the space of power variables ${F} \times {E}$ and let ${X}$ denote an $n$-dimensional space, the space of energy variables. Suppose that ${F} := {F}_s \times {F}_e $ and that ${E} := {E}_s  \times {E}_e $, with $\text{dim} \, {F}_s = \text{dim} \, {E}_s = n$ and $\text{dim} \, {F}_e = \text{dim} \, {E}_e = m$. Moreover, let $\mathbf{J}(\mathbf{x})$ denote
 	a skew-symmetric matrix of dimension $n$ and $\mathbf{B}(\mathbf{x})$ a matrix of dimension $n \times m$. Then, the set
 	\begin{equation}
-	{D} := \left\{ (\mathbf{f}_s, \mathbf{f}_e , \mathbf{e}_s ,\mathbf{e}_e ) \in {F} \times {E} \vert \quad \mathbf{f}_s = - \mathbf{J}(\mathbf{x}) \mathbf{e}_s - \mathbf{B}(\mathbf{x}) \mathbf{f}_e, \; \mathbf{e}_e = \mathbf{B}(\mathbf{x})^\top \mathbf{e}_s \right\}
+	{D} := \left\{ (\mathbf{f}_s, \mathbf{f}_e , \mathbf{e}_s ,\mathbf{e}_e ) \in {F} \times {E} \vert \quad \mathbf{f}_s = \mathbf{J}(\mathbf{x}) \mathbf{e}_s + \mathbf{B}(\mathbf{x}) \mathbf{f}_e, \; \mathbf{e}_e = -\mathbf{B}(\mathbf{x})^\top \mathbf{e}_s \right\}
 	\end{equation}
 	is a Dirac structure.
 \end{proposition}
 
-\subsection{Finite-dimensional port-Hamiltonian systems}
-Consider the time-invariant dynamical system:
+It is now possible to make the connection between Dirac structures and pH system explicit.
+
+\subsection{Finite dimensional port-Hamiltonian systems}
+ Consider the time-invariant dynamical system:
 \begin{equation}
 \label{eq:finitePH}
 \begin{cases}
@@ -44,13 +47,85 @@ Consider the time-invariant dynamical system:
 where $ H(\mathbf{x}) : X \rightarrow \mathbb{R} $, the Hamiltonian, is a real-valued function bounded from below. Such a system is called port-Hamiltonian, as it arises from the Hamiltonian modelling of a physical system and it interacts with the environment through the input $\mathbf{u}$, included in the formulation. The connection with the concept of Dirac structure is achieved by considering the following port behavior:
 \begin{equation}
 \begin{aligned}
-\mathbf{f}_s &= - \dot{\mathbf{x}}, \qquad 
+\mathbf{f}_s &= \dot{\mathbf{x}}, \qquad 
 &\mathbf{e}_s &= \nabla{H}(\mathbf{x}), \\
-\mathbf{f}_e &= \mathbf{u}, \qquad
-&\mathbf{e}_e &= \mathbf{y}. \\
+\mathbf{f}_e &=\mathbf{u}, \qquad
+&\mathbf{e}_e &= -\mathbf{y}. \\
 \end{aligned}
 \end{equation}
-With this choice of the port variables, system \eqref{eq:finitePH} defines, by Proposition \ref{prop:Dirac}, a Dirac structure. Dissipation and distributed forces can be included and the corresponding system defines an extended Dirac structure, once the proper port variables have been introduced.
+With this choice of the port variables, system \eqref{eq:finitePH} defines, by Proposition \ref{prop:Dirac}, a Dirac structure. Dissipation and distributed forces can be included and the corresponding system defines an extended Dirac structure, once the proper port variables have been introduced. \\
+
+System \ref{eq:finitePH} is a pH system in canonical form. Recently, finite dimensional differential algebraic port-Hamiltonian systems (pHDAE) have been introduced both for linear \cite{beattie2018linear} and non linear systems \cite{morandin2019}. This enriched description share all the crucial features of ordinary pHs, but easily account for algebraic constraints, time-dependent transformations and explicit dependence on time in the Hamiltonian. The application of the proposed discretization method lead naturally to pHDAE systems. 
+
+
+\section{Infinite dimensional setting}
+
+Infinite dimensional spaces appears whenever differential operators have to be considered. The fundamental notion of formal adjoint 
+
+
+\subsection{Differential operators}
+
+Let $\Omega$ denote a compact subset of $\mathbb{R}^d$ representing the spatial domain of the distributed parameter system. Consider two function space $F_1, F_2$ over the fields $\bbA, \; \bbB$ defined on $\Omega \subset \mathbb{R}^d$ and a map $\mathcal{L}$ relating the two
+\begin{equation}
+	\begin{aligned}
+	\mathcal{L}: F_1(\Omega, \bbA) &\longrightarrow F_2(\Omega, \bbB), \\
+			     \bm{u} &\longrightarrow \bm{v}.
+	\end{aligned}
+\end{equation}
+
+Fields $\mathbb{A}, \mathbb{B}$ denote can either  scalars $\bbR$, vectors $\bbR^d$,  tensors $\bbR^{d \times d}$ or a Cartesian product of those. Given $\bm{u} \in F_1, \;  \bm{v} \in F_2$ The map $\mathcal{L}$ is a  differential operator if it can be represented by a linear combination of the derivate of $\bm{u}$
+\begin{equation}
+\bm{v} = \mathcal{L} \bm{u} \iff \bm{v} := \sum_{|\alpha|=0}^n  \mathcal{P}_{\alpha} \partial^{\alpha} \bm{u},
+\end{equation}
+where $\alpha := (\alpha_1, \dots , \alpha_n)$ is a multi-index of order $|\alpha| := \sum_{i=1}^n \alpha_i$ and $\partial^{\alpha} := \partial_{x_1}^{\alpha_1} \dots \partial_{x_d}^{\alpha_d}$ is a differential operator of order $|\alpha|$ resulting from a combination of spatial derivatives. $\mathcal{P}_\alpha: \bbA \rightarrow \bbB$ is a constant algebraic operators from field $\bbA$ to $\bbB$. 
+
+\begin{example}[Divergence operator in $\mathbb{R}^d$]
+	Given $\bm{u} \in C^\infty(\Omega, \bbR^d), \; v \in C^\infty(\Omega, \bbR)$, where $C^\infty(\Omega, \bbR), \; C^\infty(\Omega, \bbR^d)$ denotes the set of smooth scalar function defined on $\Omega$, the divergence operator in Cartesian coordinate is expressed as
+	\begin{equation}
+	v = \div \bm{u} = \sum_{i = 1}^d \bm{e}_i^\top \partial_{x_i} \bm{u},
+	\end{equation}
+	where $\bm{e}_i$ is the i$-th$ element of the canonical basis in $\bbR^d$. 
+\end{example}
+
+The differential operators employed in this thesis are reported in Appendix \ref{app:math}. \\
+
+
+In this work a very important notion related to a differential operator is the one of formal adjoint.  Consider the spaces of square integrable functions in domain $\Omega$ over the fields $\bbA, \; \bbB$ and denoted by $L^2(\Omega, \bbA), \; L^2(\Omega, \bbB)$. Their inner product are denoted by $\inner[L^2(\Omega, \bbA)]{\cdot}{\cdot}, \inner[L^2(\Omega, \bbB)]{\cdot}{\cdot}$ For scalars $(a,b) \in L^2(\Omega)$, vectors $(\bm{a}, \bm{b})\in L^2(\Omega, \mathbb{R}^d)$ and tensors  $(\bm{A}, \bm{B}) \in L^2(\Omega,\mathbb{R}^{d\times d})$ the $L^2$ inner product is given by 
+\begin{equation}
+\inner[L^2(\Omega)]{a}{b} = \int_{\Omega} a b \d\Omega, \qquad \inner[L^2(\Omega, \mathbb{R}^d)]{\bm{a}}{\bm{b}} = \int_{\Omega} \bm{a} \cdot \bm{b} \d\Omega, \qquad \inner[L^2(\Omega, \mathbb{R}^{d \times d})]{\bm{A}}{\bm{B}} = \int_{\Omega} \bm{A} \cddot \bm{B} \d\Omega.
+\end{equation} 
+The notation $\bm{A}\cddot \bm{B} = \sum_{i, j} A_{ij} B_{ij}$ denotes the tensor contraction. We can now state the definition of formal adjoint 
+
+\begin{definition}
+Let $\mathcal{L}= L^2(\Omega, \mathbb{A}) \rightarrow L^2(\Omega, \mathbb{B})$ be a differential operator and  $\bm{u}_1 \in C_0^\infty(\Omega, \bbA), \; \bm{u}_2(\Omega, \bbB)$ be smooth variables with compact support on $\Omega$. 
+The formal adjoint of the differential operator $\mathcal{L}$, denoted by $\mathcal{L}^*= L^2(\Omega, \mathbb{B}) \rightarrow L^2(\Omega, \mathbb{A})$, is defined by the relation
+\begin{equation}
+\inner[L^2(\Omega, \bbB)]{\mathcal{L}\bm{u}_1}{\bm{u}_2} = \inner[L^2(\Omega, \bbA)]{\bm{u}_1}{\mathcal{L}^*\bm{u}_2}, \qquad \bm{u}_1 \in C_0^\infty(\Omega, \bbA), \; \bm{u}_2 \in C_0^\infty(\Omega, \bbB), 
+\end{equation}{}
+\end{definition}
+This definition represent an extension to generic fields $\bbA, \; \bbB$ of Def. 5.80 in \cite{rogers2004pde} (reported in Appendix \ref{app:math}). 
+
+\begin{remark}[Differences between adjoint and formal adjoint]
+	The definition of formal adjoint is such that the integration by parts formula is respected. Contrarily to the adjoint of an operator, the formal adjoint definition does not regard the actual domain of the operator nor the boundary conditions. For example, the differential operators $\div,\, \grad$ are unbounded in the ${L}^2$ topology. Whenever unbounded operators are considered, it is important to define their domain. To avoid the need of specifying domains, the notion of formal adjoint is used. The formal adjoint respects the integration by parts formula and is defined only for sufficiently smooth functions with compact support. In this sense the formal adjoint of $\div$  is $-\grad$, since for smooth functions with compact support, it holds
+	\begin{equation*}
+	\inner[{L}^2(\Omega, \mathbb{R}^{d})]{\bm{y}}{\grad {x}}
+	\underbrace{=}_{\text{I.B.P.}} -\inner[{L}^2(\Omega, \mathbb{R})]{\div(\bm{y})}{x},
+	\end{equation*}
+	for $\bm{y} \in C_0^\infty(\Omega, \mathbb{R}^{d}), \; {x} \in C_0^\infty(\Omega)$ (I.B.P. stands for integration by parts). The definition of the domain of the operators, that requires the knowledge of the boundary conditions, has not been specified. 
+\end{remark}
+
+To define 
+
+\begin{definition}
+	\label{def:skewoper}
+	Let $W = C^{\infty}(\Omega, \mathbb{R}^{q})$ be the space of vector-valued smooth functions and $\mathcal{J}: W \rightarrow W$ a constant matrix differential operator. Then, $\mathcal{J}$ is formally skew-adjoint (or skew-symmetric) if and only if $\mathcal{J} = -\mathcal{J}^*$. This corresponds to the algebraic condition on $q \times q$ square matrices
+	\begin{equation}
+	\bm{P}_{\alpha} = (-1)^{|\alpha| + 1} \bm{P}_{\alpha}^\top, \quad \forall \alpha.
+	\end{equation}
+\end{definition}
+
+\begin{comment}
+
 
 \subsection{Constant matrix differential operators}
 
@@ -72,20 +147,20 @@ The following definition, instrumental for the case of dpHs, is a simplified ver
 \end{definition}
 
 \begin{remark}[Differences between adjoint and formal adjoint]
-The definition of formal adjoint is such that the integration by parts formula is respected
-\begin{equation*}
-\int_{\Omega} \bm{a} \cdot (\mathcal{L}\bm{b}) \d\Omega = \int_{\Omega} (\mathcal{L}^*\bm{a}) \cdot \bm{b} \d\Omega,
-\end{equation*}
-where $\bm{a} \in C^{\infty}_0(\Omega, \mathbb{R}^{q_u}), \; \bm{b} \in C^{\infty}_0(\Omega, \mathbb{R}^{q_v})$ are smooth functions with compact support. This corresponds to the adjoint definition for a bounded operator between $L^2$ spaces of square integrable functions
-\begin{equation*}
-\inner[L^2(\Omega, \mathbb{R}^{q_v})]{\bm{a}}{\mathcal{L}\bm{b}} = \inner[L^2(\Omega, \mathbb{R}^{q_u})]{\mathcal{L}^*\bm{a}}{\bm{b}}.
-\end{equation*}
-That means that, contrarily to the adjoint of an operator, the formal adjoint definition does not regard the actual domain of the operator nor the boundary conditions. For example, the differential operators $\div,\, \grad$ are unbounded in the ${L}^2$ topology. Whenever unbounded operators are considered, it is important to define their domain. To avoid the need of specifying domains, the notion of formal adjoint is used. The formal adjoint respects the integration by parts formula and is defined only for sufficiently smooth functions with compact support. In this sense the formal adjoint of $\div$  is $-\grad$, since for smooth functions with compact support, it holds
-\begin{equation*}
-\inner[{L}^2(\Omega, \mathbb{R}^{3})]{\bm{y}}{\grad {x}}
-\underbrace{=}_{\text{I.B.P.}} -\inner[{L}^2(\Omega, \mathbb{R})]{\div(\bm{y})}{x},
-\end{equation*}
-for $\bm{y} \in C_0^\infty(\Omega, \mathbb{R}^{n}), \; {x} \in C_0^\infty(\Omega)$ (I.B.P. stands for integration by parts). The definition of the domain of the operators, that requires the knowledge of the boundary conditions, has not been specified. 
+	The definition of formal adjoint is such that the integration by parts formula is respected
+	\begin{equation*}
+	\int_{\Omega} \bm{a} \cdot (\mathcal{L}\bm{b}) \d\Omega = \int_{\Omega} (\mathcal{L}^*\bm{a}) \cdot \bm{b} \d\Omega,
+	\end{equation*}
+	where $\bm{a} \in C^{\infty}_0(\Omega, \mathbb{R}^{q_u}), \; \bm{b} \in C^{\infty}_0(\Omega, \mathbb{R}^{q_v})$ are smooth functions with compact support. This corresponds to the adjoint definition for a bounded operator between $L^2$ spaces of square integrable functions
+	\begin{equation*}
+	\inner[L^2(\Omega, \mathbb{R}^{q_v})]{\bm{a}}{\mathcal{L}\bm{b}} = \inner[L^2(\Omega, \mathbb{R}^{q_u})]{\mathcal{L}^*\bm{a}}{\bm{b}}.
+	\end{equation*}
+	That means that, contrarily to the adjoint of an operator, the formal adjoint definition does not regard the actual domain of the operator nor the boundary conditions. For example, the differential operators $\div,\, \grad$ are unbounded in the ${L}^2$ topology. Whenever unbounded operators are considered, it is important to define their domain. To avoid the need of specifying domains, the notion of formal adjoint is used. The formal adjoint respects the integration by parts formula and is defined only for sufficiently smooth functions with compact support. In this sense the formal adjoint of $\div$  is $-\grad$, since for smooth functions with compact support, it holds
+	\begin{equation*}
+	\inner[{L}^2(\Omega, \mathbb{R}^{3})]{\bm{y}}{\grad {x}}
+	\underbrace{=}_{\text{I.B.P.}} -\inner[{L}^2(\Omega, \mathbb{R})]{\div(\bm{y})}{x},
+	\end{equation*}
+	for $\bm{y} \in C_0^\infty(\Omega, \mathbb{R}^{3}), \; {x} \in C_0^\infty(\Omega)$ (I.B.P. stands for integration by parts). The definition of the domain of the operators, that requires the knowledge of the boundary conditions, has not been specified. 
 \end{remark}
 
 When $q_u=q_v=q \implies U \equiv V = W$, formal skew-adjoint operators can be defined: 
@@ -111,14 +186,18 @@ An important relation between a differential operator and its adjoint is express
 It is important to note that $\widetilde{\mathcal{A}}_{\mathcal{L}}$ is a constant differential operator. The quantity $\widetilde{\mathcal{A}}_{\mathcal{L}}(\bm{u}, \bm{v})$ is a constant linear combination of the functions $\bm{u}$ and $\bm{v}$ together with their spatial derivatives up to a certain order and depending on $\mathcal{L}$. 
 
 \begin{corollary} 
-		Consider a skew-symmetric differential operator $\mathcal{J}$. For each function $\bm{u}, \, \bm{v} \in W=C^{\infty}(\Omega, \mathbb{R}^{q})$ it holds:
+	Consider a skew-symmetric differential operator $\mathcal{J}$. For each function $\bm{u}, \, \bm{v} \in W=C^{\infty}(\Omega, \mathbb{R}^{q})$ it holds:
 	\begin{equation}
 	\int_{\Omega} \left( \bm{v}^\top \mathcal{J} \bm{u} + \bm{u}^\top \mathcal{J} \bm{v}\right) \d\Omega= \int_{\partial \Omega} \widetilde{\mathcal{A}}_{\mathcal{J}}(\bm{u}, \bm{v}) \d{S},
 	\end{equation}
 	where $\widetilde{\mathcal{A}}_{\mathcal{J}}$ is a symmetric differential operator on $\partial\Omega$ depending on the differential operator~$\mathcal{J}$.
 \end{corollary}
 
+\end{comment}
+
 \subsection{Constant Stokes-Dirac structures}
+ To have the most suitable definition of Stokes-Dirac structure for flexible systems, the approach adopted in \cite{macchelli2004modelling} is here recovered. \\
+ 
 Following \cite{macchelli2004modelling}, let ${F}$ denote the space of flows, i.e. the space of smooth functions from the compact set $\Omega \subset \mathbb{R}^d$ to $\mathbb{R}^q$. For simplicity assume that  the space of efforts is ${E} \equiv {F}$ (generally speaking these spaces are Hilbert spaces linked by duality, as in \cite{villegas2007}). Given $\bm{f} = (f_1, \dots, f_q) \in {F}$ and $\bm{e} = (e_1, \dots, e_q) \in {E}$. Let $\bm{z} = \mathcal{A}_\partial(\bm{e})$ denote the boundary terms, where $\mathcal{A}_\partial$ provides the restriction on $\partial\Omega$ of the effort variables $\bm{e}$ and of their spatial derivatives of proper order. The associated boundary space is ${Z} := \left\{ \bm{z} \vert \; \bm{z} = \mathcal{A}_{\partial}(\bm{e})  \right\}$. Then, it holds
 \begin{equation}
 \int_{\partial \Omega} \widetilde{\mathcal{A}}_{\mathcal{J}}(\bm{e}_1, \bm{e}_2) \d{S} = \int_{\partial \Omega} \mathcal{A}_{\mathcal{J}}(\bm{z}_1, \bm{z}_2) \d{S}, \quad \text{with} \quad  \widetilde{\mathcal{A}}_\mathcal{J}(\cdot, \cdot) = \mathcal{A}_{\mathcal{J}}(\mathcal{A}_{\partial}(\cdot), \, \mathcal{A}_{\partial}(\cdot)).
@@ -149,8 +228,9 @@ This  relation expresses the  power  conservation property of the Stokes–Dirac
 	The constant Stokes-Dirac structure has been defined in case of smooth vector-valued functions for simplicity.  The definition is indeed more general and encompasses the case of more complex functional spaces, in particular the $L^2$ space of square integrable functions.  Linear elasticity for example is defined on a mixed function space of vector- and tensor-valued functions, cf. Sec \secref{sec:pHelas}.
 \end{remark}
 
+\subsection{Distributed port-Hamiltonian system}
 
-\section{Distributed port-Hamiltonian systems}
+PHs as boundary control systems have been analyzed deeply in one geometrical dimension \cite{zwart2012,legorrec2005}. The complete characterization of pH in arbitrary dimension is still an open research field. Two notable exceptions \cite{zwart2015wave,skrepek2019wellposedness} provide partial answers to this problem. The first demonstrate the well-posedness of the linear wave equation in arbitrary geometrical dimensions. The second generalizes this result to treat the case of generic first order linear pHs in arbitrary geometrical dimensions. \\
 
 A distributed lossless port-Hamiltonian system is defined by a set of variables that describes the unknowns, by a formally skew-adjoint differential operator, an energy functional and a set of boundary inputs and corresponding conjugated outputs. Such a system is described by the following set of equations
 \begin{equation}\label{eq:phsys}
@@ -208,62 +288,9 @@ If the flow, effort and boundary variables are chosen to be
 
 then system \eqref{eq:phsys} defines a Stokes-Dirac structure by Proposition \ref{prop:StokesDirac}.  In this rather informal treatment of dpHs, no rigorous characterization whatsoever has been introduced for operators $\mathcal{J}, \, \mathcal{B_\partial,\, C_\partial}$ in system \eqref{eq:phsys}. A formal characterization of these operators has been given in \cite{legorrec2005} for pH of generic order only in one geometrical dimensional. In Chapter \ref{ch:pfem} the operator $\mathcal{J}$ will be better characterize using an appropriate partition. By applying a general integration by parts formula, the operators $\mathcal{B_\partial,\, C_\partial}$ associated to $\mathcal{J}$ can be defined as well. The following examples clarifies this assertion for some known pHs.
 
-\subsection{Euler Bernoulli beam}\label{sec:beamEB}
-The Euler-Bernoulli beam model consists of one PDE, describing the vertical displacement along the beam length:
-\begin{equation}
-\rho A(x) \diffp[2]{w}{t}(x,t) + \displaystyle \diffp[2]{}{x} \left( EI(x) \diffp[2]{w}{x} \right) = 0, \quad x \in \Omega=\{0, L\},
-\end{equation}
-where ${w}(x,t)$ is the transverse displacement of the beam. The coefficients $\rho(x), A(x) E(x)$ and $I(x)$  are the mass density, cross section, Young's modulus of elasticity and the moment of inertia of a cross section. The energy variables are then chosen as follows:
-\begin{equation}\label{eq:alpha_EB}
-\alpha_{w}= \rho A(x) \diffp{w}{t}(x,t),  \quad \text{Linear Momentum},\quad
-\alpha_{\kappa} = \diffp[2]{w}{x}(x,t), \quad \text{Curvature}. \
-\end{equation}
 
-Those variables are collected in the vector $\bm{\alpha} = (\alpha_{w}, \, \alpha_{\kappa})^T $, so that the Hamiltonian can be written as a quadratic functional in the energy variables: 
-\begin{equation}
-H = \energy{\frac{1}{\rho A} \alpha_{w}^2 + EI \alpha_\kappa^2}
-\end{equation}
 
-The co-energy variables are found by computing the variational derivative of the Hamiltonian:
-\begin{equation}\label{eq:e_EB}
-\begin{aligned}
-e_{w} &:= \diffd{H}{\alpha_w} = \diffp{w}{t}(x,t) ,  &\quad \text{Vertical velocity}, \\
-e_{\kappa} &:= \diffd{H}{\alpha_{\kappa}} =EI(x) \diffp[2]{w}{x}(x,t),  &\quad \text{Flexural momentum}. \\
-\end{aligned}
-\end{equation}
-The underlying interconnection structure is then found to be:
-\begin{equation}
-\diffp{}{t}\begin{pmatrix}
-\alpha_w \\ \alpha_\kappa \\
-\end{pmatrix} = \begin{bmatrix}
-0 & -\partial_{xx} \\
-\partial_{xx} & 0 \\
-\end{bmatrix} \begin{pmatrix}
-e_w \\ e_\kappa \\
-\end{pmatrix}.
-\end{equation}
-
-The power flow gives access to the boundary variables:
-\begin{equation}
-\begin{aligned}
-\dot{H} &= \int_{\Omega} \left\{e_w \partial_t \alpha_w + e_\kappa \partial_t \alpha_\kappa \right\}  \d{\Omega}, \\
-&= \int_{\Omega} \left\{-e_w \partial_{xx}e_\kappa + e_\kappa \partial_{xx} e_w \right\} \d{\Omega}, \qquad \text{Integration by parts}, \\
-&= \int_{\partial\Omega}\{-e_w \partial_{x}e_\kappa + e_\kappa \partial_{x} e_w \} \d{s}= \inner[\partial\Omega]{-e_w}{\partial_{x}e_\kappa} + \inner[\partial\Omega]{e_\kappa}{\partial_{x}e_w}
-\end{aligned}
-\end{equation}
-Since the system is of differential order two, two pairing appears, giving rise to four combination of uniform boundary causality
-\begin{itemize}
-	\item {First case} ${u}_{\partial, 1} = e_w, \quad {u}_{\partial, 2} = \partial_x e_w, \quad {y}_{\partial, 1} = -\partial_{x}e_\kappa, \quad {y}_{\partial, 2} = e_\kappa$. \\
-	This imposes the vertical $e_w:= \partial_t w$ and angular velocity $\partial_x e_w:= \partial_{xt} w$ as boundary inputs. If the inputs are null a clamped boundary condition is obtained.
-	\item {Second case} ${u}_{\partial, 1} = e_w, \quad {u}_{\partial, 2} = e_\kappa, \quad {y}_{\partial, 1} = -\partial_{x}e_\kappa, \quad {y}_{\partial, 2} = \partial_x e_w$. \\
-	This imposes the vertical velocity and flexural momentum $e_\kappa:= EI \partial_{xx} w$ as boundary inputs.  Zero inputs lead to a simply supported condition is found.
-	\item {Third case} ${u}_{\partial, 1} = -\partial_{x}e_\kappa , \quad {u}_{\partial, 2} = e_\kappa, \quad {y}_{\partial, 1} = e_w, \quad {y}_{\partial, 2} = \partial_x e_w$. \\
-	This imposes the shear force $\partial_{x}e_\kappa:= \partial_{x}(EI \partial_{xx}w)$ and flexural momentum as boundary inputs. Null inputs correspond to a free condition.
-	\item {Fourth case} ${u}_{\partial, 1} = -\partial_{x}e_\kappa , \quad {u}_{\partial, 2} = \partial_{x}e_w, \quad {y}_{\partial, 1} = e_w, \quad {y}_{\partial, 2} = e_\kappa$. \\
-	This imposes the shear force and angular velocity as boundary inputs.
-\end{itemize} 
-
-\subsection{Wave equation}\label{sec:waveeq}
+\subsubsection{Wave equation}\label{sec:waveeq}
 
 Given an open bounded connected set $\Omega \subset \mathbb{R}^2$ with Lipschitz continuous boundary $\partial\Omega$, the propagation of sound in air can be described by the following model \cite{trenchant2018}
 \begin{equation}\label{eq:waveeq}
@@ -320,7 +347,62 @@ The boundary term $\inner[\partial\Omega]{e_p}{\bm{e}_v}$ pairs two power variab
 	This imposes the variable $\bm{e}_v \cdot\bm{n}:= \bm{v}\cdot \bm{n}$ as boundary input and corresponds to a Neumann condition.
 \end{itemize} 
 
-\subsection{2D shallow water equations}\label{sec:shallowwater}
+\subsubsection{Euler Bernoulli beam}\label{sec:beamEB}
+The Euler-Bernoulli beam model consists of one PDE, describing the vertical displacement along the beam length:
+\begin{equation}
+\rho A(x) \diffp[2]{w}{t}(x,t) + \displaystyle \diffp[2]{}{x} \left( EI(x) \diffp[2]{w}{x} \right) = 0, \quad x \in \Omega=\{0, L\},
+\end{equation}
+where ${w}(x,t)$ is the transverse displacement of the beam. The coefficients $\rho(x), A(x) E(x)$ and $I(x)$  are the mass density, cross section, Young's modulus of elasticity and the moment of inertia of a cross section. The energy variables are then chosen as follows:
+\begin{equation}\label{eq:alpha_EB}
+\alpha_{w}= \rho A(x) \diffp{w}{t}(x,t),  \quad \text{Linear Momentum},\quad
+\alpha_{\kappa} = \diffp[2]{w}{x}(x,t), \quad \text{Curvature}. \
+\end{equation}
+
+Those variables are collected in the vector $\bm{\alpha} = (\alpha_{w}, \, \alpha_{\kappa})^T $, so that the Hamiltonian can be written as a quadratic functional in the energy variables: 
+\begin{equation}
+H = \energy{\frac{1}{\rho A} \alpha_{w}^2 + EI \alpha_\kappa^2}
+\end{equation}
+
+The co-energy variables are found by computing the variational derivative of the Hamiltonian:
+\begin{equation}\label{eq:e_EB}
+\begin{aligned}
+e_{w} &:= \diffd{H}{\alpha_w} = \diffp{w}{t}(x,t) ,  &\quad \text{Vertical velocity}, \\
+e_{\kappa} &:= \diffd{H}{\alpha_{\kappa}} =EI(x) \diffp[2]{w}{x}(x,t),  &\quad \text{Flexural momentum}. \\
+\end{aligned}
+\end{equation}
+The underlying interconnection structure is then found to be:
+\begin{equation}
+\diffp{}{t}\begin{pmatrix}
+\alpha_w \\ \alpha_\kappa \\
+\end{pmatrix} = \begin{bmatrix}
+0 & -\partial_{xx} \\
+\partial_{xx} & 0 \\
+\end{bmatrix} \begin{pmatrix}
+e_w \\ e_\kappa \\
+\end{pmatrix}.
+\end{equation}
+
+The power flow gives access to the boundary variables:
+\begin{equation}
+\begin{aligned}
+\dot{H} &= \int_{\Omega} \left\{e_w \partial_t \alpha_w + e_\kappa \partial_t \alpha_\kappa \right\}  \d{\Omega}, \\
+&= \int_{\Omega} \left\{-e_w \partial_{xx}e_\kappa + e_\kappa \partial_{xx} e_w \right\} \d{\Omega}, \qquad \text{Integration by parts}, \\
+&= \int_{\partial\Omega}\{-e_w \partial_{x}e_\kappa + e_\kappa \partial_{x} e_w \} \d{s}= \inner[\partial\Omega]{-e_w}{\partial_{x}e_\kappa} + \inner[\partial\Omega]{e_\kappa}{\partial_{x}e_w}
+\end{aligned}
+\end{equation}
+Since the system is of differential order two, two pairing appears, giving rise to four combination of uniform boundary causality
+\begin{itemize}
+	\item {First case} ${u}_{\partial, 1} = e_w, \quad {u}_{\partial, 2} = \partial_x e_w, \quad {y}_{\partial, 1} = -\partial_{x}e_\kappa, \quad {y}_{\partial, 2} = e_\kappa$. \\
+	This imposes the vertical $e_w:= \partial_t w$ and angular velocity $\partial_x e_w:= \partial_{xt} w$ as boundary inputs. If the inputs are null a clamped boundary condition is obtained.
+	\item {Second case} ${u}_{\partial, 1} = e_w, \quad {u}_{\partial, 2} = e_\kappa, \quad {y}_{\partial, 1} = -\partial_{x}e_\kappa, \quad {y}_{\partial, 2} = \partial_x e_w$. \\
+	This imposes the vertical velocity and flexural momentum $e_\kappa:= EI \partial_{xx} w$ as boundary inputs.  Zero inputs lead to a simply supported condition is found.
+	\item {Third case} ${u}_{\partial, 1} = -\partial_{x}e_\kappa , \quad {u}_{\partial, 2} = e_\kappa, \quad {y}_{\partial, 1} = e_w, \quad {y}_{\partial, 2} = \partial_x e_w$. \\
+	This imposes the shear force $\partial_{x}e_\kappa:= \partial_{x}(EI \partial_{xx}w)$ and flexural momentum as boundary inputs. Null inputs correspond to a free condition.
+	\item {Fourth case} ${u}_{\partial, 1} = -\partial_{x}e_\kappa , \quad {u}_{\partial, 2} = \partial_{x}e_w, \quad {y}_{\partial, 1} = e_w, \quad {y}_{\partial, 2} = e_\kappa$. \\
+	This imposes the shear force and angular velocity as boundary inputs.
+\end{itemize} 
+
+\subsubsection{2D shallow water equations}\label{sec:shallowwater}
 This formulation may be found in \cite[Section 6.2.]{cardoso2016}. This model describes a thin fluid layer of constant density in hydrostatic balance, like the propagation of a tsunami wave far from shore. Consider an open bounded connected set $\Omega \subset \mathbb{R}^2$ and a constant bed profile. The mass conservation implies
 \begin{equation*}
 \diffp{h}{t} + \div(h\bm{v}) = 0,
