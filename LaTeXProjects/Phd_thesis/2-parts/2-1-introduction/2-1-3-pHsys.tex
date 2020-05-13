@@ -15,9 +15,9 @@ Finite dimensional port-Hamiltonian are characterized by geometrical structures 
 
 Consider a  finite dimensional space ${F}$ over the field $\mathbb{R}$ and ${E} \equiv {F}'$ its dual, i.e. the space of linear operator $\mathbf{e} : {F} \rightarrow \mathbb{R}$. The elements of $\mathit{F}$ are called flows, while the elements of ${E}$ are called efforts. Those are port variables and their combination gives the power flowing inside the system. The space ${B} = {F} \times {E}$ is called the bond space of power variables. Therefore the power is defined as  $\left\langle \mathbf{e}, \mathbf{f} \right\rangle = \bm{e}(\mathbf{f})$, where $\left\langle \mathbf{e} , \mathbf{f} \right\rangle$ is the dual product between $\mathbf{f}$ and $\mathbf{e}$.
 \begin{definition}[\cite{courant1990}, Def. 1.1.1]
-	Given the finite-dimensional space ${F}$ and its dual ${E}$ with respect to the inner product $\left\langle \cdot , \cdot \right\rangle : {F} \times {E} \rightarrow \mathbb{R}$, consider the symmetric bilinear form:
+	Given the finite-dimensional space ${F}$ and its dual ${E}$ with respect to the inner product $\left\langle \cdot , \cdot \right\rangle_{E \times F} : {F} \times {E} \rightarrow \mathbb{R}$, consider the symmetric bilinear form:
 	\begin{equation}
-	\bilprod{(\mathbf{f}_1, \mathbf{e}_1)}{(\mathbf{f}_2, \mathbf{e}_2)} := \inner{\mathbf{e}_1}{\mathbf{f}_2} +  \inner{\mathbf{e}_2}{\mathbf{f}_1}, \where \mathbf{f}_i, \mathbf{e}_i \in {B}, \; i = 1, 2
+	\bilprod{(\mathbf{f}_1, \mathbf{e}_1)}{(\mathbf{f}_2, \mathbf{e}_2)} := \inner[E \times F]{\mathbf{e}_1}{\mathbf{f}_2} +  \inner[E \times F]{\mathbf{e}_2}{\mathbf{f}_1}, \where \mathbf{f}_i, \mathbf{e}_i \in {B}, \; i = 1, 2
 	\end{equation}
 	
 	A Dirac structure on ${B} := {F} \times {E}$ is a subspace ${D} \subset {B}$, which is maximally isotropic under $\left\langle \left\langle \cdot, \cdot \right\rangle \right\rangle$.	Equivalently, a Dirac structure on ${B} := {F} \times {E}$ is a subspace ${D} \subset {B}$ 	which equals its orthogonal complement with respect to $\left\langle \left\langle \cdot, \cdot \right\rangle \right\rangle: {D} ={D}^\perp$.
@@ -44,7 +44,7 @@ It is now possible to make the connection between Dirac structures and pH system
 \mathbf{y} &= \mathbf{B}(\mathbf{x})^\top \nabla H(\mathbf{x}),
 \end{cases}
 \end{equation}
-where $ H(\mathbf{x}) : X \rightarrow \mathbb{R} $, the Hamiltonian, is a real-valued function bounded from below. Such a system is called port-Hamiltonian, as it arises from the Hamiltonian modelling of a physical system and it interacts with the environment through the input $\mathbf{u}$, included in the formulation. The connection with the concept of Dirac structure is achieved by considering the following port behavior:
+where $ H(\mathbf{x}) : X \subset \bbR^n \rightarrow \mathbb{R} $, the Hamiltonian, is a real-valued function bounded from below. Such a system is called port-Hamiltonian, as it arises from the Hamiltonian modelling of a physical system and it interacts with the environment through the input $\mathbf{u}$, included in the formulation. The connection with the concept of Dirac structure is achieved by considering the following port behavior:
 \begin{equation}
 \begin{aligned}
 \mathbf{f}_s &= \dot{\mathbf{x}}, \qquad 
@@ -60,12 +60,12 @@ System \ref{eq:finitePH} is a pH system in canonical form. Recently, finite dime
 
 \section{Infinite dimensional setting}
 
-Infinite dimensional spaces appears whenever differential operators have to be considered. The fundamental notion of formal adjoint 
+Infinite dimensional spaces appears whenever differential operators have to be considered. In this section we first explain what defines a differential operator. Then Stokes-Dirac structures, characterized by a skew-symmetric differential operator, are introduced. Finally distributed port-Hamiltonian systems and their connection to the concept of Stokes-Dirac structure are illustrated.
 
 
-\subsection{Differential operators}
+\subsection{Linear differential operators}
 
-Let $\Omega$ denote a compact subset of $\mathbb{R}^d$ representing the spatial domain of the distributed parameter system. Consider two function space $F_1, F_2$ over the fields $\bbA, \; \bbB$ defined on $\Omega \subset \mathbb{R}^d$ and a map $\mathcal{L}$ relating the two
+Let $\Omega$ denote a compact subset of $\mathbb{R}^d$ representing the spatial domain of the distributed parameter system. Consider two function space $F_1, F_2$ over the sets $\bbA, \; \bbB$ defined on $\Omega \subset \mathbb{R}^d$ and a map $\mathcal{L}$ relating the two
 \begin{equation}
 	\begin{aligned}
 	\mathcal{L}: F_1(\Omega, \bbA) &\longrightarrow F_2(\Omega, \bbB), \\
@@ -73,16 +73,16 @@ Let $\Omega$ denote a compact subset of $\mathbb{R}^d$ representing the spatial 
 	\end{aligned}
 \end{equation}
 
-Fields $\mathbb{A}, \mathbb{B}$ denote can either  scalars $\bbR$, vectors $\bbR^d$,  tensors $\bbR^{d \times d}$ or a Cartesian product of those. Given $\bm{u} \in F_1, \;  \bm{v} \in F_2$ The map $\mathcal{L}$ is a  differential operator if it can be represented by a linear combination of the derivate of $\bm{u}$
+Sets $\mathbb{A}, \mathbb{B}$ denote can either  scalars $\bbR$, vectors $\bbR^d$,  tensors $\bbR^{d \times d}$ or a Cartesian product of those. Given $\bm{u} \in F_1, \;  \bm{v} \in F_2$ The map $\mathcal{L}$ is a linear differential operator if it can be represented by a linear combination of derivatives of $\bm{u}$
 \begin{equation}
 \bm{v} = \mathcal{L} \bm{u} \iff \bm{v} := \sum_{|\alpha|=0}^n  \mathcal{P}_{\alpha} \partial^{\alpha} \bm{u},
 \end{equation}
-where $\alpha := (\alpha_1, \dots , \alpha_n)$ is a multi-index of order $|\alpha| := \sum_{i=1}^n \alpha_i$ and $\partial^{\alpha} := \partial_{x_1}^{\alpha_1} \dots \partial_{x_d}^{\alpha_d}$ is a differential operator of order $|\alpha|$ resulting from a combination of spatial derivatives. $\mathcal{P}_\alpha: \bbA \rightarrow \bbB$ is a constant algebraic operators from field $\bbA$ to $\bbB$. 
+where $\alpha := (\alpha_1, \dots , \alpha_d)$ is a multi-index of order $|\alpha| := \sum_{i=1}^d \alpha_i$ and $\partial^{\alpha} := \partial_{x_1}^{\alpha_1} \dots \partial_{x_d}^{\alpha_d}$ is a differential operator of order $|\alpha|$ resulting from a combination of spatial derivatives. $\mathcal{P}_\alpha: \bbA \rightarrow \bbB$ is a constant algebraic operators from set $\bbA$ to $\bbB$. 
 
 \begin{example}[Divergence operator in $\mathbb{R}^d$]
-	Given $\bm{u} \in C^\infty(\Omega, \bbR^d), \; v \in C^\infty(\Omega, \bbR)$, where $C^\infty(\Omega, \bbR), \; C^\infty(\Omega, \bbR^d)$ denotes the set of smooth scalar function defined on $\Omega$, the divergence operator in Cartesian coordinate is expressed as
+	Given $\bm{u} \in C^\infty(\Omega, \bbR^d), \; v \in C^\infty(\Omega)$, where $C^\infty(\Omega, \bbR^d), \; C^\infty(\Omega)$ denotes the set of smooth vector- and scalar-valued function defined on $\Omega$, the divergence operator in Cartesian coordinate is expressed as
 	\begin{equation}
-	v = \div \bm{u} = \sum_{i = 1}^d \bm{e}_i^\top \partial_{x_i} \bm{u},
+	v = \div \bm{u} = \sum_{i = 1}^d \bm{e}_i \cdot \partial_{x_i} \bm{u},
 	\end{equation}
 	where $\bm{e}_i$ is the i$-th$ element of the canonical basis in $\bbR^d$. 
 \end{example}
@@ -90,20 +90,19 @@ where $\alpha := (\alpha_1, \dots , \alpha_n)$ is a multi-index of order $|\alph
 The differential operators employed in this thesis are reported in Appendix \ref{app:math}. \\
 
 
-In this work a very important notion related to a differential operator is the one of formal adjoint.  Consider the spaces of square integrable functions in domain $\Omega$ over the fields $\bbA, \; \bbB$ and denoted by $L^2(\Omega, \bbA), \; L^2(\Omega, \bbB)$. Their inner product are denoted by $\inner[L^2(\Omega, \bbA)]{\cdot}{\cdot}, \inner[L^2(\Omega, \bbB)]{\cdot}{\cdot}$ For scalars $(a,b) \in L^2(\Omega)$, vectors $(\bm{a}, \bm{b})\in L^2(\Omega, \mathbb{R}^d)$ and tensors  $(\bm{A}, \bm{B}) \in L^2(\Omega,\mathbb{R}^{d\times d})$ the $L^2$ inner product is given by 
+In this work a very important notion related to a differential operator is the one of formal adjoint.  Consider the spaces of square integrable functions in domain $\Omega$ over the sets $\bbA, \; \bbB$ and denoted by $L^2(\Omega, \bbA), \; L^2(\Omega, \bbB)$. Their inner product are denoted by $\inner[L^2(\Omega, \bbA)]{\cdot}{\cdot}, \inner[L^2(\Omega, \bbB)]{\cdot}{\cdot}$ For scalars $(a,b) \in L^2(\Omega)$, vectors $(\bm{a}, \bm{b})\in L^2(\Omega, \mathbb{R}^d)$ and tensors  $(\bm{A}, \bm{B}) \in L^2(\Omega,\mathbb{R}^{d\times d})$ the $L^2$ inner product is given by 
 \begin{equation}
 \inner[L^2(\Omega)]{a}{b} = \int_{\Omega} a b \d\Omega, \qquad \inner[L^2(\Omega, \mathbb{R}^d)]{\bm{a}}{\bm{b}} = \int_{\Omega} \bm{a} \cdot \bm{b} \d\Omega, \qquad \inner[L^2(\Omega, \mathbb{R}^{d \times d})]{\bm{A}}{\bm{B}} = \int_{\Omega} \bm{A} \cddot \bm{B} \d\Omega.
 \end{equation} 
-The notation $\bm{A}\cddot \bm{B} = \sum_{i, j} A_{ij} B_{ij}$ denotes the tensor contraction. We can now state the definition of formal adjoint 
+The notation $\bm{A}\cddot \bm{B} = \sum_{i, j} A_{ij} B_{ij}$ denotes the tensor contraction. We can now state the definition of formal adjoint.
 
-\begin{definition}
-Let $\mathcal{L}= L^2(\Omega, \mathbb{A}) \rightarrow L^2(\Omega, \mathbb{B})$ be a differential operator and  $\bm{u}_1 \in C_0^\infty(\Omega, \bbA), \; \bm{u}_2(\Omega, \bbB)$ be smooth variables with compact support on $\Omega$. 
-The formal adjoint of the differential operator $\mathcal{L}$, denoted by $\mathcal{L}^*= L^2(\Omega, \mathbb{B}) \rightarrow L^2(\Omega, \mathbb{A})$, is defined by the relation
+\begin{definition}[Formal Adjoint]
+Let $\mathcal{L}= L^2(\Omega, \bbA) \rightarrow L^2(\Omega, \bbB)$ be a differential operator and  $\bm{u} \in C_0^\infty(\Omega, \bbA), \; \bm{v}(\Omega, \bbB)$ be smooth variables with compact support on $\Omega$. The formal adjoint of the differential operator $\mathcal{L}$, denoted by $\mathcal{L}^*= L^2(\Omega, \bbB) \rightarrow L^2(\Omega, \bbA)$, is defined by the relation
 \begin{equation}
-\inner[L^2(\Omega, \bbB)]{\mathcal{L}\bm{u}_1}{\bm{u}_2} = \inner[L^2(\Omega, \bbA)]{\bm{u}_1}{\mathcal{L}^*\bm{u}_2}, \qquad \bm{u}_1 \in C_0^\infty(\Omega, \bbA), \; \bm{u}_2 \in C_0^\infty(\Omega, \bbB), 
+\inner[L^2(\Omega, \bbB)]{\mathcal{L}\bm{u}}{\bm{v}} = \inner[L^2(\Omega, \bbA)]{\bm{u}}{\mathcal{L}^*\bm{v}}.
 \end{equation}{}
 \end{definition}
-This definition represent an extension to generic fields $\bbA, \; \bbB$ of Def. 5.80 in \cite{rogers2004pde} (reported in Appendix \ref{app:math}). 
+This definition represent an extension to generic sets $\bbA, \; \bbB$ of Def. 5.80 in \cite{rogers2004pde} (reported in Appendix \ref{app:math}). 
 
 \begin{remark}[Differences between adjoint and formal adjoint]
 	The definition of formal adjoint is such that the integration by parts formula is respected. Contrarily to the adjoint of an operator, the formal adjoint definition does not regard the actual domain of the operator nor the boundary conditions. For example, the differential operators $\div,\, \grad$ are unbounded in the ${L}^2$ topology. Whenever unbounded operators are considered, it is important to define their domain. To avoid the need of specifying domains, the notion of formal adjoint is used. The formal adjoint respects the integration by parts formula and is defined only for sufficiently smooth functions with compact support. In this sense the formal adjoint of $\div$  is $-\grad$, since for smooth functions with compact support, it holds
@@ -114,19 +113,118 @@ This definition represent an extension to generic fields $\bbA, \; \bbB$ of Def.
 	for $\bm{y} \in C_0^\infty(\Omega, \mathbb{R}^{d}), \; {x} \in C_0^\infty(\Omega)$ (I.B.P. stands for integration by parts). The definition of the domain of the operators, that requires the knowledge of the boundary conditions, has not been specified. 
 \end{remark}
 
-To define 
+For pHs formally skew-adjoint operators (or simply skew-symmetric) plays a fundamental role.
 
-\begin{definition}
+\begin{definition}[Formally skew-adjoint operator]
 	\label{def:skewoper}
-	Let $W = C^{\infty}(\Omega, \mathbb{R}^{q})$ be the space of vector-valued smooth functions and $\mathcal{J}: W \rightarrow W$ a constant matrix differential operator. Then, $\mathcal{J}$ is formally skew-adjoint (or skew-symmetric) if and only if $\mathcal{J} = -\mathcal{J}^*$. This corresponds to the algebraic condition on $q \times q$ square matrices
+	Let $\mathcal{J}: C^{\infty}(\Omega, \mathbb{F}) \rightarrow C^{\infty}(\Omega, \mathbb{F})$ be a linear differential operator. Notice that the set $\mathbb{F}$ in the domain and co-domain is the same. Then, $\mathcal{J}$ is formally skew-adjoint (or skew-symmetric) if and only if $\mathcal{J} = -\mathcal{J}^*$. \\
+	
+	If functions with compact support are considered, i.e. $\bm{u}_1, \bm{u}_2 \in  C^{\infty}_0(\Omega, \mathbb{F})$ a formally skew-adjoint operators is characterized by the relation 
 	\begin{equation}
-	\bm{P}_{\alpha} = (-1)^{|\alpha| + 1} \bm{P}_{\alpha}^\top, \quad \forall \alpha.
-	\end{equation}
+	\inner[L^2(\Omega, \bbB)]{\mathcal{J}\bm{u}_1}{\bm{u}_2} + \inner[L^2(\Omega, \bbA)]{\bm{u}_1}{\mathcal{J}\bm{u}_2} = 0.
+	\end{equation}{}
 \end{definition}
 
+\subsection{Constant Stokes-Dirac structures}
+
+Constant Stokes-Dirac structures are the infinite-dimensional generalization of constant Dirac structures (i.e. Dirac structures for which the matrices $\mathbf{J}, \; \mathbf{B}$ in \eqref{eq:finitePH} are constant). Stokes-Dirac structure are characterized by the fact that they they are equal their orthogonal complement with respect to a bilinear product. So we recall the definition of orthogonal companion for the case of smooth functions.
+
+\begin{definition}[Orthogonal complement]
+Let $\Omega \subset \mathbb{R}^d, \; d \in \{1,2,3\}$ be an open connected set and $C^\infty(\partial\Omega, \bbR^m)$ the space of smooth functions over its boundary, consider the space 
+\begin{equation}\label{eq:Bset}
+B = C^\infty(\Omega, \bbF) \times C^\infty(\partial\Omega, \bbR^m) \times C^\infty(\Omega, \bbF) \times C^\infty(\partial\Omega, \bbR^m)
+\end{equation} 
+and the bilinear pairing defined by
+\begin{equation}\label{eq:bilprod}
+\begin{aligned}
+\bilprod{\cdot}{\cdot}: B \times B &\longrightarrow \bbR, \\
+(\bm{a}, \; \bm{a}_\partial, \; \bm{b}, \; \bm{b}_\partial) \times (\bm{c}, \; \bm{c}_\partial, \; \bm{d}, \; \bm{d}_\partial) &\longrightarrow 
+\begin{aligned}
+&\inner[L^2(\Omega, \mathbb{F})]{\bm{a}}{\bm{d}} + \inner[L^2(\Omega, \mathbb{F})]{\bm{b}}{\bm{c}} + \\
+&\inner[L^2(\partial\Omega, \bbR^m)]{\bm{a}_\partial}{\bm{d}_\partial} +\inner[L^2(\partial\Omega, \bbR^m)]{\bm{b}_\partial}{\bm{c}_\partial}.
+\end{aligned}
+\end{aligned}
+\end{equation}
+Given a linear subspace $W \subset B$, its orthogonal complement of $W$ is the set
+\begin{equation}\label{eq:orthocom}
+W^\perp = \{\bm{v} \in B \vert \bilprod{\bm{v}}{\bm{w}} = 0, \;  \forall \bm{w} \in W\}
+\end{equation}
+\end{definition} 
+
+A Stokes-Dirac structure is a subset that equals its orthogonal complement with respect to the bilinear product \eqref{eq:bilprod}.
+\begin{definition}[Stokes-Dirac structure]
+	The subset $D \subset B$, with $B$ defined in \eqref{eq:Bset} is a Stokes-Dirac structure iff 
+	\begin{equation}
+	D = D^\perp,
+	\end{equation}
+	where the orthogonal complement has been defined in Eq. \eqref{eq:orthocom}
+\end{definition} 
+
+For a subset to be a Stokes-Dirac structures a link between flow and effort variables must hold.  Consider $\bm{f} \in C^\infty(\Omega, \mathbb{F})$ and $\bm \in C^\infty(\Omega, \mathbb{F})$ and te following relation between the two
+
+\begin{equation}\label{eq:stdir}
+\bm{f} =\mathcal{J}\bm{e}, \qquad \mathcal{J}= -\mathcal{J}^*,
+\end{equation}
+where $\mathcal{J}$ is a formally skew-adjoint operator. A Stokes-Dirac structure requires the specification of boundary variables in order to express a general power  conservation  property  for \textit{open} physical  systems. We make therefore the following assumption, over the existence of appropriate boundary operators.
+
+\begin{assumption}[Existence of boundary operators]
+	\label{ass:bdoper}
+	Assume that exist two linear boundary operators $\mathcal{B}_\partial, \; \mathcal{C}_\partial$ such that for $\bm{u}_1, \; \bm{u}_2 \in C^\infty(\Omega, \mathbb{F})$ the following integration by parts formula holds
+	\begin{equation}\label{eq:intbypartsJ}
+	\inner[L^2(\Omega, \bbB)]{\mathcal{J}\bm{u}_1}{\bm{u}_2} + \inner[L^2(\Omega, \bbA)]{\bm{u}_1}{\mathcal{J}\bm{u}_2} = \inner[L^2(\partial\Omega, \bbR^m)]{\mathcal{B}_\partial \bm{u}_1}{\mathcal{C}_\partial \bm{u}_2} + \inner[L^2(\partial\Omega, \bbR^m)]{\mathcal{B}_\partial \bm{u}_2}{\mathcal{C}_\partial \bm{u}_1},
+	\end{equation}
+	where $L^2(\partial\Omega, \bbR^m)$ represent the space of square integrable functions over the boundary, endowed with the inner product
+	\begin{equation}
+	\inner[L^2(\partial\Omega, \mathbb{R}^m)]{\bm{a}_\partial}{\bm{b}_\partial} = \int_{\partial\Omega} \bm{a}_\partial \cdot \bm{b}_\partial \d{S}, \qquad \bm{a}_\partial, \bm{b}_\partial \in \mathbb{R}^m.
+	\end{equation}
+\end{assumption}
+
+This assumption is necessary to appropriately define a Stokes-Dirac structure. Only few particular cases, like the transport equation, do not verify it. We can now characterize generic Stokes-Dirac structure for smooth functions spaces.
+
+\begin{proposition}[Characterization of Stokes-Dirac structures]\label{prop:stdir}
+Let $B$ be defined as in Eq. \eqref{eq:Bset} and $\mathcal{J}$ be a formally skew adjoint operator verifying Assumption \ref{ass:bdoper}. The set
+\begin{equation}\label{eq:Ddirst}
+D_{\mathcal{J}} = \{(\bm{f}, \; \bm{f}_\partial, \; \bm{e}, \; \bm{e}_\partial) \in B\vert \bm{f} = \mathcal{J} \bm{e}, \; \bm{f}_\partial = \mathcal{B}_\partial \bm{e}, \; \bm{e}_\partial = -\mathcal{C}_\partial \bm{e}\} 
+\end{equation}
+is a Stokes-Dirac structure with respect to the bilinear pairing \eqref{eq:bilprod}.
+\begin{proof}
+A Stokes-Dirac is characterized by the fact that ${D}_{\mathcal{J}} = {D}_{\mathcal{J}}^\perp$. Then one has to show that ${D}_{\mathcal{J}} \subset {D}_{\mathcal{J}}^\perp$ and ${D}_{\mathcal{J}}^\perp \subset {D}_{\mathcal{J}}$. Following \cite{legorrec2005}, the proof is obtained following three steps. \\
+
+\textit{Step 1}. To show that ${D}_{\mathcal{J}} \subset {D}_{\mathcal{J}}^\perp$, take $(\bm{f}, \, \bm{f}_\partial, \, \bm{e}, \, \bm{e}_\partial) \in {D}_{\mathcal{J}}$. Then
+\begin{align*}
+\bilprod{(\bm{f}, \bm{f}_{\partial}, \bm{e}, \bm{e}_{\partial})}{(\bm{f}, \bm{f}_{\partial}, \bm{e}, \bm{e}_{\partial})} =& 2 \inner[L^2(\Omega, \bbF)]{\bm{e}}{\bm{f}} + 2 \inner[L^2(\partial\Omega, \bbR^m)]{\bm{e}_{\partial}}{\bm{f}_{\partial}}, \\
+=& 2 \inner[L^2(\Omega, \bbF)]{\bm{e}}{\mathcal{J}\bm{e}} + 2 \inner[L^2(\partial\Omega, \bbR^m)]{\bm{e}_{\partial}}{\bm{f}_{\partial}}, \\
+\stackrel{\text{Eq. \eqref{eq:intbypartsJ}}}{=}& 2 \inner[L^2(\partial\Omega, \bbR^m)]{\mathcal{B}_\partial \bm{e}}{\mathcal{C}_\partial \bm{e}} + 2 \inner[L^2(\partial\Omega, \bbR^m)]{\bm{e}_{\partial}}{\bm{f}_{\partial}}, \\
+\stackrel{\text{Eq. \eqref{eq:Ddirst}}}{=}&  2 \inner[L^2(\partial\Omega, \bbR^m)]{\mathcal{B}_\partial \bm{e}}{\mathcal{C}_\partial \bm{e}} - 2 \inner[L^2(\partial\Omega, \bbR^m)]{\mathcal{B}_\partial \bm{e}}{\mathcal{C}_\partial \bm{e}}, \\
+=& 0.
+\end{align*}
+This implies ${D}_{\mathcal{J}} \subset {D}_{\mathcal{J}}^\perp$.
+
+\textit{Step 2}. Take $(\bm{\phi}, \, \bm{\phi}_\partial, \, \bm{\epsilon}, \, \bm{\epsilon}_\partial) \in {D}_{\mathcal{J}}^\perp$ and $\bm{e}_0 \in C_0^\infty(\Omega, \bbF)$. This implies $\mathcal{B}_\partial \bm{e}_0 = (\bm{0},\, \bm{0})$ and $\mathcal{C}_\partial \bm{e}_0 = (\bm{0},\, \bm{0})$. Taking $(\mathcal{J}\bm{e}_0, \bm{0}, \bm{e}_0, \bm{0}) \in {D}_{\mathcal{J}}$ then 
+\begin{equation*}
+\bilprod{(\bm{\phi}, \bm{\phi}_\partial,  \bm{\epsilon}, \bm{\epsilon}_\partial)}{(\mathcal{J}\bm{e}_0, \bm{0}, \bm{e}_0, \bm{0})} = \inner[L^2(\Omega, \bbF)]{\bm{\epsilon}}{\mathcal{J}\bm{e}_0} + \inner[L^2(\Omega, \bbF)]{\bm{e}_0}{\bm{\phi}} = 0, \quad \forall \bm{e}_0 \in C_0^\infty(\Omega, \bbF).
+\end{equation*}
+It follows that $\bm{\epsilon} \in C_0^\infty(\Omega, \bbF)$ and $\bm{\phi}=\mathcal{J}\bm{\epsilon}$. \\
+
+\textit{Step 3}. Take $(\bm{\phi}, \, \bm{\phi}_\partial, \, \bm{\epsilon}, \, \bm{\epsilon}_\partial) \in {D}_{\mathcal{J}}^\perp$ and $(\bm{f}, \, \bm{f}_\partial, \, \bm{e}, \, \bm{e}_\partial) \in {D}_{\mathcal{J}}$. From step 2 and \eqref{eq:intbypartsJ}
+
+\begin{align*}
+0&= \inner[L^2(\Omega, \bbF)]{\mathcal{J}\bm{e}}{\bm{\epsilon}} +\inner[L^2(\Omega, \bbF)]{\bm{e}}{\mathcal{J}\bm{\epsilon}} + \inner[L^2(\partial\Omega, \bbR^m)]{\bm{e}_{\partial}}{\bm{\phi}_{\partial}} +  \inner[L^2(\partial\Omega, \bbR^m)]{\bm{\epsilon}_{\partial}}{\bm{f}_{\partial}}, \\
+&\stackrel{\text{Eq. \eqref{eq:intbypartsJ}}}{=} \inner[L^2(\partial\Omega, \bbR^m)]{\mathcal{B}_\partial \bm{e}}{\mathcal{C}_\partial \bm{\epsilon}} + \inner[L^2(\partial\Omega, \bbR^m)]{\mathcal{B}_\partial \bm{\epsilon}}{\mathcal{C}_\partial\bm{e}} + \inner[L^2(\partial\Omega, \bbR^m)]{\bm{e}_{\partial}}{\bm{\phi}_{\partial}} +  \inner[L^2(\partial\Omega, \bbR^m)]{\bm{\epsilon}_{\partial}}{\bm{f}_{\partial}}, \\
+&= \inner[L^2(\partial\Omega, \bbR^m)]{\mathcal{B}_\partial \bm{e}}{\mathcal{C}_\partial \bm{\epsilon}} + \inner[L^2(\partial\Omega, \bbR^m)]{\mathcal{B}_\partial \bm{\epsilon}}{\mathcal{C}_\partial\bm{e}} + \inner[L^2(\partial\Omega, \bbR^m)]{-\mathcal{C}_\partial \bm{e}}{\bm{\phi}_{\partial}} +  \inner[L^2(\partial\Omega, \bbR^m)]{\bm{\epsilon}_{\partial}}{\mathcal{B}_\partial\bm{e}}, \\
+&= \inner[L^2(\partial\Omega, \bbR^m)]{\mathcal{B}_\partial \bm{e}}{\mathcal{C}_\partial \bm{\epsilon} + \bm{\epsilon}_\partial} + \inner[L^2(\partial\Omega, \bbR^m)]{\mathcal{B}_\partial \bm{\epsilon} - \bm{\phi}_\partial}{\mathcal{C}_\partial\bm{e}}, \qquad \text{By linearity}.
+\end{align*}
+Given the fact that $\bm{e}$ is arbitrary then
+\begin{equation*}
+\bm{\phi}_{\partial} = \mathcal{B}_\partial \bm{\epsilon}, \qquad 
+\bm{\epsilon}_{\partial} = -\mathcal{C}_\partial\bm{\epsilon},
+\end{equation*}
+meaning that ${D}_{\mathcal{J}}^\perp \subset {D}_{\mathcal{J}}$. 
+\end{proof}
+\end{proposition}
+
+
 \begin{comment}
-
-
 \subsection{Constant matrix differential operators}
 
 Let $\Omega$ denote a compact subset of $\mathbb{R}^d$ representing the spatial domain of the distributed parameter system. Then, let ${U} = C^{\infty}(\Omega, \mathbb{R}^{q_u})$ and ${V}= C^{\infty}(\Omega, \mathbb{R}^{q_v})$ denote the sets of smooth functions from $\Omega$ to $\mathbb{R}^{q_u}$ and $\mathbb{R}^{q_v}$ respectively.
@@ -193,9 +291,9 @@ It is important to note that $\widetilde{\mathcal{A}}_{\mathcal{L}}$ is a consta
 	where $\widetilde{\mathcal{A}}_{\mathcal{J}}$ is a symmetric differential operator on $\partial\Omega$ depending on the differential operator~$\mathcal{J}$.
 \end{corollary}
 
-\end{comment}
 
 \subsection{Constant Stokes-Dirac structures}
+
  To have the most suitable definition of Stokes-Dirac structure for flexible systems, the approach adopted in \cite{macchelli2004modelling} is here recovered. \\
  
 Following \cite{macchelli2004modelling}, let ${F}$ denote the space of flows, i.e. the space of smooth functions from the compact set $\Omega \subset \mathbb{R}^d$ to $\mathbb{R}^q$. For simplicity assume that  the space of efforts is ${E} \equiv {F}$ (generally speaking these spaces are Hilbert spaces linked by duality, as in \cite{villegas2007}). Given $\bm{f} = (f_1, \dots, f_q) \in {F}$ and $\bm{e} = (e_1, \dots, e_q) \in {E}$. Let $\bm{z} = \mathcal{A}_\partial(\bm{e})$ denote the boundary terms, where $\mathcal{A}_\partial$ provides the restriction on $\partial\Omega$ of the effort variables $\bm{e}$ and of their spatial derivatives of proper order. The associated boundary space is ${Z} := \left\{ \bm{z} \vert \; \bm{z} = \mathcal{A}_{\partial}(\bm{e})  \right\}$. Then, it holds
@@ -228,33 +326,34 @@ This  relation expresses the  power  conservation property of the Stokes–Dirac
 	The constant Stokes-Dirac structure has been defined in case of smooth vector-valued functions for simplicity.  The definition is indeed more general and encompasses the case of more complex functional spaces, in particular the $L^2$ space of square integrable functions.  Linear elasticity for example is defined on a mixed function space of vector- and tensor-valued functions, cf. Sec \secref{sec:pHelas}.
 \end{remark}
 
+\end{comment}
+
 \subsection{Distributed port-Hamiltonian system}
 
-PHs as boundary control systems have been analyzed deeply in one geometrical dimension \cite{zwart2012,legorrec2005}. The complete characterization of pH in arbitrary dimension is still an open research field. Two notable exceptions \cite{zwart2015wave,skrepek2019wellposedness} provide partial answers to this problem. The first demonstrate the well-posedness of the linear wave equation in arbitrary geometrical dimensions. The second generalizes this result to treat the case of generic first order linear pHs in arbitrary geometrical dimensions. \\
 
-A distributed lossless port-Hamiltonian system is defined by a set of variables that describes the unknowns, by a formally skew-adjoint differential operator, an energy functional and a set of boundary inputs and corresponding conjugated outputs. Such a system is described by the following set of equations
+A distributed lossless port-Hamiltonian system is defined by a set of variables that describes the unknowns, by a formally skew-adjoint differential operator, an energy functional and a set of boundary inputs and corresponding conjugated outputs. Such a system is described by the following set of equations, defined on an open connected set $\Omega \subset \bbR^d$
 \begin{equation}\label{eq:phsys}
 \begin{aligned}
-\diffp{\bm{\alpha}}{t} &= \mathcal{J}\displaystyle \bm{e}, \vspace{3pt}\\
-\bm{e} &:= \displaystyle \diffd{H}{\bm{\alpha}}, \\
-\bm{u}_\partial &= \mathcal{B}_\partial  \displaystyle \bm{e}, \vspace{3pt}\\
-\bm{y}_\partial &= \mathcal{C}_\partial \displaystyle \bm{e}, \vspace{3pt}
+\partial_t {\bm{\alpha}} &= \mathcal{J} \, \delta_{\bm{\alpha}}{H}, \\
+\bm{u}_\partial &= \mathcal{B}_\partial  \, \delta_{\bm{\alpha}}{H}, \\
+\bm{y}_\partial &= \mathcal{C}_\partial \, \delta_{\bm{\alpha}}{H}, 
+\end{aligned} \qquad
+\begin{aligned}
+{\bm{\alpha}} &\in C^\infty(\Omega, \bbF),\\
+\bm{u}_\partial &\in \bbR^m, \\
+\bm{y}_\partial &\in \bbR^m. 
 \end{aligned}
 \end{equation}
-The unknowns $\bm{\alpha}$ are called energy variables in the port-Hamiltonian framework, the formally skew-adjoint operator $\mathcal{J}$ is named interconnection operator (see Def. \ref{def:skewOp} for a precise definition of formal skew adjointness). $\mathcal{B}_\partial, \mathcal{C}_\partial$ are boundary operators, that provide the boundary input $\bm{u}_\partial$ and output $\bm{y}_\partial$ \cite[Chapter 4]{tucsnak2009observation}. The variational derivative of the Hamiltonian defines the co-energy variables $\bm{e}$.
-
-\begin{remark}
-	It will become clear in this section that the effort variables of the Stokes-Dirac structure are indeed equivalent to the co-energy variables of the pH system. This justifies using the same notation for both.
-\end{remark}
+The unknowns $\bm{\alpha}$ are called energy variables in the port-Hamiltonian framework, the formally skew-adjoint operator $\mathcal{J}$ is named interconnection operator (see Def. \ref{def:skewoper} for a precise definition of formal skew adjointness). $\mathcal{B}_\partial, \mathcal{C}_\partial$ are boundary operators, that provide the boundary input $\bm{u}_\partial$ and output $\bm{y}_\partial$ \cite[Chapter 4]{tucsnak2009observation}. The functional $H(\bm{\alpha}): C^\infty(\Omega, \bbF) \rightarrow \bbR$ corresponds to the Hamiltonian functional and in all the examples considered in this thesis coincide with the total energy of the system. Notation $\delta_{\bm{\alpha}}{H}$ indicates the variational derivative of $H$.
 
 \begin{definition}[Variational derivative, Def. 4.1 in \cite{olver1993}]
-Consider a functional $H(\bm{\alpha})$
+Consider a functional $H(\bm{\alpha}): C^\infty(\Omega, \bbF) \rightarrow \bbR$
 \begin{equation*} 
 H(\bm{\alpha}) = \int_{\Omega} \mathcal{H}(\bm{\alpha}) \d{\Omega}.
 \end{equation*}
 Given a variation $\bm{\alpha} = \bar{\bm{\alpha}} + \eta \bm{\delta\alpha}$ the variational derivative $\diffd{H}{\bm{\alpha}}$ is defined as
 \begin{equation*}
-H(\bar{\bm{\alpha}} + \eta \bm{\delta\alpha}) = H(\bar{\bm{\alpha}}) + \eta \int_{\Omega} \diffd{H}{\bm{\alpha}} \cdot \bm{\delta\alpha} \d{\Omega} + O(\eta^2).
+H(\bar{\bm{\alpha}} + \eta \bm{\delta\alpha}) = H(\bar{\bm{\alpha}}) + \eta \inner[L^2(\Omega, \bbF)]{\delta_{\bm{\alpha}}{H}}{\bm{\delta\alpha}} + O(\eta^2).
 \end{equation*}
 \end{definition}
 \begin{remark}
@@ -264,29 +363,31 @@ If the integrand does not contain derivative of the argument $\bm{\alpha}$ then 
 \end{equation*}
 \end{remark}
 
+\begin{remark}[Co-energy variables]
+	The variational derivative of the Hamiltonian defines the co-energy variables $\bm{e}:=\delta_{\bm{\alpha}} H$. These are equivalent to the effort variables of the Stokes-Dirac structure as we will immediately show.
+\end{remark}
 
-Lossless port-Hamiltonian systems possess a peculiar property: the energy rate is given by the power due to the boundary ports $\bm{u}_\partial, \bm{y}_\partial$
+Suppose that operators $\mathcal{J}, \; \mathcal{B}_\partial, \;  \mathcal{C}_\partial$ in Eq. \ref{eq:phsys} verify Ass. \ref{ass:bdoper}. The connection between the concept of Stokes-Dirac structure and dpHs becomes clear if the following port behavior is considered
+\begin{equation}\label{eq:portbeh_inf}
+\begin{aligned}
+\bm{f} &= \partial_t \bm{\alpha}, \\
+\bm{f}_\partial &= \bm{u}_\partial, 
+\end{aligned} \qquad
+\begin{aligned}
+\bm{e} &= \delta_{\bm{\alpha}} H, \\
+\bm{e}_\partial &= -\bm{y}_\partial. 
+\end{aligned}
+\end{equation}
+By proposition \eqref{prop:stdir} System \eqref{eq:phsys} under the port behavior \eqref{eq:portbeh_inf} defines a Stokes-Dirac structure.  Since operators $\mathcal{J}, \; \mathcal{B}_\partial, \;  \mathcal{C}_\partial$ in Eq. \ref{eq:phsys} verify Ass. \ref{ass:bdoper}, System \eqref{eq:phsys} is lossless. The energy rate is in fact given by 
 \begin{equation}\label{eq:enrate}
 \begin{aligned}
-\dot{H} &= \int_{\Omega} \diffd{H}{\bm{\alpha}} \cdot \diffp{\bm{\alpha}}{t} \d{\Omega} \stackrel{\text{Stokes theorem}}{=} \int_{\partial \Omega} \bm{u}_\partial \cdot \bm{y}_\partial \d{S} \
+\dot{H} &= \inner[L^2(\Omega, \bbF)]{\delta_{\bm{\alpha}} H}{\partial_t \bm{\alpha}}, \\
+&\stackrel{Eq. \eqref{eq:intbypartsJ}}{=} \inner[L^2(\partial\Omega, \bbR^m)]{\mathcal{B}_\partial \delta_{\bm{\alpha}} H}{\mathcal{C}_\partial \delta_{\bm{\alpha}} H}, \\
+&= \inner[L^2(\partial\Omega, \bbR^m)]{\bm{u}_\partial}{\bm{y}_\partial}. \
 \end{aligned}
 \end{equation} 
-From the energy rate, the structural power balance is obtained
-\begin{equation}\label{eq:strpow}
--\int_{\Omega} \diffd{H}{\bm{\alpha}} \cdot \diffp{\bm{\alpha}}{t} \d{\Omega} + \int_{\partial \Omega} \bm{u}_\partial \cdot \bm{y}_\partial \d{S} = 0
-\end{equation}
 
-
-From \eqref{eq:enbalstr}, it is clear by identification that $\mathcal{A}_{\mathcal{J}}(\bm{z}, \bm{z}) = 2\,  \bm{u}_\partial \cdot \bm{y}_\partial$. This means that the boundary space can be split into boundary input and output
-\begin{equation*}
-{Z} := \left\{ \bm{z} \vert \; \bm{z} = \mathcal{A}_{\partial}(\bm{e}) = (\bm{u}_\partial, \, \bm{y}_\partial) \right\}
-\end{equation*}
-If the flow, effort and boundary variables are chosen to be
-\begin{equation}
-\bm{f}:= -\partial_t \bm{\alpha}, \quad \bm{e}:=\delta_{\bm\alpha} H, \quad \bm{z}:=(\bm{u}_\partial, \, \bm{y}_\partial), 
-\end{equation}
-
-then system \eqref{eq:phsys} defines a Stokes-Dirac structure by Proposition \ref{prop:StokesDirac}.  In this rather informal treatment of dpHs, no rigorous characterization whatsoever has been introduced for operators $\mathcal{J}, \, \mathcal{B_\partial,\, C_\partial}$ in system \eqref{eq:phsys}. A formal characterization of these operators has been given in \cite{legorrec2005} for pH of generic order only in one geometrical dimensional. In Chapter \ref{ch:pfem} the operator $\mathcal{J}$ will be better characterize using an appropriate partition. By applying a general integration by parts formula, the operators $\mathcal{B_\partial,\, C_\partial}$ associated to $\mathcal{J}$ can be defined as well. The following examples clarifies this assertion for some known pHs.
+No rigorous characterization has been given so far for operators $\mathcal{J}, \, \mathcal{B_\partial,\, C_\partial}$ in system \eqref{eq:phsys}. A formal characterization of these operators has been given in \cite{legorrec2005} for pH of generic order only in one geometrical dimensional. In Chapter \ref{ch:pfem} the operator $\mathcal{J}$ will be better characterize using an appropriate partition. By applying a general integration by parts formula, the operators $\mathcal{B_\partial,\, C_\partial}$ associated to $\mathcal{J}$ can be defined as well. The following examples clarifies this assertion for some known pHs.
 
 
 
@@ -299,7 +400,7 @@ Given an open bounded connected set $\Omega \subset \mathbb{R}^2$ with Lipschitz
 \mu_0 \partial_{t} \bm{v}(\bm{x}, t) &= -\grad p, \\
 \end{aligned}
 \end{equation}
-where the scalar fields $\chi_s, \, \mu_0$ are the constant adiabatic compressibility factor and the steady state mass density respectively. The scalar field and vector field $p \in \mathbb{R}, \, \bm{v} \in \mathbb{R}^2$ represents the variation of pressure and velocity from the steady state. The Hamiltonian (total energy) reads
+where the scalars $\chi_s, \, \mu_0$ are the constant adiabatic compressibility factor and the steady state mass density respectively. The scalar field $p \in \mathbb{R}$ and vector field $\bm{v} \in \mathbb{R}^2$ represents the variation of pressure and velocity from the steady state. The Hamiltonian (total energy) reads
 \begin{equation*}
 H = \frac{1}{2} \int_{\Omega} \left\{\chi_s p^2 + {\mu_0}\norm{\bm{v}}^2 \right\} \d\Omega.
 \end{equation*}
@@ -322,9 +423,9 @@ Equation \eqref{eq:waveeq} can be recast in port-Hamiltonian form
 \alpha_p \\
 \bm{\alpha}_v \\
 \end{pmatrix} = 
-\begin{bmatrix}
-0 & -\div \\
--\grad & \bm{0}
+-\begin{bmatrix}
+0 & \div \\
+\grad & \bm{0}
 \end{bmatrix}
 \begin{pmatrix}
 e_p \\
@@ -338,13 +439,31 @@ From the energy rate it is possible to identify the boundary variables.
  &= -\int_{\Omega} \div(e_p \, \bm{e}_v) \d\Omega, \qquad &\text{Stokes theorem}, \\
  &= -\int_{\partial \Omega} e_p \, \bm{e}_v\cdot\bm{n} \d{S} = -\inner[\partial\Omega]{e_p}{\bm{e}_v \cdot\bm{n}}.
 \end{align*}
-The boundary term $\inner[\partial\Omega]{e_p}{\bm{e}_v}$ pairs two power variables. One is taken as control input, the other plays the role of power-conjugated output. The assignment of these roles to the boundary power variables is referred to as causality of the boundary port \cite{kotyczka2018weak},\cite[Chapter~2]{kotyczka2019numerical}. Under uniform causality assumption, either $e_p$ or $\bm{e}_v$ can assume the role of (distributed) boundary input, but not both. This leads to two possible selections:
+The boundary term $\inner[\partial\Omega]{e_p}{\bm{e}_v\cdot\bm{n}}$ pairs two power variables. One is taken as control input, the other plays the role of power-conjugated output. The assignment of these roles to the boundary power variables is referred to as causality of the boundary port \cite{kotyczka2018weak},\cite[Chapter~2]{kotyczka2019numerical}. Under uniform causality assumption, either $e_p$ or $\bm{e}_v$ can assume the role of (distributed) boundary input, but not both. This leads to two possible selections:
 \begin{itemize}
 	\item {First case} ${u}_\partial = e_p, \quad {y}_\partial = \bm{e}_v \cdot\bm{n}$. \\
-	This imposes the variable $e_p:= p$ as boundary input and corresponds to a classical Dirichlet condition.
-	
+	This imposes the variable $e_p:= p$ as boundary input and corresponds to a classical Dirichlet condition. The boundary operator for this case are given by 
+	\[
+	\mathcal{B}_\partial \begin{pmatrix}
+	e_p \\
+	\bm{e}_v \\
+	\end{pmatrix} = e_p\vert_{\partial\Omega}, \qquad \mathcal{C}_\partial \begin{pmatrix}
+	e_p \\
+	\bm{e}_v \\
+	\end{pmatrix} = \bm{e}_v\cdot\bm{n}\vert_{\partial\Omega},
+	\]
+	corresponding to the standard trace and normal trace operators
 	\item {Second case} ${u}_\partial = \bm{e}_v \cdot\bm{n}, \quad {y}_\partial = e_p$. \\
-	This imposes the variable $\bm{e}_v \cdot\bm{n}:= \bm{v}\cdot \bm{n}$ as boundary input and corresponds to a Neumann condition.
+	This imposes the variable $\bm{e}_v \cdot\bm{n}:= \bm{v}\cdot \bm{n}$ as boundary input and corresponds to a Neumann condition. The boundary operators are therefore switched with respect to the previous case
+	\[
+	\mathcal{B}_\partial \begin{pmatrix}
+	e_p \\
+	\bm{e}_v \\
+	\end{pmatrix} = \bm{e}_v\cdot\bm{n}\vert_{\partial\Omega}e_p\vert_{\partial\Omega}, \qquad \mathcal{C}_\partial \begin{pmatrix}
+	e_p \\
+	\bm{e}_v \\
+	\end{pmatrix} = e_p\vert_{\partial\Omega}.
+	\]
 \end{itemize} 
 
 \subsubsection{Euler Bernoulli beam}\label{sec:beamEB}
@@ -403,7 +522,7 @@ Since the system is of differential order two, two pairing appears, giving rise 
 \end{itemize} 
 
 \subsubsection{2D shallow water equations}\label{sec:shallowwater}
-This formulation may be found in \cite[Section 6.2.]{cardoso2016}. This model describes a thin fluid layer of constant density in hydrostatic balance, like the propagation of a tsunami wave far from shore. Consider an open bounded connected set $\Omega \subset \mathbb{R}^2$ and a constant bed profile. The mass conservation implies
+This formulation may be found in \cite[Section 6.2]{cardoso2016}. This model describes a thin fluid layer of constant density in hydrostatic balance, like the propagation of a tsunami wave far from shore. Consider an open bounded connected set $\Omega \subset \mathbb{R}^2$ and a constant bed profile. The mass conservation implies
 \begin{equation*}
 \diffp{h}{t} + \div(h\bm{v}) = 0,
 \end{equation*}
@@ -488,4 +607,4 @@ Again two possible cases of uniform boundary causality arise:
 \end{itemize} 
 
 \section{Conclusion}
-In this chapter, the main mathematical tools needed to understand infinite-dimensional pHs were recalled. A general characterization of the underlying operators behind a boundary control pH system is still an open topic. We have recalled some results available in the literature. Unfortunately, these do not provide a perfectly coherent treatment of pH systems of generic order on multi-dimensional domains. In Chapter \ref{ch:pfem}, these operators are characterized, in connection to the discretization method developed.
+In this chapter, the main mathematical tools needed to understand infinite-dimensional pHs were recalled. A general characterization of the underlying operators behind a boundary control pH system is still an open topic.  In Chapter \ref{ch:pfem}, these operators are characterized, in connection to the discretization method developed.
