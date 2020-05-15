@@ -16,7 +16,7 @@ self = Mindlin_test
 
 #%% Problem definition
 ### Geometric rectangular domain
-x0, xL = 0, 1
+x0, xL = 0, 3
 y0, yL = 0, 1
 Mindlin_test.Set_Rectangular_Domain(x0, xL, y0, yL)
 
@@ -120,7 +120,7 @@ Mindlin_test.Set_Time_Setting(time_step=1e-6)
 
 #method = 'DAE:Assimulo'
 #method = 'DAE:RK4Augmented'
-method = 'DAE:SV2Augmented'
+method = 'DAE:SV_Augmented'
 
 #%%
 
