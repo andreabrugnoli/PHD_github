@@ -93,10 +93,10 @@ gau_Apw_0 = 'x[0]*x[1]' # 'rho * ampl * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]
 #gau_Aqw_0_1 = '-ampl * 2 * (x[0]-X0)/sX * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
 #gau_Aqw_0_2 = '-ampl * 2 * (x[0]-Y0)/sY * exp(- pow( (x[0]-X0)/sX, 2) - pow( (x[1]-Y0)/sY, 2) )'
 
-Mindlin_test.Set_Initial_Data(W_0='0', Th_0_1='0', Th_0_2='0',\
-                         Apw_0=gau_Apw_0, Apth1_0='0', Apth2_0='0',\
-                         Aqth11_0='0', Aqth12_0='0', Aqth22_0='0',\
-                         Aqw1_0='0', Aqw2_0='0',\
+Mindlin_test.Set_Initial_Data(W_0='0', Th1_0='0', Th2_0='0',\
+                         ew_0=gau_Apw_0, eth1_0='0', eth2_0='0',\
+                         Ekap11_0='0', Ekap12_0='0', Ekap22_0='0',\
+                         egam1_0='0', egam2_0='0',\
                          ampl=ampl, sX=sX, sY=sY, X0=X0, Y0=Y0, rho=Mindlin_test.rho)
 
 #Mindlin_test.Set_Initial_Data(Aq_0_1='0', Aq_0_2='0', Ap_0='0', W_0='0')

@@ -182,24 +182,24 @@ class Mindlin:
 
     ## Method.
     #  @param self The object pointer. 
-    def Set_Initial_Data(self, W_0=None, Th_0_1=None, Th_0_2=None,\
-                         Apw_0=None, Apth1_0=None, Apth2_0=None,\
-                         Aqth11_0=None, Aqth12_0=None, Aqth22_0=None,\
-                         Aqw1_0=None, Aqw2_0=None, **kwargs):
+    def Set_Initial_Data(self, W_0=None, Th1_0=None, Th2_0=None,\
+                         ew_0=None, eth1_0=None, eth2_0=None,\
+                         Ekap11_0=None, Ekap12_0=None, Ekap22_0=None,\
+                         egam1_0=None, egam2_0=None, **kwargs):
         """
         Set initial data on the FE spaces 
         """
         # Expressions
         
         self.W_0    = W_0
-        self.Th_0   = (Th_0_1, Th_0_2)
+        self.Th_0   = (Th1_0, Th2_0)
 
-        self.Apw_0  = Apw_0
-        self.Apth_0 = (Apth1_0, Apth2_0) 
+        self.Apw_0  = ew_0
+        self.Apth_0 = (eth1_0, eth2_0) 
 
-        self.Aqth_0 = (Aqth11_0, Aqth12_0, Aqth22_0)
+        self.Aqth_0 = (Ekap11_0, Ekap12_0, Ekap22_0)
         
-        self.Aqw_0  = (Aqw1_0, Aqw2_0)
+        self.Aqw_0  = (egam1_0, egam2_0)
         
         self.init_data = kwargs
 
@@ -1691,22 +1691,22 @@ class Mindlin:
             Sys        = Mass_solver.solve(self.JR)	    
             Sys_Ctrl_N = Mass_solver.solve(self.B_Next_sparse)
 	    
-        
-        BDMinvBDT = self.B_Dext_sparse.T @ Mass_solver.solve(self.B_Dext_sparse) 
+        BDMinvBDT = csc_matrix(self.B_Dext_sparse.T @ Mass_solver.solve(self.B_Dext_sparse))
         BDMinvBDT_solver = umfpack.UmfpackLU(BDMinvBDT)
         
-        if not self.memory_constrained:
-            prefix         = Mass_solver.solve(self.B_Dext_sparse)
-            Sys_Ctrl_D     = prefix @ BDMinvBDT_solver.solve(self.Mb_D)
-            Sys_Aug        = - prefix @ BDMinvBDT_solver.solve(self.B_Dext.T) @ Sys
+        if not self.memory_constrained:            
+            prefix         = Mass_solver.solve(self.B_Dext_sparse)                        
+            Sys_Ctrl_D     = prefix @ BDMinvBDT_solver.solve(self.Mb_D)            
+            Sys_Aug        = - prefix @ BDMinvBDT_solver.solve(self.B_Dext.T) @ Sys            
             Sys_Ctrl_N_Aug = - prefix @ BDMinvBDT_solver.solve(self.B_Dext.T) @ Sys_Ctrl_N
             Sys_AUG        = Sys + Sys_Aug
             Sys_Ctrl_N_AUG = Sys_Ctrl_N + Sys_Ctrl_N_Aug
         
+
         def dif_aug_func(t,y):
             if self.memory_constrained:
                 Sys_y_vec     =   Mass_solver.solve(self.my_mult(self.JR,y))
-                Sys_Aug_y_vec = - Mass_solver.solve(self.my_mult(self.B_Dext_sparse,BDMinvBDT_solver.solve(self.my_mult(self.B_Dext.T,Sys_y_vec))))
+                Sys_Aug_y_vec = - Mass_solver.solve(self.my_mult(self.B_Dext_sparse,BDMinvBDT_solver.solve(self.my_mult(self.B_Dext.T,Sys_y_vec))))                
                 Sys_D_vec     =   Mass_solver.solve(self.my_mult(self.B_Dext_sparse,BDMinvBDT_solver.solve(self.my_mult(self.Mb_D,self.Ub_D_dir(t)))))
                 Sys_N_vec     =   Mass_solver.solve(self.my_mult(self.B_Next_sparse,self.Ub_N(t)))
                 Sys_N_Aug_vec = - Mass_solver.solve(self.my_mult(self.B_Dext_sparse,BDMinvBDT_solver.solve(self.my_mult(self.B_Dext.T,Sys_N_vec))))
@@ -1766,7 +1766,7 @@ class Mindlin:
         Sys            = Mass_solver.solve(self.JR)
         Sys_Ctrl_N     = Mass_solver.solve(self.B_Next_sparse)
         
-        BDMinvBDT      = self.B_Dext_sparse.T @ Mass_solver.solve(self.B_Dext_sparse) 
+        BDMinvBDT      = csc_matrix(self.B_Dext_sparse.T @ Mass_solver.solve(self.B_Dext_sparse))
         BDMinvBDT_solver = umfpack.UmfpackLU(BDMinvBDT)
         
         prefix         = Mass_solver.solve(self.B_Dext_sparse)
