@@ -13,18 +13,24 @@ import scipy.linalg as la
 import scipy.sparse as spa
 import scipy.sparse.linalg as sp_la
 matplotlib.rcParams['text.usetex'] = True
-save_res = True
+save_res = False
 bc_input = 'SSSS_H2'
+
+
+name_FEp = 'Argyris'
+name_FEq = 'DG'
+
 
 def compute_err(n, r):
 
     h_mesh = 1/n
 
     E = Constant(136 * 10**9) # Pa
+    # E = Constant(1)  # Pa
     rho = Constant(5600)  # kg/m^3
     nu = Constant(0.3)
-    h = Constant(0.001)
-
+    # h = Constant(0.001)
+    h = Constant(0.1)
     Lx = 1
     Ly = 1
 
@@ -56,8 +62,7 @@ def compute_err(n, r):
 
     # Finite element defition
 
-    name_FEp = 'Argyris'
-    name_FEq = 'DG'
+
     deg_q = 3
 
     if name_FEp == 'Morley':
@@ -142,6 +147,12 @@ def compute_err(n, r):
     petsc_g = assemble(g_lmb, mat_type='aij').M.handle
     G_lmb = sp.sparse.csr_matrix(petsc_g.getValuesCSR()[::-1])
     rows, cols = spa.csr_matrix.nonzero(G_lmb)
+
+
+    # ind_col = np.argsort(cols)
+    # sorted_cols = np.sort(cols)
+    # sorted_rows = rows[ind_col]
+
     set_cols = np.array(list(set(cols)))
 
     n_lmb = len(set_cols)
@@ -149,6 +160,7 @@ def compute_err(n, r):
     for r, c in zip(rows, cols):
         ind_col = np.where(set_cols == c)[0]
         G[r, ind_col] = G_lmb[r, c]
+
 
     G_ortho = la.null_space(G.T).T
     G_ortho = spa.csr_matrix(G_ortho)
@@ -305,7 +317,7 @@ def compute_err(n, r):
     return v_err_last, v_err_max, v_err_quad, sig_err_last, sig_err_max, sig_err_quad
 
 
-n_h = 4
+n_h = 3
 n1_vec = np.array([2**(i+1) for i in range(n_h)])
 h1_vec = 1./n1_vec
 
@@ -462,8 +474,8 @@ print("")
 plt.figure()
 
 # plt.plot(np.log(h1_vec), np.log(v_r1_atF), ':o', label='HHJ 1')
-plt.plot(np.log(h1_vec), np.log(v_errInf_r1), '-.+', label='H^2 $L^\infty$')
-plt.plot(np.log(h1_vec), np.log(v_errQuad_r1), '--*', label='H^2 $L^2$')
+plt.plot(np.log(h1_vec), np.log(v_errInf_r1), '-.+', label=name_FEp + ' $L^\infty$')
+plt.plot(np.log(h1_vec), np.log(v_errQuad_r1), '--*', label=name_FEp + ' $L^2$')
 plt.plot(np.log(h1_vec), np.log(h1_vec), '-v', label=r'$h$')
 
 # # plt.plot(np.log(h1_vec), np.log(v_r2_atF), ':o', label='HHJ 2')
@@ -523,8 +535,8 @@ print("")
 plt.figure()
 
 # plt.plot(np.log(h1_vec), np.log(sig_r1_atF), ':o', label='HHJ 1')
-plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+', label='H^2 $L^\infty$')
-plt.plot(np.log(h1_vec), np.log(sig_errQuad_r1), '--*', label='H^2 $L^2$')
+plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+', label=name_FEq +' $L^\infty$')
+plt.plot(np.log(h1_vec), np.log(sig_errQuad_r1), '--*', label=name_FEq +' $L^2$')
 plt.plot(np.log(h1_vec), np.log(h1_vec), '-v', label=r'$h$')
 
 # # plt.plot(np.log(h1_vec), np.log(sig_r2_atF), ':o', label='HHJ 2')

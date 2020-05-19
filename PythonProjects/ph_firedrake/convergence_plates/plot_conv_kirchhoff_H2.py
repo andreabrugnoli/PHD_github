@@ -18,6 +18,7 @@ matplotlib.rcParams['text.usetex'] = True
 matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{amsmath}"]
 matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{bm}"]
 
+save_fig = False
 path_res = "./convergence_results_kirchhoff/"
 bc = "SSSS_H2_"
 
@@ -80,7 +81,9 @@ plt.ylabel(r'log(Error Velocity)')
 plt.title(r'Velocity Error vs Mesh size')
 plt.legend()
 path_fig = "/home/a.brugnoli/Plots/Python/Plots/Kirchhoff_plots/Convergence/firedrake/"
-plt.savefig(path_fig + bc + "_vel.eps", format="eps")
+
+if save_fig:
+    plt.savefig(path_fig + bc + "_vel.eps", format="eps")
 
 sig_r1int_atF = np.polyfit(np.log(h1_vec), np.log(sig_err_r1), 1)[0]
 sig_r1int_max = np.polyfit(np.log(h1_vec), np.log(sig_errInf_r1), 1)[0]
@@ -105,5 +108,6 @@ plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log(Error Stress)')
 plt.title(r'Stress Error vs Mesh size')
 plt.legend()
-plt.savefig(path_fig + bc + "_sigma.eps", format="eps")
+if save_fig:
+    plt.savefig(path_fig + bc + "_sigma.eps", format="eps")
 plt.show()

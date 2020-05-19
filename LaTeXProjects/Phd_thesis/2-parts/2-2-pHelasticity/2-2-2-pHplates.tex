@@ -4,7 +4,7 @@
 Ludwig Wittgenstein}}
 \minitoc
 
-\lettrine{\color{theme}{P}}lates are plane structural elements with a small thickness compared to the planar dimension. Thanks to this feature, it is not necessary to model plate structures using three-dimensional elasticity. Dimensional reduction strategies are employed to describe plate structures as two-dimensional problems. These strategies rely on an educated guess of the displacement field. For beams and plates this field is expressed in terms of unknown functions $\phi_i^j(x,y,t)$ that solely depends on the midplane coordinates $(x,y)$
+\lettrine{\color{theme}{P}}lates are plane structural elements with a small thickness compared to the planar dimensions. Thanks to this feature, it is not necessary to model plate structures using three-dimensional elasticity. Dimensional reduction strategies are employed to describe plate structures as two-dimensional problems. These strategies rely on an educated guess of the displacement field. For beams and plates this field is expressed in terms of unknown functions $\phi_i^j(x,y,t)$ that solely depends on the midplane coordinates $(x,y)$
 \begin{equation*}
 u_i(x,y,z,t) = \sum_{j=0}^m (z)^j \phi_i^j(x,y,t).
 \end{equation*}
@@ -14,7 +14,7 @@ where $u_{i}, \, i = \{x, y, z\}$ are the components of the displacement field. 
 	\item the Kirchhoff-Love model for thin plates.
 \end{itemize}
 
-In this chapter it its shown how to formulate first-order plate models as pHs. 
+In this chapter it is shown how to formulate first-order plate models as pHs. 
 
 \section{First order plate theory}
 As previously stated, first order theories assume a linear dependence on the vertical coordinate (cf. \cite{reddy2006theory})
@@ -30,7 +30,7 @@ u_y(x,y,z,t) &= u_y^0(x,y,t) -z \theta_y(x,y,t), \\
 u_z(x,y,z,t) &= u_z^0(x,y,t), 
 \end{aligned}
 \end{equation}
-where $u_i(x,y,t) = \phi_i^0(x,y,t), \, \theta_i(x,y,t) = -\phi_i^1(x,y,t)$. Assuming a linear elastic behavior, the 3D strain tensor for such a displacement field takes the form
+where $u_i^0(x,y,t) = \phi_i^0(x,y,t), \, \theta_i(x,y,t) = -\phi_i^1(x,y,t)$. Assuming a linear elastic behavior, the 3D strain tensors for such a displacement field takes the form
 \begin{align}
 \varepsilon_{\alpha \beta} &= \frac{1}{2} \left(\partial_\beta u_\alpha + \partial_\alpha u_\beta \right) - z \frac{1}{2} \left(\partial_\beta \theta_\alpha + \partial_\alpha \theta_\beta \right) = {\varepsilon}^0_{\alpha \beta} - z \kappa_{\alpha \beta}, \label{eq:eps_inplane}\\
 \varepsilon_{\alpha z} &= \frac{1}{2} \left(\partial_a u_z - \theta_\alpha \right) = \frac{1}{2} \gamma_\alpha,
@@ -94,11 +94,11 @@ where
 \begin{equation}\label{eq:Db}
 \bm{\mathcal{D}}_{b} = D_b \left[ (1-\nu) (\cdot) + \nu \Tr(\cdot) \bm{I}_{2\times 2} \right], \where D_b = \frac{E h^3}{12(1-\nu^2)}.
 \end{equation}
-The shear stress has to be integrated along the fibers as well. Given the excessive rigidity of the shear contribution, a correction factor $k=5/6$ \cite[Chapter 10]{reddy2006theory} is introduced 
+The shear stress has to be integrated along the fibers as well. Given the excessive rigidity of the shear contribution, a correction factor $K_{\text{sh}}=5/6$ \cite[Chapter 10]{reddy2006theory} is introduced 
 \begin{equation}\label{eq:shearstress}
-\bm{q} = \int_{-h/2}^{h/2} k \bm{\sigma_s} = kGh \bm{\gamma},
+\bm{q} = \int_{-h/2}^{h/2} K_{\text{sh}} \bm{\sigma_s} = K_{\text{sh}} Gh \bm{\gamma},
 \end{equation}
-where $\bm{\gamma}$ is defined in Eq. \eqref{eq:gamma}. The equations of motion can be obtained using Hamilton's principle. It consists in minimizing the total Lagrangian, given by $L = E_{\text{def}} - E_{\text{kin}}$, where $E_{\text{def}}, \, E_{\text{kin}}$ are the deformation  and kinetic energy
+where $\bm{\gamma}$ is defined in Eq. \eqref{eq:gamma}. The equations of motion can be obtained using Hamilton's principle. It consists in minimizing the total Lagrangian, given by $L = E_{\text{def}} - E_{\text{kin}}$, where $E_{\text{def}}$ and $E_{\text{kin}}$ are the deformation  and kinetic energies
 \begin{align}
 E_{\text{def}} &= \frac{1}{2} \int_{\Omega} \int_{-h/2}^{h/2} \bm{\Sigma} \cddot \bm{\varepsilon} \d{\Omega} \d{z} = \frac{1}{2} \int_{\Omega} \left\{\bm{M} \cddot \bm{\kappa} + \bm{q} \cdot \bm{\gamma} \right\} \d{\Omega}, \label{eq:defenMin}\\
 E_{\text{kin}} &= \frac{1}{2}  \int_{\Omega} \int_{-h/2}^{h/2} \rho \,  \norm{\partial_t \bm{u}}^2 \d{\Omega} \d{z} = \frac{1}{2} \int_{\Omega} \left\{\frac{\rho h^3}{12} \norm{\partial_t \bm{\theta}}^2 + \rho h (\partial_t u_z)^2  \right\} \d{\Omega}, \label{eq:kinenMin}
@@ -114,7 +114,7 @@ The final result is the following system of PDEs (for the detailed computations 
 \frac{\rho h^3}{12} \diffp[2]{\bm{\theta}}{t} &=\Div \bm{M} + \bm{q},
 \end{aligned}
 \end{equation}
-with $\bm{M}= \bm{\mathcal{D}}_b\,\Grad{\bm{\theta}}$ and $\bm{q}= kGh\,(\grad u_z - \bm{\theta})$. This PDE goes together with specified boundary conditions. Those will be detailed in \ref{sec:pHmin}.
+with $\bm{M}= \bm{\mathcal{D}}_b\,\Grad{\bm{\theta}}$ and $\bm{q}= K_{\text{sh}} Gh\,(\grad u_z - \bm{\theta})$. This PDE goes together with specified boundary conditions. Those will be detailed in \ref{sec:pHmin}.
 
 
 \subsection{Kirchhoff-Love model}
@@ -201,7 +201,7 @@ The energy is now a quadratic function of the energy variables
 \label{eq:Halpha_min}
 H = \frac{1}{2} \int_{\Omega}  \left\{ \frac{1}{\rho h}\alpha_w^2 + \frac{12}{\rho h^3} \norm{\bm{\alpha}_{\theta}}^2 + (\bm{\mathcal{D}}_b \bm{A}_\kappa) \cddot \bm{A}_\kappa + (\bm{\mathcal{D}}_s \bm{\alpha}_\gamma) \cdot  \bm{\alpha}_\gamma  \right\}  \d\Omega, 
 \end{equation}
-where $\bm{\mathcal{D}}_s:= Ghk \bm{I}_{2\times 2}$ and $G$ is the shear modulus $k$ the correction factor. The co-energy variables are found by computing the variational derivative of the Hamiltonian:
+where $\bm{\mathcal{D}}_s:= G h K_{\text{sh}} \bm{I}_{2\times 2}$, $G$ is the shear modulus  and $K_{\text{sh}}$ the correction factor. The co-energy variables are found by computing the variational derivative of the Hamiltonian:
 \begin{equation}\label{eq:e_Min}
 \begin{aligned}
 e_w &:= \diffd{H}{\alpha_w} = \diffp{w}{t},  \quad &\text{Linear velocity,} \\
@@ -241,7 +241,7 @@ e_w \\
 \bm{e}_{\gamma} \\
 \end{pmatrix}.
 \end{equation}
-The first two equations are equivalent to \eqref{eq:classMin}. The last two equations, like \eqref{eq:compderElas} for 3D elasticity, represent the fact the higher order derivatives commute.
+The first two equations are equivalent to \eqref{eq:classMin}. The last two equations, like \eqref{eq:compderElas} for 3D elasticity, represent the fact that the higher order derivatives commute.
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=0.7\textwidth]{part_2/cauchy_law.eps}
@@ -273,7 +273,7 @@ M_{nn} &:=  \bm{M} \cddot (\bm{n}\otimes{\bm{n}}) = \bm{E}_{\kappa} \cddot (\bm{
 \text{Torsional momentum} \quad M_{ns} &:= \bm{M} \cddot (\bm{s}\otimes{\bm{n}}) = \bm{E}_{\kappa} \cddot (\bm{s}\otimes{\bm{n}}),	
 \end{aligned},
 \end{equation}
-Vectors $\bm{n}$ and $\bm{s}$ designate the normal and tangential unit vectors to the boundary, as shown in Fig. \ref{fig:plate_ref}. Given two vectors $\bm{a} \in \mathbb{R}^n, \, \bm{a} \in \mathbb{R}^m$, the notation $\bm{a}\otimes{\bm{b}} = \bm{a} \bm{b}^\top \in \mathbb{R}^{n\times m}$ denotes the outer (or dyadic) product of two vectors.  The corresponding power conjugated variables~are
+Vectors $\bm{n}$ and $\bm{s}$ designate the normal and tangential unit vectors to the boundary, as shown in Fig. \ref{fig:plate_ref}. Given two vectors $\bm{a} \in \mathbb{R}^n, \, \bm{b} \in \mathbb{R}^m$, the notation $\bm{a}\otimes{\bm{b}} = \bm{a} \bm{b}^\top \in \mathbb{R}^{n\times m}$ denotes the outer (or dyadic) product of two vectors.  The corresponding power conjugated variables~are
 \begin{equation} 
 \label{eq:wtwnws}
 \begin{aligned}
@@ -358,7 +358,7 @@ e_w \\
 \end{pmatrix},
 \end{aligned}
 \end{equation}
-where $\gamma_{0}^{\Gamma_*}a = a\vert_{\Gamma_*}$ denotes the trace over the set $\Gamma_*$. Furthermore, notations $\gamma_{n}^{\Gamma_*}\bm{a} = \bm{a} \cdot \bm{n}\vert_{\Gamma_*}, \,  \gamma_{s}^{\Gamma_*}\bm{a}= \bm{a} \cdot \bm{s}\vert_{\Gamma_*}$ indicate the normal and tangential trace over the set $\Gamma_*$ respectively. Symbols $\gamma_{nn}^{\Gamma_*}, \gamma_{ns}^{\Gamma_*}$ denote the normal-normal trace and the normal-tangential trace of tensor-valued functions, $\gamma_{nn}^{\Gamma_*}\bm{A} = \bm{A} \cddot (\bm{n} \otimes \bm{n})\vert_{\Gamma_*}, \, \gamma_{ns}^{\Gamma_*}\bm{A} = \bm{A} \cddot (\bm{n} \otimes \bm{s})\vert_{\Gamma_*}$.
+where $\gamma_{0}^{\Gamma_*}a = a\vert_{\Gamma_*}$ denotes the trace over the set $\Gamma_*$. Furthermore, notations $\gamma_{n}^{\Gamma_*}\bm{a} = \bm{a} \cdot \bm{n}\vert_{\Gamma_*}, \,  \gamma_{s}^{\Gamma_*}\bm{a}= \bm{a} \cdot \bm{s}\vert_{\Gamma_*}$ indicate respectively the normal and tangential traces over the set $\Gamma_*$. Symbols $\gamma_{nn}^{\Gamma_*}, \gamma_{ns}^{\Gamma_*}$ denote the normal-normal trace and the normal-tangential trace of tensor-valued functions and $\gamma_{nn}^{\Gamma_*}\bm{A} = \bm{A} \cddot (\bm{n} \otimes \bm{n})\vert_{\Gamma_*}, \, \gamma_{ns}^{\Gamma_*}\bm{A} = \bm{A} \cddot (\bm{n} \otimes \bm{s})\vert_{\Gamma_*}$.
 
 \begin{remark}
 	It can be observed that the interconnection structure given by $\mathcal{J}$ in \eqref{eq:phsysMin} mimics that of the Timoshenko beam \cite[Chapter 7]{zwart2012}.
@@ -366,7 +366,7 @@ where $\gamma_{0}^{\Gamma_*}a = a\vert_{\Gamma_*}$ denotes the trace over the se
 
 \begin{conjecture}[Stokes-Dirac structure for the Mindlin plate]\label{conj:stdirMin}
 Consider $\mathbb{V} = \mathbb{R}^2, \, \mathbb{S} = \mathbb{R}^{2\times 2}_{\text{sym}}$ and
-let $H^{1}(\Omega)$ be the space of functions with gradient in $L^2(\Omega, \mathbb{V})$ and $H^{\div}  (\Omega, \mathbb{V})$ the space of vector-valued functions with divergence in $L^2(\Omega)$. Furthermore, $H^{1}(\Omega, \mathbb{V})$ is the space of vectors with symmetric gradient in $L^2(\Omega, \mathbb{S})$ and $H^{\Div}  (\Omega, \mathbb{S})$ denote the space of symmetric tensors with divergence in $L^2(\Omega, \mathbb{V})$. Consider the definitions 
+let $H^{1}(\Omega)$ be the space of functions with gradient in $L^2(\Omega, \mathbb{V})$ and $H^{\div}  (\Omega, \mathbb{V})$ the space of vector-valued functions with divergence in $L^2(\Omega)$. Furthermore, $H^{1}(\Omega, \mathbb{V})$ is the space of vectors with symmetric gradient in $L^2(\Omega, \mathbb{S})$ and $H^{\Div}  (\Omega, \mathbb{S})$ denotes the space of symmetric tensors with divergence in $L^2(\Omega, \mathbb{V})$. Consider the definitions 
 \begin{align*}
 H &:= H^{1}(\Omega) \times H^{\Grad}(\Omega, \mathbb{V}) \times H^{\Div}(\Omega, \mathbb{S}) \times H^{\div}(\Omega, \mathbb{V}), \\
 F &:= L^2(\Omega) \times L^2(\Omega, \mathbb{V}) \times L^2(\Omega, \mathbb{S}) \times L^2(\Omega, \mathbb{V}), \\
@@ -429,11 +429,11 @@ e_w \\
 \bm{E}_{\kappa} \\
 \end{pmatrix}.
 \end{equation}
-The first equation is equivalent to \eqref{eq:classKir}. The last equation represent the fact the higher order derivatives commute
+The first equation is equivalent to \eqref{eq:classKir}. The last equation represents the fact that higher order derivatives commute
 \begin{align*}
 \partial_t \bm{A}_{\kappa} &= \Grad\grad e_w, \\
 \partial_t \bm{\kappa} &= \Grad\grad \partial_t w, \\
-\partial_t \Grad\grad w  &= \Grad\grad \partial_t w, \\
+\partial_t \Grad\grad w  &= \Grad\grad \partial_t w. \\
 \end{align*}
 The last equation holds for $w \in C^3(\Omega)$.
 \begin{theorem}
@@ -463,7 +463,7 @@ The last equation holds for $w \in C^3(\Omega)$.
 		\end{equation*}
 		
 		
-		The function have to belong to the operator domain, so for instance $f \in {C}_0^2(\Omega) \in \Dom({\div\Div}^*)$ the space of twice differentiable scalar functions with compact support and $\bm{\Psi}$ can be chosen in the set ${C}_{0}^2(\Omega, \mathbb{S}) \in \Dom(\div\Div)$, the space of twice differentiable symmetric tensors with compact support on $\Omega$. A classical result is the fact that the adjoint of the vector divergence is $\mathrm{div}^* = -\mathrm{grad}$ as stated in \cite{zwart2015wave}. By theorem \ref{th:adjDiv}, it holds $\mathrm{Div}^* = -\mathrm{Grad}$. Considering that $\div\Div = \div \circ \Div$ is the composition of two different operators and that the adjoint of a composed operator is the adjoint of each operator in reverse order, i.e. $(B \circ C)^* = C^* \circ B^*$, then it can be stated
+		The function has to belong to the operator domain, so for instance $f \in {C}_0^2(\Omega) \in \Dom({\div\Div}^*)$ the space of twice differentiable scalar functions with compact support and $\bm{\Psi}$ can be chosen in the set ${C}_{0}^2(\Omega, \mathbb{S}) \in \Dom(\div\Div)$, the space of twice differentiable symmetric tensors with compact support on $\Omega$. A classical result is the fact that the adjoint of the vector divergence is $\mathrm{div}^* = -\mathrm{grad}$ as stated in \cite{zwart2015wave}. By theorem \ref{th:adjDiv}, it holds $\mathrm{Div}^* = -\mathrm{Grad}$. Considering that $\div\Div = \div \circ \Div$ is the composition of two different operators and that the adjoint of a composed operator is the adjoint of each operator in reverse order, i.e. $(B \circ C)^* = C^* \circ B^*$, then it can be stated
 		\begin{equation*}
 		(\div \circ \Div)^* = {\Div}^* \circ {\div}^* = \Grad \circ \grad.
 		\end{equation*}  
@@ -644,8 +644,8 @@ where $i$ indicates the layer under consideration. The matrix $ \bm{\mathcal{D}}
 
 \begin{equation}
 	\begin{aligned}
-	\bm{N} := \int_{-h/2}^{h/2} \bm{\Sigma}_{2D} \d{z}, \qquad 
-	\bm{M} := \int_{-h/2}^{h/2} - z \bm{\Sigma}_{2D} \d{z}. \
+	\bm{N} := \int_{-h/2}^{h/2} \bm{\Sigma}_{2D}^i \d{z}, \qquad 
+	\bm{M} := \int_{-h/2}^{h/2} - z \bm{\Sigma}_{2D}^i \d{z}. \
 	\end{aligned}
 \end{equation}
 Since the stress are discontinuous due to the change of constitutive law along the thickness, the integration has to be performed lamina-wise. Once the computations are carried out, it is found
@@ -690,7 +690,7 @@ By using Hamilton's principle the equations of motion are retrieved (see \cite[C
 	\end{aligned}	
 \end{equation}
 where $\bm{N}, \, \bm{M}, \, \bm{q}$ are defined in Eqs. \eqref{eq:NM_laminated}, \eqref{eq:q_laminated}. 
-To get a port-Hamiltonian formulation, the following energy variable are chosen
+To get a port-Hamiltonian formulation, the following energy variables are chosen
 \begin{equation}
 	\begin{aligned}
 	\bm{\alpha}_u &= \rho h \diffp{\bm{u}^0}{t}, \\
@@ -727,7 +727,7 @@ e_w &:= \diffd{H}{\alpha_w} = \diffp{u_z}{t}, \\
 \bm{e}_{\gamma} &:= \diffd{H}{\bm\alpha_\gamma} = \bm{q}  \\
 \end{aligned}
 \end{equation}
-The final pH formulation is found as usual considering the dynamics \eqref{eq:sysLamMin} and fact that higher derivatives commute
+The final pH formulation is found as usual considering the dynamics \eqref{eq:sysLamMin} and Clairaut's theorem
 \begin{equation}\label{eq:phsysLamMin}
 \diffp{}{t}
 \begin{pmatrix}
@@ -802,7 +802,7 @@ where $\bm{\kappa}$ is defined in Eq. \eqref{eq:kappa}. Furthermore, as stated i
 \end{aligned}	
 \end{equation}
 where $\bm{N}, \, \bm{M}$ are defined in Eqs. \eqref{eq:NM_laminated}. 
-To get a port-Hamiltonian formulation, the following energy variable are chosen
+To get a port-Hamiltonian formulation, the following energy variables are chosen
 \begin{equation}
 \begin{aligned}
 \bm{\alpha}_u &= \rho h \diffp{\bm{u}^0}{t}, \\
@@ -831,7 +831,7 @@ e_w &:= \diffd{H}{\alpha_w} = \diffp{u_z}{t}, \\
 \bm{E}_{\kappa} &:= \diffd{H}{\bm{A}_{\kappa}} = \bm{M}, \\
 \end{aligned} 
 \end{equation}
-The final pH formulation is found as usual considering the dynamics \eqref{eq:sysLamKir} and fact that higher derivatives commute
+The final pH formulation is found to be
 \begin{equation}\label{eq:phsysLamKir}
 \diffp{}{t}
 \begin{pmatrix}
@@ -882,4 +882,4 @@ The energy rate provides the appropriate boundary conditions from which one can 
 
 In this chapter, a pH formulation for the most commonly used plate models has been detailed. Many open questions remain. In particular, how to generalize the results to shell problems, for which the domain is a surface embedded in the three dimensional space (a manifold). Computations get more involved in this case since the usage of differential geometry concepts is unavoidable. These models are important since they are widely used in the aerospace industry and ubiquitous in nature. \\
 
-The reformulation of plate models using the language of differential geometry is another open research topic. Indeed, while for the Mindlin plate it should be possible to use vector-valued forms to obtain an equivalent system, for the Kirchhoff plate the task appears more involved. An interesting reference that can provide some ideas in this direction is \cite{yao2011modeling}. 
+The reformulation of plate models using the language of differential geometry is another open research topic. Indeed, while for the Mindlin plate it should be possible to use vector-valued forms to obtain an equivalent system, for the Kirchhoff plate higher order Stokes-Dirac structure are needed \cite{nishida2004}. 

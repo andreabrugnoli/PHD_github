@@ -19,8 +19,8 @@ matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
 matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{bm}"]
 
 path_res = "./convergence_results_kirchhoff/"
-bc_input = "SSSS_HHJ_"
-save_res = True
+bc_input = "CSSF_HHJ_"
+save_res = False
 
 coeff = 0.90
 h1_vec = np.load(path_res + bc_input + "h1.npy")

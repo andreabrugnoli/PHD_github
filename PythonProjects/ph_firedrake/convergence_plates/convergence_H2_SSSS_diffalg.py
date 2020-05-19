@@ -13,8 +13,11 @@ import scipy.linalg as la
 import scipy.sparse as spa
 import scipy.sparse.linalg as sp_la
 matplotlib.rcParams['text.usetex'] = True
-save_res = True
-bc_input = 'SSSS_H2'
+save_res = False
+bc_input = 'SSSS_H2_diffalg'
+
+name_FEp = 'Argyris'
+name_FEq = 'DG'
 
 def compute_err(n):
 
@@ -56,8 +59,7 @@ def compute_err(n):
 
     # Finite element defition
 
-    name_FEp = 'Argyris'
-    name_FEq = 'DG'
+
     deg_q = 3
 
     if name_FEp == 'Morley':
@@ -303,7 +305,7 @@ def compute_err(n):
     return v_err_last, v_err_max, v_err_quad, sig_err_last, sig_err_max, sig_err_quad
 
 
-n_h = 6
+n_h = 3
 n1_vec = np.array([2**(i+1) for i in range(n_h)])
 h1_vec = 1./n1_vec
 
@@ -366,7 +368,7 @@ print("")
 plt.figure()
 
 # plt.plot(np.log(h1_vec), np.log(v_r1_atF), ':o', label='H2')
-plt.plot(np.log(h1_vec), np.log(v_errInf_r1), '-.+', label='H2 $L^\infty$')
+plt.plot(np.log(h1_vec), np.log(v_errInf_r1), '-.+', label=name_FEp + ' $L^\infty$')
 # plt.plot(np.log(h1_vec), np.log(v_errQuad_r1), '--*', label='H2 $L^2$')
 plt.plot(np.log(h1_vec), np.log(h1_vec), '-v', label=r'$h$')
 
@@ -393,7 +395,7 @@ print("")
 plt.figure()
 
 # plt.plot(np.log(h1_vec), np.log(sig_r1_atF), ':o', label='H2')
-plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+', label='H2 $L^\infty$')
+plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+', label=name_FEq + ' $L^\infty$')
 # plt.plot(np.log(h1_vec), np.log(sig_errQuad_r1), '--*', label='H2 $L^2$')
 plt.plot(np.log(h1_vec), np.log(h1_vec), '-v', label=r'$h$')
 

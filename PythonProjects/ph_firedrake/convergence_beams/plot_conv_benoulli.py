@@ -19,8 +19,8 @@ matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
 matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{bm}"]
 
 path_res = "./convergence_results_bernoulli/"
-bc_input = "SS_grgr_"
-save_res = False
+bc_input = "SS_divDiv_"
+save_res = True
 
 coeff = 1
 h1_vec = np.load(path_res + bc_input + "h1.npy")

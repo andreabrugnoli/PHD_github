@@ -11,7 +11,7 @@ import petsc4py
 
 matplotlib.rcParams['text.usetex'] = True
 save_res = True
-bc_input = 'SS_grgr'
+bc_input = 'SS_CGCG'
 
 
 def compute_err(n, r):
