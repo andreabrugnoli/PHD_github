@@ -220,7 +220,7 @@ e_w &:= \diffd{H}{\alpha_w} = \diffp{w}{t},  \quad &\text{Linear velocity,} \\
 \end{proposition}
 
 Once the variables are concatenated together, the pH system is expressed as follows
-\begin{equation}
+\begin{equation}\label{eq:pHdyn_Min}
 \diffp{}{t}
 \begin{pmatrix}
 \alpha_w \\
@@ -273,7 +273,8 @@ M_{nn} &:=  \bm{M} \cddot (\bm{n}\otimes{\bm{n}}) = \bm{E}_{\kappa} \cddot (\bm{
 \text{Torsional momentum} \quad M_{ns} &:= \bm{M} \cddot (\bm{s}\otimes{\bm{n}}) = \bm{E}_{\kappa} \cddot (\bm{s}\otimes{\bm{n}}),	
 \end{aligned},
 \end{equation}
-Vectors $\bm{n}$ and $\bm{s}$ designate the normal and tangential unit vectors to the boundary, as shown in Fig. \ref{fig:plate_ref}. Given two vectors $\bm{a} \in \mathbb{R}^n, \, \bm{b} \in \mathbb{R}^m$, the notation $\bm{a}\otimes{\bm{b}} = \bm{a} \bm{b}^\top \in \mathbb{R}^{n\times m}$ denotes the outer (or dyadic) product of two vectors.  The corresponding power conjugated variables~are
+Given two vectors $\bm{a} \in \mathbb{R}^n, \, \bm{b} \in \mathbb{R}^m$, the notation $\bm{a}\otimes{\bm{b}} = \bm{a} \bm{b}^\top \in \mathbb{R}^{n\times m}$ denotes the outer (or dyadic) product of two vectors.
+Vectors $\bm{n}$ and $\bm{s}$ designate the normal and tangential unit vectors to the boundary, as shown in Fig. \ref{fig:plate_ref}.  The corresponding power conjugated variables~are
 \begin{equation} 
 \label{eq:wtwnws}
 \begin{aligned}
@@ -414,7 +415,7 @@ e_w := \diffd{H}{\alpha_w} = \diffp{w}{t}, \quad \text{Linear velocity},  \qquad
 \end{equation}
 
 The port-Hamiltonian system is then written as
-\begin{equation}
+\begin{equation}\label{eq:pHdyn_Kir}
 \diffp{}{t}
 \begin{pmatrix}
 \alpha_w \\
@@ -640,14 +641,15 @@ Assume that each layer is an anisotropic material under plane stress condition. 
 \begin{equation*}
 \bm{\Sigma}_{2D}^i = \bm{\mathcal{D}}_{2D}^i \bm{\varepsilon}_{2D}^i,
 \end{equation*}  
-where $i$ indicates the layer under consideration. The matrix $ \bm{\mathcal{D}}_{2D}^i$ depends on the properties of each material. To reduce the problem to bi-dimensional,  the stresses have to be integrated along the thickness. Differently from isotropic plate, for laminated anisotropic plates the membrane and bending behavior are coupled. To see this consider the membrane and bending resultant of the stress 
+where $i$ indicates the layer under consideration. The matrix $ \bm{\mathcal{D}}_{2D}^i$ depends on the properties of each material. To reduce the problem to bi-dimensional,  the stresses have to be integrated along the thickness. Consider the membrane and bending resultant of the stress 
 
 \begin{equation}
 	\begin{aligned}
-	\bm{N} := \int_{-h/2}^{h/2} \bm{\Sigma}_{2D}^i \d{z}, \qquad 
-	\bm{M} := \int_{-h/2}^{h/2} - z \bm{\Sigma}_{2D}^i \d{z}. \
+	\bm{N} := \sum_{i=1}^{n_{\text{layer}}}\int_{z_i}^{z_{i+1}} \bm{\Sigma}_{2D}^i \d{z}, \qquad 
+	\bm{M} := \sum_{i=1}^{n_{\text{layer}}}\int_{z_i}^{z_{i+1}} - z \bm{\Sigma}_{2D}^i \d{z}. \
 	\end{aligned}
 \end{equation}
+where $n_{\text{layer}}$ is the number of layers and $z_i$ represents the height of the $i^{\text{th}}$ layer (see Fig. \ref{fig:laminated_plate})
 Since the stress are discontinuous due to the change of constitutive law along the thickness, the integration has to be performed lamina-wise. Once the computations are carried out, it is found
 \begin{equation}\label{eq:NM_laminated}
 \begin{pmatrix}
@@ -665,7 +667,7 @@ where
 \begin{equation}
 	\bm{\mathcal{D}}_{m} = \sum_{i = 1}^{n_{\text{layer}}} \bm{\mathcal{D}}_{2D}^i (z_{i+1}-z_{i}), \quad \bm{\mathcal{D}}_{c} = -\frac{1}{2}\sum_{i = 1}^{n_{\text{layer}}} \bm{\mathcal{D}}_{2D}^i (z_{i+1}^2-z_{i}^2), \quad \bm{\mathcal{D}}_{b} = \frac{1}{3} \sum_{i = 1}^{n_{\text{layer}}} \bm{\mathcal{D}}_{2D}^i (z_{i+1}^3-z_{i}^3),
 \end{equation}
-and $n_{\text{layer}}$ is the number of layers and $z_i$ represents the height of the $i^{\text{th}}$ layer (see Fig. \ref{fig:laminated_plate}). The coupling term $\bm{\mathcal{D}}_{c}$ disappears if a symmetric configuration is considered. For the shear contribution it is obtained
+Differently from isotropic plate, for laminated anisotropic plates the membrane and bending behavior are coupled. The coupling term $\bm{\mathcal{D}}_{c}$ disappears if a symmetric configuration is considered. For the shear contribution it is obtained
 \begin{equation}\label{eq:q_laminated}
 	\bm{q} := \int_{-h/2}^{h/2} \bm{\sigma}_{s} \d{z} = \bm{\mathcal{D}}_s \bm{\gamma}, \where \bm{\gamma}= \grad u_z - \bm{\theta}.
 \end{equation} 

@@ -26,11 +26,14 @@ def compute_err(n, r):
     h_mesh = 1/n
 
     E = Constant(136 * 10**9) # Pa
-    # E = Constant(1)  # Pa
+    h = Constant(0.001)
+
     rho = Constant(5600)  # kg/m^3
     nu = Constant(0.3)
-    # h = Constant(0.001)
-    h = Constant(0.1)
+
+    # E = Constant(1)  # Pa
+    # h = Constant(0.1)
+
     Lx = 1
     Ly = 1
 

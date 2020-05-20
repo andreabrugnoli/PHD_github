@@ -13,7 +13,7 @@ import scipy.linalg as la
 import scipy.sparse as spa
 import scipy.sparse.linalg as sp_la
 matplotlib.rcParams['text.usetex'] = True
-save_res = False
+save_res = True
 bc_input = 'CSSF_H2'
 
 def compute_constants():
@@ -47,21 +47,29 @@ def compute_err(n, r):
 
     h_mesh = 1/n
 
-    # rho = Constant(5600)  # kg/m^3
-    # h = Constant(0.001)
-    rho = Constant(1)  # kg/m^3
-    h = Constant(1)
+    h = Constant(0.001)
+    rho = Constant(5600)  # kg/m^3
+
+    E = Constant(136 * 10 ** 9)  # Pa
+    nu = Constant(0.3)
+    # rho = Constant(1)  # kg/m^3
+    # h = Constant(1)
     Lx = 2
     Ly = 2
 
-    # D = Constant(E * h ** 3 / (1 - nu ** 2) / 12)
-    # fl_rot = Constant(12 / (E * h ** 3))
+    D = Constant(E * h ** 3 / (1 - nu ** 2) / 12)
+    fl_rot = Constant(12 / (E * h ** 3))
     # Useful Matrices
 
     # Operators and functions
     def gradSym(u):
         return 0.5 * (nabla_grad(u) + nabla_grad(u).T)
         # return sym(nabla_grad(u))
+
+    def bending_mom(kappa):
+        # momenta = D * ((1 - nu) * kappa + nu * Identity(2) * tr(kappa))
+        momenta = kappa
+        return momenta
 
     def bending_curv(momenta):
         # kappa = fl_rot * ((1+nu)*momenta - nu * Identity(2) * tr(momenta))
@@ -77,7 +85,7 @@ def compute_err(n, r):
 
     # The unit square mesh is divided in :math:`N\times N` quadrilaterals::
 
-    mesh = RectangleMesh(n, n, Lx, Lx, quadrilateral=False)
+    mesh = RectangleMesh(n, n, Lx, Ly, quadrilateral=False)
 
     # Domain, Subdomains, Boundary, Suboundaries
 
@@ -243,7 +251,8 @@ def compute_err(n, r):
     kappa_ex = as_tensor([[wdyn_xx, wdyn_xy],
                           [wdyn_xy, wdyn_yy]])
 
-    sigma_ex = kappa_ex
+    sigma_ex = bending_mom(kappa_ex)
+
 
     # dtt_w = -beta ** 2 * wst * sin(beta * t_)
     # dtt_w1 = -beta ** 2 * wst * sin(beta * t_1)
