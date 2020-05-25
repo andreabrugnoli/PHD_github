@@ -7,7 +7,7 @@
 
 In this first part of this chapter, pH plate problems are discretized using mixed finite elements. This means that the divergence operator explicitly appears in the weak formulation.   In this second part the discretization is of dual-mixed type \cite{arnold1990intro}, meaning that the gradient operator comes out in the weak formulation. \\
 
-Homogeneous boundary conditions will be always considered. This can be enforced weakly or strongly depending on the specific formulation under analysis.
+Homogeneous boundary conditions will be always considered. This are enforced weakly or strongly depending on the specific formulation under analysis.
 
 
 \section{Plate problems using known mixed finite elements}
@@ -50,11 +50,7 @@ Let ${X}$ be a Hilbert space, and $t_f$ a positive real number. We denote by $L^
 \]
 
 \subsection{Mindlin plate mixed discretization}
-We consider the weak formulation \eqref{eq:weak_min_div}, reported in Section \secref{sec:linearPfem}. For the subsequent numerical studies we will always consider clamped boundary conditions
-\begin{equation}
-e_w\vert_{\partial\Omega} = 0, \qquad \bm{e}_\theta\vert_{\partial\Omega}=0.
-\end{equation}
-These conditions are enforced weakly by eliminating the boundary terms.
+We consider the weak formulation \eqref{eq:weak_min_div}, reported in Section \secref{sec:linearPfem}. The boundary terms disappears since homogeneous boundary conditions apply. We present first a scheme that enforces the symmetry of the momenta tensor strongly and then a scheme in which the symmetry of the momenta tensor is imposed weakly.
 
 \subsubsection{Mindlin plate with strongly imposed symmetry}\label{sec:min_strong}
 The weak formulation with strongly imposed symmetry seeks 
@@ -63,10 +59,10 @@ $$\{e_w, \bm{e}_{\bm{\theta}}, \bm{E}_{\kappa}, \bm{e}_{\gamma}\} \in L^2(\Omega
 \begin{equation}
 \label{eq:weak_min_PH_strong}
 \begin{aligned}
-(v_w, \ \rho b \dot{e}_w) &= (v_w, \mathrm{div} \bm{e}_\gamma) + (v_w, f), \\ 
-(\bm{v}_\theta, \ \rho b^3/12  \dot{\bm{e}}_\theta) &= (\bm{v}_\theta, \mathrm{Div} \bm{E}_\kappa + \bm{e}_\gamma) + (\bm{v}_\theta, \bm{\tau}), \\  
-(\bm{V}_\kappa, \ \bm{\mathcal{C}}_{b} \dot{\bm{E}}_\kappa) &= -(\mathrm{Div} \bm{V}_\kappa,  \bm{e}_\theta), \\ 
-(\bm{v}_\gamma, \ C_s \dot{\bm{e}}_\gamma) &= -(\mathrm{div} \bm{v}_\gamma, e_w ) + (\bm{v}_\gamma, \bm{e}_{\theta}), \\ 
+\inner[L^2(\Omega)]{v_w}{\rho b \dot{e}_w} &= \inner[L^2(\Omega)]{v_w}{\div \bm{e}_\gamma} + (v_w, f), \\ 
+\inner[L^2(\Omega, \mathbb{V})]{\bm{v}_\theta}{I_\theta \dot{\bm{e}}_\theta} &= \inner[L^2(\Omega, \mathbb{V})]{\bm{v}_\theta}{\Div \bm{E}_\kappa + \bm{e}_\gamma} + \inner[L^2(\Omega, \mathbb{V})]{\bm{v}_\theta}{\bm{\tau}}, \\  
+\inner[L^2(\Omega, \mathbb{S})]{\bm{V}_\kappa}{\bm{\mathcal{C}}_{b} \dot{\bm{E}}_\kappa} &= -\inner[L^2(\Omega, \mathbb{S})]{\Div \bm{V}_\kappa}{\bm{e}_\theta}, \\ 
+\inner[L^2(\Omega, \mathbb{V})]{\bm{v}_\gamma}{C_s \dot{\bm{e}}_\gamma} &= -\inner[L^2(\Omega)]{\mathrm{div} \bm{v}_\gamma}{e_w} + \inner[L^2(\Omega, \mathbb{V})]{\bm{v}_\gamma}{\bm{e}_{\theta}}, \\ 
 \end{aligned} \qquad
 \begin{aligned}
 \forall\; v_w &\in L^2(\Omega), \\
@@ -76,7 +72,7 @@ $$\{e_w, \bm{e}_{\bm{\theta}}, \bm{E}_{\kappa}, \bm{e}_{\gamma}\} \in L^2(\Omega
 \end{aligned}
 \end{equation}
 
-Obtaining stable finite elements that embed the symmetry of the stress tensor for the elastodynamics problem has proven to be a difficult task \cite{arnold2002mixed}. The easiest construction is the one presented in \cite{becache2001elas}. This finite element solution can be implemented in {\sc{Firedrake}} \cite{rathgeber2017firedrake} thanks to the extruded mesh functionality \cite{mcrae2016}.  The main disadvantage is that this scheme requires the domain to be given by a union of rectangles, as the mesh elements have to be square. However, this allows constructing a simple element for the momenta tensor. The polynomial spaces for the discretization are
+The plate thickness is indicated by the $b$ symbol, to avoid confusion with the average mesh size indicated by $h$. Obtaining stable finite elements that embed the symmetry of the stress tensor for the elastodynamics problem has proven to be a difficult task \cite{arnold2002mixed}. The easiest construction is the one presented in \cite{becache2001elas}. This finite element solution can be implemented in {\sc{Firedrake}} \cite{rathgeber2017firedrake} thanks to the extruded mesh functionality \cite{mcrae2016}.  The main disadvantage is that this scheme requires the domain to be given by a union of rectangles, as the mesh elements have to be square. However, this allows constructing a simple element for the momenta tensor. The polynomial spaces for the discretization are
 \[
 N_{k} = \{p(x, y)| \; p(x, y) = \sum_{i\le k, j\le k} a_{ij} x^i y^j  \}.
 \]
@@ -84,13 +80,14 @@ Given a regular mesh $\mathcal{R}_h$ with square elements $Q$ the following spac
 \begin{equation}
 \label{eq:BTJ}
 \begin{aligned}
-L_h^{\text{BJT}} &= \{w_h \in L | \ \forall Q, \ w_h|_{Q} \in N_{k-1} \}, \\
-V_h^{\text{BJT}} &= \{\bm{\theta}_h \in V | \ \forall Q,\ \bm{\theta}_h|_{Q} \in (N_{k-1})^2 \}, \\
-S_h^{\text{BJT}} &= \{m_{12} \in H^1(\Omega)| \ \forall Q,\ m_{12}|_{Q} \in N_{k} \}  \\
-&\cup \{(m_{11}, m_{22}) \in D| \; \forall Q,\ (m_{11}, m_{22})|_{Q} \in N_{k} \}, \\
-D_h^{\text{BJT}} &= \{\bm{q}_h \in D | \ \forall Q,\ \bm{q}_h|_{Q} \in N_{k} \}, \\ 
+L_{h, \text{BJT}}^2(\Omega) &= \{w_h \in L^2(\Omega) | \ \forall Q, \ w_h|_{Q} \in N_{k-1} \}, \\
+L_{h, \text{BJT}}^2(\Omega, \mathbb{V}) &= \{\bm{\theta}_h \in L^2(\Omega, \mathbb{V}) | \ \forall Q,\ \bm{\theta}_h|_{Q} \in (N_{k-1})^2 \}, \\
+H_{h, \text{BJT}}^{\Div}(\Omega, \mathbb{S}) &= \{m_{12} \in H^1(\Omega)| \ \forall Q,\ m_{12}|_{Q} \in N_{k} \}  \\
+&\cup \{(m_{11}, m_{22}) \in H^{\div}(\Omega, \mathbb{V})| \; \forall Q,\ (m_{11}, m_{22})|_{Q} \in N_{k} \}, \\
+H_{h, \text{BJT}}^{\div}(\Omega, \mathbb{V}) &= \{\bm{q}_h \in H^{\div}(\Omega, \mathbb{V}) | \ \forall Q,\ \bm{q}_h|_{Q} \in N_{k} \}, \\ 
 \end{aligned}
 \end{equation}
+
 where BTJ stands for the initials of the authors in \cite{becache2000wave,becache2001elas}. Combining the results of both papers, the following error estimates are conjectured.
 \begin{conjecture}[Convergence rate for the BJT element]
 	Assuming a smooth solution to problem~\eqref{eq:weak_min_PH_strong}, the following error estimates hold 
@@ -109,40 +106,49 @@ where BTJ stands for the initials of the authors in \cite{becache2000wave,becach
 \end{conjecture}
 
 
-\subsection{Mindlin plate with weakly imposed symmetry}\label{sec:min_weak}
-To impose the symmetry of the momenta tensor weakly. we modify the third equation in \eqref{eq:weak_min_PH_strong}. Consider the equation without applying the integration by parts
+\subsubsection{Mindlin plate with weakly imposed symmetry}\label{sec:min_weak}
+To impose the symmetry of the momenta tensor weakly. we modify the third equation in \eqref{eq:weak_min_PH_strong}. The symmetric gradient can be rewritten as 
 \[
-(\bm{V}_\kappa, \ \mathcal{D}^{-1} \dot{\bm{E}}_\kappa) = (\bm{V}_\kappa, \mathrm{Grad}\ \bm{e}_\theta ). 
+\Grad\ \bm{\theta} = \grad \bm{\theta} - \mathrm{skw}(\grad \bm{\theta}),
 \]
-The symmetric gradient can be rewritten as 
+where $\mathrm{skw}(\bm{A})=(\bm{A} - \bm{A}^\top)/2$ is the skew-symmetric part of matrix $\bm{A}$. Consider the weak form of the third equation in \eqref{eq:weak_min_PH_strong} before applying the integration by parts
 \[
-\mathrm{Grad}\ \bm{\theta} = \mathrm{grad}\ \bm{\theta} - \mathrm{skw}(\mathrm{grad} \ \bm{\theta}),
-\]
-where $\mathrm{skw}(\bm{A})=(\bm{A} - \bm{A}^\top)/2$ is the skew-symmetric part of matrix $\bm{A}$. Introducing the new variable $\bm{E}_r = \mathrm{skw}(\mathrm{grad}\ \bm{\theta})$, then $\{\bm{e}_\theta, \bm{E}_\kappa, \bm{E}_r\} \in V\times M\times K$ satisfy (remind that $\bm{e}_\theta = \partial_t {\bm{\theta}}$)
+\inner[L^2(\Omega, \mathbb{M})]{\bm{V}_\kappa}{\bm{\mathcal{C}}_b \dot{\bm{E}}_\kappa} = \inner[L^2(\Omega, \mathbb{M})]{\bm{V}_\kappa}{\Grad \bm{e}_\theta}. 
+\] Introducing the new variable $\bm{E}_r = \mathrm{skw}(\mathrm{grad}\ \bm{\theta})$, then $\{\bm{e}_\theta, \bm{E}_\kappa, \bm{E}_r\} \in L^2(\Omega, \mathbb{V}) \times H^{\Div}(\Omega, \mathbb{M}) \times L^2(\Omega, \mathbb{K})$ satisfy (remind that $\bm{e}_\theta = \partial_t {\bm{\theta}}$)
 \begin{equation*}
 \begin{aligned}
-(\bm{V}_\kappa, \ \mathcal{D}^{-1} \dot{\bm{E}}_\kappa) &= (\bm{V}_\kappa, \mathrm{grad}\ \bm{e}_\theta) - (\bm{V}_\kappa, \ \dot{\bm{E}}_r), \\
-&= -(\mathrm{Div}\bm{V}_\kappa, \bm{e}_\theta) - (\bm{V}_\kappa, \ \dot{\bm{E}}_r).
+\inner[L^2(\Omega, \mathbb{M})]{\bm{V}_\kappa}{\bm{\mathcal{C}}_b \dot{\bm{E}}_\kappa} &= \inner[L^2(\Omega, \mathbb{M})]{\bm{V}_\kappa}{\grad \bm{e}_\theta} - \inner[L^2(\Omega, \mathbb{M})]{\bm{V}_\kappa}{\dot{\bm{E}}_r}, \\
+&= -\inner[L^2(\Omega, \mathbb{V})]{\Div\bm{V}_\kappa}{\bm{e}_\theta} - \inner[L^2(\Omega, \mathbb{M})]{\bm{V}_\kappa}{\dot{\bm{E}}_r}.
 \end{aligned}
 \end{equation*}
-The momenta tensor is weakly symmetric if $(\bm{V}_r, \ \bm{E}_{\kappa}) = 0$. The weak formulation then consists in finding 
-$$
-\{e_w, \bm{e}_{\bm{\theta}}, \bm{E}_{\kappa}, \bm{e}_{\gamma}, \bm{E}_{r}\} \in L^2(\Omega) \times L^2(\Omega, \mathbb{V}) \times H^{\Div}(\Omega, \mathbb{S}) \times H^{\div}(\Omega, \mathbb{V}) \times L^2(\Omega, \mathbb{K}).
-$$
+
+
+The momenta tensor is weakly symmetric if 
+$$\inner[L^2(\Omega, \mathbb{M})]{\bm{V}_r}{\bm{E}_{\kappa}},$$
+or equivalently 
+$$\inner[L^2(\Omega, \mathbb{M})]{\bm{V}_r}{\dot{\bm{E}}_{\kappa}}.$$
+
+The weak formulation then consists in finding 
+\[
+\{e_w, \bm{e}_{\bm{\theta}}, \bm{E}_{\kappa}, \bm{e}_{\gamma}, \bm{E}_{r}\} \in L^2(\Omega) \times L^2(\Omega, \mathbb{V}) \times H^{\Div}(\Omega, \mathbb{M}) \times H^{\div}(\Omega, \mathbb{V}) \times L^2(\Omega, \mathbb{K}).
+\]
+
+
+
 so that 
 \begin{equation}
 \label{eq:weak_min_PH_weak}
 \begin{aligned}
-(v_w, \ \rho b \dot{e}_w) &= (v_w, \mathrm{div} \bm{e}_\gamma) + (v_w, f), \\ 
-(\bm{v}_\theta, \ \rho b^3/12  \dot{\bm{e}}_\theta) &= (\bm{v}_\theta, \mathrm{Div} \bm{E}_\kappa + \bm{e}_\gamma) + (\bm{v}_\theta, \bm{\tau}), \\  
-(\bm{V}_\kappa, \ \mathcal{D}^{-1} \dot{\bm{E}}_\kappa) &= -(\mathrm{Div} \bm{V}_\kappa,  \bm{e}_\theta) - (\bm{V}_\kappa, \ \dot{\bm{E}}_r), \\ 
-(\bm{v}_\gamma, \ \mathcal{C}^{-1} \dot{\bm{e}}_\gamma) &= -(\mathrm{div} \bm{v}_\gamma, e_w ) + (\bm{v}_\gamma, \bm{e}_{\theta}), \\ 
-(\bm{V}_r, \ \dot{\bm{E}}_\kappa) &= 0
+\inner[L^2(\Omega)]{v_w}{\rho b \dot{e}_w} &= \inner[L^2(\Omega)]{v_w}{\div \bm{e}_\gamma} + (v_w, f), \\ 
+\inner[L^2(\Omega, \mathbb{V})]{\bm{v}_\theta}{I_\theta \dot{\bm{e}}_\theta} &= \inner[L^2(\Omega, \mathbb{V})]{\bm{v}_\theta}{\Div \bm{E}_\kappa + \bm{e}_\gamma} + \inner[L^2(\Omega, \mathbb{V})]{\bm{v}_\theta}{\bm{\tau}}, \\  
+\inner[L^2(\Omega, \mathbb{M})]{\bm{V}_\kappa}{\bm{\mathcal{C}}_{b} \dot{\bm{E}}_\kappa} &= -\inner[L^2(\Omega, \mathbb{V})]{\Div \bm{V}_\kappa}{\bm{e}_\theta} -  \inner[L^2(\Omega, \mathbb{M})]{\bm{V}_\kappa}{\dot{\bm{E}}_r}, \\ 
+\inner[L^2(\Omega, \mathbb{V})]{\bm{v}_\gamma}{C_s \dot{\bm{e}}_\gamma} &= -\inner[L^2(\Omega)]{\mathrm{div} \bm{v}_\gamma}{e_w} + \inner[L^2(\Omega, \mathbb{V})]{\bm{v}_\gamma}{\bm{e}_{\theta}}, \\   
+\inner[L^2(\Omega, \mathbb{M})]{\bm{V}_r}{\dot{\bm{E}}_\kappa} &= 0
 \end{aligned} \qquad
 \begin{aligned}
 \forall \;v_w &\in L^2(\Omega), \\
 \forall \; \bm{v}_\theta &\in L^2(\Omega, \mathbb{V}), \\
-\forall \;\bm{V}_\kappa &\in H^{\Div}(\Omega, \mathbb{S}), \\
+\forall \;\bm{V}_\kappa &\in H^{\Div}(\Omega, \mathbb{M}), \\
 \forall \;\bm{v}_\gamma &\in H^{\div}(\Omega, \mathbb{V}), \\
 \forall \;\bm{V}_r &\in L^2(\Omega, \mathbb{K}).\\
 \end{aligned}
@@ -152,15 +158,16 @@ Consider a regular triangulation $\mathcal{T}_h$ with elements $T$. The space of
 \begin{equation}
 \label{eq:AFW}
 \begin{aligned}
-L_h^{\text{AFW}} &= \{w_h \in L | \ \forall T, \ w_h|_{T} \in P_{k-1} \}, \\
-V_h^{\text{AFW}} &= \{\bm{\theta}_h \in V | \ \forall T,\ \bm{\theta}_h|_{T} \in (P_{k-1})^2 \}, \\
-S_h^{\text{AFW}} &= \{(m_{11}, m_{12}) \in D| \ \forall T,\ (m_{11}, m_{12})|_{T} \in BDM_{[k]} \}  \\
-& \; \cup \{(m_{21}, m_{22}) \in D| \ \forall T,\ (m_{21}, m_{22})|_{T} \in BDM_{[k]} \}, \\
-D_h^{\text{AFW}} &= \{\bm{q}_h \in D | \ \forall T,\ \bm{q}_h|_{T} \in RT_{[k-1]} \}, \\
-K_h^{\text{AFW}} &= \{\bm{R}_h \in K | \ \forall T, \ w_h|_{T} \in P_{k-1} \}, \\ 
+L_{h, \text{AFW}}^2(\Omega) &= \{w_h \in L^2(\Omega) | \ \forall T, \ w_h|_{T} \in P_{k-1} \}, \\
+L_{h, \text{AFW}}^2(\Omega, \mathbb{V}) &= \{\bm{\theta}_h \in L^2(\Omega, \mathbb{V}) | \ \forall T,\ \bm{\theta}_h|_{T} \in (P_{k-1})^2 \}, \\
+H_{h, \text{AFW}}^{\Div}(\Omega, \mathbb{M}) &= \{(m_{11}, m_{12}) \in H^{\div}(\Omega, \mathbb{V})| \ \forall T,\ (m_{11}, m_{12})|_{T} \in BDM_{[k]} \}  \\
+& \; \cup \{(m_{21}, m_{22}) \in H^{\div}(\Omega, \mathbb{V})| \ \forall T,\ (m_{21}, m_{22})|_{T} \in BDM_{[k]} \}, \\
+H_{h, \text{AFW}}^{\div}(\Omega, \mathbb{V}) &= \{\bm{q}_h \in H^{\div}(\Omega, \mathbb{V}) | \ \forall T,\ \bm{q}_h|_{T} \in RT_{[k-1]} \}, \\
+L_{h, \text{AFW}}^2(\Omega, \mathbb{K}) &= \{\bm{R}_h \in L^2(\Omega, \mathbb{K}) | \ \forall T, \ w_h|_{T} \in P_{k-1} \}, \\ 
 \end{aligned}
 \end{equation}
-where $BDM$ are the Brezzi-Douglas-Marini elements and $RT$ the Raviart-Thomas elements. The acronym AFW stands for Arnold-Falk-Winther. A convergence analysis for the general elastodynamics problem with weak symmetry in the $L^\infty (L^2)$ norm is detailed \cite{arnold2014elastodynamics}. A convergence study for the wave equation with mixed finite elements in the $L^\infty (L^2)$ is presented in \cite{geveci1988}. Combining the results of the two, the following error estimates are conjectured:
+
+where $BDM$ are the Brezzi-Douglas-Marini elements \cite{brezzi1985bdm} and $RT$ the Raviart-Thomas elements \cite{raviart1977}. The acronym AFW stands for Arnold-Falk-Winther, that proposed this kind on discretization for static elasticity in \cite{arnold2007mixed}. A convergence analysis for the general elastodynamics problem with weak symmetry in the $L^\infty (L^2)$ norm is detailed \cite{arnold2014elastodynamics}. A convergence study for the wave equation with mixed finite elements in the $L^\infty (L^2)$ is presented in \cite{geveci1988}. Combining the results of the two, the following error estimates are conjectured:
 \begin{conjecture}[Rate of convergence for the AFW element]
 	Assuming a smooth solution to problem~\eqref{eq:weak_min_PH_strong}, the following error estimates hold 
 	\begin{equation}
@@ -178,40 +185,45 @@ where $BDM$ are the Brezzi-Douglas-Marini elements and $RT$ the Raviart-Thomas e
 \end{conjecture}
 
 \subsection{The HHJ scheme for the Kirchhoff plate}\label{sec:HHJ}
-For the Kirchhoff plate, the HHJ scheme can be used to obtain a structure-preserving discretization. The discussion follows \cite{arnold2019hellan}. Given the non conforming nature of this scheme, it is necessary to first introduce the discrete functional spaces and state the problem directly in discrete form. The vertical displacement is approximated using continuous Lagrange polynomials, while the momenta tensor is discretized using the HHJ element
+For the Kirchhoff plate, the HHJ scheme can be used to obtain a structure-preserving discretization. Given the non conforming nature of this scheme, it is necessary to first introduce the discrete functional spaces and state the problem directly in discrete form. The illustration of the method follows closely \cite{arnold2019hellan}. The vertical displacement is approximated using continuous Lagrange polynomials, while the momenta tensor is discretized using the HHJ element
 \begin{equation}
 \label{eq:HHJ}
 \begin{aligned}
 W_h = &\{w_h \in H^1_0(\Omega)| \; \forall T, \; w_h|_{T} \in P_{k} \}, \\
-U_h = &\{\bm{M}_h \in L^2(\Omega, \mathbb{S})| \; \forall T, \; \bm{M}_h|_{T} \in P_{k-1}(\mathbb{S}) , \\ 
+S_h = &\{\bm{M}_h \in L^2(\Omega, \mathbb{S})| \; \forall T, \; \bm{M}_h|_{T} \in (P_{k-1})^{2\times 2}_{\text{sym}} , \\ 
 &\, \ \bm{M}_h \text{ is normal-normal continous across elements}\}.
 \end{aligned}
 \end{equation}
-The normal to normal continuity means that if two triangles $T_1, T_2$ share a common edge $E$ then $\bm{n}^\top (\bm{M}_h|_{T_1}) \bm{n} = \bm{n}^\top (\bm{M}_h|_{T_2}) \bm{n}$ on $E$. Taking system \eqref{eq:PH_sys_Kir_Ten} and multiplying the first equation by $v_w \in W_h$ and integrating over a triangle
+The normal to normal continuity means that if two triangles $T_1, T_2$ share a common edge $E$ then $\bm{n}^\top (\bm{M}_h|_{T_1}) \bm{n} = \bm{n}^\top (\bm{M}_h|_{T_2}) \bm{n}$ on $E$. Taking system \eqref{eq:pHdyn_Kir} and multiplying the first equation by $v_w \in W_h$ and integrating over a triangle
 \begin{equation*}
 \begin{aligned}
-& - (v_w, \ \mathrm{div}\mathrm{Div} \bm{E}_\kappa))_{T} = (\nabla v_w, \ \mathrm{Div} \bm{E}_\kappa))_{T}=, \\
-& -(\nabla^2 v_w, \ \bm{E}_\kappa)_T + (\partial_n v_w, \bm{n}^\top\bm{E}_\kappa \bm{n})_{\partial T} + (\partial_s v_w, \bm{s}^\top\bm{E}_\kappa \bm{n})_{\partial T}. \\
+- \inner[L^2(T)]{v_w}{\div\Div \bm{E}_\kappa} &= \inner[L^2(T, \mathbb{V})]{\nabla v_w}{\Div \bm{E}_\kappa} - \inner[L^2(\partial T)]{v_w}{\Div \bm{E}_\kappa \cdot \bm{n}}, \\
+&=-\inner[L^2(T, \mathbb{S})]{\Hess v_w}{\bm{E}_\kappa} - \inner[L^2(\partial T)]{v_w}{\Div \bm{E}_\kappa \cdot \bm{n}}, \\
+&+\inner[L^2(\partial T)]{\partial_{\bm{s}} v_w}{\bm{s}^\top\bm{E}_\kappa \bm{n}} + \inner[L^2(\partial T)]{\partial_{\bm{n}} v_w}{\bm{n}^\top\bm{E}_\kappa \bm{n}}. \\
 \end{aligned}
 \end{equation*}
-A double integration by parts is applied to get the final equation. Summing up over all triangles provides for the penultimate term
+A double integration by parts is applied to get the final equation. For the last term a summation over all triangles provides
 \begin{equation*}
-\sum_{T \in \mathcal{T}_h} (\partial_n v_w, \bm{n}^\top\bm{E}_\kappa \bm{n})_{\partial T} = \sum_{E \in \mathcal{E}_h} ([\![\partial_n v_w]\!], m_{\text{nn}})_{E},
+\sum_{T \in \mathcal{T}_h} \inner[L^2(\partial T)]{\partial_{\bm{n}} v_w}{\bm{n}^\top\bm{E}_\kappa \bm{n}} = \sum_{E \in \mathcal{E}_h} \inner[L^2(E)]{[\![\partial_{\bm{n}} v_w]\!]}{\bm{n}^\top\bm{E}_\kappa \bm{n}},
 \end{equation*} 
-where $\mathcal{E}_h$ is the set of all edges belonging to the mesh and $[\![a]\!] = a|_{T_1} + a|_{T_2}$ denotes the jump of a function across shared edges. For a boundary edge it is simply the value of the function. For the final term, it holds $(\partial_s v_w, \bm{s}^\top\bm{E}_\kappa \bm{n})_{\partial T}=0$, since $v_w$ is continuous across the edge boundaries and the normal switches sign. We are now in a position to state the final weak form. Given the definition
+where $\mathcal{E}_h$ is the set of all edges belonging to the mesh and $[\![a]\!] = a|_{T_1} + a|_{T_2}$ denotes the jump of a function across shared edges. For a boundary edge it is simply the value of the function. For the other terms, it holds 
 \[
-b_h(v_w, \ \bm{E}_{\kappa}) := - \sum_{T \in \mathcal{T}_h} ( \nabla^2 v_w, \ \bm{E}_\kappa) + \sum_{E \in \mathcal{E}_h} ([\![\partial_n v_w]\!], m_{\text{nn}})_{E}, 
+\inner[L^2(\partial T)]{v_w}{\Div \bm{E}_\kappa \cdot \bm{n}} = 0, \qquad \inner[L^2(\partial T)]{\partial_{\bm{s}} v_w}{\bm{s}^\top\bm{E}_\kappa \bm{n}} = 0,
 \]
-find $(e_w, \bm{E}_\kappa) \in W_h \times U_h$ such that
+since $v_w$ is continuous across the edge boundaries and the normal switches sign. We are now in a position to state the final weak form. Given the bilinear form
+\[
+b_h(v_w, \ \bm{E}_{\kappa}) := - \sum_{T \in \mathcal{T}_h} \inner[L^2(T, \mathbb{S})]{\Hess v_w}{\bm{E}_\kappa} + \sum_{E \in \mathcal{E}_h} \inner[L^2(E)]{[\![\partial_n v_w]\!]}{\bm{n}^\top\bm{E}_\kappa \bm{n}}, 
+\]
+find $(e_w, \bm{E}_\kappa) \in W_h \times S_h$ such that
 \begin{equation}
 \label{eq:weak_kir_PH}
 \begin{aligned}
-(v_w, \ \rho b \dot{e}_w) &= +b_h(v_w, \ \bm{E}_{\kappa}) + (v_w, f), \\ 
-(\bm{V}_\kappa, \ \mathcal{D}^{-1} \dot{\bm{E}}_\kappa) &= -b_h(e_w, \ \bm{V}_{\kappa}), \\ 
+\inner[L^2(\Omega)]{v_w}{\rho b \dot{e}_w} &= +b_h(v_w, \ \bm{E}_{\kappa}) + \inner[L^2(\Omega)]{v_w}{f}, \\ 
+(\bm{V}_\kappa, \bm{\mathcal{C}}_b \dot{\bm{E}}_\kappa) &= -b_h(e_w, \ \bm{V}_{\kappa}), \\ 
 \end{aligned} \quad
 \begin{aligned}
 v_w \in W_h, \\
-\bm{V}_\kappa \in U_h. \\
+\bm{V}_\kappa \in S_h. \\
 \end{aligned}
 \end{equation}
 
@@ -225,7 +237,7 @@ For the associated static problem, under the hypothesis of smooth solutions, opt
 	\end{equation}
 \end{conjecture}
 
-\section{Numerical experiments}
+\subsection{Numerical experiments}
 \label{sec:numerics}
 In this section numerical test cases are used to verify the conjectured orders of convergence for the two problems. Upon discretization, system \eqref{eq:weak_min_PH_strong}, \eqref{eq:weak_min_PH_weak}, \eqref{eq:weak_kir_PH} assumes the form 
 \[
