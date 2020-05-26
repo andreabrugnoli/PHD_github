@@ -41,24 +41,27 @@ def compute_constants():
 
 name_FEp = 'Argyris'
 name_FEq = 'DG'
-
+deg_p = 5
+deg_q = 3
 
 def compute_err(n, r):
 
     h_mesh = 1/n
 
-    h = Constant(0.001)
-    rho = Constant(5600)  # kg/m^3
-
-    E = Constant(136 * 10 ** 9)  # Pa
-    nu = Constant(0.3)
-    # rho = Constant(1)  # kg/m^3
-    # h = Constant(1)
     Lx = 2
     Ly = 2
 
-    D = Constant(E * h ** 3 / (1 - nu ** 2) / 12)
-    fl_rot = Constant(12 / (E * h ** 3))
+    rho = Constant(1)  # kg/m^3
+    h = Constant(1)
+
+    # h = Constant(0.001)
+    # rho = Constant(5600)  # kg/m^3
+    #
+    # E = Constant(136 * 10 ** 9)  # Pa
+    # nu = Constant(0.3)
+
+    # D = Constant(E * h ** 3 / (1 - nu ** 2) / 12)
+    # fl_rot = Constant(12 / (E * h ** 3))
     # Useful Matrices
 
     # Operators and functions
@@ -90,22 +93,6 @@ def compute_err(n, r):
     # Domain, Subdomains, Boundary, Suboundaries
 
     # Finite element defition
-
-    deg_q = 3
-
-    if name_FEp == 'Morley':
-        deg_p = 2
-    elif name_FEp == 'Hermite':
-        deg_p = 3
-    elif name_FEp == 'Argyris' or name_FEp == 'Bell':
-        deg_p = 5
-
-    if name_FEq == 'Morley':
-        deg_q = 2
-    elif name_FEq == 'Hermite':
-        deg_q = 3
-    elif name_FEq == 'Argyris' or name_FEq == 'Bell':
-        deg_q = 5
 
     Vp = FunctionSpace(mesh, name_FEp, deg_p)
     Vq = VectorFunctionSpace(mesh, name_FEq, deg_q, dim=3)
@@ -372,7 +359,7 @@ def compute_err(n, r):
     return v_err_last, v_err_max, v_err_quad, sig_err_last, sig_err_max, sig_err_quad
 
 
-n_h = 3
+n_h = 5
 n1_vec = np.array([2**(i+1) for i in range(n_h)])
 h1_vec = 1./n1_vec
 

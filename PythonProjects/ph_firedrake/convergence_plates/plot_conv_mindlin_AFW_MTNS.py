@@ -20,109 +20,109 @@ matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{bm}"]
 
 path_res = "./convergence_results_mindlin/"
 bc_input= "CCCC_AFW_"
-save_res = False
+save_res = True
 
 coeff = 0.95
 
-# h1_vec = np.load(path_res + bc_input + "h1.npy")
-# h2_vec = np.load(path_res + bc_input + "h3.npy")
-#
-# n_h = len(h1_vec)
-# v_errInf_r1 = np.load(path_res + bc_input + "v_errInf_r1.npy")
-# v_errQuad_r1 = np.load(path_res + bc_input + "v_errQuad_r1.npy")
-#
-# v_errInf_r2 = np.load(path_res + bc_input + "v_errInf_r2.npy")
-# v_errQuad_r2 = np.load(path_res + bc_input + "v_errQuad_r2.npy")
-#
-# v_errInf_r3 = np.load(path_res + bc_input + "v_errInf_r3.npy")
-# v_errQuad_r3 = np.load(path_res + bc_input + "v_errQuad_r3.npy")
-#
-# om_errInf_r1 = np.load(path_res + bc_input + "om_errInf_r1.npy")
-# om_errQuad_r1 = np.load(path_res + bc_input + "om_errQuad_r1.npy")
-#
-# om_errInf_r2 = np.load(path_res + bc_input + "om_errInf_r2.npy")
-# om_errQuad_r2 = np.load(path_res + bc_input + "om_errQuad_r2.npy")
-#
-# om_errInf_r3 = np.load(path_res + bc_input + "om_errInf_r3.npy")
-# om_errQuad_r3 = np.load(path_res + bc_input + "om_errQuad_r3.npy")
-#
-# sig_errInf_r1 = np.load(path_res + bc_input + "sig_errInf_r1.npy")
-# sig_errQuad_r1 = np.load(path_res + bc_input + "sig_errQuad_r1.npy")
-#
-# sig_errInf_r2 = np.load(path_res + bc_input + "sig_errInf_r2.npy")
-# sig_errQuad_r2 = np.load(path_res + bc_input + "sig_errQuad_r2.npy")
-#
-# sig_errInf_r3 = np.load(path_res + bc_input + "sig_errInf_r3.npy")
-# sig_errQuad_r3 = np.load(path_res + bc_input + "sig_errQuad_r3.npy")
-#
-# q_errInf_r1 = np.load(path_res + bc_input + "q_errInf_r1.npy")
-# q_errQuad_r1 = np.load(path_res + bc_input + "q_errQuad_r1.npy")
-#
-# q_errInf_r2 = np.load(path_res + bc_input + "q_errInf_r2.npy")
-# q_errQuad_r2 = np.load(path_res + bc_input + "q_errQuad_r2.npy")
-#
-# q_errInf_r3 = np.load(path_res + bc_input + "q_errInf_r3.npy")
-# q_errQuad_r3 = np.load(path_res + bc_input + "q_errQuad_r3.npy")
-#
-# r_errInf_r1 = np.load(path_res + bc_input + "r_errInf_r1.npy")
-# r_errQuad_r1 = np.load(path_res + bc_input + "r_errQuad_r1.npy")
-#
-# r_errInf_r2 = np.load(path_res + bc_input + "r_errInf_r2.npy")
-# r_errQuad_r2 = np.load(path_res + bc_input + "r_errQuad_r2.npy")
-#
-# r_errInf_r3 = np.load(path_res + bc_input + "r_errInf_r3.npy")
-# r_errQuad_r3 = np.load(path_res + bc_input + "r_errQuad_r3.npy")
+h1_vec = np.load(path_res + bc_input + "h1.npy")
+h2_vec = np.load(path_res + bc_input + "h3.npy")
 
-h1_vec = np.load(path_res + bc_input + "h1.npy")[:-1]
-h2_vec = np.load(path_res + bc_input + "h3.npy")[:-1]
-
-print("h1:" + str(h1_vec))
-print("h3:" + str(h2_vec))
 n_h = len(h1_vec)
-v_errInf_r1 = np.load(path_res + bc_input + "v_errInf_r1.npy")[:-1]
-v_errQuad_r1 = np.load(path_res + bc_input + "v_errQuad_r1.npy")[:-1]
+v_errInf_r1 = np.load(path_res + bc_input + "v_errInf_r1.npy")
+v_errQuad_r1 = np.load(path_res + bc_input + "v_errQuad_r1.npy")
 
-v_errInf_r2 = np.load(path_res + bc_input + "v_errInf_r2.npy")[:-1]
-v_errQuad_r2 = np.load(path_res + bc_input + "v_errQuad_r2.npy")[:-1]
+v_errInf_r2 = np.load(path_res + bc_input + "v_errInf_r2.npy")
+v_errQuad_r2 = np.load(path_res + bc_input + "v_errQuad_r2.npy")
 
-v_errInf_r3 = np.load(path_res + bc_input + "v_errInf_r3.npy")[:-1]
-v_errQuad_r3 = np.load(path_res + bc_input + "v_errQuad_r3.npy")[:-1]
+v_errInf_r3 = np.load(path_res + bc_input + "v_errInf_r3.npy")
+v_errQuad_r3 = np.load(path_res + bc_input + "v_errQuad_r3.npy")
 
-om_errInf_r1 = np.load(path_res + bc_input + "om_errInf_r1.npy")[:-1]
-om_errQuad_r1 = np.load(path_res + bc_input + "om_errQuad_r1.npy")[:-1]
+om_errInf_r1 = np.load(path_res + bc_input + "om_errInf_r1.npy")
+om_errQuad_r1 = np.load(path_res + bc_input + "om_errQuad_r1.npy")
 
-om_errInf_r2 = np.load(path_res + bc_input + "om_errInf_r2.npy")[:-1]
-om_errQuad_r2 = np.load(path_res + bc_input + "om_errQuad_r2.npy")[:-1]
+om_errInf_r2 = np.load(path_res + bc_input + "om_errInf_r2.npy")
+om_errQuad_r2 = np.load(path_res + bc_input + "om_errQuad_r2.npy")
 
-om_errInf_r3 = np.load(path_res + bc_input + "om_errInf_r3.npy")[:-1]
-om_errQuad_r3 = np.load(path_res + bc_input + "om_errQuad_r3.npy")[:-1]
+om_errInf_r3 = np.load(path_res + bc_input + "om_errInf_r3.npy")
+om_errQuad_r3 = np.load(path_res + bc_input + "om_errQuad_r3.npy")
 
-sig_errInf_r1 = np.load(path_res + bc_input + "sig_errInf_r1.npy")[:-1]
-sig_errQuad_r1 = np.load(path_res + bc_input + "sig_errQuad_r1.npy")[:-1]
+sig_errInf_r1 = np.load(path_res + bc_input + "sig_errInf_r1.npy")
+sig_errQuad_r1 = np.load(path_res + bc_input + "sig_errQuad_r1.npy")
 
-sig_errInf_r2 = np.load(path_res + bc_input + "sig_errInf_r2.npy")[:-1]
-sig_errQuad_r2 = np.load(path_res + bc_input + "sig_errQuad_r2.npy")[:-1]
+sig_errInf_r2 = np.load(path_res + bc_input + "sig_errInf_r2.npy")
+sig_errQuad_r2 = np.load(path_res + bc_input + "sig_errQuad_r2.npy")
 
-sig_errInf_r3 = np.load(path_res + bc_input + "sig_errInf_r3.npy")[:-1]
-sig_errQuad_r3 = np.load(path_res + bc_input + "sig_errQuad_r3.npy")[:-1]
+sig_errInf_r3 = np.load(path_res + bc_input + "sig_errInf_r3.npy")
+sig_errQuad_r3 = np.load(path_res + bc_input + "sig_errQuad_r3.npy")
 
-q_errInf_r1 = np.load(path_res + bc_input + "q_errInf_r1.npy")[:-1]
-q_errQuad_r1 = np.load(path_res + bc_input + "q_errQuad_r1.npy")[:-1]
+q_errInf_r1 = np.load(path_res + bc_input + "q_errInf_r1.npy")
+q_errQuad_r1 = np.load(path_res + bc_input + "q_errQuad_r1.npy")
 
-q_errInf_r2 = np.load(path_res + bc_input + "q_errInf_r2.npy")[:-1]
-q_errQuad_r2 = np.load(path_res + bc_input + "q_errQuad_r2.npy")[:-1]
+q_errInf_r2 = np.load(path_res + bc_input + "q_errInf_r2.npy")
+q_errQuad_r2 = np.load(path_res + bc_input + "q_errQuad_r2.npy")
 
-q_errInf_r3 = np.load(path_res + bc_input + "q_errInf_r3.npy")[:-1]
-q_errQuad_r3 = np.load(path_res + bc_input + "q_errQuad_r3.npy")[:-1]
+q_errInf_r3 = np.load(path_res + bc_input + "q_errInf_r3.npy")
+q_errQuad_r3 = np.load(path_res + bc_input + "q_errQuad_r3.npy")
 
-r_errInf_r1 = np.load(path_res + bc_input + "r_errInf_r1.npy")[:-1]
-r_errQuad_r1 = np.load(path_res + bc_input + "r_errQuad_r1.npy")[:-1]
+r_errInf_r1 = np.load(path_res + bc_input + "r_errInf_r1.npy")
+r_errQuad_r1 = np.load(path_res + bc_input + "r_errQuad_r1.npy")
 
-r_errInf_r2 = np.load(path_res + bc_input + "r_errInf_r2.npy")[:-1]
-r_errQuad_r2 = np.load(path_res + bc_input + "r_errQuad_r2.npy")[:-1]
+r_errInf_r2 = np.load(path_res + bc_input + "r_errInf_r2.npy")
+r_errQuad_r2 = np.load(path_res + bc_input + "r_errQuad_r2.npy")
 
-r_errInf_r3 = np.load(path_res + bc_input + "r_errInf_r3.npy")[:-1]
-r_errQuad_r3 = np.load(path_res + bc_input + "r_errQuad_r3.npy")[:-1]
+r_errInf_r3 = np.load(path_res + bc_input + "r_errInf_r3.npy")
+r_errQuad_r3 = np.load(path_res + bc_input + "r_errQuad_r3.npy")
+
+# h1_vec = np.load(path_res + bc_input + "h1.npy")[:-1]
+# h2_vec = np.load(path_res + bc_input + "h3.npy")[:-1]
+#
+# print("h1:" + str(h1_vec))
+# print("h3:" + str(h2_vec))
+# n_h = len(h1_vec)
+# v_errInf_r1 = np.load(path_res + bc_input + "v_errInf_r1.npy")[:-1]
+# v_errQuad_r1 = np.load(path_res + bc_input + "v_errQuad_r1.npy")[:-1]
+#
+# v_errInf_r2 = np.load(path_res + bc_input + "v_errInf_r2.npy")[:-1]
+# v_errQuad_r2 = np.load(path_res + bc_input + "v_errQuad_r2.npy")[:-1]
+#
+# v_errInf_r3 = np.load(path_res + bc_input + "v_errInf_r3.npy")[:-1]
+# v_errQuad_r3 = np.load(path_res + bc_input + "v_errQuad_r3.npy")[:-1]
+#
+# om_errInf_r1 = np.load(path_res + bc_input + "om_errInf_r1.npy")[:-1]
+# om_errQuad_r1 = np.load(path_res + bc_input + "om_errQuad_r1.npy")[:-1]
+#
+# om_errInf_r2 = np.load(path_res + bc_input + "om_errInf_r2.npy")[:-1]
+# om_errQuad_r2 = np.load(path_res + bc_input + "om_errQuad_r2.npy")[:-1]
+#
+# om_errInf_r3 = np.load(path_res + bc_input + "om_errInf_r3.npy")[:-1]
+# om_errQuad_r3 = np.load(path_res + bc_input + "om_errQuad_r3.npy")[:-1]
+#
+# sig_errInf_r1 = np.load(path_res + bc_input + "sig_errInf_r1.npy")[:-1]
+# sig_errQuad_r1 = np.load(path_res + bc_input + "sig_errQuad_r1.npy")[:-1]
+#
+# sig_errInf_r2 = np.load(path_res + bc_input + "sig_errInf_r2.npy")[:-1]
+# sig_errQuad_r2 = np.load(path_res + bc_input + "sig_errQuad_r2.npy")[:-1]
+#
+# sig_errInf_r3 = np.load(path_res + bc_input + "sig_errInf_r3.npy")[:-1]
+# sig_errQuad_r3 = np.load(path_res + bc_input + "sig_errQuad_r3.npy")[:-1]
+#
+# q_errInf_r1 = np.load(path_res + bc_input + "q_errInf_r1.npy")[:-1]
+# q_errQuad_r1 = np.load(path_res + bc_input + "q_errQuad_r1.npy")[:-1]
+#
+# q_errInf_r2 = np.load(path_res + bc_input + "q_errInf_r2.npy")[:-1]
+# q_errQuad_r2 = np.load(path_res + bc_input + "q_errQuad_r2.npy")[:-1]
+#
+# q_errInf_r3 = np.load(path_res + bc_input + "q_errInf_r3.npy")[:-1]
+# q_errQuad_r3 = np.load(path_res + bc_input + "q_errQuad_r3.npy")[:-1]
+#
+# r_errInf_r1 = np.load(path_res + bc_input + "r_errInf_r1.npy")[:-1]
+# r_errQuad_r1 = np.load(path_res + bc_input + "r_errQuad_r1.npy")[:-1]
+#
+# r_errInf_r2 = np.load(path_res + bc_input + "r_errInf_r2.npy")[:-1]
+# r_errQuad_r2 = np.load(path_res + bc_input + "r_errQuad_r2.npy")[:-1]
+#
+# r_errInf_r3 = np.load(path_res + bc_input + "r_errInf_r3.npy")[:-1]
+# r_errQuad_r3 = np.load(path_res + bc_input + "r_errQuad_r3.npy")[:-1]
 #
 # v_errInf_r1 = np.load(path_res + bc_input + "v_errF_r1.npy")
 # v_errQuad_r1 = np.load(path_res + bc_input + "v_errQuad_r1.npy")[:-1]
@@ -389,7 +389,7 @@ plt.plot(np.log(h1_vec), np.log(h1_vec**2) + coeff*(np.log(sig_errInf_r2)[-1] - 
 
 # plt.plot(np.log(h2_vec), np.log(sig_r3_atF), ':o', label='BEC 3')
 plt.plot(np.log(h2_vec), np.log(sig_errInf_r3), '-.+', label='$k=3$')
-plt.plot(np.log(h2_vec), np.log(h2_vec**3) + coeff*(np.log(sig_errInf_r3)[-1] - np.log(h2_vec**3)[-1]), '-v', label=r'$h^3$')
+plt.plot(np.log(h2_vec), np.log(h2_vec**3) + coeff*(np.log(sig_errInf_r3)[0] - np.log(h2_vec**3)[0]), '-v', label=r'$h^3$')
 
 plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log($||\bm{E}_{\kappa} - \bm{E}_{\kappa}^h||_{L^\infty L^2}$)')
@@ -444,7 +444,7 @@ plt.plot(np.log(h1_vec), np.log(h1_vec**2) + coeff*(np.log(q_errInf_r2)[-1] - np
 
 # plt.plot(np.log(h2_vec), np.log(q_r3_atF), ':o', label='BEC 3')
 plt.plot(np.log(h2_vec), np.log(q_errInf_r3), '-.+', label='$k=3$')
-plt.plot(np.log(h2_vec), np.log(h2_vec**3) + coeff*(np.log(q_errInf_r3)[-1] - np.log(h2_vec**3)[-1]), '-v', label=r'$h^3$')
+plt.plot(np.log(h2_vec), np.log(h2_vec**3) + coeff*(np.log(q_errInf_r3)[0] - np.log(h2_vec**3)[0]), '-v', label=r'$h^3$')
 
 plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log($||\bm{e}_{\gamma} - \bm{e}_{\gamma}^h||_{L^\infty L^2}$)')
@@ -498,7 +498,7 @@ plt.plot(np.log(h1_vec), np.log(h1_vec**2) + coeff*(np.log(r_errInf_r2)[-1] - np
 
 # plt.plot(np.log(h2_vec), np.log(q_r3_atF), ':o', label='BEC 3')
 plt.plot(np.log(h2_vec), np.log(r_errInf_r3), '-.+', label='$k=3$')
-plt.plot(np.log(h2_vec), np.log(h2_vec**3) + coeff*(np.log(r_errInf_r3)[-1] - np.log(h2_vec**3)[-1]), '-v', label=r'$h^3$')
+plt.plot(np.log(h2_vec), np.log(h2_vec**3) + coeff*(np.log(r_errInf_r3)[0] - np.log(h2_vec**3)[0]), '-v', label=r'$h^3$')
 
 plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log($||\bm{E}_{r} - \bm{E}_{r}^h||_{L^\infty L^2}$)')

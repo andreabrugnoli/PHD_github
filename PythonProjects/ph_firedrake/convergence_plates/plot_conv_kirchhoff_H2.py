@@ -20,7 +20,7 @@ matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{bm}"]
 
 save_fig = False
 path_res = "./convergence_results_kirchhoff/"
-bc = "SSSS_H2_"
+bc = "CSSF_H2_diffalg_"
 
 h1_vec = np.load(path_res + bc + "h1.npy")
 

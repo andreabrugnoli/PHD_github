@@ -18,6 +18,8 @@ bc_input = 'SSSS_H2_diffalg'
 
 name_FEp = 'Argyris'
 name_FEq = 'DG'
+deg_p = 5
+deg_q = 3
 
 def compute_err(n):
 
@@ -59,22 +61,6 @@ def compute_err(n):
 
     # Finite element defition
 
-
-    deg_q = 3
-
-    if name_FEp == 'Morley':
-        deg_p = 2
-    elif name_FEp == 'Hermite':
-        deg_p = 3
-    elif name_FEp == 'Argyris' or name_FEp == 'Bell':
-        deg_p = 5
-
-    if name_FEq == 'Morley':
-        deg_q = 2
-    elif name_FEq == 'Hermite':
-        deg_q = 3
-    elif name_FEq == 'Argyris' or name_FEq == 'Bell':
-        deg_q = 5
 
     Vp = FunctionSpace(mesh, name_FEp, deg_p)
     Vq = VectorFunctionSpace(mesh, name_FEq, deg_q, dim=3)
@@ -305,7 +291,7 @@ def compute_err(n):
     return v_err_last, v_err_max, v_err_quad, sig_err_last, sig_err_max, sig_err_quad
 
 
-n_h = 3
+n_h = 5
 n1_vec = np.array([2**(i+1) for i in range(n_h)])
 h1_vec = 1./n1_vec
 

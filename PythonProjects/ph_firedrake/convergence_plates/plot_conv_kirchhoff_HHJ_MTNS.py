@@ -19,12 +19,16 @@ matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
 matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{bm}"]
 
 path_res = "./convergence_results_kirchhoff/"
-bc_input = "CSSF_HHJ_"
+bc_input = "SSSS_HHJ_"
 save_res = False
 
 coeff = 0.90
 h1_vec = np.load(path_res + bc_input + "h1.npy")
 h2_vec = np.load(path_res + bc_input + "h3.npy")
+
+print(h1_vec)
+print(h2_vec)
+
 
 n_h = len(h1_vec)
 v_err_r1 = np.load(path_res + bc_input + "v_errF_r1.npy")
@@ -107,6 +111,8 @@ v_r1int_atF = np.polyfit(np.log(h1_vec), np.log(v_err_r1), 1)[0]
 v_r1int_max = np.polyfit(np.log(h1_vec), np.log(v_errInf_r1), 1)[0]
 v_r1int_L2 = np.polyfit(np.log(h1_vec), np.log(v_errQuad_r1), 1)[0]
 
+print("Error r=1 for v Linf: " + str(v_errInf_r1))
+print("Error r=1 for v L2: " + str(v_errQuad_r1))
 print("Estimated order of convergence r=1 for v at T fin: " + str(v_r1_atF))
 print("Interpolated order of convergence r=1 for v at T fin: " + str(v_r1int_atF))
 print("Estimated order of convergence r=1 for v Linf: " + str(v_r1_max))
@@ -119,6 +125,8 @@ v_r2int = np.polyfit(np.log(h1_vec), np.log(v_err_r2), 1)[0]
 v_r2int_max = np.polyfit(np.log(h1_vec), np.log(v_errInf_r2), 1)[0]
 v_r2int_L2 = np.polyfit(np.log(h1_vec), np.log(v_errQuad_r2), 1)[0]
 
+print("Error r=2 for v Linf: " + str(v_errInf_r2))
+print("Error r=2 for v L2: " + str(v_errQuad_r2))
 print("Estimated order of convergence r=2 for v at T fin: " + str(v_r2_atF))
 print("Interpolated order of convergence r=2 for v at T fin: " + str(v_r2int))
 print("Estimated order of convergence r=2 for v Linf: " + str(v_r2_max))
@@ -131,6 +139,8 @@ v_r3int = np.polyfit(np.log(h2_vec), np.log(v_err_r3), 1)[0]
 v_r3int_max = np.polyfit(np.log(h2_vec), np.log(v_errInf_r3), 1)[0]
 v_r3int_L2 = np.polyfit(np.log(h2_vec), np.log(v_errQuad_r3), 1)[0]
 
+print("Error r=3 for v Linf: " + str(v_errInf_r3))
+print("Error r=3 for v L2: " + str(v_errQuad_r3))
 print("Estimated order of convergence r=3 for v at T fin: " + str(v_r3_atF))
 print("Interpolated order of convergence r=3 for v at T fin: " + str(v_r3int))
 print("Estimated order of convergence r=3 for v Linf: " + str(v_r3_max))
@@ -164,6 +174,8 @@ sig_r1int_atF = np.polyfit(np.log(h1_vec), np.log(sig_err_r1), 1)[0]
 sig_r1int_max = np.polyfit(np.log(h1_vec), np.log(sig_errInf_r1), 1)[0]
 sig_r1int_L2 = np.polyfit(np.log(h1_vec), np.log(sig_errQuad_r1), 1)[0]
 
+print("Error r=1 for sig Linf: " + str(sig_errInf_r1))
+print("Error r=1 for sig L2: " + str(sig_errQuad_r1))
 print("Estimated order of convergence r=1 for sigma at T fin: " + str(sig_r1_atF))
 print("Interpolated order of convergence r=1 for sigma at T fin: " + str(sig_r1int_atF))
 print("Estimated order of convergence r=1 for sigma Linf: " + str(sig_r1_max))
@@ -176,6 +188,8 @@ sig_r2int = np.polyfit(np.log(h1_vec), np.log(sig_err_r2), 1)[0]
 sig_r2int_max = np.polyfit(np.log(h1_vec), np.log(sig_errInf_r2), 1)[0]
 sig_r2int_L2 = np.polyfit(np.log(h1_vec), np.log(sig_errQuad_r2), 1)[0]
 
+print("Error r=2 for sig Linf: " + str(sig_errInf_r2))
+print("Error r=2 for sig L2: " + str(sig_errQuad_r2))
 print("Estimated order of convergence r=2 for sigma at T fin: " + str(sig_r2_atF))
 print("Interpolated order of convergence r=2 for sigma at T fin: " + str(sig_r2int))
 print("Estimated order of convergence r=2 for sigma Linf: " + str(sig_r2_max))
@@ -188,6 +202,8 @@ sig_r3int = np.polyfit(np.log(h2_vec), np.log(sig_err_r3), 1)[0]
 sig_r3int_max = np.polyfit(np.log(h2_vec), np.log(sig_errInf_r3), 1)[0]
 sig_r3int_L2 = np.polyfit(np.log(h2_vec), np.log(sig_errQuad_r3), 1)[0]
 
+print("Error r=3 for sig Linf: " + str(sig_errInf_r3))
+print("Error r=3 for sig L2: " + str(sig_errQuad_r3))
 print("Estimated order of convergence r=3 for sigma at T fin: " + str(sig_r3_atF))
 print("Interpolated order of convergence r=3 for sigma at T fin: " + str(sig_r3int))
 print("Estimated order of convergence r=3 for sigma Linf: " + str(sig_r3_max))

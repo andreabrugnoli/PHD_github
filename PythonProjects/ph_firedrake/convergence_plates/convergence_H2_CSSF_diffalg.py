@@ -13,7 +13,7 @@ import scipy.linalg as la
 import scipy.sparse as spa
 import scipy.sparse.linalg as sp_la
 matplotlib.rcParams['text.usetex'] = True
-save_res = False
+save_res = True
 bc_input = 'CSSF_H2_diffalg'
 
 def compute_constants():
@@ -358,7 +358,7 @@ def compute_err(n):
     return v_err_last, v_err_max, v_err_quad, sig_err_last, sig_err_max, sig_err_quad
 
 
-n_h = 3
+n_h = 5
 n1_vec = np.array([2**(i+1) for i in range(n_h)])
 h1_vec = 1./n1_vec
 

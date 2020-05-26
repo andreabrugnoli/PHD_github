@@ -406,7 +406,7 @@ def compute_err(n, r):
            q_err_max, q_err_quad, r_err_max, r_err_quad
 
 
-n_h = 5
+n_h = 4
 n1_vec = np.array([2**(i+2) for i in range(n_h)])
 n2_vec = np.array([2**(i+1) for i in range(n_h)])
 h1_vec = 1./n1_vec

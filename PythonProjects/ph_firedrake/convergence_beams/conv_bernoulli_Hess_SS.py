@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import petsc4py
 
 matplotlib.rcParams['text.usetex'] = True
-save_res = True
+save_res = False
 bc_input = 'SS_Hess'
 
 
@@ -227,6 +227,7 @@ def compute_err(n, r):
                                          + dot(eq_n1.dx(0) - grad_sigex, eq_n1.dx(0) - grad_sigex) * dx))
         sig_err_L2[i] = np.sqrt(assemble(inner(eq_n1 - sigma_ex, eq_n1 - sigma_ex) * dx))
 
+        v_err_H2[i] = np.sqrt(assemble(dot(ep_n1.dx(0).dx(0) - dxx_vex, ep_n1.dx(0).dx(0) - dxx_vex) * dx))
     # plt.figure()
     # plt.plot(t_vec, w_atP, 'r-', label=r'approx $w$')
     # plt.plot(t_vec, np.sin(pi*Ppoint/L)*np.sin(beta*t_vec), 'b-', label=r'exact $w$')
@@ -256,7 +257,7 @@ def compute_err(n, r):
     return v_err_last, v_err_max, v_err_quad, sig_err_last, sig_err_max, sig_err_quad
 
 
-n_h = 6
+n_h = 3
 n1_vec = np.array([2**(i+2) for i in range(n_h)])
 h1_vec = 1./n1_vec
 
