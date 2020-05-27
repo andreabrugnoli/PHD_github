@@ -17,18 +17,30 @@ First we focused on the Mindlin plate. This problem is a combination of plane wa
 We then discuss the Kirchhoff plate problem. For this problem non-conforming finite element approximation have been studied, but for the static case \cite{blum1990}. \\
 
 \paragraph{Notations}
-The space of all, symmetric and skew-symmetric $d\times d$ matrices are denoted by $\mathbb{M}, \mathbb{S}, \mathbb{K}$ respectively. The space of $\mathbb{R}^d$ vectors is denoted by $\mathbb{V}$. The symbol $\Omega \subset \mathbb{R}^2$ denotes an open connected set. The standard notation $H^m(\Omega)$ denotes the Sobolev space of square integrable functions with  $m^\text{th}$ derivative in $L^2$ and norm $||\cdot||_m$. In particular, $H^1_0(\Omega)$ is the space of weakly derivable functions with vanishing trace. For $\mathbb{X} \subseteq \mathbb{M}$, let
+The space of all, symmetric and skew-symmetric $2\times 2$ matrices are denoted by $\mathbb{M}, \mathbb{S}, \mathbb{K}$ respectively. The space of $\mathbb{R}^2$ vectors is denoted by $\mathbb{V}$. The symbol $\Omega \subset \mathbb{R}^2$ denotes an open connected set. The standard notation $H^m(\Omega)$ denotes the Sobolev space of square integrable functions with  $m^\text{th}$ derivative in $L^2$ and norm 
+\begin{equation*}
+||u||_m^2 = {\sum_{|\alpha|\le m} \norm{\partial^\alpha u}_{L^2(\Omega)}^2}.
+\end{equation*}
+The space $H^{\Grad}(\Omega, \mathbb{V})$ is the space of vectors with symmetric gradient in $L^2$
+\begin{equation*}
+	H^{\Grad}(\Omega, \mathbb{V}) = \{\bm{u} \in L^2(\Omega, \mathbb{V}) \vert \; \Grad(\bm{u}) \in L^2(\Omega, \mathbb{S}) \},
+\end{equation*}
+and norm 
+\begin{equation*}
+||\bm{u}||_{\Grad}^2 = {||\bm{u}||^2 + ||\Grad(\bm{u})||^2}.
+\end{equation*}
+For $\mathbb{X} \subseteq \mathbb{M}$, let
 \begin{equation*}
 \begin{aligned}
-H^{\div}(\Omega, \mathbb{V}) &= \{\bm{u} \in L^2(\Omega, \mathbb{V}) \vert \; \mathrm{div}(\bm{u}) \in L^2(\Omega) \}, \\
-H^{\Div}(\Omega, \mathbb{X}) &= \{\bm{U} \in L^2(\Omega, \mathbb{X}) \vert \; \mathrm{Div}(\bm{U}) \in L^2(\Omega; \mathbb{V}) \},
+H^{\div}(\Omega, \mathbb{V}) &= \{\bm{u} \in L^2(\Omega, \mathbb{V}) \vert \; \div(\bm{u}) \in L^2(\Omega) \}, \\
+H^{\Div}(\Omega, \mathbb{X}) &= \{\bm{U} \in L^2(\Omega, \mathbb{X}) \vert \; \Div(\bm{U}) \in L^2(\Omega; \mathbb{V}) \},
 \end{aligned}
 \end{equation*}
-which are Hilbert spaces with the norm 
-\begin{equation*}
-||\bm{u}||^2_{\text{div}} = ||\bm{u}||^2 + ||\mathrm{div}(\bm{u})||^2, \qquad
-||\bm{U}||^2_{\text{Div}} = ||\bm{U}||^2 + ||\mathrm{Div}(\bm{U})||^2.
-\end{equation*}
+which are Hilbert spaces with the norms 
+\begin{align*}
+\norm{\bm{u}}_{\div}^2 &= {\norm{\bm{u}}_{L^2(\Omega, \mathbb{V})}^2 + \norm{\div(\bm{u})}_{L^2(\Omega)}^2}, \\
+\norm{\bm{U}}_{\Div}^2 &= {\norm{\bm{U}}_{L^2(\Omega, \mathbb{M})}^2 + \norm{\Div(\bm{U})}_{L^2(\Omega, \mathbb{V})}^2}.
+\end{align*}
 Let ${X}$ be a Hilbert space, and $t_f$ a positive real number. We denote by $L^\infty([0, t_f]; {X})$ or $L^\infty({X})$ the space of functions $f: [0, t_f] \rightarrow X$ for which the time-space norm $||\cdot||_{L^\infty([0, t_f]; {X})}$ satisfies
 \[
 ||f||_{L^\infty([0, t_f]; {X})} = \esssup_{t \in [0,t_f]} ||f||_{{X}} < \infty.
@@ -344,7 +356,7 @@ Because of the presence of the Lagrange multiplier, the mass matrix $\mathbf{M}$
 ||\cdot ||_{L^\infty ({X})} \approx || \cdot ||_{L^\infty_{\Delta t} ({X})} = \max_{t \in t_i} ||\cdot||_{{X}},
 \]
 where $t_i$ are the discrete simulation instants. 
-\subsection{Numerical test for the Mindlin plate}
+\subsection{Numerical test for the Mindlin plate}\label{sec:numtest_min}
 To validate the method first we test a finite element combinations on an analytic solution. Constructing an analytical solution for a vibrating Mindlin plate is far from trivial. Therefore, the solution for the static case \cite{veiga2013} is exploited. \\
 
 Consider a distributed static force given by 
@@ -406,7 +418,7 @@ e_w^\text{ex}\vert_{\partial\Omega} = 0, \\
 \end{equation}
 Variables $(e_w^\text{ex}, \bm{e}_\theta^\text{ex}, \bm{E}_\kappa^\text{ex}, \bm{e}_\gamma^\text{ex})$ under excitations $(f_d, \bm{\tau}_d)$ solve problem~\eqref{eq:pHdyn_Min1}. The solution being smooth, the conjectures \ref{conj:BJTestimates} and \ref{conj:AWFestimates} should hold. The numerical values of the physical parameters are reported in Table \ref{tab:parMin}.  
 
-\begin{table}[h!]
+\begin{table}[h]
 	\centering
 	\begin{tabular}{ccccc}
 		\hline 
@@ -426,7 +438,7 @@ Variables $(e_w^\text{ex}, \bm{e}_\theta^\text{ex}, \bm{E}_\kappa^\text{ex}, \bm
 
 The weak form \eqref{eq:weak_min_div_strong} and its corresponding finite elements \eqref{eq:BTJ} was implemented using {\sc{Firedrake}} extruded mesh functionality \cite{mcrae2016}. A direct solver based on an LU preconditioner is used. In Fig. \ref{fig:errorBTJ} and Tables \ref{tab:resminBTJ_k1}, \ref{tab:resminBTJ_k2}, \ref{tab:resminBTJ_k3} the errors for $(e_w, \bm{e}_\theta, \bm{E}_\kappa, \bm{e}_\gamma)$ are reported. As one can notice, the conjectured error estimates \eqref{eq:errBEC} are respected for all variables. 
 
-\begin{figure}[h!t]%
+\begin{figure}[h]%
 	\centering
 	\subfloat[][$L^\infty_{\Delta t} (L^2)$ error for $e_w$]{%
 		\label{fig:errBTJ1}%
@@ -446,70 +458,11 @@ The weak form \eqref{eq:weak_min_div_strong} and its corresponding finite elemen
 	\label{fig:errorBTJ}%
 \end{figure}
 
-\begin{table}[hp]
-	\centering
-	\begin{tabular}{ccccccccc}
-		\hline 
-		\multirow{2}{*}{$\frac{1}{h}$} & \multicolumn{2}{c}{$||e_w - e_w^h||_{L^{\infty}(L^2)}$}    & \multicolumn{2}{c}{$||\bm{e}_\theta - \bm{e}_\theta^h||_{L^{\infty}(L^2)}$} & \multicolumn{2}{c}{$||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty}(L^2)}$} & \multicolumn{2}{c}{$||\bm{e}_\gamma - \bm{e}_\gamma^ h||_{L^{\infty}(L^2)}$}   \\ 
-		& Error & Order  & Error & Order  & Error & Order  & Error & Order   \\ 
-		\hline 
-		4  & 1.62e-05 & ---  & 1.51e-04 & ---  & 4.89e-08 & ---  & 5.83e-07 & --- \\ 
-		8  & 6.52e-06 & 1.31 & 4.59e-05 & 1.71 & 1.45e-08 & 1.75 & 2.01e-07 & 1.53\\ 
-		16 & 3.28e-06 & 0.98 & 2.17e-05 & 1.07 & 5.69e-09 & 1.34 & 9.41e-08 & 1.09\\ 
-		32 & 1.64e-06 & 0.99 & 1.07e-05 & 1.01 & 2.63e-09 & 1.10 & 4.64e-08 & 1.02\\ 
-		64 & 8.24e-07 & 0.99 & 5.39e-06 & 1.00 & 1.29e-09 & 1.02 & 2.31e-08 & 1.00\\ 
-		\hline 
-	\end{tabular} 
-	\captionsetup{width=0.95\linewidth}
-	\vspace{1mm}
-	\captionof{table}{Mindlin plate convergence result for the BJT scheme $k=1$.}
-	\label{tab:resminBTJ_k1}
-\end{table}
-
-\begin{table}[hp]
-	\centering
-	\begin{tabular}{ccccccccc}
-		\hline 
-		\multirow{2}{*}{$\frac{1}{h}$} & \multicolumn{2}{c}{$||e_w - e_w^h||_{L^{\infty}(L^2)}$}    & \multicolumn{2}{c}{$||\bm{e}_\theta - \bm{e}_\theta^h||_{L^{\infty}(L^2)}$} & \multicolumn{2}{c}{$||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty}(L^2)}$} & \multicolumn{2}{c}{$||\bm{e}_\gamma - \bm{e}_\gamma^ h||_{L^{\infty}(L^2)}$}   \\ 
-		& Error & Order  & Error & Order  & Error & Order  & Error & Order   \\ 
-		\hline 
-		4  & 8.05e-06 & ---  & 7.22e-05 & ---  & 1.72e-08 & ---  & 2.42e-07 & --- \\ 
-		8  & 2.12e-06 & 1.92 & 1.87e-05 & 1.94 & 4.42e-09 & 1.96 & 6.06e-08 & 2.00\\ 
-		16 & 5.42e-07 & 1.96 & 4.09e-06 & 2.19 & 1.14e-09 & 1.95 & 1.43e-08 & 2.07\\ 
-		32 & 1.36e-07 & 1.99 & 1.04e-06 & 1.97 & 2.89e-10 & 1.97 & 3.56e-09 & 2.00\\ 
-		64 & 3.41e-08 & 1.99 & 2.62e-07 & 1.99 & 7.26e-11 & 1.99 & 8.88e-10 & 2.00\\ 
-		\hline 
-	\end{tabular} 
-	\captionsetup{width=0.95\linewidth}
-	\vspace{1mm}
-	\captionof{table}{Mindlin plate convergence result for the BJT scheme $k=2$.}
-	\label{tab:resminBTJ_k2}
-\end{table}
-
-\begin{table}[hp]
-	\centering
-	\begin{tabular}{ccccccccc}
-		\hline 
-		\multirow{2}{*}{$\frac{1}{h}$} & \multicolumn{2}{c}{$||e_w - e_w^h||_{L^{\infty}(L^2)}$}    & \multicolumn{2}{c}{$||\bm{e}_\theta - \bm{e}_\theta^h||_{L^{\infty}(L^2)}$} & \multicolumn{2}{c}{$||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty}(L^2)}$} & \multicolumn{2}{c}{$||\bm{e}_\gamma - \bm{e}_\gamma^ h||_{L^{\infty}(L^2)}$}   \\ 
-		& Error & Order  & Error & Order  & Error & Order  & Error & Order   \\ 
-		\hline 
-		2  & 6.98e-07 & ---  & 1.42e-05 & ---  & 1.54e-09 & ---  & 3.31e-08 & --- \\ 
-		4  & 1.09e-07 & 2.67 & 2.14e-06 & 2.72 & 2.31e-10 & 2.73 & 4.61e-09 & 2.84\\ 
-		8  & 1.44e-08 & 2.91 & 2.29e-07 & 3.22 & 2.42e-11 & 3.25 & 6.36e-10 & 2.85\\ 
-		16 & 1.83e-09 & 2.97 & 2.05e-08 & 3.19 & 2.62e-12 & 3.20 & 8.44e-11 & 2.91\\ 
-		32 & 2.30e-10 & 2.99 & 2.94e-09 & 3.08 & 3.00e-13 & 3.12 & 1.07e-11 & 2.97\\ 
-		\hline 
-	\end{tabular} 
-	\captionsetup{width=0.95\linewidth}
-	\vspace{1mm}
-	\captionof{table}{Mindlin plate convergence result for the BJT scheme $k=3$.}
-	\label{tab:resminBTJ_k3}
-\end{table}
 
 \paragraph{Results for the mixed weak symmetry formulation (AFW elements \eqref{eq:AFW})} 
-Formulation \eqref{eq:weak_min_div_weak} and its element \eqref{eq:AFW} are considered here. A direct solver failed for high order cases (i.e. $k=3$). For this reason a generalized minimal residual method is used with restart number of iterations equal to 100. In Fig. \ref{fig:errorAFW} and Tables \ref{tab:resminAFW_k1}, \ref{tab:resminAFW_k2}, \ref{tab:resminAFW_k3} the errors for variables $(e_w, \bm{e}_\theta, \bm{E}_\kappa, \bm{e}_\gamma)$  are reported. The errors for $(e_w, \bm{e}_\theta, \bm{e}_\gamma)$ respect the conjectured result \eqref{eq:errAFW}. Variable $\bm{E}_\kappa$ exhibit a superconvergence phenomenon for the case $k=1$. In \cite{arnold2014elastodynamics} no numerical study was carried out for the case $k=1$. The $BDM$ elements might be responsible for such superconvergence. The convergence order of $(\bm{E}_\kappa, \bm{e}_\gamma)$ deteriorates for $k=3$ for the finest mesh. This must be linked to errors due to the underlying large saddle-point problem. Indeed in \cite{arnold2014elastodynamics} an hybridization method is used to transform the saddle-point problem into a positive definite one. The results for the Lagrange multiplier is reported in Fig. \ref{fig:errAFW5} and Table \ref{tab:resminAFW_r}. For this variable an order 2 of convergence is observed for all cases.
+Formulation \eqref{eq:weak_min_div_weak} and its element \eqref{eq:AFW} are considered here. A direct solver fails for high order cases (i.e. $k=3$). For this reason a generalized minimal residual method GMRES \cite{saad1986gmres} is used with restart number of iterations equal to 100. In Fig. \ref{fig:errorAFW} and Tables \ref{tab:resminAFW_k1}, \ref{tab:resminAFW_k2}, \ref{tab:resminAFW_k3} the errors for variables $(e_w, \bm{e}_\theta, \bm{E}_\kappa, \bm{e}_\gamma)$  are reported. The errors for $(e_w, \bm{e}_\theta, \bm{e}_\gamma)$ respect the conjectured result \eqref{eq:errAFW}. Variable $\bm{E}_\kappa$ exhibit a superconvergence phenomenon for the case $k=1$. In \cite{arnold2014elastodynamics} no numerical study was carried out for the case $k=1$. The $BDM$ elements might be responsible for such superconvergence. The convergence order of $(\bm{E}_\kappa, \bm{e}_\gamma)$ deteriorates for $k=3$ for the finest mesh. This must be linked to errors due to the underlying large saddle-point problem. Indeed in \cite{arnold2014elastodynamics} an hybridization method is used to transform the saddle-point problem into a positive definite one. The results for the Lagrange multiplier is reported in Fig. \ref{fig:errAFW5} and Table \ref{tab:resminAFW_r}. For this variable an order 2 of convergence is observed for all cases.
 
-\begin{figure}[h!t]%
+\begin{figure}[h]%
 	\centering
 	\subfloat[][$L^\infty_{\Delta t} (L^2)$ error for $e_w$]{%
 		\label{fig:errAFW1}%
@@ -533,89 +486,14 @@ Formulation \eqref{eq:weak_min_div_weak} and its element \eqref{eq:AFW} are cons
 \end{figure}
 
 
-\begin{table}[hp]
-	\centering
-	\begin{tabular}{ccccccccc}
-		\hline 
-		\multirow{2}{*}{$\frac{1}{h}$} & \multicolumn{2}{c}{$||e_w - e_w^h||_{L^{\infty}(L^2)}$}    & \multicolumn{2}{c}{$||\bm{e}_\theta - \bm{e}_\theta^h||_{L^{\infty}(L^2)}$} & \multicolumn{2}{c}{$||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty}(L^2)}$} & \multicolumn{2}{c}{$||\bm{e}_\gamma - \bm{e}_\gamma^ h||_{L^{\infty}(L^2)}$}   \\ 
-		& Error & Order  & Error & Order  & Error & Order  & Error & Order   \\ 
-		\hline 
-		4  & 1.05e-05 & ---  & 7.96e-05 & ---  & 3.75e-08 & ---  & 6.54e-07 & --- \\ 
-		8  & 5.33e-06 & 0.98 & 3.53e-05 & 1.17 & 1.15e-08 & 1.70 & 3.73e-07 & 0.80\\ 
-		16 & 2.68e-06 & 0.99 & 1.75e-05 & 1.00 & 3.02e-09 & 1.92 & 1.92e-07 & 0.95\\ 
-		32 & 1.34e-06 & 0.99 & 8.80e-06 & 0.99 & 7.71e-10 & 1.97 & 9.72e-08 & 0.98\\ 
-		\hline 
-	\end{tabular} 
-	\captionsetup{width=0.95\linewidth}
-	\vspace{1mm}
-	\captionof{table}{Mindlin plate convergence result for the AFW scheme $k=1$.}
-	\label{tab:resminAFW_k1}
-\end{table}
 
-\begin{table}[hp]
-	\centering
-	\begin{tabular}{ccccccccc}
-		\hline 
-		\multirow{2}{*}{$\frac{1}{h}$} & \multicolumn{2}{c}{$||e_w - e_w^h||_{L^{\infty}(L^2)}$}    & \multicolumn{2}{c}{$||\bm{e}_\theta - \bm{e}_\theta^h||_{L^{\infty}(L^2)}$} & \multicolumn{2}{c}{$||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty}(L^2)}$} & \multicolumn{2}{c}{$||\bm{e}_\gamma - \bm{e}_\gamma^ h||_{L^{\infty}(L^2)}$}   \\ 
-		& Error & Order  & Error & Order  & Error & Order  & Error & Order   \\ 
-		\hline 
-		4  & 8.43e-06 & ---  & 8.10e-05 & ---  & 1.80e-08 & ---  & 2.68e-07 & --- \\ 
-		8  & 2.28e-06 & 1.88 & 1.82e-05 & 2.15 & 4.79e-09 & 1.90 & 6.99e-08 & 1.93\\ 
-		16 & 5.85e-07 & 1.96 & 4.41e-06 & 2.04 & 1.22e-09 & 1.96 & 1.75e-08 & 1.99\\ 
-		32 & 1.47e-07 & 1.98 & 1.12e-06 & 1.97 & 3.03e-10 & 2.01 & 4.47e-09 & 1.97\\ 
-		\hline 
-	\end{tabular} 
-	\captionsetup{width=0.95\linewidth}
-	\vspace{1mm}
-	\captionof{table}{Mindlin plate convergence result for the AFW scheme $k=2$.}
-	\label{tab:resminAFW_k2}
-\end{table}
-
-\begin{table}[hp]
-	\centering
-	\begin{tabular}{ccccccccc}
-		\hline 
-		\multirow{2}{*}{$\frac{1}{h}$} & \multicolumn{2}{c}{$||e_w - e_w^h||_{L^{\infty}(L^2)}$}    & \multicolumn{2}{c}{$||\bm{e}_\theta - \bm{e}_\theta^h||_{L^{\infty}(L^2)}$} & \multicolumn{2}{c}{$||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty}(L^2)}$} & \multicolumn{2}{c}{$||\bm{e}_\gamma - \bm{e}_\gamma^ h||_{L^{\infty}(L^2)}$}   \\ 
-		& Error & Order  & Error & Order  & Error & Order  & Error & Order   \\ 
-		\hline 
-		2  & 1.11e-06 & ---  & 1.63e-05 & ---  & 2.14e-09 & ---  & 4.63e-08 & --- \\ 
-		4  & 1.63e-07 & 2.77 & 2.56e-06 & 2.67 & 2.61e-10 & 3.04 & 6.96e-09 & 2.73\\ 
-		8  & 2.13e-08 & 2.93 & 2.63e-07 & 3.28 & 2.42e-11 & 3.42 & 9.90e-10 & 2.81\\ 
-		16 & 2.93e-09 & 2.86 & 4.24e-08 & 2.63 & 8.99e-12 & 1.43 & 3.64e-10 & 1.44\\ 
-		\hline 
-	\end{tabular} 
-	\captionsetup{width=0.95\linewidth}
-	\vspace{1mm}
-	\captionof{table}{Mindlin plate convergence result for the AFW scheme $k=3$.}
-	\label{tab:resminAFW_k3}
-\end{table}
-
-\begin{table}[hp]
-	\centering
-	\begin{tabular}{ccccccc}
-		\hline 
-		\multicolumn{7}{c}{$||\bm{E}_r - \bm{E}_r^h||_{L^{\infty}(L^2)}$} \\
-		\multirow{2}{*}{$\frac{1}{h}$} & \multicolumn{2}{c}{$k=1$}    & \multicolumn{2}{c}{$k=2$} & \multicolumn{2}{c}{$k=3$}   \\ 
-		& Error & Order  & Error & Order  & Error & Order \\ 
-		\hline 
-		4  & 2.45e-09 & ---  & 1.07e-09 & ---  & 1.57e-09 & ---  \\ 
-		8  & 4.98e-10 & 2.29 & 2.48e-10 & 2.11 & 3.52e-10 & 2.15 \\ 
-		16 & 1.26e-10 & 1.97 & 6.11e-11 & 2.02 & 8.67e-11 & 2.02 \\ 
-		32 & 3.19e-11 & 1.98 & 1.52e-11 & 1.99 & 2.16e-11 & 2.00 \\ 
-		\hline 
-	\end{tabular} 
-	\captionsetup{width=0.95\linewidth}
-	\vspace{1mm}
-	\captionof{table}{Mindlin plate convergence result for the Lagrange multiplier $\bm{E}_r$.}
-	\label{tab:resminAFW_r}
-\end{table}
 
 
 \paragraph{Results for dual mixed formulation (CGDG elements \eqref{eq:CGDG})}
 A direct solver based on an LU preconditioner is used.
 In Fig. \ref{fig:errorCGDG} and Tables \ref{tab:resminCGDG_k1} the errors are reported. Conjecture \ref{conj:CGDGestimates} is verified for this test. 
 
-\begin{figure}[h!t]%
+\begin{figure}[h]%
 	\centering
 	\subfloat[][$L^\infty_{\Delta t} ( H^1(\Omega))$ error for $e_w$]{%
 		\label{fig:errCGDG1}%
@@ -635,67 +513,7 @@ In Fig. \ref{fig:errorCGDG} and Tables \ref{tab:resminCGDG_k1} the errors are re
 	\label{fig:errorCGDG}%
 \end{figure}
 
-\begin{table}[hp]
-	\centering
-	\begin{tabular}{ccccccccc}
-		\hline 
-		\multirow{2}{*}{$\frac{1}{h}$} & \multicolumn{2}{c}{$||e_w - e_w^h||_{L^{\infty}(H^1)}$}    & \multicolumn{2}{c}{$||\bm{e}_\theta - \bm{e}_\theta^h||_{L^{\infty}(H^{\Grad})}$} & \multicolumn{2}{c}{$||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty}(L^2)}$} & \multicolumn{2}{c}{$||\bm{e}_\gamma - \bm{e}_\gamma^ h||_{L^{\infty}(L^2)}$}   \\ 
-		& Error & Order  & Error & Order  & Error & Order  & Error & Order   \\ 
-		\hline 
-		8  & 7.30e-05 & ---  & 5.52e-04 & ---  & 3.99e-08 & ---  & 9.02e-07 & --- \\ 
-		16 & 3.13e-05 & 1.22 & 2.26e-04 & 1.28 & 1.88e-08 & 1.08 & 5.47e-07 & 0.72\\ 
-		32 & 1.57e-05 & 0.99 & 1.11e-04 & 1.02 & 8.84e-09 & 1.09 & 2.94e-07 & 0.89\\ 
-		64 & 7.87e-06 & 0.99 & 5.57e-05 & 0.99 & 4.31e-09 & 1.03 & 1.50e-07 & 0.97\\ 
-		128& 3.94e-06 & 0.99 & 2.78e-05 & 0.99 & 2.14e-09 & 1.01 & 7.55e-08 & 0.99\\ 
-		\hline 
-	\end{tabular} 
-	\captionsetup{width=0.95\linewidth}
-	\vspace{1mm}
-	\captionof{table}{Mindlin plate convergence result for the CGDG scheme $k=1$.}
-	\label{tab:resminCGDG_k1}
-\end{table}
 
-
-\begin{table}[hp]
-	\centering
-	\begin{tabular}{ccccccccc}
-		\hline 
-		\multirow{2}{*}{$\frac{1}{h}$} & \multicolumn{2}{c}{$||e_w - e_w^h||_{L^{\infty}(H^1)}$}    & \multicolumn{2}{c}{$||\bm{e}_\theta - \bm{e}_\theta^h||_{L^{\infty}(H^{\Grad})}$} & \multicolumn{2}{c}{$||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty}(L^2)}$} & \multicolumn{2}{c}{$||\bm{e}_\gamma - \bm{e}_\gamma^ h||_{L^{\infty}(L^2)}$}   \\
-		& Error & Order  & Error & Order  & Error & Order  & Error & Order   \\ 
-		\hline 
-		8  & 9.78e-06 & ---  & 1.04e-04 & ---  & 7.30e-09 & ---  & 1.77e-07 & --- \\ 
-		16 & 2.53e-06 & 1.95 & 2.49e-05 & 2.07 & 1.85e-09 & 1.97 & 4.93e-08 & 1.84\\ 
-		32 & 6.35e-07 & 1.99 & 6.06e-06 & 2.04 & 4.63e-10 & 1.99 & 1.27e-08 & 1.95\\ 
-		64 & 1.58e-07 & 1.99 & 1.50e-06 & 2.01 & 1.15e-10 & 2.00 & 3.21e-09 & 1.98\\ 
-		128& 3.97e-08 & 2.00 & 3.74e-07 & 2.00 & 2.89e-11 & 2.00 & 8.06e-10 & 1.99\\ 
-		\hline 
-	\end{tabular} 
-	\captionsetup{width=0.95\linewidth}
-	\vspace{1mm}
-	\captionof{table}{Mindlin plate convergence result for the CGDG scheme $k=2$.}
-	\label{tab:resminCGDG_k2}
-\end{table}
-
-
-\begin{table}[hp]
-	\centering
-	\begin{tabular}{ccccccccc}
-		\hline 
-		\multirow{2}{*}{$\frac{1}{h}$} & \multicolumn{2}{c}{$||e_w - e_w^h||_{L^{\infty}(H^1)}$}    & \multicolumn{2}{c}{$||\bm{e}_\theta - \bm{e}_\theta^h||_{L^{\infty}(H^{\Grad})}$} & \multicolumn{2}{c}{$||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty}(L^2)}$} & \multicolumn{2}{c}{$||\bm{e}_\gamma - \bm{e}_\gamma^ h||_{L^{\infty}(L^2)}$}   \\
-		& Error & Order  & Error & Order  & Error & Order  & Error & Order   \\ 
-		\hline 
-		4  & 1.38e-06 & ---  & 1.24e-05 & ---  & 8.24e-10 & ---  & 2.24e-08 & --- \\ 
-		8  & 1.79e-07 & 2.94 & 1.51e-06 & 3.03 & 1.03e-10 & 2.99 & 2.90e-09 & 2.94\\ 
-		16 & 2.26e-08 & 2.98 & 1.88e-07 & 3.00 & 1.28e-11 & 3.00 & 3.64e-10 & 2.99\\ 
-		32 & 2.83e-09 & 2.99 & 2.36e-08 & 2.99 & 1.60e-12 & 3.00 & 4.54e-11 & 3.00\\ 
-		64 & 3.54e-10 & 2.99 & 2.95e-09 & 2.99 & 2.00e-13 & 3.00 & 5.67e-12 & 3.00\\ 
-		\hline 
-	\end{tabular} 
-	\captionsetup{width=0.95\linewidth}
-	\vspace{1mm}
-	\captionof{table}{Mindlin plate convergence result for the CGDG scheme $k=3$.}
-	\label{tab:resminCGDG_k3}
-\end{table}
 
 
 \subsection{Numerical test for the Kirchhoff plate}
@@ -720,7 +538,7 @@ e_w\vert_{\partial\Omega} = 0, \qquad \bm{E}_\kappa \cddot (\bm{n} \otimes \bm{n
 \]
 Variables $(e_w^{\text{ex}}, \bm{E}_\kappa^{\text{ex}})$ under excitation $f$ solve problem~\eqref{eq:pHdyn_Kir}. The physical parameters used in simulation are reported in Table \ref{tab:parKir}. 
 
-\begin{table}[h!]
+\begin{table}[h]
 	\centering
 	\begin{tabular}{cccc}
 		\hline 
@@ -740,7 +558,7 @@ Variables $(e_w^{\text{ex}}, \bm{E}_\kappa^{\text{ex}})$ under excitation $f$ so
 \paragraph{Results for the HHJ elements \eqref{eq:HHJ}}
 Results are shown in Fig.~\ref{fig:errorHHJ_SSSS} and Tables \ref{tab:resminHHJ_SSSS_k1}, \ref{tab:resminHHJ_SSSS_k2} and \ref{tab:resminHHJ_SSSS_k3}. The conjectured error estimates are respected.
 
-\begin{figure}[h!t]%
+\begin{figure}[h]%
 	\centering
 	\subfloat[][$L^\infty_{\Delta t} (H^1)$ error for $e_w$]{%
 		\label{fig:errHHJ1_SSSS}%
@@ -753,72 +571,14 @@ Results are shown in Fig.~\ref{fig:errorHHJ_SSSS} and Tables \ref{tab:resminHHJ_
 	\label{fig:errorHHJ_SSSS}%
 \end{figure}
 
-\begin{table}[hp]
-	\centering
-	\begin{tabular}{ccccc}
-		\hline 
-		\multirow{2}{*}{$\frac{1}{h}$} & \multicolumn{2}{c}{$||e_w - e_w^h||_{L^{\infty}(L^2)}$}  & \multicolumn{2}{c}{$||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty}(L^2)}$}   \\ 
-		& Error & Order  & Error & Order  \\
-		\hline 
-		4  & 1.38e-00 & ---  & 5.11e+01 & ---  \\ 
-		8  & 5.17e-01 & 1.41 & 2.64e+01 & 0.95 \\ 
-		16 & 2.28e-01 & 1.18 & 1.33e+01 & 0.98 \\ 
-		32 & 1.09e-01 & 1.05 & 6.68e-00 & 0.99 \\ 
-		64 & 5.45e-02 & 1.01 & 3.34e-00 & 0.99 \\ 
-		\hline 
-	\end{tabular} 
-	\captionsetup{width=0.95\linewidth}
-	\vspace{1mm}
-	\captionof{table}{Kirchoff plate convergence result for SSSS test $k=1$.}
-	\label{tab:resminHHJ_SSSS_k1}
-\end{table}
 
-\begin{table}[hp]
-	\centering
-	\begin{tabular}{ccccc}
-		\hline 
-		\multirow{2}{*}{$\frac{1}{h}$} & \multicolumn{2}{c}{$||e_w - e_w^h||_{L^{\infty}(L^2)}$}  & \multicolumn{2}{c}{$||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty}(L^2)}$}   \\ 
-		& Error & Order  & Error & Order  \\
-		\hline 
-		4  & 1.47e-01 & ---  & 6.58e-00 & ---  \\ 
-		8  & 3.48e-02 & 2.08 & 1.70e-00 & 1.94 \\ 
-		16 & 8.51e-03 & 2.03 & 4.31e-01 & 1.98 \\ 
-		32 & 2.11e-03 & 2.00 & 1.08e-01 & 1.99 \\ 
-		64 & 5.28e-04 & 2.00 & 2.70e-02 & 1.99 \\ 
-		\hline 
-	\end{tabular} 
-	\captionsetup{width=0.95\linewidth}
-	\vspace{1mm}
-	\captionof{table}{Kirchoff plate convergence result for SSSS test $k=2$.}
-	\label{tab:resminHHJ_SSSS_k2}
-\end{table}
-
-\begin{table}[hp]
-	\centering
-	\begin{tabular}{ccccc}
-		\hline 
-		\multirow{2}{*}{$\frac{1}{h}$} & \multicolumn{2}{c}{$||e_w - e_w^h||_{L^{\infty}(L^2)}$}  & \multicolumn{2}{c}{$||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty}(L^2)}$}   \\ 
-		& Error & Order  & Error & Order  \\
-		\hline 
-		2  & 1.15e-01 & ---  & 4.85e-00 & ---  \\ 
-		4  & 1.51e-02 & 2.92 & 6.42e-01 & 2.91 \\ 
-		8  & 1.92e-03 & 2.97 & 8.10e-02 & 2.98 \\ 
-		16 & 2.41e-04 & 2.99 & 1.01e-02 & 2.99 \\ 
-		32 & 3.02e-05 & 2.99 & 1.26e-03 & 3.00 \\ 
-		\hline 
-	\end{tabular} 
-	\captionsetup{width=0.95\linewidth}
-	\vspace{1mm}
-	\captionof{table}{Kirchoff plate convergence result for SSSS test $k=3$.}
-	\label{tab:resminHHJ_SSSS_k3}
-\end{table}
 
 \paragraph{Results for the dual mixed formulation}
 
 
 \subsubsection{Mixed boundary conditions (CSFS)}
 
-We retrieve the manufactured solution for the static case from \cite{rafetseder2018}. Consider a square plate $\Omega = (-1,1)\times (-1,1)$ with simply supported top and  bottom boundary, clamped left boundary and free right boundary. The stiffness tensor is the identity
+We retrieve the manufactured solution for the static case from \cite{rafetseder2018siam}. Consider a square plate $\Omega = (-1,1)\times (-1,1)$ with simply supported top and  bottom boundary, clamped left boundary and free right boundary. The stiffness tensor is the identity
 \begin{equation*}
 \bm{\mathcal{D}}_b = \mathrm{Id}.
 \end{equation*} 
@@ -839,7 +599,7 @@ c_2 &= - \frac{8\pi[2\pi\sinh(\pi) + \cosh(\pi)]}{5 + 8\pi^2 + 3\cosh(4\pi)}, \\
 c_3 &= \frac{10\cosh(\pi) + 6\cosh(\pi) + 16\pi[\sinh(\pi) + \pi\cosh(\pi)]}{5 + 8 \pi^2 + 3\cosh(4\pi)}, \\
 c_4 &= \frac{2\pi(5\sinh(\pi) - 3\sinh(3\pi) + 4\pi\cosh(\pi))}{5 + 8\pi^2 + 3\cosh(4\pi)}
 \end{align*}
-The dynamical solution is constructed as in paragraph \ref{par:analytical_min}, meaning that a the static solution is multiplied by a sinusoidal function in time
+The dynamical solution is constructed as in Sec. \secref{sec:numtest_min}, meaning that a the static solution is multiplied by a sinusoidal function in time
 \begin{equation*}
 w_d(x, y) = w_s(x, y) \sin(t).
 \end{equation*}
@@ -877,9 +637,9 @@ e_w^\text{ex}\vert_{y=1} = 0, \\
 Variables $(e_w^\text{ex}, \bm{E}_\kappa^\text{ex})$ under excitations $f_d$ solve problem~\eqref{eq:pHdyn_Kir1}. 
 
 \paragraph{Results for the HHJ elements \eqref{eq:HHJ}}
-The results are reported in Fig. \ref{fig:errorHHJ_CSSF} and Tables \ref{tab:resminHHJ_CSFS_k1}, \ref{tab:resminHHJ_CSFS_k2}, \ref{tab:resminHHJ_CSFS_k3}. The conjecture \ref{conj:HHJestimates} is verified for all orders.
+The results are reported in Fig. \ref{fig:errorHHJ_CSSF} and Tables \ref{tab:resminHHJ_CSFS_k1}, \ref{tab:resminHHJ_CSFS_k2}, \ref{tab:resminHHJ_CSFS_k3}. Conjecture \ref{conj:HHJestimates} is verified for all orders.
 
-\begin{figure}[h!t]%
+\begin{figure}[h]%
 	\centering
 	\subfloat[][$L^\infty_{\Delta t} (H^1)$ error for $e_w$]{%
 		\label{fig:errHHJ1_CSSF}%
@@ -892,70 +652,10 @@ The results are reported in Fig. \ref{fig:errorHHJ_CSSF} and Tables \ref{tab:res
 	\label{fig:errorHHJ_CSSF}%
 \end{figure}
 
-\begin{table}[hp]
-	\centering
-	\begin{tabular}{ccccc}
-		\hline 
-		\multirow{2}{*}{$\frac{1}{h}$} & \multicolumn{2}{c}{$||e_w - e_w^h||_{L^{\infty}(L^2)}$}  & \multicolumn{2}{c}{$||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty}(L^2)}$}   \\ 
-		& Error & Order  & Error & Order  \\
-		\hline 
-		4  & 5.94e-00 & ---  & 1.62e+01 & ---  \\ 
-		8  & 2.35e-00 & 1.33 & 9.27e-00 & 0.81 \\ 
-		16 & 9.98e-01 & 1.23 & 4.86e-00 & 0.93 \\ 
-		32 & 4.69e-01 & 1.08 & 2.46e-00 & 0.98 \\ 
-		64 & 2.34e-01 & 1.00 & 1.23e-00 & 0.99 \\ 
-		\hline 
-	\end{tabular} 
-	\captionsetup{width=0.95\linewidth}
-	\vspace{1mm}
-	\captionof{table}{Kirchoff plate convergence result for CSFS test $k=1$.}
-	\label{tab:resminHHJ_CSFS_k1}
-\end{table}
-
-\begin{table}[hp]
-	\centering
-	\begin{tabular}{ccccc}
-		\hline 
-		\multirow{2}{*}{$\frac{1}{h}$} & \multicolumn{2}{c}{$||e_w - e_w^h||_{L^{\infty}(L^2)}$}  & \multicolumn{2}{c}{$||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty}(L^2)}$}   \\ 
-		& Error & Order  & Error & Order  \\
-		\hline 
-		4  & 1.13e-00 & ---  & 4.14e-00 & ---  \\ 
-		8  & 2.90e-01 & 1.96 & 1.19e-00 & 1.79 \\ 
-		16 & 7.14e-02 & 2.02 & 3.13e-01 & 1.93 \\ 
-		32 & 1.77e-02 & 2.00 & 7.96e-02 & 1.97 \\ 
-		64 & 4.43e-03 & 2.00 & 2.00e-02 & 1.98 \\ 
-		\hline 
-	\end{tabular} 
-	\captionsetup{width=0.95\linewidth}
-	\vspace{1mm}
-	\captionof{table}{Kirchoff plate convergence result for CSFS test $k=2$.}
-	\label{tab:resminHHJ_CSFS_k2}
-\end{table}
-
-\begin{table}[hp]
-	\centering
-	\begin{tabular}{ccccc}
-		\hline 
-		\multirow{2}{*}{$\frac{1}{h}$} & \multicolumn{2}{c}{$||e_w - e_w^h||_{L^{\infty}(L^2)}$}  & \multicolumn{2}{c}{$||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty}(L^2)}$}   \\ 
-		& Error & Order  & Error & Order  \\
-		\hline 
-		2  & 1.57e-00 & ---  & 4.25e-00 & ---  \\ 
-		4  & 2.39e-01 & 2.71 & 8.44e-01 & 2.33 \\ 
-		8  & 3.37e-02 & 2.82 & 1.16e-01 & 2.85 \\ 
-		16 & 4.50e-03 & 2.90 & 1.49e-02 & 2.95 \\ 
-		32 & 5.76e-04 & 2.96 & 1.89e-03 & 2.98 \\ 
-		\hline 
-	\end{tabular} 
-	\captionsetup{width=0.95\linewidth}
-	\vspace{1mm}
-	\captionof{table}{Kirchoff plate convergence result for CSFS test $k=3$.}
-	\label{tab:resminHHJ_CSFS_k3}
-\end{table}
-
 
 
 \paragraph{Results for the dual mixed formulation}
 
 
 \section{Conclusion}
-In this paper, the link between mixed finite element method and pH plate models has been studied. It was shown that existing elements can be used to obtain structure-preserving discretization. A rigorous error analysis is still to be done but it should be easy to prove, given the available results. Since the pH framework provides a powerful description of boundary controlled systems, it is important that numerical methods be capable of handling generic boundary conditions. The methods discussed here possess this feature in the Mindlin plate case. For the Kirchhoff plate, a promising methodology is detailed in \cite{mixed_kirchhoff}, but the dynamical case has not been considered yet. Future developments include the analysis and discretization of viscoelastic and thermoelastic problems in pH form.
+In this paper, the link between mixed finite element method and pH plate models has been studied. It was shown that existing elements can be used to obtain structure-preserving discretization. A rigorous error analysis is still to be done but it should be easy to prove, given the available results. Since the pH framework provides a powerful description of boundary controlled systems, it is important that numerical methods be capable of handling generic boundary conditions. The methods discussed here possess this feature in the Mindlin plate case. For the Kirchhoff plate, a promising methodology is detailed in \cite{rafetseder2018siam}, but the dynamical case has not been considered yet. Future developments include the analysis and discretization of viscoelastic and thermoelastic problems in pH form.
