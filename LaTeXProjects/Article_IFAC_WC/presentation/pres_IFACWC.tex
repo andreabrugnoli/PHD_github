@@ -2,12 +2,13 @@
 \usefonttheme[onlymath]{serif}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{bm}
-
+\usepackage{comment}
 \usepackage{graphicx}
 \usepackage{diffcoeff}
 \usepackage{dsfont}
 \usepackage{mathrsfs}
-\usepackage{tcolorbox}
+\usepackage[most]{tcolorbox}
+\usepackage[caption=false]{subfig}
 
 %\usepackage{multimedia}
 \usepackage{media9}
@@ -15,7 +16,10 @@
 
 \graphicspath{{../Figures/}}
 
-\bibliography{bib_pres_IFACWC}
+\definecolor{lightyellow}{RGB}{255, 255, 150}
+
+
+\bibliography{bib_pres_IFACWC.bib}
 
 \DeclareMathOperator{\Tr}{Tr}
 \DeclareMathOperator*{\grad}{grad}
@@ -44,9 +48,23 @@
 
 \author[Andrea Brugnoli]{Andrea Brugnoli\inst{1}, Fl\'avio Luiz Cardoso-Ribeiro\inst{2}, Ghislain Haine\inst{1}, Paul Kotyczka\inst{3}}
 
-\institute{\inst{1}ISAE-SUPAERO, France \and \inst{2}Instituto Tecnol\'ogico de Aeron\'autica, Brazil \and \inst{3}Technical University of Munich, Germany}
+\institute[ISAE]{\inst{1}ISAE-SUPAERO, France \and \inst{2}Instituto Tecnol\'ogico de Aeron\'autica, Brazil \and \inst{3}Technical University of Munich, Germany}
 
 \date[Berlin, 11/7/20]{July, the 11th, 2020}
+
+\AtBeginSection[]{
+	\begin{frame}<beamer>
+	\frametitle{Plan} %
+	\tableofcontents[currentsection,subsectionstyle=shaded]  
+\end{frame}
+}
+
+\AtBeginSubsection[]{
+\begin{frame}<beamer>
+\frametitle{Plan} %
+\tableofcontents[currentsection,hideothersubsections,currentsubsection]  
+\end{frame}
+}
 
 %\thanks{}
 
@@ -126,6 +144,7 @@ g(r) = 16 \frac{r^2}{R^4} \left( R - r \right)^2 v_0.
 }
 \only<3>{
 	\centering
+	\vspace{2cm}
 	\includegraphics[width=0.8\textwidth]{bc_3D_sketch.eps}	
 }
 \end{overlayarea}
@@ -136,7 +155,7 @@ g(r) = 16 \frac{r^2}{R^4} \left( R - r \right)^2 v_0.
 \begin{frame}{Model reduction by symmetry}
 \begin{overlayarea}{\textwidth}{\textheight}
 	
-	Because of symmetry the model can be reduced to a 2D problem in polar coordinates over the domain $\Omega_{\text{r}} = \{x \in [0, L], r \in [0, R]\}$
+	Because of symmetry the model can be reduced to a 2D problem 
 	\begin{equation*}
 	\diffp{}{t}
 	\begin{bmatrix}
@@ -153,7 +172,7 @@ g(r) = 16 \frac{r^2}{R^4} \left( R - r \right)^2 v_0.
 	p \\
 	v_x \\
 	v_r \\
-	\end{bmatrix}.
+	\end{bmatrix}, \quad \text{on } \Omega_{\text{r}} = \{x \in [0, L], r \in [0, R]\}.
 	\end{equation*}
 	\only<2>{
 	The boundary conditions must now account for the symmetry condition at $r=0$
@@ -180,7 +199,7 @@ The system can be rewritten compactly as a pH system in co-energy variables
 \label{eq:sys_ph}
 \mathcal{M} \partial_t{e} = \mathcal{J} e
 \end{equation*}
-where $\mathcal{M} = \mathrm{diag}([\chi_s, \ \mu_0, \ \mu_0])$  and $e = [p, \ v_x, \ v_r]^\top$. \\
+where $\mathcal{M} = \mathrm{diag}([\chi_s, \ \mu_0, \ \mu_0])$  and $e = [e_p, \ \bm{e}_{v}]^\top= [p, \ \bm{v}]^\top$. \\
 \vspace{8pt}
 \only<1>{
 The Hamiltonian is then computed as
@@ -199,49 +218,26 @@ The power flow is obtained by application of the Stokes theorem
 \only<2>{
 The interconnection operator $\mathcal{J}$ can be decomposed into the sum of $\mathcal{J} = \mathcal{J}_{\text{div}} + \mathcal{J}_{\text{grad}}$
 \begin{equation*}
-\mathcal{J}_{\text{div}} = -\begin{bmatrix}
-0 & \partial_x & \partial_r + 1/r \\
-0 & 0 & 0 \\
-0 & 0 & 0 \\
-\end{bmatrix}, \qquad 
-\mathcal{J}_{\text{grad}} = -\begin{bmatrix}
-0 & 0 & 0 \\
-\partial_x & 0 & 0 \\
-\partial_r & 0 & 0 \\
-\end{bmatrix}.
+\begin{aligned}
+\mathcal{J}_{\text{div}} &= -\begin{bmatrix}
+0 & \div_r \\
+0 & 0 \\
+\end{bmatrix}, \qquad \div_r = [\partial_x, \;   \partial_r + 1/r] \\
+\mathcal{J}_{\text{grad}} &= -\begin{bmatrix}
+0 & 0 \\
+{\grad}_r & 0 \\
+\end{bmatrix}, \qquad {\grad}_r =\begin{pmatrix}
+\partial_x\\
+\partial_r
+\end{pmatrix}.
+\end{aligned}
 \end{equation*}
 }
 \end{overlayarea}
 \end{frame}
 
 
-\section{Finite element Discretization}
-
-\begin{frame}{}
-\begin{exampleblock}{Available methods}
-	\begin{itemize}
-		\item Spectral methods (Moulla 2012):
-		\begin{itemize}
-			\item[\textcolor{green}{\checkmark}] Rapid spectral convergence;
-			\item[\textcolor{red}{$\times$}] Only for 1D problem;
-		\end{itemize}
-		\item Finite differences (Trenchant 2018);
-		\begin{itemize}
-			\item[\textcolor{green}{\checkmark}] Valid up to 2D geometries;
-			\item[\textcolor{red}{$\times$}] Requires \textit{ad hoc} implementation (staggered grids);
-		\end{itemize}
-		\item Finite elements based
-		\begin{itemize}
-			\item Golo 2004, Kotyczka 2018: the implementation requires exterior calculus knowledge and depends on the some parameters that ensure the preservation of power flow;		
-			\item \textcolor{blue}{Cardoso-Ribeiro 2018}:
-			\begin{itemize}
-				\item[\textcolor{green}{\checkmark}] Natural extension of the mixed finite element method to pH systems;
-				\item[\textcolor{green}{\checkmark}] Implementable using well-established libraries (Fenics, Firedrake);
-			\end{itemize}
-		\end{itemize}
-	\end{itemize}
-\end{exampleblock}
-\end{frame}
+\section{Finite dimensional Discretization}
 
 \begin{frame}{The partitioned finite element method (PFEM)}
 
@@ -267,14 +263,14 @@ The interconnection operator $\mathcal{J}$ can be decomposed into the sum of $\m
 \only<1>{
 If the integration by parts is applied on $\mathcal{J}_{\text{div}}$
 \begin{equation*}
-\left(w, \mathcal{J} e \right)_{\Omega_{\text{r}}} = \left(w, \mathcal{J}_{\text{grad}} \ e \right)_{\Omega_{\text{r}}} - \left(\mathcal{J}_{\text{grad}} \ w, e \right)_{\Omega_{\text{r}}} + \left(w_p, \textcolor{red}{u_N} \right)_{\partial \Omega_{\text{r}}}.
+\left(w, \mathcal{J} e \right)_{\Omega_{\text{r}}} = \left(\bm{w}_v, {\grad}_r e_p \right)_{\Omega_{\text{r}}} - \left({\grad}_r w_p, \bm{e}_v \right)_{\Omega_{\text{r}}} + \left(w_p, \textcolor{red}{u_N} \right)_{\partial \Omega_{\text{r}}}.
 \end{equation*}
 The skew-symmetric bilinear form 
-\[ j_{\text{grad}}(w, e) := \left(w, \mathcal{J}_{\text{grad}} \ e \right)_{\Omega_{\text{r}}} - \left(\mathcal{J}_{\text{grad}} \ w, e \right)_{\Omega_{\text{r}}} \]
-may now be introduced, together with the boundary form
+\[ j_{\text{grad}}(w, e) := \left(\bm{w}_v, {\grad}_r e_p \right)_{\Omega_{\text{r}}} - \left({\grad}_r w_p, \bm{e}_v \right)_{\Omega_{\text{r}}} \]
+is introduced, together with the boundary form
 \begin{equation*}
 \label{eq:f_N}
-\left(w_p, u_N \right)_{\partial \Omega_{\text{r}}} = \int_{\partial \Omega_{\text{r}}} w_p \textcolor{red}{u_N} \ \d{\Gamma_r},
+\left(w_p, \textcolor{red}{u_N} \right)_{\partial \Omega_{\text{r}}} = \int_{\partial \Omega_{\text{r}}} w_p \textcolor{red}{u_N} \ \d{\Gamma_r},
 \end{equation*}
 where $\textcolor{red}{u_N} = \bm{v} \cdot \bm{n} \vert_{\partial \Omega_r}$. The corresponding power conjugated output is given by $\textcolor{blue}{y_N} = p \vert_{\partial \Omega_r}$. \\
 The system in weak form under Neumann boundary control is then written as
@@ -291,10 +287,10 @@ The system in weak form under Neumann boundary control is then written as
 \only<2>{
 If the integration by parts is carried out on $\mathcal{J}_{\text{grad}}$ 
 \begin{equation*}
-\left(w, \mathcal{J} e \right)_{\Omega_{\text{r}}} = \left(v, \mathcal{J}_{\text{div}} \ e \right)_{\Omega_{\text{r}}} - \left(\mathcal{J}_{\text{div}} \ w, e \right)_{\Omega_{\text{r}}} + \left(\bm{w}_v \cdot \bm{n}, \textcolor{blue}{u_D} \right)_{\partial \Omega_{\text{r}}}.
+\left(w, \mathcal{J} e \right)_{\Omega_{\text{r}}} = \left(w_p, \div_r \bm{e}_v \right)_{\Omega_{\text{r}}} - \left(\div_r \bm{w}_v, e_p \right)_{\Omega_{\text{r}}} + \left(\bm{w}_v \cdot \bm{n}, \textcolor{blue}{u_D} \right)_{\partial \Omega_{\text{r}}}.
 \end{equation*}
 The skew-symmetric bilinear form 
-\[ j_{\text{div}}(w, e) := \left(w, \mathcal{J}_{\text{div}} \ e \right)_{\Omega_{\text{r}}} - \left(\mathcal{J}_{\text{div}} \ w, e \right)_{\Omega_{\text{r}}} \]
+\[ j_{\text{div}}(w, e) := \left(w_p, \div_r \bm{e}_v \right)_{\Omega_{\text{r}}} - \left(\div_r \bm{w}_v, e_p \right)_{\Omega_{\text{r}}} \]
 is introduced, together with the boundary form
 \begin{equation*}
 \left(\bm{w}_v \cdot \bm{n}, \textcolor{blue}{u_D} \right)_{\partial \Omega_{\text{r}}} = \int_{\partial \Omega_{\text{r}}} \bm{w}_v \cdot \bm{n} \ \textcolor{blue}{u_D} \ \d{\Gamma_r}, 
@@ -311,49 +307,55 @@ where $\textcolor{blue}{u_D} = p \ \vert_{\partial \Omega_r}$. Adding  the conju
 \end{frame}
 
 \begin{frame}{Mixed boundary condition}
-
-To tackle mixed boundary conditions two approaches are developed
+To tackle mixed boundary conditions two approaches are developed:
 \begin{itemize}
-	\item A Lagrange multiplier based method;
-	\item A virtual domain decomposition method.
+	\item a Lagrange multiplier based method;
+	\item a virtual domain decomposition method.
 \end{itemize} 	
+\begin{figure}[b]%
+	\centering
+	\includegraphics[width=0.4\columnwidth]{boundary_part.eps} \\
+	\caption[bcpart]{Boundary partition for the problem.}
+\end{figure}
 \end{frame}
+
 
 \subsection{Lagrange multiplier approach}
 
-\begin{frame}
-Start from 
+\begin{frame}{Weak form with Lagrange multipliers}
+\setlength{\belowdisplayskip}{1pt}
+\setlength{\abovedisplayskip}{1pt}
 \begin{equation*}
-\left(w, \mathcal{J} e \right)_{\Omega_{\text{r}}} = \left(w, \mathcal{J}_{\text{grad}} \ e \right)_{\Omega_{\text{r}}} - \left(\mathcal{J}_{\text{grad}} \ w, e \right)_{\Omega_{\text{r}}} + \left(w_p, \bm{v}\cdot\bm{n}\vert_{\partial \Omega_{\text{r}}} \right)_{\partial \Omega_{\text{r}}}.
+\left(w, \mathcal{J} e \right)_{\Omega_{\text{r}}} =  j_{\text{grad}}(w, e) + \left(w_p, \bm{v}\cdot\bm{n}\vert_{\partial \Omega_{\text{r}}} \right)_{\partial \Omega_{\text{r}}}.
 \end{equation*}
-	The quantity $\bm{v}\cdot\bm{n}\vert_{\partial \Omega_{\text{r}}}$ is known only $\Gamma_N$. On $\Gamma_D$ a Lagrange multiplier $\lambda_D$ is introduced 
-	\begin{equation}
+	The quantity $\bm{v}\cdot\bm{n}\vert_{\partial \Omega_{\text{r}}}$ is known only $\Gamma_N$. On $\Gamma_D$ the Lagrange multiplier $\lambda_D$ is introduced 
+	\begin{equation*}
 	\label{eq:bdint_dae}
 	\int_{\partial \Omega_{\text{r}}} w_p \bm{v} \cdot \bm{n} \d{\Gamma_r} = \int_{\Gamma_N} w_p u_N \ \d{\Gamma_r} + \int_{\Gamma_D} w_p \lambda_D \d{\Gamma_r}.
-	\end{equation}
-	The constraint associated with the Lagrange multiplier  is the non-homogeneous Dirichlet condition
-	\begin{equation}
+	\end{equation*}
+	The constraint  is the non-homogeneous Dirichlet condition
+	\begin{equation*}
 	\label{eq:wf_con}
 	\int_{\Gamma_D} w_\lambda (p - u_D) \d{\Gamma_r} = 0, \qquad \text{$w_\lambda$ test function for the Lagrange multiplier.}
-	\end{equation}
+	\end{equation*}
 	
-	\begin{block}{Final Weak Form}
+	\begin{exampleblock}{Final Weak Form with Lagrange multiplier}
 	\begin{equation*}
-\begin{aligned}
-m(w, \partial_t{e}) &= j_{\text{grad}}(w, e) + \left(w_p, \lambda_D \right)_{\Gamma_D} + \left(w_p, u_N \right)_{\Gamma_N}, \\
-0 &= - \left(w_\lambda, p \right)_{\Gamma_D} + \left(w_\lambda, u_D \right)_{\Gamma_D}, \\
-\left(w_N, y_N \right)_{\Gamma_N} &= \left(w_N, p \right)_{\Gamma_N}, \\
-\left(w_D, y_D \right)_{\Gamma_D} &= \left(w_D, \lambda_D \right)_{\Gamma_D}, 
-\end{aligned}
-\end{equation*}
-	\end{block}
+	\begin{aligned}
+	m(w, \partial_t{e}) &= j_{\text{grad}}(w, e) + \left(w_p, \lambda_D \right)_{\Gamma_D} + \left(w_p, \textcolor{red}{u_N} \right)_{\Gamma_N}, \\
+	0 &= - \left(w_\lambda, p \right)_{\Gamma_D} + \left(w_\lambda, \textcolor{blue}{u_D} \right)_{\Gamma_D}, \\
+	\left(w_N, \textcolor{blue}{y_N} \right)_{\Gamma_N} &= \left(w_N, p \right)_{\Gamma_N}, \\
+	\left(w_D, \textcolor{red}{y_D} \right)_{\Gamma_D} &= \left(w_D, \lambda_D \right)_{\Gamma_D}, 
+	\end{aligned}
+	\end{equation*}
+	\end{exampleblock}
 
 
 \end{frame}
 
 \begin{frame}
-		where $w_N, w_D$ are the test functions associated to the output discretization and $\left( \cdot, \cdot \right)_{\Gamma_{*}}$ is the $L^2$ inner product on boundary $\Gamma_*$. A Galerkin method can now be applied to retrieve a finite dimensional pH system. This means that corresponding test and trial functions are discretized using the same basis
-	\begin{equation}
+	A Galerkin method can now be applied to retrieve a finite dimensional pH system. This means that corresponding test and trial functions are discretized using the same basis
+	\begin{equation*}
 	\label{eq:basis_func}
 	\begin{aligned}
 	\begin{aligned}
@@ -361,89 +363,69 @@ m(w, \partial_t{e}) &= j_{\text{grad}}(w, e) + \left(w_p, \lambda_D \right)_{\Ga
 	\bm{v} &\approx \sum_{i=1}^{n_v} \bm\phi_v^i(x, r) v^i, \\
 	\end{aligned} \quad
 	\begin{aligned}
-	*_D &\approx \sum_{i=1}^{n_D} \phi^i_\Gamma(s) *^i_D, \quad (* = \{u, y, \lambda\}), \\
-	*_N &\approx \sum_{i=1}^{n_N} \phi_\Gamma^i(s) *^i_N, \quad (* = \{u,  y\}).
+	*_D &\approx \sum_{i=1}^{n_D} \phi^i_\Gamma(s_D) *^i_D, \quad s_D \in \Gamma_D, \quad (* = \{u, y, \lambda\}), \\
+	*_N &\approx \sum_{i=1}^{n_N} \phi_\Gamma^i(s_N) *^i_N, \quad s_N \in \Gamma_N, \quad (* = \{u,  y\}).
 	\end{aligned} 
 	\end{aligned}
-	\end{equation}
-	The shape functions $\phi_p^i(x, r), \bm\phi_v^i(x, r)$ are defined over the domain, whereas $\phi_\Gamma^i(s)$ ($s$ is the curvilinear abscissa) is defined on the boundary only. Plugging the approximations \eqref{eq:basis_func} into \eqref{eq:weak_lag}, a pHDAE (\cite{beattie2018linear}) is obtained:
-	\begin{equation}
+	\end{equation*}
+	A pHDAE system is obtained:
+	\begin{equation*}
 	\begin{aligned}
 	\label{eq:discr_phdae}
 	\begin{bmatrix}
 	\mathbf{M} & \mathbf{0} \\
 	\mathbf{0} & \mathbf{0} \\
 	\end{bmatrix} \frac{\d}{\d t}
-	\begin{bmatrix}
+	\begin{pmatrix}
 	\mathbf{e}\\
 	\bm{\lambda}_D \\
-	\end{bmatrix}
+	\end{pmatrix}
 	&= \begin{bmatrix}
 	\mathbf{J} & \mathbf{G}_D\\
 	-\mathbf{G}_D^T & \mathbf{0} \\
 	\end{bmatrix}
-	\begin{bmatrix}
+	\begin{pmatrix}
 	\mathbf{e}\\
 	\bm{\lambda}_D \\
-	\end{bmatrix} + \begin{bmatrix}
+	\end{pmatrix} + \begin{bmatrix}
 	\mathbf{B}_N & \mathbf{0}\\
 	\mathbf{0} & \mathbf{B}_D \\
 	\end{bmatrix}
+	\begin{pmatrix}
+	\textcolor{red}{\mathbf{u}_N} \\
+	\textcolor{blue}{\mathbf{u}_D} \\
+	\end{pmatrix}, \\
 	\begin{bmatrix}
-	\mathbf{u}_N \\
-	\mathbf{u}_D \\
-	\end{bmatrix}, \\
-	\begin{bmatrix}
-	\mathbf{y}_N \\
-	\mathbf{y}_D \\
-	\end{bmatrix} &=
+	\mathbf{M}_{\Gamma_N} & \mathbf{0} \\
+	\mathbf{0} & \mathbf{M}_{\Gamma_D} \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	\textcolor{blue}{\mathbf{y}_N} \\
+	\textcolor{red}{\mathbf{y}_D} \\
+	\end{pmatrix} &=
 	\begin{bmatrix}
 	\mathbf{B}_N^T & \mathbf{0} \\ 
 	\mathbf{0} & \mathbf{B}_D^T \\ 
 	\end{bmatrix}
-	\begin{bmatrix}
+	\begin{pmatrix}
 	\mathbf{e}\\
 	\bm{\lambda}_D \\
-	\end{bmatrix},
-	\end{aligned}
-	\end{equation}
-	where $\mathbf{M} = \mathrm{diag}(\mathbf{M}_p, \mathbf{M}_v)$ and
-	\begin{equation*}
-	\mathbf{J} = \begin{bmatrix}
-	\mathbf{0} & \mathbf{A}_{\mathrm{grad}} \\
-	- \mathbf{A}_{\mathrm{grad}}^T & \mathbf{0} \\
-	\end{bmatrix}, \quad 
-	\mathbf{G}_{D} = \begin{bmatrix}
-	\mathbf{G}_{D, p} \\
-	\mathbf{0} \\
-	\end{bmatrix}, \quad
-	\mathbf{B}_{N} = \begin{bmatrix}
-	\mathbf{B}_{N, p} \\
-	\mathbf{0} \\
-	\end{bmatrix}.
-	\end{equation*}
-	The matrices elements are computed as follows:
-	\begin{equation*}
-	\begin{aligned}
-	\mathbf{M}_p^{ij} &= ({\phi}_{p}^i,\, \chi_s {\phi}_{p}^j)_{\Omega_r}, \\ \mathbf{M}_v^{ij} &= (\bm{\phi}_{v}^i,\, \mu_0 \bm{\phi}_{v}^j)_{\Omega_r}, \\
-	\mathbf{A}_{\mathrm{grad}}^{ij} &= (\nabla{\phi}_{p}^{i}, \, \bm{\phi}_{v}^j)_{\Omega_r}, 
-	\end{aligned} \quad 
-	\begin{aligned}
-	\mathbf{G}_{D, p}^{ij} &= ({\phi}_{p}^i,\, {\phi}_{\Gamma}^j)_{\Gamma_D}, \\ 
-	\mathbf{B}_{N, p}^{ij} &= ({\phi}_{p}^{i},\, {\phi}_{\Gamma}^{j})_{\Gamma_N}, \\
-	\mathbf{B}_{D}^{ij} &= ({\phi}_{\Gamma}^{i},\, {\phi}_{\Gamma}^{j})_{\Gamma_D}. \\
+	\end{pmatrix}.
 	\end{aligned}
 	\end{equation*}
 	
-	
-	Concerning the actual boundary conditions, on $\Gamma_D$ the impedance condition \eqref{eq:bc_imp} is applied while on  $\Gamma_N$ the inlet and outlet flow condition \eqref{eq:bc_flowL}, \eqref{eq:bc_flowR} hold on the left and right side of the rectangle. The impedance boundary conditions is imposed by putting into weak form the expression $u_D=-\mathcal{Z}\lambda_D=-\mathcal{Z}y_D$:
-	\[ \mathbf{M}_{\Gamma_D} \mathbf{u}_D = - \mathbf{M}_{\Gamma_D, \mathcal{Z}} \widehat{\mathbf{y}}_D,
+\end{frame}
+
+\begin{frame}{Imposition of the boundary conditions}
+	Take the weak form of $u_D=-\mathcal{Z}\lambda_D=-\mathcal{Z}y_D$:
+	\[ \mathbf{M}_{\Gamma_D} \textcolor{blue}{\mathbf{u}_D} = - \mathbf{M}_{\Gamma_D, \mathcal{Z}} \textcolor{red}{\mathbf{y}_D},
 	\]
-	where $\mathbf{M}_{\Gamma_D, \mathcal{Z}}$ corresponds to the mass matrix associated to the weighted inner product $\left(w_D, \mathcal{Z}  y_D\right)_{\Gamma_D}$, namely $\mathbf{M}_{\Gamma_D, \mathcal{Z}}^{ij} = \left(\phi_\Gamma^i, \mathcal{Z}  \phi_\Gamma^j \right)_{\Gamma_D}$. This amounts to applying to system \eqref{eq:sys_dae} the control law
-	\[ \mathbf{u}_D = - \mathbf{M}_{\Gamma_D}^{-1} \mathbf{M}_{\Gamma_D, \mathcal{Z}} \mathbf{M}_{\Gamma_D}^{-1} \mathbf{y}_D = -\mathbf{Z} \mathbf{y}_D.
+	This amounts to applying the control law
+	\[ \mathbf{u}_D  = -\mathbf{Z} \mathbf{B}_D^T \bm{\lambda}_D, \qquad \mathbf{Z} = \mathbf{M}_{\Gamma_D}^{-1} \mathbf{M}_{\Gamma_D, \mathcal{Z}} \mathbf{M}_{\Gamma_D}^{-1}
 	\]
-	The Neumann boundary condition is imposed by projection on the $u_N$ space.   The boundary controlled system becomes   
-	\begin{equation}
+	The Neumann boundary condition is imposed projecting $u_N = f(r)$. 
+	\begin{block}{Finite dimensional system with Lagrange multiplier}
+	\begin{equation*}
 	\label{eq:sys_dae}
 	\begin{bmatrix}
 	\mathbf{M} & \mathbf{0} \\
@@ -464,73 +446,280 @@ m(w, \partial_t{e}) &= j_{\text{grad}}(w, e) + \left(w_p, \lambda_D \right)_{\Ga
 	\mathbf{b}_N \\
 	\mathbf{0} \\
 	\end{bmatrix},
-	\end{equation}
+	\end{equation*}
 	with $\mathbf{R} = \mathbf{B}_D \mathbf{Z} \mathbf{B}_D^T$ a symmetric positive definite matrix. 
+	\end{block}
 	
 \end{frame}
-
 
 \subsection{Virtual domain decomposition}
 
+\begin{frame}{Decompostion of the domain}
+First of all the domain has to be decomposed. The interface between the two subdomain is chosen to get regular meshes on both subdomains.
+\begin{figure}[t]%
+	\centering
+	\includegraphics[width=0.5\columnwidth]{domain_split.eps} \\
+	\caption{Virtual decomposition of the domain.}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+	Two weak formulations are constructed: one integrating over $\Omega_N$, the other over $\Omega_D$:
+	\begin{align*}
+	\left(w, \mathcal{M} \partial_t{e} \right)_{\Omega_N} &= \left(w, \mathcal{J} e \right)_{\Omega_{N}}, \qquad \text{where } \left(\alpha, \beta \right)_{\Omega_N} = \int_{\Omega_{N}} \alpha \cdot \beta \d{\Omega_{N}}, \\
+	\left(w, \mathcal{M} \partial_t{e} \right)_{\Omega_D} &= \left(w, \mathcal{J} e \right)_{\Omega_{D}}, \qquad \text{where } \left(\alpha, \beta \right)_{\Omega_D} = \int_{\Omega_{D}} \alpha \cdot \beta \d{\Omega_{D}}.
+	\end{align*}
+	The integration by parts is performed differently on each subdomain to highlight the appropriate boundary input
+	\begin{equation*}
+	\begin{aligned}
+	\left(w, \mathcal{M} e \right)_{\Omega_{N}} &= j_{\text{grad}}^{\Omega_N}(w, e) + \left(w_p, \textcolor{red}{u_N} \right)_{\partial \Omega_N}, \\
+	\left(w, \mathcal{M} e \right)_{\Omega_{D}} &= j_{\text{div}}^{\Omega_D}(w, e) + \left(\bm{w}_v \cdot \bm{n}, \textcolor{blue}{u_D} \right)_{\partial \Omega_D},  \\
+	\end{aligned} 
+	\end{equation*}
+where the bilinear skew-symmetric forms are defined on each subdomain
+\begin{equation*}
+	\begin{aligned}
+	j_{\text{grad}}^{\Omega_{N}}(w, e) &:= \left(\bm{w}_v, {\grad}_r e_p \right)_{\Omega_{N}} - \left({\grad}_r w_p, \bm{e}_v \right)_{\Omega_{N}}, \\
+	j_{\text{div}}^{\Omega_{D}}(w, e) &:= \left(w_p, \div_r \bm{e}_v \right)_{\Omega_{D}} - \left(\div_r \bm{w}_v, e_p \right)_{\Omega_{D}}.
+	\end{aligned}
+\end{equation*}
+\end{frame}
+
+\begin{frame}
+The boundary terms are then split into two contributions
+\begin{equation*}
+\begin{aligned}
+\partial\Omega_N = \Gamma_N \cup \Gamma_{\text{int}} &\implies \\
+\partial\Omega_D = \Gamma_D \cup \Gamma_{\text{int}} &\implies
+\end{aligned}
+\begin{aligned}
+\left(w_p, \textcolor{red}{u_N} \right)_{\partial \Omega_N} &= \left(w_p, \textcolor{red}{u_N} \right)_{\Gamma_N} + \left(w_p, \textcolor{red}{u_N}\right)_{\Gamma_{\text{int}}}, \\
+\left(\bm{w}_v \cdot \bm{n}, \textcolor{blue}{u_D} \right)_{\partial \Omega_D} &= \left(\bm{w}_v \cdot \bm{n}, \textcolor{blue}{u_D} \right)_{\Gamma_D} + \left(\bm{w}_v \cdot \bm{n}, \textcolor{blue}{u_D} \right)_{\Gamma_{\text{int}}}.
+\end{aligned}
+\end{equation*}
+
+Two finite dimensional pH systems are obtained
+
+\begin{tcbraster}[raster columns=2, raster equal height]
+	\begin{tcolorbox}[width=0.48\textwidth, nobeforeafter, colframe=red,title=Subdomain $\Omega_N$,  coltitle=black]%%
+		\begin{equation*}
+		\begin{aligned}
+		\mathbf{M}_N {\dot{\mathbf{e}}_N} &= \mathbf{J}_N \mathbf{e}_N  + \mathbf{B}_N \textcolor{red}{\mathbf{u}_N} + \mathbf{B}_{N}^{\text{int}} \textcolor{red}{\mathbf{u}_N^{\text{int}}}, \\
+		\mathbf{M}_{\Gamma_N} \textcolor{blue}{\mathbf{y}_N} &= \mathbf{B}_{N}^\top \mathbf{e}_N, \\
+		\mathbf{M}_{\Gamma_{\text{int}}} \textcolor{blue}{\mathbf{y}_N^{\text{int}}} &=  \mathbf{B}_{N}^{\text{int}\, \top} \mathbf{e}_N, \\
+		\end{aligned}
+		\end{equation*}
+		with Hamiltonian $H_{d, N} = \frac{1}{2} {\mathbf{e}}_{N}^\top \mathbf{M}_N {{\mathbf{e}}_N}$
+	\end{tcolorbox} 
+	\begin{tcolorbox}[width=0.48\textwidth, nobeforeafter,  colframe=cyan,title=Subdomain $\Omega_D$, coltitle=black]%%
+		\begin{equation*}
+		\begin{aligned}
+		\mathbf{M}_D \dot{\mathbf{e}}_D &= \mathbf{J}_D \mathbf{e}_D + \mathbf{B}_D \textcolor{blue}{\mathbf{u}_D} + \mathbf{B}_{D}^{\text{int}} \textcolor{blue}{\mathbf{u}_D^{\text{int}}}, \\
+		\mathbf{M}_{\Gamma_D} \textcolor{red}{\mathbf{y}_D} &= \mathbf{B}_{D}^\top \, \mathbf{e}_D, \\
+		\mathbf{M}_{\Gamma_{\text{int}}} \textcolor{red}{\mathbf{y}_D^{\text{int}}} &= \mathbf{B}_{D}^{\text{int}\, \top} \mathbf{e}_D. \\
+		\end{aligned}
+		\end{equation*}
+		with Hamiltonian $H_{d, D} = \frac{1}{2} {\mathbf{e}}_{D}^\top \mathbf{M}_D {{\mathbf{e}}_D}$
+	\end{tcolorbox}
+\end{tcbraster}
+\end{frame}
 
 
-\begin{frame}{Results}
+\begin{frame}{Power preserving interconnection}
+A gyrator interconnection is performed
+\begin{equation*}
+\textcolor{red}{\mathbf{u}_N^{\text{int}}} = - \textcolor{red}{{\mathbf{y}}_D^{\text{int}}} = - \mathbf{M}_{\Gamma_{\text{int}}}^{-1}\mathbf{B}_{D}^{\text{int}\, \top} \mathbf{e}_D, \qquad
+\textcolor{blue}{\mathbf{u}_D^{\text{int}}} = \textcolor{blue}{\mathbf{y}_N^{\text{int}}} = \mathbf{M}_{\Gamma_{\text{int}}}^{-1} \mathbf{B}_{N}^{\text{int}\, \top} \mathbf{e}_N.
+\end{equation*}
+The interconnection implies that the power is exchanged without loss between the two systems
+\begin{equation*}
+\mathbf{u}_D^{\text{int}\, \top} \mathbf{M}_{\Gamma_{\text{int}}} \mathbf{y}_D^{\text{int}} + \mathbf{u}_N^{\text{int}\, \top} \mathbf{M}_{\Gamma_{\text{int}}} \mathbf{y}_N^{\text{int}} = 0.
+\end{equation*}
+After imposition of the boundary condition the final system is obtained.
+\begin{block}{Finite dimensional system (Virtual domain decomposition)}
+	\begin{equation*}
+\begin{bmatrix}
+\mathbf{M}_N & \mathbf{0} \\
+\mathbf{0} & \mathbf{M}_D \\
+\end{bmatrix} \frac{\d}{\d t}
+\begin{bmatrix}
+\mathbf{e}_N\\
+\mathbf{e}_D \\
+\end{bmatrix}
+= \left(\begin{bmatrix}
+\mathbf{J}_N & -\mathbf{C} \\
+\mathbf{C}^\top & \mathbf{J}_D \\
+\end{bmatrix} - 
+\begin{bmatrix}
+\mathbf{0} & \mathbf{0} \\
+\mathbf{0} & \mathbf{R} \\
+\end{bmatrix}
+ \right)
+\begin{bmatrix}
+\mathbf{e}_N\\
+\mathbf{e}_D \\
+\end{bmatrix}  + \begin{bmatrix}
+\mathbf{b}_N \\
+\mathbf{0} \\
+\end{bmatrix}
+	\end{equation*}
+	with $\mathbf{C} = \mathbf{B}_{N}^{\text{int}} \mathbf{M}_{\Gamma_{\text{int}}}^{-1} \mathbf{B}_{D}^{\text{int}\, \top}$. 
+\end{block}
+\end{frame}
+
+\section{Results}
+
+\begin{frame}{Physical interpretation of the impedance}
+The energy accounts for the pressure and velocity contribution
+\[
+H_p = \frac{1}{2} \int \chi_s p^2 \d{\Omega}_r  \approx \frac{1}{2} \mathbf{p}^T \mathbf{M}_p \mathbf{p}, \qquad H_v = \frac{1}{2} \int \mu_0 \, ||\mathbf{v}||^2 \d{\Omega}_r \approx \frac{1}{2} \mathbf{v}^T \mathbf{M}_v \mathbf{v}, \]
+The total energy at the initial time is the kinetic energy only
+\[
+H_v^0 = H_{vx}^0 + H_{vr}^0 = \frac{1}{2} \int_{0}^L\int_{0}^R  \mu_0 \left[(v_x^0)^2 + (v_r^0)^2 \right] \ r \d{r}\d{x}.
+\]
+The numerical values of the energy contribution are 
+\[H_v^0 = 0.453 [J], \ \; H_{vx}^0 = 0.204 [J], \ \; H_{vr}^0 = 0.249 [J].\]
+The impedance acts by dissipating the radial component of the velocity 
+\begin{equation*}
+	\lim_{t \rightarrow \infty} H_{vr} \rightarrow 0, \qquad \lim_{t \rightarrow \infty} H_v \rightarrow H_{vx}^0 = 0.204 [J]
+\end{equation*}
+\end{frame}
+
+\begin{frame}{Finite element choice}
+\only<1>{
+\begin{tcolorbox}[title = Pressure field approximation, colframe=green, coltitle=black]
+The pressure $\phi_p(x, r)$ is interpolated using order~1 Lagrange polynomials.
+\end{tcolorbox}
+\begin{tcolorbox}[title = Velocity field approximation, colframe=orange, coltitle=black]
+The velocity field $\bm{\phi}_v(x, r)$ is interpolated using order~2 Raviart-Thomas polynomials.
+\end{tcolorbox}
+\begin{tcolorbox}[title = Boundary variables approximation, colframe=violet, coltitle=white]
+The boundary variables ${\phi}_\Gamma(s)$ are approximated by Lagrange polynomial of order~1 defined on the boundary $\Gamma_D$ (for $\lambda_D, u_D, y_D$) or $\Gamma_N$ (for $u_N, y_N$).
+\end{tcolorbox}
+}
+\only<2>{
+	\centering
+	\includegraphics[width=0.9\columnwidth]{fe_sketch.eps}
+}
+
+\end{frame}
+
+\begin{frame}[fragile]{Results}
+
+\onslide*<1>{
+\begin{figure}[ht]%
+	\centering
+	\subfloat[][DAE system.]{%
+		\label{fig:Htrend_dae}%
+		\includegraphics[width=0.48\columnwidth]{Hdae_all.eps}}%
+	\hspace{8pt}%
+	\subfloat[][ODE system.]{%
+		\label{fig:Htrend_ode}%
+		\includegraphics[width=0.48\columnwidth]{Hode_all.eps}} \\
+	\caption[]{Hamiltonian trend for different mesh size.}%
+\end{figure}
+}
+\onslide*<2>{
+\begin{figure}[ht]%
+	\centering
+	\subfloat[][Reference Hamiltonian.]{%
+		\label{fig:Hdae15}%
+		\includegraphics[width=0.48\columnwidth]{Href.eps}}%
+	\hspace{8pt}%
+	\subfloat[][$L^2$ Hamiltonian error.]{%
+		\label{fig:Hdiff}%
+		\includegraphics[width=0.48\columnwidth]{Hall_diff.eps}} \\
+	\caption[]{Reference Hamiltonian and $L^2$ error.}%
+	\label{fig:Href_err}%
+\end{figure}
+}
+\onslide*<3>{
+	\begin{figure}[ht]%
+		\centering
+		\subfloat[][$L^2$ pressure error.]{%
+			\label{fig:p_err}%
+			\includegraphics[width=0.48\columnwidth]{err_ep.eps}}%
+		\hspace{8pt}%
+		\subfloat[][$L^2$ velocity error.]{%
+			\label{fig:v_err}%
+			\includegraphics[width=0.48\columnwidth]{err_eq.eps}} \\
+		\caption[]{Error on the state variables for different mesh size.}%
+		\label{fig:error_x}%
+	\end{figure}
+}
+
+\begin{comment}
+\end{comment}
+
 \begin{center}
-	\onslide*<1>{
-		\begin{columns}
-			\begin{column}{.3\textwidth}
-				\includemedia[
-				label=vidNoRod,
-				addresource=../Videos/wave_dae15.mp4,
-				activate=pageopen,
-				width=4cm, height=5cm,
-				flashvars={
-					source=../Videos/wave_dae15.mp4
-					&loop=true
-				}
-				]{}{VPlayer.swf}
-				DAE $h = L/15$
-			\end{column}		
-			\begin{column}{.3\textwidth}
-				\includemedia[
-				label=vidNoRod,
-				addresource=../Videos/wave_dae10.mp4,
-				activate=pageopen,
-				width=4cm, height=5cm,
-				flashvars={
-					source=../Videos/wave_dae10.mp4
-					&loop=true
-				}
-				]{}{VPlayer.swf}
-				DAE $h = L/10$
-			\end{column}
-			\begin{column}{.3\textwidth}
-				\includemedia[
-				label=vidRod,
-				addresource=../Videos/wave_ode10.mp4,
-				activate=pageopen,
-				width=4cm, height=5cm,
-				flashvars={
-					source=../Videos/wave_ode10.mp4
-					&loop=true
-				}
-				]{}{VPlayer.swf}
-				ODE $h = L/10$
-			\end{column}
-		\end{columns}
-	
+\onslide*<4>{
+	\begin{columns}
+		\begin{column}{.3\textwidth}
+			\includemedia[
+			label=vidNoRod,
+			addresource=../Videos/wave_dae15.mp4,
+			activate=pageopen,
+			width=4cm, height=5cm,
+			flashvars={
+				source=../Videos/wave_dae15.mp4
+				&loop=true
+			}
+			]{}{VPlayer.swf}
+			Reference solution
+		\end{column}		
+		\begin{column}{.3\textwidth}
+			\includemedia[
+			label=vidNoRod,
+			addresource=../Videos/wave_dae10.mp4,
+			activate=pageopen,
+			width=4cm, height=5cm,
+			flashvars={
+				source=../Videos/wave_dae10.mp4
+				&loop=true
+			}
+			]{}{VPlayer.swf}
+			DAE $h = L/10$
+		\end{column}
+		\begin{column}{.3\textwidth}
+			\includemedia[
+			label=vidRod,
+			addresource=../Videos/wave_ode10.mp4,
+			activate=pageopen,
+			width=4cm, height=5cm,
+			flashvars={
+				source=../Videos/wave_ode10.mp4
+				&loop=true
+			}
+			]{}{VPlayer.swf}
+			ODE $h = L/10$
+		\end{column}
+	\end{columns}	
 	\mediabutton[
 	mediacommand=vidNoRod:playPause,
 	mediacommand=vidRod:playPause
-	]{\fbox{Play/Pause}}
-				
-		%\movie[width=0.8\textwidth, height=0.6\textheight]{Plate and rod}{../Videos/Comparison_RodNoRod.mp4}	
-	}
-		\onslide*<2>{
-		
-		}
-	\end{center}
+	]{\fbox{Play/Pause}}	
+	%\movie[width=0.8\textwidth, height=0.6\textheight]{Plate and rod}{../Videos/Comparison_RodNoRod.mp4}	
+}
+\end{center}
+
+
 \end{frame}
 
+\begin{frame}{Conclusion}
+Future developments:
+\begin{itemize}
+\item a numerical analysis of the optimal choice for the underlying finite elements;
+\item  the employment of theses techniques to more complicated models arising from structural and fluid mechanics;
+\item reformulation of the approach in terms of differential forms;
+\item application of the domain decomposition technique to parallelize simulations of large-scale models.
+\end{itemize}
+\vspace{1cm}
+\centering{\Huge Thanks for your attention} 
+\end{frame}
+
+\begin{frame}[allowframebreaks]{References}
+\nocite{*}
+\printbibliography
+\end{frame}
 
 \end{document}
