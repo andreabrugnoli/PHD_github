@@ -9,13 +9,6 @@ In this first part of this chapter, pH plate problems are discretized using mixe
 
 Homogeneous boundary conditions will be always considered. This are enforced weakly or strongly depending on the specific formulation under analysis.
 
-
-\section{Plate problems using known mixed finite elements}
-
-First we focused on the Mindlin plate. This problem is a combination of plane wave dynamics and plane elastodynamics. A classical mixed formulation requires $H^{\div}$ conforming elements both for the wave dynamics \cite{becache2000wave} and elastodynamics \cite{becache2001elas,arnold2014elastodynamics}. To obtain a suitable discretization of the Mindlin problem one has to combine the two. Additional difficulties arising from the symmetry of the stress tensor that can be imposed strongly \cite{becache2001elas} or weakly \cite{arnold2014elastodynamics}.
-
-We then discuss the Kirchhoff plate problem. For this problem non-conforming finite element approximation have been studied, but for the static case \cite{blum1990}. \\
-
 \paragraph{Notations}
 The space of all, symmetric and skew-symmetric $2\times 2$ matrices are denoted by $\mathbb{M}, \mathbb{S}, \mathbb{K}$ respectively. The space of $\mathbb{R}^2$ vectors is denoted by $\mathbb{V}$. The symbol $\Omega \subset \mathbb{R}^2$ denotes an open connected set. The standard notation $H^m(\Omega)$ denotes the Sobolev space of square integrable functions with  $m^\text{th}$ derivative in $L^2$ and norm 
 \begin{equation*}
@@ -23,7 +16,7 @@ The space of all, symmetric and skew-symmetric $2\times 2$ matrices are denoted 
 \end{equation*}
 The space $H^{\Grad}(\Omega, \mathbb{V})$ is the space of vectors with symmetric gradient in $L^2$
 \begin{equation*}
-	H^{\Grad}(\Omega, \mathbb{V}) = \{\bm{u} \in L^2(\Omega, \mathbb{V}) \vert \; \Grad(\bm{u}) \in L^2(\Omega, \mathbb{S}) \},
+H^{\Grad}(\Omega, \mathbb{V}) = \{\bm{u} \in L^2(\Omega, \mathbb{V}) \vert \; \Grad(\bm{u}) \in L^2(\Omega, \mathbb{S}) \},
 \end{equation*}
 and norm 
 \begin{equation*}
@@ -45,6 +38,134 @@ Let ${X}$ be a Hilbert space, and $t_f$ a positive real number. We denote by $L^
 \[
 ||f||_{L^\infty([0, t_f]; {X})} = \esssup_{t \in [0,t_f]} ||f||_{{X}} < \infty.
 \]
+
+
+\section{Discretization of the Euler-Bernoulli beam}
+In this section the Euler-Bernoulli beam is discretized using conforming finite elements for three different formulations:
+\begin{itemize}
+	\item the weak formulation \eqref{eq:weak_EB_Hess} corresponding (in absence of inputs) to a free-free beam;
+	\item the weak formulation \eqref{eq:weak_EB_divDiv} corresponding (for zero inputs) to a clamped-clamped beam;
+	\item a novel weak formulation allowing to use $H^1$ conforming finite elements (both lines of  system \eqref{eq:weak_EB} are integrated by parts once).
+\end{itemize}
+
+\subsection{Mixed discretization for the weak form \eqref{eq:weak_EB_Hess}}
+The weak formulation \eqref{eq:weak_EB_Hess} seeks 
+\begin{equation*}
+\{e_w, e_\kappa\} \in H^2(\Omega) \times L^2(\Omega)
+\end{equation*}
+
+so that
+\begin{equation}\label{eq:weak_EB_Hess_recall}
+\begin{aligned}
+\inner[L^2(\Omega)]{v_w}{\rho A \partial_t e_w} &= -\inner[L^2(\Omega)]{\partial_{xx} v_w}{e_\kappa}, \\
+\inner[L^2(\Omega)]{v_\kappa}{(EI)^{-1} \partial_t e_\kappa} &= \inner[L^2(\Omega)]{v_\kappa}{\partial_{xx} e_w}, \\
+\end{aligned}\qquad
+\begin{aligned}
+\forall \; v_w &\in H^2(\Omega), \\
+\forall \; v_\kappa &\in L^2(\Omega).
+\end{aligned}
+\end{equation}
+
+Given an interval mesh $\mathcal{I}_h$ with elements $E$, the following family of finite elements is conforming for this problem
+\begin{equation}
+\label{eq:HerDG1}
+\begin{aligned}
+H_{h, \text{HerDG1}}^{2}(\Omega) &= \{ w_h \in H^{2}(\Omega) | \ \forall E \in \mathcal{I}_h,\ \bm{q}_h|_{Q} \in \mathrm{Her} \}, \\ 
+L_{h, \text{HerDG1}}^2(\Omega) &= \{M_h \in L^2(\Omega) | \ \forall E \in \mathcal{I}_h, \ M_h|_{E} \in \mathrm{DG}_{1} \}, \\
+\end{aligned}
+\end{equation}
+where Her denotes the cubic Hermite polynomials and DG is the discontinuous Galerkin finite element \cite[Chapter 3]{logg2012}.  Since for the discretization of the static problem the use of Hermite polynomial provides optimal convergence of order $2$, it seems logical to conjecture the following error estimates:
+
+\begin{conjecture}[Convergence of the HerDG1 elements]\label{conj:HerDG1estimates}
+	Assuming a smooth solution for problem~\eqref{eq:weak_EB_Hess_recall}, the following error estimates hold
+	\begin{equation}
+	\label{eq:errHerDG1}
+	||e_w - e_w^h||_{L^{\infty} (H^2)} \lesssim h^{2}, \qquad
+	||e_\kappa - e_\kappa^h||_{L^{\infty} (L^2)} \lesssim h^{2}.
+	\end{equation}
+\end{conjecture}
+
+
+\subsection{Mixed discretization for the weak form \eqref{eq:weak_EB_divDiv}}
+The weak formulation \eqref{eq:weak_EB_divDiv} seeks 
+\begin{equation*}
+\{e_w, e_\kappa\} \in L^2(\Omega) \times H^2(\Omega) 
+\end{equation*}
+
+so that
+\begin{equation}\label{eq:weak_EB_divDiv_recall}
+\begin{aligned}
+\inner[L^2(\Omega)]{v_w}{\rho A \partial_t e_w} &= \inner[L^2(\Omega)]{v_w}{-\partial_{xx} e_\kappa} , \\
+\inner[L^2(\Omega)]{v_\kappa}{(EI)^{-1} \partial_t e_\kappa} &= \inner[L^2(\Omega)]{\partial_{xx} v_\kappa}{ e_w}, \\
+\end{aligned}\qquad
+\begin{aligned}
+\forall \; v_w &\in L^2(\Omega), \\
+\forall \; v_\kappa &\in H^2(\Omega).
+\end{aligned}
+\end{equation}
+
+Given an interval mesh $\mathcal{I}_h$ with elements $E$, the following family of finite elements is conforming for this problem
+\begin{equation}
+\label{eq:DG1Her}
+\begin{aligned}
+H_{h, \text{HerDG1}}^{2}(\Omega) &= \{ w_h \in H^{2}(\Omega) | \ \forall E \in \mathcal{I}_h,\ \bm{q}_h|_{Q} \in \mathrm{Her} \}, \\ 
+L_{h, \text{HerDG1}}^2(\Omega) &= \{M_h \in L^2(\Omega) | \ \forall E \in \mathcal{I}_h, \ M_h|_{E} \in \mathrm{DG}_{1} \}, \\
+\end{aligned}
+\end{equation}
+Since the formulation is symmetrical to \eqref{eq:weak_EB_Hess_recall}, it seems logical to conjecture the following error estimates:
+
+\begin{conjecture}[Convergence of the DG1Her elements]\label{conj:DG1Herestimates}
+	Assuming a smooth solution for problem~\eqref{eq:weak_EB_divDiv_recall}, the following error estimates hold
+	\begin{equation}
+	\label{eq:errDG1Her}
+	||e_w - e_w^h||_{L^{\infty} (L^2)} \lesssim h^{2}, \qquad
+	||e_\kappa - e_\kappa^h||_{L^{\infty} (H^2)} \lesssim h^{2}.
+	\end{equation}
+\end{conjecture}
+
+
+\subsection{Mixed discretization with lower regularity requirement}
+Consider the weak formulation \eqref{eq:weak_EB}. If both lines are integrated by parts the following weak form is obtained: find
+\begin{equation*}
+\{e_w, e_\kappa\} \in H^1(\Omega) \times H^1(\Omega) 
+\end{equation*}
+
+so that
+\begin{equation}\label{eq:weak_EB_CGCG}
+\begin{aligned}
+\inner[L^2(\Omega)]{v_w}{\rho A \partial_t e_w} &= \inner[L^2(\Omega)]{\partial_{x} v_w}{\partial_{x} e_\kappa} , \\
+\inner[L^2(\Omega)]{v_\kappa}{(EI)^{-1} \partial_t e_\kappa} &= -\inner[L^2(\Omega)]{\partial_{x} v_w}{\partial_{x} e_\kappa}, \\
+\end{aligned}\qquad
+\begin{aligned}
+\forall \; v_w &\in H^1(\Omega), \\
+\forall \; v_\kappa &\in H^1(\Omega).
+\end{aligned}
+\end{equation}
+
+Given an interval mesh $\mathcal{I}_h$ with elements $E$, the following family of finite elements is conforming for this problem
+\begin{equation}
+\begin{aligned}
+H_{h, \text{CGCG}}^{2}(\Omega) &= \{ w_h \in H^{1}(\Omega) | \ \forall E \in \mathcal{I}_h,\ \bm{q}_h|_{Q} \in \mathrm{CG}_k \}, \\ 
+L_{h, \text{CG}}^2(\Omega) &= \{M_h \in H^{1}(\Omega) | \ \forall E \in \mathcal{I}_h, \ M_h|_{E} \in \mathrm{CG}_k \}, \\
+\end{aligned}
+\end{equation}
+where CG is the continuous Galerkin finite element \cite[Chapter 3]{logg2012}.  The following error estimates are conjectured:
+
+\begin{conjecture}[Convergence of the CGCG elements]\label{conj:CGCGestimates}
+	Assuming a smooth solution for problem~\eqref{eq:weak_EB_divDiv_recall}, the following error estimates hold
+	\begin{equation}
+	\label{eq:errCGCG}
+	||e_w - e_w^h||_{L^{\infty} (H^1)} \lesssim h^{k}, \qquad
+	||e_\kappa - e_\kappa^h||_{L^{\infty} (H^1)} \lesssim h^{k}.
+	\end{equation}
+\end{conjecture}
+
+\section{Plate problems using known mixed finite elements}
+
+First we focused on the Mindlin plate. This problem is a combination of plane wave dynamics and plane elastodynamics. A classical mixed formulation requires $H^{\div}$ conforming elements both for the wave dynamics \cite{becache2000wave} and elastodynamics \cite{becache2001elas,arnold2014elastodynamics}. To obtain a suitable discretization of the Mindlin problem one has to combine the two. Additional difficulties arising from the symmetry of the stress tensor that can be imposed strongly \cite{becache2001elas} or weakly \cite{arnold2014elastodynamics}.
+
+We then discuss the Kirchhoff plate problem. For this problem non-conforming finite element approximation have been studied, but for the static case \cite{blum1990}. \\
+
 
 \subsection{Mindlin plate mixed discretization}
 We consider the weak formulation \eqref{eq:weak_min_div}, reported in Section \secref{sec:linearPfem}. The boundary terms disappears since homogeneous boundary conditions apply. We present first a scheme that enforces the symmetry of the momenta tensor strongly and then a scheme in which the symmetry of the momenta tensor is imposed weakly.
@@ -71,24 +192,20 @@ $$\{e_w, \bm{e}_{\bm{\theta}}, \bm{E}_{\kappa}, \bm{e}_{\gamma}\} \in L^2(\Omega
 
 The plate thickness is indicated by the $b$ symbol, to avoid confusion with the average mesh size indicated by $h$. A distributed force $f$ and torque $\bm{\tau}$ are considered in order to find a manufactured solution for this problem. \\
 
-Obtaining stable finite elements that embed the symmetry of the stress tensor for the elastodynamics problem has proven to be a difficult task \cite{arnold2002mixed}. The easiest construction is the one presented in \cite{becache2001elas}. This finite element solution can be implemented in {\sc{Firedrake}} \cite{rathgeber2017firedrake} thanks to the extruded mesh functionality \cite{mcrae2016}.  The main disadvantage is that this scheme requires the domain to be given by a union of rectangles, as the mesh elements have to be square. However, this allows constructing a simple element for the momenta tensor. The polynomial spaces for the discretization are
-\[
-N_{k} = \{p(x, y)| \; p(x, y) = \sum_{i\le k, j\le k} a_{ij} x^i y^j  \}.
-\]
-Given a regular mesh $\mathcal{R}_h$ with square elements $Q$ the following spaces are introduced as discretization spaces
+Obtaining stable finite elements that embed the symmetry of the stress tensor for the elastodynamics problem has proven to be a difficult task \cite{arnold2002mixed}. The easiest construction is the one presented in \cite{becache2001elas}. This finite element solution can be implemented in {\sc{Firedrake}} \cite{rathgeber2017firedrake} thanks to the extruded mesh functionality \cite{mcrae2016}.  The main disadvantage is that this scheme requires the domain to be given by a union of rectangles, as the mesh elements have to be square. However, this allows constructing a simple element for the momenta tensor. Given a regular mesh $\mathcal{R}_h$ with square elements $Q$ the following spaces are introduced as discretization spaces
 \begin{equation}
 \label{eq:BTJ}
 \begin{aligned}
-L_{h, \text{BJT}}^2(\Omega) &= \{w_h \in L^2(\Omega) | \ \forall Q, \ w_h|_{Q} \in N_{k-1} \}, \\
-L_{h, \text{BJT}}^2(\Omega, \mathbb{V}) &= \{\bm{\theta}_h \in L^2(\Omega, \mathbb{V}) | \ \forall Q,\ \bm{\theta}_h|_{Q} \in (N_{k-1})^2 \}, \\
-H_{h, \text{BJT}}^{\Div}(\Omega, \mathbb{S}) &= \{m_{12} \in H^1(\Omega)| \ \forall Q,\ m_{12}|_{Q} \in N_{k} \}  \\
-&\cup \{(m_{11}, m_{22}) \in H^{\div}(\Omega, \mathbb{V})| \; \forall Q,\ (m_{11}, m_{22})|_{Q} \in N_{k} \}, \\
-H_{h, \text{BJT}}^{\div}(\Omega, \mathbb{V}) &= \{\bm{q}_h \in H^{\div}(\Omega, \mathbb{V}) | \ \forall Q,\ \bm{q}_h|_{Q} \in N_{k} \}, \\ 
+L_{h, \text{BJT}}^2(\Omega) &= \{w_h \in L^2(\Omega) | \ \forall Q \in \mathcal{R}_h, \ w_h|_{Q} \in \mathrm{DG}_{k-1} \}, \\
+L_{h, \text{BJT}}^2(\Omega, \mathbb{V}) &= \{\bm{\theta}_h \in L^2(\Omega, \mathbb{V}) | \ \forall Q \in \mathcal{R}_h,\ \bm{\theta}_h|_{Q} \in (\mathrm{DG}_{k-1})^2 \}, \\
+H_{h, \text{BJT}}^{\Div}(\Omega, \mathbb{S}) &= \{m_{12} \in H^1(\Omega)| \ \forall Q \in \mathcal{R}_h,\ m_{12}|_{Q} \in \mathrm{CG}_{k} \}  \\
+&\cup \{(m_{11}, m_{22}) \in H^{\div}(\Omega, \mathbb{V})| \; \forall Q\in \mathcal{R}_h,\ (m_{11}, m_{22})|_{Q} \in \mathrm{BDM}_{k} \}, \\
+H_{h, \text{BJT}}^{\div}(\Omega, \mathbb{V}) &= \{\bm{q}_h \in H^{\div}(\Omega, \mathbb{V}) | \ \forall Q\in \mathcal{R}_h,\ \bm{q}_h|_{Q} \in \mathrm{BDM}_{k} \}, \\ 
 \end{aligned}
 \end{equation}
 
-where BTJ stands for the initials of the authors in \cite{becache2000wave,becache2001elas}. Combining the results of both papers, the following error estimates are conjectured.
-\begin{conjecture}[Convergence rate for the BJT element]\label{conj:BJTestimates}
+where $\mathrm{BDM}$ are the Brezzi-Douglas-Marini elements \cite{brezzi1985bdm}. BTJ stands for the initials of the authors in \cite{becache2000wave,becache2001elas}. Combining the results of both papers, the following error estimates are conjectured.
+\begin{conjecture}[Convergence rate for the BJT elements]\label{conj:BJTestimates}
 	Assuming a smooth solution to problem~\eqref{eq:weak_min_div_strong}, the following error estimates hold 
 	\begin{equation}
 	\label{eq:errBEC}
@@ -153,21 +270,21 @@ so that
 \end{aligned}
 \end{equation}
 
-Consider a regular triangulation $\mathcal{T}_h$ with elements $T$. The space of polynomials of order $k$ on a mesh cell is denoted by $P_k$. The following spaces are used as discretization spaces
+Consider a regular triangulation $\mathcal{T}_h$ with elements $T$. The following spaces are used as discretization spaces
 \begin{equation}
 \label{eq:AFW}
 \begin{aligned}
-L_{h, \text{AFW}}^2(\Omega) &= \{w_h \in L^2(\Omega) | \ \forall T, \ w_h|_{T} \in P_{k-1} \}, \\
-L_{h, \text{AFW}}^2(\Omega, \mathbb{V}) &= \{\bm{\theta}_h \in L^2(\Omega, \mathbb{V}) | \ \forall T,\ \bm{\theta}_h|_{T} \in (P_{k-1})^2 \}, \\
-H_{h, \text{AFW}}^{\Div}(\Omega, \mathbb{M}) &= \{(m_{11}, m_{12}) \in H^{\div}(\Omega, \mathbb{V})| \ \forall T,\ (m_{11}, m_{12})|_{T} \in BDM_{[k]} \}  \\
-& \; \cup \{(m_{21}, m_{22}) \in H^{\div}(\Omega, \mathbb{V})| \ \forall T,\ (m_{21}, m_{22})|_{T} \in BDM_{[k]} \}, \\
-H_{h, \text{AFW}}^{\div}(\Omega, \mathbb{V}) &= \{\bm{q}_h \in H^{\div}(\Omega, \mathbb{V}) | \ \forall T,\ \bm{q}_h|_{T} \in RT_{[k-1]} \}, \\
-L_{h, \text{AFW}}^2(\Omega, \mathbb{K}) &= \{\bm{R}_h \in L^2(\Omega, \mathbb{K}) | \ \forall T, \ w_h|_{T} \in P_{k-1} \}, \\ 
+L_{h, \text{AFW}}^2(\Omega) &= \{w_h \in L^2(\Omega) | \ \forall T \in \mathcal{T}_h, \ w_h|_{T} \in \mathrm{DG}_{k-1} \}, \\
+L_{h, \text{AFW}}^2(\Omega, \mathbb{V}) &= \{\bm{\theta}_h \in L^2(\Omega, \mathbb{V}) | \ \forall T \in \mathcal{T}_h,\ \bm{\theta}_h|_{T} \in (\mathrm{DG}_{k-1})^2 \}, \\
+H_{h, \text{AFW}}^{\Div}(\Omega, \mathbb{M}) &= \{(m_{11}, m_{12}) \in H^{\div}(\Omega, \mathbb{V})| \ \forall T \in \mathcal{T}_h,\ (m_{11}, m_{12})|_{T} \in \mathrm{BDM}_{k} \}  \\
+& \; \cup \{(m_{21}, m_{22}) \in H^{\div}(\Omega, \mathbb{V})| \ \forall T \in \mathcal{T}_h,\ (m_{21}, m_{22})|_{T} \in \mathrm{BDM}_{k} \}, \\
+H_{h, \text{AFW}}^{\div}(\Omega, \mathbb{V}) &= \{\bm{q}_h \in H^{\div}(\Omega, \mathbb{V}) | \ \forall T \in \mathcal{T}_h,\ \bm{q}_h|_{T} \in \mathrm{RT}_{k-1} \}, \\
+L_{h, \text{AFW}}^2(\Omega, \mathbb{K}) &= \{\bm{R}_h \in L^2(\Omega, \mathbb{K}) | \ \forall T \in \mathcal{T}_h, \ w_h|_{T} \in \mathrm{DG}_{k-1} \}, \\ 
 \end{aligned}
 \end{equation}
 
-where $BDM$ are the Brezzi-Douglas-Marini elements \cite{brezzi1985bdm} and $RT$ the Raviart-Thomas elements \cite{raviart1977}. The acronym AFW stands for Arnold-Falk-Winther, that proposed this kind on discretization for static elasticity \cite{arnold2007mixed}. A convergence analysis for the general elastodynamics problem with weak symmetry in the $L^\infty (L^2)$ norm is detailed \cite{arnold2014elastodynamics}. A convergence study for the wave equation with mixed finite elements in the $L^\infty (L^2)$ is presented in \cite{geveci1988}. Combining the results of the two, the following error estimates are conjectured:
-\begin{conjecture}[Rate of convergence for the AFW element]\label{conj:AWFestimates}
+where $\mathrm{RT}$ stands for the Raviart-Thomas elements \cite{raviart1977}. The acronym AFW stands for Arnold-Falk-Winther, that proposed this kind on discretization for static elasticity \cite{arnold2007mixed}. A convergence analysis for the general elastodynamics problem with weak symmetry in the $L^\infty (L^2)$ norm is detailed \cite{arnold2014elastodynamics}. A convergence study for the wave equation with mixed finite elements in the $L^\infty (L^2)$ is presented in \cite{geveci1988}. Combining the results of the two, the following error estimates are conjectured:
+\begin{conjecture}[Rate of convergence for the AFW elements]\label{conj:AWFestimates}
 	Assuming a smooth solution to problem~\eqref{eq:weak_min_div_weak}, the following error estimates hold 
 	\begin{equation}
 	\label{eq:errAFW}
@@ -188,8 +305,8 @@ For the Kirchhoff plate, the Hellan-Herrmann-Johnson scheme \cite{hellan1967,her
 \begin{equation}
 \label{eq:HHJ}
 \begin{aligned}
-W_h = &\{w_h \in H^1_0(\Omega)| \; \forall T, \; w_h|_{T} \in P_{k} \}, \\
-S_h = &\{\bm{M}_h \in L^2(\Omega, \mathbb{S})| \; \forall T, \; \bm{M}_h|_{T} \in (P_{k-1})^{2\times 2}_{\text{sym}} , \\ 
+W_h = &\{w_h \in H^1_0(\Omega)| \; \forall T \in \mathcal{T}_h, \; w_h|_{T} \in P_{k} \}, \\
+S_h = &\{\bm{M}_h \in L^2(\Omega, \mathbb{S})| \; \forall T \in \mathcal{T}_h, \; \bm{M}_h|_{T} \in (P_{k-1})^{2\times 2}_{\text{sym}} , \\ 
 &\, \ \bm{M}_h \text{ is normal-normal continous across elements}\}.
 \end{aligned}
 \end{equation}
@@ -227,7 +344,8 @@ v_w &\in W_h, \\
 \end{equation}
 
 For the associated static problem, under the hypothesis of smooth solutions, optimal convergence of order $O(k)$ for $w \in H^1$ and $\bm{M} \in L^2$ has been established. So, it is natural to conjecture the following result for the dynamic problem:
-\begin{conjecture}\label{conj:HHJestimates}
+\begin{conjecture}[Convergence of the HHJ elements]
+	\label{conj:HHJestimates}
 	Assuming a smooth solution for problem~\eqref{eq:weak_kir_HHJ}, the following error estimates hold
 	\begin{equation}
 	\label{eq:errHHJ}
@@ -260,23 +378,24 @@ so that
 \end{aligned}
 \end{equation}
 
- Consider a regular triangulation $\mathcal{T}_h$ with elements $T$. The space of polynomials of order $k$ on a mesh cell is denoted by $P_k$. The following family of finite elements is conforming to the weak formulation \eqref{eq:weak_min_grad}
+ Consider a regular triangulation $\mathcal{T}_h$ with elements $T$. The following family of finite elements is conforming to the weak formulation \eqref{eq:weak_min_grad}
 \begin{equation}\label{eq:CGDG}
 \begin{aligned}
-H_{h}^{1}(\Omega) &= \{w_h \in H^1(\Omega) \vert \ \forall T, \ w_h|_{T} \in P_{k} \}, \\
-H_h^{\Grad}(\Omega, \bbR^2) &= \{ \bm{\theta}_h \in H^{\Grad}(\Omega, \bbR^2) \vert \ \forall T,\ \bm{\theta}_h|_{T} \in (P_{k})^2 \}, \\
-L_h^2(\Omega, \mathbb{S}) &= \{ \bm{M}_h \in L^2(\Omega, \mathbb{S}) \vert \ \forall T, \bm{M}_h|_{T} \in (P_{k-1})^{2 \times 2}_{\text{sym}} \}, \\
-L_h^2(\Omega, \bbR^2) &= \{\bm{q}_h \in L^2(\Omega, \bbR^2)  \vert \ \forall T,\ \bm{q}_h|_{T} \in (P_{k-1})^{2} \}, \\
+H_{h}^{1}(\Omega) &= \{w_h \in H^1(\Omega) \vert \ \forall T \in \mathcal{T}_h, \ w_h|_{T} \in \mathrm{CG}_{k} \}, \\
+H_h^{\Grad}(\Omega, \bbR^2) &= \{ \bm{\theta}_h \in H^{\Grad}(\Omega, \bbR^2) \vert \ \forall T \in \mathcal{T}_h,\ \bm{\theta}_h|_{T} \in (\mathrm{CG}_{k})^2 \}, \\
+L_h^2(\Omega, \mathbb{S}) &= \{ \bm{M}_h \in L^2(\Omega, \mathbb{S}) \vert \ \forall T \in \mathcal{T}_h, \bm{M}_h|_{T} \in (\mathrm{DG}_{k-1})^{2 \times 2}_{\text{sym}} \}, \\
+L_h^2(\Omega, \bbR^2) &= \{\bm{q}_h \in L^2(\Omega, \bbR^2)  \vert \ \forall T \in \mathcal{T}_h,\ \bm{q}_h|_{T} \in (\mathrm{DG}_{k-1})^{2} \}, \\
 \end{aligned}
 \end{equation}
-To approximate spaces $H_h^{1}(\Omega), \; H_h^{\Grad}(\Omega, \bbR^2)$ Lagrange polynomials of order $k$ are selected. For spaces $L_h^2(\Omega, \mathbb{S}), \; L_h^2(\Omega, \bbR^2)$ Discontinous Galerkin polynomials of order $k-1$ are employed. We use the acronym CGDG to denote this combination of elements
+To approximate spaces $H_h^{1}(\Omega), \; H_h^{\Grad}(\Omega, \bbR^2)$ Lagrange polynomials of order $k$ are selected. For spaces $L_h^2(\Omega, \mathbb{S}), \; L_h^2(\Omega, \bbR^2)$ Discontinous Galerkin polynomials of order $k-1$ are employed. We use the acronym CGDG (continuous Galerkin, discontinuous Galerkin) to denote this combination of elements
 \[
 \mathrm{CGDG} = \mathrm{CG} \times \mathrm{CG}(\bbR^2) \times \mathrm{DG}(\mathbb{S}) \times \mathrm{DG}(\bbR^2)
 \]
 
 This selection of finite elements can be seen as a standard discretization of the problem combined with a reduced integration of the stress tensor. For this reason, the following conjecture on the error estimates is proposed. 
 
-\begin{conjecture}\label{conj:min}\label{conj:CGDGestimates}
+\begin{conjecture}[Convergence of the CGDG elements]
+	\label{conj:CGDGestimates}
 	Assuming a smooth solution to problem~\eqref{eq:weak_min_grad}, the following error estimates hold 
 	\begin{equation}
 	\label{eq:errCGDG}
@@ -356,6 +475,15 @@ Because of the presence of the Lagrange multiplier, the mass matrix $\mathbf{M}$
 ||\cdot ||_{L^\infty ({X})} \approx || \cdot ||_{L^\infty_{\Delta t} ({X})} = \max_{t \in t_i} ||\cdot||_{{X}},
 \]
 where $t_i$ are the discrete simulation instants. 
+
+
+\subsection{Numerical test for the Euler-Bernoulli beam}
+We consider the following exact solution for the Euler-Bernoulli beam under simply supported boundary conditions
+\begin{equation}
+w^{\text{ex}} = \sin(\pi x/ L)\sin(t)
+\end{equation}
+
+
 \subsection{Numerical test for the Mindlin plate}\label{sec:numtest_min}
 To validate the method first we test a finite element combinations on an analytic solution. Constructing an analytical solution for a vibrating Mindlin plate is far from trivial. Therefore, the solution for the static case \cite{veiga2013} is exploited. \\
 
@@ -490,8 +618,7 @@ Formulation \eqref{eq:weak_min_div_weak} and its element \eqref{eq:AFW} are cons
 
 
 \paragraph{Results for dual mixed formulation (CGDG elements \eqref{eq:CGDG})}
-A direct solver based on an LU preconditioner is used.
-In Fig. \ref{fig:errorCGDG} and Tables \ref{tab:resminCGDG_k1} the errors are reported. Conjecture \ref{conj:CGDGestimates} is verified for this test. 
+For this formulation have to imposed strongly on $e_w, \bm{e}_\theta$. A direct solver based on an LU preconditioner is used. In Fig. \ref{fig:errorCGDG} and Tables \ref{tab:resminCGDG_k1} the errors are reported. Conjecture \ref{conj:CGDGestimates} is verified for this test. 
 
 \begin{figure}[h]%
 	\centering
