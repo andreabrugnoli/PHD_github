@@ -13,7 +13,7 @@ import scipy.linalg as la
 import scipy.sparse as spa
 import scipy.sparse.linalg as sp_la
 matplotlib.rcParams['text.usetex'] = True
-save_res = True
+save_res = False
 
 name_FEp = 'Bell'
 name_FEq = 'DG'
@@ -111,7 +111,6 @@ def compute_err(n, r):
 
     dx = Measure('dx')
     ds = Measure('ds')
-    dS = Measure("dS")
 
     m_form = inner(v_p, al_p) * dx + inner(v_q, al_q) * dx
 
@@ -159,7 +158,9 @@ def compute_err(n, r):
 
     G_ortho.tocsr()
 
-    dt = 0.1 * h_mesh
+    # dt = 0.1 * h_mesh
+    dt = h_mesh**2
+
     theta = 0.5
 
     A_form = m_form - dt * theta * j_form

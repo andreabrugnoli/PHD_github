@@ -17,18 +17,25 @@ import matplotlib.pyplot as plt
 matplotlib.rcParams['text.usetex'] = True
 
 bc_input = 'CCCC_CGDG'
-save_res = True
+save_res = False
 
 def compute_err(n, r):
 
     h_mesh = 1/n
 
-    E = Constant(1)
+    E = Constant(136*10**9)
     nu = Constant(0.3)
 
-    rho = Constant(1)
+    rho = Constant(5600)
     k = Constant(5/6)
     h = Constant(0.1)
+
+    # E = Constant(1)
+    # nu = Constant(0.3)
+    #
+    # rho = Constant(1)
+    # k = Constant(5 / 6)
+    # h = Constant(0.1)
 
     D = E * h ** 3 / (1 - nu ** 2) / 12
     fl_rot = 12 / (E * h ** 3)
@@ -255,7 +262,7 @@ def compute_err(n, r):
 
     t_vec = np.linspace(0, t_fin, num=n_t)
 
-    # param = {"ksp_type": "gmres", "ksp_gmres_restart":100, "ksp_atol":1e-30}
+    # param = {"ksp_type": "gmres", "ksp_gmres_restart":100, "ksp_atol":1e-40}
     param = {"ksp_type": "preonly", "pc_type": "lu"}
 
     for i in range(1, n_t):
@@ -341,9 +348,10 @@ def compute_err(n, r):
            q_err_max, q_err_quad
 
 
-n_h = 5
+n_h = 3
 n1_vec = np.array([2**(i+3) for i in range(n_h)])
 n2_vec = np.array([2**(i+2) for i in range(n_h)])
+
 h1_vec = 1./n1_vec
 h2_vec = 1./n2_vec
 
@@ -423,11 +431,11 @@ for i in range(n_h):
     v_errInf_r1[i], v_errQuad_r1[i], om_errInf_r1[i], om_errQuad_r1[i], \
     sig_errInf_r1[i], sig_errQuad_r1[i], q_errInf_r1[i], q_errQuad_r1[i] = compute_err(n1_vec[i], 1)
 
-    v_errInf_r2[i], v_errQuad_r2[i], om_errInf_r2[i], om_errQuad_r2[i], \
-    sig_errInf_r2[i], sig_errQuad_r2[i], q_errInf_r2[i], q_errQuad_r2[i] = compute_err(n1_vec[i], 2)
+    # v_errInf_r2[i], v_errQuad_r2[i], om_errInf_r2[i], om_errQuad_r2[i], \
+    # sig_errInf_r2[i], sig_errQuad_r2[i], q_errInf_r2[i], q_errQuad_r2[i] = compute_err(n1_vec[i], 2)
 
-    v_errInf_r3[i], v_errQuad_r3[i], om_errInf_r3[i], om_errQuad_r3[i], \
-    sig_errInf_r3[i], sig_errQuad_r3[i], q_errInf_r3[i], q_errQuad_r3[i] = compute_err(n1_vec[i], 3)
+    # v_errInf_r3[i], v_errQuad_r3[i], om_errInf_r3[i], om_errQuad_r3[i], \
+    # sig_errInf_r3[i], sig_errQuad_r3[i], q_errInf_r3[i], q_errQuad_r3[i] = compute_err(n1_vec[i], 3)
 
     if i>0:
         v_r1_max[i-1] = np.log(v_errInf_r1[i]/v_errInf_r1[i-1])/np.log(h1_vec[i]/h1_vec[i-1])

@@ -20,10 +20,10 @@ matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{bm}"]
 
 save_fig = False
 path_res = "./convergence_results_kirchhoff/"
-bc = "CSSF_H2_diffalg_"
+bc = "CSSF_BellDG3_"
 
 h1_vec = np.load(path_res + bc + "h1.npy")
-
+print(h1_vec)
 coeff = 0.95
 
 n_h = len(h1_vec)
@@ -60,6 +60,8 @@ v_r1int_atF = np.polyfit(np.log(h1_vec), np.log(v_err_r1), 1)[0]
 v_r1int_max = np.polyfit(np.log(h1_vec), np.log(v_errInf_r1), 1)[0]
 v_r1int_L2 = np.polyfit(np.log(h1_vec), np.log(v_errQuad_r1), 1)[0]
 
+print("Error for v Linf: " + str(v_errInf_r1))
+print("Error for v L2: " + str(v_errQuad_r1))
 print("Estimated order of convergence r=1 for v at T fin: " + str(v_r1_atF))
 print("Interpolated order of convergence r=1 for v at T fin: " + str(v_r1int_atF))
 print("Estimated order of convergence r=1 for v Linf: " + str(v_r1_max))
@@ -72,12 +74,12 @@ print("")
 plt.figure()
 
 # plt.plot(np.log(h1_vec), np.log(v_r1_atF), ':o', label='H2')
-plt.plot(np.log(h1_vec), np.log(v_errInf_r1), '-.+', label='$H^2 L^\infty$')
+plt.plot(np.log(h1_vec), np.log(v_errInf_r1), '-.+', label='Bell')
 # plt.plot(np.log(h1_vec), np.log(v_errQuad_r1), '--*', label='H2 $L^2$')
 plt.plot(np.log(h1_vec), np.log(h1_vec) + coeff*(np.log(v_errInf_r1)[-1] - np.log(h1_vec)[-1]), '-v', label=r'$h$')
 
-plt.xlabel(r'log(Mesh size $h$)')
-plt.ylabel(r'log(Error Velocity)')
+plt.xlabel(r'log(Mesh size)')
+plt.ylabel(r'log($||e_w - e_w^h||_{L^\infty H^2}$)')
 plt.title(r'Velocity Error vs Mesh size')
 plt.legend()
 path_fig = "/home/a.brugnoli/Plots/Python/Plots/Kirchhoff_plots/Convergence/firedrake/"
@@ -89,6 +91,8 @@ sig_r1int_atF = np.polyfit(np.log(h1_vec), np.log(sig_err_r1), 1)[0]
 sig_r1int_max = np.polyfit(np.log(h1_vec), np.log(sig_errInf_r1), 1)[0]
 sig_r1int_L2 = np.polyfit(np.log(h1_vec), np.log(sig_errQuad_r1), 1)[0]
 
+print("Error for sig Linf: " + str(sig_errInf_r1))
+print("Error for sig L2: " + str(sig_errQuad_r1))
 print("Estimated order of convergence r=1 for sigma at T fin: " + str(sig_r1_atF))
 print("Interpolated order of convergence r=1 for sigma at T fin: " + str(sig_r1int_atF))
 print("Estimated order of convergence r=1 for sigma Linf: " + str(sig_r1_max))
@@ -100,14 +104,14 @@ print("")
 plt.figure()
 
 # plt.plot(np.log(h1_vec), np.log(sig_r1_atF), ':o', label='H2')
-plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+', label='$H^2 L^\infty$')
+plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+', label='DG $k =3$')
 # plt.plot(np.log(h1_vec), np.log(sig_errQuad_r1), '--*', label='H2 $L^2$')
 plt.plot(np.log(h1_vec), np.log(h1_vec)+ coeff*(np.log(sig_errInf_r1)[-1] - np.log(h1_vec)[-1]), '-v', label=r'$h$')
 
 plt.xlabel(r'log(Mesh size $h$)')
-plt.ylabel(r'log(Error Stress)')
+plt.ylabel(r'log($||\bm{E}_{\kappa} - \bm{E}_{\kappa}^h||_{L^\infty L^2}$)')
 plt.title(r'Stress Error vs Mesh size')
 plt.legend()
 if save_fig:
-    plt.savefig(path_fig + bc + "_sigma.eps", format="eps")
+    plt.savefig(path_fig + bc + "_sig.eps", format="eps")
 plt.show()

@@ -243,11 +243,12 @@ plt.figure()
 
 if bc_input[2:] == '_grgr_':
     plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+', label='$k=1$')
+    plt.plot(np.log(h1_vec), np.log(h1_vec) + coeff * (np.log(sig_errInf_r1)[-1] - np.log(h1_vec)[-1]) + np.log(2),
+             '-v', label=r'$h$')
+
     plt.plot(np.log(h1_vec), np.log(sig_errInf_r2), '-.+', label='$k=2$')
     plt.plot(np.log(h1_vec), np.log(h1_vec**2) + coeff*(np.log(sig_errInf_r2)[-1] - np.log(h1_vec**2)[-1])+ np.log(2), '-v', label=r'$h^2$')
 
-    plt.plot(np.log(h1_vec), np.log(h1_vec) + coeff * (np.log(sig_errInf_r1)[-1] - np.log(h1_vec)[-1]) + np.log(2),
-             '-v', label=r'$h$')
 
     plt.plot(np.log(h2_vec), np.log(sig_errInf_r3), '-.+', label='$k=3$')
     plt.plot(np.log(h2_vec), np.log(h2_vec**3) + coeff*(np.log(sig_errInf_r3)[-1] - np.log(h2_vec**3)[-1])+ np.log(2), '-v', label=r'$h^3$')

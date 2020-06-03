@@ -10,7 +10,7 @@ import scipy.sparse.linalg as sp_la
 # import matplotlib.pyplot as plt
 
 L = 1
-n = 5
+n = 3
 mesh = RectangleMesh(n, n, L, L, quadrilateral=False)
 
 #plot(mesh); plt.show()
@@ -20,34 +20,34 @@ mesh = RectangleMesh(n, n, L, L, quadrilateral=False)
 # Finite element defition
 
 
-Vp = FunctionSpace(mesh, "Argyris", 5)
+Vp = FunctionSpace(mesh, "Bell", 5)
 n_p = Vp.dim()
 print("Vp dim: "+ str(n_p))
 
-v_p = TestFunction(Vp)
-
-e_p = TrialFunction(Vp)
+VCG1 = FunctionSpace(mesh, "CG", 1)
 
 
 for i in range(1, 5):
     boundary_nodes_t = sorted(set(Vp.boundary_nodes(i, "topological")))
     print("topological " + str(i) + ": " + str(boundary_nodes_t))
 
+    boundary_nodes_t_CG1 = sorted(set(VCG1.boundary_nodes(i, "topological")*6))
+    print("topological CG1*6" + str(i) + ": " + str(boundary_nodes_t_CG1))
 
-    m_form = v_p * e_p * ds(i)
-
-    petsc_m = assemble(m_form, mat_type='aij').M.handle
-    M = sp.sparse.csr_matrix(petsc_m.getValuesCSR()[::-1])
-    rows, cols = spa.csr_matrix.nonzero(M)
-
-    set_rows = np.array(list(set(rows)))
-    set_cols = np.array(list(set(cols)))
-
-    #print("rows " + str(i) + ": " + str(set_rows))
-    print("cols " + str(i) + ": " + str(set_cols))
-
-    diff = sorted(set(boundary_nodes_t).difference(set(boundary_nodes_t).difference(set_cols)))
-    print("diff " + str(i) + ": " + str(diff))
+    # m_form = v_p * e_p * ds(i)
+    #
+    # petsc_m = assemble(m_form, mat_type='aij').M.handle
+    # M = sp.sparse.csr_matrix(petsc_m.getValuesCSR()[::-1])
+    # rows, cols = spa.csr_matrix.nonzero(M)
+    #
+    # set_rows = np.array(list(set(rows)))
+    # set_cols = np.array(list(set(cols)))
+    #
+    # #print("rows " + str(i) + ": " + str(set_rows))
+    # # print("cols " + str(i) + ": " + str(set_cols))
+    #
+    # diff = sorted(set(boundary_nodes_t).difference(set(boundary_nodes_t).difference(set_cols)))
+    # print("diff " + str(i) + ": " + str(diff))
 
 
 # boundary_nodes_t = sorted(set(Vp.boundary_nodes("on_boundary", "topological")))

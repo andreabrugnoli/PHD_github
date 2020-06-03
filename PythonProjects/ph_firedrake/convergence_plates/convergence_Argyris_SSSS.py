@@ -13,7 +13,7 @@ import scipy.linalg as la
 import scipy.sparse as spa
 import scipy.sparse.linalg as sp_la
 matplotlib.rcParams['text.usetex'] = True
-save_res = True
+save_res = False
 
 name_FEp = 'Argyris'
 name_FEq = 'DG'
@@ -35,9 +35,9 @@ def compute_err(n, r):
     h = Constant(0.001)
     rho = Constant(5600)  # kg/m^3
 
-    # E = Constant(1)  # Pa
-    # h = Constant(1)
-    # rho = Constant(1)
+    # E = Constant(100000000)  # Pa
+    # h = Constant(0.01)
+    # rho = Constant(100)
 
     Lx = 1
     Ly = 1
@@ -66,10 +66,7 @@ def compute_err(n, r):
 
     mesh = RectangleMesh(n, n, Lx, Lx, quadrilateral=False)
 
-    # Domain, Subdomains, Boundary, Suboundaries
-
     # Finite element defition
-
 
     Vp = FunctionSpace(mesh, name_FEp, deg_p)
     Vq = VectorFunctionSpace(mesh, name_FEq, deg_q, dim=3)
@@ -160,7 +157,7 @@ def compute_err(n, r):
             else:
                 j = j+1
 
-    # print(bd_nodes)
+    print(bd_nodes)
 
     assert len(bd_nodes) - len(set(bd_nodes)) == 4
 
@@ -174,7 +171,8 @@ def compute_err(n, r):
 
     G_ortho.tocsr()
 
-    dt = 0.1 * h_mesh
+    # dt = h_mesh/10
+    dt = h_mesh**2
     theta = 0.5
 
     A_form = m_form - dt * theta * j_form
@@ -241,7 +239,7 @@ def compute_err(n, r):
     v_err_H1 = np.zeros((n_t,))
     sig_err_L2 = np.zeros((n_t,))
 
-    # Ppoint = (Lx/14, Ly/3)
+    # Ppoint = (0, Ly/3)
     # w_atP = np.zeros((n_t,))
     # v_atP = np.zeros((n_t,))
     # v_atP[0] = ep_n.at(Ppoint)
@@ -284,6 +282,7 @@ def compute_err(n, r):
 
         # w_atP[i] = w_n1.at(Ppoint)
         # v_atP[i] = ep_n1.at(Ppoint)
+
         t_.assign(t)
 
         # w_err_H1[i] = np.sqrt(assemble(dot(w_n1-w_exact, w_n1-w_exact) * dx
@@ -326,9 +325,9 @@ def compute_err(n, r):
     return v_err_last, v_err_max, v_err_quad, sig_err_last, sig_err_max, sig_err_quad
 
 
-n_h = 4
+n_h = 2
 n1_vec = np.array([2**(i+2) for i in range(n_h)])
-# n1_vec = np.array([i+1 for i in range(n_h)])
+# n1_vec = np.array([i+2 for i in range(n_h)])
 h1_vec = 1./n1_vec
 
 n2_vec = np.array([2**(i) for i in range(n_h)])
