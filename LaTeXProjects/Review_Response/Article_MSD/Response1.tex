@@ -1,0 +1,402 @@
+%% LyX 2.1.5 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage{color}
+\usepackage{tcolorbox}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\usepackage{url}
+\usepackage[footnote]{acronym}
+\usepackage[unicode=true,pdfusetitle,
+ bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
+ breaklinks=false,pdfborder={0 0 0},backref=false,colorlinks=true]
+ {hyperref}
+\hypersetup{allcolors=red}
+
+\def\onedot{$\mathsurround0pt\ldotp$}
+\def\cddot{% two dots stacked vertically
+	\mathbin{\vcenter{\baselineskip.67ex
+			\hbox{\onedot}\hbox{\onedot}}%
+}}
+
+\makeatletter \renewcommand\d[1]{\ensuremath{%
+		\;\mathrm{d}#1\@ifnextchar\d{\!}{}}}
+\makeatother
+
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+%===================================
+%% --  Page margins
+\usepackage{geometry}
+\geometry{verbose,twoside,a4paper,
+    % Main margins 
+top=3cm,
+bottom=3cm,
+inner=2.5cm,outer=2.5cm,
+    % Split of top margins
+headheight=2.2cm,headsep=0.5cm,
+    % Split of bottom margin
+footskip=0.5cm,
+    % Split of outer margin
+marginparsep=0.5cm,
+marginparwidth=12.5pt % width of icon \faNewspaperO at 11pt
+}
+% Width of icon is computed with
+% \newlength{\myl} \settowidth{\myl}{\faNewspaperO} Width of icon \faNewspaperO is \the\myl.
+%===================================
+
+%===================================
+%% -- Header
+%\renewcommand{\thepage}{\roman{page}}% Roman numerals for page counter
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+% Custom fancy style (can be modified on the fly within the document as well)
+\fancyhf{} %Clear Everything.
+  % Current page number on the exterior
+\fancyhead[R]{Brugnoli {\it et al.},  APM-D-18-02037, \thepage}
+  % Chapter name on the interior of even pages
+\fancyhead[L]{\nouppercase{\leftmark}}
+% Redefinition of the plain style
+% (This page style is used for the first page of Chapter, table of contents,
+% etc...)
+\fancypagestyle{plain}{
+       \fancyhf{} %Clear Everything.
+       \renewcommand{\headrule}{\hrule height 2pt \vspace{1mm}\hrule height 1pt}
+       \fancyhead[R]{\thepage}
+}
+%===================================
+
+%===================================
+%% -- tcolorbox to quote
+%\usepackage[most]{tcolorbox}
+\tcbuselibrary{most}
+\tcbuselibrary{breakable} % breakable boxes
+%\definecolor{background}{HTML}{F9F5E9}
+%\definecolor{linecolor}{HTML}{E0D7BC}
+\colorlet{background}{lightgray!80!white}
+\colorlet{linecolor}{black}
+
+\newtcolorbox{quotebox}[2][]{%
+leftupper=2em,
+colback=background,
+colframe=background,
+%fonttitle=\bfseries,
+coltitle=black,
+breakable,
+enhanced,
+attach boxed title to top right,
+boxed title style={empty},
+sharp corners,
+borderline north={0.5pt}{0pt}{linecolor},
+borderline north={0.5pt}{1.5pt}{linecolor},
+borderline south={0.5pt}{0pt}{linecolor},
+borderline south={0.5pt}{1.5pt}{linecolor},
+title=#2,#1}
+
+\tcbset{colback=white,
+%colframe=green!50!black,
+%fonttitle=\bfseries,
+coltitle=white,
+breakable,enhanced jigsaw,%breakable box
+%sharp corners,
+}
+%===================================
+
+%===================================
+%-- 'Remark' and TODO' command
+\usepackage{fontawesome}
+\usepackage{tcolorbox}
+   % enable macro
+\newcommand{\remark}[1]{%
+\begin{tcolorbox}[title=,colframe=white,colback=lightgray!50!white,fontupper=\sffamily\small]
+\faComment~#1
+\end{tcolorbox}}
+   % disable macro
+\renewcommand{\remark}[1]{}
+   % enable macro
+\newcounter{todocounter}
+\newcommand{\todo}[1]{\stepcounter{todocounter}\textbf{\textcolor{red}{(TODO \arabic{todocounter} -- #1)}}}
+   % disable macro
+%\renewcommand{\todo}[1]{\stepcounter{todocounter} \textbf{ \textcolor{red}{(\arabic{todocounter})} }}
+%===================================
+
+%===================================
+%%-- Misc.
+\usepackage{lipsum}
+% Write 'et al.'
+% Use \etal (no trailing space) or \etal{} (trailing space)
+\newcommand{\etal}{\emph{et al.}}
+  % Line numbering
+\usepackage{lineno}
+\modulolinenumbers[5]
+  % For option 'stretch fill image'
+\tcbuselibrary{skins}
+%===================================
+
+%===================================
+%% -- Color for review
+   % background color
+\colorlet{colorRevBG1}{red!60!black} % dark red
+\colorlet{colorRevBG2}{blue!60!black} % dark blue
+\colorlet{colorRevBG3}{green!40!black} % dark green
+  % front color
+\colorlet{colorRev1}{red!80!black} % dark red
+\colorlet{colorRev2}{blue!80!black} % dark blue
+\colorlet{colorRev3}{green!50!black} % dark green
+% Macro to enter revisions
+% Usage: \revision[No.]{text}
+%\usepackage{ifthen}
+\usepackage{xstring}
+\newcommand{\revision}[2]{%
+\IfStrEqCase{#1}{{1}{\textcolor{colorRev1}{#2}}
+    {2}{\textcolor{colorRev2}{#2}}
+    {3}{\textcolor{colorRev3}{#2}}}
+    [\PackageError{rev}{Unknown reviewer: #1}{Choose available.}]%
+}
+
+%===================================
+
+\makeatother
+
+\makeatother
+
+\begin{document}
+\thispagestyle{plain}
+
+\noindent {\Large{} APM-D-18-02037
+}{\Large \par}
+
+\noindent \begin{flushleft}
+{\Large{}Port-Hamiltonian formulation and Symplectic discretization of Plate models \\	\vspace{2mm}\large\textit{Part I : Mindlin model for thick plates}}
+\par\end{flushleft}{\Large \par}
+
+\noindent \begin{flushleft}
+Andrea Brugnoli, Daniel Alazard, Val\'erie Pommier-Budinger, Denis Matignon
+\par\end{flushleft}
+
+\noindent \begin{flushleft}
+\today
+\par\end{flushleft}
+
+\begin{center}
+\textbf{\Large{}Response to reviewers}
+\par\end{center}{\Large \par}
+
+We gratefully acknowledge each reviewer for his/her most constructive comments. The quality of the paper has benefited from yours suggestions. Our responses are provided in this document.
+
+Revised passages have been highlighted in the PDF version of the manuscript, with a different color for \textcolor{colorRev1}{Reviewer \#1} and \textcolor{colorRev2}{Reviewer \#2}.
+
+\tableofcontents{}
+
+\section*{Acronyms}
+
+\begin{acronym}[IDA-PBC--] % Specify the longest acronym in order to set the first column width
+	\acro{FMS}{\emph{Flexible multibody system}}
+\end{acronym}
+
+\clearpage{}
+
+
+\section{Summary of revisions}
+
+The manuscript has been revised to account for the comments of the two reviewers. The revisions are highlighted in \revision{1}{red for reviewer \#1} and in \revision{2}{blue for reviewer \#2}. A summary of the revisions
+is given below.
+
+\begin{tcolorbox}[title=Summary of revisions (Reviewer No. 1), colframe=colorRevBG1]
+Here the sections we refer to are the ones for the unrevised paper.
+
+\end{tcolorbox}
+
+
+\begin{tcolorbox}[title=Summary of revisions (Reviewer No. 2),colframe=colorRevBG2]
+Here the sections we refer to here are the ones for the unrevised paper.
+
+\end{tcolorbox}
+ 
+We have also made the following minor modifications:
+
+\clearpage{}
+
+
+\section[Document format]{Format of the present document}
+
+
+\subsubsection*{Format of response}
+
+An answer is formatted as follows. The reviewer is first quoted with
+a gray box that also indicates the position of the quote in the original
+review. The comment is then answered in the subsequent paragraph(s).
+A description of the revisions and their positions in the unrevised paper is then given in a box.
+The color of the box for each reviewer matches the text color used in the revised manuscript, given below.
+\begin{itemize}
+	\item \textcolor{colorRev1}{Reviewer \#1} 
+	\item \textcolor{colorRev2}{Reviewer \#2}
+\end{itemize}
+
+\begin{quotebox}{Reviewer No.$i\in\left\{1{,}2\right\} $ -- Position of the quote}
+"Direct quote of a comment provided by the reviewer No.$i$."
+\end{quotebox}
+
+Answer to the comment for reviewer No. 1.
+
+\begin{tcolorbox}[title=Revision page -- (Reviewer No. $1$),colframe=colorRevBG1]
+ Descriptions of the corresponding revisions in the manuscript.
+\end{tcolorbox}
+
+Answer to the comment for reviewer No. 2.
+\begin{tcolorbox}[title=Revision  page -- (Reviewer No. $2$),colframe=colorRevBG2]
+	Descriptions of the corresponding revisions in the manuscript.
+\end{tcolorbox}
+
+
+\subsubsection*{Remark on the use of references}
+
+In our responses, we refer to two families of bibliographic entries:
+\begin{itemize}
+\item The ones that are contained in the revised manuscript, which are referred
+to using the numerical style of the \emph{Journal}, e.g. [1].
+\item References\emph{ specific to this document} and not necessarily contained
+in the manuscript. To avoid confusion, these references are quoted
+using an author-year citation style, e.g. \cite{neto2003stabilization}.
+\end{itemize}
+\clearpage{}
+
+
+\section{Reply to reviewer \#1}
+We thank the reviewer for these constructive and insightful comments. We have addressed each one
+below. In the revised manuscript, the corresponding revisions are \textcolor{colorRev1}{highlighted in red}.
+
+\begin{quotebox}{Reviewer No.1 -- Comment a}
+	The paper starts with (partially) well known relations on the equations of motion of deformable bodies attached to a reference frame. The PDE-approach is commonly treated in the control theory, but mostly breaks down hereafter by introducing a discretization and some missing links in the otherwise concise derivations. Wouldn't the formulation be much clearer for the reader, if the derivations are shortened by starting with less common approaches?
+\end{quotebox}
+
+The equations of motion in Hamiltonian  form can be derived from a variational principle either for rigid body dynamics \cite[Proposition 7.1.1]{holm2008geometric} and general non linear elasticity \cite[Chapter 3]{marsden1981lectures}.  The inclusion of flexibility in case of small deformations using a floating frame formulation is treated in  \cite[Eq. 4.10]{simeon2013computational} using the least action principle. However, in this last reference no comments are made on the Hamiltonian structure of the problem. To the best of our knowledge an Hamiltonian formulation of the floating frame description has not been presented in the literature. It is possible that the equations of motions proposed in the paper can be obtained by means of variational principle, but we have not figured that out yet. For this reason we have simply shown that the equations proposed in \cite{simeon2013computational} can be recast, after some computations, in port-Hamiltonian form. This is neither the clearest nor the most elegant procedure to obtain Sys 12 in the paper. The final result is anyway consistent with more classical derivations and possesses some nice features. 
+
+
+\begin{tcolorbox}[title=Revision pages 17 to 25 (Reviewer No. 1 -- Comment a),colframe=colorRevBG1]
+
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.1 -- Comment b}
+Ref. [39] on page 2 is outdated. There have been much publications since regarding model order reduction related to corotational formulations and inertial/absolute frame.
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision pages 20 to 25 (Reviewer No. 1 -- Comment b),colframe=colorRevBG1]
+	\cite{rong2019}
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment c}
+	The cross map operator is usually written as a tilde in multibody dynamics.
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision pages 20 to 25 (Reviewer No. 1 -- Comment c),colframe=colorRevBG1]
+	
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment d}
+	While the formulation is really interesting and already commonly used for rigid body systems, I would like to see this formulation for general bodies, not for beams. The concept with beams is what many people treat in robotics, probably in a slightly different manner, but resulting in similar equations (cf. Bremer's projection equations). You state in the abstract "Thanks to the features of the pH framework, complex multibody systems are constructed in a modular way" - but this is the same, if you use the approach from robotics. Do you obtain different equations of motion?
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision page 1 (Reviewer No. 1 -- Comment d ),colframe=colorRevBG1]
+	
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.1 -- Comment e}
+	Eq. (29) is similar to the equations which people often use for flexible multibody dynamics. However, it is hard to see how the according matrices can be computed from the previous derivations. Thus, it would be advantageous, if you interpret these terms with respect to (mechanical) flexible multibody dynamics notation and if you can embed it into existing (common) formulations.
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision page 1 (Reviewer No. 1 -- Comment e ),colframe=colorRevBG1]
+	
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment f}
+Eq. (33) should be explained in more detail regarding the EA and EI terms, which might be natural due to the D{-1} term in the mass operator, but will be confusing for common readers.
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision page 1 (Reviewer No. 1 -- Comment f ),colframe=colorRevBG1]
+	
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment g}
+	I am strongly missing comparison to other formulations and other multibody codes: are the analytical / numerical results the same? Is the performance higher?
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision page 1 (Reviewer No. 1 -- Comment g ),colframe=colorRevBG1]
+	
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment h}
+	I am very much missing the "what does not work" and "restrictions" in the conclusions (e.g., does it work for (flexible) sliding joints or multimodal joints?), which should be present in any "new formulation". The proposed approach starts with a very general PDE formulation, but breaks down to beams in the end. Slider-crank and four bar mechanisms are shown, but no really "complex multibody systems". For those who would like to reproduce the formulation, they have a right to know, if it will work out for their application or it will not.
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision page 1 (Reviewer No. 1 -- Comment h ),colframe=colorRevBG1]
+	
+\end{tcolorbox}
+
+
+\clearpage{}
+
+\section{Reply to reviewer \#2}
+We thank the reviewer for these detailed and constructive comments. We have addressed each one
+below. In the revised manuscript, the corresponding revisions are \textcolor{colorRev2}{highlighted in blue}.
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 1}
+Can the authors explain what they understand by a "lossless" system? It is not a standard term in finite elements technology. 
+\end{quotebox}
+\cite[Definition 3.1.4]{van2000l2}
+System that is conservative with respect to the storage function $s(\mathbf{u}, \mathbf{y}) = \mathbf{u}^\top \mathbf{y}$.
+\begin{tcolorbox}[title=Revision pages 3 to 6 (Reviewer No. 2 -- Comment 1 ),colframe=colorRevBG2]
+
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 2}
+The text before equation (21) and (22) does not correspond with equations (21) and (22). Please, rephrase.
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision pages 8 to 10 (Reviewer No. 2 -- Comment 2 ),colframe=colorRevBG2]
+
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 3}
+	Page (4), before equation (4). Should be infinitesimal STRAIN instead of stress.
+\end{quotebox}
+\begin{tcolorbox}[title=Revision page 14 (Reviewer No. 2 -- Comment 3),colframe=colorRevBG2]
+
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 4}
+Constraints are imposed at the velocity level. It is well-known that a drift appears in this case. Are you using any stabilization ?
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision page 10 (Reviewer No. 2 -- Comment 4),colframe=colorRevBG2]
+
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 5}
+Page 20, first paragraph section 6: four bar MECHANISM.
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision page 10 (Reviewer No. 2 -- Comment 5),colframe=colorRevBG2]
+	
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 6}
+In order to assess about the accuracy of solutions and quality of the approach, it would be important to include a convergence study. What are the typical time steps used in the analyses? Are you getting quadratic convergence ? What are typical cpu times comsumptions for the examples you are displaying ?
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision page 10 (Reviewer No. 2 -- Comment 6),colframe=colorRevBG2]
+	
+\end{tcolorbox}
+
+
+\clearpage{}
+
+
+\bibliographystyle{alpha}
+\bibliography{biblio}
+\end{document}

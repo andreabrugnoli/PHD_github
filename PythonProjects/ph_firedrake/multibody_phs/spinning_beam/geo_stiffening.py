@@ -19,7 +19,9 @@ I_beam = 1
 
 offset = 0.05
 J_beam = 1/3*rho_beam*A_beam*((offset+L_beam)**3 - offset**3)
-beta = 0.5
+# beta = 0.5
+beta = 4
+
 J_joint = beta*J_beam
 n_elem = 3
 
