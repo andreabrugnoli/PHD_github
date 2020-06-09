@@ -12,6 +12,570 @@ from mpl_toolkits.mplot3d import Axes3D
 from math import pi
 plt.rc('text', usetex=True)
 
+def skew(x):
+    return np.array([[0, -x[2], x[1]],
+                     [x[2], 0, -x[0]],
+                     [-x[1], x[0], 0]])
+
+
+
+
+class FloatingKP6dofs_Bell(SysPhdaeRig):
+
+    def __init__(self, Lx, Ly, h, rho, E, nu, nx, ny, coord_P, coord_C=np.empty((0, 2)), modes=False):
+
+        assert len(coord_P) == 2
+        assert coord_C.shape[1] == 2
+        fl_rot = 12. / (E * h ** 3)
+        fl_mem = 1./ (E*h)
+
+
+        C_b_vec = as_tensor([
+            [fl_rot, -nu * fl_rot, 0],
+            [-nu * fl_rot, fl_rot, 0],
+            [0, 0, fl_rot * 2 * (1 + nu)]
+        ])
+
+        C_m_vec = as_tensor([
+            [fl_mem, -nu * fl_mem, 0],
+            [-nu * fl_mem, fl_mem, 0],
+            [0, 0, fl_mem * 2 * (1 + nu)]
+        ])
+
+        # Vectorial Formulation possible only
+        def membrane_def_vec(S):
+            return dot(C_m_vec, S)
+
+
+        def bending_curv_vec(MM):
+            return dot(C_b_vec, MM)
+
+        def gradgrad_vec(w):
+            return as_vector([w.dx(0).dx(0), w.dx(1).dx(1), 2 * w.dx(0).dx(1)])
+
+        def Grad_vec(u):
+            return as_vector([u[0].dx(0), u[1].dx(1), u[0].dx(1) + u[1].dx(0)])
+
+        mesh = RectangleMesh(nx, ny, Lx, Ly, quadrilateral=False)
+        # mesh = Mesh("plate_hole_ref2.msh")
+
+        # plot(mesh); plt.show()
+
+        x, y = SpatialCoordinate(mesh)
+
+        Vp_m = VectorFunctionSpace(mesh, 'CG', 1)
+        Vq_m = VectorFunctionSpace(mesh, 'DG', 0, dim=3)
+
+        Vp_b = FunctionSpace(mesh, "Bell", 5)
+        Vq_b = VectorFunctionSpace(mesh, "DG", 3, dim=3)
+
+        V = Vp_m * Vp_b * Vq_m * Vq_b
+        n_V = V.dim()
+
+        v = TestFunction(V)
+        vp_m, vp_b, vq_m, vq_b = split(v)
+
+        e_v = TrialFunction(V)
+        ep_m, ep_b, eq_m, eq_b = split(e_v)
+
+        alp_m = rho * h * ep_m
+
+        alp_b = rho * h * ep_b
+
+        alq_m = membrane_def_vec(eq_m)
+
+        alq_b = bending_curv_vec(eq_b)
+
+        dx = Measure('dx')
+        ds = Measure('ds')
+        mp_m = dot(vp_m, alp_m) * dx
+        mp_b = dot(vp_b, alp_b) * dx
+
+        mq_m = inner(vq_m, alq_m) * dx
+        mq_b = inner(vq_b, alq_b) * dx
+
+
+        m_form = mp_m + mp_b + mq_m + mq_b
+
+        j_Grad = inner(vq_m, Grad_vec(ep_m)) * dx
+        j_GradIP = -inner(Grad_vec(vp_m), eq_m) * dx
+
+        j_gradgrad = inner(vq_b, gradgrad_vec(ep_b)) * dx
+        j_gradgradIP = -inner(gradgrad_vec(vp_b), eq_b) * dx
+
+        j_form = j_gradgrad + j_gradgradIP + j_Grad + j_GradIP
+
+        petsc_j = assemble(j_form, mat_type='aij').M.handle
+        petsc_m = assemble(m_form, mat_type='aij').M.handle
+
+        J_FEM = np.array(petsc_j.convert("dense").getDenseArray())
+        M_FEM = np.array(petsc_m.convert("dense").getDenseArray())
+
+        tab_coord = mesh.coordinates.dat.data
+        i_P = find_point(tab_coord, coord_P)[0]
+
+        ndofVp_b = 3
+        ndofVp_m = 2
+
+        np_m1 = Vp_m.sub(0).dim()
+
+        np_m = Vp_m.dim()
+        np_b = Vp_b.dim()
+
+        nq_m = Vq_m.dim()
+        nq_b = Vq_b.dim()
+
+        n_p = np_m + np_b - ndofVp_b - ndofVp_m
+        n_q = nq_m + nq_b
+
+
+        dofP_m1 = list([i_P])
+        dofP_m2 = list([np_m1 + i_P])
+
+        dofP_b = i_P*6 + np_m
+
+        dofs2dump = dofP_m1 + dofP_m2 + list(range(dofP_b, dofP_b + ndofVp_b))
+        dofs2keep = list(set(range(n_V)).difference(set(dofs2dump)))
+
+        J_f = J_FEM
+        M_f = M_FEM
+
+        J_f = J_f[dofs2keep, :]
+        J_f = J_f[:, dofs2keep]
+
+        M_f = M_f[dofs2keep, :]
+        M_f = M_f[:, dofs2keep]
+
+        x_P, y_P = tab_coord[i_P]
+
+        # print(x_P, y_P)
+        # print(i_P)
+        # print(np_m1, dofs2dump)
+
+        n_rig = 6
+        n_fl = n_p + n_q
+        n_tot = n_rig + n_fl
+
+        Jxx = assemble(rho * h * (y - y_P) ** 2 * dx)
+        Jyy = assemble(rho * h * (x - x_P) ** 2 * dx)
+        Jzz = assemble(rho * h * ((x - x_P) ** 2 + (y - y_P) ** 2) * dx)
+        Jxy = -assemble(rho * h * (x - x_P)*(y - y_P) * dx)
+        Jxz = 0
+        Jyz = 0
+
+        J_in = np.array([[Jxx, Jxy, 0],
+                         [Jxy, Jyy, 0],
+                         [0,   0, Jzz]])
+
+        S_x = assemble(rho * h * (x - x_P) * dx)
+        S_y = assemble(rho * h * (y - y_P) * dx)
+
+        S_vec = np.array([S_x, S_y, 0])
+        M_r = np.zeros((n_rig, n_rig))
+        m_plate = rho * h * Lx * Ly
+
+
+        M_r[:3, :3] = m_plate*np.eye(3)
+        M_r[3:, 3:] = J_in
+        M_r[3:, :3] = skew(S_vec)
+        M_r[:3, 3:] = skew(S_vec).T
+
+        M_fr = np.zeros((n_fl, n_rig))
+        M_fr[:, 0] = assemble(+vp_m[0] * rho * h * dx).vector().get_local()[dofs2keep]
+        M_fr[:, 1] = assemble(+vp_m[1] * rho * h * dx).vector().get_local()[dofs2keep]
+        M_fr[:, 2] = assemble(+vp_b * rho * h * dx).vector().get_local()[dofs2keep]
+
+        M_fr[:, 5] = assemble(-vp_m[0] * rho * h * (y - y_P) * dx).vector().get_local()[dofs2keep]
+        M_fr[:, 5] = assemble(+vp_m[1] * rho * h * (x - x_P) * dx).vector().get_local()[dofs2keep]
+
+        M_fr[:, 3] = assemble(+vp_b * rho * h * (y - y_P) * dx).vector().get_local()[dofs2keep]
+        M_fr[:, 4] = assemble(-vp_b * rho * h * (x - x_P) * dx).vector().get_local()[dofs2keep]
+
+        M = la.block_diag(M_r, M_f)
+        M[n_rig:, :n_rig] = M_fr
+        M[:n_rig, n_rig:] = M_fr.T
+        if not np.linalg.matrix_rank(M) == n_tot:
+            warnings.warn("Singular mass matrix")
+
+        J = np.zeros((n_tot, n_tot))
+        J[n_rig:, n_rig:] = J_f
+
+        # B MATRIX
+
+        n_C = coord_C.shape[0]
+        n_u = n_rig * (n_C + 1)
+        B = np.zeros((n_tot, n_u))
+        B[:n_rig, :n_rig] = np.eye(n_rig)
+
+
+        if modes:
+            M_FEM[dofs2dump, :] = 0
+            M_FEM[:, dofs2dump] = 0
+            J_FEM[dofs2dump, :] = 0
+            J_FEM[dofs2dump, dofs2dump] = 1
+
+            n_modes = input('Number modes to be visualized:')
+
+            printmodes_kir(M_FEM, J_FEM, mesh, Vp_b, n_modes)
+
+        SysPhdaeRig.__init__(self, n_tot, 0, n_rig, n_p, n_q, E=M, J=J, B=B)
+
+        FloatingKP6dofs_Bell.vp_m = vp_m
+        FloatingKP6dofs_Bell.vp_b = vp_b
+        FloatingKP6dofs_Bell.dofs2keep = dofs2keep
+        FloatingKP6dofs_Bell.coords = tab_coord
+        FloatingKP6dofs_Bell.np_m1 = np_m1
+
+        FloatingKP6dofs_Bell.rho = rho
+        FloatingKP6dofs_Bell.h = h
+
+        FloatingKP6dofs_Bell.Vp_x = FunctionSpace(mesh, 'CG', 1)
+        FloatingKP6dofs_Bell.Vp_y = FunctionSpace(mesh, 'CG', 1)
+        FloatingKP6dofs_Bell.Vp_z = FunctionSpace(mesh, 'Bell', 5)
+        FloatingKP6dofs_Bell.x = x
+        FloatingKP6dofs_Bell.y = y
+
+
+    def vec_shapefun(self):
+
+        col1 = assemble(self.vp_m[0]*dx).vector().get_local()[self.dofs2keep]
+        col2 = assemble(self.vp_m[1]*dx).vector().get_local()[self.dofs2keep]
+        col3 = assemble(self.vp_b*dx).vector().get_local()[self.dofs2keep]
+
+        return np.concatenate((col1.reshape((-1,1)), col2.reshape((-1,1)), col3.reshape((-1,1))), axis=1)
+
+    def matrices_j3d(self):
+
+
+        ## x_P = (0, 0)
+        # Finite element defition
+        Vp_x = self.Vp_x
+        Vp_y = self.Vp_y
+        Vp_z = self.Vp_z
+
+        h = self.h
+        rho = self.rho
+
+        x = FloatingKP6dofs_Bell.x
+        y = FloatingKP6dofs_Bell.y
+
+        np_x = Vp_x.dim()
+        np_y = Vp_y.dim()
+        np_z = Vp_z.dim()
+
+        vp_x = TestFunction(Vp_x)
+        vp_y = TestFunction(Vp_y)
+        vp_z = TestFunction(Vp_z)
+
+        ep_x = TrialFunction(Vp_x)
+        ep_y = TrialFunction(Vp_y)
+        ep_z = TrialFunction(Vp_z)
+
+        dofs2dump_x = list([0])
+        dofs2keep_x = list(set(range(np_x)).difference(set(dofs2dump_x)))
+
+        dofs2dump_y = list([0])
+        dofs2dump_z = list([0, 1, 2])
+
+        dofs2keep_y = list(set(range(np_y)).difference(set(dofs2dump_y)))
+        dofs2keep_z = list(set(range(np_z)).difference(set(dofs2dump_z)))
+
+        npx_keep = len(dofs2keep_x)
+        npy_keep = len(dofs2keep_y)
+        npz_keep = len(dofs2keep_z)
+
+        np_keep = npx_keep + npy_keep + npz_keep
+
+        dx = Measure('dx')
+
+        Jf_01tz = assemble(vp_x * rho * h * dx).vector().get_local()[dofs2keep_x]
+        Jf_01ry = assemble(- vp_x * rho * h * x * dx).vector().get_local()[dofs2keep_x]
+
+        jf_01fz = vp_x * rho * h * ep_z * dx
+        petsc_jf_01fz = assemble(jf_01fz, mat_type='aij').M.handle
+        Jf_01fz = np.array(petsc_jf_01fz.convert("dense").getDenseArray())
+
+        Jf_01fz = Jf_01fz[dofs2keep_x, :]
+        Jf_01fz = Jf_01fz[:, dofs2keep_z]
+
+        Jf_10tz = assemble(vp_y * rho * h * dx).vector().get_local()[dofs2keep_y]
+        Jf_10ry = assemble(-vp_y * rho * h * x * dx).vector().get_local()[dofs2keep_y]
+        Jf_12rz = assemble(vp_y * rho * h * y * dx).vector().get_local()[dofs2keep_y]
+        Jf_10rx = assemble(vp_y * rho * h * y * dx).vector().get_local()[dofs2keep_y]
+
+        jf_10fz = vp_y * rho * h * ep_z * dx
+
+        petsc_jf_10fz = assemble(jf_10fz, mat_type='aij').M.handle
+
+        Jf_10fz = np.array(petsc_jf_10fz.convert("dense").getDenseArray())
+
+        Jf_10fz = Jf_10fz[dofs2keep_y, :]
+        Jf_10fz = Jf_10fz[:, dofs2keep_z]
+
+        Jf_tz = np.zeros((np_keep, 3))
+        Jf_tz[:npx_keep, 1] = -Jf_01tz
+        Jf_tz[npx_keep:npx_keep + npy_keep, 0] = Jf_10tz
+
+        Jf_ry = np.zeros((np_keep, 3))
+        Jf_ry[:npx_keep, 1] = -Jf_01ry
+        Jf_ry[npx_keep:npx_keep + npy_keep, 0] = Jf_10ry
+
+        Jf_fz = np.zeros((np_keep, 3, npz_keep))
+        Jf_fz[:npx_keep, 1, :] = -Jf_01fz
+        Jf_fz[npx_keep:npx_keep + npy_keep, 0, :] = Jf_10fz
+
+        Jf_02ty = assemble(vp_x * rho * h * dx).vector().get_local()[dofs2keep_x]
+        Jf_02rz = assemble(vp_x * rho * h * x * dx).vector().get_local()[dofs2keep_x]
+        Jf_01rx = assemble(vp_x * rho * h * y * dx).vector().get_local()[dofs2keep_x]
+
+        jf_02fy = vp_x * rho * h * ep_y * dx
+
+        petsc_jf_02fy = assemble(jf_02fy, mat_type='aij').M.handle
+
+        Jf_02fy = np.array(petsc_jf_02fy.convert("dense").getDenseArray())
+
+        Jf_02fy = Jf_02fy[dofs2keep_x, :]
+        Jf_02fy = Jf_02fy[:, dofs2keep_y]
+
+        Jf_20ty = assemble(vp_z * rho * h * dx).vector().get_local()[dofs2keep_z]
+        Jf_20rz = assemble(vp_z * rho * h * x * dx).vector().get_local()[dofs2keep_z]
+        Jf_21rz = assemble(vp_z * rho * h * y * dx).vector().get_local()[dofs2keep_z]
+
+
+        jf_20fy = vp_z * rho * h * ep_y * dx
+
+        petsc_jf_20fy = assemble(jf_20fy, mat_type='aij').M.handle
+
+        Jf_20fy = np.array(petsc_jf_20fy.convert("dense").getDenseArray())
+
+        Jf_20fy = Jf_20fy[dofs2keep_z, :]
+        Jf_20fy = Jf_20fy[:, dofs2keep_y]
+
+        Jf_ty = np.zeros((np_keep, 3))
+        Jf_ty[:npx_keep, 2] = Jf_02ty
+        Jf_ty[npx_keep + npy_keep:, 0] = -Jf_20ty
+
+        Jf_rx = np.zeros((np_keep, 3))
+        Jf_rx[:npx_keep, 1] = -Jf_01rx
+        Jf_rx[npx_keep:npx_keep + npy_keep, 0] = Jf_10rx
+
+        Jf_rz = np.zeros((np_keep, 3))
+        Jf_rz[:npx_keep, 2] = Jf_02rz
+        Jf_rz[npx_keep + npy_keep:, 0] = -Jf_20rz
+
+        Jf_rz[npx_keep:npx_keep + npy_keep, 2] = -Jf_12rz
+        Jf_rz[npx_keep + npy_keep:, 1] = Jf_21rz
+
+        Jf_fy = np.zeros((np_keep, 3, npy_keep))
+        Jf_fy[:npx_keep, 2, :] = Jf_02fy
+        Jf_fy[npx_keep + npy_keep:, 0, :] = -Jf_20fy
+
+        Jf_12tx = assemble(vp_y * rho * h * dx).vector().get_local()[dofs2keep_y]
+
+        jf_12fx = vp_y * rho * h * ep_x * dx
+
+        petsc_jf_12fx = assemble(jf_12fx, mat_type='aij').M.handle
+
+        Jf_12fx = np.array(petsc_jf_12fx.convert("dense").getDenseArray())
+
+        Jf_12fx = Jf_12fx[dofs2keep_y, :]
+        Jf_12fx = Jf_12fx[:, dofs2keep_x]
+
+        Jf_21tx = assemble(vp_z * rho * h * dx).vector().get_local()[dofs2keep_z]
+
+        jf_21fx = vp_z * rho * h * ep_x * dx
+
+        petsc_jf_21fx = assemble(jf_21fx, mat_type='aij').M.handle
+
+        Jf_21fx = np.array(petsc_jf_21fx.convert("dense").getDenseArray())
+
+        Jf_21fx = Jf_21fx[dofs2keep_z, :]
+        Jf_21fx = Jf_21fx[:, dofs2keep_x]
+
+        Jf_tx = np.zeros((np_keep, 3))
+        Jf_tx[npx_keep:npx_keep + npy_keep, 2] = - Jf_12tx
+        Jf_tx[npx_keep + npy_keep:, 1] = Jf_21tx
+
+        Jf_fx = np.zeros((np_keep, 3, npx_keep))
+        Jf_fx[npx_keep:npx_keep + npy_keep, 2, :] = - Jf_12fx
+        Jf_fx[npx_keep + npy_keep:, 1, :] = Jf_21fx
+
+        return Jf_tx, Jf_ty, Jf_tz, Jf_rx, Jf_ry, Jf_rz, Jf_fx, Jf_fy, Jf_fz
+
+
+class FloatingKP3dofs_Bell(SysPhdaeRig):
+
+    def __init__(self, Lx, Ly, h, rho, E, nu, nx, ny, coord_P, coord_C=np.empty((0, 2)), modes=False):
+
+        assert len(coord_P) == 2
+        assert coord_C.shape[1] == 2
+        fl_rot = 12. / (E * h ** 3)
+        fl_mem = 1./ (E*h)
+
+
+        C_b_vec = as_tensor([
+            [fl_rot, -nu * fl_rot, 0],
+            [-nu * fl_rot, fl_rot, 0],
+            [0, 0, fl_rot * 2 * (1 + nu)]
+        ])
+
+        def bending_curv_vec(MM):
+            return dot(C_b_vec, MM)
+
+        def gradgrad_vec(w):
+            return as_vector([w.dx(0).dx(0), w.dx(1).dx(1), 2 * w.dx(0).dx(1)])
+
+        mesh = RectangleMesh(nx, ny, Lx, Ly, quadrilateral=False)
+        # mesh = Mesh("plate_hole_ref2.msh")
+
+        # plot(mesh); plt.show()
+
+        x, y = SpatialCoordinate(mesh)
+
+        Vp_b = FunctionSpace(mesh, "Bell", 5)
+        Vq_b = VectorFunctionSpace(mesh, "DG", 3, dim=3)
+
+        V = Vp_b * Vq_b
+        n_V = V.dim()
+
+        v = TestFunction(V)
+        vp_b, vq_b = split(v)
+
+        e_v = TrialFunction(V)
+        ep_b, eq_b = split(e_v)
+
+        alp_b = rho * h * ep_b
+
+
+        alq_b = bending_curv_vec(eq_b)
+
+        dx = Measure('dx')
+        ds = Measure('ds')
+        mp_b = dot(vp_b, alp_b) * dx
+
+        mq_b = inner(vq_b, alq_b) * dx
+
+
+        m_form = mp_b +  mq_b
+
+        j_gradgrad = inner(vq_b, gradgrad_vec(ep_b)) * dx
+        j_gradgradIP = -inner(gradgrad_vec(vp_b), eq_b) * dx
+
+        j_form = j_gradgrad + j_gradgradIP
+
+        petsc_j = assemble(j_form, mat_type='aij').M.handle
+        petsc_m = assemble(m_form, mat_type='aij').M.handle
+
+        J_FEM = np.array(petsc_j.convert("dense").getDenseArray())
+        M_FEM = np.array(petsc_m.convert("dense").getDenseArray())
+
+        tab_coord = mesh.coordinates.dat.data
+        i_P = find_point(tab_coord, coord_P)[0]
+
+        ndofVp_b = 3
+
+        np_b = Vp_b.dim()
+
+        nq_b = Vq_b.dim()
+
+        n_p = np_b - ndofVp_b
+        n_q =  nq_b
+
+
+        dofP_b = i_P*6
+
+        dofs2dump = list(range(dofP_b, dofP_b + ndofVp_b))
+        dofs2keep = list(set(range(n_V)).difference(set(dofs2dump)))
+
+        J_f = J_FEM
+        M_f = M_FEM
+
+        J_f = J_f[dofs2keep, :]
+        J_f = J_f[:, dofs2keep]
+
+        M_f = M_f[dofs2keep, :]
+        M_f = M_f[:, dofs2keep]
+
+        x_P, y_P = tab_coord[i_P]
+
+        # print(x_P, y_P)
+        # print(i_P)
+        # print(np_m1, dofs2dump)
+
+        n_rig = 6
+        n_fl = n_p + n_q
+        n_tot = n_rig + n_fl
+
+        Jxx = assemble(rho * h * (y - y_P) ** 2 * dx)
+        Jyy = assemble(rho * h * (x - x_P) ** 2 * dx)
+        Jzz = assemble(rho * h * ((x - x_P) ** 2 + (y - y_P) ** 2) * dx)
+        Jxy = -assemble(rho * h * (x - x_P)*(y - y_P) * dx)
+        Jxz = 0
+        Jyz = 0
+
+        J_in = np.array([[Jxx, Jxy, 0],
+                         [Jxy, Jyy, 0],
+                         [0,   0, Jzz]])
+
+        S_x = assemble(rho * h * (x - x_P) * dx)
+        S_y = assemble(rho * h * (y - y_P) * dx)
+
+        S_vec = np.array([S_x, S_y, 0])
+        M_r = np.zeros((n_rig, n_rig))
+        m_plate = rho * h * Lx * Ly
+
+
+        M_r[:3, :3] = m_plate*np.eye(3)
+        M_r[3:, 3:] = J_in
+        M_r[3:, :3] = skew(S_vec)
+        M_r[:3, 3:] = skew(S_vec).T
+
+        M_fr = np.zeros((n_fl, n_rig))
+        M_fr[:, 2] = assemble(+vp_b * rho * h * dx).vector().get_local()[dofs2keep]
+
+        M_fr[:, 3] = assemble(+vp_b * rho * h * (y - y_P) * dx).vector().get_local()[dofs2keep]
+        M_fr[:, 4] = assemble(-vp_b * rho * h * (x - x_P) * dx).vector().get_local()[dofs2keep]
+
+        M = la.block_diag(M_r, M_f)
+        M[n_rig:, :n_rig] = M_fr
+        M[:n_rig, n_rig:] = M_fr.T
+        if not np.linalg.matrix_rank(M) == n_tot:
+            warnings.warn("Singular mass matrix")
+
+        J = np.zeros((n_tot, n_tot))
+        J[n_rig:, n_rig:] = J_f
+
+        # B MATRIX
+
+        n_C = coord_C.shape[0]
+        n_u = n_rig * (n_C + 1)
+        B = np.zeros((n_tot, n_u))
+        B[:n_rig, :n_rig] = np.eye(n_rig)
+
+
+        if modes:
+            M_FEM[dofs2dump, :] = 0
+            M_FEM[:, dofs2dump] = 0
+            J_FEM[dofs2dump, :] = 0
+            J_FEM[dofs2dump, dofs2dump] = 1
+
+            n_modes = input('Number modes to be visualized:')
+
+            printmodes_kir(M_FEM, J_FEM, mesh, Vp_b, n_modes)
+
+        SysPhdaeRig.__init__(self, n_tot, 0, n_rig, n_p, n_q, E=M, J=J, B=B)
+
+        FloatingKP3dofs_Bell.vp_b = vp_b
+        FloatingKP3dofs_Bell.dofs2keep = dofs2keep
+        FloatingKP3dofs_Bell.coords = tab_coord
+
+
+    def vec_shapefun(self):
+
+        col3 = assemble(self.vp_b*dx).vector().get_local()[self.dofs2keep]
+
+        return col3
+
 
 class FloatingKP(SysPhdaeRig):
 
@@ -255,7 +819,7 @@ class FloatingBellKP(SysPhdaeRig):
 
         name_FEp = "Bell"
         deg_p = 5
-        name_FEq = "Hermite"
+        name_FEq = "DG"
         deg_q = 3
         ndof_Vp = 6
 

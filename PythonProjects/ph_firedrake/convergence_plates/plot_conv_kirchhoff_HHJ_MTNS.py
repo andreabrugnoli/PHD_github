@@ -19,8 +19,8 @@ matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
 matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{bm}"]
 
 path_res = "./convergence_results_kirchhoff/"
-bc_input = "SSSS_HHJ_"
-save_res = False
+bc_input = "CSSF_HHJ_"
+save_res = True
 
 coeff = 0.90
 h1_vec = np.load(path_res + bc_input + "h1.npy")
@@ -162,7 +162,7 @@ plt.plot(np.log(h1_vec), np.log(h1_vec**2) + coeff*(np.log(v_errInf_r2)[-1] - np
 plt.plot(np.log(h2_vec), np.log(v_errInf_r3), '-.+', label='$k=3$')
 plt.plot(np.log(h2_vec), np.log(h2_vec**3) + coeff*(np.log(v_errInf_r3)[-1] - np.log(h2_vec**3)[-1]) + np.log(2), '-v', label=r'$h^3$')
 
-plt.xlabel(r'log(Mesh size)')
+plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log($||e_w - e_w^h||_{L^\infty H^1}$)')
 plt.title(r'$e_w$ error (HHJ element)')
 plt.legend()

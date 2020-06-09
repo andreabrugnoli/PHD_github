@@ -18,9 +18,9 @@ matplotlib.rcParams['text.usetex'] = True
 matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{amsmath}"]
 matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{bm}"]
 
-save_fig = False
+save_fig = True
 path_res = "./convergence_results_kirchhoff/"
-bc = "CSSF_BellDG3_"
+bc = "SSSS_BellDG3_"
 
 h1_vec = np.load(path_res + bc + "h1.npy")
 print(h1_vec)
@@ -78,9 +78,9 @@ plt.plot(np.log(h1_vec), np.log(v_errInf_r1), '-.+', label='Bell')
 # plt.plot(np.log(h1_vec), np.log(v_errQuad_r1), '--*', label='H2 $L^2$')
 plt.plot(np.log(h1_vec), np.log(h1_vec) + coeff*(np.log(v_errInf_r1)[-1] - np.log(h1_vec)[-1]), '-v', label=r'$h$')
 
-plt.xlabel(r'log(Mesh size)')
+plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log($||e_w - e_w^h||_{L^\infty H^2}$)')
-plt.title(r'Velocity Error vs Mesh size')
+plt.title(r'$e_w$ error (BellDG3 element)')
 plt.legend()
 path_fig = "/home/a.brugnoli/Plots/Python/Plots/Kirchhoff_plots/Convergence/firedrake/"
 
@@ -110,7 +110,7 @@ plt.plot(np.log(h1_vec), np.log(h1_vec)+ coeff*(np.log(sig_errInf_r1)[-1] - np.l
 
 plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log($||\bm{E}_{\kappa} - \bm{E}_{\kappa}^h||_{L^\infty L^2}$)')
-plt.title(r'Stress Error vs Mesh size')
+plt.title(r'$\bm{E}_\kappa$ error (BellDG3 element)')
 plt.legend()
 if save_fig:
     plt.savefig(path_fig + bc + "_sig.eps", format="eps")

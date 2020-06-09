@@ -19,7 +19,7 @@ matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
 matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{bm}"]
 
 path_res = "./convergence_results_bernoulli/"
-bc_input = "SS_grgr_"
+bc_input = "SS_Hess_"
 save_res = True
 
 coeff = 1
@@ -180,7 +180,7 @@ elif bc_input[2:] == '_Hess_':
     plt.plot(np.log(h1_vec), np.log(h1_vec**2) + coeff * (np.log(v_errInf_r1)[-1] - np.log(h1_vec)[-1]) + np.log(2),
              '-v', label=r'$h^2$')
 
-plt.xlabel(r'log(Mesh size)')
+plt.xlabel(r'log(Mesh size $h$)')
 if bc_input[2:] == '_grgr_':
     plt.title(r'$e_w$ error (CGCG element)')
     plt.ylabel(r'log($||e_w - e_w^h||_{L^\infty H^1}$)')
