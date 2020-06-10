@@ -21,6 +21,7 @@ def skew(x):
                      [-x[1], x[0], 0]])
 
 
+save = False
 
 # L_beam = 0.14142
 # rho_beam = 7.8 * 10 ** (6)
@@ -41,7 +42,7 @@ Fz_max = 100
 mass_beam = rho_beam * A_beam * L_beam
 Jxx_beam = 2 * I_beam * rho_beam * L_beam
 
-n_elem = 2
+n_elem = 12
 bc='CF'
 beam = SpatialBeam(n_elem, L_beam, rho_beam, A_beam, E_beam, I_beam, Jxx_beam, bc=bc)
 
@@ -131,7 +132,7 @@ def sys(t,y):
     J[n_r:n_r + n_p, :n_r] = Jf_om + Jf_om_cor
     J[:n_r, n_r:n_r + n_p] = -2 * Jf_om.T
 
-    # dedt = invM @ (J @ y_e + B_Mz0 * Mz_0 + B_FzL * Fz_L)
+    dedt = invM @ (J @ y_e + B_Mz0 * Mz_0 + B_FzL * Fz_L)
 
     act_quat = np.quaternion(y_quat[0], y_quat[1], y_quat[2], y_quat[3])
     Rot_mat = quaternion.as_rotation_matrix(act_quat)
@@ -179,7 +180,7 @@ t_span = [t_0, t_fin]
 #     else:
 #         Fz_vec[i] = 0
 
-path_fig = "/home/a.brugnoli/Plots_Videos/Python/Plots/Multibody_PH/FlBeam_joint/"
+path_fig = "/home/a.brugnoli/Plots/Python/Plots/Multibody_PH/FlBeam_joint/"
 
 # plt.figure()
 # plt.plot(t_ev, Mz_vec, 'r')
@@ -218,7 +219,8 @@ plt.xlabel(r'{Time} (s)', fontsize=fntsize)
 plt.ylabel(r'{Hamiltonian} (J)', fontsize=fntsize)
 plt.title(r"Hamiltonian spinning beam",
           fontsize=fntsize)
-plt.savefig(path_fig + 'Hamiltonian.eps', format="eps")
+if save:
+    plt.savefig(path_fig + 'Hamiltonian.eps', format="eps")
 
 
 for i in range(n_ev):
@@ -244,7 +246,9 @@ plt.ylabel("$\omega_z \ [\mathrm{rad/s}]$", fontsize=fntsize)
 plt.title("Angular velocity along z in I", fontsize=fntsize)
 axes = plt.gca()
 axes.set_ylim([-0.04, 0.1])
-plt.savefig(path_fig + 'omega_zI.eps', format="eps")
+if save:
+
+    plt.savefig(path_fig + 'omega_zI.eps', format="eps")
 
 
 plt.show()

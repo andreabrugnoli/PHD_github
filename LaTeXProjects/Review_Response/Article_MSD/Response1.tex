@@ -5,6 +5,8 @@
 \usepackage{color}
 \usepackage{tcolorbox}
 \usepackage{amsmath,amssymb,amsthm}
+\usepackage{arydshln,mathtools}
+\usepackage{diffcoeff}
 \usepackage{bm}
 \usepackage{url}
 \usepackage[footnote]{acronym}
@@ -19,6 +21,15 @@
 	\mathbin{\vcenter{\baselineskip.67ex
 			\hbox{\onedot}\hbox{\onedot}}%
 }}
+
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator*{\grad}{grad}
+\DeclareMathOperator*{\Grad}{Grad}
+\DeclareMathOperator*{\Div}{Div}
+\renewcommand{\div}{\operatorname{div}}
+\DeclareMathOperator*{\Hess}{Hess}
+
+\newcommand{\crmat}[1]{\ensuremath{\widetilde{\left[#1\right]}}}
 
 \makeatletter \renewcommand\d[1]{\ensuremath{%
 		\;\mathrm{d}#1\@ifnextchar\d{\!}{}}}
@@ -271,7 +282,7 @@ below. In the revised manuscript, the corresponding revisions are \textcolor{col
 	The paper starts with (partially) well known relations on the equations of motion of deformable bodies attached to a reference frame. The PDE-approach is commonly treated in the control theory, but mostly breaks down hereafter by introducing a discretization and some missing links in the otherwise concise derivations. Wouldn't the formulation be much clearer for the reader, if the derivations are shortened by starting with less common approaches?
 \end{quotebox}
 
-The equations of motion in Hamiltonian  form can be derived from a variational principle either for rigid body dynamics \cite[Proposition 7.1.1]{holm2008geometric} and general non linear elasticity \cite[Chapter 3]{marsden1981lectures}.  The inclusion of flexibility in case of small deformations using a floating frame formulation is treated in  \cite[Eq. 4.10]{simeon2013computational} using the least action principle. However, in this last reference no comments are made on the Hamiltonian structure of the problem. To the best of our knowledge an Hamiltonian formulation of the floating frame description has not been presented in the literature. It is possible that the equations of motions proposed in the paper can be obtained by means of variational principle, but we have not figured that out yet. For this reason we have simply shown that the equations proposed in \cite{simeon2013computational} can be recast, after some computations, in port-Hamiltonian form. This is neither the clearest nor the most elegant procedure to obtain Sys 12 in the paper. The final result is anyway consistent with more classical derivations and possesses some nice features. 
+The equations of motion in Hamiltonian  form can be derived from a variational principle either for rigid body dynamics \cite[Proposition 7.1.1]{holm2008geometric} and general non linear elasticity \cite[Chapter 3]{marsden1981lectures}.  The inclusion of flexibility in case of small deformations using a floating frame formulation is treated in  \cite[Eq. 4.10]{simeon2013computational} using the least action principle. However, in this last reference no comments are made on the Hamiltonian structure of the problem. To the best of our knowledge an Hamiltonian formulation of the floating frame description has not been presented in the literature. It is possible that the equations of motions proposed in the paper can be obtained by means of variational principle, but we have not figured that out yet. For this reason we have simply shown that the equations proposed in \cite{simeon2013computational} can be recast, after some computations, in port-Hamiltonian form. This is neither the clearest nor the most elegant procedure to obtain Sys [12] in the unrevised paper. The final result is anyway consistent with more classical derivations and possesses some nice features. 
 
 
 \begin{tcolorbox}[title=Revision page 2 and page 24 (Reviewer No. 1 -- Comment a),colframe=colorRevBG1]
@@ -294,39 +305,120 @@ The recent review paper \cite{rong2019} has been cited for references on modal r
 \end{quotebox}
 
 \begin{tcolorbox}[title=Revision pages 20 to 25 (Reviewer No. 1 -- Comment c),colframe=colorRevBG1]
-	We have adjusted the notation throughout the paper to be compliant with this remark.
+	We have adjusted the notation throughout the paper.
 \end{tcolorbox}
 
 \begin{quotebox}{Reviewer No.1 -- Comment d}
 	While the formulation is really interesting and already commonly used for rigid body systems, I would like to see this formulation for general bodies, not for beams. The concept with beams is what many people treat in robotics, probably in a slightly different manner, but resulting in similar equations (cf. Bremer's projection equations). You state in the abstract "Thanks to the features of the pH framework, complex multibody systems are constructed in a modular way" - but this is the same, if you use the approach from robotics. Do you obtain different equations of motion?
 \end{quotebox}
-Indeed the numerical applications of the paper only involve beams and this is the reason why a significant part of the paper is dedicated to this specific case. 
+Indeed the numerical applications of the paper only involve beams and this is the reason why a significant part of the paper is dedicated to this specific case. However, this formulation gathers all linear elastic models. For example in the case of the Kirchhoff plate \cite{brugnoli2019kir} one obtains the following system
 
+\begin{equation}
+\setlength{\dashlinegap}{2pt}
+\bm{\mathcal{E}}
+\diffp{}{t}
+\underbrace{
+	\begin{pmatrix}
+	^i \bm{r}_P \\ \bm{R}_{\text{v}} \\ \bm{u}_{m} \\ {u}_{b} \\\hdashline  \bm{v}_P \\ \bm\omega_P  \\ \bm{v}_{m} \\ {v}_{b} \\ \bm{N} \\ \bm{M} \\
+	\end{pmatrix}
+}_{\bm{e}} = 
+\underbrace{
+	{\left[ \begin{array}{cccc:cccccc}
+		0 & 0 & 0 & 0 &  \bm{R} & 0 & 0 & 0 & 0 & 0 \\
+		0 & 0 & 0 & 0 & 0 & \crmat{\bm{R}_{\text{v}}} & 0 & 0 & 0  & 0\\
+		0 & 0 & 0 & 0 & 0 & 0 & \bm{I}_{2} & 0 & 0  & 0 \\ 
+		0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0  & 0 \\ 
+		\hdashline
+		-\bm{R}^\top & 0 & 0 & 0 & 0 & \crmat{\widehat{\bm{p}}_t} & 0 & 0  & 0  & 0\\
+		0 & -\crmat{\bm{R}_{\text{v}}}^\top & 0 & 0 & \crmat{\widehat{\bm{p}}_t} & \crmat{\widehat{\bm{p}}_r} & \bm{\mathcal{I}}_{p_{m}}^\Omega & \bm{\mathcal{I}}_{p_{b}}^\Omega  & 0  & 0\\
+		0 & 0 & -\bm{I}_{2} & 0 & 0 & -(\bm{\mathcal{I}}_{p_{m}}^\Omega)^* & 0 & 0  & \Div  & 0\\
+		0 & 0 & 0 & -1& 0 & -(\bm{\mathcal{I}}_{p_b}^\Omega)^* & 0 & 0  & 0  & \div\Div\\
+		0 & 0 & 0 & 0 & 0 & 0 & \Grad & 0  & 0  & 0\\
+		0 & 0 & 0 & 0 & 0 & 0 & 0 & \Hess  & 0  & 0\\
+		\end{array} \right]}
+}_{\bm{\mathcal{J}}}
+\underbrace{\begin{pmatrix}
+	\partial_{\bm{r}_P}H \\ \partial_{\bm{R}_\text{v}}H \\ \delta_{\bm{u}_{m}} H \\ \delta_{u_{b}} H \\\hdashline  \bm{v}_P \\ \bm\omega_P  \\ \bm{v}_{m} \\ {v}_{b} \\ \bm{N} \\ \bm{M} \\
+	\end{pmatrix}}_{\bm{z}},
+\end{equation} 
+where the subscripts $m$ and $b$ denote the membrane and bending contribution, $\bm{u}_{m}, \; {u}_{b}$ are the in-plane and out-of-plane flexible displacements, $\bm{N} , \; \bm{M}$ the membrane and bending stress resultant. The operator $\div\Div \bm{M} = \sum_{i=1}^{2}\sum_{j=1}^{2} \diffp{M}{x_i,x_j}$ is the double divergence of a tensor and $\Hess$ is the Hessian. The Mindlin plate \cite{brugnoli2019min} results in a larger system that incorporates the nodal angular deflections. The discretization of these model is much harder than that of one-dimensional system. We have recently submitted an ArXiv preprint on this topic \cite{brugnoli2020convergence}. As a linear multibody application involving the Kirchoff plate, we have recently presented \cite{brugnoli2019int} the interconnection of a cantilever plate to a welded rigid bar. \\
 
-\begin{tcolorbox}[title=Revision page 1 (Reviewer No. 1 -- Comment d ),colframe=colorRevBG1]
-	
+Other approaches, commonly used in robotics \cite[Chapter 5]{bremer2008elastic}, allows constructing chain of flexible bodies in a systematic way. However, our approach highlights the Hamiltonian structure and the conservation of energy: the interconnections among bodies do preserve these two important features. \\
+
+The equations of motion we obtain are exactly equivalent to those detailed in \cite{simeon2013computational} and valid only for linear elasticity and moderate angular rotations (since the centrifugal stiffening effect is neglected). The crucial point is that those equation possess an equivalent pH representation.
+
+\begin{tcolorbox}[title=Revision page 3 and page 9 (Reviewer No. 1 -- Comment d ),colframe=colorRevBG1]
+	An additional remark has been made in the introduction to cite \cite{bremer2008elastic} for the systematic construction of multibody systems. We have added a remark at page 8 to illustrate the system of equations obtained in the case of the Kirchhoff plate.
 \end{tcolorbox}
 
 
 \begin{quotebox}{Reviewer No.1 -- Comment e}
 	Eq. (29) is similar to the equations which people often use for flexible multibody dynamics. However, it is hard to see how the according matrices can be computed from the previous derivations. Thus, it would be advantageous, if you interpret these terms with respect to (mechanical) flexible multibody dynamics notation and if you can embed it into existing (common) formulations.
 \end{quotebox}
+The discretization we use relies on mixed finite elements (cf. \cite{arnold1990mixed} for an interesting introduction), but has a clear connection with the standard discretization. Eq. [29] in the unrevised paper was written compactly for sake of conciseness but indeed it is structured as follows
+\begin{equation}\label{eq:findim_mixed}
+\begin{bmatrix}
+\mathbf{M}_1 & \mathbf{0} \\
+\mathbf{0} & \mathbf{M_2} \\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\mathbf{e}}_1 \\
+\dot{\mathbf{e}}_2 \\
+\end{pmatrix} = \begin{bmatrix}
+\mathbf{0} & -\mathbf{D}^\top \\
+\mathbf{D} & \mathbf{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+\mathbf{e}_{1} \\
+\mathbf{e}_{2} \\
+\end{pmatrix} + 
+\begin{bmatrix}
+\mathbf{M}_{d}\\
+\mathbf{0}\\
+\end{bmatrix}
+\mathbf{u}_d
++ 
+\begin{bmatrix}
+\mathbf{B}_{1, \partial}\\
+\mathbf{0}\\
+\end{bmatrix}
+\mathbf{u}_\partial,
+\end{equation}
 
-\begin{tcolorbox}[title=Revision page 1 (Reviewer No. 1 -- Comment e ),colframe=colorRevBG1]
-	
+A standard finite element discretization of linear elastodynamics provides a system of the form
+\begin{equation}\label{eq:findim_stand}
+\mathbf{M}_1 \ddot{\mathbf{q}} + \mathbf{K} \mathbf{q} = \mathbf{M}_{d}\mathbf{u}_d + \mathbf{B}_{1, \partial}\mathbf{u}_\partial,
+\end{equation}
+where the same notation has been used for identically computed matrices. Since the stiffness matrix $\mathbf{K}$ is symmetric and positive definite, it admits the following non unique factorization \cite{horn2012matrix}
+\begin{equation*}
+\mathbf{K} = \mathbf{D}^\top \mathbf{M}_2^{-1} \mathbf{D}.
+\end{equation*}
+Now consider the following variables
+\begin{equation*}
+\mathbf{e}_1 := \dot{\mathbf{q}}, \qquad 
+\mathbf{e}_2 := \mathbf{M}_2^{-1} \mathbf{D}{\mathbf{q}}. 
+\end{equation*}
+With this change of variables Sys. \eqref{eq:findim_stand} can be equivalently rewritten as \eqref{eq:findim_mixed}.
+
+\begin{tcolorbox}[title=Revision page 12-13 (Reviewer No. 1 -- Comment e ),colframe=colorRevBG1]
+	The section 4.1 has been revised to include additional details on the construction of the matrices and the partitioned structure of the final system \ref{eq:findim_mixed}. A remark has been added to compare the standard discretization to the proposed mixed discretization.
 \end{tcolorbox}
 
 \begin{quotebox}{Reviewer No.1 -- Comment f}
-Eq. (33) should be explained in more detail regarding the EA and EI terms, which might be natural due to the D{-1} term in the mass operator, but will be confusing for common readers.
+Eq. (33) should be explained in more detail regarding the $EA^{-1}$ and $EI^{-1}$ terms, which might be natural due to the $\bm{\mathcal{D}}^{-1}$ term in the mass operator, but will be confusing for common readers.
 \end{quotebox}
 
-\begin{tcolorbox}[title=Revision page 1 (Reviewer No. 1 -- Comment f ),colframe=colorRevBG1]
-	
+\begin{tcolorbox}[title=Revision page 16 (Reviewer No. 1 -- Comment f ),colframe=colorRevBG1]
+	Eq [33] has been commented to explain the presence of the terms $EA^{-1}$ and $EI^{-1}$: these arise in connection to the deformation energy
+	\begin{equation*}
+	H_{\text{def}} = \frac{1}{2}\int_{0}^L \frac{1}{EA} n_x^2 + \frac{1}{EI} m_x^2  \d\Omega.
+	\end{equation*}
 \end{tcolorbox}
 
 \begin{quotebox}{Reviewer No.1 -- Comment g}
 	I am strongly missing comparison to other formulations and other multibody codes: are the analytical / numerical results the same? Is the performance higher?
 \end{quotebox}
+We do not claim any computational superiority of this methodology
 
 \begin{tcolorbox}[title=Revision page 1 (Reviewer No. 1 -- Comment g ),colframe=colorRevBG1]
 	

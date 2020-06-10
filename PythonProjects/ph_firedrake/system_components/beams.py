@@ -656,7 +656,7 @@ class SpatialBeam(SysPhdaeRig):
         assert check_positive_matrix(M_r)
         assert check_positive_matrix(M_f)
         assert check_positive_matrix(M)
-        assert np.linalg.det(M) != 0
+        # assert np.linalg.det(M) != 0
 
         j_grad_x = vq_x * ep_x.dx(0) * dx
         j_gradIP_x = -vp_x.dx(0) * eq_x * dx

@@ -222,7 +222,7 @@ fig = plt.figure()
 plt.plot(t_ev, H_vec, 'b-')
 plt.xlabel(r'{Time} (s)', fontsize=fntsize)
 plt.ylabel(r'{Hamiltonian} (J)', fontsize=fntsize)
-plt.title(r"Hamiltonian spinning beam",
+plt.title(r"Hamiltonian crank slider",
           fontsize=fntsize)
 # plt.savefig(path_fig + 'Hamiltonian.eps', format="eps")
 

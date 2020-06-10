@@ -4,7 +4,7 @@ clear all
 addpath('./TITOP_Kirchh/')
 
 rho = 7810;  % Kg/m^3
-E = 10^5;  % Pa
+E = 10^9;  % Pa
 nu = 0.3;
 h = 0.01;  % m
 Lx = 0.6;  % m

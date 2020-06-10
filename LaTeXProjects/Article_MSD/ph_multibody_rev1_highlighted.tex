@@ -45,6 +45,7 @@
 \renewcommand{\div}{\operatorname{div}}
 \DeclareMathOperator*{\Hess}{Hess}
 
+\newcommand{\inner}[3][]{\ensuremath{\left\langle #2, \, #3 \right\rangle_{#1}}}
 %\newcommand{\crmat}[1]{\ensuremath{\left[#1\right]_{\times}}}
 \newcommand{\crmat}[1]{\ensuremath{\widetilde{\left[#1\right]}}}
 
@@ -136,9 +137,9 @@ A new formulation for the modular construction of flexible multibody systems is 
 \section{Introduction}
 \label{intro}
 \indent In structural control co-design of flexible multibody systems, it is especially useful to dispose of a modular description, to simplify analysis. In this spirit, the transfer matrix method \cite{Rui2005} and the component mode synthesis \cite{HurtyCMS} are two well known substructuring techniques that allow the construction of complex multibody systems by interconnecting subcomponents together. A reformulation of the Finite Element-Transfer Matrix (FE-TM) method \cite{TAN199047} allows an easy construction of reduced models that are suited for decentralized control design. For the component mode synthesis, the controlled component synthesis (CCS), a framework for the design of decentralized controller of flexible structures, has been proposed in \cite{YoungCMS}. Another modeling paradigm based on the component mode synthesis is the two-input two-output port (TITOP) approach \cite{TITOP}. It conceives the dynamical model of each substructure as a transfer between the accelerations and the external forces at the connection points. This feature allows considering different boundary conditions by inverting specific channels in the transfer matrix. A rigorous validation was provided in \cite{Perez,SANFEDINO2018128}, where the robustness of the methodology in handling various boundary conditions was assessed. \\
-\indent The Lagrangian formulation is the most commonly used methodology to retrieve the equations of motion of flexible multibody systems. \firstRev{Using the variational principles of geometric mechanics the equations of motion in Hamiltonian form can be derived either for rigid body dynamics \cite[Proposition 7.1.1]{holm2008geometric} and general non linear elasticity \cite[Chapter 3]{marsden1981lectures}.} The port-Hamiltonian (pH) framework \cite{bookPHs} has been recently extended to describe the dynamics of rigid and flexible links \cite{macchelli_fl,macchelli_flrig}. PH systems are intrinsically modular \cite{CerveraIntFinite}, hence this approach naturally allows constructing complex system by interconnecting together atomic elements. The formulation therein naturally accounts for the non-linearities due to large deformations.  However, this methodology relies on Lie algebra and differential geometry concepts and requires non standard discretization techniques \cite{Golo}. Thus, the overall implementation is not straightforward. \\
+\indent The Lagrangian formulation is the most commonly used methodology to retrieve the equations of motion of flexible multibody systems. \firstRev{Using the variational principles of geometric mechanics the equations of motion in Hamiltonian form can be derived either for rigid body dynamics \cite[Proposition 7.1.1]{holm2008geometric} and general non linear elasticity \cite[Chapter 3]{marsden1981lectures}.} The port-Hamiltonian (pH) framework \cite{bookPHs} has been recently employed to describe the dynamics of rigid and flexible links \cite{macchelli_fl,macchelli_flrig}. PH systems are intrinsically modular \cite{CerveraIntFinite}, hence this approach naturally allows constructing complex system by interconnecting together atomic elements. The formulation therein naturally accounts for the non-linearities due to large deformations.  However, this methodology relies on Lie algebra and differential geometry concepts and requires non standard discretization techniques \cite{Golo}. Thus, the overall implementation is not straightforward. \\
 \indent Together with the approach used to derive the equations of motion, the incorporation of the elastic motion represents another important point when dealing with flexible multibody systems. Three descriptions are commonly used: the floating frame formulation, the corotational frame formulation and the inertial frame formulation \cite{Ellenbroek2018}. The choice greatly depends on the foreseen application.  The corotational and inertial frame formulations take into account large deformations of the elastic body, hence are well-suited for accurate simulations. \firstRev{For these formulation many model reduction strategies have been developed in the last two decades \cite{rong2019}.} The inclusion of active control strategies is often unfeasible due to the computational burden \cite{Noor_rev}. The floating frame formulation is less accurate but easily integrates many model reduction techniques \cite{NOWAKOWSKI201240}, making it possible to obtain a low-dimensional problem for control design. \\
-\indent \firstRev{The strong form Lagrangian formulation of flexible dynamics using a floating frame formulation is detailed in  \cite[Eq. 4.10]{simeon2013computational} using the least action principle, but without highlighting the Hamiltonian structure of the problem.} In this paper, we propose to combine the pH framework with a floating frame description of the dynamics. Starting from the general equation for the rigid flexible dynamics of a floating body, an equivalent port-Hamiltonian system is found by appropriate selection of the canonical momenta. The flexible behavior is based on the linear elasticity assumption making it possible to include models that cannot be easily formulated in terms of differential form  \cite{BRUGNOLI2019940,BRUGNOLI2019961}. The problem is then written as a coupled system of ordinary and partial differential equations (ODEs and PDEs), extending the general definition of finite-dimensional port-Hamiltonian descriptor systems provided in \cite{mehrmann2019structurepreserving}. A suitable structure-preserving discretization method, based on \cite{cardoso2019partitioned}, is then used to obtain a finite-dimensional pH system. The modularity feature of pH systems makes the proposed approach analogous to a substructuring technique \cite{substructuring}: each individual component can be interconnected to the other bodies using standard interconnection of pH systems, as it is done in \cite{macchelli_flrig}. This feature allows the use of modeling platforms like \textsc{Simulink}$^{\tiny{\textregistered}}$ or \textsc{Modelica}$^{\tiny{\textregistered}}$. The constraints are imposed on the velocities, leading to a quasi-linear index 2 differential-algebraic port-Hamiltonian system (pHDAE) \cite{phd_steinbrecher,beattie2018linear}. In the linear case, the algebraic constraints can be eliminated, preserving the overall pH structure, using null space methods \cite{nullspaceFlMult}.  As a floating frame formulation is used, model reduction techniques can be employed to lower the computational complexity of the model \cite{phode_red,phdae_red}. These peculiarities make the proposed formulation interesting for control applications, that can benefit from the properties of pH systems \cite{PHadaptive,ORTEGAsurvey}. \\
+\indent \firstRev{The strong form Lagrangian formulation of flexible dynamics using a floating frame formulation is detailed in  \cite[Eq. 4.10]{simeon2013computational} using the least action principle, but without highlighting the Hamiltonian structure of the problem.} In this paper, we propose to combine the pH framework with a floating frame description of the dynamics. Starting from the general equation for the rigid flexible dynamics of a floating body, an equivalent port-Hamiltonian system is found by appropriate selection of the canonical momenta. The flexible behavior is based on the linear elasticity assumption making it possible to include models that cannot be easily formulated in terms of differential form  \cite{BRUGNOLI2019940,BRUGNOLI2019961}. The problem is then written as a coupled system of ordinary and partial differential equations (ODEs and PDEs), extending the general definition of finite-dimensional port-Hamiltonian descriptor systems provided in \cite{mehrmann2019structurepreserving}. A suitable structure-preserving discretization method, based on \cite{cardoso2019partitioned}, is then used to obtain a finite-dimensional pH system. The modularity feature of pH systems makes the proposed approach analogous to a substructuring technique \cite{substructuring}: each individual component can be interconnected to the other bodies using standard interconnection of pH systems, as it is done in \cite{macchelli_flrig}. This feature allows the use of modeling platforms like \textsc{Simulink}$^{\tiny{\textregistered}}$ or \textsc{Modelica}$^{\tiny{\textregistered}}$. \firstRev{Other approaches, commonly used in robotics \cite[Chapter 5]{bremer2008elastic}, allows constructing chain of bodies in a systematic way. However, in the proposed formulation the interconnections among bodies do preserve the Hamiltonian structure and the conservation of energy.} The constraints are imposed on the velocities, leading to a quasi-linear index 2 differential-algebraic port-Hamiltonian system (pHDAE) \cite{phd_steinbrecher,beattie2018linear}. In the linear case, the algebraic constraints can be eliminated, preserving the overall pH structure, using null space methods \cite{nullspaceFlMult}.  As a floating frame formulation is used, model reduction techniques can be employed to lower the computational complexity of the model \cite{phode_red,phdae_red}. These peculiarities make the proposed formulation interesting for control applications, that can benefit from the properties of pH systems \cite{PHadaptive,ORTEGAsurvey}.  \\
 \indent The paper is organized in the following manner. In Section \ref{sec:class_model} the classical equations of a flexible floating body are recalled. Using the properties of the cross product, the equations are recast in a form closer to the pH structure. Section \ref{sec:pH_fd} details the pH formulation of a floating flexible body by introducing the proper canonical momenta. In Section \ref{sec:discr} a finite element based discretization is detailed for the elastodynamics problem. The procedure is easily applied to flexible floating bodies. The particular case of thin planar beams is then detailed, as it will be next employed in the simulation part. Section~\ref{sec:MB_pH} explains how to interconnect models together using classical pH interconnection. Section \ref{sec:valid} is devoted to numerical examples, to assess the validity of the proposed methodology. The test cases are taken from previously published articles \cite{Chebbi2017,Ellenbroek2018}.
 
  
@@ -316,7 +317,7 @@ where $\bm{R}_{x}, \bm{R}_{y}, \bm{R}_{z}$ are the first, second and third row o
 \crmat{\bm{R}_y} \\
 \crmat{\bm{R}_z} \\
 \end{bmatrix}, \qquad 
-\crmat{\bm{R}_{\text{v}}} : \mathbb{R}^9 \rightarrow \mathbb{R}^{9 \times 3}.
+\crmat{\bm{R}_{\text{v}}} \in \mathbb{R}^{9 \times 3}.
 \end{equation*}
 
 The overall port-Hamiltonian formulation, equivalent to Eqs. \eqref{eq:rig_tr2}, \eqref{eq:rig_rot2}, \eqref{eq:flex2}, is then (omitting the external forces and torques)
@@ -447,9 +448,43 @@ where the integration by parts (Stokes theorem) has been used
 \end{equation}
 The power balance equals the power due to body force and surface traction
 \begin{equation}
-\dot{H}(\bm{e}) = \int_{\partial \Omega} (\bm{\Sigma} \cdot \bm{n}) \cdot \bm{v} \d\Gamma + \int_{\Omega} \bm{u}_d \cdot \bm{v}  \d{\Omega}, \quad \bm{v} := \bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}_f) + {\bm{v}}_f.
+\dot{H}(\bm{e}) = \int_{\partial \Omega} (\bm{\Sigma} \cdot \bm{n}) \cdot \bm{v} \d\Gamma + \int_{\Omega} \bm{u}_d \cdot \bm{v}  \d{\Omega}, \quad \bm{v} := \bm{v}_P + \crmat{\bm{\omega}_P} \bm{x}_f + {\bm{v}}_f.
 \end{equation}
-Even if three dimensional elasticity has been taken as example up to this point, other models are easily considered. Beam and plate models \cite{BRUGNOLI2019940,BRUGNOLI2019961} are described by appropriate differential operators that replace the $\Div, \Grad$ appearing in \eqref{eq:ph_mfd_all} (see \secref{sec:ph_floatbeam}).
+
+\begin{remark}
+Even if three dimensional elasticity has been taken as example up to this point, other models are easily considered. Beam and plate models \cite{BRUGNOLI2019940,BRUGNOLI2019961} are described by appropriate differential operators that replace the $\Div, \Grad$ appearing in \eqref{eq:ph_mfd_all} (see \secref{sec:ph_floatbeam}). \firstRev{For example in the case of the Kirchhoff plate one obtains the following system
+\begin{equation}
+\footnotesize
+\setlength{\dashlinegap}{2pt}
+\bm{\mathcal{E}}
+\diffp{}{t}
+\underbrace{
+	\begin{pmatrix}
+	^i \bm{r}_P \\ \bm{R}_{\text{v}} \\ \bm{u}_{m} \\ {u}_{b} \\\hdashline  \bm{v}_P \\ \bm\omega_P  \\ \bm{v}_{m} \\ {v}_{b} \\ \bm{N} \\ \bm{M} \\
+	\end{pmatrix}
+}_{\bm{e}} = 
+\underbrace{
+	{\left[ \begin{array}{cccc:cccccc}
+		0 & 0 & 0 & 0 &  \bm{R} & 0 & 0 & 0 & 0 & 0 \\
+		0 & 0 & 0 & 0 & 0 & \crmat{\bm{R}_{\text{v}}} & 0 & 0 & 0  & 0\\
+		0 & 0 & 0 & 0 & 0 & 0 & \bm{I}_{2} & 0 & 0  & 0 \\ 
+		0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0  & 0 \\ 
+		\hdashline
+		-\bm{R}^\top & 0 & 0 & 0 & 0 & \crmat{\widehat{\bm{p}}_t} & 0 & 0  & 0  & 0\\
+		0 & -\crmat{\bm{R}_{\text{v}}}^\top & 0 & 0 & \crmat{\widehat{\bm{p}}_t} & \crmat{\widehat{\bm{p}}_r} & \bm{\mathcal{I}}_{p_{m}}^\Omega & \bm{\mathcal{I}}_{p_{b}}^\Omega  & 0  & 0\\
+		0 & 0 & -\bm{I}_{2} & 0 & 0 & -(\bm{\mathcal{I}}_{p_{m}}^\Omega)^* & 0 & 0  & \Div  & 0\\
+		0 & 0 & 0 & -1& 0 & -(\bm{\mathcal{I}}_{p_b}^\Omega)^* & 0 & 0  & 0  & \div\Div\\
+		0 & 0 & 0 & 0 & 0 & 0 & \Grad & 0  & 0  & 0\\
+		0 & 0 & 0 & 0 & 0 & 0 & 0 & \Hess  & 0  & 0\\
+		\end{array} \right]}
+}_{\bm{\mathcal{J}}}
+\underbrace{\begin{pmatrix}
+	\partial_{\bm{r}_P}H \\ \partial_{\bm{R}_\text{v}}H \\ \delta_{\bm{u}_{m}} H \\ \delta_{u_{b}} H \\\hdashline  \bm{v}_P \\ \bm\omega_P  \\ \bm{v}_{m} \\ {v}_{b} \\ \bm{N} \\ \bm{M} \\
+	\end{pmatrix}}_{\bm{z}},
+\end{equation} 
+where the subscripts $m$ and $b$ denote the membrane and bending contribution, $\bm{u}_{m}, \; {u}_{b}$ are the in-plane and out-of-plane flexible displacements, $\bm{N} , \; \bm{M}$ the membrane and bending stress resultant. The operator $\div\Div \bm{M} = \sum_{i=1}^{2}\sum_{j=1}^{2} \diffp{M}{x_i,x_j}$ is the double divergence of a tensor and $\Hess$ is the Hessian.}
+\end{remark}
+
 
 \begin{remark}
 	Conservative forces are easily accounted for by introducing an appropriate potential energy. For example if the gravity force is considered, the corresponding potential energy reads
@@ -522,20 +557,22 @@ To get a pH representation, the energy variables have to be properly selected by
 \label{eq:en_eldyn}
 \displaystyle H = \frac{1}{2} \int_{\Omega} \left\{\rho \left(\diffp{\bm{u}}{t}\right)^2 + \bm\Sigma \cddot \bm\varepsilon \right\} \d{\Omega}.
 \end{equation}
+\secondRev{
 Taking as energy variables the linear momentum and the deformation
 \begin{equation}
 \begin{aligned}
-\text{Energies} \quad  \bm{x}_1 &:= \rho \ \partial_t \bm{u}, \\
-\text{Co-energies} \quad \bm{e}_1 &:= \diffd{H}{\bm{x}_1} =  \partial_t \bm{u}, \\
+\text{Energies} \qquad  \bm{x}_1 &:= \rho \ \partial_t \bm{u}, \\
+\bm{X}_2 &:= \bm\varepsilon = \Grad(\bm{u}). \\
 \end{aligned} 
 \end{equation}
 the corresponding co-energies are obtained by taking the variational derivative of the Hamiltonian
 \begin{equation}
 \begin{aligned}
-\bm{X}_2 &:= \bm\varepsilon = \Grad(\bm{u}). \\
+\text{Co-energies} \qquad \bm{e}_1 &:= \diffd{H}{\bm{x}_1} =  \partial_t \bm{u}, \\
 \bm{E}_2 &:= \diffd{H}{\bm{X}_2} = \bm\Sigma.
 \end{aligned}
 \end{equation}
+}
 The port-Hamiltonian representation in co-energy variables becomes
 \begin{equation*}
 \underbrace{\begin{bmatrix}
@@ -553,7 +590,7 @@ The port-Hamiltonian representation in co-energy variables becomes
 \end{bmatrix} + 
 \underbrace{\begin{bmatrix}
 	\bm{I} \\ 0 \\
-	\end{bmatrix}}_{\bm{\mathcal{B}}_d} \bm{u}_d 
+	\end{bmatrix}}_{\bm{\mathcal{B}}_d} \bm{u}_d.
 \end{equation*}
 The interconnection operator may be decomposed as $\bm{\mathcal{J}} = \bm{\mathcal{J}}_{\Div} + \bm{\mathcal{J}}_{\Grad}$
 \begin{equation}
@@ -565,7 +602,7 @@ The interconnection operator may be decomposed as $\bm{\mathcal{J}} = \bm{\mathc
 	\end{bmatrix}}_{\bm{\mathcal{J}}_{\Div}} + 
 \underbrace{\begin{bmatrix}
 	0 & 0 \\ \Grad & 0 \\
-	\end{bmatrix}}_{\bm{\mathcal{J}}_{\Grad}}
+	\end{bmatrix}}_{\bm{\mathcal{J}}_{\Grad}}.
 \end{equation}
 Assuming a Neumann boundary conditions (the normal traction $\bm\tau$ is known at the boundary), this system can be written compactly as a boundary control system
 \begin{equation}
@@ -579,7 +616,7 @@ Assuming a Neumann boundary conditions (the normal traction $\bm\tau$ is known a
 \end{equation}
 The system is defined over the state space
 \[
-\mathscr{X} = \mathscr{L}^2(\Omega, \mathbb{R}^3) \times\mathscr{L}^2(\Omega, \mathbb{R}^{3\times 3}_{\text{sym}}),
+\mathscr{X} = \mathscr{X}_1 \times \mathscr{X}_2 = \mathscr{L}^2(\Omega, \mathbb{R}^3) \times\mathscr{L}^2(\Omega, \mathbb{R}^{3\times 3}_{\text{sym}}),
 \]
 where $\mathscr{L}^2$ is the space of square integrable functions. Taking  $[\bm{a}, \bm{A}], \ [\bm{b}, \bm{B}] \in \mathscr{X}$ the inner product is computed as
 \[
@@ -594,31 +631,103 @@ So the system is lossless and passive with storage function given by the total e
 \begin{equation*}
 \left\langle \bm{w}, \; \bm{\mathcal{M}} \ \partial_t \bm{e} \right\rangle_{\mathscr{X}} = \left\langle \bm{w}, \; \bm{\mathcal{J}} \bm{e} \right\rangle_{\mathscr{X}} + \left\langle \bm{w}, \; \bm{\mathcal{B}}_d \bm{u}_d \right\rangle_{\mathscr{X}}.
 \end{equation*}
-The bilinear form $m(\bm{w}, \partial_t \bm{e}) = \left\langle \bm{w}, \; \bm{\mathcal{M}} \ \partial_t \bm{e} \right\rangle_{\mathscr{X}}$ is symmetric and coercive. The bilinear form $b_d(\bm{w}, \bm{u}_d):=\left\langle \bm{w}, \; \bm{\mathcal{B}}_d \bm{u}_d \right\rangle_{\mathscr{X}}$ takes into account distributed control.\\
+The bilinear form $\left\langle \bm{w}, \; \bm{\mathcal{M}} \ \partial_t \bm{e} \right\rangle_{\mathscr{X}}$ is symmetric and coercive. The bilinear form $\left\langle \bm{w}, \; \bm{\mathcal{B}}_d \bm{u}_d \right\rangle_{\mathscr{X}}$ takes into account distributed control.\\
 Now an integration by parts is applied on $\bm{\mathcal{J}}_{\Div}$:
+\firstRev{
 \begin{equation}
-\left\langle \bm{w}, \; \bm{\mathcal{J}} \bm{e} \right\rangle_{\mathscr{X}} = \left\langle \bm{w}, \; \bm{\mathcal{J}}_{\Grad} \bm{e} \right\rangle_{\mathscr{X}} - \left\langle \bm{\mathcal{J}}_{\Grad} \bm{w}, \; \bm{e} \right\rangle_{\mathscr{X}} + \left\langle \bm{w}, \; \bm{u}_\partial \right\rangle_{\mathscr{L}^2(\partial \Omega, \mathbb{R}^3)},
+\begin{aligned}
+\left\langle \bm{w}, \; \bm{\mathcal{J}} \bm{e} \right\rangle_{\mathscr{X}} &= \left\langle \bm{w}, \; \bm{\mathcal{J}}_{\Grad} \bm{e} \right\rangle_{\mathscr{X}} - \left\langle \bm{\mathcal{J}}_{\Grad} \bm{w}, \; \bm{e} \right\rangle_{\mathscr{X}} + \left\langle \bm{w}_1, \; \bm{u}_\partial \right\rangle_{\mathscr{L}^2(\partial \Omega, \mathbb{R}^3)}, \\
+&= \left\langle \bm{W}_2, \; \Grad(\bm{e}_1) \right\rangle_{\mathscr{X}_2} - \left\langle {\Grad} (\bm{w}_1), \; \bm{E}_2 \right\rangle_{\mathscr{X}_2} + \left\langle \bm{w}_1, \; \bm{u}_\partial \right\rangle_{\mathscr{L}^2(\partial \Omega, \mathbb{R}^3)}
+\end{aligned}
 \end{equation}
-where $\left\langle \cdot,  \cdot \right\rangle_{\mathscr{L}^2(\partial \Omega, \mathbb{R}^3)}$ denotes the $\mathscr{L}^2$ inner product over the boundary. The expression $j_{\Grad}(\bm{w}, \bm{e}) :=\left\langle \bm{w}, \; \bm{\mathcal{J}}_{\Grad} \bm{e} \right\rangle_{\mathscr{X}} - \left\langle \bm{\mathcal{J}}_{\Grad} \bm{w}, \; \bm{e} \right\rangle_{\mathscr{X}}$ is a skew symmetric bilinear form, since $j_{\Grad}(\bm{w}, \bm{e})=-j_{\Grad}(\bm{e},\bm{w})$ holds. The bilinear form $b_{\partial}(\bm{w}, \bm{u}_\partial) := \left\langle \bm{w}, \; \bm{u}_\partial \right\rangle_{\mathscr{L}^2(\partial \Omega, \mathbb{R}^3)}$ imposes the Neumann condition weakly. System \eqref{eq:eldyn_PDE} is now rewritten in weak form
+}
+where $\left\langle \cdot,  \cdot \right\rangle_{\mathscr{L}^2(\partial \Omega, \mathbb{R}^3)}$ denotes the $\mathscr{L}^2$ inner product over the boundary. The expression $j_{\Grad}(\bm{w}, \bm{e}) :=\left\langle \bm{W}_2, \; \Grad(\bm{e}_1) \right\rangle_{\mathscr{X}_2} - \left\langle {\Grad} (\bm{w}_1), \; \bm{E}_2 \right\rangle_{\mathscr{X}_2}$ is a skew symmetric bilinear form, since $j_{\Grad}(\bm{w}, \bm{e})=-j_{\Grad}(\bm{e},\bm{w})$ holds. The bilinear form $\left\langle \bm{w}_1, \; \bm{u}_\partial \right\rangle_{\mathscr{L}^2(\partial \Omega, \mathbb{R}^3)}$ imposes the Neumann condition weakly. System \eqref{eq:eldyn_PDE} is now rewritten in weak form
+\firstRev{
 \begin{equation}
-m(\bm{w}, \partial_t \bm{e}) = j_{\Grad}(\bm{w}, \bm{e}) + b_d(\bm{w}, \bm{u}_d) + b_{\partial}(\bm{w}, \bm{u}_\partial).
+\begin{aligned}
+\inner[\mathscr{X}_1]{\bm{w}_1}{\rho \partial_t \bm{e}_1} &=- \left\langle {\Grad} (\bm{w}_1), \; \bm{E}_2 \right\rangle_{\mathscr{X}_2} + \inner[\mathscr{X}_1]{\bm{w}_1}{\bm{u}_d}  + \left\langle \bm{w}_1, \; \bm{u}_\partial \right\rangle_{\mathscr{L}^2(\partial \Omega, \mathbb{R}^3)}, \\
+\inner[\mathscr{X}_2]{\bm{w}_2}{\bm{\mathcal{D}}^{-1}\partial_t \bm{e}_2} &=\left\langle \bm{W}_2, \; {\Grad} (\bm{e}_1) \right\rangle_{\mathscr{X}_2}.
+\end{aligned}
 \end{equation}
+}
 The output equation is discretized considering test function $\bm{w}_\partial$ defined over the boundary
 \begin{equation}
 \left\langle \bm{w}_\partial, \; \bm{y}_\partial \right\rangle_{\mathscr{L}^2(\partial \Omega, \mathbb{R}^3)} = \left\langle \bm{w}_\partial, \; \bm{e}_1 \right\rangle_{\mathscr{L}^2(\partial \Omega, \mathbb{R}^3)}.
 \end{equation}
 If a Galerkin method is applied then corresponding test and trial functions are discretized using the same basis
+\firstRev{
 \begin{equation*}
 \begin{aligned}
-\bm{w}_1(\bm{x},t) = \bm{\phi}_1(\bm{x})^\top \mathbf{w}_1(t), \\
-\bm{e}_1(\bm{x},t) = \bm{\phi}_1(\bm{x})^\top \mathbf{e}_1(t), 
-\end{aligned} \qquad
+\bm{w}_1(\bm{x}) &= \sum_{i=1}^{n_1} \bm{\phi}_1^i(\bm{x}) {w}_1^i, \\
+\bm{e}_1(\bm{x},t) &= \sum_{i=1}^{n_1} \bm{\phi}_1^i(\bm{x}) {e}_1^i(t), \\
+\end{aligned} \quad
 \begin{aligned}
-\bm{W}_2(\bm{x},t) = \bm{\phi}_2(\bm{x})^\top \mathbf{w}_2(t), \\
-\bm{E}_2(\bm{x},t) = \bm{\phi}_2(\bm{x})^\top \mathbf{e}_2(t),
+\bm{W}_2(\bm{x}) &= \sum_{i=1}^{n_2} \bm{\Phi}_2^i(\bm{x}) {w}_2^i, \\
+\bm{E}_2(\bm{x},t) &= \sum_{i=1}^{n_2} \bm{\Phi}_2^i(\bm{x}) {e}_2^i(t), \\
+\end{aligned} \quad 
+\begin{aligned}
+\bm{w}_\partial(\bm{s}) &= \sum_{i=1}^{n_\partial} \bm{\phi}_\partial^i(\bm{s}) w_\partial^i, \\
+\bm{u}_\partial(\bm{s},t) &= \sum_{i=1}^{n_\partial} \bm{\phi}_\partial^i(\bm{s}) u_\partial^i(t), \\
 \end{aligned}
 \end{equation*}
-where the bold italic variables represent numerical vectors. A finite-dimensional pH system is readily obtained
+where $\bm{x} \in \Omega, \; \bm{s} \in \partial\Omega$.} A finite-dimensional pH system is readily obtained\firstRev{
+\begin{equation}\label{eq:findimEl_ex}
+\begin{aligned}
+\underbrace{\begin{bmatrix}
+\mathbf{M}_1 & \mathbf{0} \\
+\mathbf{0} & \mathbf{M_2} \\
+\end{bmatrix}}_{\mathbf{M}}
+\begin{pmatrix}
+\dot{\mathbf{e}}_1 \\
+\dot{\mathbf{e}}_2 \\
+\end{pmatrix} &= \underbrace{\begin{bmatrix}
+\mathbf{0} & -\mathbf{D}^\top \\
+\mathbf{D} & \mathbf{0} \\
+\end{bmatrix}}_{\mathbf{J}}
+\begin{pmatrix}
+\mathbf{e}_{1} \\
+\mathbf{e}_{2} \\
+\end{pmatrix} + 
+\underbrace{\begin{bmatrix}
+\mathbf{M}_{d}\\
+\mathbf{0}\\
+\end{bmatrix}}_{\mathbf{B}_d}
+\mathbf{u}_d
++ 
+\underbrace{\begin{bmatrix}
+\mathbf{B}_{1, \partial}\\
+\mathbf{0}\\
+\end{bmatrix}}_{\mathbf{B}_\partial}
+\mathbf{u}_\partial, \\
+\mathbf{M}_{d} \widetilde{\mathbf{y}}_d &= \begin{bmatrix}
+\mathbf{M}_{d} & \mathbf{0}
+\end{bmatrix} \begin{pmatrix}
+\mathbf{e}_{1} \\
+\mathbf{e}_{2} \\
+\end{pmatrix},  \\
+\mathbf{M}_\partial \widetilde{\mathbf{y}}_\partial &= \begin{bmatrix}
+\mathbf{B}_{1, \partial}^\top & \mathbf{0}
+\end{bmatrix} \begin{pmatrix}
+\mathbf{e}_{1} \\
+\mathbf{e}_{2} \\
+\end{pmatrix}.
+\end{aligned}
+\end{equation}
+The matrices are defined as follows 
+\begin{equation}\label{eq:matrices}
+\begin{aligned}
+M_1^{ij} &= \inner[\mathscr{X}_1]{\bm\phi_1^i}{\rho \bm\phi_1^j}, \\
+M_2^{mn} &= \inner[\mathscr{X}_2]{\bm\Phi_2^m}{\bm{\mathcal{D}}^{-1}\bm\Phi_2^n}, \\
+M_d^{ij} &= \inner[\mathscr{X}_1]{\bm\phi_1^i}{\bm\phi_1^j}, \\
+\end{aligned}\quad
+\begin{aligned}
+M_\partial^{lk} &= \inner[L^2(\partial \Omega, \mathbb{R}^3)]{\bm\phi_\partial^l}{\bm\phi_\delta^k}, \\
+{D}^{mi} &= \inner[\mathscr{X}_2]{\bm\Phi_2^m}{\Grad\bm\phi_1^i}, \\
+{B}_{1, \partial}^{ik} &= \inner[\mathscr{L}^2(\partial \Omega, \mathbb{R}^3)]{\bm\phi_1^i}{\bm\phi_\partial^k}, \\
+\end{aligned}
+\end{equation}
+where $i, j \in \left\{1, n_1\right\}, \; m,n \in \left\{1, n_2\right\}, \; l, k \in \left\{1, n_\partial \right\}$. System \eqref{eq:findimEl_ex} is rewritten compactly as
+}
 \begin{equation}
 \begin{aligned}
 \mathbf{M} \dot{\mathbf{e}} &= \mathbf{J} \mathbf{e} + \mathbf{B}_d \mathbf{u}_d + \mathbf{B}_\partial \mathbf{u}_\partial, \\
@@ -632,6 +741,54 @@ The discrete power balance is given by
 \dot{H}_d = \mathbf{e}^\top \mathbf{M} \dot{\mathbf{e}} = \mathbf{e}^\top ( \mathbf{J} \dot{\mathbf{e}} + \mathbf{B}_d \mathbf{u}_d + \mathbf{B}_\partial \mathbf{u}_\partial) = \mathbf{y}_d^\top \mathbf{u}_d + \mathbf{y}_\partial^\top \mathbf{u}_\partial,
 \end{equation*}
 which mimics \eqref{eq:pow_eldyn} at the discrete level.
+
+\firstRev{
+\begin{remark}[Connection with standard discretization]
+A standard finite element discretization of linear elastodynamics provides a system of the form
+\begin{equation}\label{eq:findim_stand}
+\mathbf{M}_1 \ddot{\mathbf{q}} + \mathbf{K} \mathbf{q} = \mathbf{M}_{d}\mathbf{u}_d + \mathbf{B}_{1, \partial}\mathbf{u}_\partial,
+\end{equation}
+where $\mathbf{M}_1, \; \mathbf{M}_{d}, \; \mathbf{B}_{1, \partial}$ are defined as in \eqref{eq:matrices}. Since the stiffness matrix $\mathbf{K}$ is symmetric and positive definite, it admits the following non unique factorization \cite{horn2012matrix}
+\begin{equation*}
+\mathbf{K} = \mathbf{D}^\top \mathbf{M}_2^{-1} \mathbf{D}.
+\end{equation*}
+Now consider the following new variables
+\begin{equation*}
+\mathbf{e}_1 := \dot{\mathbf{q}}, \qquad 
+\mathbf{e}_2 := \mathbf{M}_2^{-1} \mathbf{D}{\mathbf{q}}. 
+\end{equation*}
+Then Sys. \eqref{eq:findim_stand} can be rewritten as
+\begin{equation}
+	\begin{bmatrix}
+		\mathbf{M}_1 & \mathbf{0} \\
+		\mathbf{0} & \mathbf{M_2} \\
+		\end{bmatrix}
+	\begin{pmatrix}
+	\dot{\mathbf{e}}_1 \\
+	\dot{\mathbf{e}}_2 \\
+	\end{pmatrix} = \begin{bmatrix}
+		\mathbf{0} & -\mathbf{D}^\top \\
+		\mathbf{D} & \mathbf{0} \\
+		\end{bmatrix}
+	\begin{pmatrix}
+	\mathbf{e}_{1} \\
+	\mathbf{e}_{2} \\
+	\end{pmatrix} + 
+	\begin{bmatrix}
+		\mathbf{M}_{d}\\
+		\mathbf{0}\\
+		\end{bmatrix}
+	\mathbf{u}_d
+	+ 
+	\begin{bmatrix}
+		\mathbf{B}_{1, \partial}\\
+		\mathbf{0}\\
+		\end{bmatrix}
+	\mathbf{u}_\partial,
+\end{equation}
+which is exactly \eqref{eq:findimEl_ex}
+\end{remark}
+}
 \begin{remark}
 	Vectors $\widetilde{\mathbf{y}}_d, \widetilde{\mathbf{y}}_\partial$ correspond to the output degrees of freedom. The outputs $\mathbf{y}_d, \mathbf{y}_\partial$ have been defined incorporating the mass matrix in order get the discrete power balance $\dot{H}_d = \mathbf{u}_\partial^\top \mathbf{y}_\partial + \mathbf{u}_d^\top \mathbf{y}_d$.
 \end{remark}
@@ -756,11 +913,15 @@ m & 0 & 0 & \mathcal{I}_\rho^L & 0 & 0 & 0 \\
 \hdashline 
 (\mathcal{I}_\rho^{L})^* & 0 & 0 & \rho A & 0 & 0 & 0  \\
 0 & (\mathcal{I}_\rho^{L})^* & (\mathcal{I}_{\rho x}^{L})^* & 0 & \rho A & 0 & 0  \\
-0 & 0 & 0 & 0 & 0 & {EA}^{-1} & 0 \\
-0 & 0 & 0 & 0 & 0 & 0 & {EI}^{-1} \\
+0 & 0 & 0 & 0 & 0 & (EA)^{-1} & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & (EI)^{-1} \\
 \end{array} \right],
 \end{equation}
-where  $s^x = \int_{0}^{L} \rho A x \d{x}$ is the static moment, $J^{zz} = \int_{0}^{L} \rho A x^2 \d{x}$ is the moment of inertia, $\mathcal{I}_\rho^L := \int_{0}^L \rho A (\cdot) \d{x}, \; \mathcal{I}_{\rho x}^L := \int_{0}^L \rho A x (\cdot) \d{x}$. The interconnection operator is found by adapting the cross product to the planar case:
+where  $s^x = \int_{0}^{L} \rho A x \d{x}$ is the static moment, $J^{zz} = \int_{0}^{L} \rho A x^2 \d{x}$ is the moment of inertia, $\mathcal{I}_\rho^L := \int_{0}^L \rho A (\cdot) \d{x}, \; \mathcal{I}_{\rho x}^L := \int_{0}^L \rho A x (\cdot) \d{x}$. \firstRev{Differently from standard Lagrangian formulations, the mass operator include the coefficients $(EA)^{-1}$ and $(EI)^{-1}$. These coefficients represent the compliance of the beam and appear in the mass operator to include the deformation energy
+\begin{equation*}
+H_{\text{def}} = \frac{1}{2}\int_{0}^L \frac{1}{EA} n_x^2 + \frac{1}{EI} m_x^2  \d\Omega.
+\end{equation*}
+} The interconnection operator is found by adapting the cross product to the planar case:
 \begin{equation}
 \label{eq:EB_J}
 \bm{\mathcal{J}}_{e}(\bm{e}) = 
