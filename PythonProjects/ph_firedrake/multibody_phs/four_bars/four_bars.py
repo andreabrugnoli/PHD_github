@@ -9,6 +9,15 @@ from modules_ph.classes_phsystem import SysPhdaeRig
 from system_components.beams import FloatFlexBeam, draw_deformation
 from multibody_phs.four_bars.fourbars_constants import *
 from math import pi
+import scipy.io
+res = scipy.io.loadmat('results.mat')
+angles_Matlab = res.get('angles').reshape((51, ))
+
+mode1_Matlab = res.get('mode1').reshape((51, 1))
+mode2_Matlab = res.get('mode2').reshape((51, 1))
+mode3_Matlab = res.get('mode3').reshape((51, 1))
+
+path_fig = "/home/a.brugnoli/Plots/Python/Plots/Multibody_PH/FourBar/"
 
 
 def configuration(theta2, l1, l2, l3, l4):
@@ -275,17 +284,26 @@ def omegatheta_plot(n_elem, theta_vec, n_om):
 
     plt.close("all")
     plt.figure()
-    plt.plot(theta_vec*180/pi, omega_vec[:, 0],
-             theta_vec*180/pi, omega_vec[:, 1])
-    plt.legend(("$\omega_1$", "$\omega_2$"), shadow=True, fontsize=fntsize)
-    plt.xlabel(r'Crank angle $\theta$ [deg]', {'fontsize': fntsize})
-    plt.ylabel(r'Eigenfrequencies [rad/s]', {'fontsize': fntsize})
 
-    plt.figure()
-    plt.plot(theta_vec*180/pi, omega_vec[:, 2], label="$\omega_3$")
+    plt.plot(theta_vec*180/pi, omega_vec[:, 0], label="Present $\omega_1$")
+    plt.plot(theta_vec*180/pi, omega_vec[:, 1], label="Present $\omega_2$")
+    plt.plot(angles_Matlab, mode1_Matlab, label="Chebbi $\omega_1$")
+    plt.plot(angles_Matlab, mode2_Matlab, label="Chebbi $\omega_2$")
     plt.legend(shadow=True, fontsize=fntsize)
     plt.xlabel(r'Crank angle $\theta$ [deg]', {'fontsize': fntsize})
     plt.ylabel(r'Eigenfrequencies [rad/s]', {'fontsize': fntsize})
+
+    plt.savefig(path_fig + 'FourBar_Om12_Chebby.eps', format="eps")
+
+    plt.figure()
+    plt.plot(theta_vec*180/pi, omega_vec[:, 2], label="Present $\omega_3$")
+    plt.plot(angles_Matlab, mode3_Matlab, label="Chebbi $\omega_3$")
+    plt.legend(shadow=True, fontsize=fntsize)
+    plt.xlabel(r'Crank angle $\theta$ [deg]', {'fontsize': fntsize})
+    plt.ylabel(r'Eigenfrequencies [rad/s]', {'fontsize': fntsize})
+
+    plt.savefig(path_fig + 'FourBar_Om3_Chebby.eps', format="eps")
+
 
     plt.show()
 
@@ -299,7 +317,7 @@ n_omega = 6
 mech = construct_mech(2, 0)
 
 eigenvalues, eigvectors = la.eig(mech.J, mech.E)
-#
+
 omega_all = np.imag(eigenvalues)
 index = omega_all > 0
 omega = omega_all[index]
@@ -308,8 +326,8 @@ perm = np.argsort(omega)
 eigvec_omega = eigvec_omega[:, perm]
 omega.sort()
 
-print(omega)
-compute_eigs(n_omega, n_el, 0, draw=True)
+# print(omega)
+# compute_eigs(n_omega, n_el, 0, draw=True)
 # compute_eigs(n_omega, n_el, pi, draw=True)
-# omegatheta_plot(n_el, th_vec, n_omega)
+omegatheta_plot(n_el, th_vec, n_omega)
 

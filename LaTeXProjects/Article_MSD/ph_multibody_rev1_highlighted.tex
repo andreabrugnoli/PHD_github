@@ -189,7 +189,7 @@ where $\bm{x}$ is the position vector of the current point, $\bm{v}_P, \bm{\omeg
 	 \Div{\bm\Sigma} + \bm\beta,
 		\end{split}
 	\end{equation}
-	Variable $\bm\Sigma$ is the Cauchy stress tensor. From linear elasticity theory it is well known that the infinitesimal strain is given by $\bm\varepsilon = \Grad(\bm{u}_f)$, where $\Grad=~\frac{1}{2}[\nabla+\nabla^\top]$ is the symmetric gradient. The constitutive equation is expressed as $\bm\Sigma =  \bm{\mathcal{D}} \bm\varepsilon$, where $ \bm{\mathcal{D}}$ is the stiffness tensor. This PDE requires the specifications of boundary conditions.
+	Variable $\bm\Sigma$ is the Cauchy stress tensor. From linear elasticity theory it is well known that the infinitesimal \secondRev{strain} is given by $\bm\varepsilon = \Grad(\bm{u}_f)$, where $\Grad=~\frac{1}{2}[\nabla+\nabla^\top]$ is the symmetric gradient. The constitutive equation is expressed as $\bm\Sigma =  \bm{\mathcal{D}} \bm\varepsilon$, where $ \bm{\mathcal{D}}$ is the stiffness tensor. This PDE requires the specifications of boundary conditions.
 	\begin{equation}
 	\label{eq:bcPDE}
 	\begin{aligned}
@@ -539,7 +539,7 @@ where the subscripts $m$ and $b$ denote the membrane and bending contribution, $
 
 \section{Discretization procedure}
 \label{sec:discr}
-A finite-element based technique to obtain a finite-dimensional pH system is illustrated. This methodology relies on the results explained in \cite{cardoso2019partitioned} and ahead, used in \cite{BRUGNOLI2019940,BRUGNOLI2019961}. The essential feature of this method is that it is structure-preserving. Given the lossless infinite-dimensional system \eqref{eq:MFD_pHDAE}, it allows obtaining a finite-dimensional representation that is again lossless. The procedure boils down to three simple steps
+A finite-element based technique to obtain a finite-dimensional pH system is illustrated. This methodology relies on the results explained in \cite{cardoso2019partitioned} and ahead, used in \cite{BRUGNOLI2019940,BRUGNOLI2019961}. The essential feature of this method is that it is structure-preserving. Given the lossless \secondRev{(cf. \cite[Definition 3.1.4]{vandershaft2000l2})} infinite-dimensional system \eqref{eq:MFD_pHDAE}, it allows obtaining a finite-dimensional representation that is again lossless. The procedure boils down to three simple steps
 \begin{enumerate}
 	\item The system is written in weak form; 
 	\item An integration by parts is applied to highlight the appropriate boundary control;
@@ -561,14 +561,14 @@ To get a pH representation, the energy variables have to be properly selected by
 Taking as energy variables the linear momentum and the deformation
 \begin{equation}
 \begin{aligned}
-\text{Energies} \qquad  \bm{x}_1 &:= \rho \ \partial_t \bm{u}, \\
-\bm{X}_2 &:= \bm\varepsilon = \Grad(\bm{u}). \\
+\bm{x}_1 &:= \rho \ \partial_t \bm{u}, \\
+\bm{X}_2 &:= \bm\varepsilon = \Grad(\bm{u}), \\
 \end{aligned} 
 \end{equation}
 the corresponding co-energies are obtained by taking the variational derivative of the Hamiltonian
 \begin{equation}
 \begin{aligned}
-\text{Co-energies} \qquad \bm{e}_1 &:= \diffd{H}{\bm{x}_1} =  \partial_t \bm{u}, \\
+\bm{e}_1 &:= \diffd{H}{\bm{x}_1} =  \partial_t \bm{u}, \\
 \bm{E}_2 &:= \diffd{H}{\bm{X}_2} = \bm\Sigma.
 \end{aligned}
 \end{equation}
@@ -1328,7 +1328,7 @@ Once an equivalent ODE formulation is obtained the concepts and ideas presented 
 
 \section{Validation}
 \label{sec:valid}
-In this section numerical simulations are performed to assess the correctness of the proposed formulation. A first example concerns the computation of eigenvalues of a four bar mechanics for different geometrical configuration. The second example is a rotating crank-slider. In this case the non-linearities cannot be neglected. The third example is a hinged beam undergoing external excitations so that the out-of-plane motion becomes important. The examples make use of Euler Bernoulli beam model \eqref{eq:EB_sys}. To discretize the system, Lagrange polynomial of order one are used for $v_f^x$ and $n_x$, while Hermite polynomials are used for $v_f^y$ and $m_{x}$. This choice ensures the conformity with respect to the differential operator. The Firedrake python library \cite{rathgeber2017firedrake} is employed to construct the finite-dimensional discretization.  
+In this section numerical simulations are performed to assess the correctness of the proposed formulation. A first example concerns the computation of eigenvalues of a four bar \secondRev{mechanism} for different geometrical configuration. The second example is a rotating crank-slider. In this case the non-linearities cannot be neglected. The third example is a hinged beam undergoing external excitations so that the out-of-plane motion becomes important. The examples make use of Euler Bernoulli beam model \eqref{eq:EB_sys}. To discretize the system, Lagrange polynomial of order one are used for $v_f^x$ and $n_x$, while Hermite polynomials are used for $v_f^y$ and $m_{x}$. This choice ensures the conformity with respect to the differential operator. The Firedrake python library \cite{rathgeber2017firedrake} is employed to construct the finite-dimensional discretization.  
 
 \subsection{Linear analysis of a four-bar mechanism}
 
@@ -1374,8 +1374,8 @@ The resulting system is expressed in pH form as $\mathbf{E}\dot{\mathbf{e}} = \m
 
 \begin{figure}[tb]
 	\centering
-	\includegraphics[width=0.49\textwidth]{FourBar_Om12.eps} 
-	\includegraphics[width=0.49\textwidth]{FourBar_Om3.eps} 
+	\includegraphics[width=0.49\textwidth]{FourBar_Om12_Chebby.eps} 
+	\includegraphics[width=0.49\textwidth]{FourBar_Om3_Chebby.eps} 
 	\caption{Eigenvalues $\omega_i, \ i=1,2,3$ for the four bar mechanism for varying crank angle.}
 	\label{fig:omega_4bars}
 \end{figure}
@@ -1439,6 +1439,19 @@ The resulting system is a quasi linear index-2 DAE of the form
 Setting the initial conditions properly is of utmost  importance for a DAE solver. For this problem the beam is supposed undeformed at the initial time. The initial conditions for the rigid movement are then found using basic kinematics considerations.  The system is then solved using the IDA algorithm available in the Assimulo library \cite{assimulo}. In Fig. \ref{fig:defM_crsl} the midpoint deformation displacement $u_f^x(L_{\text{cl}/2}),\; u_f^y(L_{\text{cl}/2})$, normalized with respect to the coupler length, is reported. The resulting vertical displacement is in accordance with the results presented in \cite{Ellenbroek2018}. The horizontal displacement exhibits high oscillations because of the higher eigenfrequencies of the longitudinal movement. This is due to the fact that null initial conditions are imposed on the deformation \cite{MB_Daepde}. In order to obtain a smoother solution, the initial deformation has to be computed from the rigid initial condition.
 
 
+\begin{table}[tb]
+	% table caption is above the table
+	\caption{\secondRev{Computational performance for the crank slider.}}
+	\label{tab:comp_perf_crslider}       % Give a unique label
+	% For LaTeX tables use
+	\begin{tabular}{cccc}
+		\hline\noalign{\smallskip}
+		Solver & Elapsed simulation time & Average $\Delta t$ & Final time \\
+		\noalign{\smallskip}\hline\noalign{\smallskip}
+		IDA & $12.14\; \mathrm{[s]}$ & $4.98 \, 10^{-7} \; \mathrm{[s]}$ & $0.053 \, 10^{-4} \; \mathrm{[s]}$\\
+		\hline
+	\end{tabular}
+\end{table}
 
 \subsection{Hinged spatial beam}
 A spatial beam rotating about a spherical joint is considered (see Fig. \ref{fig:beam_3D}). This example was considered in \cite{Cardona2000,Ellenbroek2018}. The physical parameters are briefly recalled in Table \ref{tab:data_3Dbeam}. The spherical joint constraint is imposed by setting to zero the linear velocity, while a cantilever is imposed for the deformation field as the tip is free. For the first $10.2 [\mathrm{s}]$ a torque $ M_z =200 [\mathrm{N/mm}]$ is applied about the vertical axis. Then, an impulsive force $ F_z =100 [\mathrm{N}]$ is applied at the tip of the beam at $15 [\mathrm{s}]$, to excite the out-of-plane movement. The system is solved using an implicit Runge-Kutta method of the Radau IIA family. The simulation results, provided in Fig. \ref{fig:H_omega}, correspond to the total energy and the angular velocity measured in the inertial vertical direction. The result matches with the provided references. Indeed the non-linearities associated to the gyroscopic terms are small as the maximum angular velocity is equal to $0.1 \ [\mathrm{rad/s}] \approx 5 \ [\mathrm{deg/s}]$. 
@@ -1473,10 +1486,26 @@ A spatial beam rotating about a spherical joint is considered (see Fig. \ref{fig
 \end{table}
 
 
+\begin{table}[tb]
+	% table caption is above the table
+	\caption{\secondRev{Computational performance for the hinged spatial beam.}}
+	\label{tab:comp_perf_hinged}       % Give a unique label
+	% For LaTeX tables use
+	\begin{tabular}{cccc}
+		\hline\noalign{\smallskip}
+		Solver & Elapsed simulation time & Average $\Delta t$ &  Final time \\
+		\noalign{\smallskip}\hline\noalign{\smallskip}
+		Radau IIA & $21.14\; \mathrm{[s]}$ & $6 \, 10^{-4} \; \mathrm{[s]}$ & $50 \; \mathrm{[s]}$ \\
+		\hline
+	\end{tabular}
+\end{table}
+
 \section{Conclusion}
-A port-Hamiltonian formulation for the flexible multibody dynamics has been discussed. \firstRev{The equations were obtained by direct manipulation of pre-existing results. The derivation of equations of motions proposed in the paper through a variational principle represents an insightful possible development.} The proposed methodology, being based on a floating frame formulation, relies on the hypothesis of small deformations. However, the geometric stiffening effect can be accounted for by considering a corresponding energy. The discretization procedure uses a mixed finite element method, hence, the stress distribution is available without any post-processing. This is a valuable characteristic of this framework, as the stress distribution is the most important variable for preliminary analysis of mechanical components. Moreover, this approach allows treating different models (e.g. plates, shells) easily and in a common framework. The construction of complex multibody system becomes completely modular and well suited for control applications.  \\
-Many future directions are to be investigated. Large deformation could be included by employing a substructuring technique \cite{SHABANA_substructure}.
-The stability and numerical convergence of the associated finite element is still to be proved. Another interesting topic is the application of model reduction techniques. While for linear pHDAE systems consolidated methodologies exist, for the general non linear differential-algebraic case, solutions are not yet available. Numerical methods capable of preserving important structural properties in discrete time have been studied for rigid body dynamics \cite{celledoni2018passivity} and generic ODE \cite{KOTYCZKA_dt} and DAE \cite{mehrmann2019structurepreserving} pH systems. The effectiveness of those with respect to the proposed formulation has to be demonstrated.  The inclusion of control strategies is an important topic to be explored in the future.
+A port-Hamiltonian formulation for the flexible multibody dynamics has been discussed. \firstRev{The equations were obtained by direct manipulation of pre-existing results. The derivation of equations of motions proposed in the paper through a variational principle represents an insightful possible development.} The proposed methodology, being based on a floating frame formulation, relies on the hypothesis of small deformations. However, the geometric stiffening effect can be accounted for by considering a corresponding energy. The discretization procedure uses a mixed finite element method, hence, the stress distribution is available without any post-processing. This is a valuable characteristic of this framework, as the stress distribution is the most important variable for preliminary analysis of mechanical components. Moreover, this approach allows treating different models (e.g. plates, shells) in a common framework. \firstRev{In principle this formulation works with any kind of rigid and flexible joints.} The construction of multibody system becomes completely modular and well suited for control applications.  \\
+
+\firstRev{There are however many issues that require further investigations. The stability and numerical convergence of the associated finite element is still to be proved. Higher dimensional plate models can be incorporated but their discretization is hard. Since this method is based on a floating frame formulation, the numerical implementation requires access to the underlying finite element libraries and therefore not easy and error prone.  The numerical simulation of the resulting systems have been accomplished using ready-to-use libraries but the computational aspects are still not clear. Numerical methods capable of preserving important structural properties in discrete time have been studied for rigid body dynamics \cite{celledoni2018passivity} and generic ODE \cite{KOTYCZKA_dt} and DAE \cite{mehrmann2019structurepreserving} pH systems. The effectiveness of those with respect to the proposed formulation has to be demonstrated. In this work we have employed a finite element discretization. However spectral methods can be used to achieve a structure preserving discretization that results in simpler models. The constraints imposition are imposed at a velocity level to preserve the pH structure. To avoid drifting phenomena stabilization technique may be introduced. Large deformation could be included by employing a substructuring technique \cite{SHABANA_substructure}. Another interesting topic is the application of model reduction techniques. While for linear pHDAE systems consolidated methodologies exist, for the general non linear differential-algebraic case, solutions are not yet available. 
+}
+  
 
 
 %\begin{acknowledgements}

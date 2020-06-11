@@ -13,6 +13,7 @@ from math import pi
 from assimulo.solvers import IDA
 from assimulo.solvers import Radau5DAE
 from assimulo.implicit_ode import Implicit_Problem
+import time
 
 n_elem = 2
 
@@ -88,10 +89,14 @@ n_tot = n_sys + 4  # 3 lambda et theta
 order = []
 t_final = 8/omega_cr
 
+t_step = []
+
 
 def dae_closed_phs(t, y, yd):
 
     print(t/t_final*100)
+
+    t_step.append(t)
 
     yd_sys = yd[:n_sys]
     y_sys = y[:n_sys]
@@ -138,6 +143,7 @@ def dae_closed_phs(t, y, yd):
     res_th = np.reshape(yd[-1] - omega_cl, (1, ))
 
     res = np.concatenate((res_sys, res_cl, res_mass, res_th), axis=0)
+
     return res
 
 
@@ -186,7 +192,20 @@ imp_sim.make_consistent('IDA_YA_YDP_INIT')
 # Simulate
 n_ev = 5000
 t_ev = np.linspace(0, t_final, n_ev)
+
+ti_sim = time.time()
 t_sol, y_sol, yd_sol = imp_sim.simulate(t_final, 0, t_ev)
+tf_sim = time.time()
+
+elapsed_t = tf_sim - ti_sim
+
+dt_vec = np.diff(t_step)
+
+dt_avg = np.mean(dt_vec)
+
+print("elapsed: " + str(elapsed_t))
+print("dt_avg: " + str(dt_avg))
+
 e_sol = y_sol[:, :n_e].T
 lmb_sol = y_sol[:, n_e:-1].T
 th_cl_sol = y_sol[:, -1]

@@ -165,10 +165,10 @@ class FloatFlexBeam(SysPhdaeRig):
 
         if bc=='CF':
             dofs2dump = list([0, np_x, np_x + 1])
-            print("CF")
+            # print("CF")
         else:
             dofs2dump = list([0, np_x, n_p-2])
-            print("SS")
+            # print("SS")
 
         dofs2keep = list(set(range(n_V)).difference(set(dofs2dump)))
 

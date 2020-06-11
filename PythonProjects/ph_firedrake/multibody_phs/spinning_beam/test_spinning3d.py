@@ -12,7 +12,7 @@ import scipy.linalg as la
 from modules_ph.classes_phsystem import SysPhdaeRig
 from system_components.beams import SpatialBeam, draw_deformation3D, matrices_j3d
 from math import pi
-
+import time
 from tools_plotting.animate_lines import animate_line3d
 
 def skew(x):
@@ -42,7 +42,7 @@ Fz_max = 100
 mass_beam = rho_beam * A_beam * L_beam
 Jxx_beam = 2 * I_beam * rho_beam * L_beam
 
-n_elem = 12
+n_elem = 2
 bc='CF'
 beam = SpatialBeam(n_elem, L_beam, rho_beam, A_beam, E_beam, I_beam, Jxx_beam, bc=bc)
 
@@ -91,11 +91,12 @@ t5 = t4 + t_load
 t_0 = 0
 t_fin = 50
 
-
-
+t_step = []
 def sys(t,y):
 
     print(t/t_fin*100)
+
+    t_step.append(t)
 
     if t <= t_load:
         Mz_0 = Mz_max*t/t_load
@@ -146,6 +147,8 @@ def sys(t,y):
     dquat = 0.5 * Omega_mat @ y_quat
 
     dydt = np.concatenate((dedt, dquat))
+
+
     return dydt
 
 
@@ -198,7 +201,19 @@ path_fig = "/home/a.brugnoli/Plots/Python/Plots/Multibody_PH/FlBeam_joint/"
 #
 # plt.show()
 
+ti_sim = time.time()
+
 sol = solve_ivp(sys, t_span, y0, method='Radau', vectorized=False, t_eval=t_ev)
+tf_sim = time.time()
+
+elapsed_t = tf_sim - ti_sim
+
+dt_vec = np.diff(t_step)
+
+dt_avg = np.mean(dt_vec)
+
+print("elapsed: " + str(elapsed_t))
+print("dt_avg: " + str(dt_avg))
 
 t_sol = sol.t
 y_sol = sol.y

@@ -204,6 +204,7 @@ Revised passages have been highlighted in the PDF version of the manuscript, wit
 
 \begin{acronym}[IDA-PBC--] % Specify the longest acronym in order to set the first column width
 	\acro{FMS}{\emph{Flexible multibody system}}
+	\acro{pH}{\emph{port-Hamiltonian}}
 \end{acronym}
 
 \clearpage{}
@@ -275,7 +276,7 @@ using an author-year citation style, e.g. \cite{neto2003stabilization}.
 
 
 \section{Reply to reviewer \#1}
-We thank the reviewer for these constructive and insightful comments. We have addressed each one
+We thank the reviewer for these detailed and insightful comments. We have addressed each one
 below. In the revised manuscript, the corresponding revisions are \textcolor{colorRev1}{highlighted in red}.
 
 \begin{quotebox}{Reviewer No.1 -- Comment a}
@@ -345,7 +346,7 @@ where the subscripts $m$ and $b$ denote the membrane and bending contribution, $
 
 Other approaches, commonly used in robotics \cite[Chapter 5]{bremer2008elastic}, allows constructing chain of flexible bodies in a systematic way. However, our approach highlights the Hamiltonian structure and the conservation of energy: the interconnections among bodies do preserve these two important features. \\
 
-The equations of motion we obtain are exactly equivalent to those detailed in \cite{simeon2013computational} and valid only for linear elasticity and moderate angular rotations (since the centrifugal stiffening effect is neglected). The crucial point is that those equation possess an equivalent pH representation.
+The equations of motion we obtain are exactly equivalent to those detailed in \cite{simeon2013computational} and valid only for linear elasticity and moderate angular rotations (since the centrifugal stiffening effect is neglected). The crucial point is that those equations possess an equivalent pH representation.
 
 \begin{tcolorbox}[title=Revision page 3 and page 9 (Reviewer No. 1 -- Comment d ),colframe=colorRevBG1]
 	An additional remark has been made in the introduction to cite \cite{bremer2008elastic} for the systematic construction of multibody systems. We have added a remark at page 8 to illustrate the system of equations obtained in the case of the Kirchhoff plate.
@@ -418,7 +419,8 @@ Eq. (33) should be explained in more detail regarding the $EA^{-1}$ and $EI^{-1}
 \begin{quotebox}{Reviewer No.1 -- Comment g}
 	I am strongly missing comparison to other formulations and other multibody codes: are the analytical / numerical results the same? Is the performance higher?
 \end{quotebox}
-We do not claim any computational superiority of this methodology
+The considered numerical examples represent a validation of the proposed formulation with respect to preexisting publications. It is indeed difficult to find in the literature benchmark examples on the floating frame formulations.
+We do not claim any computational superiority of this methodology. 
 
 \begin{tcolorbox}[title=Revision page 1 (Reviewer No. 1 -- Comment g ),colframe=colorRevBG1]
 	
@@ -427,47 +429,76 @@ We do not claim any computational superiority of this methodology
 \begin{quotebox}{Reviewer No.1 -- Comment h}
 	I am very much missing the "what does not work" and "restrictions" in the conclusions (e.g., does it work for (flexible) sliding joints or multimodal joints?), which should be present in any "new formulation". The proposed approach starts with a very general PDE formulation, but breaks down to beams in the end. Slider-crank and four bar mechanisms are shown, but no really "complex multibody systems". For those who would like to reproduce the formulation, they have a right to know, if it will work out for their application or it will not.
 \end{quotebox}
+In principle this formulation works with any kind of joints. There are however many issues that require further investigations. 
+\begin{enumerate} 
+\item Since this method is based on a floating frame formulation, the numerical implementation requires access to the underlying finite element libraries and therefore not easy and error prone \cite{zwolfer2019}.  
+\item Higher dimensional models can be incorporated but their discretization is hard. While it is possible to write plate models in pH form, the reformulation general shell structures in pH form is still an open topic.
+\item The numerical simulation of the resulting systems have been accomplished using ready-to-use libraries but the computational aspects are still not clear.
+\item  It is important to see how classical modal analysis is related to the proposed framework to incorporate modal reduction strategies.
+\item The inclusion of damping requires further attention: 
+	\begin{itemize}
+		\item Rayleigh damping: it is still not clear how to add a stiffness proportional damping.
+		\item Modal damping.
+	\end{itemize}
+\item In our work we have employed a finite element discretization. However spectral methods can be used to achieve a structure preserving discretization that results in simpler models.
+\item The constraints imposition are imposed at a velocity level to preserve the pH structure. To avoid drifting phenomena stabilization technique may be introduced.
+\end{enumerate}
 
-\begin{tcolorbox}[title=Revision page 1 (Reviewer No. 1 -- Comment h ),colframe=colorRevBG1]
-	
+
+
+\begin{tcolorbox}[title=Revision page 25 (Reviewer No. 1 -- Comment h ),colframe=colorRevBG1]
+	The conclusion section has been modifies to incorporate remarks on the drawbacks and difficult points.
 \end{tcolorbox}
 
 
 \clearpage{}
 
 \section{Reply to reviewer \#2}
-We thank the reviewer for these detailed and constructive comments. We have addressed each one
+We thank the reviewer for these constructive comments. We have addressed each one
 below. In the revised manuscript, the corresponding revisions are \textcolor{colorRev2}{highlighted in blue}.
 
 
 \begin{quotebox}{Reviewer No.2 -- Comment 1}
 Can the authors explain what they understand by a "lossless" system? It is not a standard term in finite elements technology. 
 \end{quotebox}
-\cite[Definition 3.1.4]{van2000l2}
-System that is conservative with respect to the supply rate $s(\mathbf{u}, \mathbf{y}) = \mathbf{u}^\top \mathbf{y}$.
-\begin{tcolorbox}[title=Revision pages 3 to 6 (Reviewer No. 2 -- Comment 1 ),colframe=colorRevBG2]
+This term is taken from the control community. A lossless system is a
+system that is conservative with respect to the supply rate $s(\mathbf{u}, \mathbf{y}) = \mathbf{u}^\top \mathbf{y}$ (cf. \cite[Definition 3.1.4]{van2000l2}). This means that there exist a storage function $S(t)$ such that
+\begin{equation}
+	S(t_1) - S(t_0) =  \int_{t_0}^{t_1} \mathbf{u}^\top \mathbf{y} \d{t}.
+\end{equation}
 
+For pH (infinite- or finite dimensional) systems with no dissipation the energy rate reads:
+\begin{equation*}
+	\dot{H} = \mathbf{u}^\top \mathbf{y}
+\end{equation*}
+Therefore, the Hamiltonian plays the role of storage function. Integrating between $t_0$ and $t_1$ one obtains
+\begin{equation*}
+H(t_1) - H(t_0) = \int_{t_0}^{t_1} \mathbf{u}^\top \mathbf{y} \d{t},
+\end{equation*}
+meaning that the system is lossless.
+\begin{tcolorbox}[title=Revision pages10 (Reviewer No. 2 -- Comment 1 ),colframe=colorRevBG2]
+The reference \cite{van2000l2} has been cited concerning the definition of lossless system
 \end{tcolorbox}
 
 \begin{quotebox}{Reviewer No.2 -- Comment 2}
 The text before equation (21) and (22) does not correspond with equations (21) and (22). Please, rephrase.
 \end{quotebox}
 
-\begin{tcolorbox}[title=Revision pages 8 to 10 (Reviewer No. 2 -- Comment 2 ),colframe=colorRevBG2]
-
+\begin{tcolorbox}[title=Revision page 11 (Reviewer No. 2 -- Comment 2 ),colframe=colorRevBG2]
+We have revised the text at the indicated location.
 \end{tcolorbox}
 
 \begin{quotebox}{Reviewer No.2 -- Comment 3}
 	Page (4), before equation (4). Should be infinitesimal STRAIN instead of stress.
 \end{quotebox}
 \begin{tcolorbox}[title=Revision page 14 (Reviewer No. 2 -- Comment 3),colframe=colorRevBG2]
-
+We performed the necessary correction
 \end{tcolorbox}
 
 \begin{quotebox}{Reviewer No.2 -- Comment 4}
 Constraints are imposed at the velocity level. It is well-known that a drift appears in this case. Are you using any stabilization ?
 \end{quotebox}
-
+No stabilization is used. Imposing the constraints at the velocity level allows preserving the overall pH structure (since the power flowing is computed through the velocities). T
 \begin{tcolorbox}[title=Revision page 10 (Reviewer No. 2 -- Comment 4),colframe=colorRevBG2]
 
 \end{tcolorbox}
@@ -476,8 +507,8 @@ Constraints are imposed at the velocity level. It is well-known that a drift app
 Page 20, first paragraph section 6: four bar MECHANISM.
 \end{quotebox}
 
-\begin{tcolorbox}[title=Revision page 10 (Reviewer No. 2 -- Comment 5),colframe=colorRevBG2]
-	
+\begin{tcolorbox}[title=Revision page 21 (Reviewer No. 2 -- Comment 5),colframe=colorRevBG2]
+	We performed the necessary correction
 \end{tcolorbox}
 
 
