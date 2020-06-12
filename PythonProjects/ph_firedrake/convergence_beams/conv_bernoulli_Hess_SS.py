@@ -9,8 +9,23 @@ import matplotlib
 import matplotlib.pyplot as plt
 import petsc4py
 
+import matplotlib.pyplot as plt
+SMALL_SIZE = 14
+MEDIUM_SIZE = 16
+BIGGER_SIZE = 18
+
+plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
+plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+
 matplotlib.rcParams['text.usetex'] = True
 save_res = False
+save_fig = False
 bc_input = 'SS_Hess'
 
 
@@ -53,7 +68,9 @@ def compute_err(n, r):
     # Finite element defition
 
     Vp = FunctionSpace(mesh, "Hermite", 3)
-    Vq = FunctionSpace(mesh, "DG", 1)
+    # Vq = FunctionSpace(mesh, "DG", 1)
+    Vq = FunctionSpace(mesh, "Hermite", 3)
+
     V = Vp * Vq
 
     n_Vp = V.sub(0).dim()
@@ -102,9 +119,11 @@ def compute_err(n, r):
 
     dxx_wex = - (pi / L) ** 2 * sin(pi * x[0] / L) * sin(beta * t_)
     dxxx_wex = - (pi / L) ** 3 * cos(pi * x[0] / L) * sin(beta * t_)
+    dxxxx_wex = (pi / L) ** 4 * sin(pi * x[0] / L) * sin(beta * t_)
 
     sigma_ex = E * I * dxx_wex
     grad_sigex = E * I * dxxx_wex
+    hess_sigex = E * I * dxxxx_wex
 
     force = sin(pi*x[0]/L)*sin(beta*t_)*(E*I * (pi/L)**4 - rho*Area*beta**2)
     force1 = sin(pi*x[0]/L)*sin(beta*t_1)*(E*I * (pi/L)**4 - rho*Area*beta**2)
@@ -138,10 +157,13 @@ def compute_err(n, r):
     n_t = int(floor(t_fin/dt) + 1)
 
     w_err_H1 = np.zeros((n_t,))
+    w_err_H2 = np.zeros((n_t,))
+
     v_err_H2 = np.zeros((n_t,))
     v_err_H1 = np.zeros((n_t,))
     v_err_L2 = np.zeros((n_t,))
 
+    sig_err_H2 = np.zeros((n_t,))
     sig_err_H1 = np.zeros((n_t,))
     sig_err_L2 = np.zeros((n_t,))
 
@@ -152,12 +174,20 @@ def compute_err(n, r):
 
     # w_err_H1[0] = np.sqrt(assemble(dot(w_n-w_exact, w_n-w_exact) *dx
     #                      + dot(grad(w_n) - grad_wex, grad(w_n) - grad_wex) * dx))
+    w_err_H2[0] = np.sqrt(assemble(dot(w_n - w_exact, w_n - w_exact) * dx
+                         + dot(w_n.dx(0) - grad_wex, w_n.dx(0) - grad_wex) * dx
+                         + dot(w_n.dx(0).dx(0) - dxx_wex, w_n.dx(0).dx(0) - dxx_wex) * dx))
+
     v_err_H2[0] = np.sqrt(assemble(dot(ep_n - v_exact, ep_n - v_exact) * dx
                                    + dot(ep_n.dx(0) - grad_vex, ep_n.dx(0) - grad_vex) * dx
                                    + dot(ep_n.dx(0).dx(0) - dxx_vex, ep_n.dx(0).dx(0) - dxx_vex) * dx))
     v_err_H1[0] = np.sqrt(assemble(dot(ep_n - v_exact, ep_n - v_exact) * dx
                                    + dot(ep_n.dx(0) - grad_vex, ep_n.dx(0) - grad_vex) * dx))
     v_err_L2[0] = np.sqrt(assemble(dot(ep_n - v_exact, ep_n - v_exact) * dx))
+
+    sig_err_H1[0] = np.sqrt(assemble(inner(eq_n - sigma_ex, eq_n - sigma_ex) * dx
+                                     + dot(eq_n.dx(0) - grad_sigex, eq_n.dx(0) - grad_sigex) * dx
+                                     + dot(eq_n.dx(0).dx(0) - hess_sigex, eq_n.dx(0).dx(0) - hess_sigex) * dx))
 
     sig_err_H1[0] = np.sqrt(assemble(inner(eq_n - sigma_ex, eq_n - sigma_ex) * dx
                                      + dot(eq_n.dx(0) - grad_sigex, eq_n.dx(0) - grad_sigex) * dx))
@@ -216,12 +246,20 @@ def compute_err(n, r):
 
         # w_err_H1[i] = np.sqrt(assemble(dot(w_n1-w_exact, w_n1-w_exact) * dx
         #                      + dot(grad(w_n1)-grad_wex, grad(w_n1)-grad_wex) * dx))
+        w_err_H2[i] = np.sqrt(assemble(dot(w_n1 - w_exact, w_n1 - w_exact) * dx
+                                       + dot(w_n1.dx(0) - grad_wex, w_n1.dx(0) - grad_wex) * dx
+                                       + dot(w_n1.dx(0).dx(0) - dxx_wex, w_n1.dx(0).dx(0) - dxx_wex) * dx))
+
         v_err_H2[i] = np.sqrt(assemble(dot(ep_n1 - v_exact, ep_n1 - v_exact) * dx
                                        + dot(ep_n1.dx(0) - grad_vex, ep_n1.dx(0) - grad_vex) * dx
                                        + dot(ep_n1.dx(0).dx(0) - dxx_vex, ep_n1.dx(0).dx(0) - dxx_vex) * dx))
         v_err_H1[i] = np.sqrt(assemble(dot(ep_n1 - v_exact, ep_n1 - v_exact) * dx
                                        + dot(ep_n1.dx(0) - grad_vex, ep_n1.dx(0) - grad_vex) * dx))
         v_err_L2[i] = np.sqrt(assemble(dot(ep_n1 - v_exact, ep_n1 - v_exact) * dx))
+
+        sig_err_H2[i] = np.sqrt(assemble(inner(eq_n1 - sigma_ex, eq_n1 - sigma_ex) * dx
+                                         + dot(eq_n1.dx(0) - grad_sigex, eq_n1.dx(0) - grad_sigex) * dx
+                                         + dot(eq_n1.dx(0).dx(0) - hess_sigex, eq_n1.dx(0).dx(0) - hess_sigex) * dx))
 
         sig_err_H1[i] = np.sqrt(assemble(inner(eq_n1 - sigma_ex, eq_n1 - sigma_ex) * dx
                                          + dot(eq_n1.dx(0) - grad_sigex, eq_n1.dx(0) - grad_sigex) * dx))
@@ -238,9 +276,9 @@ def compute_err(n, r):
     # plt.legend()
     # # plt.show()
 
-    # v_err_last = w_err_H1[-1]
-    # v_err_max = max(w_err_H1)
-    # v_err_quad = np.sqrt(np.sum(dt * np.power(w_err_H1, 2)))
+    w_err_last = w_err_H2[-1]
+    w_err_max = max(w_err_H2)
+    w_err_quad = np.sqrt(np.sum(dt * np.power(w_err_H2, 2)))
 
     # v_err_last = v_err_H1[-1]
     # v_err_max = max(v_err_H1)
@@ -254,7 +292,11 @@ def compute_err(n, r):
     sig_err_max = max(sig_err_L2)
     sig_err_quad = np.sqrt(np.sum(dt * np.power(sig_err_L2, 2)))
 
-    return v_err_last, v_err_max, v_err_quad, sig_err_last, sig_err_max, sig_err_quad
+    # sig_err_last = sig_err_H1[-1]
+    # sig_err_max = max(sig_err_H1)
+    # sig_err_quad = np.sqrt(np.sum(dt * np.power(sig_err_H1, 2)))
+
+    return w_err_last, w_err_max, w_err_quad, v_err_last, v_err_max, v_err_quad, sig_err_last, sig_err_max, sig_err_quad
 
 
 n_h = 3
@@ -288,6 +330,14 @@ v_r1_L2 = np.zeros((n_h-1,))
 # v_r3_max = np.zeros((n_h-1,))
 # v_r3_L2 = np.zeros((n_h-1,))
 
+w_err_r1 = np.zeros((n_h,))
+w_errInf_r1 = np.zeros((n_h,))
+w_errQuad_r1 = np.zeros((n_h,))
+#
+w_r1_atF = np.zeros((n_h-1,))
+w_r1_max = np.zeros((n_h-1,))
+w_r1_L2 = np.zeros((n_h-1,))
+
 sig_err_r1 = np.zeros((n_h,))
 sig_errInf_r1 = np.zeros((n_h,))
 sig_errQuad_r1 = np.zeros((n_h,))
@@ -314,7 +364,7 @@ sig_r1_L2 = np.zeros((n_h-1,))
 
 
 for i in range(n_h):
-    v_err_r1[i], v_errInf_r1[i], v_errQuad_r1[i],\
+    w_err_r1[i], w_errInf_r1[i], w_errQuad_r1[i], v_err_r1[i], v_errInf_r1[i], v_errQuad_r1[i],\
     sig_err_r1[i], sig_errInf_r1[i], sig_errQuad_r1[i] = compute_err(n1_vec[i], 1)
     # v_err_r2[i], v_errInf_r2[i], v_errQuad_r2[i], sig_err_r2[i],\
     # sig_errInf_r2[i], sig_errQuad_r2[i] = compute_err(n1_vec[i], 2)
@@ -325,6 +375,10 @@ for i in range(n_h):
         v_r1_atF[i-1] = np.log(v_err_r1[i]/v_err_r1[i-1])/np.log(h1_vec[i]/h1_vec[i-1])
         v_r1_max[i-1] = np.log(v_errInf_r1[i]/v_errInf_r1[i-1])/np.log(h1_vec[i]/h1_vec[i-1])
         v_r1_L2[i-1] = np.log(v_errQuad_r1[i]/v_errQuad_r1[i-1])/np.log(h1_vec[i]/h1_vec[i-1])
+
+        w_r1_atF[i - 1] = np.log(w_err_r1[i] / w_err_r1[i - 1]) / np.log(h1_vec[i] / h1_vec[i - 1])
+        w_r1_max[i - 1] = np.log(w_errInf_r1[i] / w_errInf_r1[i - 1]) / np.log(h1_vec[i] / h1_vec[i - 1])
+        w_r1_L2[i - 1] = np.log(w_errQuad_r1[i] / w_errQuad_r1[i - 1]) / np.log(h1_vec[i] / h1_vec[i - 1])
 
         # v_r2_atF[i-1] = np.log(v_err_r2[i]/v_err_r2[i-1])/np.log(h1_vec[i]/h1_vec[i-1])
         # v_r2_max[i-1] = np.log(v_errInf_r2[i]/v_errInf_r2[i-1])/np.log(h1_vec[i]/h1_vec[i-1])
@@ -377,6 +431,36 @@ if save_res:
     # np.save(path_res + bc_input + "_sig_errQuad_r3", sig_errQuad_r3)
 
 
+w_r1int_atF = np.polyfit(np.log(h1_vec), np.log(w_err_r1), 1)[0]
+w_r1int_max = np.polyfit(np.log(h1_vec), np.log(w_errInf_r1), 1)[0]
+w_r1int_L2 = np.polyfit(np.log(h1_vec), np.log(w_errQuad_r1), 1)[0]
+
+print("Estimated order of convergence r=1 for w at T fin: " + str(w_r1_atF))
+print("Interpolated order of convergence r=1 for w at T fin: " + str(w_r1int_atF))
+print("Estimated order of convergence r=1 for w Linf: " + str(w_r1_max))
+print("Interpolated order of convergence r=1 for w Linf: " + str(w_r1int_max))
+print("Estimated order of convergence r=1 for w L2: " + str(w_r1_L2))
+print("Interpolated order of convergence r=1 for w L2: " + str(w_r1int_L2))
+print("")
+
+plt.figure()
+
+plt.plot(np.log(h1_vec), np.log(w_errInf_r1), '-.+')
+# plt.plot(np.log(h1_vec), np.log(w_errQuad_r1), '--*', label='HER 1 $L^2$')
+plt.plot(np.log(h1_vec), np.log(h1_vec**2), '-v', label=r'$h^2$')
+
+
+
+plt.xlabel('log(Mesh size $h$)')
+plt.ylabel('log(Error Displacement)')
+plt.title('Displacement Error vs Mesh size')
+plt.legend()
+path_fig = "/home/a.brugnoli/Plots/Python/Plots/EulerBernoulli/Convergence/"
+if save_fig:
+    plt.savefig(path_fig  + bc_input + "_dis.eps", format="eps")
+
+
+
 v_r1int_atF = np.polyfit(np.log(h1_vec), np.log(v_err_r1), 1)[0]
 v_r1int_max = np.polyfit(np.log(h1_vec), np.log(v_errInf_r1), 1)[0]
 v_r1int_L2 = np.polyfit(np.log(h1_vec), np.log(v_errQuad_r1), 1)[0]
@@ -389,55 +473,21 @@ print("Estimated order of convergence r=1 for v L2: " + str(v_r1_L2))
 print("Interpolated order of convergence r=1 for v L2: " + str(v_r1int_L2))
 print("")
 
-# v_r2int = np.polyfit(np.log(h1_vec), np.log(v_err_r2), 1)[0]
-# v_r2int_max = np.polyfit(np.log(h1_vec), np.log(v_errInf_r2), 1)[0]
-# v_r2int_L2 = np.polyfit(np.log(h1_vec), np.log(v_errQuad_r2), 1)[0]
-#
-# print("Estimated order of convergence r=2 for v at T fin: " + str(v_r2_atF))
-# print("Interpolated order of convergence r=2 for v at T fin: " + str(v_r2int))
-# print("Estimated order of convergence r=2 for v Linf: " + str(v_r2_max))
-# print("Interpolated order of convergence r=2 for v Linf: " + str(v_r2int_max))
-# print("Estimated order of convergence r=2 for v L2: " + str(v_r2_L2))
-# print("Interpolated order of convergence r=2 for v L2: " + str(v_r2int_L2))
-# print("")
-#
-# v_r3int = np.polyfit(np.log(h2_vec), np.log(v_err_r3), 1)[0]
-# v_r3int_max = np.polyfit(np.log(h2_vec), np.log(v_errInf_r3), 1)[0]
-# v_r3int_L2 = np.polyfit(np.log(h2_vec), np.log(v_errQuad_r3), 1)[0]
-#
-# print("Estimated order of convergence r=3 for v at T fin: " + str(v_r3_atF))
-# print("Interpolated order of convergence r=3 for v at T fin: " + str(v_r3int))
-# print("Estimated order of convergence r=3 for v Linf: " + str(v_r3_max))
-# print("Interpolated order of convergence r=3 for v Linf: " + str(v_r3int_max))
-# print("Estimated order of convergence r=3 for v L2: " + str(v_r3_L2))
-# print("Interpolated order of convergence r=3 for v L2: " + str(v_r3int_L2))
-# print("")
-
 plt.figure()
 
 # plt.plot(np.log(h1_vec), np.log(v_r1_atF), ':o', label='HER 1')
-plt.plot(np.log(h1_vec), np.log(v_errInf_r1), '-.+', label='HER 1 $L^\infty$')
-plt.plot(np.log(h1_vec), np.log(v_errQuad_r1), '--*', label='HER 1 $L^2$')
-plt.plot(np.log(h1_vec), np.log(h1_vec), '-v', label=r'$h$')
+plt.plot(np.log(h1_vec), np.log(v_errInf_r1), '-.+')
+# plt.plot(np.log(h1_vec), np.log(v_errQuad_r1), '--*', label='HER 1 $L^2$')
+# plt.plot(np.log(h1_vec), np.log(h1_vec), '-v', label=r'$h$')
 
-# # plt.plot(np.log(h1_vec), np.log(v_r2_atF), ':o', label='HHJ 2')
-# plt.plot(np.log(h1_vec), np.log(v_errInf_r2), '-.+', label='HHJ 2 $L^\infty$')
-# plt.plot(np.log(h1_vec), np.log(v_errQuad_r2), '--*', label='HHJ 2 $L^2$')
 plt.plot(np.log(h1_vec), np.log(h1_vec**2), '-v', label=r'$h^2$')
-plt.plot(np.log(h1_vec), np.log(h1_vec**3), '-v', label=r'$h^3$')
+# plt.plot(np.log(h1_vec), np.log(h1_vec**3), '-v', label=r'$h^3$')
 
-#
-# # plt.plot(np.log(h2_vec), np.log(v_r3_atF), ':o', label='HHJ 3')
-# plt.plot(np.log(h2_vec), np.log(v_errInf_r3), '-.+', label='HHJ 3 $L^\infty$')
-# plt.plot(np.log(h2_vec), np.log(v_errQuad_r3), '--*', label='HHJ 3 $L^2$')
-# plt.plot(np.log(h2_vec), np.log(h2_vec**3), '-v', label=r'$h^3$')
-
-plt.xlabel(r'log(Mesh size $h$)')
-plt.ylabel(r'log(Error Velocity)')
-plt.title(r'Velocity Error vs Mesh size')
+plt.xlabel('log(Mesh size $h$)')
+plt.ylabel('log(Error Velocity)')
+plt.title('Velocity Error vs Mesh size')
 plt.legend()
-path_fig = "/home/a.brugnoli/Plots/Python/Plots/Kirchhoff_plots/Convergence/firedrake/"
-if save_res:
+if save_fig:
     plt.savefig(path_fig  + bc_input + "_vel.eps", format="eps")
 
 sig_r1int_atF = np.polyfit(np.log(h1_vec), np.log(sig_err_r1), 1)[0]
@@ -452,52 +502,25 @@ print("Estimated order of convergence r=1 for sigma L2: " + str(sig_r1_L2))
 print("Interpolated order of convergence r=1 for sigma L2: " + str(sig_r1int_L2))
 print("")
 
-# sig_r2int = np.polyfit(np.log(h1_vec), np.log(sig_err_r2), 1)[0]
-# sig_r2int_max = np.polyfit(np.log(h1_vec), np.log(sig_errInf_r2), 1)[0]
-# sig_r2int_L2 = np.polyfit(np.log(h1_vec), np.log(sig_errQuad_r2), 1)[0]
-#
-# print("Estimated order of convergence r=2 for sigma at T fin: " + str(sig_r2_atF))
-# print("Interpolated order of convergence r=2 for sigma at T fin: " + str(sig_r2int))
-# print("Estimated order of convergence r=2 for sigma Linf: " + str(sig_r2_max))
-# print("Interpolated order of convergence r=2 for sigma Linf: " + str(sig_r2int_max))
-# print("Estimated order of convergence r=2 for sigma L2: " + str(sig_r2_L2))
-# print("Interpolated order of convergence r=2 for sigma L2: " + str(sig_r2int_L2))
-# print("")
-#
-# sig_r3int = np.polyfit(np.log(h2_vec), np.log(sig_err_r3), 1)[0]
-# sig_r3int_max = np.polyfit(np.log(h2_vec), np.log(sig_errInf_r3), 1)[0]
-# sig_r3int_L2 = np.polyfit(np.log(h2_vec), np.log(sig_errQuad_r3), 1)[0]
-#
-# print("Estimated order of convergence r=3 for sigma at T fin: " + str(sig_r3_atF))
-# print("Interpolated order of convergence r=3 for sigma at T fin: " + str(sig_r3int))
-# print("Estimated order of convergence r=3 for sigma Linf: " + str(sig_r3_max))
-# print("Interpolated order of convergence r=3 for sigma Linf: " + str(sig_r3int_max))
-# print("Estimated order of convergence r=3 for sigma L2: " + str(sig_r3_L2))
-# print("Interpolated order of convergence r=3 for sigma L2: " + str(sig_r3int_L2))
-# print("")
-
 plt.figure()
 
 # plt.plot(np.log(h1_vec), np.log(sig_r1_atF), ':o', label='HER 1')
-plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+', label='HER 1 $L^\infty$')
-plt.plot(np.log(h1_vec), np.log(sig_errQuad_r1), '--*', label='HER 1 $L^2$')
-plt.plot(np.log(h1_vec), np.log(h1_vec), '-v', label=r'$h$')
+plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+')
+# plt.plot(np.log(h1_vec), np.log(sig_errQuad_r1), '--*', label='HER 1 $L^2$')
+# plt.plot(np.log(h1_vec), np.log(h1_vec), '-v', label=r'$h$')
 
-# # plt.plot(np.log(h1_vec), np.log(sig_r2_atF), ':o', label='HER 2')
-# plt.plot(np.log(h1_vec), np.log(sig_errInf_r2), '-.+', label='HER 2 $L^\infty$')
-# plt.plot(np.log(h1_vec), np.log(sig_errQuad_r2), '--*', label='HER 2 $L^2$')
-plt.plot(np.log(h1_vec), np.log(h1_vec**2), '-v', label=r'$h^2$')
-plt.plot(np.log(h1_vec), np.log(h1_vec**3), '-v', label=r'$h^3$')
+plt.plot(np.log(h1_vec), np.log(h1_vec**2) - np.log(5), '-v', label=r'$h^2$')
+# plt.plot(np.log(h1_vec), np.log(h1_vec**3), '-v', label=r'$h^3$')
 
 # # plt.plot(np.log(h2_vec), np.log(sig_r3_atF), ':o', label='HHJ 3')
 # plt.plot(np.log(h2_vec), np.log(sig_errInf_r3), '-.+', label='HHJ 3 $L^\infty$')
 # plt.plot(np.log(h2_vec), np.log(sig_errQuad_r3), '--*', label='HHJ 3 $L^2$')
 # plt.plot(np.log(h2_vec), np.log(h2_vec**3), '-v', label=r'$h^3$')
 
-plt.xlabel(r'log(Mesh size $h$)')
-plt.ylabel(r'log(Error Stress)')
-plt.title(r'Stress Error vs Mesh size')
+plt.xlabel('log(Mesh size $h$)')
+plt.ylabel('log(Error Stress)')
+plt.title('Stress Error vs Mesh size')
 plt.legend()
-if save_res:
+if save_fig:
     plt.savefig(path_fig + bc_input + "_sigma.eps", format="eps")
 plt.show()
