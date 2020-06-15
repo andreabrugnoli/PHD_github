@@ -9,9 +9,28 @@ from scipy import integrate
 
 import matplotlib.pyplot as plt
 import matplotlib
-from matplotlib.ticker import FormatStrFormatter
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from tools_plotting.animate_surf import animate2D
 import matplotlib.animation as animation
+from matplotlib import cm
+
+SMALL_SIZE = 14
+MEDIUM_SIZE = 16
+BIGGER_SIZE = 18
+
+plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
+plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+from matplotlib import rcParams
+rcParams.update({'figure.autolayout': True})
+rcParams['text.usetex'] = True
+
+path_out = "/home/a.brugnoli/Plots/Python/Plots/Kirchhoff_plots/Simulations/Article_CDC/DampingInjection2/"
 
 
 E = 7e10
@@ -66,23 +85,24 @@ mesh = UnitSquareMesh(n_x, n_y, quadrilateral=False)
 # plot(mesh)
 # plt.show()
 
-nameFE = 'Bell'
-name_FEp = nameFE
-name_FEq = nameFE
+name_FEp = 'Bell'
+name_FEq = 'DG'
+deg_p = 5
+deg_q = 3
 
-if name_FEp == 'Morley':
-    deg_p = 2
-elif name_FEp == 'Hermite':
-    deg_p = 3
-elif name_FEp == 'Argyris' or name_FEp == 'Bell':
-    deg_p = 5
-
-if name_FEq == 'Morley':
-    deg_q = 2
-elif name_FEq == 'Hermite':
-    deg_q = 3
-elif name_FEq == 'Argyris' or name_FEq == 'Bell':
-    deg_q = 5
+# if name_FEp == 'Morley':
+#     deg_p = 2
+# elif name_FEp == 'Hermite':
+#     deg_p = 3
+# elif name_FEp == 'Argyris' or name_FEp == 'Bell':
+#     deg_p = 5
+#
+# if name_FEq == 'Morley':
+#     deg_q = 2
+# elif name_FEq == 'Hermite':
+#     deg_q = 3
+# elif name_FEq == 'Argyris' or name_FEq == 'Bell':
+#     deg_q = 5
 
 Vp = FunctionSpace(mesh, name_FEp, deg_p)
 Vq = VectorFunctionSpace(mesh, name_FEq, deg_q, dim=3)
@@ -137,8 +157,8 @@ M_pl = np.array(petsc_m.convert("dense").getDenseArray())
 n = FacetNormal(mesh)
 # s = as_vector([-n[1], n[0]])
 
-V_qn = FunctionSpace(mesh, 'Lagrange', 2)
-V_Mnn = FunctionSpace(mesh, 'Lagrange', 2)
+V_qn = FunctionSpace(mesh, 'Lagrange', 1)
+V_Mnn = FunctionSpace(mesh, 'Lagrange', 1)
 
 Vu = V_qn * V_Mnn
 q_n, M_nn = TrialFunction(Vu)
@@ -205,6 +225,8 @@ t_span = [t0, t_fin]
 
 def sys(t,y):
 
+    print(t/t_fin*100)
+
     if t < 0.2 * t_fin:
         dydt = invM_pl @ (Jsys @ y)
 
@@ -220,7 +242,7 @@ y0[:n_Vp] = e_p0.vector().get_local()
 
 t_ev = np.linspace(t0, t_fin, num = n_t)
 
-sol = integrate.solve_ivp(sys, t_span, y0, method='Radau', vectorized=False, t_eval = t_ev)
+sol = integrate.solve_ivp(sys, t_span, y0, method='RK45', vectorized=False, t_eval = t_ev)
 
 t_ev = sol.t
 
@@ -264,25 +286,68 @@ for i in range(n_ev):
     Hpl_vec[i] = 0.5 * (e_sol[:, i].T @ M_pl @ e_sol[:, i])
 
 
-matplotlib.rcParams['text.usetex'] = True
 fig, ax = plt.subplots()
-ax.yaxis.set_major_formatter(FormatStrFormatter('%.2e'))
-plt.plot(t_ev, Hpl_vec, 'b-', label='Hamiltonian Plate (J)')
-plt.xlabel(r'{Time} (s)', fontsize=16)
-plt.ylabel(r'{Hamiltonian} (J)', fontsize=16)
-plt.title(r"Hamiltonian trend",
-          fontsize=16)
-plt.legend(loc='upper left')
+ax.yaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
+plt.plot(t_ev, Hpl_vec, 'b-')
+plt.xlabel(r'{Time} $\mathrm{[s]}$')
+plt.ylabel(r'{Hamiltonian} $\mathrm{[J]}$')
+plt.title(r"Hamiltonian")
+# plt.legend(loc='upper left')
 
-plt.show()
+plt.savefig(path_out + "Hamiltonian.eps", format="eps")
+
+plot_solutions = False
+if plot_solutions:
+
+
+    n_fig = 8
+    tol = 1e-6
+
+    for i in range(n_fig):
+        index = int(n_ev/n_fig*(i+1)-1)
+        w_fun = Function(Vp)
+        w_fun.vector()[:] = w_mm[:, index]
+
+        Vp_CG = FunctionSpace(mesh, 'Lagrange', 3)
+        wmm_wCG = project(w_fun, Vp_CG)
+
+        from firedrake.plot import _two_dimension_triangle_func_val
+
+        triangulation, Z = _two_dimension_triangle_func_val(wmm_wCG, 10)
+        fig = plt.figure()
+
+        ax = fig.add_subplot(111, projection="3d")
+        ax.collections.clear()
+
+        surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False} #, 'vmin': minZ, 'vmax': maxZ}
+        lab = 'Time =' + '{0:.2f}'.format(t_ev[index])
+        surf = ax.plot_trisurf(triangulation, Z, **surf_opts)
+        # fig.colorbar(surf)
+
+        ax.set_xbound(-tol, l_x + tol)
+        ax.set_xlabel('$x \;  \mathrm{[m]}$')
+
+        ax.set_ybound(-tol, l_y + tol)
+        ax.set_ylabel('$y \;  \mathrm{[m]}$')
+
+        ax.w_zaxis.set_major_locator(LinearLocator(10))
+        ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2f'))
+
+        ax.set_zlabel('$w \;  \mathrm{[\mu m]}$')
+        ax.set_title('Vertical displacement ' +'$(t=$' + '{0:.2f}'.format(t_ev[index]) + '$\mathrm{[s]})$')
+        # ax.set_title('Vertical displacement ' +'$(t=$' + str(t_ev[index]) + '$\mathrm{[s]})$')
+
+        ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
+
+        plt.savefig(path_out + "Snapshot_t" + str(index + 1) + ".eps", format="eps")
 
 
 
 anim = animate2D(minZ, maxZ, wmm_CGvec, t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \
                          zlabel = '$w [mm]$', title = 'Vertical Displacement')
 
-# Writer = animation.writers['ffmpeg']
-# writer = Writer(fps=25, metadata=dict(artist='Me'), bitrate=1800)
+Writer = animation.writers['ffmpeg']
+writer = Writer(fps=25, metadata=dict(artist='Me'), bitrate=1800)
 # anim.save('Kirchh_NoRod.mp4', writer=writer)
 
 plt.show()

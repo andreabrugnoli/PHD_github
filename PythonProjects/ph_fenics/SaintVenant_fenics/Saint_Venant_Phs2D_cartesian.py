@@ -11,7 +11,22 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from mpl_toolkits.mplot3d import Axes3D
 
-matplotlib.rcParams['text.usetex'] = True
+
+SMALL_SIZE = 14
+MEDIUM_SIZE = 16
+BIGGER_SIZE = 18
+
+plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
+plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+from matplotlib import rcParams
+rcParams.update({'figure.autolayout': True})
+rcParams['text.usetex'] = True
 
 from scipy import integrate
 from scipy import linalg as la
@@ -309,12 +324,13 @@ for i in range(n_ev):
     V_vec[i] = LyaFunc(alp_sol[:,i], alq_sol[:,i])
 
 fntsize = 16
-path_out = "/home/a.brugnoli/PycharmProjects/fenics/SaintVenant_fenics/Simulations/TwoDimension/"
+path_out = "/home/a.brugnoli/Plots/Python/Plots/SaintVenant_plots/Simulations/TwoDimension/"
 
 plt.figure()
 plt.plot(t_ev, H_vec, 'r-')
 plt.xlabel(r'{Time} (s)',fontsize=fntsize)
-plt.ylabel('Total Energy (J)' ,fontsize=fntsize)
+plt.ylabel('Hamiltonian $\mathrm{[J]}$' ,fontsize=fntsize)
+plt.title(r"Hamiltonian")
 
 plt.savefig(path_out + "Hamiltonian.eps", format="eps")
 
@@ -322,6 +338,7 @@ plt.figure()
 plt.plot(t_ev, V_vec, 'g-', label = 'Lyapunov Function (J)')
 plt.xlabel(r'{Time} (s)',fontsize=fntsize)
 plt.ylabel('Lyapunov Function (J)' ,fontsize=fntsize)
+plt.title(r"Lyapunov function")
 
 plt.savefig(path_out + "Lyapunov.eps", format="eps")
 

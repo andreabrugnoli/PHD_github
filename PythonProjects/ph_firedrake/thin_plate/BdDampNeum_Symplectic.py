@@ -12,15 +12,28 @@ from scipy.sparse.linalg import inv as inv_sp
 import matplotlib.pyplot as plt
 import matplotlib
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
-from matplotlib import cm
 from tools_plotting.animate_surf import animate2D
-from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as animation
+from matplotlib import cm
+
+SMALL_SIZE = 14
+MEDIUM_SIZE = 16
+BIGGER_SIZE = 18
+
+plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
+plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+from matplotlib import rcParams
+rcParams.update({'figure.autolayout': True})
+rcParams['text.usetex'] = True
+
 
 from thin_plate.symplectic_integrators import StormerVerletGrad
-
-
-matplotlib.rcParams['text.usetex'] = True
 
 
 E = 7e10
@@ -88,27 +101,11 @@ mesh = UnitSquareMesh(n_x, n_y, quadrilateral=False)
 
 # plot(mesh)
 # plt.show()
+name_FEp = 'Bell'
+name_FEq = 'DG'
 
-nameFE = 'Bell'
-name_FEp = nameFE
-name_FEq = nameFE
-
-if name_FEp == 'Morley':
-    deg_p = 2
-elif name_FEp == 'Hermite':
-    deg_p = 3
-elif name_FEp == 'Argyris' or name_FEp == 'Bell':
-    deg_p = 5
-
-if name_FEq == 'Morley':
-    deg_q = 2
-elif name_FEq == 'Hermite':
-    deg_q = 3
-elif name_FEq == 'Argyris' or name_FEq == 'Bell':
-    deg_q = 5
-
-Vp = FunctionSpace(mesh, name_FEp, deg_p)
-Vq = VectorFunctionSpace(mesh, name_FEq, deg_q, dim=3)
+Vp = FunctionSpace(mesh, name_FEp, 5)
+Vq = VectorFunctionSpace(mesh, name_FEq, 3, dim=3)
 
 n_Vp = Vp.dim()
 n_Vq = Vq.dim()
@@ -186,9 +183,9 @@ q_n, M_nn = TrialFunction(Vu)
 
 v_omn = dot(grad(v_p), n)
 
-b_bd = v_p * q_n * ds(2) + v_omn * M_nn * ds(2)
-# b_bd = v_p * q_n * ds(2) + v_omn * M_nn * ds(2) \
-#         + v_p * q_n * ds(3) + v_omn * M_nn * ds(3) + v_p * q_n * ds(4) + v_omn * M_nn * ds(4)
+# b_bd = v_p * q_n * ds(2) + v_omn * M_nn * ds(2)
+b_bd = v_p * q_n * ds(2) + v_omn * M_nn * ds(2) \
+        + v_p * q_n * ds(3) + v_omn * M_nn * ds(3) + v_p * q_n * ds(4) + v_omn * M_nn * ds(4)
 b_mul = v_p * q_n * ds(1) + v_omn * M_nn * ds(1)
 
 # Assemble the stiffness matrix and the mass matrix.
@@ -234,14 +231,10 @@ n_ev = 1000
 
 x, y = SpatialCoordinate(mesh)
 Aw = 0.001
-# init_p = Aw*(1 - cos(2*pi/l_x*x) )
-init_p = Expression('A*( pow(x[0], 2))', \
-                    degree=4, lx=l_x, ly=l_y, A = 0.001)
-init_q = Expression(('0', '0', '0'), degree=4, lx=l_x, ly=l_y)
 
 e_pw_0 = Function(Vp)
-e_pw_0.assign(project(init_p, Vp))
-ep_0 = e_pw_0.vector().get_local() #
+e_pw_0.assign(project(Aw*x**2, Vp))
+ep_0 = e_pw_0.vector().get_local()
 eq_0 = np.zeros((n_Vq))
 
 solverSym = StormerVerletGrad(M_p, M_q, D_p, D_q, R_p, P_p)
@@ -293,7 +286,6 @@ print(minZ)
 #     plt.ioff()
 # plt.close('all')
 
-fntsize = 16
 H_vec = np.zeros((n_ev,))
 
 for i in range(n_ev):
@@ -302,35 +294,22 @@ for i in range(n_ev):
 matplotlib.rcParams['text.usetex'] = True
 fig, ax = plt.subplots()
 ax.yaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
-plt.plot(t_ev, H_vec, 'b-', label='Hamiltonian Plate (J)')
-plt.xlabel(r'{Time} (s)', fontsize=fntsize)
-plt.ylabel(r'{Hamiltonian} (J)', fontsize=fntsize)
-# plt.title(r"Hamiltonian trend",
-#           fontsize=fntsize)
+plt.plot(t_ev, H_vec, 'b-')
+plt.xlabel(r'{Time} (s)')
+plt.ylabel(r'{Hamiltonian} $\mathrm{[J]}$')
+plt.title(r"Hamiltonian")
 # plt.legend(loc='upper left')
-path_out = "/home/a.brugnoli/Plots_Videos/Plots/Kirchhoff_plots/Simulations/Article_CDC/DampingInjection/"
-# plt.savefig(path_out + "Hamiltonian.eps", format="eps")
+path_out = "/home/a.brugnoli/Plots/Python/Plots/Kirchhoff_plots/Simulations/Article_CDC/DampingInjection2/"
 
+plt.savefig(path_out + "Hamiltonian.eps", format="eps")
 
-anim = animate2D(minZ, maxZ, wmm_CGvec, t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \
-                         zlabel = '$w [\mu m]$', title = 'Vertical Displacement')
-
-
-# rallenty = 10
-# Writer = animation.writers['ffmpeg']
-# writer = Writer(fps=int(n_ev/(t_f*rallenty)), metadata=dict(artist='Me'), bitrate=1800)
-# anim.save(path_out + 'Kirchh_Damped.mp4', writer=writer)
-
-plt.show()
 
 
 plot_solutions = True
 if plot_solutions:
 
 
-    matplotlib.rcParams['text.usetex'] = True
-
-    n_fig = 200
+    n_fig = 50
     tol = 1e-6
 
     for i in range(n_fig):
@@ -350,22 +329,37 @@ if plot_solutions:
         ax.collections.clear()
 
         surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False} #, 'vmin': minZ, 'vmax': maxZ}
-        # lab = 'Time =' + '{0:.2e}'.format(t_ev[index])
+        lab = 'Time =' + '{0:.2f}'.format(t_ev[index])
         surf = ax.plot_trisurf(triangulation, Z, **surf_opts)
         # fig.colorbar(surf)
 
         ax.set_xbound(-tol, l_x + tol)
-        ax.set_xlabel('$x [m]$', fontsize=fntsize)
+        ax.set_xlabel('$x \;  \mathrm{[m]}$')
 
         ax.set_ybound(-tol, l_y + tol)
-        ax.set_ylabel('$y [m]$', fontsize=fntsize)
+        ax.set_ylabel('$y \;  \mathrm{[m]}$')
 
         ax.w_zaxis.set_major_locator(LinearLocator(10))
-        ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
+        ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2f'))
 
-        ax.set_zlabel('$w [\mu m]$', fontsize=fntsize)
-        ax.set_title('Vertical displacement ' +'$(t=$' + '{0:.2e}'.format(t_ev[index]) + '$s)$', fontsize=fntsize)
+        ax.set_zlabel('$w \;  \mathrm{[\mu m]}$')
+        ax.set_title('Vertical displacement ' +'$(t=$' + '{0:.2f}'.format(t_ev[index]) + '$\mathrm{[s]})$')
+        # ax.set_title('Vertical displacement ' +'$(t=$' + str(t_ev[index]) + '$\mathrm{[s]})$')
 
         ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
 
         plt.savefig(path_out + "Snapshot_t" + str(index + 1) + ".eps", format="eps")
+
+
+plt.show()
+
+# anim = animate2D(minZ, maxZ, wmm_CGvec, t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \
+#                          zlabel = '$w [\mu m]$', title = 'Vertical Displacement')
+
+
+# rallenty = 10
+# Writer = animation.writers['ffmpeg']
+# writer = Writer(fps=int(n_ev/(t_f*rallenty)), metadata=dict(artist='Me'), bitrate=1800)
+# anim.save(path_out + 'Kirchh_Damped.mp4', writer=writer)
+
+# plt.show()
