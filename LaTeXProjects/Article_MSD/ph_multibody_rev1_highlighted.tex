@@ -1334,7 +1334,7 @@ In this section numerical simulations are performed to assess the correctness of
 \end{figure}
 
 \secondRev{
-\subsection{Convergence test for a manufactured solution}
+\subsection{Convergence test for an analytical solution}
 We consider the following exact solution for the Euler-Bernoulli beam under simply supported boundary conditions
 \begin{equation*}
 \begin{aligned}
@@ -1527,7 +1527,7 @@ Setting the initial conditions properly is of utmost  importance for a DAE solve
 \end{table}
 
 \subsection{Hinged spatial beam}
-A spatial beam rotating about a spherical joint is considered (see Fig. \ref{fig:beam_3D}). This example was considered in \cite{Cardona2000,Ellenbroek2018}. The physical parameters are briefly recalled in Table \ref{tab:data_3Dbeam}. The spherical joint constraint is imposed by setting to zero the linear velocity, while a cantilever is imposed for the deformation field as the tip is free. For the first $10.2 [\mathrm{s}]$ a torque $ M_z =200 [\mathrm{N/mm}]$ is applied about the vertical axis. Then, an impulsive force $ F_z =100 [\mathrm{N}]$ is applied at the tip of the beam at $15 [\mathrm{s}]$, to excite the out-of-plane movement. The system is solved using an implicit Runge-Kutta method of the Radau IIA family \secondRev{(see Tab. \ref{tab:comp_perf_hinged} for the computational performance of this test case} The simulation results, provided in Fig. \ref{fig:H_omega}, correspond to the total energy and the angular velocity measured in the inertial vertical direction. The result matches with the provided references. Indeed the non-linearities associated to the gyroscopic terms are small as the maximum angular velocity is equal to $0.1 \ [\mathrm{rad/s}] \approx 5 \ [\mathrm{deg/s}]$. 
+A spatial beam rotating about a spherical joint is considered (see Fig. \ref{fig:beam_3D}). This example was considered in \cite{Cardona2000,Ellenbroek2018}. The physical parameters are briefly recalled in Table \ref{tab:data_3Dbeam}. The spherical joint constraint is imposed by setting to zero the linear velocity, while a cantilever is imposed for the deformation field as the tip is free. For the first $10.2 [\mathrm{s}]$ a torque $ M_z =200 [\mathrm{N/mm}]$ is applied about the vertical axis. Then, an impulsive force $ F_z =100 [\mathrm{N}]$ is applied at the tip of the beam at $15 [\mathrm{s}]$, to excite the out-of-plane movement. The system is solved using an implicit Runge-Kutta method of the Radau IIA family \secondRev{(see Tab. \ref{tab:comp_perf_hinged} for the computational performance of this test case)}. The simulation results, provided in Fig. \ref{fig:H_omega}, correspond to the total energy and the angular velocity measured in the inertial vertical direction. The result matches with the provided references. Indeed the non-linearities associated to the gyroscopic terms are small as the maximum angular velocity is equal to $0.1 \ [\mathrm{rad/s}] \approx 5 \ [\mathrm{deg/s}]$. 
 
 \begin{figure}[tb]
 	\centering
@@ -1753,8 +1753,8 @@ Notice that $2 \crmat{\bm{v}_f}\bm{v}_P + 2 \crmat{\bm{v}_P}\bm{v}_f = 0$. Using
 \end{equation}
 Indeed, Eqs. \eqref{eq:rig_tr5}, \eqref{eq:rig_rot5}, \eqref{eq:flex5} are exactly \eqref{eq:rig_tr2}, \eqref{eq:rig_rot2}, \eqref{eq:flex2}. Now by definitions \eqref{eq:mod_momenta}, \eqref{eq:mod_momentafl}
 \begin{align*}
-\widetilde{\bm{p}}_t &= m \bm{v}_P + \crmat{\bm{s}_u}^\top \bm\omega_P +2 \int_{\Omega} \rho \bm{v}_f \d{\Omega}, \\
-\widetilde{\bm{p}}_r &= \crmat{\bm{s}_u} \bm{v}_P + \bm{J}_u \bm\omega_P + 2 \int_{\Omega} \rho \crmat{\bm{x}_f} {\bm{v}}_f \d{\Omega}, \\
+\widehat{\bm{p}}_t &= m \bm{v}_P + \crmat{\bm{s}_u}^\top \bm\omega_P +2 \int_{\Omega} \rho \bm{v}_f \d{\Omega}, \\
+\widehat{\bm{p}}_r &= \crmat{\bm{s}_u} \bm{v}_P + \bm{J}_u \bm\omega_P + 2 \int_{\Omega} \rho \crmat{\bm{x}_f} {\bm{v}}_f \d{\Omega}, \\
 \bm{\mathcal{I}}_{p_f}^\Omega(\cdot) &= \int_{\Omega} \left[ 2 \left(\rho \crmat{\bm{v}_P} + \rho \crmat{\crmat{\bm{x}_f}^\top \, \bm\omega_P} +\rho \crmat{\bm{v}_f}\right) + \rho \crmat{\bm{v}_f} \right] (\cdot) \d{\Omega}, 
 \end{align*}
 Eqs. \eqref{eq:rig_tr3}, \eqref{eq:rig_rot3}, \eqref{eq:flex3} are written as 
@@ -1765,8 +1765,8 @@ Eqs. \eqref{eq:rig_tr3}, \eqref{eq:rig_rot3}, \eqref{eq:flex3} are written as
 \bm{v}_P \\ \bm\omega_P  \\ \bm{v}_f  \\ \bm\Sigma \\
 \end{bmatrix} = 
 \begin{bmatrix}
-0 & \crmat{\widetilde{\bm{p}}_t} & 0 & 0 \\
-\crmat{\widetilde{\bm{p}}_t} & \crmat{\widetilde{\bm{p}}_r} & \bm{\mathcal{I}}_{p_f}^\Omega & 0 \\
+0 & \crmat{\widehat{\bm{p}}_t} & 0 & 0 \\
+\crmat{\widehat{\bm{p}}_t} & \crmat{\widehat{\bm{p}}_r} & \bm{\mathcal{I}}_{p_f}^\Omega & 0 \\
 0 & -(\bm{\mathcal{I}}_{p_f}^\Omega)^* & 0 & \Div \\
 0 & 0 & \Grad & 0 \\
 \end{bmatrix}

@@ -1,6 +1,20 @@
 import matplotlib.pyplot as plt
 plt.rc('text', usetex=True)
-fntsize = 15
+
+SMALL_SIZE = 14
+MEDIUM_SIZE = 16
+BIGGER_SIZE = 18
+
+plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
+plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+from matplotlib import rcParams
+rcParams.update({'figure.autolayout': True})
 
 import numpy as np
 import scipy.linalg as la
@@ -231,7 +245,6 @@ else:
 
 
 path_fig = "/home/a.brugnoli/Plots/Python/Plots/Multibody_PH/CrankSlider/"
-fntsize = 16
 
 H_vec = np.zeros((n_ev,))
 for i in range(n_ev):
@@ -239,10 +252,9 @@ for i in range(n_ev):
 
 fig = plt.figure()
 plt.plot(t_ev, H_vec, 'b-')
-plt.xlabel(r'{Time} (s)', fontsize=fntsize)
-plt.ylabel(r'{Hamiltonian} (J)', fontsize=fntsize)
-plt.title(r"Hamiltonian crank slider",
-          fontsize=fntsize)
+plt.xlabel(r'{Time} (s)')
+plt.ylabel(r'{Hamiltonian} (J)')
+plt.title(r"Hamiltonian crank slider")
 # plt.savefig(path_fig + 'Hamiltonian.eps', format="eps")
 
 # n_ev = len(t_sol)
@@ -289,22 +301,22 @@ wM_B = r_sol.y[1, :]
 
 fig = plt.figure()
 plt.plot(omega_cr*t_ev, om_cl_sol, 'b-')
-plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
-plt.ylabel(r'$\omega^z_{cl}$ [rad/s]', fontsize = fntsize)
-plt.title(r"Angular velocity coupler", fontsize=fntsize)
+plt.xlabel(r'Crank angle $\mathrm{[rad]}$')
+plt.ylabel(r'$\omega^z_{cl}$ [rad/s]')
+plt.title(r"Angular velocity coupler")
 
 fig = plt.figure()
 plt.plot(omega_cr*t_ev, uM_B/L_coupler, 'b-')
-plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
-plt.ylabel(r'$u_f/L_{cl}$ along $x$', fontsize = fntsize)
-plt.title(r"Midpoint horizontal deflection", fontsize=fntsize)
+plt.xlabel(r'Crank angle $\mathrm{[rad]}$')
+plt.ylabel(r'$u_f^x/L_{cl}$')
+plt.title(r"Midpoint horizontal deflection")
 plt.savefig(path_fig + 'uM_disp.eps', format="eps")
 
 fig = plt.figure()
 plt.plot(omega_cr*t_ev, wM_B/L_coupler, 'b-')
-plt.xlabel(r'Crank angle [rad]', fontsize = fntsize)
-plt.ylabel(r'$u_f/L_{cl}$ along $y$', fontsize = fntsize)
-plt.title(r"Midpoint vertical deflection", fontsize=fntsize)
+plt.xlabel(r'Crank angle $\mathrm{[rad]}$')
+plt.ylabel(r'$u_f^y/L_{cl}$')
+plt.title(r"Midpoint vertical deflection")
 axes = plt.gca()
 axes.set_ylim([-0.015, 0.02])
 plt.savefig(path_fig + 'wM_disp.eps', format="eps")

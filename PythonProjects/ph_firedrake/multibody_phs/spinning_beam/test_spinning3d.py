@@ -1,6 +1,20 @@
 import matplotlib.pyplot as plt
 plt.rc('text', usetex=True)
-fntsize = 16
+
+SMALL_SIZE = 14
+MEDIUM_SIZE = 16
+BIGGER_SIZE = 18
+
+plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
+plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+from matplotlib import rcParams
+rcParams.update({'figure.autolayout': True})
 
 import numpy as np
 import quaternion
@@ -21,7 +35,7 @@ def skew(x):
                      [-x[1], x[0], 0]])
 
 
-save = False
+save = True
 
 # L_beam = 0.14142
 # rho_beam = 7.8 * 10 ** (6)
@@ -133,7 +147,7 @@ def sys(t,y):
     J[n_r:n_r + n_p, :n_r] = Jf_om + Jf_om_cor
     J[:n_r, n_r:n_r + n_p] = -2 * Jf_om.T
 
-    dedt = invM @ (J @ y_e + B_Mz0 * Mz_0 + B_FzL * Fz_L)
+    # dedt = invM @ (J @ y_e + B_Mz0 * Mz_0 + B_FzL * Fz_L)
 
     act_quat = np.quaternion(y_quat[0], y_quat[1], y_quat[2], y_quat[3])
     Rot_mat = quaternion.as_rotation_matrix(act_quat)
@@ -228,12 +242,19 @@ H_vec = np.zeros((n_ev,))
 for i in range(n_ev):
     H_vec[i] = 0.5 * (e_sol[:, i].T @ M @ e_sol[:, i])
 
+# fig = plt.figure()
+# plt.plot(t_ev, H_vec, 'b-')
+# plt.xlabel('{Time} $[\mathrm{s}]$', fontsize=fntsize)
+# plt.ylabel('{Hamiltonian} $[\mathrm{kg \cdot mm^2/s^2}]$', fontsize=fntsize)
+# plt.title("Hamiltonian spinning beam",
+#           fontsize=fntsize)
+
 fig = plt.figure()
 plt.plot(t_ev, H_vec, 'b-')
-plt.xlabel(r'{Time} (s)', fontsize=fntsize)
-plt.ylabel(r'{Hamiltonian} (J)', fontsize=fntsize)
-plt.title(r"Hamiltonian spinning beam",
-          fontsize=fntsize)
+plt.xlabel('{Time} $[\mathrm{s}]$')
+plt.ylabel('{Hamiltonian} $[\mathrm{kg \cdot mm^2/s^2}]$')
+plt.title("Hamiltonian spinning beam")
+
 if save:
     plt.savefig(path_fig + 'Hamiltonian.eps', format="eps")
 
@@ -254,11 +275,25 @@ for i in range(n_ev):
 # plt.ylabel("$\omega_y$", fontsize=fntsize)
 # plt.title("Angular velocity along y in I", fontsize=fntsize)
 
+# plt.figure()
+# plt.plot(t_sol, omI_sol[2], 'r')
+# plt.xlabel("Time $[\mathrm{s}]$", fontsize=fntsize)
+# plt.ylabel("$\omega_z \ [\mathrm{rad/s}]$", fontsize=fntsize)
+# plt.title(r"Angular velocity along $\widehat{\mathbf{Z}}$", fontsize=fntsize)
+# axes = plt.gca()
+# axes.set_ylim([-0.04, 0.1])
+
+# plt.figure()
+# plt.plot(t_sol, omI_sol[2], 'r')
+# plt.xlabel("Time $[\mathrm{s}]$", fontsize=fntsize)
+# plt.ylabel("$\omega_z \ [\mathrm{rad/s}]$", fontsize=fntsize)
+# plt.title(r"Angular velocity along $\widehat{\mathbf{Z}}$", fontsize=fntsize)
+
 plt.figure()
 plt.plot(t_sol, omI_sol[2], 'r')
-plt.xlabel("Time $[\mathrm{s}]$", fontsize=fntsize)
-plt.ylabel("$\omega_z \ [\mathrm{rad/s}]$", fontsize=fntsize)
-plt.title("Angular velocity along z in I", fontsize=fntsize)
+plt.xlabel("Time $[\mathrm{s}]$")
+plt.ylabel("$\omega_z \ [\mathrm{rad/s}]$")
+plt.title(r"Angular velocity along $\widehat{\mathbf{Z}}$")
 axes = plt.gca()
 axes.set_ylim([-0.04, 0.1])
 if save:

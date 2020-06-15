@@ -1,6 +1,21 @@
 import matplotlib.pyplot as plt
 plt.rc('text', usetex=True)
-fntsize = 15
+plt.rc('text', usetex=True)
+
+SMALL_SIZE = 14
+MEDIUM_SIZE = 16
+BIGGER_SIZE = 18
+
+plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
+plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+from matplotlib import rcParams
+rcParams.update({'figure.autolayout': True})
 
 import numpy as np
 import scipy.linalg as la
@@ -155,9 +170,9 @@ def draw_mechanism(eig_r, eig_p, th1, n_dr):
     xIdef_mech = np.hstack((xIdef_cr, xIdef_cl, xIdef_fl))
 
     plt.plot(xI_mech[0, :], xI_mech[1, :], 'r', xIdef_mech[0, :], xIdef_mech[1, :], 'b')
-    plt.legend(("Undeformed", "Deformed"), shadow=True, fontsize=fntsize)
-    plt.xlabel(r'Coordinate $x [m]$', {'fontsize': fntsize})
-    plt.ylabel(r'Coordinate $y [m]$', {'fontsize': fntsize})
+    plt.legend(("Undeformed", "Deformed"), shadow=True)
+    plt.xlabel(r'Coordinate $x [m]$')
+    plt.ylabel(r'Coordinate $y [m]$')
 
 
 def construct_mech(n_elem, theta_cr):
@@ -289,18 +304,18 @@ def omegatheta_plot(n_elem, theta_vec, n_om):
     plt.plot(theta_vec*180/pi, omega_vec[:, 1], label="Present $\omega_2$")
     plt.plot(angles_Matlab, mode1_Matlab, label="Chebbi $\omega_1$")
     plt.plot(angles_Matlab, mode2_Matlab, label="Chebbi $\omega_2$")
-    plt.legend(shadow=True, fontsize=fntsize)
-    plt.xlabel(r'Crank angle $\theta$ [deg]', {'fontsize': fntsize})
-    plt.ylabel(r'Eigenfrequencies [rad/s]', {'fontsize': fntsize})
+    plt.legend(shadow=True)
+    plt.xlabel(r'Crank angle $\theta\; \mathrm{[deg]}$')
+    plt.ylabel(r'Eigenfrequencies $\mathrm{[rad/s]}$')
 
     plt.savefig(path_fig + 'FourBar_Om12_Chebby.eps', format="eps")
 
     plt.figure()
     plt.plot(theta_vec*180/pi, omega_vec[:, 2], label="Present $\omega_3$")
     plt.plot(angles_Matlab, mode3_Matlab, label="Chebbi $\omega_3$")
-    plt.legend(shadow=True, fontsize=fntsize)
-    plt.xlabel(r'Crank angle $\theta$ [deg]', {'fontsize': fntsize})
-    plt.ylabel(r'Eigenfrequencies [rad/s]', {'fontsize': fntsize})
+    plt.legend(shadow=True)
+    plt.xlabel(r'Crank angle $\theta \; \mathrm{[deg]}$')
+    plt.ylabel(r'Eigenfrequencies $\mathrm{[rad/s]}$')
 
     plt.savefig(path_fig + 'FourBar_Om3_Chebby.eps', format="eps")
 
