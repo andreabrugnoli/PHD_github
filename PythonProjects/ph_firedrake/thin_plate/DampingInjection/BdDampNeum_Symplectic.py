@@ -46,9 +46,9 @@ L = 1
 l_x = L
 l_y = L
 
-z_imp = 100
+z_imp = 5
 
-n = 4 #int(input("N element on each side: "))
+n = 6 #int(input("N element on each side: "))
 
 # Plate bending stiffness :math:`D=\dfrac{Eh^3}{12(1-\nu^2)}` and shear stiffness :math:`F = \kappa Gh`
 # with a shear correction factor :math:`\kappa = 5/6` for a homogeneous plate
@@ -175,13 +175,16 @@ M_q = np.array(petsc_m_q.convert("dense").getDenseArray())
 n = FacetNormal(mesh)
 # s = as_vector([-n[1], n[0]])
 
-V_qn = FunctionSpace(mesh, 'Lagrange', 2)
-V_Mnn = FunctionSpace(mesh, 'Lagrange', 2)
+V_qn = FunctionSpace(mesh, 'Lagrange', 1)
+V_Mnn = FunctionSpace(mesh, 'Lagrange', 1)
 
 Vu = V_qn * V_Mnn
 q_n, M_nn = TrialFunction(Vu)
 
+
+
 v_omn = dot(grad(v_p), n)
+
 
 # b_bd = v_p * q_n * ds(2) + v_omn * M_nn * ds(2)
 b_bd = v_p * q_n * ds(2) + v_omn * M_nn * ds(2) \
@@ -199,7 +202,18 @@ Bbd_pl = Bbd_pl[:, bd_dofs_ctrl]
 
 n_ctrl = len(bd_dofs_ctrl)
 
-Z = np.eye(n_ctrl) * z_imp
+v_wt, v_omn = TestFunction(Vu)
+
+m_partial = v_wt * q_n * ds(2) + v_omn * M_nn * ds(2) \
+        + v_wt * q_n * ds(3) + v_omn * M_nn * ds(3) + v_wt * q_n * ds(4) + v_omn * M_nn * ds(4)
+
+M_part = assemble(m_partial,  mat_type='aij')
+petsc_mpart = M_part.M.handle
+
+M_partial= np.array(petsc_mpart.convert("dense").getDenseArray())
+M_partial = M_partial[:, bd_dofs_ctrl][bd_dofs_ctrl, :]
+
+Z = la.inv(M_partial) * z_imp
 
 R_p = Bbd_pl @ Z @ Bbd_pl.T
 
@@ -233,7 +247,7 @@ x, y = SpatialCoordinate(mesh)
 Aw = 0.001
 
 e_pw_0 = Function(Vp)
-e_pw_0.assign(project(Aw*x**2, Vp))
+e_pw_0.assign(project(Aw*x**2*cos(2*pi*y), Vp))
 ep_0 = e_pw_0.vector().get_local()
 eq_0 = np.zeros((n_Vq))
 
@@ -241,9 +255,16 @@ solverSym = StormerVerletGrad(M_p, M_q, D_p, D_q, R_p, P_p)
 
 sol = solverSym.compute_sol(ep_0, eq_0, t_f, t_0 = t_0, dt = dt, n_ev = n_ev)
 
+
+path_res = "/home/a.brugnoli/LargeFiles/results_DampKirchh/"
+
 t_ev = sol.t_ev
 ep_sol = sol.ep_sol
 eq_sol = sol.eq_sol
+
+np.save(path_res + "t_ev", t_ev)
+np.save(path_res + "ep_sol", ep_sol)
+np.save(path_res + "eq_sol", eq_sol)
 
 n_ev = len(t_ev)
 
@@ -295,7 +316,7 @@ matplotlib.rcParams['text.usetex'] = True
 fig, ax = plt.subplots()
 ax.yaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
 plt.plot(t_ev, H_vec, 'b-')
-plt.xlabel(r'{Time} (s)')
+plt.xlabel(r'{Time} $\mathrm{[s]}$')
 plt.ylabel(r'{Hamiltonian} $\mathrm{[J]}$')
 plt.title(r"Hamiltonian")
 # plt.legend(loc='upper left')
@@ -303,6 +324,16 @@ path_out = "/home/a.brugnoli/Plots/Python/Plots/Kirchhoff_plots/Simulations/Arti
 
 plt.savefig(path_out + "Hamiltonian.eps", format="eps")
 
+anim = animate2D(minZ, maxZ, wmm_CGvec, t_ev, xlabel = '$x \;  \mathrm{[m]}$', ylabel = '$y \;  \mathrm{[m]}$', \
+                         zlabel = '$w \;  \mathrm{[\mu m]}$', title = 'Vertical Displacement')
+
+
+rallenty = 10
+Writer = animation.writers['ffmpeg']
+# writer = Writer(fps=int(n_ev/(t_f*rallenty)), metadata=dict(artist='Me'), bitrate=1800)
+writer = Writer(fps=25, metadata=dict(artist='Me'), bitrate=1800)
+
+anim.save(path_out + 'Kirchh_Damped.mp4', writer=writer)
 
 
 plot_solutions = True
@@ -351,15 +382,4 @@ if plot_solutions:
         plt.savefig(path_out + "Snapshot_t" + str(index + 1) + ".eps", format="eps")
 
 
-plt.show()
 
-# anim = animate2D(minZ, maxZ, wmm_CGvec, t_ev, xlabel = '$x[m]$', ylabel = '$y [m]$', \
-#                          zlabel = '$w [\mu m]$', title = 'Vertical Displacement')
-
-
-# rallenty = 10
-# Writer = animation.writers['ffmpeg']
-# writer = Writer(fps=int(n_ev/(t_f*rallenty)), metadata=dict(artist='Me'), bitrate=1800)
-# anim.save(path_out + 'Kirchh_Damped.mp4', writer=writer)
-
-# plt.show()

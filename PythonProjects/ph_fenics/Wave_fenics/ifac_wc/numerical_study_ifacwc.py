@@ -2,8 +2,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 from fenics import *
 import meshio
+SMALL_SIZE = 14
+MEDIUM_SIZE = 16
+BIGGER_SIZE = 18
 
-plt.rc('text', usetex=True)
+plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
+plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+from matplotlib import rcParams
+rcParams.update({'figure.autolayout': True})
+rcParams['text.usetex'] = True
 
 parameters['allow_extrapolation'] = True
 
@@ -66,7 +79,6 @@ ds2_ref = Measure('ds', domain=mesh2_ref)
 
 
 n_mesh = 7
-fntsize = 16
 
 t_elapsed_dae = np.zeros(n_mesh)
 t_elapsed_ode = np.zeros(n_mesh)
@@ -76,14 +88,14 @@ errHode = np.zeros(n_mesh)
 
 h_vec = np.zeros(n_mesh)
 plt.figure(0)
-plt.xlabel(r'Time (s)', fontsize=fntsize)
-plt.ylabel(r'$H_{DAE}$', fontsize=fntsize)
-plt.title(r"Hamiltonian given by DAE", fontsize=fntsize)
+plt.xlabel(r'Time $\mathrm{[s]}$')
+plt.ylabel(r'$H_{DAE}$')
+plt.title(r"Hamiltonian given by DAE")
 
 plt.figure(1)
-plt.xlabel(r'Time (s)', fontsize=fntsize)
-plt.ylabel(r'$H_{ODE}$', fontsize=fntsize)
-plt.title(r"Hamiltonian given by ODE", fontsize=fntsize)
+plt.xlabel(r'Time $\mathrm{[s]}$')
+plt.ylabel(r'$H_{ODE}$')
+plt.title(r"Hamiltonian given by ODE")
 
 err_ep_ode = np.zeros(n_mesh)
 err_eq_ode = np.zeros(n_mesh)
@@ -293,7 +305,7 @@ for i in range(n_mesh):
     h_vec[i] = R_ext/mesh_ind
 
 
-path_figs = "/home/a.brugnoli/Plots_Videos/Python/Plots/Waves/IFAC_WC2020/"
+path_figs = "/home/a.brugnoli/Plots/Python/Plots/Waves/IFAC_WC2020/"
 
 plt.figure(0)
 plt.plot(t_ref, H_ref, label=r'$h_{REF} = R/$' + str(15))
@@ -309,9 +321,9 @@ plt.figure(2)
 plt.plot(t_ref, H_ref, label=r'$H$')
 plt.plot(t_ref, Hp_ref, label=r'$H_p$')
 plt.plot(t_ref, Hq_ref, label=r'$H_v$')
-plt.xlabel(r'Time (s)', fontsize=fntsize)
-plt.ylabel(r'Hamiltonian (J)', fontsize=fntsize)
-plt.title(r"Reference Hamiltonian", fontsize=fntsize)
+plt.xlabel(r'Time $\mathrm{[s]}$')
+plt.ylabel(r'Hamiltonian $\mathrm{[J]}$')
+plt.title(r"Reference Hamiltonian")
 plt.legend(loc='upper right')
 plt.savefig(path_figs + "Href.eps", format="eps")
 
@@ -340,8 +352,8 @@ fig = plt.figure()
 plt.plot(h_vec, errHode, 'b-', label="ODE")
 plt.plot(h_vec, errHdae, 'r-', label="DAE")
 plt.xlabel(r'Mesh size', fontsize=fntsize)
-plt.ylabel(r'$||H_{REF} - H_{ODE/DAE}||_{L^2}$', fontsize=fntsize)
-plt.title(r"$L^2$ norm Hamiltonian difference", fontsize=fntsize)
+plt.ylabel(r'$||H_{REF} - H_{ODE/DAE}||_{L^2}$')
+plt.title(r"$L^2$ norm Hamiltonian difference")
 # plt.yscale('log')
 plt.legend(loc='upper left')
 plt.savefig(path_figs + "Hall_diff.eps", format="eps")
@@ -349,9 +361,9 @@ plt.savefig(path_figs + "Hall_diff.eps", format="eps")
 fig = plt.figure()
 plt.plot(h_vec, err_ep_ode, 'b-', label="ODE")
 plt.plot(h_vec, err_ep_dae, 'r-', label="DAE")
-plt.xlabel(r'Mesh size', fontsize=fntsize)
-plt.ylabel(r'$||p_{REF} - p_{DAE}||_{L^2}$', fontsize=fntsize)
-plt.title(r"$L^2$ norm error on p", fontsize=fntsize)
+plt.xlabel(r'Mesh size')
+plt.ylabel(r'$||p_{REF} - p_{DAE}||_{L^2}$')
+plt.title(r"$L^2$ norm error on p")
 # plt.yscale('log')
 plt.legend(loc='upper left')
 plt.savefig(path_figs + "err_ep.eps", format="eps")
@@ -359,9 +371,9 @@ plt.savefig(path_figs + "err_ep.eps", format="eps")
 fig = plt.figure()
 plt.plot(h_vec, err_eq_ode, 'b-',  label="ODE")
 plt.plot(h_vec, err_eq_dae, 'r-',  label="DAE")
-plt.xlabel(r'Mesh size', fontsize=fntsize)
-plt.ylabel(r'$||v_{REF} - v_{DAE}||_{L^2}$', fontsize=fntsize)
-plt.title(r"$L^2$ norm error on v", fontsize=fntsize)
+plt.xlabel(r'Mesh size')
+plt.ylabel(r'$||v_{REF} - v_{DAE}||_{L^2}$')
+plt.title(r"$L^2$ norm error on v")
 plt.legend(loc='upper left')
 
 plt.savefig(path_figs + "err_eq.eps", format="eps")

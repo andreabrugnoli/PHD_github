@@ -43,7 +43,7 @@ def animate2D(x, y, sol2D, t, xlabel = None, ylabel = None,  zlabel = None, titl
     ax.w_zaxis.set_major_locator(LinearLocator(10))
     ax.w_zaxis.set_major_formatter(FormatStrFormatter('%.2g'))
 
-    ax.set_title(title, fontsize=fntsize)
+    ax.set_title(title, loc = "left", fontsize=fntsize)
 
     lab = 'Time =' + '{0:.2e}'.format(t[0])
     plot = ax.plot_trisurf(x, y, sol2D[:, 0], label = lab, **surf_opts)

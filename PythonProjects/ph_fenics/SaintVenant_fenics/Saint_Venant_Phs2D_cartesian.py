@@ -138,6 +138,8 @@ Pu = FiniteElement('DG', mesh.ufl_cell(), deg_p)
 Vu = FunctionSpace(mesh, Pu)
 u = TrialFunction(Vu)
 
+v_u = TestFunction(Vu)
+
 B = assemble(v_q * u * ds)
 Binput = B.array()
 boundary_dof = np.where(Binput.any(axis=0))[0]
@@ -145,6 +147,10 @@ boundary_dof = np.where(Binput.any(axis=0))[0]
 Binput = Binput[:,boundary_dof]
 
 n_bd = len(boundary_dof)
+
+m_partial = v_u * u * ds
+
+M_partial = assemble(m_partial).array()[:, boundary_dof][boundary_dof, :]
 
 # r = Expression("sqrt(r*r+x[1]*x[1])", degree=2)
 # theta = Expression("atan2(x[1],r)", degree=2)
@@ -241,8 +247,11 @@ e0 = np.concatenate((e0_p, e0_q), axis = 0)
 # preparacao da dinâmica utilizando integrador IVP
 B = np.concatenate((np.zeros((n_Vp, n_bd)), Binput), axis = 0)
 #Btilde = (invM @ B).reshape(-1,)
-z = 0.001
-Rr = z * invM @ (B @ B.T) @ invM
+z_imp = 0.001
+
+Z = la.inv(M_partial) * z_imp
+
+Rr = invM @ (B @ Z @ B.T) @ invM
 def fun(t,y):
     al_p = y[:n_Vp]
     al_q = y[n_Vp:n_V]
@@ -324,20 +333,20 @@ for i in range(n_ev):
     V_vec[i] = LyaFunc(alp_sol[:,i], alq_sol[:,i])
 
 fntsize = 16
-path_out = "/home/a.brugnoli/Plots/Python/Plots/SaintVenant_plots/Simulations/TwoDimension/"
+path_out = "/home/a.brugnoli/Plots/Python/Plots/SaintVenant_plots/Simulations/TwoDimension2/"
 
 plt.figure()
 plt.plot(t_ev, H_vec, 'r-')
-plt.xlabel(r'{Time} (s)',fontsize=fntsize)
+plt.xlabel(r'{Time} $\mathrm{[s]}$',fontsize=fntsize)
 plt.ylabel('Hamiltonian $\mathrm{[J]}$' ,fontsize=fntsize)
 plt.title(r"Hamiltonian")
 
 plt.savefig(path_out + "Hamiltonian.eps", format="eps")
 
 plt.figure()
-plt.plot(t_ev, V_vec, 'g-', label = 'Lyapunov Function (J)')
-plt.xlabel(r'{Time} (s)',fontsize=fntsize)
-plt.ylabel('Lyapunov Function (J)' ,fontsize=fntsize)
+plt.plot(t_ev, V_vec, 'g-')
+plt.xlabel(r'{Time} $\mathrm{[s]}$',fontsize=fntsize)
+plt.ylabel('Lyapunov Function $\mathrm{[J]}$' ,fontsize=fntsize)
 plt.title(r"Lyapunov function")
 
 plt.savefig(path_out + "Lyapunov.eps", format="eps")
@@ -350,20 +359,13 @@ from SaintVenant_fenics.AnimateSurf import animate2D
 x_plot = dofVq_x[:,0]
 y_plot = dofVq_x[:,1]
 
-anim = animate2D(x_plot, y_plot, alq_sol, t_ev)
 
-plt.show()
-
-# rallenty = 0.2
-# Writer = animation.writers['ffmpeg']
-# writer = Writer(fps=n_ev/t_fin*rallenty, metadata=dict(artist='Me'), bitrate=1800)
-# anim.save('wave.mp4', writer=writer)
 
 minZ = alq_sol.min()
 maxZ = alq_sol.max()
 
 
-save_figs = False
+save_figs = True
 if save_figs:
     n_fig = 7
     tol = 1e-6
@@ -372,14 +374,14 @@ if save_figs:
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
 
-        surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False, 'vmin': minZ, 'vmax': maxZ}
+        surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False} #, 'vmin': minZ, 'vmax': maxZ}
 
         ax.set_xbound(min(x_plot) - tol, max(x_plot) + tol)
-        ax.set_xlabel('$x [m]$', fontsize=fntsize)
+        ax.set_xlabel('$x \;  \mathrm{[m]}$')
         ax.set_ybound(min(y_plot) - tol, max(y_plot) + tol)
-        ax.set_ylabel('$y [m]$', fontsize=fntsize)
-        ax.set_zlabel('$h [m]$', fontsize=fntsize)
-        ax.set_title('Fluid Height', fontsize=fntsize)
+        ax.set_ylabel('$y \;  \mathrm{[m]}$')
+        ax.set_zlabel('$h \;  \mathrm{[m]}$')
+        ax.set_title('Fluid Height')
 
         ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
         ax.w_zaxis.set_major_locator(LinearLocator(10))
@@ -388,3 +390,14 @@ if save_figs:
         ax.plot_trisurf(x_plot, y_plot, alq_sol[:,index], **surf_opts)
         plt.savefig(path_out + "Snap_n" + str(index + 1) + ".eps", format="eps")
         # plt.show()
+
+
+#anim = animate2D(x_plot, y_plot, alq_sol, t_ev, xlabel = '$x \;  \mathrm{[m]}$',\
+#                        ylabel = '$y \;  \mathrm{[m]}$', \
+#                         zlabel = '$h \;  \mathrm{[m]}$', title = 'Fluid Height')
+#
+#
+#rallenty = 0.2
+#Writer = animation.writers['ffmpeg']
+#writer = Writer(fps=n_ev/t_fin*rallenty, metadata=dict(artist='Me'), bitrate=1800)
+#anim.save(path_out + 'wave.mp4', writer=writer)

@@ -334,7 +334,7 @@ if plot_solutions:
         ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2f'))
 
         ax.set_zlabel('$w \;  \mathrm{[\mu m]}$')
-        ax.set_title('Vertical displacement ' +'$(t=$' + '{0:.2f}'.format(t_ev[index]) + '$\mathrm{[s]})$')
+        ax.set_title('Vertical displacement ' +'$(t=$' + '{0:.2f}'.format(t_ev[index]) + '$ \; \mathrm{[s]})$')
         # ax.set_title('Vertical displacement ' +'$(t=$' + str(t_ev[index]) + '$\mathrm{[s]})$')
 
         ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
