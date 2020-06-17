@@ -456,8 +456,8 @@ In this section the Lagrange multiplier method \secref{sec:lagrMul} and the virt
 We consider the model for the propagation of sound in air \ref{eq:pHsys_waves}
 \begin{equation}
 \begin{bmatrix}
-\chi_s & p \\
-\bm{0} & \mu_0 \\
+\chi_s & 0 \\
+\bm{0} & \mu_0 \bm{I}_{3\times 3} \\
 \end{bmatrix}
 \diffp{}{t}
 \begin{pmatrix}
@@ -471,15 +471,15 @@ e_p \\
 \begin{pmatrix}
 e_p \\
 \bm{e}_v \\
-\end{pmatrix},
+\end{pmatrix}, \qquad \Omega = \{x \in [0, L], r \in [0, R], \theta = [0, 2 \pi)\},
 \end{equation}
-on $\Omega \subset \mathbb{R}^3$. $e_p \in \mathbb{R}$  and $\bm{e}_v \in \mathbb{R}^3$ denote the variations of pressure and velocity from a steady state, $\mu_0$ is the steady state mass density, and $\chi_s$ represents a constant adiabatic compressibility factor.  A cylindrical duct of length $L$ and radius $R$ is considered as physical domain, $\Omega = \{x \in [0, L], r \in [0, R], \theta = [0, 2 \pi)\}$. Denoting by $x, r, \theta$ the axial, radial and tangential coordinate,  the following boundary conditions are imposed
-\begin{align}
-e_p(x, R, \theta, t) &= - \mathcal{Z}(x, t) \, e_v^r(x, R, \theta), \label{eq:bc_imp} \\
-\bm{e}_v \cdot \bm{n}(0, r, \theta, t) &= -e_v^x(0, r, \theta) = - f(r), \label{eq:bc_flowL}\\
-\bm{e}_v \cdot \bm{n}(L, r, \theta, t) &= +e_v^x(L, r, \theta) = + f(r), \label{eq:bc_flowR}.
-\end{align}
-As the main focus is the treatment of mixed boundary conditions, it is assumed that the impedance operator $\mathcal{Z}$ is non invertible. If it were invertible than the impedance condition could be treated as a Robin condition. For the initial boundary conditions, it is assumed
+where $e_p \in \mathbb{R}$  and $\bm{e}_v \in \mathbb{R}^3$ denote the variations of pressure and velocity from a steady state, $\mu_0$ is the steady state mass density, and $\chi_s$ represents a constant adiabatic compressibility factor. With $x, r, \theta$ we denote the axial, radial and tangential cylindrical coordinates.  The domain is cylindrical duct of length $L$ and radius $R$. The following boundary conditions are imposed
+\begin{align*}
+e_p(x, R, \theta, t) &= - \mathcal{Z}(x, t) \, e_v^r(x, R, \theta), \\
+\bm{e}_v \cdot \bm{n}(0, r, \theta, t) &= -e_v^x(0, r, \theta) = - f(r), \\
+\bm{e}_v \cdot \bm{n}(L, r, \theta, t) &= +e_v^x(L, r, \theta) = + f(r).
+\end{align*}
+For the initial boundary conditions, it is assumed
 \begin{equation}
 \label{eq:init_con}
 \begin{aligned}
@@ -499,12 +499,12 @@ f(r) &= \left( 1 - \frac{r^2}{R^2} \right) v_0, \\
 g(r) &= 16 \frac{r^2}{R^4} \left( R - r \right)^2 v_0. \\
 \end{aligned}
 \end{equation*}
-This model describes the behavior of an axis-symmetrical flow subjected to an impedance condition on the lateral surface. Because of symmetry the model can be reduced to a 2D problem in polar coordinates over the domain $\Omega_{\text{r}} = \{x \in [0, L], r \in [0, R]\}$. The reduced system reads
+The impedance operator $\mathcal{Z}$ is non invertible. If it were invertible than the impedance condition could be treated as a Robin condition. This model describes the behavior of an axis-symmetrical flow subjected to an impedance condition on the lateral surface. Because of symmetry the model can be reduced to a 2D problem in polar coordinates over the domain $\Omega_{\text{r}} = \{x \in [0, L], r \in [0, R]\}$. The reduced system reads
 \begin{equation}
 \label{eq:red_mod}
 \begin{bmatrix}
 \chi_s & p \\
-\bm{0} & \mu_0 \\
+\bm{0} & \mu_0 \bm{I}_{2\times 2} \\
 \end{bmatrix}
 \diffp{}{t}
 \begin{pmatrix}
@@ -527,7 +527,18 @@ e_p \\
 \partial_r\\
 \end{bmatrix}.
 \end{equation}
-The boundary conditions must now account for the symmetry condition at $r=0$, leading to the additional condition $\bm{e}_v\cdot \bm{n}(x, 0) = e_v^r(x, 0) =0$. The Hamiltonian is then computed as
+The boundary conditions must now account for the symmetry condition at $r=0$, leading to the set of boundary conditions
+\begin{align}
+u_D &=  e_p|_{\Gamma_D} = - \mathcal{Z}(x, t) \, e_v^r(x, R), \label{eq:bc_imp} \\
+u_N &= \bm{e}_v \cdot \bm{n}|_{\Gamma_N} = 
+\begin{cases}
+- f(r), \qquad &x=0, \\
++ f(r), \qquad &x=L, \\
+0, \qquad &r=0,
+\end{cases} \label{eq:bc_neu}
+\end{align}
+where $\Gamma_D, \; \Gamma_D$ denote the boundary partitions (see Fig. \ref{fig:bc_part_vibro}).
+ The Hamiltonian is then computed as
 \[
 H = \frac{1}{2} \inner[\Omega_{\text{r}}]{e_p}{\chi_s e_p} + \frac{1}{2} \inner[\Omega_{\text{r}}]{\bm{e}_v}{\mu_0 \bm{e}_v}
 \]
@@ -548,7 +559,7 @@ where $\d{\Gamma_r} = r \d{s}$ is the infinitesimal surface. \\
 	\label{fig:bc_part_vibro}
 \end{figure}
 
-The boundary is split in two partition (see Fig. \ref{fig:bc_part_vibro}) to perform the discretization of this problem. In the next paragraphs we provide a concise description of the discretization procedure for the two methods.
+In the next paragraphs we provide a concise description of the discretization procedure for the two methods.
 
 \paragraph{Lagrange multipliers}
 If a Lagrange multiplier is introduced for the Dirichlet boundary condition, the following weak form is obtained
