@@ -315,9 +315,9 @@ The discretization is performed as in \eqref{eq:pHsys_findim_shwater}. Variable 
 \dot{\bm{\alpha}}_{d, h} \\
 \dot{\bm{\alpha}}_{d, v} \\
 \end{pmatrix}
-&= - \begin{bmatrix}
-\mathbf{0} &  - \mathbf{M}_h^{-1} \mathbf{D}_{\grad}^\top \mathbf{M}_v^{-1} \\
-\mathbf{M}_v^{-1} \mathbf{D}_{\grad} \mathbf{M}_h^{-1} & \mathbf{0} \\
+&= \begin{bmatrix}
+\mathbf{0} &  \mathbf{M}_h^{-1} \mathbf{D}_{\grad}^\top \mathbf{M}_v^{-1} \\
+-\mathbf{M}_v^{-1} \mathbf{D}_{\grad} \mathbf{M}_h^{-1} & \mathbf{0} \\
 \end{bmatrix} 
 \begin{pmatrix}
 \partial_{\bm{\alpha}_{d, h}} H_d(\bm{\alpha}_{d, h},\; \bm{\alpha}_{d, v})\\
@@ -346,9 +346,9 @@ where $\mathbf{y}_\partial^* = \mathbf{M}_\partial^{-1}\int_{\partial\Omega} \rh
 \dot{\bm{\alpha}}_{d, h} \\
 \dot{\bm{\alpha}}_{d, v} \\
 \end{pmatrix}
-= - \begin{bmatrix}
-\mathbf{R}_h &  - \mathbf{M}_h^{-1} \mathbf{D}_{\grad}^\top \mathbf{M}_v^{-1} \\
-\mathbf{M}_v^{-1} \mathbf{D}_{\grad} \mathbf{M}_h^{-1} & \mathbf{0} \\
+= \begin{bmatrix}
+-\mathbf{R}_h &  \mathbf{M}_h^{-1} \mathbf{D}_{\grad}^\top \mathbf{M}_v^{-1} \\
+-\mathbf{M}_v^{-1} \mathbf{D}_{\grad} \mathbf{M}_h^{-1} & \mathbf{0} \\
 \end{bmatrix} 
 \begin{bmatrix}
 \partial_{\bm{\alpha}_{d, h}} H_d(\bm{\alpha}_{d, h},\; \bm{\alpha}_{d, v})\\
@@ -387,7 +387,7 @@ is positive definite and the discretized Lyapunov function reads
 		\hline 
 		Integrator & Runge-Kutta 45 \\
 		N$^\circ$ FE along $R$ & 10 \\
-		FE spaces & CG$_0$ $\times$ DG$_1$ $\times$ DG$_0$\\
+		FE spaces & CG$_1$ $\times$ DG$_0$ $\times$ DG$_0$\\
 		$t_{\text{end}}$ & $3\; \mathrm{[s]}$\\ 
 		\hline 
 	\end{tabular} 
@@ -397,11 +397,7 @@ is positive definite and the discretized Lyapunov function reads
 	\label{tab:parSWE_damp}
 \end{table}
 
-The parameters for the simulation are reported in Table. \eqref{tab:parSWE_damp}. The controller gain is set to 
-\begin{equation*}
-	k = 10^{-3}.
-\end{equation*}
-The control law is activated after $0.5$ seconds. The system is simulated using a Runge-Kutta method. Snapshots are collected in Fig. \ref{fig:SnapDamp_SWE}. The discretized Hamiltonian and Lyapunov functional trend (Fig. \ref{fig:HL_SWE}) clearly show that while the Lyapunov function monotonically decrease, the Hamiltonian does not.
+The parameters for the simulation are reported in Table. \eqref{tab:parSWE_damp}. The controller gain is set to $k = 10^{-3}$. The control law is activated after $0.5$ seconds. The system is simulated using a Runge-Kutta method. Snapshots are collected in Fig. \ref{fig:SnapDamp_SWE}. The discretized Hamiltonian and Lyapunov functional trends (Fig. \ref{fig:HL_SWE}) clearly show that while the Lyapunov function monotonically decrease, the Hamiltonian does not.
 
 
 
@@ -456,7 +452,7 @@ In this section the Lagrange multiplier method \secref{sec:lagrMul} and the virt
 
 \subsection{Trajectory tracking of a thin beam}
 
-\subsection{Vibroacoustic under mixed boundary conditions}
+\subsection{Vibroacoustics under mixed boundary conditions}
 We consider the model for the propagation of sound in air \ref{eq:pHsys_waves}
 \begin{equation}
 \begin{bmatrix}
@@ -469,8 +465,8 @@ e_p \\
 \bm{e}_v \\
 \end{pmatrix} = -
 \begin{bmatrix}
-0 & \mathrm{div} \\
-\mathrm{grad} & \bm{0} \\
+0 & \div \\
+\grad & \bm{0} \\
 \end{bmatrix}
 \begin{pmatrix}
 e_p \\
@@ -481,9 +477,9 @@ on $\Omega \subset \mathbb{R}^3$. $e_p \in \mathbb{R}$  and $\bm{e}_v \in \mathb
 \begin{align}
 e_p(x, R, \theta, t) &= - \mathcal{Z}(x, t) \, e_v^r(x, R, \theta), \label{eq:bc_imp} \\
 \bm{e}_v \cdot \bm{n}(0, r, \theta, t) &= -e_v^x(0, r, \theta) = - f(r), \label{eq:bc_flowL}\\
-\bm{e}_v \cdot \bm{n}(L, r, \theta, t) &= +e_v^x(L, r, \theta) = + f(r), \label{eq:bc_flowR}
+\bm{e}_v \cdot \bm{n}(L, r, \theta, t) &= +e_v^x(L, r, \theta) = + f(r), \label{eq:bc_flowR}.
 \end{align}
-where $\bm{n}$ is the outward normal at the boundary. As the main focus is the treatment of mixed boundary conditions, it is assumed that the impedance operator $\mathcal{Z}$ is non invertible. If it were invertible than the impedance condition could be treated as a Robin condition. For the initial boundary conditions, it is assumed
+As the main focus is the treatment of mixed boundary conditions, it is assumed that the impedance operator $\mathcal{Z}$ is non invertible. If it were invertible than the impedance condition could be treated as a Robin condition. For the initial boundary conditions, it is assumed
 \begin{equation}
 \label{eq:init_con}
 \begin{aligned}
@@ -517,7 +513,7 @@ e_p \\
 \end{pmatrix} = -
 \begin{bmatrix}
 0 & \div_r \\
-{\grad}_r & 0 \\
+{\grad}_r & \bm{0} \\
 \end{bmatrix}
 \begin{pmatrix}
 e_p \\
@@ -753,7 +749,7 @@ where $\mathbf{C} = \mathbf{B}_{\Gamma_{\text{int}}}^{\Omega_D} \mathbf{M}_{\Gam
 \mathbf{b}_{\Gamma_N}^{\Omega_N}\\
 \end{pmatrix},
 \end{equation}
-where $\mathbf{R}_{\Omega_D} = \mathbf{B}_{\Gamma_D}^{\Omega_D} \mathbf{M}_{\Gamma_D}^{-1} \mathbf{B}_{\Gamma_D}^{\Omega_D \top}$.
+where $\mathbf{R}_{\Omega_D} = \mathbf{B}_{\Gamma_D}^{\Omega_D} \mathbf{M}_{\Gamma_D}^{-1} \mathbf{B}_{\Gamma_D}^{\Omega_D \top}$ is symmetric and positive definite.
 
 \paragraph{Numerical results and discussion}
 In this section a numerical illustration of the two methodologies is presented. The Hamiltonian and the state variables trends given by the DAE (obtained from the Lagrange's multiplier method) and the ODE (obtained from the virtual domain decomposition method) are compared with respect to a reference solution. The reference is set to the DAE solution on a very fine mesh. The physical parameters are provided in Tab. \ref{tab:parWaves}. 
@@ -783,10 +779,11 @@ e_p^0(x, r) = 0 , \quad e_v^{x, 0}(x, r) = f(r), \quad e_v^{r, 0}(x, r) = g(r).
 		ODE Integrator & RK 45\\
 		DAE Integrator & IDA\\ 
 		$t_{\text{end}}$& $0.1  [\textrm{s}]$ \\ 
+		FE spaces & CG$_1$ $\times$ RT$_1$ $\times$ CG$_1$ \\
 		\hline 
 	\end{tabular} 
 	\vspace{1mm}
-	\caption{Simulation settings and parameters.}
+	\caption{Settings and parameters for the vibroacoustic problem.}
 	\label{tab:parWaves}
 \end{table}
 
@@ -794,7 +791,7 @@ A radial component of the velocity allows highlighting the effect of the impedan
 
 \begin{itemize}
 	\item $e_p$ is interpolated using order~1 Lagrange polynomials;
-	\item $\bm{e}_v$ is interpolated using order~2 Raviart-Thomas polynomials;
+	\item $\bm{e}_v$ is interpolated using order~1 Raviart-Thomas polynomials;
 	\item Boundary variables are approximated by Lagrange polynomial of order~1 defined on the boundary $\Gamma_D$ (for $\lambda_D, u_D, y_D$) or $\Gamma_N$ (for $u_N, y_N$).
 \end{itemize}
 
@@ -870,7 +867,7 @@ In order to demonstrate the consistency of the two proposed approaches the follo
 \varepsilon^v_{\text{ODE}/\text{DAE}} = \frac{||\bm{v}_{\text{REF}} - \bm{v}_{\text{ODE}/\text{DAE}} ||_{L^2}}{||\mathbf{v}_{\text{REF}}||_{L^2}}. 
 \end{align*}
 The total energy obtained with several meshes is shown in Figs. \ref{fig:Htrend_dae}, \ref{fig:Htrend_ode} for the DAE and ODE approach respectively. It can be noticed that the Hamiltonian tends to the value $H_{vx}^0$ as expected. The overall Hamiltonian trend is well captured and even for coarse meshes the relative error does not exceed 6\% (see Fig. \ref{fig:Hdiff}).
-Both methods converge monotonically to the reference solution, as illustrated in Figs. \ref{fig:p_err}, \ref{fig:v_err}. The faster convergence of one method on the other cannot be established.
+Both methods converge monotonically to the reference solution, as illustrated in Figs. \ref{fig:p_err}, \ref{fig:v_err}. The faster convergence of one method on the other cannot be established. For what concerns the computational cost, in Tab. \ref{tab:deltaT} the simulation time required by each solver is shown. The ODE approach is less time consuming for mesh size sufficiently small.
 
 \begin{table}[t]
 	\centering
