@@ -1,4 +1,4 @@
-\chapter{Numerical applications}
+\chapter{Numerical applications}\label{ch:applications}
 
 \epigraph{The most obvious characteristic of science is its application: the fact that, as a consequence of science, one has a power to do things. And the effect this power has had need hardly be mentioned. The whole industrial revolution would almost have been impossible without the development of science.}{\textit{Richard Feynman \\ The Meaning of It All: Thoughts of a Citizen-Scientist}}
 \minitoc
@@ -68,7 +68,7 @@ y_{\partial, m} &=\partial_{\bm{n}} e_w|_{\Gamma_N}.
 \end{equation*}
 The initial conditions (compatible with the constraints) are given by
 \[
-e_w(x,y,0) = 10^{-3} x^2 \cos(2 \pi y), \qquad \bm{E}_\kappa(x,y,0) ={0}.
+e_w(x,y,0) = x^2 \cos(2 \pi y), \qquad \bm{E}_\kappa(x,y,0) ={0}.
 \]
 The following control law asymptotically stabilizes the system (cf. \cite{lagnese1989})
 \begin{equation}\label{eq:ctrllaw_Kir}
@@ -83,7 +83,7 @@ u_m &= - k_m \partial_{\bm{n}} e_w|_{\Gamma_N}  = - k_m y_{\partial, m}, \\
 \end{equation}
 \\
 
-The discretization is performed as in \eqref{eq:pHsys_findim_kirchh_hess} using the BellDG3 element \eqref{eq:BellDG3}. A structured mesh with 6 elements for side is used. The Dirichlet conditions are imposed weakly using Lagrange multipliers (cf. \eqref{eq:pHsys_infdim_mult1}), that are discretized using Lagrange polynomials of order 1. The resulting system read
+The discretization is performed as in \eqref{eq:pHsys_findim_kirchh_hess}. A structured mesh with 6 elements for side is used. Variables $e_w$ and $\bm{E}_\kappa$ are discretized using the Argyris element and Discontinuous Galerkin elements of order 3. The Dirichlet conditions are imposed weakly using Lagrange multipliers (cf. \eqref{eq:pHsys_infdim_mult1} and Remark \ref{rmk:BellArg}), that are discretized using Lagrange polynomials of order 2. The resulting system read
 
 \begin{equation}\label{eq:pHsys_findim_bdKir_open}
 \begin{aligned}
@@ -192,7 +192,7 @@ Therefore, the Hamiltonian energy is a Lyapunov function and the asymptotic stab
 		Integrator & St\"ormer-Verlet \\
 		$\Delta t $ & $1 \; \mathrm{[\mu s]}$ \\  
 		N$^\circ$ FE & 6 \\
-		FE spaces & Bell $\times$ DG$_3$ $\times$ CG$_1$\\
+		FE spaces & Argyris $\times$ DG$_3$ $\times$ CG$_2$\\
 		$t_{\text{end}}$ & $5\; \mathrm{[s]}$\\ 
 		\hline 
 	\end{tabular} 
@@ -207,7 +207,7 @@ The parameters for the numerical simulation are given in Table~\ref{tab:parKir_d
 	k_q = 5, \qquad k_m = 5.
 \end{equation}
 
-The control law is activated after 1 second. The system is simulated using a St\"ormer-Verlet time integrator using a time step $\Delta t = 10^{-6}$ for a total simulation time of $t_{\text{end}} = 5 \; \mathrm{[s]}$. Snapshots of the simulation are reported in Fig. \ref{fig:SnapDamp_Kir}. The discrete Hamiltonian goes almost to zero in 4 seconds (Fig. \ref{fig:H_bs_Kirchhoff}).
+The system is simulated using a St\"ormer-Verlet time integrator using a time step $\Delta t = 10^{-6}$ for a total simulation time of $t_{\text{end}} = 5 \; \mathrm{[s]}$. The Lagrange multiplier is eliminated using a projection method \cite{benner2015time} The control law is activated after 1 second. Snapshots of the simulation are reported in Fig. \ref{fig:SnapDamp_Kir}. The discrete Hamiltonian goes almost to zero in 4 seconds (Fig. \ref{fig:H_bs_Kirchhoff}).
 
 
 \begin{figure}[htb]
@@ -288,7 +288,7 @@ The corresponding output reads
 
  The initial conditions are
 \begin{equation}
-\alpha_h = h_{*} + 10^{-1} \sin(\pi/R r) \cos(2 \theta), \qquad r = \sqrt{x^2 + y^2}, \quad \theta = \arctan(y/r).
+\alpha_h = h_{*} + 10^{-1} \sin(\pi r/R) \cos(2 \theta), \qquad r = \sqrt{x^2 + y^2}, \qquad \theta = \arctan(y/r),
 \end{equation}
 where $ h_{*}$ is the desired fluid height. It is known that a proportional controller exponentially stabilizes the system \cite{dos2008boundary}. Here, we use a simple control for stabilizing the system around the desired point $h^*$
 \begin{equation}\label{eq:ctrllaw_SWE}
@@ -319,10 +319,10 @@ The discretization is performed as in \eqref{eq:pHsys_findim_shwater}. Variable 
 \mathbf{0} &  - \mathbf{M}_h^{-1} \mathbf{D}_{\grad}^\top \mathbf{M}_v^{-1} \\
 \mathbf{M}_v^{-1} \mathbf{D}_{\grad} \mathbf{M}_h^{-1} & \mathbf{0} \\
 \end{bmatrix} 
-\begin{bmatrix}
+\begin{pmatrix}
 \partial_{\bm{\alpha}_{d, h}} H_d(\bm{\alpha}_{d, h},\; \bm{\alpha}_{d, v})\\
 \partial_{\bm{\alpha}_{d, v}} H_d(\bm{\alpha}_{d, h},\; \bm{\alpha}_{d, v})\\
-\end{bmatrix} + 
+\end{pmatrix} + 
 \begin{bmatrix}
 \mathbf{B}_h \\
 \mathbf{0}\\
@@ -330,10 +330,10 @@ The discretization is performed as in \eqref{eq:pHsys_findim_shwater}. Variable 
 \mathbf{u}_\partial, \\
 \mathbf{M}_\partial {\mathbf{y}_\partial} &= \begin{bmatrix}
 \mathbf{B}_h^\top & \mathbf{0}
-\end{bmatrix}\begin{bmatrix}
+\end{bmatrix}\begin{pmatrix}
 \partial_{\bm{\alpha}_{d, h}} H_d(\bm{\alpha}_{d, h},\; \bm{\alpha}_{d, v})\\
 \partial_{\bm{\alpha}_{d, v}} H_d(\bm{\alpha}_{d, h},\; \bm{\alpha}_{d, v})\\
-\end{bmatrix}.
+\end{pmatrix}.
 \end{aligned}
 \end{equation}
 The control law \eqref{eq:ctrllaw_SWE}, once discretized, is expressed as
@@ -368,15 +368,8 @@ is positive definite and the discretized Lyapunov function reads
 \begin{equation*}
 \dot{V}_d = - \partial_{\bm{\alpha}_{d, h}} H_d(\bm{\alpha}_{d, h},\; \bm{\alpha}_{d, v})^\top \mathbf{R}_h \partial_{\bm{\alpha}_{d, h}} H_d(\bm{\alpha}_{d, h},\; \bm{\alpha}_{d, v}) \le 0.
 \end{equation*}
-\\
 
-The parameters for the simulation are reported in Table. \eqref{tab:parSWE_damp}. The controller gain is set to 
-\begin{equation*}
-	k = 10^{-3}.
-\end{equation*}
-The control law is activate after $0.5$ seconds. The system is simulated using a Runge-Kutta method. Snapshots are collected in Fig. \ref{fig:SnapDamp_SWE}. The discretized Hamiltonian and Lyapunov functional trend (Fig. \ref{fig:HL_SWE}) clearly show that while the Lyapunov function monotonically decrease, the Hamiltonian does not.
-
-\begin{table}[t]
+\begin{table}[th]
 	\centering
 	\begin{tabular}{|c|c|}
 		\hline 
@@ -403,6 +396,14 @@ The control law is activate after $0.5$ seconds. The system is simulated using a
 	\captionof{table}{Settings and parameters for the irrotational shallow water equations.}
 	\label{tab:parSWE_damp}
 \end{table}
+
+The parameters for the simulation are reported in Table. \eqref{tab:parSWE_damp}. The controller gain is set to 
+\begin{equation*}
+	k = 10^{-3}.
+\end{equation*}
+The control law is activated after $0.5$ seconds. The system is simulated using a Runge-Kutta method. Snapshots are collected in Fig. \ref{fig:SnapDamp_SWE}. The discretized Hamiltonian and Lyapunov functional trend (Fig. \ref{fig:HL_SWE}) clearly show that while the Lyapunov function monotonically decrease, the Hamiltonian does not.
+
+
 
 \begin{figure}[htb]%
 	\centering
@@ -447,12 +448,449 @@ The control law is activate after $0.5$ seconds. The system is simulated using a
 
 
 \section{Mixed boundary conditions enforcement}\label{sec:mixbd_enfor}
-In thi
+In this section the Lagrange multiplier method \secref{sec:lagrMul} and the virtual domain decomposition method \secref{sec:vdd} are compared for two problems:
+\begin{enumerate}
+	\item a reference tracking problem for the Euler-Bernoulli beam;
+	\item a vibroacoustic application.
+\end{enumerate}
 
 \subsection{Trajectory tracking of a thin beam}
 
 \subsection{Vibroacoustic under mixed boundary conditions}
-In th
+We consider the model for the propagation of sound in air \ref{eq:pHsys_waves}
+\begin{equation}
+\begin{bmatrix}
+\chi_s & p \\
+\bm{0} & \mu_0 \\
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+e_p \\
+\bm{e}_v \\
+\end{pmatrix} = -
+\begin{bmatrix}
+0 & \mathrm{div} \\
+\mathrm{grad} & \bm{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+e_p \\
+\bm{e}_v \\
+\end{pmatrix},
+\end{equation}
+on $\Omega \subset \mathbb{R}^3$. $e_p \in \mathbb{R}$  and $\bm{e}_v \in \mathbb{R}^3$ denote the variations of pressure and velocity from a steady state, $\mu_0$ is the steady state mass density, and $\chi_s$ represents a constant adiabatic compressibility factor.  A cylindrical duct of length $L$ and radius $R$ is considered as physical domain, $\Omega = \{x \in [0, L], r \in [0, R], \theta = [0, 2 \pi)\}$. Denoting by $x, r, \theta$ the axial, radial and tangential coordinate,  the following boundary conditions are imposed
+\begin{align}
+e_p(x, R, \theta, t) &= - \mathcal{Z}(x, t) \, e_v^r(x, R, \theta), \label{eq:bc_imp} \\
+\bm{e}_v \cdot \bm{n}(0, r, \theta, t) &= -e_v^x(0, r, \theta) = - f(r), \label{eq:bc_flowL}\\
+\bm{e}_v \cdot \bm{n}(L, r, \theta, t) &= +e_v^x(L, r, \theta) = + f(r), \label{eq:bc_flowR}
+\end{align}
+where $\bm{n}$ is the outward normal at the boundary. As the main focus is the treatment of mixed boundary conditions, it is assumed that the impedance operator $\mathcal{Z}$ is non invertible. If it were invertible than the impedance condition could be treated as a Robin condition. For the initial boundary conditions, it is assumed
+\begin{equation}
+\label{eq:init_con}
+\begin{aligned}
+e_p^0(x, r, \theta) &= 0, \\
+e_v^{x, 0}(x, r, \theta) &= f(r), 
+\end{aligned}  \qquad
+\begin{aligned}
+e_v^{r, 0}(x, r, \theta) &= g(r), \\
+e_v^{\theta, 0}(x, r, \theta) &= 0.
+\end{aligned}    
+\end{equation}
+The impedance and the axial and radial flows expressions are the following
+\begin{equation*}
+\begin{aligned}
+\mathcal{Z}(x, t) &= \mathds{1}\left\{ \frac{1}{3} L \leq \ x \ \leq \frac{2}{3} L, \,  t \geq 0.2 \ t_{\text{fin}} \right\} \mu_0 \, c_0, \\
+f(r) &= \left( 1 - \frac{r^2}{R^2} \right) v_0, \\
+g(r) &= 16 \frac{r^2}{R^4} \left( R - r \right)^2 v_0. \\
+\end{aligned}
+\end{equation*}
+This model describes the behavior of an axis-symmetrical flow subjected to an impedance condition on the lateral surface. Because of symmetry the model can be reduced to a 2D problem in polar coordinates over the domain $\Omega_{\text{r}} = \{x \in [0, L], r \in [0, R]\}$. The reduced system reads
+\begin{equation}
+\label{eq:red_mod}
+\begin{bmatrix}
+\chi_s & p \\
+\bm{0} & \mu_0 \\
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+e_p \\
+\bm{e}_v \\
+\end{pmatrix} = -
+\begin{bmatrix}
+0 & \div_r \\
+{\grad}_r & 0 \\
+\end{bmatrix}
+\begin{pmatrix}
+e_p \\
+\bm{e}_v \\
+\end{pmatrix}, \qquad
+{\div}_r = \begin{bmatrix}
+\partial_x & \partial_r + 1/r
+\end{bmatrix}, \quad
+{\grad}_r = \begin{bmatrix}
+\partial_x\\
+\partial_r\\
+\end{bmatrix}.
+\end{equation}
+The boundary conditions must now account for the symmetry condition at $r=0$, leading to the additional condition $\bm{e}_v\cdot \bm{n}(x, 0) = e_v^r(x, 0) =0$. The Hamiltonian is then computed as
+\[
+H = \frac{1}{2} \inner[\Omega_{\text{r}}]{e_p}{\chi_s e_p} + \frac{1}{2} \inner[\Omega_{\text{r}}]{\bm{e}_v}{\mu_0 \bm{e}_v}
+\]
+where $\inner[\Omega_{\text{r}}]{\cdot}{\cdot}$ is the standard $L^2$ inner product in polar coordinates, defined for scalar or vector fields as
+\[
+\inner[\Omega_{\text{r}}]{\alpha}{\beta}= \int_{\Omega_{\text{r}}} \alpha \cdot \beta \ r \d{r} \d{x} = \int_{\Omega_{\text{r}}} \alpha \cdot \beta \ \d{\Omega_r}.
+\]
+The power flow is obtained by application of the Stokes theorem
+\[
+\dot{H} = \inner[\partial \Omega_{\text{r}}]{e_p}{\bm{e}_v \cdot \bm{n}} = \int_{\partial \Omega_{\text{r}}} e_p \ \bm{e}_v \cdot \bm{n} \d{\Gamma_r} = - \int_{0}^{L} \mathcal{Z}(x, t) (e_v^r)^2 \ R \d{x} \le 0 
+\]
+where $\d{\Gamma_r} = r \d{s}$ is the infinitesimal surface. \\
+
+\begin{figure}[t]%
+	\centering
+	\includegraphics[width=0.45\columnwidth]{part_3/applications/mixed_bd_waves/boundary_part.eps} \\
+	\caption{Boundary partition for the vibroacoustic problem.}
+	\label{fig:bc_part_vibro}
+\end{figure}
+
+The boundary is split in two partition (see Fig. \ref{fig:bc_part_vibro}) to perform the discretization of this problem. In the next paragraphs we provide a concise description of the discretization procedure for the two methods.
+
+\paragraph{Lagrange multipliers}
+If a Lagrange multiplier is introduced for the Dirichlet boundary condition, the following weak form is obtained
+\begin{equation}
+\begin{aligned}
+\inner[\Omega_r]{v_p}{\chi_s \partial_t e_p} &= \inner[\Omega_r]{{\grad}_r v_p}{\bm{e}_v} + \inner[\Gamma_D]{v_p}{\lambda_D}  +\inner[\Gamma_D]{v_p}{u_N}, \\
+\inner[\Omega_r]{\bm{v}_v}{\mu_0 \partial_t \bm{e}_v} &=  \inner[\Omega_r]{\bm{v}_v}{{\grad}_r e_p}, \\
+0 &= - \inner[\Gamma_D]{v_\lambda}{e_p} + \inner[\Gamma_D]{v_D}{u_D}, \\
+\inner[\Gamma_N]{v_\lambda}{y_N} &= \inner[\Gamma_N]{v_N}{e_p}, \\
+\inner[\Gamma_D]{v_D}{y_D} &= \inner[\Gamma_D]{v_D}{\lambda_D},
+\end{aligned}
+\end{equation}
+where $v_N, v_D$ are the test functions associated to the output discretization and $\inner[\Gamma_{*}]{\cdot}{\cdot}$ is the $L^2$ inner product on boundary $\Gamma_*$. Introducing a Galerkin approximation for the variables, one obtains the following system
+\begin{equation}\label{eq:pHfindim_waves_phdae}
+\begin{aligned}
+\begin{bmatrix}
+\mathbf{M}_{\chi_s} & \mathbf{0} & \mathbf{0}\\
+\mathbf{0} & \mathbf{M}_{\mu_0} & \mathbf{0} \\
+\mathbf{0} & \mathbf{0} & \mathbf{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\mathbf{e}}_p\\
+\dot{\mathbf{e}}_v\\
+\dot{\bm{\lambda}}_D \\
+\end{pmatrix}
+&= \begin{bmatrix}
+\mathbf{0} & \mathbf{D}_{\grad}^\top & \mathbf{B}_D\\
+-\mathbf{D}_{\grad} & \mathbf{0} & \mathbf{0} \\
+-\mathbf{B}_D^\top & \mathbf{0} & \mathbf{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+{\mathbf{e}}_p\\
+{\mathbf{e}}_v\\
+{\bm{\lambda}}_D \\
+\end{pmatrix} + \begin{bmatrix}
+\mathbf{B}_N & \mathbf{0}\\
+\mathbf{0}& \mathbf{0}\\
+\mathbf{0} & \mathbf{M}_{\Gamma_D} \\
+\end{bmatrix}
+\begin{pmatrix}
+\mathbf{u}_N \\
+\mathbf{u}_D \\
+\end{pmatrix}, \\
+\begin{bmatrix}
+\mathbf{M}_{\Gamma_N} & \mathbf{0} \\
+\mathbf{0} & \mathbf{M}_{\Gamma_D} \\
+\end{bmatrix}
+\begin{pmatrix}
+\mathbf{y}_N \\
+\mathbf{y}_D \\
+\end{pmatrix} &=
+\begin{bmatrix}
+\mathbf{B}_N^\top & \mathbf{0} & \mathbf{0}\\ 
+\mathbf{0} & \mathbf{0} & \mathbf{M}_{\Gamma_D} \\ 
+\end{bmatrix}
+\begin{pmatrix}
+{\mathbf{e}}_p\\
+{\mathbf{e}}_v\\
+{\bm{\lambda}}_D \\
+\end{pmatrix}.
+\end{aligned}
+\end{equation}
+The matrices are computed as in \eqref{eq:pHsys_infdim_mult1}. To impose the actual boundary conditions consider the weak form of \eqref{eq:bc_imp} $u_D=-\mathcal{Z}\lambda_D=-\mathcal{Z}y_D$:
+\[ \mathbf{M}_{\Gamma_D} \mathbf{u}_D = - \mathbf{M}_{\Gamma_D, \mathcal{Z}} {\mathbf{y}}_D,
+\]
+where $\mathbf{M}_{\Gamma_D, \mathcal{Z}}$ corresponds to the mass matrix associated to the weighted inner product $\inner[\Gamma_D]{v_D}{\mathcal{Z} y_D}$. The Neumann boundary condition is imposed by projection on the $u_N$ space.   The boundary controlled system becomes   
+\begin{equation}\label{eq:pHfindim_waves_phdae_bc}
+\begin{bmatrix}
+\mathbf{M}_{\chi_s} & \mathbf{0} & \mathbf{0}\\
+\mathbf{0} & \mathbf{M}_{\mu_0} & \mathbf{0} \\
+\mathbf{0} & \mathbf{0} & \mathbf{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\mathbf{e}}_p\\
+\dot{\mathbf{e}}_v\\
+\dot{\bm{\lambda}}_D \\
+\end{pmatrix}
+= \begin{bmatrix}
+\mathbf{0} & \mathbf{D}_{\grad}^\top & \mathbf{B}_D\\
+-\mathbf{D}_{\grad} & \mathbf{0} & \mathbf{0} \\
+-\mathbf{B}_D^\top & \mathbf{0} & -\mathbf{M}_{\Gamma_D, \mathcal{Z}} \\
+\end{bmatrix}
+\begin{pmatrix}
+{\mathbf{e}}_p\\
+{\mathbf{e}}_v\\
+{\bm{\lambda}}_D \\
+\end{pmatrix} + \begin{pmatrix}
+\mathbf{b}_N \\
+\mathbf{0}\\
+\mathbf{0}\\
+\end{pmatrix},
+\end{equation}
+
+\paragraph{Virtual domain decomposition}
+
+In order to apply this methodology the domain has to be split into two sub-domains. The shared boundary connecting the two sub-domains can be freely chosen. For the given geometry, the separation line that provide the most regular simplicial meshes is the trapezoidal one given in Fig. \ref{fig:dom_dec_vibro}. 
+\begin{figure}[t]%
+	\centering
+	\includegraphics[width=0.45\columnwidth]{part_3/applications/mixed_bd_waves/domain_split.eps} \\
+	\caption{Virtual decomposition of the vibroacoustic domain.}
+	\label{fig:dom_dec_vibro}
+\end{figure}
+Applying the PFEM methodology as in \ref{sec:vdd} two finite dimensional systems are obtained. For $\Omega_D$ the system is analogous to \eqref{eq:pHfindim_Om1} and reads
+\begin{equation}
+\label{eq:pHfindim_waves_OmD}
+\begin{aligned}
+\mathbf{M}_D \dot{\mathbf{e}_D}&= \mathbf{J}_{\Omega_D} \mathbf{e}_{\Omega_D} + \mathbf{B}^{\Omega_D}_{\Gamma_D} \mathbf{u}_D + \mathbf{B}^{\Omega_D}_{\Gamma_{\text{int}}} \mathbf{u}_D^{\text{int}}, \\
+\mathbf{M}_{\Gamma_D} {\mathbf{y}}_D &= \mathbf{B}^{\Omega_D \top}_{\Gamma_D} \, \mathbf{e}_D, \\
+\mathbf{M}_{\Gamma_{\text{int}}} {\mathbf{y}}_D^{\text{int}} &= \mathbf{B}^{\Omega_D \top}_{\Gamma_{\text{int}}} \mathbf{e}_D. \\
+\end{aligned}
+\end{equation}
+
+For $\Omega_N$ the system is analogous to \eqref{eq:pHfindim_Om2} and reads
+\begin{equation}
+\label{eq:pHfindim_waves_OmN}
+\begin{aligned}
+\mathbf{M}_{\Omega_N}\dot{\mathbf{e}_N} &= \mathbf{J}_{\Omega_N} \mathbf{e}_{\Omega_N}  + \mathbf{B}^{\Omega_N}_{\Gamma_N} \mathbf{u}_N + \mathbf{B}^{\Omega_N}_{\Gamma_{\text{int}}} \mathbf{u}_N^{\text{int}}, \\
+\mathbf{M}_{\Gamma_N} {\mathbf{y}}_N &= \mathbf{B}^{\Omega_N \top}_{\Gamma_N} \mathbf{e}_N, \\
+\mathbf{M}_{\Gamma_{\text{int}}} {\mathbf{y}}_N^{\text{int}} &=  \mathbf{B}^{\Omega_N \top}_{\Gamma_{\text{int}}} \mathbf{e}_N, \\
+\end{aligned}
+\end{equation}
+In order to get a system with mixed causality, systems \eqref{eq:pHfindim_waves_OmD} and \eqref{eq:pHfindim_waves_OmD} have to be interconnected using a classical gyrator interconnection. Considering that the pressure field is continuous at $\Gamma_{\text{int}}$, the outward normal verifies $\bm{n}_D \vert_{\Gamma_{\text{int}}}= - \bm{n}_N \vert_{\Gamma_{\text{int}}}$ and the corresponding degrees of freedom have to be matched, the correct interconnection reads
+\begin{equation}
+\begin{aligned}{}
+\mathbf{u}_N^{\text{int}} &= - \mathbf{y}_D^{\text{int}}, \\
+\mathbf{u}_D^{\text{int}} &= \mathbf{y}_N^{\text{int}}.
+\end{aligned}
+\end{equation}
+This interconnection establishes that the power is exchanged without loss between the two systems
+\begin{equation}
+\mathbf{u}_D^{\text{int}\, \top} \mathbf{M}_{\Gamma_{\text{int}}} \mathbf{y}_D^{\text{int}} + \mathbf{u}_N^{\text{int}\, \top} \mathbf{M}_{\Gamma_{\text{int}}} \mathbf{y}_N^{\text{int}} = 0.
+\end{equation}
+The resulting interconnected system is written as
+\begin{equation}\label{eq:pHfindim_waves_intOmDN}
+\begin{aligned}
+\begin{bmatrix}
+\mathbf{M}_{\Omega_D} & \mathbf{0} \\
+\mathbf{0} & \mathbf{M}_{\Omega_N} \\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\mathbf{e}}_{\Omega_D} \\
+\dot{\mathbf{e}}_{\Omega_N} \\
+\end{pmatrix}
+&= \begin{bmatrix}
+\mathbf{J}_{\Omega_D} & \mathbf{C}\\
+-\mathbf{C}^\top & \mathbf{J}_{\Omega_N} \\
+\end{bmatrix} 
+\begin{pmatrix}
+{\mathbf{e}}_{\Omega_D} \\
+{\mathbf{e}}_{\Omega_N} \\
+\end{pmatrix} + 
+\begin{bmatrix}
+\mathbf{B}_{\Gamma_D}^{\Omega_D} & \mathbf{0}\\
+\mathbf{0} & \mathbf{B}_{\Gamma_N}^{\Omega_N}\\
+\end{bmatrix}
+\begin{pmatrix}
+\mathbf{u}_{D} \\
+\mathbf{u}_{N}\\
+\end{pmatrix}, \\
+\begin{bmatrix}
+\mathbf{M}_{\Gamma_D} & \mathbf{0}  \\
+\mathbf{0} & \mathbf{M}_{\Gamma_N} \\
+\end{bmatrix}
+\begin{pmatrix}
+\mathbf{y}_{D} \\
+\mathbf{y}_{N} \\
+\end{pmatrix}
+&= 
+\begin{bmatrix}
+\mathbf{B}_{\Gamma_D}^{\Omega_N \top} & \mathbf{0} \\
+\mathbf{0} & \mathbf{B}_{\Gamma_N}^{\Omega_D \top} \\
+\end{bmatrix}\begin{pmatrix}
+{\mathbf{e}}_{\Omega_1} \\
+{\mathbf{e}}_{\Omega_2} \\
+\end{pmatrix}.
+\end{aligned}
+\end{equation}
+where $\mathbf{C} = \mathbf{B}_{\Gamma_{\text{int}}}^{\Omega_D} \mathbf{M}_{\Gamma_{\text{int}}}^{-1} \mathbf{B}_{\Gamma_{\text{int}}}^{\Omega_N \top}$. The actual boundary condition \eqref{eq:bc_imp} can be plugged into the system leading to 
+\begin{equation}\label{eq:pHfindim_waves_phode_bc}
+\begin{bmatrix}
+\mathbf{M}_{\Omega_D} & \mathbf{0} \\
+\mathbf{0} & \mathbf{M}_{\Omega_N} \\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\mathbf{e}}_{\Omega_D} \\
+\dot{\mathbf{e}}_{\Omega_N} \\
+\end{pmatrix}
+= \begin{bmatrix}
+\mathbf{J}_{\Omega_D} - \mathbf{R}_{\Omega_D}  & \mathbf{C}\\
+-\mathbf{C}^\top & \mathbf{J}_{\Omega_N} \\
+\end{bmatrix} 
+\begin{pmatrix}
+{\mathbf{e}}_{\Omega_D} \\
+{\mathbf{e}}_{\Omega_N} \\
+\end{pmatrix} + 
+\begin{pmatrix}
+\mathbf{0}\\
+\mathbf{b}_{\Gamma_N}^{\Omega_N}\\
+\end{pmatrix},
+\end{equation}
+where $\mathbf{R}_{\Omega_D} = \mathbf{B}_{\Gamma_D}^{\Omega_D} \mathbf{M}_{\Gamma_D}^{-1} \mathbf{B}_{\Gamma_D}^{\Omega_D \top}$.
+
+\paragraph{Numerical results and discussion}
+In this section a numerical illustration of the two methodologies is presented. The Hamiltonian and the state variables trends given by the DAE (obtained from the Lagrange's multiplier method) and the ODE (obtained from the virtual domain decomposition method) are compared with respect to a reference solution. The reference is set to the DAE solution on a very fine mesh. The physical parameters are provided in Tab. \ref{tab:parWaves}. 
+The initial condition are selected according to \eqref{eq:init_con}:
+\begin{equation*}
+e_p^0(x, r) = 0 , \quad e_v^{x, 0}(x, r) = f(r), \quad e_v^{r, 0}(x, r) = g(r). 
+\end{equation*}
+
+\begin{table}[t]
+	\centering
+	\begin{tabular}{|c|c|}
+		\hline 
+		\multicolumn{2}{|c|}{Physical Parameters} \\ 
+		\hline 
+		$L$ & $2\ [\textrm{m}]$ \\ 
+		$R$ & $1\ [\textrm{m}]$ \\
+		$\mu_0$ & $1.225\ [\textrm{kg}/\textrm{m}^3]$ \\ 
+		$c_0$ & $340\ [\textrm{m/s}]$ \\
+		$\chi_s$ & $7.061 \ [\mu\textrm{Pa}]^{-1}$ \\ 
+		$v_0$ & $1\ [\textrm{m/s}]$ \\ 
+		\hline 
+	\end{tabular} 
+	\begin{tabular}{|c|c|}
+		\hline 
+		\multicolumn{2}{|c|}{Simulation Settings} \\ 
+		\hline 
+		ODE Integrator & RK 45\\
+		DAE Integrator & IDA\\ 
+		$t_{\text{end}}$& $0.1  [\textrm{s}]$ \\ 
+		\hline 
+	\end{tabular} 
+	\vspace{1mm}
+	\caption{Simulation settings and parameters.}
+	\label{tab:parWaves}
+\end{table}
+
+A radial component of the velocity allows highlighting the effect of the impedance. The velocity profile satisfies some regularity conditions so that the transition between Neumann and Dirichlet boundary conditions is smooth. In order to get a finite dimensional discretization the fields are approximated using the following finite element families for both approaches:
+
+\begin{itemize}
+	\item $e_p$ is interpolated using order~1 Lagrange polynomials;
+	\item $\bm{e}_v$ is interpolated using order~2 Raviart-Thomas polynomials;
+	\item Boundary variables are approximated by Lagrange polynomial of order~1 defined on the boundary $\Gamma_D$ (for $\lambda_D, u_D, y_D$) or $\Gamma_N$ (for $u_N, y_N$).
+\end{itemize}
+
+Such a choice guarantees the conformity with respect to the differential operators. The matrices are obtained by using {\sc{FEniCS}}. The reference solution, obtained by using the DAE approach on a very fine mesh, is plotted in Fig. \ref{fig:Hdae15}, where the two contribution to the total energy
+\[
+H_{p, d} \approx \frac{1}{2} \mathbf{e}_p^\top \mathbf{M}_p \mathbf{e}_p, \qquad H_{v, d} \approx \frac{1}{2} \mathbf{e}_v^\top \mathbf{M}_v \mathbf{e}_v, \]
+are highlighted. The Dirichlet condition induces a continuous transfer from radial kinetic energy into pressure potential. The impedance acts by dissipating the radial component of the velocity so that only the axial flow contribution is left. The total energy at the initial time of the simulation is given only by the kinetic energy
+\[
+H_v^0 = H_{vx}^0 + H_{vr}^0 = \frac{1}{2} \int_{0}^L\int_{0}^R  \mu_0 \norm{\bm{e}_v}^2 \ r \d{r}\d{x}.
+\]
+Given the physical parameters in Tab. \ref{tab:parWaves}, the numerical values of the energy contribution are readily found
+\[H_v^0 = 0.453 [J], \ \; H_{vx}^0 = 0.204 [J], \ \; H_{vr}^0 = 0.249 [J].\]
+
+\begin{figure}[ht]%
+	\centering
+	\subfloat[][Reference Hamiltonian.]{%
+		\label{fig:Hdae15}%
+		\includegraphics[width=0.48\columnwidth]{part_3/applications/mixed_bd_waves/Href.eps}}%
+	\hspace{8pt}%
+	\subfloat[][$L^2$ Hamiltonian error.]{%
+		\label{fig:Hdiff}%
+		\includegraphics[width=0.48\columnwidth]{part_3/applications/mixed_bd_waves/Hall_diff.eps}} \\
+	\caption[]{Reference Hamiltonian and $L^2$ error.}%
+	\label{fig:Href_err}%
+\end{figure}
+
+
+\begin{figure}[ht]%
+	\centering
+	\subfloat[][DAE system \eqref{eq:pHfindim_waves_phdae_bc}.]{%
+		\label{fig:Htrend_dae}%
+		\includegraphics[width=0.48\columnwidth]{part_3/applications/mixed_bd_waves/Hdae_all.eps}}%
+	\hspace{8pt}%
+	\subfloat[][ODE system \eqref{eq:pHfindim_waves_phode_bc}.]{%
+		\label{fig:Htrend_ode}%
+		\includegraphics[width=0.48\columnwidth]{part_3/applications/mixed_bd_waves/Hode_all.eps}} \\
+	\caption[]{Hamiltonian trend for different mesh size.}%
+	\label{fig:Htrend}%
+\end{figure}
+
+\begin{figure}[ht]%
+	\centering
+	\subfloat[][$L^2$ pressure error.]{%
+		\label{fig:p_err}%
+		\includegraphics[width=0.48\columnwidth]{part_3/applications/mixed_bd_waves/err_ep.eps}}%
+	\hspace{8pt}%
+	\subfloat[][$L^2$ velocity error.]{%
+		\label{fig:v_err}%
+		\includegraphics[width=0.48\columnwidth]{part_3/applications/mixed_bd_waves/err_eq.eps}} \\
+	\caption[]{Error on the state variables for different mesh size.}%
+	\label{fig:error_x}%
+\end{figure}
+
+\begin{comment}
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.45\textwidth]{err_ep.eps} 
+\caption{Pressure error given by the two methods.}
+\label{fig:p_err}
+\end{figure}
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.45\textwidth]{err_eq.eps} 
+\caption{Velocity error given by the two methods.}
+\label{fig:v_err}
+\end{figure}
+\end{comment}
+
+In order to demonstrate the consistency of the two proposed approaches the following measures are adopted
+\begin{align*}
+\varepsilon^{H}_{\text{ODE}/\text{DAE}} = \frac{||H_{\text{REF}} - H_{\text{ODE}/\text{DAE}} ||_{L^2}}{||H_{\text{REF}}||_{L^2}}, \\
+\varepsilon^p_{\text{ODE}/\text{DAE}} = \frac{||p_{\text{REF}} - p_{\text{ODE}/\text{DAE}} ||_{L^2}}{||p_{\text{REF}}||_{L^2}}, \\
+\varepsilon^v_{\text{ODE}/\text{DAE}} = \frac{||\bm{v}_{\text{REF}} - \bm{v}_{\text{ODE}/\text{DAE}} ||_{L^2}}{||\mathbf{v}_{\text{REF}}||_{L^2}}. 
+\end{align*}
+The total energy obtained with several meshes is shown in Figs. \ref{fig:Htrend_dae}, \ref{fig:Htrend_ode} for the DAE and ODE approach respectively. It can be noticed that the Hamiltonian tends to the value $H_{vx}^0$ as expected. The overall Hamiltonian trend is well captured and even for coarse meshes the relative error does not exceed 6\% (see Fig. \ref{fig:Hdiff}).
+Both methods converge monotonically to the reference solution, as illustrated in Figs. \ref{fig:p_err}, \ref{fig:v_err}. The faster convergence of one method on the other cannot be established.
+
+\begin{table}[t]
+	\centering
+	\begin{tabular}{ccc}
+		\hline 
+		$h$ mesh & $\Delta t_{\text{DAE}} [s]$ & $\Delta t_{\text{ODE}} [s]$  \\ 
+		\hline 
+		$R_{\text{ext}}/4$ & 98.95 & 124.43 \\
+		$R_{\text{ext}}/5$ & 415.99 & 255.54 \\
+		$R_{\text{ext}}/6$ & 798.24 & 893.63 \\
+		$R_{\text{ext}}/7$ & 1408.76 & 1120.69 \\
+		$R_{\text{ext}}/8$ & 3054.78 & 2271.28 \\
+		$R_{\text{ext}}/9$ & 6929.24 & 5792.89 \\
+		$R_{\text{ext}}/10$ & 12648.15 & 8835.09 \\
+		\hline 
+	\end{tabular} 
+	\vspace{1mm}
+	\caption{Elapsed simulation time for the vibroacoustic experiment.}
+	\label{tab:deltaT}
+\end{table}
 
 
 \section{Thermoelastic wave propagation}\label{sec:thelas_wave}

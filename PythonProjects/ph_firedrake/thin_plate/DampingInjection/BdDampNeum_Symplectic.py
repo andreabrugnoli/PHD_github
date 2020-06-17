@@ -32,8 +32,75 @@ from matplotlib import rcParams
 rcParams.update({'figure.autolayout': True})
 rcParams['text.usetex'] = True
 
+from scipy.sparse.linalg import spsolve
+from scipy.sparse import csr_matrix,csc_matrix
 
-from thin_plate.symplectic_integrators import StormerVerletGrad
+
+def Integration_DAE_SV2_Augmented(M, J, R, B_Dext, B_Next, e0, Np, Nq, dt, t_fin):
+    M_sparse = csc_matrix(M)
+    J_sparse = csc_matrix(J)
+    R_sparse = csc_matrix(R)
+
+    B_Dext_sparse = csc_matrix(B_Dext)
+    B_Next_sparse = csc_matrix(B_Next)
+
+
+    SysJ = spsolve(M_sparse, J_sparse)
+    SysJR = spsolve(M_sparse, J_sparse - R_sparse)
+
+    BDMinvBDT = B_Dext_sparse.T @ spsolve(M_sparse, B_Dext_sparse)
+    prefix = spsolve(M_sparse, B_Dext_sparse)
+
+    Sys_AugJ = - prefix @ spsolve(BDMinvBDT, B_Dext.T) @ SysJ
+    Sys_AUGJ = SysJ + Sys_AugJ
+    Sys_AUGJ_qq = Sys_AUGJ[:Nq, :Nq]
+    Sys_AUGJ_qp = Sys_AUGJ[:Nq, Nq:]
+    Sys_AUGJ_pq = Sys_AUGJ[Nq:, :Nq]
+    Sys_AUGJ_pp = Sys_AUGJ[Nq:, Nq:]
+
+    Sys_AugJR = - prefix @ spsolve(BDMinvBDT, B_Dext.T) @ SysJR
+    Sys_AUGJR = SysJR + Sys_AugJR
+    Sys_AUGJR_qq = Sys_AUGJR[:Nq, :Nq]
+    Sys_AUGJR_qp = Sys_AUGJR[:Nq, Nq:]
+    Sys_AUGJR_pq = Sys_AUGJR[Nq:, :Nq]
+    Sys_AUGJR_pp = Sys_AUGJR[Nq:, Nq:]
+
+    Nsys = Np + Nq
+
+    t_ev = np.linspace(t_0, t_f, n_ev)
+
+    Nt = int(t_fin/dt)
+    A = np.zeros((Nsys, n_ev))
+
+    A[:, 0] = e0
+
+    for k in range(Nt):
+
+        t= dt*(k+1)
+
+        if t<0.2*t_fin:
+            App = A[Nq:, k] + dt / 2 * (Sys_AUGJ_pq @ A[:Nq, k] + Sys_AUGJ_pp @ A[Nq:, k])
+
+            A[:Nq, k + 1] = A[:Nq, k] + dt * (Sys_AUGJ_qq @ A[:Nq, k]+ Sys_AUGJ_qp @ App)
+
+            A[Nq:, k + 1] = App + dt / 2 * (Sys_AUGJ_pq @ A[:Nq, k + 1] + Sys_AUGJ_pp @ App)
+        else:
+            App = A[Nq:, k] + dt / 2 * (Sys_AUGJR_pq @ A[:Nq, k] + Sys_AUGJR_pp @ A[Nq:, k])
+
+            A[:Nq, k + 1] = A[:Nq, k] + dt * (Sys_AUGJR_qq @ A[:Nq, k] + Sys_AUGJR_qp @ App)
+
+            A[Nq:, k + 1] = App + dt / 2 * (Sys_AUGJR_pq @ A[:Nq, k + 1] + Sys_AUGJR_pp @ App)
+
+        # Progress bar
+        perct = int(k / (Nt - 1) * 100)
+        bar = ('Time-stepping SV2Augmented : |' + '#' * int(perct / 2) + ' ' + str(perct) + '%' + '|')
+        sys.stdout.write('\r' + bar)
+
+    Ham = np.array([1 / 2 * A[:, k] @ M_sparse @ A[:, k] for k in range(Nt + 1)])
+
+    print('\n intergation completed \n')
+
+    return A, Ham
 
 
 E = 7e10
@@ -46,9 +113,9 @@ L = 1
 l_x = L
 l_y = L
 
-z_imp = 5
+z_imp = 10
 
-n = 6 #int(input("N element on each side: "))
+n = 5 #int(input("N element on each side: "))
 
 # Plate bending stiffness :math:`D=\dfrac{Eh^3}{12(1-\nu^2)}` and shear stiffness :math:`F = \kappa Gh`
 # with a shear correction factor :math:`\kappa = 5/6` for a homogeneous plate
@@ -247,14 +314,14 @@ x, y = SpatialCoordinate(mesh)
 Aw = 0.001
 
 e_pw_0 = Function(Vp)
-e_pw_0.assign(project(Aw*x**2*cos(2*pi*y), Vp))
+e_pw_0.assign(project(Aw*x**2, Vp))
 ep_0 = e_pw_0.vector().get_local()
 eq_0 = np.zeros((n_Vq))
 
-solverSym = StormerVerletGrad(M_p, M_q, D_p, D_q, R_p, P_p)
+# solverSym = StormerVerletGrad(M_p, M_q, D_p, D_q, R_p, P_p)
+# sol = solverSym.compute_sol(ep_0, eq_0, t_f, t_0 = t_0, dt = dt, n_ev = n_ev)
 
-sol = solverSym.compute_sol(ep_0, eq_0, t_f, t_0 = t_0, dt = dt, n_ev = n_ev)
-
+sol, H_vec = Integration_DAE_SV2_Augmented(M, J, R, B_Dext, B_Next, e0, Np, Nq, dt, t_fin)
 
 path_res = "/home/a.brugnoli/LargeFiles/results_DampKirchh/"
 
@@ -306,11 +373,11 @@ print(minZ)
 # if matplotlib.is_interactive():
 #     plt.ioff()
 # plt.close('all')
-
-H_vec = np.zeros((n_ev,))
-
-for i in range(n_ev):
-    H_vec[i] = 0.5 * (np.transpose(ep_sol[:, i]) @ M_p @ ep_sol[:, i] + np.transpose(eq_sol[:, i]) @ M_q @ eq_sol[:, i])
+#
+# H_vec = np.zeros((n_ev,))
+#
+# for i in range(n_ev):
+#     H_vec[i] = 0.5 * (np.transpose(ep_sol[:, i]) @ M_p @ ep_sol[:, i] + np.transpose(eq_sol[:, i]) @ M_q @ eq_sol[:, i])
 
 matplotlib.rcParams['text.usetex'] = True
 fig, ax = plt.subplots()
