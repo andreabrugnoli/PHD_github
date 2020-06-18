@@ -1,7 +1,8 @@
 from firedrake import *
+from firedrake.plot import calculate_one_dim_points
 import numpy as np
 import scipy.linalg as la
-from system_components.beams import FreeEB, ClampedEB, draw_allbending
+from system_components.beams import ClampedEB
 from modules_ph.classes_phsystem import SysPhdaeRig
 from scipy import integrate
 import matplotlib.pyplot as plt
@@ -10,9 +11,23 @@ from assimulo.solvers import IDA
 from assimulo.implicit_ode import Implicit_Problem
 from mpl_toolkits.mplot3d import Axes3D
 
-plt.rc('text', usetex=True)
+SMALL_SIZE = 14
+MEDIUM_SIZE = 16
+BIGGER_SIZE = 18
 
-fntsize = 15
+plt.rc('font', size=SMALL_SIZE)  # controls default text sizes
+plt.rc('axes', titlesize=BIGGER_SIZE)  # fontsize of the axes title
+plt.rc('axes', labelsize=MEDIUM_SIZE)  # fontsize of the x and y labels
+plt.rc('xtick', labelsize=SMALL_SIZE)  # fontsize of the tick labels
+plt.rc('ytick', labelsize=SMALL_SIZE)  # fontsize of the tick labels
+plt.rc('legend', fontsize=SMALL_SIZE)  # legend fontsize
+plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+from matplotlib import rcParams
+
+rcParams.update({'figure.autolayout': True})
+rcParams['text.usetex'] = True
+
 n_el = 6
 L = 1
 frac = 2
@@ -26,12 +41,14 @@ beamCC = ClampedEB(n_el, L, 1, 1, 1, 1)
 mesh= IntervalMesh(n_el, L)
 
 # Finite element defition
-deg = 3
-Vp = FunctionSpace(mesh, "Hermite", deg)
+Vp = FunctionSpace(mesh, "DG", 1)
+Vq = FunctionSpace(mesh, "Hermite", 3)
 
 n_e = beamCC.n
 n_p = beamCC.n_p
 n_q = beamCC.n_q
+
+print(n_e, n_p, n_q)
 
 x = SpatialCoordinate(mesh)[0]
 
@@ -139,7 +156,7 @@ imp_sim.report_continuously = True
 imp_sim.make_consistent('IDA_YA_YDP_INIT')
 
 # Simulate
-n_ev = 500
+n_ev = 100
 t_ev = np.linspace(0, t_fin, n_ev)
 
 t_sol, y_sol, yd_sol = imp_sim.simulate(t_fin, 0, t_ev)
@@ -165,26 +182,29 @@ for i in range(1, n_ev):
     w_sol[:, i] = w_old + 0.5 * (ep_sol[:, i - 1] + ep_sol[:, i]) * dt_vec[i-1]
     w_old = w_sol[:, i]
 
-fntsize = 16
-# plt.figure()
-# plt.plot(t_ev, ep_sol[0, :], 'bo', label='Simulated')
-# plt.plot(t_ev, omega_r * np.cos(omega_r * t_ev), 'r--', label='Reference')
-# plt.xlabel(r'{Time} (s)', fontsize=fntsize)
-# plt.ylabel(r'w [m]', fontsize=fntsize)
-# plt.title(r"Vertical velocity", fontsize=fntsize)
-# plt.legend(loc='upper left')
-#
-# plt.figure()
-# plt.plot(t_ev, w_sol[0, :], 'b*', label='Simulated')
-# plt.plot(t_ev, np.sin(omega_r * t_ev), 'r-', label='Reference')
-# plt.xlabel(r'{Time} (s)', fontsize=fntsize)
-# plt.ylabel(r'w [m]', fontsize=fntsize)
-# plt.title(r"Vertical displacement", fontsize=fntsize)
-# plt.legend(loc='upper left')
-#
-# plt.show()
+plt.figure()
+plt.plot(t_ev, ep_sol[0, :], 'bo', label='Simulated')
+plt.plot(t_ev, omega_r * np.cos(omega_r * t_ev), 'r--', label='Reference')
+plt.xlabel(r'{Time} (s)')
+plt.ylabel(r'w [m]')
+plt.title(r"Vertical velocity")
+plt.legend(loc='upper left')
 
-n_plot = 30
+plt.figure()
+plt.plot(t_ev, w_sol[0, :], 'b*', label='Simulated')
+plt.plot(t_ev, np.sin(omega_r * t_ev), 'r-', label='Reference')
+plt.xlabel(r'{Time} (s)')
+plt.ylabel(r'w [m]')
+plt.title(r"Vertical displacement")
+plt.legend(loc='upper left')
+
+np.save("t_evDAE", t_ev)
+np.save("ep0_solDAE", ep_sol[0, :])
+np.save("w0_solDAE", w_sol[0, :])
+
+
+factor = 6
+n_plot = n_el*6
 
 v_plot = np.zeros((n_plot, n_ev))
 w_plot = np.zeros((n_plot, n_ev))
@@ -194,11 +214,11 @@ x_plot = np.linspace(0, L, n_plot)
 t_plot = t_ev
 
 w_old = w_plot[:, 0]
-
+v_i = Function(Vp)
 for i in range(n_ev):
-    v_i = draw_allbending(n_plot, [0, 0, 0], ep_sol[:n_p, i], L)[2]
+    v_i.vector().set_local(ep_sol[:n_p, i])
 
-    v_plot[:n_plot, i] = v_i
+    v_plot[:n_plot, i] = calculate_one_dim_points(v_i, factor)[1]
 
     if i > 0:
         w_plot[:, i] = w_old + 0.5 * (v_plot[:, i - 1] + v_plot[:, i]) * dt_vec[i-1]
@@ -242,20 +262,26 @@ X_plot, T_plot = np.meshgrid(x_plot, t_plot)
 
 
 # Plot the surface.
-ax.set_xlabel('Space coordinate $[m]$', fontsize=fntsize)
-ax.set_ylabel('Time $[s]$', fontsize=fntsize)
-ax.set_zlabel('$w [m]$', fontsize=fntsize)
+ax.set_xlabel('Space coordinate $[m]$')
+ax.set_ylabel('Time $[s]$')
+ax.set_zlabel('$w [m]$')
 
 
 W_plot = np.transpose(w_plot)
 surf = ax.plot_surface(X_plot, T_plot, W_plot, cmap=cm.jet, linewidth=0, antialiased=False, label='Beam $w$')
 
+
 surf._facecolors2d = surf._facecolors3d
 surf._edgecolors2d = surf._edgecolors3d
 
 x0 = np.zeros((n_ev,))
-w0_plot = ax.plot(x0, t_ev, np.sin(omega_r * t_ev), label='Reference $w$', color='black')
+w0_plot = ax.plot(x0, t_ev, np.sin(omega_r * t_ev), label='Output $w(0, t)$', color='purple', linewidth=5)
+
+u_t = 0.5 * (np.cosh(sqrom_r) + np.cos(sqrom_r)) * np.sin(omega_r * t_ev)
+x1 = np.ones((n_ev,))
+w1_plot = ax.plot(x1, t_ev, u_t, label='Control $w(L, t)$', color='black', linewidth=5)
+
 ax.legend(handles=[w0_plot[0]])
 
-fig.colorbar(surf, shrink=0.5, aspect=5)
+ax.legend(handles=[w0_plot[0], w1_plot[0]])
 plt.show()

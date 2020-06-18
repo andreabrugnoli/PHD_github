@@ -147,7 +147,7 @@ L = 1
 l_x = L
 l_y = L
 
-z_imp = 0.1
+z_imp = 10
 
 n = 6  # int(input("N element on each side: "))
 
@@ -327,7 +327,7 @@ n_ev = 1000
 x, y = SpatialCoordinate(mesh)
 
 e_pw_0 = Function(Vp)
-e_pw_0.assign(project(x ** 2*cos(2*pi*y), Vp))
+e_pw_0.assign(project(x ** 2, Vp))
 ep_0 = e_pw_0.vector().get_local()
 eq_0 = np.zeros((n_Vq))
 
@@ -413,6 +413,7 @@ Writer = animation.writers['ffmpeg']
 writer = Writer(fps=25, metadata=dict(artist='Me'), bitrate=1800)
 
 anim.save(path_out + 'Kirchh_Damped.mp4', writer=writer)
+# plt.show()
 
 plot_solutions = True
 if plot_solutions:

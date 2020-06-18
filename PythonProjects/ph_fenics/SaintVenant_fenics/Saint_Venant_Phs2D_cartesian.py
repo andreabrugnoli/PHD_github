@@ -337,16 +337,16 @@ path_out = "/home/a.brugnoli/Plots/Python/Plots/SaintVenant_plots/Simulations/Tw
 
 plt.figure()
 plt.plot(t_ev, H_vec, 'r-')
-plt.xlabel(r'{Time} $\mathrm{[s]}$',fontsize=fntsize)
-plt.ylabel('Hamiltonian $\mathrm{[J]}$' ,fontsize=fntsize)
+plt.xlabel(r'{Time} $\mathrm{[s]}$')
+plt.ylabel('Hamiltonian $\mathrm{[J]}$')
 plt.title(r"Hamiltonian")
 
 plt.savefig(path_out + "Hamiltonian.eps", format="eps")
 
 plt.figure()
 plt.plot(t_ev, V_vec, 'g-')
-plt.xlabel(r'{Time} $\mathrm{[s]}$',fontsize=fntsize)
-plt.ylabel('Lyapunov Function $\mathrm{[J]}$' ,fontsize=fntsize)
+plt.xlabel(r'{Time} $\mathrm{[s]}$')
+plt.ylabel('Lyapunov Function $\mathrm{[J]}$')
 plt.title(r"Lyapunov function")
 
 plt.savefig(path_out + "Lyapunov.eps", format="eps")
