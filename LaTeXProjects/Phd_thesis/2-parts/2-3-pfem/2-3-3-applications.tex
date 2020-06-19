@@ -207,7 +207,7 @@ The parameters for the numerical simulation are given in Table~\ref{tab:parKir_d
 	k_q = 10, \qquad k_m = 10.
 \end{equation}
 
-The system is simulated using a St\"ormer-Verlet time integrator \cite{hairer2003geometric} using a time step $\Delta t = 10^{-6}$ for a total simulation time of $t_{\text{end}} = 5 \; \mathrm{[s]}$. The Lagrange multiplier is eliminated using a projection method \cite{benner2015time} The control law is activated after 1 second. Snapshots of the simulation are reported in Fig. \ref{fig:SnapDamp_Kir}. The discrete Hamiltonian goes almost to zero in 4 seconds (Fig. \ref{fig:H_bs_Kirchhoff}).
+The system is simulated using a St\"ormer-Verlet time integrator \cite{hairer2003geometric} using a time step $\Delta t = 10^{-6}$ for a total simulation time of $t_{\text{end}} = 5 \; \mathrm{[s]}$. The Lagrange multiplier is eliminated using a projection method \cite{benner2015time}. The control law is activated after 1 second. Snapshots of the simulation are reported in Fig. \ref{fig:SnapDamp_Kir}. The discrete Hamiltonian goes almost to zero in 4 seconds (Fig. \ref{fig:H_bs_Kirchhoff}).
 
 
 \begin{figure}[htb]
@@ -364,7 +364,7 @@ Again the matrix
 \begin{equation*}
 	\mathbf{R}_h = k \mathbf{B}_h \mathbf{M}_\partial^{-1} \mathbf{B}_h^\top \succ 0
 \end{equation*}
-is positive definite and the discretized Lyapunov function reads
+is positive definite and the discretized Lyapunov function rate reads
 \begin{equation*}
 \dot{V}_d = - \partial_{\bm{\alpha}_{d, h}} H_d(\bm{\alpha}_{d, h},\; \bm{\alpha}_{d, v})^\top \mathbf{R}_h \partial_{\bm{\alpha}_{d, h}} H_d(\bm{\alpha}_{d, h},\; \bm{\alpha}_{d, v}) \le 0.
 \end{equation*}
@@ -386,7 +386,7 @@ is positive definite and the discretized Lyapunov function reads
 		\multicolumn{2}{|c|}{Simulation Settings} \\
 		\hline 
 		Integrator & Runge-Kutta 45 \\
-		N$^\circ$ FE along $R$ & 10 \\
+		N$^\circ$ FE along $R$ & 20 \\
 		FE spaces & CG$_1$ $\times$ DG$_0$ $\times$ DG$_0$\\
 		$t_{\text{end}}$ & $3\; \mathrm{[s]}$\\ 
 		\hline 
@@ -465,15 +465,22 @@ Given the reference output $w^r(1, t)= \sin(\omega t)$, the reference solution a
 \begin{equation}\label{eq:refsol_EB}
 w^r(x, t) = \sum_{k=0}^{\infty} \omega^{2k} \frac{x^{4k}}{(4k)!}\sin(\omega t) = \frac{1}{2}[\cosh(\sqrt{\omega} x) + \cos(\omega x)]\sin(\omega t).
 \end{equation}
-The inputs that assure the tracking of the output can be computed
+The inputs that assure the tracking of the outputs can be computed
 \begin{equation}
 \begin{aligned}
 w^r(1, t) = \frac{1}{2}[\cosh(\sqrt{\omega}) + \cos(\omega)]\sin(\omega t), \\
-\partial_x w^r(1, t) = \frac{1}{2}[\sinh(\sqrt{\omega}) - \sin(\omega)]\sin(\omega t), \\
+\partial_x w^r(1, t) = \frac{1}{2}[\sinh(\sqrt{\omega}) - \sin(\omega)]\sin(\omega t). \\
 \end{aligned}
 \end{equation}
 
-This problem can be equivalently cast as a boundary control pH system 
+\begin{figure}[t]%
+	\centering
+	\includegraphics[width=0.8\columnwidth]{part_3/applications/mixed_bd_EB/prob_definition.eps} \\
+	\caption{Boundary conditions for the motion planning problem.}
+	\label{fig:prob_def_EB}
+\end{figure}
+
+This problem can be equivalently cast as a boundary control pH system with mixed boundary conditions (see Fig. \ref{fig:prob_def_EB}).
 \begin{subequations}
 	\begin{align}
 	\diffp{}{t}\begin{pmatrix}
@@ -503,6 +510,11 @@ This problem can be equivalently cast as a boundary control pH system
 	\end{pmatrix}.
 	\end{align}
 \end{subequations}
+This choice of the inputs assures that the outputs $y_{\partial}^1 = \partial_x e_w(0, t), \; y_{\partial}^2 = e_w(0, t)$ verify the desired trajectories
+$$ y_{\partial}^1 =  \partial_t \partial_x w^r(0,t) = 0, \qquad y_{\partial}^2 = \partial_t w^r(0, t) = \omega \cos(\omega t).
+$$
+
+
 
 
 \subsection{Vibroacoustics under mixed boundary conditions}
@@ -647,16 +659,16 @@ where $v_N, v_D$ are the test functions associated to the output discretization 
 \dot{\bm{\lambda}}_D \\
 \end{pmatrix}
 &= \begin{bmatrix}
-\mathbf{0} & \mathbf{D}_{\grad}^\top & \mathbf{B}_D\\
+\mathbf{0} & \mathbf{D}_{\grad}^\top & \mathbf{B}_{p, \Gamma_D}\\
 -\mathbf{D}_{\grad} & \mathbf{0} & \mathbf{0} \\
--\mathbf{B}_D^\top & \mathbf{0} & \mathbf{0} \\
+-\mathbf{B}_{p, \Gamma_D}^\top & \mathbf{0} & \mathbf{0} \\
 \end{bmatrix}
 \begin{pmatrix}
 {\mathbf{e}}_p\\
 {\mathbf{e}}_v\\
 {\bm{\lambda}}_D \\
 \end{pmatrix} + \begin{bmatrix}
-\mathbf{B}_N & \mathbf{0}\\
+\mathbf{B}_{p, \Gamma_N} & \mathbf{0}\\
 \mathbf{0}& \mathbf{0}\\
 \mathbf{0} & \mathbf{M}_{\Gamma_D} \\
 \end{bmatrix}
@@ -673,7 +685,7 @@ where $v_N, v_D$ are the test functions associated to the output discretization 
 \mathbf{y}_D \\
 \end{pmatrix} &=
 \begin{bmatrix}
-\mathbf{B}_N^\top & \mathbf{0} & \mathbf{0}\\ 
+\mathbf{B}_{p, \Gamma_D}^\top & \mathbf{0} & \mathbf{0}\\ 
 \mathbf{0} & \mathbf{0} & \mathbf{M}_{\Gamma_D} \\ 
 \end{bmatrix}
 \begin{pmatrix}
@@ -699,9 +711,9 @@ where $\mathbf{M}_{\Gamma_D, \mathcal{Z}}$ corresponds to the mass matrix associ
 \dot{\bm{\lambda}}_D \\
 \end{pmatrix}
 = \begin{bmatrix}
-\mathbf{0} & \mathbf{D}_{\grad}^\top & \mathbf{B}_D\\
+\mathbf{0} & \mathbf{D}_{\grad}^\top & \mathbf{B}_{p, \Gamma_D}\\
 -\mathbf{D}_{\grad} & \mathbf{0} & \mathbf{0} \\
--\mathbf{B}_D^\top & \mathbf{0} & -\mathbf{M}_{\Gamma_D, \mathcal{Z}} \\
+-\mathbf{B}_{p, \Gamma_D}^\top & \mathbf{0} & -\mathbf{M}_{\Gamma_D, \mathcal{Z}} \\
 \end{bmatrix}
 \begin{pmatrix}
 {\mathbf{e}}_p\\
@@ -738,20 +750,20 @@ for $\Omega_N$ to \eqref{eq:pHfindim_Om2}.
 
 \begin{tcbraster}[raster columns=2, raster equal height]
 	\begin{tcolorbox}[width=0.5\textwidth, nobeforeafter, colframe=cyan,title=Subdomain $\Omega_D$,  coltitle=white]%%
-	\begin{equation}
-	\label{eq:pHfindim_waves_OmD}
+	\begin{equation}\label{eq:pHfindim_waves_OmD}
+	\hspace*{-0.3cm}
 	\begin{aligned}
-	\mathbf{M}_D \dot{\mathbf{e}_D}= \mathbf{J}_{\Omega_D} \mathbf{e}_{\Omega_D} + \mathbf{B}^{\Omega_D}_{\Gamma_D} \mathbf{u}_D + \mathbf{B}^{\Omega_D}_{\Gamma_{\text{int}}} \mathbf{u}_D^{\text{int}}, \\
+	\mathbf{M}_{\Omega_D} \dot{\mathbf{e}}_{\Omega_D}= \mathbf{J}_{\Omega_D} \mathbf{e}_{\Omega_D} + \mathbf{B}^{\Omega_D}_{\Gamma_D} \mathbf{u}_D + \mathbf{B}^{\Omega_D}_{\Gamma_{\text{int}}} \mathbf{u}_D^{\text{int}}, \\
 	\mathbf{M}_{\Gamma_D} {\mathbf{y}}_D = \mathbf{B}^{\Omega_D \top}_{\Gamma_D} \, \mathbf{e}_D, \\
 	\mathbf{M}_{\Gamma_{\text{int}}} {\mathbf{y}}_D^{\text{int}} = \mathbf{B}^{\Omega_D \top}_{\Gamma_{\text{int}}} \mathbf{e}_D. \\
 	\end{aligned}
 	\end{equation}
 	\end{tcolorbox} 
 	\begin{tcolorbox}[width=0.5\textwidth, nobeforeafter,  colframe=red,title=Subdomain $\Omega_N$, coltitle=white]%%
-	\begin{equation}
-	\label{eq:pHfindim_waves_OmN}
+	\begin{equation}\label{eq:pHfindim_waves_OmN}
+	\hspace*{-0.3cm}
 	\begin{aligned}
-	\mathbf{M}_{\Omega_N}\dot{\mathbf{e}_N} = \mathbf{J}_{\Omega_N} \mathbf{e}_{\Omega_N}  + \mathbf{B}^{\Omega_N}_{\Gamma_N} \mathbf{u}_N + \mathbf{B}^{\Omega_N}_{\Gamma_{\text{int}}} \mathbf{u}_N^{\text{int}}, \\
+	\mathbf{M}_{\Omega_N}\dot{\mathbf{e}}_{\Omega_N} = \mathbf{J}_{\Omega_N} \mathbf{e}_{\Omega_N}  + \mathbf{B}^{\Omega_N}_{\Gamma_N} \mathbf{u}_N + \mathbf{B}^{\Omega_N}_{\Gamma_{\text{int}}} \mathbf{u}_N^{\text{int}}, \\
 	\mathbf{M}_{\Gamma_N} {\mathbf{y}}_N = \mathbf{B}^{\Omega_N \top}_{\Gamma_N} \mathbf{e}_N, \\
 	\mathbf{M}_{\Gamma_{\text{int}}} {\mathbf{y}}_N^{\text{int}} =  \mathbf{B}^{\Omega_N \top}_{\Gamma_{\text{int}}} \mathbf{e}_N.\\
 	\end{aligned}	

@@ -32,7 +32,7 @@ from scipy import integrate
 from scipy import linalg as la
 from math import ceil, floor
 
-n = 10
+n = 20
 deg_p = 0
 deg_q = 1
 
@@ -332,7 +332,6 @@ for i in range(n_ev):
     # H_vec_lin[i] = HamFuncMat(alp_sol[:,i], alq_sol[:,i])
     V_vec[i] = LyaFunc(alp_sol[:,i], alq_sol[:,i])
 
-fntsize = 16
 path_out = "/home/a.brugnoli/Plots/Python/Plots/SaintVenant_plots/Simulations/TwoDimension2/"
 
 plt.figure()
@@ -365,7 +364,7 @@ minZ = alq_sol.min()
 maxZ = alq_sol.max()
 
 
-save_figs = True
+save_figs = False
 if save_figs:
     n_fig = 7
     tol = 1e-6
@@ -392,12 +391,12 @@ if save_figs:
         # plt.show()
 
 
-#anim = animate2D(x_plot, y_plot, alq_sol, t_ev, xlabel = '$x \;  \mathrm{[m]}$',\
-#                        ylabel = '$y \;  \mathrm{[m]}$', \
-#                         zlabel = '$h \;  \mathrm{[m]}$', title = 'Fluid Height')
-#
-#
-#rallenty = 0.2
-#Writer = animation.writers['ffmpeg']
-#writer = Writer(fps=n_ev/t_fin*rallenty, metadata=dict(artist='Me'), bitrate=1800)
-#anim.save(path_out + 'wave.mp4', writer=writer)
+anim = animate2D(x_plot, y_plot, alq_sol, t_ev, xlabel = '$x \;  \mathrm{[m]}$',\
+                        ylabel = '$y \;  \mathrm{[m]}$', \
+                         zlabel = '$h \;  \mathrm{[m]}$', title = 'Fluid Height')
+
+
+rallenty = 0.2
+Writer = animation.writers['ffmpeg']
+writer = Writer(fps=n_ev/t_fin*rallenty, metadata=dict(artist='Me'), bitrate=1800)
+anim.save(path_out + 'wave.mp4', writer=writer)
