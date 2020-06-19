@@ -198,9 +198,9 @@ plt.ylabel(r'w [m]')
 plt.title(r"Vertical displacement")
 plt.legend(loc='upper left')
 
-np.save("t_evDAE", t_ev)
-np.save("ep0_solDAE", ep_sol[0, :])
-np.save("w0_solDAE", w_sol[0, :])
+# np.save("t_evDAE", t_ev)
+# np.save("ep0_solDAE", ep_sol[0, :])
+# np.save("w0_solDAE", w_sol[0, :])
 
 
 factor = 6

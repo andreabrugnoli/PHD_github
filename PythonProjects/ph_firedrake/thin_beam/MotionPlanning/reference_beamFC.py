@@ -121,8 +121,8 @@ for i in range(1, n_ev):
 
 
 plt.figure()
-plt.plot(t_ev, ep_sol[0, :], 'g+', label='Simulated VDD')
-plt.plot(tev_DAE, ep0_DAE, 'b1', label='Simulated DAE')
+plt.plot(t_ev, ep_sol[0, :], 'g1', label='Simulated VDD')
+plt.plot(tev_DAE, ep0_DAE, 'bo', label='Simulated DAE', mfc='none')
 plt.plot(t_ev, omega_r * np.cos(omega_r * t_ev), 'r--', label='Reference')
 plt.xlabel(r'{Time} $\mathrm{[s]}$')
 plt.ylabel(r'$e_w \; \mathrm{[m]}$')
@@ -132,8 +132,8 @@ plt.legend(loc='best')
 plt.savefig(pathout + "ref_vel.eps", format="eps")
 
 plt.figure()
-plt.plot(t_ev, w_sol[0, :], 'g+', label='Simulated VDD')
-plt.plot(tev_DAE, w0_DAE, 'b1', label='Simulated DAE')
+plt.plot(t_ev, w_sol[0, :], 'g1', label='Simulated VDD')
+plt.plot(tev_DAE, w0_DAE, 'bo', label='Simulated DAE', mfc='none')
 plt.plot(t_ev, np.sin(omega_r * t_ev), 'r--', label='Reference')
 plt.xlabel(r'{Time} $\mathrm{[s]}$')
 plt.ylabel(r'$w \; \mathrm{[m]}$')
@@ -251,7 +251,7 @@ w0_plot = ax.plot(x0, t_ev, np.sin(omega_r * t_ev), label='Output $w(0, t)$', co
 
 u_t = 0.5 * (np.cosh(sqrom_r) + np.cos(sqrom_r)) * np.sin(omega_r * t_ev)
 x1 = np.ones((n_ev,))
-w1_plot = ax.plot(x1, t_ev, u_t, label='Control $w(L, t)$', color='black', linewidth=5)
+w1_plot = ax.plot(x1, t_ev, u_t, label='Control $w(1, t)$', color='black', linewidth=5)
 
 ax.legend(handles=[w0_plot[0], w1_plot[0]], loc="best")
 

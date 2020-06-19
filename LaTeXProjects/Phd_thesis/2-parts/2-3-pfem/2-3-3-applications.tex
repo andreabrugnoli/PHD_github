@@ -491,9 +491,14 @@ This problem can be equivalently cast as a boundary control pH system with mixed
 	\end{bmatrix} \begin{pmatrix}
 	e_w \\ e_\kappa \\
 	\end{pmatrix}  \\
-	\bm{u}_\partial &= \begin{pmatrix}
+	\begin{pmatrix}
+	u_N^1 \\
+	u_N^2 \\
+	u_D^1 \\
+	u_D^2 \\
+	\end{pmatrix} &= \begin{pmatrix}
 	e_\kappa(0, t) \\
-	\partial_x e_\kappa(0, t) \\
+	-\partial_x e_\kappa(0, t) \\
 	e_w(1, t) \\
 	\partial_x e_w(1,t) \\
 	\end{pmatrix} = \begin{pmatrix}
@@ -502,8 +507,13 @@ This problem can be equivalently cast as a boundary control pH system with mixed
 	\frac{1}{2}[\cosh(\sqrt{\omega}) + \cos(\omega)]\omega \cos(\omega t) \\
 	\frac{1}{2}[\sinh(\sqrt{\omega}) - \sin(\omega)]\omega \cos(\omega t) \\
 	\end{pmatrix},  \\
-	\bm{y}_\partial &= \begin{pmatrix}
-	\partial_x e_w(0, t) \\
+	\begin{pmatrix}
+	y_N^1 \\
+	y_N^2 \\
+	y_D^1 \\
+	y_D^2 \\
+	\end{pmatrix}  &= \begin{pmatrix}
+	-\partial_x e_w(0, t) \\
 	e_w(0, t) \\
 	\partial_x e_\kappa(1, t) \\
 	e_\kappa(1,t) \\
@@ -514,8 +524,219 @@ This choice of the inputs assures that the outputs $y_{\partial}^1 = \partial_x 
 $$ y_{\partial}^1 =  \partial_t \partial_x w^r(0,t) = 0, \qquad y_{\partial}^2 = \partial_t w^r(0, t) = \omega \cos(\omega t).
 $$
 
+Next we concisely reported the discretization strategy for the imposition of mixed boundary conditions.
+
+\paragraph{Lagrange multipliers}
+If a Lagrange multipliers is used for the Neumann boundary condition
+
+\begin{equation}
+\begin{aligned}
+\inner[\Omega]{v_w}{\partial_t e_w} &= \inner[\Omega]{v_w}{-\partial_{xx} e_\kappa} , \\
+\inner[\Omega]{v_\kappa}{\partial_t e_\kappa} &= \inner[L^2(\Omega)]{\partial_{xx} v_\kappa}{ e_w}  + \inner[\Gamma_N]{\begin{pmatrix}
+	\partial_{\bm{n}} v_\kappa \\
+	v_\kappa \\
+	\end{pmatrix}}{\begin{pmatrix}
+	\lambda_{N}^1 \\
+	\lambda_{N}^2 \\
+	\end{pmatrix}} + \inner[\Gamma_D]{\begin{pmatrix}
+	\partial_{\bm{n}} v_\kappa \\
+	v_\kappa \\
+	\end{pmatrix}}{\begin{pmatrix}
+	u_{D}^1 \\
+	u_{D}^2 \\
+	\end{pmatrix}}.
+\end{aligned}
+\end{equation}
+
+Using a Galerkin method the following system is computed.
+\begin{equation}\label{eq:pHfindim_phdae_EB}
+\begin{aligned}
+\begin{bmatrix}
+\mathbf{M}_{w} & \mathbf{0} & \mathbf{0}\\
+\mathbf{0} & \mathbf{M}_{\kappa} & \mathbf{0} \\
+\mathbf{0} & \mathbf{0} & \mathbf{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\mathbf{e}}_w\\
+\dot{\mathbf{e}}_\kappa\\
+\dot{\bm{\lambda}}_N \\
+\end{pmatrix}
+&= \begin{bmatrix}
+\mathbf{0} & \mathbf{D}_{-\partial_{xx}}^\top & \mathbf{0} \\
+-\mathbf{D}_{-\partial_{xx}} & \mathbf{0} & \mathbf{B}_{\kappa, \Gamma_N}  \\
+\mathbf{0} & -\mathbf{B}_{\kappa, \Gamma_N}^\top & \mathbf{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+{\mathbf{e}}_w\\
+{\mathbf{e}}_\kappa\\
+{\bm{\lambda}}_N \\
+\end{pmatrix} + \begin{bmatrix}
+\mathbf{0} \\
+\mathbf{B}_{\kappa, \Gamma_D} \\
+\mathbf{0} \\
+\end{bmatrix} \mathbf{u}_D, \\
+\mathbf{y}_D  &=
+\begin{bmatrix}
+\mathbf{0} & \mathbf{B}_{\kappa, \Gamma_D}^\top & \mathbf{0}\\ 
+\end{bmatrix}
+\begin{pmatrix}
+{\mathbf{e}}_p\\
+{\mathbf{e}}_v\\
+{\bm{\lambda}}_N \\
+\end{pmatrix}.
+\end{aligned}
+\end{equation}
+The DG1Her element \eqref{eq:DG1Her} is employed for the discretization.
+
+\begin{figure}[t]
+	\begin{minipage}[b]{0.4\linewidth}
+		\centering
+		\includegraphics[width=0.95\columnwidth]{part_3/applications/mixed_bd_EB/dom_split.eps} \\
+		\caption{Virtual decomposition of the Euler Bernoulli beam.}
+		\label{fig:dom_dec_EC}
+	\end{minipage}
+	\hspace{0.5cm}
+	\begin{minipage}[b]{0.5\linewidth}
+		\centering
+		\includegraphics[width=0.95\columnwidth]{part_3/applications/mixed_bd_EB/dom_int.eps}
+		\caption{Interconnection for the Euler-Bernoulli beam.}
+		\label{fig:dom_int_EB}
+	\end{minipage}
+\end{figure}
 
 
+\paragraph{Virtual domain decomposition}
+For the decomposition, the beam is split into halves \ref{fig:dom_dec_EC}.
+Applying the PFEM methodology as in \ref{sec:vdd} two finite dimensional systems are obtained. For $\Omega_N$ the system is analogous to \eqref{eq:pHfindim_Om2}, 
+
+\begin{tcolorbox}[colframe=red,title=Subdomain $\Omega_N$, coltitle=white]%%
+	\begin{equation}\label{eq:pHfindim_EB_OmN}
+	\begin{aligned}
+	\begin{bmatrix}
+	\mathbf{M}_{w} & \mathbf{0} \\
+	\mathbf{0} & \mathbf{M}_{\kappa} \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	\dot{\mathbf{e}}_w\\
+	\dot{\mathbf{e}}_\kappa\\
+	\end{pmatrix}
+	&= \begin{bmatrix}
+	\mathbf{0} & -\mathbf{D}_{\partial_{xx}}^\top\\
+	\mathbf{D}_{\partial_{xx}} & \mathbf{0}\\
+	\end{bmatrix}
+	\begin{pmatrix}
+	{\mathbf{e}}_w\\
+	{\mathbf{e}}_\kappa\\
+	\end{pmatrix} + \begin{bmatrix}
+	\mathbf{B}_{w, \Gamma_{\text{int}}}\\
+	\mathbf{0}\\
+	\end{bmatrix}\mathbf{u}_N^{\text{int}}, \\
+	\mathbf{y}_N^{\text{int}} &=
+	\begin{bmatrix}
+	\mathbf{B}_{w, \Gamma_{\text{int}}}^\top & \mathbf{0}\\ 
+	\end{bmatrix}
+	\begin{pmatrix}
+	{\mathbf{e}}_w\\
+	{\mathbf{e}}_\kappa\\
+	\end{pmatrix}.
+	\end{aligned}	
+	\end{equation}
+\end{tcolorbox}
+while for $\Omega_D$ to \eqref{eq:pHfindim_Om1}.
+	
+\begin{tcolorbox}[colframe=blue,title=Subdomain $\Omega_D$,  coltitle=white]%%
+	\begin{equation}\label{eq:pHfindim_EB_OmD}
+	\begin{aligned}
+	\begin{bmatrix}
+	\mathbf{M}_{w} & \mathbf{0}\\
+	\mathbf{0} & \mathbf{M}_{\kappa}\\
+	\end{bmatrix}
+	\begin{pmatrix}
+	\dot{\mathbf{e}}_w\\
+	\dot{\mathbf{e}}_\kappa\\
+	\end{pmatrix}
+	&= \begin{bmatrix}
+	\mathbf{0} & \mathbf{D}_{-\partial_{xx}}\\
+	-\mathbf{D}_{-\partial_{xx}}^\top & \mathbf{0}  \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	{\mathbf{e}}_w\\
+	{\mathbf{e}}_\kappa\\
+	\end{pmatrix} + \begin{bmatrix}
+	\mathbf{0} & \mathbf{0} \\
+	\mathbf{B}_{\kappa, \Gamma_D} & \mathbf{B}_{\kappa, \Gamma_{\text{int}}} \\
+	\end{bmatrix} \begin{pmatrix}
+	\mathbf{u}_D \\ \mathbf{u}_D^{\text{int}}
+	\end{pmatrix}, \\
+	\begin{pmatrix}
+	\mathbf{y}_D \\ \mathbf{y}_D^{\text{int}}
+	\end{pmatrix}  &=
+	\begin{bmatrix}
+	\mathbf{0} & \mathbf{B}_{\kappa, \Gamma_D}^\top\\ 
+	\mathbf{0} & \mathbf{B}_{\kappa, \Gamma_{\text{int}}}^\top\\ 
+	\end{bmatrix}
+	\begin{pmatrix}
+	{\mathbf{e}}_w \\
+	{\mathbf{e}}_\kappa \\
+	\end{pmatrix}.
+	\end{aligned}
+	\end{equation}
+\end{tcolorbox} 
+In order to get a system with mixed causality, systems \eqref{eq:pHfindim_EB_OmD} and \eqref{eq:pHfindim_EB_OmD} have to be interconnected using a classical gyrator interconnection. The correct interconnection reads (cf. Fig. \ref{fig:dom_int_EB})
+\begin{align*}
+\mathbf{u}_N^{\text{int}} &= 
+\begin{pmatrix}
+e_\kappa(1/2, t) \\ \partial_x e_\kappa(1/2, t)
+\end{pmatrix} = 
+\begin{bmatrix}
+1 & 0 \\ 0 & -1
+\end{bmatrix}\begin{pmatrix}
+ e_\kappa(1/2, t) \\ -\partial_x e_\kappa(1/2, t)
+ \end{pmatrix} = \mathbf{C} \mathbf{y}_D^{\text{int}}, \\
+	\mathbf{u}_D^{\text{int}} &= 
+	\begin{pmatrix}
+	-\partial_x e_w(L/2, t) \\ e_w(L/2, t)
+	\end{pmatrix} = 
+	\begin{bmatrix}
+	-1 & 0 \\ 0 & 1
+	\end{bmatrix}\begin{pmatrix}
+	\partial_x e_w(1/2, t) \\ e_w(1/2, t) 
+	\end{pmatrix} = -\mathbf{C}^\top \mathbf{y}_N^{\text{int}}
+s\end{align*}
+This interconnection establishes that the power is exchanged without loss between the two systems
+\begin{equation}
+\mathbf{u}_D^{\text{int}\, \top} \mathbf{M}_{\Gamma_{\text{int}}} \mathbf{y}_D^{\text{int}} + \mathbf{u}_N^{\text{int}\, \top} \mathbf{M}_{\Gamma_{\text{int}}} \mathbf{y}_N^{\text{int}} = 0.
+\end{equation}
+
+For what concerns the choice of the approximations, System \eqref{eq:pHfindim_EB_OmN} is discretized using the HerDG1 elements \eqref{eq:HerDG1}, while for System \eqref{eq:pHfindim_EB_OmD} the DG1Her \eqref{eq:DG1Her} elements are used.
+
+
+
+\paragraph{Numerical results}
+Six elements are used for the discretization (both for the Lagrange multiplier and virtual domain decomposition method. The analytical solution for the reference dispacement and velocity together with their numerical discretization are plotted in Figs. \ref{fig:refw_EB} and \ref{fig:refv_EB}. The numerical predictions perfectly match the analytical solution.   In Fig. \ref{fig:w_motplan_EB} the numerical solution for the vertical displacement obtained using the virtual domain decomposition is shown. 
+
+\begin{figure}[th]
+	\centering
+	\includegraphics[width=0.6\columnwidth]{part_3/applications/mixed_bd_EB/plotW.eps} \\
+	\caption{Computed vertical displacement.}
+	\label{fig:w_motplan_EB}
+\end{figure}
+
+
+\begin{figure}[bh]
+\begin{minipage}[t]{0.5\linewidth}
+	\centering
+	\includegraphics[width=0.98\columnwidth]{part_3/applications/mixed_bd_EB/ref_w.eps} \\
+	\caption{Analytical reference displacement and numerical predictions.}
+	\label{fig:refw_EB}
+\end{minipage}
+\begin{minipage}[t]{0.5\linewidth}
+	\centering
+	\includegraphics[width=0.98\columnwidth]{part_3/applications/mixed_bd_EB/ref_vel.eps} \\
+	\caption{Analytical reference velocity and numerical predictions.}
+	\label{fig:refv_EB}
+\end{minipage}
+\end{figure}
 
 \subsection{Vibroacoustics under mixed boundary conditions}
 Consider the model for the propagation of sound in air \ref{eq:pHsys_waves}
@@ -638,10 +859,10 @@ In the next paragraphs we provide a concise description of the discretization pr
 If a Lagrange multiplier is introduced for the Dirichlet boundary condition, the following weak form is obtained
 \begin{equation}
 \begin{aligned}
-\inner[\Omega_r]{v_p}{\chi_s \partial_t e_p} &= \inner[\Omega_r]{{\grad}_r v_p}{\bm{e}_v} + \inner[\Gamma_D]{v_p}{\lambda_D}  +\inner[\Gamma_D]{v_p}{u_N}, \\
+\inner[\Omega_r]{v_p}{\chi_s \partial_t e_p} &= \inner[\Omega_r]{{\grad}_r v_p}{\bm{e}_v} + \inner[\Gamma_D]{v_p}{\lambda_D}  +\inner[\Gamma_N]{v_p}{u_N}, \\
 \inner[\Omega_r]{\bm{v}_v}{\mu_0 \partial_t \bm{e}_v} &=  \inner[\Omega_r]{\bm{v}_v}{{\grad}_r e_p}, \\
-0 &= - \inner[\Gamma_D]{v_\lambda}{e_p} + \inner[\Gamma_D]{v_D}{u_D}, \\
-\inner[\Gamma_N]{v_\lambda}{y_N} &= \inner[\Gamma_N]{v_N}{e_p}, \\
+0 &= - \inner[\Gamma_D]{v_D}{e_p} + \inner[\Gamma_D]{v_D}{u_D}, \\
+\inner[\Gamma_N]{v_N}{y_N} &= \inner[\Gamma_N]{v_N}{e_p}, \\
 \inner[\Gamma_D]{v_D}{y_D} &= \inner[\Gamma_D]{v_D}{\lambda_D},
 \end{aligned}
 \end{equation}
@@ -723,7 +944,7 @@ where $\mathbf{M}_{\Gamma_D, \mathcal{Z}}$ corresponds to the mass matrix associ
 \mathbf{b}_N \\
 \mathbf{0}\\
 \mathbf{0}\\
-\end{pmatrix},
+\end{pmatrix}.
 \end{equation}
 
 \paragraph{Virtual domain decomposition}
@@ -732,16 +953,16 @@ In order to apply this methodology the domain has to be split into two sub-domai
 \begin{figure}[t]
 	\begin{minipage}[b]{0.48\linewidth}
 			\centering
-			\includegraphics[width=0.9\columnwidth]{part_3/applications/mixed_bd_waves/domain_split.eps} \\
+			\includegraphics[width=0.9\columnwidth]{part_3/applications/mixed_bd_waves/dom_split.eps} \\
 			\caption{Virtual decomposition of the vibroacoustic domain.}
 			\label{fig:dom_dec_vibro}
 	\end{minipage}
 	\hspace{0.5cm}
 	\begin{minipage}[b]{0.48\linewidth}
 		\centering
-		\includegraphics[width=0.8\columnwidth]{part_3/applications/mixed_bd_waves/domain_int.eps}
-		\caption{Interconnection at the interface $\Gamma_{\text{int}}$.}
-		\label{fig:dom_dec_int}
+		\includegraphics[width=0.8\columnwidth]{part_3/applications/mixed_bd_waves/dom_int.eps}
+		\caption{Interconnection for the vibroacoustic domain..}
+		\label{fig:dom_int_vibro}
 	\end{minipage}
 \end{figure}
 
@@ -749,7 +970,7 @@ Applying the PFEM methodology as in \ref{sec:vdd} two finite dimensional systems
 for $\Omega_N$ to \eqref{eq:pHfindim_Om2}.
 
 \begin{tcbraster}[raster columns=2, raster equal height]
-	\begin{tcolorbox}[width=0.5\textwidth, nobeforeafter, colframe=cyan,title=Subdomain $\Omega_D$,  coltitle=white]%%
+	\begin{tcolorbox}[width=0.5\textwidth, nobeforeafter, colframe=blue,title=Subdomain $\Omega_D$,  coltitle=white]%%
 	\begin{equation}\label{eq:pHfindim_waves_OmD}
 	\hspace*{-0.3cm}
 	\begin{aligned}
@@ -770,15 +991,12 @@ for $\Omega_N$ to \eqref{eq:pHfindim_Om2}.
 	\end{equation}
 	\end{tcolorbox}
 \end{tcbraster}
-In order to get a system with mixed causality, systems \eqref{eq:pHfindim_waves_OmD} and \eqref{eq:pHfindim_waves_OmD} have to be interconnected using a classical gyrator interconnection. Considering that the pressure field is continuous at $\Gamma_{\text{int}}$, the outward normal verifies $\bm{n}_D \vert_{\Gamma_{\text{int}}}= - \bm{n}_N \vert_{\Gamma_{\text{int}}}$ and the corresponding degrees of freedom have to be matched, the correct interconnection reads (cf. Fig. \ref{fig:dom_dec_int})
+In order to get a system with mixed causality, systems \eqref{eq:pHfindim_waves_OmD} and \eqref{eq:pHfindim_waves_OmD} have to be interconnected using a classical gyrator interconnection. Considering that the pressure field is continuous at $\Gamma_{\text{int}}$, the outward normal verifies $\bm{n}_D \vert_{\Gamma_{\text{int}}}= - \bm{n}_N \vert_{\Gamma_{\text{int}}}$ and the corresponding degrees of freedom have to be matched, the correct interconnection reads (cf. Fig. \ref{fig:dom_int_vibro})
 \begin{equation}
 \mathbf{u}_N^{\text{int}} = - \mathbf{y}_D^{\text{int}}, \qquad
 \mathbf{u}_D^{\text{int}} = \mathbf{y}_N^{\text{int}}.
 \end{equation}
-This interconnection establishes that the power is exchanged without loss between the two systems
-\begin{equation}
-\mathbf{u}_D^{\text{int}\, \top} \mathbf{M}_{\Gamma_{\text{int}}} \mathbf{y}_D^{\text{int}} + \mathbf{u}_N^{\text{int}\, \top} \mathbf{M}_{\Gamma_{\text{int}}} \mathbf{y}_N^{\text{int}} = 0.
-\end{equation}
+
 The resulting interconnected system is written as
 \begin{equation}\label{eq:pHfindim_waves_intOmDN}
 \begin{aligned}
