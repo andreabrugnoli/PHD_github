@@ -4,10 +4,11 @@ import scipy.linalg as la
 from system_components.beams import FreeEB, ClampedEB, draw_allbending
 from modules_ph.classes_phsystem import SysPhdaeRig
 from scipy import integrate
-import matplotlib.pyplot as plt
 from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
 from firedrake.plot import calculate_one_dim_points
+
+import matplotlib.pyplot as plt
 
 SMALL_SIZE = 14
 MEDIUM_SIZE = 16
@@ -123,7 +124,7 @@ for i in range(1, n_ev):
 plt.figure()
 plt.plot(t_ev, ep_sol[0, :], 'g1', label='Simulated VDD')
 plt.plot(tev_DAE, ep0_DAE, 'bo', label='Simulated DAE', mfc='none')
-plt.plot(t_ev, omega_r * np.cos(omega_r * t_ev), 'r--', label='Reference')
+plt.plot(t_ev, omega_r * np.cos(omega_r * t_ev), 'r--', label='Exact')
 plt.xlabel(r'{Time} $\mathrm{[s]}$')
 plt.ylabel(r'$e_w \; \mathrm{[m]}$')
 plt.title(r"Vertical velocity")
@@ -134,7 +135,7 @@ plt.savefig(pathout + "ref_vel.eps", format="eps")
 plt.figure()
 plt.plot(t_ev, w_sol[0, :], 'g1', label='Simulated VDD')
 plt.plot(tev_DAE, w0_DAE, 'bo', label='Simulated DAE', mfc='none')
-plt.plot(t_ev, np.sin(omega_r * t_ev), 'r--', label='Reference')
+plt.plot(t_ev, np.sin(omega_r * t_ev), 'r--', label='Exact')
 plt.xlabel(r'{Time} $\mathrm{[s]}$')
 plt.ylabel(r'$w \; \mathrm{[m]}$')
 plt.title(r"Vertical displacement")

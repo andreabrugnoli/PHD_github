@@ -13,8 +13,8 @@ from math import pi, floor
 
 import matplotlib
 import matplotlib.pyplot as plt
+from tools_plotting import setup
 
-matplotlib.rcParams['text.usetex'] = True
 import mpmath
 mpmath.mp.dps = 15; mpmath.mp.pretty = True
 
@@ -235,10 +235,10 @@ path_fig = "/home/a.brugnoli/Plots/Python/Plots/Thermoelasticity/"
 save_fig = True
 plt.figure()
 
-plt.plot(t1, th1, '-.', label=r'approx $\theta$ $\delta=0$')
-plt.plot(t2, th2, '--', label=r'approx $\theta$ $\delta=1$')
-plt.plot(t_an1, th_an1, '-', label=r'exact $\theta$ $\delta=0$')
-plt.plot(t_an2, th_an2, ':', label=r'exact $\theta$ $\delta=1$')
+plt.plot(t1, th1, '-.', label=r'Approx $\theta$ $\delta=0$')
+plt.plot(t2, th2, '-.', label=r'Approx $\theta$ $\delta=1$')
+plt.plot(t_an1, th_an1, ':', label=r'Exact $\theta$ $\delta=0$')
+plt.plot(t_an2, th_an2, ':', label=r'Exact $\theta$ $\delta=1$')
 plt.xlabel(r'Dimensionless Time')
 plt.title(r'Dimensionless Temperature at ' + str(1))
 plt.legend()
@@ -246,10 +246,10 @@ plt.legend()
 plt.savefig(path_fig + "temp_at1_1D", format="eps")
 plt.figure()
 
-plt.plot(t1, u1, '-.', label=r'approx $u_x$ $\delta=0$')
-plt.plot(t2, u2, '-.', label=r'approx $u_x$ $\delta=1$')
-plt.plot(t_an1, disp_an1, '-', label=r'exact $\theta$ $\delta=0$')
-plt.plot(t_an2, disp_an2, ':', label=r'exact $\theta$ $\delta=1$')
+plt.plot(t1, u1, '-.', label=r'Approx $u_x$ $\delta=0$')
+plt.plot(t2, u2, '-.', label=r'Approx $u_x$ $\delta=1$')
+plt.plot(t_an1, disp_an1, ':', label=r'Exact $\theta$ $\delta=0$')
+plt.plot(t_an2, disp_an2, ':', label=r'Exact $\theta$ $\delta=1$')
 plt.xlabel(r'Dimensionless Time')
 plt.title(r'Dimensionless Displacement at ' + str(1))
 plt.legend()

@@ -5,9 +5,9 @@
 
 \lettrine{\color{theme}{T}}he proposed finite element discretization can be employed for different numerical applications. The chapter is organized as follows:
 \begin{itemize}
-	\item a boundary stabilization problem for the Kirchhoff plate and for the irrotational shallow water equations is presented in Sec. \secref{sec:bd_stab};
-	\item Sec. \secref{sec:mixbd_enfor} presents a comparison of the Lagrange multiplier \ref{sec:lagrMul} and the virtual domain decomposition method \ref{sec:vdd} for the enforcement of mixed boundary conditions;
-	\item a thermoelastic problem for which an analytic solution is avaiable is illustrated in Sec. \secref{sec:thelas_wave}.
+	\item a boundary stabilization problem for the Kirchhoff plate and for the irrotational shallow water equations is presented in \secref{sec:bd_stab};
+	\item Sec. \ref{sec:mixbd_enfor} presents a comparison of the Lagrange multiplier \ref{sec:lagrMul} and the virtual domain decomposition method \ref{sec:vdd} for the enforcement of mixed boundary conditions;
+	\item a thermoelastic problem for which an analytic solution is avaiable is illustrated in \secref{sec:thelas_wave}.
 \end{itemize}
 
 
@@ -103,8 +103,8 @@ The discretization is performed as in \eqref{eq:pHsys_findim_kirchh_hess}. A str
 -\mathbf{B}_{\Gamma_D}^\top & \mathbf{0} & \mathbf{0} \\
 \end{bmatrix} 
 \begin{pmatrix}
-\dot{\mathbf{e}}_{w} \\
-\dot{\mathbf{e}}_{\kappa} \\
+{\mathbf{e}}_{w} \\
+{\mathbf{e}}_{\kappa} \\
 {\bm{\lambda}}_{\Gamma_D} \\
 \end{pmatrix} + 
 \begin{bmatrix}
@@ -129,8 +129,8 @@ The discretization is performed as in \eqref{eq:pHsys_findim_kirchh_hess}. A str
 \mathbf{B}_{\partial_{\bm{n}} w, \Gamma_N}^\top & \mathbf{0} & \mathbf{0} \\
 \end{bmatrix}
 \begin{pmatrix}
-\dot{\mathbf{e}}_{w} \\
-\dot{\mathbf{e}}_{\kappa} \\
+{\mathbf{e}}_{w} \\
+{\mathbf{e}}_{\kappa} \\
 {\bm{\lambda}}_{\Gamma_D} \\
 \end{pmatrix},
 \end{aligned}
@@ -160,14 +160,14 @@ System \eqref{eq:pHsys_findim_bdKir_open} now reads
 -\mathbf{B}_{\Gamma_D}^\top & \mathbf{0} & \mathbf{0} \\
 \end{bmatrix} 
 \begin{pmatrix}
-\dot{\mathbf{e}}_{w} \\
-\dot{\mathbf{e}}_{\kappa} \\
+{\mathbf{e}}_{w} \\
+{\mathbf{e}}_{\kappa} \\
 {\bm{\lambda}}_{\Gamma_D} \\
 \end{pmatrix}.
 \end{equation}
 The matrix 
 $$\mathbf{R}_w = k_q \mathbf{B}_{w, \Gamma_N} \mathbf{M}_{\Gamma_N}^{-1} \mathbf{B}_{w, \Gamma_N}^\top + k_m \mathbf{B}_{\partial_{\bm{n}} w, \Gamma_N} \mathbf{M}_{\Gamma_N,}^{-1} \mathbf{B}_{\partial_{\bm{n}} w, \Gamma_N}^\top \succ 0$$
- is positive definitive because of the collocated input-output feature of pH systems. The energy rate evaluates to (\cite{beattie2018linear} theorem 13)
+ is positive definitive because of the collocated input-output feature of pH systems. The energy rate evaluates to \cite[Theorem 13]{beattie2018linear}
 \[\dot{H} _{d} = - \mathbf{e}_{w}^\top \; \mathbf{R}_w \; \mathbf{e}_{w} \le 0. \]
 Therefore, the Hamiltonian energy is a Lyapunov function and the asymptotic stability of configuration $\mathbf{e}_{w} = \mathbf{0}, \; \mathbf{e}_{\kappa} = \mathbf{0}$ is deduced using LaSalle' invariance  principle. \\
 
@@ -520,19 +520,19 @@ This problem can be equivalently cast as a boundary control pH system with mixed
 	\end{pmatrix}.
 	\end{align}
 \end{subequations}
-This choice of the inputs assures that the outputs $y_{\partial}^1 = \partial_x e_w(0, t), \; y_{\partial}^2 = e_w(0, t)$ verify the desired trajectories
-$$ y_{\partial}^1 =  \partial_t \partial_x w^r(0,t) = 0, \qquad y_{\partial}^2 = \partial_t w^r(0, t) = \omega \cos(\omega t).
+This choice of the inputs assures that the outputs $y_{N}^1 = -\partial_x e_w(0, t), \; y_{N}^2 = e_w(0, t)$ verify the desired trajectories
+$$ y_{N}^1 =  -\partial_t \partial_x w^r(0,t) = 0, \qquad y_{N}^2 = \partial_t w^r(0, t) = \omega \cos(\omega t).
 $$
 
 Next we concisely reported the discretization strategy for the imposition of mixed boundary conditions.
 
 \paragraph{Lagrange multipliers}
-If a Lagrange multipliers is used for the Neumann boundary condition
+If a Lagrange multipliers is used for the Neumann boundary condition the following weak form is obtained
 
 \begin{equation}
 \begin{aligned}
 \inner[\Omega]{v_w}{\partial_t e_w} &= \inner[\Omega]{v_w}{-\partial_{xx} e_\kappa} , \\
-\inner[\Omega]{v_\kappa}{\partial_t e_\kappa} &= \inner[L^2(\Omega)]{\partial_{xx} v_\kappa}{ e_w}  + \inner[\Gamma_N]{\begin{pmatrix}
+\inner[\Omega]{v_\kappa}{\partial_t e_\kappa} &= \inner[\Omega]{\partial_{xx} v_\kappa}{ e_w}  + \inner[\Gamma_N]{\begin{pmatrix}
 	\partial_{\bm{n}} v_\kappa \\
 	v_\kappa \\
 	\end{pmatrix}}{\begin{pmatrix}
@@ -606,65 +606,63 @@ The DG1Her element \eqref{eq:DG1Her} is employed for the discretization.
 
 
 \paragraph{Virtual domain decomposition}
-For the decomposition, the beam is split into halves \ref{fig:dom_dec_EC}.
-Applying the PFEM methodology as in \ref{sec:vdd} two finite dimensional systems are obtained. For $\Omega_N$ the system is analogous to \eqref{eq:pHfindim_Om2}, 
+For the decomposition, the beam is split into halves (see Fig. \ref{fig:dom_dec_EC}).
+Applying the PFEM methodology as in \ref{sec:vdd} two finite dimensional systems are obtained. For $\Omega_N$ the system is analogous to \eqref{eq:pHfindim_Om2}, while for $\Omega_D$ to \eqref{eq:pHfindim_Om1}.
 
 \begin{tcolorbox}[colframe=red,title=Subdomain $\Omega_N$, coltitle=white]%%
 	\begin{equation}\label{eq:pHfindim_EB_OmN}
 	\begin{aligned}
 	\begin{bmatrix}
-	\mathbf{M}_{w} & \mathbf{0} \\
-	\mathbf{0} & \mathbf{M}_{\kappa} \\
+	\mathbf{M}_{w}^{\Omega_N} & \mathbf{0} \\
+	\mathbf{0} & \mathbf{M}_{\kappa}^{\Omega_N} \\
 	\end{bmatrix}
 	\begin{pmatrix}
-	\dot{\mathbf{e}}_w\\
-	\dot{\mathbf{e}}_\kappa\\
+	\dot{\mathbf{e}}_{w, \Omega_N}\\
+	\dot{\mathbf{e}}_{\kappa, \Omega_N}\\
 	\end{pmatrix}
 	&= \begin{bmatrix}
-	\mathbf{0} & -\mathbf{D}_{\partial_{xx}}^\top\\
-	\mathbf{D}_{\partial_{xx}} & \mathbf{0}\\
+	\mathbf{0} & -\mathbf{D}_{\partial_{xx}}^{\Omega_N \top}\\
+	\mathbf{D}_{\partial_{xx}}^{\Omega_N} & \mathbf{0}\\
 	\end{bmatrix}
 	\begin{pmatrix}
-	{\mathbf{e}}_w\\
-	{\mathbf{e}}_\kappa\\
+	{\mathbf{e}}_{w, \Omega_N}\\
+	{\mathbf{e}}_{\kappa, \Omega_N}\\
 	\end{pmatrix} + \begin{bmatrix}
-	\mathbf{B}_{w, \Gamma_{\text{int}}}\\
+	\mathbf{B}_{w, \Gamma_{\text{int}}}^{\Omega_N}\\
 	\mathbf{0}\\
 	\end{bmatrix}\mathbf{u}_N^{\text{int}}, \\
 	\mathbf{y}_N^{\text{int}} &=
 	\begin{bmatrix}
-	\mathbf{B}_{w, \Gamma_{\text{int}}}^\top & \mathbf{0}\\ 
+	\mathbf{B}_{w, \Gamma_{\text{int}}}^{\Omega_N \top} & \mathbf{0}\\ 
 	\end{bmatrix}
 	\begin{pmatrix}
-	{\mathbf{e}}_w\\
-	{\mathbf{e}}_\kappa\\
+	{\mathbf{e}}_{w, \Omega_N}\\
+	{\mathbf{e}}_{\kappa, \Omega_N}\\
 	\end{pmatrix}.
 	\end{aligned}	
 	\end{equation}
 \end{tcolorbox}
-while for $\Omega_D$ to \eqref{eq:pHfindim_Om1}.
-	
 \begin{tcolorbox}[colframe=blue,title=Subdomain $\Omega_D$,  coltitle=white]%%
 	\begin{equation}\label{eq:pHfindim_EB_OmD}
 	\begin{aligned}
 	\begin{bmatrix}
-	\mathbf{M}_{w} & \mathbf{0}\\
-	\mathbf{0} & \mathbf{M}_{\kappa}\\
+	\mathbf{M}_{w}^{\Omega_D} & \mathbf{0}\\
+	\mathbf{0} & \mathbf{M}_{\kappa}^{\Omega_D}\\
 	\end{bmatrix}
 	\begin{pmatrix}
-	\dot{\mathbf{e}}_w\\
-	\dot{\mathbf{e}}_\kappa\\
+	\dot{\mathbf{e}}_{w, \Omega_D}\\
+	\dot{\mathbf{e}}_{\kappa, \Omega_D}\\
 	\end{pmatrix}
 	&= \begin{bmatrix}
-	\mathbf{0} & \mathbf{D}_{-\partial_{xx}}\\
-	-\mathbf{D}_{-\partial_{xx}}^\top & \mathbf{0}  \\
+	\mathbf{0} & \mathbf{D}_{-\partial_{xx}}^{\Omega_D}\\
+	-\mathbf{D}_{-\partial_{xx}}^{\Omega_D \top} & \mathbf{0}  \\
 	\end{bmatrix}
 	\begin{pmatrix}
-	{\mathbf{e}}_w\\
-	{\mathbf{e}}_\kappa\\
+	{\mathbf{e}}_{w, \Omega_D}\\
+	{\mathbf{e}}_{\kappa, \Omega_D}\\
 	\end{pmatrix} + \begin{bmatrix}
 	\mathbf{0} & \mathbf{0} \\
-	\mathbf{B}_{\kappa, \Gamma_D} & \mathbf{B}_{\kappa, \Gamma_{\text{int}}} \\
+	\mathbf{B}_{\kappa, \Gamma_D}^{\Omega_D} & \mathbf{B}_{\kappa, \Gamma_{\text{int}}}^{\Omega_D} \\
 	\end{bmatrix} \begin{pmatrix}
 	\mathbf{u}_D \\ \mathbf{u}_D^{\text{int}}
 	\end{pmatrix}, \\
@@ -672,17 +670,17 @@ while for $\Omega_D$ to \eqref{eq:pHfindim_Om1}.
 	\mathbf{y}_D \\ \mathbf{y}_D^{\text{int}}
 	\end{pmatrix}  &=
 	\begin{bmatrix}
-	\mathbf{0} & \mathbf{B}_{\kappa, \Gamma_D}^\top\\ 
-	\mathbf{0} & \mathbf{B}_{\kappa, \Gamma_{\text{int}}}^\top\\ 
+	\mathbf{0} & \mathbf{B}_{\kappa, \Gamma_D}^{\Omega_D \top }\\ 
+	\mathbf{0} & \mathbf{B}_{\kappa, \Gamma_{\text{int}}}^{\Omega_D \top}\\ 
 	\end{bmatrix}
 	\begin{pmatrix}
-	{\mathbf{e}}_w \\
-	{\mathbf{e}}_\kappa \\
+	{\mathbf{e}}_{w, \Omega_D}\\
+	{\mathbf{e}}_{\kappa, \Omega_D}\\
 	\end{pmatrix}.
 	\end{aligned}
 	\end{equation}
 \end{tcolorbox} 
-In order to get a system with mixed causality, systems \eqref{eq:pHfindim_EB_OmD} and \eqref{eq:pHfindim_EB_OmD} have to be interconnected using a classical gyrator interconnection. The correct interconnection reads (cf. Fig. \ref{fig:dom_int_EB})
+In order to get a system with mixed causality, systems \eqref{eq:pHfindim_EB_OmN} and \eqref{eq:pHfindim_EB_OmD} have to be interconnected using a classical gyrator interconnection. The correct interconnection reads (cf. Fig. \ref{fig:dom_int_EB})
 \begin{align*}
 \mathbf{u}_N^{\text{int}} &= 
 \begin{pmatrix}
@@ -713,7 +711,26 @@ For what concerns the choice of the approximations, System \eqref{eq:pHfindim_EB
 
 
 \paragraph{Numerical results}
-Six elements are used for the discretization (both for the Lagrange multiplier and virtual domain decomposition method. The analytical solution for the reference dispacement and velocity together with their numerical discretization are plotted in Figs. \ref{fig:refw_EB} and \ref{fig:refv_EB}. The numerical predictions perfectly match the analytical solution.   In Fig. \ref{fig:w_motplan_EB} the numerical solution for the vertical displacement obtained using the virtual domain decomposition is shown. 
+The settings for the numerical simulation are reported in Tab. \ref{tab:parEBmotion}. The frequency of the reference output is set to $\omega=4$. The analytical solution for the reference displacement and velocity together with their numerical discretization are plotted in Figs. \ref{fig:refw_EB} and \ref{fig:refv_EB}. The numerical predictions perfectly match the analytical solution. In Fig. \ref{fig:w_motplan_EB} the numerical solution for the vertical displacement obtained using the virtual domain decomposition is shown. 
+
+\begin{table}[th]
+	\centering
+	\begin{tabular}{|c|c|}
+		\hline 
+		\multicolumn{2}{|c|}{Simulation Settings} \\ 
+		\hline 
+		ODE Integrator & RK 45\\
+		DAE Integrator & IDA \\ 
+		N$^\circ$ elements & 6 \\ 
+		FE spaces (DAE) & DG$_1$ $\times$ Her \\
+		FE spaces (ODE) & Her $\times$ DG$_1$ on $\Omega_N$ / DG$_1$ $\times$ Her on $\Omega_D$ \\
+		$t_{\text{end}}$& $1  [\textrm{s}]$ \\ 
+		\hline 
+	\end{tabular} 
+	\vspace{1mm}
+	\caption{Settings for the Euler-Bernoulli motion planning problem.}
+	\label{tab:parEBmotion}
+\end{table}
 
 \begin{figure}[th]
 	\centering
@@ -723,7 +740,7 @@ Six elements are used for the discretization (both for the Lagrange multiplier a
 \end{figure}
 
 
-\begin{figure}[bh]
+\begin{figure}[bth!]
 \begin{minipage}[t]{0.5\linewidth}
 	\centering
 	\includegraphics[width=0.95\columnwidth]{part_3/applications/mixed_bd_EB/ref_w.eps} \\
@@ -761,12 +778,22 @@ e_p \\
 \end{equation}
 where $e_p \in \mathbb{R}$  and $\bm{e}_v \in \mathbb{R}^3$ denote the variations of pressure and velocity from a steady state, $\mu_0$ is the steady state mass density, and $\chi_s$ represents a constant adiabatic compressibility factor. With $x, r, \theta$ we denote the axial, radial and tangential cylindrical coordinates.  The domain is cylindrical duct of length $L$ and radius $R$. The following boundary conditions are imposed (see Fig. \ref{fig:bc_part_vibro_3D})
 
-\begin{figure}[t]%
-	\centering
-	\includegraphics[width=0.55\columnwidth]{part_3/applications/mixed_bd_waves/bc_3D_sketch.eps} \\
-	\caption{Boundary conditions for the 3D vibroacoustic problem.}
-	\label{fig:bc_part_vibro_3D}
+\begin{figure}[t]
+	\begin{minipage}[b]{0.5\linewidth}
+		\centering
+		\includegraphics[width=1\columnwidth]{part_3/applications/mixed_bd_waves/bc_3D_sketch.eps} \\
+		\caption{Boundary conditions for the 3D vibroacoustic problem.}
+		\label{fig:bc_part_vibro_3D}
+	\end{minipage}
+	\hspace{0.5cm}
+	\begin{minipage}[b]{0.5\linewidth}
+		\centering
+	\includegraphics[width=1\columnwidth]{part_3/applications/mixed_bd_waves/bc_2D_sketch.eps} \\
+	\caption{Boundary conditions for the reduced 2D vibroacoustic problem.}
+	\label{fig:bc_part_vibro_2D}
+	\end{minipage}
 \end{figure}
+
 
 \begin{align*}
 e_p(x, R, \theta, t) &= - \mathcal{Z}(x, t) \, e_v^r(x, R, \theta), \\
@@ -845,13 +872,6 @@ The power flow is obtained by application of the Stokes theorem
 \dot{H} = \inner[\partial \Omega_{\text{r}}]{e_p}{\bm{e}_v \cdot \bm{n}} = \int_{\partial \Omega_{\text{r}}} e_p \ \bm{e}_v \cdot \bm{n} \d{\Gamma_r} = - \int_{0}^{L} \mathcal{Z}(x, t) (e_v^r)^2 \ R \d{x} \le 0 
 \]
 where $\d{\Gamma_r} = r \d{s}$ is the infinitesimal surface. \\
-
-\begin{figure}[th]%
-	\centering
-	\includegraphics[width=0.55\columnwidth]{part_3/applications/mixed_bd_waves/bc_2D_sketch.eps} \\
-	\caption{Boundary partition for the 2D vibroacoustic problem.}
-	\label{fig:bc_part_vibro_2D}
-\end{figure}
 
 In the next paragraphs we provide a concise description of the discretization procedure for the two methods.
 
@@ -969,29 +989,93 @@ In order to apply this methodology the domain has to be split into two sub-domai
 Applying the PFEM methodology as in \ref{sec:vdd} two finite dimensional systems are obtained. For $\Omega_D$ the system is analogous to \eqref{eq:pHfindim_Om1}, while 
 for $\Omega_N$ to \eqref{eq:pHfindim_Om2}.
 
-\begin{tcbraster}[raster columns=2, raster equal height]
-	\begin{tcolorbox}[width=0.5\textwidth, nobeforeafter, colframe=blue,title=Subdomain $\Omega_D$,  coltitle=white]%%
+\begin{tcolorbox}[colframe=blue,title=Subdomain $\Omega_D$,  coltitle=white]%%
 	\begin{equation}\label{eq:pHfindim_waves_OmD}
 	\hspace*{-0.3cm}
 	\begin{aligned}
-	\mathbf{M}_{\Omega_D} \dot{\mathbf{e}}_{\Omega_D}= \mathbf{J}_{\Omega_D} \mathbf{e}_{\Omega_D} + \mathbf{B}^{\Omega_D}_{\Gamma_D} \mathbf{u}_D + \mathbf{B}^{\Omega_D}_{\Gamma_{\text{int}}} \mathbf{u}_D^{\text{int}}, \\
-	\mathbf{M}_{\Gamma_D} {\mathbf{y}}_D = \mathbf{B}^{\Omega_D \top}_{\Gamma_D} \, \mathbf{e}_D, \\
-	\mathbf{M}_{\Gamma_{\text{int}}} {\mathbf{y}}_D^{\text{int}} = \mathbf{B}^{\Omega_D \top}_{\Gamma_{\text{int}}} \mathbf{e}_D. \\
-	\end{aligned}
+	\begin{bmatrix}
+	\mathbf{M}_{\chi_s}^{\Omega_D} & \mathbf{0} \\
+	\mathbf{0} & \mathbf{M}_{\mu_0}^{\Omega_D} \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	\dot{\mathbf{e}}_{p, \Omega_D} \\
+	\dot{\mathbf{e}}_{v, \Omega_D} \\
+	\end{pmatrix}
+	&= \begin{bmatrix}
+	\mathbf{0} & -\mathbf{D}_{\div}^{\Omega_D}\\
+	\mathbf{D}_{\div}^{\Omega_D \top} & \mathbf{0}\\
+	\end{bmatrix}
+	\begin{pmatrix}
+	{\mathbf{e}}_{p, \Omega_D}\\
+	{\mathbf{e}}_{v, \Omega_D}\\
+	\end{pmatrix} + \begin{bmatrix}
+	\mathbf{0} & \mathbf{0}\\
+	\mathbf{B}_{v, \Gamma_{D}}^{\Omega_D} & \mathbf{B}_{v, \Gamma_{\text{int}}}^{\Omega_D}\\
+	\end{bmatrix}
+	\begin{pmatrix}
+	\mathbf{u}_D \\
+	\mathbf{u}_D^{\text{int}}
+	\end{pmatrix}, \\
+	\begin{pmatrix}
+	\mathbf{y}_D \\
+	\mathbf{y}_D^{\text{int}}
+	\end{pmatrix} &=
+	\begin{bmatrix}
+	\mathbf{0} & \mathbf{B}_{v, \Gamma_{D}}^{\Omega_D \top} \\ 
+	\mathbf{0} & \mathbf{B}_{v, \Gamma_{\text{int}}}^{\Omega_D \top} \\ 
+	\end{bmatrix}
+	\begin{pmatrix}
+	{\mathbf{e}}_{p, \Omega_D} \\
+	{\mathbf{e}}_{v, \Omega_D} \\
+	\end{pmatrix}.
+	\end{aligned}	
 	\end{equation}
-	\end{tcolorbox} 
-	\begin{tcolorbox}[width=0.5\textwidth, nobeforeafter,  colframe=red,title=Subdomain $\Omega_N$, coltitle=white]%%
+\end{tcolorbox} 
+\begin{tcolorbox}[colframe=red,title=Subdomain $\Omega_N$, coltitle=white]%%
 	\begin{equation}\label{eq:pHfindim_waves_OmN}
 	\hspace*{-0.3cm}
 	\begin{aligned}
-	\mathbf{M}_{\Omega_N}\dot{\mathbf{e}}_{\Omega_N} = \mathbf{J}_{\Omega_N} \mathbf{e}_{\Omega_N}  + \mathbf{B}^{\Omega_N}_{\Gamma_N} \mathbf{u}_N + \mathbf{B}^{\Omega_N}_{\Gamma_{\text{int}}} \mathbf{u}_N^{\text{int}}, \\
-	\mathbf{M}_{\Gamma_N} {\mathbf{y}}_N = \mathbf{B}^{\Omega_N \top}_{\Gamma_N} \mathbf{e}_N, \\
-	\mathbf{M}_{\Gamma_{\text{int}}} {\mathbf{y}}_N^{\text{int}} =  \mathbf{B}^{\Omega_N \top}_{\Gamma_{\text{int}}} \mathbf{e}_N.\\
-	\end{aligned}	
+	\begin{bmatrix}
+	\mathbf{M}_{\chi_s}^{\Omega_N} & \mathbf{0} \\
+	\mathbf{0} & \mathbf{M}_{\mu_0}^{\Omega_N} \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	\dot{\mathbf{e}}_{p, \Omega_N} \\
+	\dot{\mathbf{e}}_{v, \Omega_N} \\
+	\end{pmatrix}
+	&= \begin{bmatrix}
+	\mathbf{0} & \mathbf{D}_{\grad}^{\Omega_N \top}\\
+	-\mathbf{D}_{\grad}^{\Omega_N} & \mathbf{0}\\
+	\end{bmatrix}
+	\begin{pmatrix}
+	{\mathbf{e}}_{p, \Omega_N}\\
+	{\mathbf{e}}_{v, \Omega_N}\\
+	\end{pmatrix} + \begin{bmatrix}
+	\mathbf{B}_{v, \Gamma_{N}}^{\Omega_N} & \mathbf{B}_{v, \Gamma_{\text{int}}}^{\Omega_N}\\
+	\mathbf{0} & \mathbf{0}\\
+	\end{bmatrix}
+	\begin{pmatrix}
+	\mathbf{u}_N \\
+	\mathbf{u}_N^{\text{int}}
+	\end{pmatrix}, \\
+	\begin{pmatrix}
+	\mathbf{y}_N \\
+	\mathbf{y}_N^{\text{int}}
+	\end{pmatrix} &=
+	\begin{bmatrix}
+	\mathbf{B}_{v, \Gamma_{N}}^{\Omega_N \top} & \mathbf{0} \\ 
+	\mathbf{B}_{v, \Gamma_{\text{int}}}^{\Omega_N \top} & \mathbf{0}\\ 
+	\end{bmatrix}
+	\begin{pmatrix}
+	{\mathbf{e}}_{p, \Omega_N} \\
+	{\mathbf{e}}_{v, \Omega_N} \\
+	\end{pmatrix}.
+	\end{aligned}
 	\end{equation}
-	\end{tcolorbox}
-\end{tcbraster}
-In order to get a system with mixed causality, systems \eqref{eq:pHfindim_waves_OmD} and \eqref{eq:pHfindim_waves_OmD} have to be interconnected using a classical gyrator interconnection. Considering that the pressure field is continuous at $\Gamma_{\text{int}}$, the outward normal verifies $\bm{n}_D \vert_{\Gamma_{\text{int}}}= - \bm{n}_N \vert_{\Gamma_{\text{int}}}$ and the corresponding degrees of freedom have to be matched, the correct interconnection reads (cf. Fig. \ref{fig:dom_int_vibro})
+\end{tcolorbox}
+
+
+In order to get a system with mixed causality, systems \eqref{eq:pHfindim_waves_OmD} and \eqref{eq:pHfindim_waves_OmN} have to be interconnected using a classical gyrator interconnection. Considering that the pressure field is continuous at $\Gamma_{\text{int}}$, the outward normal verifies $\bm{n}_D \vert_{\Gamma_{\text{int}}}= - \bm{n}_N \vert_{\Gamma_{\text{int}}}$ and the corresponding degrees of freedom have to be matched, the correct interconnection reads (cf. Fig. \ref{fig:dom_int_vibro})
 \begin{equation}
 \mathbf{u}_N^{\text{int}} = - \mathbf{y}_D^{\text{int}}, \qquad
 \mathbf{u}_D^{\text{int}} = \mathbf{y}_N^{\text{int}}.
@@ -1042,7 +1126,7 @@ The resulting interconnected system is written as
 \end{pmatrix}.
 \end{aligned}
 \end{equation}
-where $\mathbf{C} = \mathbf{B}_{\Gamma_{\text{int}}}^{\Omega_D} \mathbf{M}_{\Gamma_{\text{int}}}^{-1} \mathbf{B}_{\Gamma_{\text{int}}}^{\Omega_N \top}$. The actual boundary condition \eqref{eq:bc_imp} can be plugged into the system leading to 
+where $\mathbf{C} = \mathbf{B}_{\Gamma_{\text{int}}}^{\Omega_D} \mathbf{M}_{\Gamma_{\text{int}}}^{-1} \mathbf{B}_{\Gamma_{\text{int}}}^{\Omega_N \top}$. The actual boundary conditions \eqref{eq:bc_imp} \eqref{eq:bc_neu} can be plugged into the system leading to 
 \begin{equation}\label{eq:pHfindim_waves_phode_bc}
 \begin{bmatrix}
 \mathbf{M}_{\Omega_D} & \mathbf{0} \\
@@ -1087,7 +1171,7 @@ e_p^0(x, r) = 0 , \quad e_v^{x, 0}(x, r) = f(r), \quad e_v^{r, 0}(x, r) = g(r).
 		$\chi_s$ & $7.061 \ [\mu\textrm{Pa}]^{-1}$ \\ 
 		$v_0$ & $1\ [\textrm{m/s}]$ \\ 
 		\hline 
-	\end{tabular} 
+	\end{tabular} \hspace{.5cm}
 	\begin{tabular}{|c|c|}
 		\hline 
 		\multicolumn{2}{|c|}{Simulation Settings} \\ 
@@ -1095,7 +1179,7 @@ e_p^0(x, r) = 0 , \quad e_v^{x, 0}(x, r) = f(r), \quad e_v^{r, 0}(x, r) = g(r).
 		ODE Integrator & RK 45\\
 		DAE Integrator & IDA\\ 
 		$t_{\text{end}}$& $0.1  [\textrm{s}]$ \\ 
-		FE spaces & CG$_1$ $\times$ RT$_1$ $\times$ CG$_1$ \\
+		FE spaces (DAE and ODE) & CG$_1$ $\times$ RT$_1$ $\times$ CG$_1$ \\
 		\hline 
 	\end{tabular} 
 	\vspace{1mm}
@@ -1113,13 +1197,13 @@ A radial component of the velocity allows highlighting the effect of the impedan
 
 Such a choice guarantees the conformity with respect to the differential operators. The {\sc{FEniCS}} library, that allows interpolating functions on different meshes, is used for the computations. The reference solution, obtained by using the DAE approach on a very fine mesh, is plotted in Fig. \ref{fig:Hdae15}, where the two contribution to the total energy
 \[
-H_{p, d} \approx \frac{1}{2} \mathbf{e}_p^\top \mathbf{M}_p \mathbf{e}_p, \qquad H_{v, d} \approx \frac{1}{2} \mathbf{e}_v^\top \mathbf{M}_v \mathbf{e}_v, \]
+H_{p, d} \approx \frac{1}{2} \mathbf{e}_p^\top \mathbf{M}_{\chi_s} \mathbf{e}_p, \qquad H_{v, d} \approx \frac{1}{2} \mathbf{e}_v^\top \mathbf{M}_{\mu_0} \mathbf{e}_v, \]
 are highlighted. The Dirichlet condition induces a continuous transfer from radial kinetic energy into pressure potential. The impedance acts by dissipating the radial component of the velocity so that only the axial flow contribution is left. The total energy at the initial time of the simulation is given only by the kinetic energy
 \[
 H_v^0 = H_{vx}^0 + H_{vr}^0 = \frac{1}{2} \int_{0}^L\int_{0}^R  \mu_0 \norm{\bm{e}_v}^2 \ r \d{r}\d{x}.
 \]
 Given the physical parameters in Tab. \ref{tab:parWaves}, the numerical values of the energy contribution are readily found
-\[H_v^0 = 0.453 [J], \ \; H_{vx}^0 = 0.204 [J], \ \; H_{vr}^0 = 0.249 [J].\]
+\[H_v^0 = 0.453 [J], \qquad H_{vx}^0 = 0.204 [J], \qquad H_{vr}^0 = 0.249 [J].\]
 
 \begin{figure}[ht]%
 	\centering
@@ -1192,4 +1276,83 @@ Both methods converge monotonically to the reference solution, as illustrated in
 
 
 \section{Thermoelastic wave propagation}\label{sec:thelas_wave}
+
+In this section the pH discretization of the Danilovskaya problem \cite{danilovskaya1950} is performed. For this problem, An analytical solution in the Laplace domain is available \cite{balla1991}. First the classical and pH formulation are illustrated. Second the discretization strategy is discussed. Numerical results are then presented.
+
+\subsection{The Danilovskaya problem}
+The Danilovskaya problem is a one-dimensional thermoelastic model in the infinite half-space $x\ge 0$. We recall the system of equation for this case
+
+\begin{equation}
+\begin{aligned}
+\displaystyle \rho \partial_{tt} u &= \partial_x ({\sigma}_{ET}), \qquad x\ge 0,  \\
+\displaystyle \rho c_\epsilon \partial_{t} T &= -\partial_x(j_Q) - \mathcal{C}_\beta \partial_t \varepsilon, \where \mathcal{C}_\beta:=T_0 \beta(2\mu + \lambda),\\
+{\sigma}_{ET} &= {\sigma}_E + {\sigma}_{T}, \\
+{\sigma}_E &= (2\mu + \lambda) \varepsilon , \\
+{\sigma}_T &= - \mathcal{C}_\beta \theta,  \\
+{\varepsilon} &= \partial_x u, \\
+{j}_Q &= -k \, \partial_x T.
+\end{aligned}
+\end{equation}
+All the variables have the same meaning as in Chapter \ref{ch:Thermo}. The initial conditions for this problem are all null. The boundary conditions impose a sudden thermal heating at $x=0$. Furthermore, the variables vanish at $\infty$
+\begin{equation*}
+\begin{aligned}
+T(0, t) = T_1 H(t), \\
+\lim_{x \rightarrow \infty} T(x, t) = 0, \\
+\end{aligned} \qquad 
+\begin{aligned}
+\sigma(0, t) = 0, \\
+\lim_{x \rightarrow \infty} u(x, t) = 0, \\
+\end{aligned}
+\end{equation*}
+
+Since the effect of the elastic vibration on the thermal field is weak, a constant $c_\delta$ is usually introduced to strengthen the coupling from the mechanical to the thermal domain \cite{rabizadeh2016}. This constant reads 
+\[
+c_\delta = \delta \frac{\rho c_\epsilon (2 \mu + \lambda)}{\beta^2 (3 \lambda + 2 \mu)^2 T_0},
+\]
+where $\delta \in \{0, 1\}$ is a variable for switching on and off the strong coupling from the mechanical to the thermal domain. The problem can be now recast as a pH system in co-energy variables
+\begin{equation}\label{eq:pHsys_ThElas1D}
+\begin{bmatrix}
+{\rho} & {0} & {0} & {0}\\
+{0} & (2\mu + \lambda)^{-1} & {0} & {0}\\
+0 & 0 & \rho c_\epsilon T_0 & 0\\
+{0} & {0} & {0} & {0}\\
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+{e}_v \\
+{e}_\varepsilon \\
+{e}_T \\
+{j}_Q \\
+\end{pmatrix} = 
+\begin{bmatrix}
+{0} & \partial_x & \mathcal{A}_\beta & {0}\\
+\partial_x & {0} & {0} & {0} \\
+- c_\delta \mathcal{A}_\beta^* & 0 & 0 & -\partial_x \\
+{0} & {0} & -\partial_x & - (T_0 k)^{-1} \\
+\end{bmatrix}
+\begin{pmatrix}
+{e}_v \\
+{e}_\varepsilon \\
+{e}_T \\
+\bm{j}_Q \\
+\end{pmatrix},
+\end{equation}
+
+where $\mathcal{A}_\beta(\cdot):=-\partial_x(\mathcal{C}_\beta \, \cdot)$ (cf. Eq. \eqref{eq:coup_operThElas}). All the variables have the same meaning as in Chapter \ref{ch:Thermo}. Notice that the coupling parameter $c_\delta$ breaks the Hamiltonian structure. The boundary conditions in the pH variables read
+
+\begin{equation*}
+\begin{aligned}
+e_T(0, t) = \frac{T_1 - T_0}{T_0} H(t), \\
+\lim_{x \rightarrow \infty} e_T(x, t) = 0, \\
+\end{aligned} \qquad 
+\begin{aligned}
+e_\varepsilon(0, t) = 0, \\
+\lim_{x \rightarrow \infty} e_v(x, t) = 0. \\
+\end{aligned}
+\end{equation*}
+
+\subsection{Discretization of the thermoelastic system}
+The partitioned finite element method also applies to system \eqref{eq:pHsys_ThElas1D}. The additional difficulty resides in the discretization of the coupling operator $\mathcal{A}_\beta$. One possible strategy, among others, consist in integrating by parts the whole first line of \eqref{eq:pHsys_ThElas1D} and the $\partial_x$ in the third line.
+
+
 

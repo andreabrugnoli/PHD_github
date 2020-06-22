@@ -10,11 +10,9 @@ import scipy.sparse.linalg as sp_la
 
 np.set_printoptions(threshold=np.inf)
 from math import pi, floor
-
-import matplotlib
 import matplotlib.pyplot as plt
+from tools_plotting import setup
 
-matplotlib.rcParams['text.usetex'] = True
 import mpmath
 mpmath.mp.dps = 15; mpmath.mp.pretty = True
 

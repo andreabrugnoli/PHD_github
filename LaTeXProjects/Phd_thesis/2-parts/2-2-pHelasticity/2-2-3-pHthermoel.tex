@@ -1,4 +1,4 @@
-\chapter{Thermoelasticity in port-Hamiltonian form}
+\chapter{Thermoelasticity in port-Hamiltonian form}\label{ch:Thermo}
 
 \epigraph{Eh bien, mon ami, la terre sera un jour ce cadavre refroidi. Elle deviendra inhabitable et sera inhabitée comme la lune, qui depuis longtemps a perdu sa chaleur vitale.}{\textit{Vingt mille lieues sous les mers\\
 Jules Verne}}
@@ -6,9 +6,6 @@ Jules Verne}}
  
 \lettrine{\color{theme}{T}}hermoelasticity is the study of deformable bodies undergoing thermal excitations. It is a clear example of a multiphysics phenomenon since the heat transfer and elastic vibrations within the body mutually interact. In this chapter, a linear model of thermoelasticity is obtained under the pH formalism. Each physics is described separately and the final system is obtained considering a power-preserving interconnection of two pHs.
 
-\begin{comment}
-The first work on this discipline dates back to \cite{duhamel1837}, but it was only more than a century later, thanks to the paper of Biot \cite{biot1956thermoelasticity}, that research on this topic received a new impulse.
-\end{comment}
 
 \section{Port-Hamiltonian linear coupled thermoelasticity}\label{sec:phthel}
 In this section, a pH formulation of heat transfer is first introduced. The classical model of thermoelasticity is then recalled. The same model is found by interconnecting the heat equation and the linear elastodynamics problem seen as pHs. It is shown that the interconnection preserves a quadratic functional that plays the role of a fictitious energy. The resulting system is dissipative  with respect to this functional. The construction makes use of the intrinsic modularity of pHs \cite{kurula2010}.
@@ -120,16 +117,16 @@ Consider a bounded connected set $\Omega \subset \mathbb{R}^d, \, d \in \{1,2,3\
 \begin{equation}\label{eq:sysThElas}
 \begin{aligned}
 \displaystyle \rho \diffp[2]{\bm{u}}{t} &= \Div(\bm{\Sigma}_{ET}) , \\
-\displaystyle \rho c_\epsilon \diffp{T}{t} &= -\div(\bm{j}_Q) - \mathcal{C}_\beta \cddot \displaystyle\diffp{\bm{\varepsilon}}{t}, \\
+\displaystyle \rho c_\epsilon \diffp{T}{t} &= -\div(\bm{j}_Q) - \bm{\mathcal{C}}_\beta \cddot \displaystyle\diffp{\bm{\varepsilon}}{t}, \\
 \bm{\Sigma}_{ET} &= \bm{\Sigma}_E + \bm{\Sigma}_{T}, \\
 \bm{\Sigma}_E &= 2\mu \bm{\varepsilon} + \lambda \Tr(\bm{\varepsilon}) \bm{I}_{d\times d}, \\
-\bm{\Sigma}_T &= - \mathcal{C}_\beta \theta,  \\
+\bm{\Sigma}_T &= - \bm{\mathcal{C}}_\beta \theta,  \\
 \bm{\varepsilon} &= \Grad(\bm{u}), \\
 \bm{j}_Q &= -k \, \grad T.
 \end{aligned}
 \end{equation}
 For simplicity  the coupling term
-\[\mathcal{C}_\beta:=T_0 \beta(2\mu + d \lambda)\bm{I}_{d\times d} \]
+\[\bm{\mathcal{C}}_\beta:=T_0 \beta(2\mu + d \lambda)\bm{I}_{d\times d} \]
 has been introduced. Field $\bm{u}$ is the displacement, $\bm{\varepsilon}$ is the infinitesimal strain tensor, $\bm{\Sigma}_E, \bm{\Sigma}_T$ are the stress tensor contribution due to mechanical deformation and a thermal field. Coefficients $\lambda,\, \mu$ are the Lam\'e parameters,  and $\beta$ the thermal expansion coefficient. Given a partition of the boundary $\partial \Omega = \Gamma_D^E \cup \Gamma_N^E = \Gamma_D^T \cup \Gamma_N^T$ for the elastic and thermal domain. The general boundary conditions read (see Fig. \ref{fig:bc_TherElas2D})
 \begin{equation}
 \begin{aligned}
@@ -218,27 +215,27 @@ e_T \\
 \end{equation} 
 with Hamiltonian $H_T$ defined in \eqref{eq:hamHeat}. The linear thermoelastic problem can be expressed as a coupled port-Hamiltonian system.  Consider the following interconnection
 \begin{equation}
-\bm{u}_E = - \Div(\mathcal{C}_\beta \, y_T), \qquad
-u_T = - \mathcal{C}_\beta \cddot\Grad(\bm{y}_E). 
+\bm{u}_E = - \Div(\bm{\mathcal{C}}_\beta \, y_T), \qquad
+u_T = - \bm{\mathcal{C}}_\beta \cddot\Grad(\bm{y}_E). 
 \end{equation}
 The interconnection is power preserving as it can be compactly written as 
-\begin{equation*}
-\bm{u}_E = \mathcal{A}_\beta(y_T), \qquad u_T = - \mathcal{A}_\beta^*(\bm{y}_E).
-\end{equation*}
+\begin{equation}\label{eq:coup_operThElas}
+\bm{u}_E = \mathcal{A}_\beta(y_T), \qquad u_T = - \mathcal{A}_\beta^*(\bm{y}_E), \where  \mathcal{A}_\beta(\cdot) = - \Div(\bm{\mathcal{C}}_\beta \, \cdot),
+\end{equation}
 where $\mathcal{A}_\beta^*$ denotes the formal adjoint. The assertion is justified by the following proposition.
 \begin{proposition}
 Let $C_0^{\infty}(\Omega), \; C_0^{\infty}(\Omega, \mathbb{R}^d)$ be the space of smooth functions and vector-valued functions respectively. Given $y_T \in C_0^{\infty}(\Omega), \; \bm{y}_E \in C_0^{\infty}(\Omega, \mathbb{R}^d)$, the coupling operator 
 \begin{equation}
 \begin{aligned}
 \mathcal{A}_\beta  : C_0^{\infty}(\Omega) &\rightarrow C_0^{\infty}(\Omega, \mathbb{R}^d), \\
-y_T &\rightarrow - \Div(\mathcal{C}_\beta y_T)
+y_T &\rightarrow - \Div(\bm{\mathcal{C}}_\beta y_T)
 \end{aligned}
 \end{equation}
 has formal adjoint 
 \begin{equation}
 \begin{aligned}
 \mathcal{A}_\beta^* : C_0^{\infty}(\Omega, \mathbb{R}^d) &\rightarrow C_0^{\infty}(\Omega) \\
-\bm{y}_E &\rightarrow +\mathcal{C}_\beta \cddot  \Grad(\bm{y}_E)
+\bm{y}_E &\rightarrow +\bm{\mathcal{C}}_\beta \cddot  \Grad(\bm{y}_E)
 \end{aligned}
 \end{equation}
 \begin{proof}
@@ -253,8 +250,8 @@ where for $\bm{u}_E, \bm{y}_E \in C_0^{\infty}(\Omega), \; u_T, y_T \in C_0^{\in
 The proof is a simple application of Theorem \ref{th:greenSymTens}
 \begin{equation}
 \begin{aligned}
-\inner[L^2(\Omega, \mathbb{R}^d)]{\bm{y}_E}{\mathcal{A}_\beta y_T} &= -\int_{\Omega} \bm{y}_E \cdot \Div(\mathcal{C}_\beta y_T) \d{\Omega}, \\
-&= \int_{\Omega} \Grad(\bm{y}_E) \cddot \mathcal{C}_\beta y_T \d{\Omega}, \\
+\inner[L^2(\Omega, \mathbb{R}^d)]{\bm{y}_E}{\mathcal{A}_\beta y_T} &= -\int_{\Omega} \bm{y}_E \cdot \Div(\bm{\mathcal{C}}_\beta y_T) \d{\Omega}, \\
+&= \int_{\Omega} \Grad(\bm{y}_E) \cddot \bm{\mathcal{C}}_\beta y_T \d{\Omega}, \\
 &= \int_{\Omega} \mathcal{A}_\beta^*(\bm{y}_E) y_T \d{\Omega}, \\
 &= \inner[L^2(\Omega)]{\mathcal{A}_\beta^*\bm{y}_E}{y_T}.
 \end{aligned}
@@ -265,14 +262,14 @@ This concludes the proof.
 If the compact support assumption is removed, it is obtained
 \begin{equation}\label{eq:balIntThElas}
 	\begin{aligned}
-	\left\langle u_T, y_T \right\rangle_{L^2(\Omega)} + \left\langle \bm{u}_E, \bm{y}_E \right\rangle_{L^2(\Omega, \mathbb{R}^3)} &= -\int_\Omega \left\{(\mathcal{C}_\beta \cddot \Grad \bm{e}_v) e_T + \Div(\mathcal{C}_\beta e_T) \cdot \bm{e}_v \right\} \d\Omega, \\
-	&= -\int_{\Omega} \div(e_T \mathcal{C}_\beta \cdot \bm{e}_v ) \d\Omega, \\
-	&= -\int_{\partial \Omega} (e_T \mathcal{C}_\beta \cdot \bm{n}) \cdot \bm{e}_v  \d{S}.
+	\left\langle u_T, y_T \right\rangle_{L^2(\Omega)} + \left\langle \bm{u}_E, \bm{y}_E \right\rangle_{L^2(\Omega, \mathbb{R}^3)} &= -\int_\Omega \left\{(\bm{\mathcal{C}}_\beta \cddot \Grad \bm{e}_v) e_T + \Div(\bm{\mathcal{C}}_\beta e_T) \cdot \bm{e}_v \right\} \d\Omega, \\
+	&= -\int_{\Omega} \div(e_T \bm{\mathcal{C}}_\beta \cdot \bm{e}_v ) \d\Omega, \\
+	&= -\int_{\partial \Omega} (e_T \bm{\mathcal{C}}_\beta \cdot \bm{n}) \cdot \bm{e}_v  \d{S}.
 	\end{aligned}
 \end{equation}
 Using the expression of $y_T, \bm{y}_E$, considering that $T_0$ is constant and applying Schwarz theorem for smooth function, the inputs are equal to
 \begin{equation*}
-\bm{u}_E =  \Div(\bm{\Sigma}_T), \qquad u_T = - \mathcal{C}_\beta \cddot  \Grad(\bm{v}) = - \mathcal{C}_\beta \cddot  \diffp{\bm{\varepsilon}}{t} .
+\bm{u}_E =  \Div(\bm{\Sigma}_T), \qquad u_T = - \bm{\mathcal{C}}_\beta \cddot  \Grad(\bm{v}) = - \bm{\mathcal{C}}_\beta \cddot  \diffp{\bm{\varepsilon}}{t} .
 \end{equation*}
 
 The coupled thermoelastic problem can now be written as
@@ -311,15 +308,15 @@ with total energy given by $H=H_E + H_T$. The power balance for each subsystem i
 The overall power balance is easily computed considering Eqs. \eqref{eq:enrateElasU} \eqref{eq:enrateHeatU} and \eqref{eq:balIntThElas}
 \begin{equation}\label{eq:enrateIntThElas}
 \begin{aligned}
-\dot{H} = \dot{H}_E + \dot{H}_T \le \int_{\partial \Omega} \left\{\left[\bm{E}_\varepsilon - e_T \mathcal{C}_\beta \right] \cdot \bm{n}\right\}  \cdot \bm{e}_v  \d{S} - \int_{\partial\Omega} \theta \ \bm{j}_Q \cdot \bm{n} \d{S}.
+\dot{H} = \dot{H}_E + \dot{H}_T \le \int_{\partial \Omega} \left\{\left[\bm{E}_\varepsilon - e_T \bm{\mathcal{C}}_\beta \right] \cdot \bm{n}\right\}  \cdot \bm{e}_v  \d{S} - \int_{\partial\Omega} \theta \ \bm{j}_Q \cdot \bm{n} \d{S}.
 \end{aligned}
 \end{equation}
-This result is the same stated in \cite{carlson1973}, page 332. From the power balance the classical boundary conditions are retrieved. This allows defining appropriate boundary operators for the thermoelastic problem
+This result is the same stated in \cite[page 332]{carlson1973}. From the power balance the classical boundary conditions are retrieved. This allows defining appropriate boundary operators for the thermoelastic problem
 \begin{equation}\label{eq:phBCHeatElas}
 	\bm{u}_\partial = 
 	\underbrace{\begin{bmatrix}
 	\bm{\gamma}_{0}^{\Gamma_D^E} & \bm{0} & \bm{0} & \bm{0} \\
-	\bm{0} & \bm{\gamma}_n^{\Gamma_N^E} & - \bm{\gamma}_n^{\Gamma_N^E}(\mathcal{C}_\beta\, \cdot )  & \bm{0}  \\ 
+	\bm{0} & \bm{\gamma}_n^{\Gamma_N^E} & - \bm{\gamma}_n^{\Gamma_N^E}(\bm{\mathcal{C}}_\beta\, \cdot )  & \bm{0}  \\ 
 	{0} & {0} & {\gamma}_{0}^{\Gamma_D^T} & {0} \\
 	\bm{0} & \bm{0} & \bm{0} & \bm{\gamma}_{n}^{\Gamma_N^T} \\
 	\end{bmatrix}}_{\mathcal{B}_\partial}
@@ -331,7 +328,7 @@ This result is the same stated in \cite{carlson1973}, page 332. From the power b
 	\end{pmatrix}, \; 
 	\bm{y}_\partial = 
 	\underbrace{\begin{bmatrix}
-		\bm{0} & \bm{\gamma}_n^{\Gamma_D^E} & - \bm{\gamma}_n^{\Gamma_D^E}(\mathcal{C}_\beta\, \cdot )  & \bm{0}  \\ 
+		\bm{0} & \bm{\gamma}_n^{\Gamma_D^E} & - \bm{\gamma}_n^{\Gamma_D^E}(\bm{\mathcal{C}}_\beta\, \cdot )  & \bm{0}  \\ 
 		\bm{\gamma}_{0}^{\Gamma_N^E} & \bm{0} & \bm{0} & \bm{0} \\
 		\bm{0} & \bm{0} & \bm{0} & \bm{\gamma}_{n}^{\Gamma_D^T} \\
 		{0} & {0} & {\gamma}_{0}^{\Gamma_N^T} & {0} \\
