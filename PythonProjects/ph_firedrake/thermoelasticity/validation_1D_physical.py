@@ -1,6 +1,7 @@
 # Convergence test for HHJ
 
 from firedrake import *
+from firedrake.plot import calculate_one_dim_points
 import numpy as np
 import scipy as sp
 
@@ -11,12 +12,16 @@ import scipy.sparse.linalg as sp_la
 np.set_printoptions(threshold=np.inf)
 from math import pi, floor
 
-import matplotlib
+from matplotlib import cm
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from tools_plotting import setup
 
 import mpmath
 mpmath.mp.dps = 15; mpmath.mp.pretty = True
+
+path_res = "/home/a.brugnoli/LargeFiles/results_thermoel1D/"
+path_fig = "/home/a.brugnoli/Plots/Python/Plots/Thermoelasticity/"
 
 
 def compute_analytical(delta, xi, tfin_hat):
@@ -103,6 +108,7 @@ def compute_sol(n, r, delta, tfin_hat):
 
 
     def r_operator(v_qt, e_qt):
+
         r_form = 1./(T_0*K)*v_qt*e_qt*dx
 
         return r_form
@@ -166,11 +172,17 @@ def compute_sol(n, r, delta, tfin_hat):
     e_n = Function(V)
     v_n1 = Function(V_pel)
     v_n = Function(V_pel)
+    u_n1 = Function(V_pel, name="u old")
+    u_n = Function(V_pel, name="u next")
+    theta_n1 = Function(V_pt)
+    theta_n = Function(V_pt)
 
 
     epel_n, eqel_n, ept_n, eqt_n = e_n.split()
 
+    u_n.assign(Constant(0.0))
     v_n.assign(Constant(0.0))
+    theta_n.assign(Constant(0.0))
 
     n_t = int(floor(t_fin/dt) + 1)
 
@@ -185,6 +197,28 @@ def compute_sol(n, r, delta, tfin_hat):
 
     param = {"ksp_type": "gmres", "ksp_gmres_restart":100, "ksp_atol":1e-60}
     # param = {"ksp_type": "preonly", "pc_type": "lu"}
+
+    # t_ev = np.linspace(0, t_fin, n_t)
+    t_ev = np.linspace(dt, t_fin, n_t-1)
+
+
+    f_solu = Function(V_pel)
+    f_solv = Function(V_pel)
+    f_solT = Function(V_pt)
+
+    f_solu.assign(u_n)
+    f_solv.assign(v_n)
+    f_solT.assign(theta_n)
+
+    sol_u = []
+
+    sol_v = []
+
+    sol_T = []
+
+    # sol_u.append(f_solu)
+    # sol_v.append(f_solv)
+    # sol_T.append(f_solT)
 
     for i in range(1, n_t):
         epel_n, eqel_n, ept_n, eqt_n = e_n.split()
@@ -206,10 +240,27 @@ def compute_sol(n, r, delta, tfin_hat):
 
         epel_n1, eqel_n1, ept_n1, eqt_n1 = e_n.split()
 
+        u_n1.assign(u_n + dt / 2 * (epel_n + epel_n1))
+        theta_n1.assign(ept_n1)
         v_n1.assign(epel_n1)
+
+        f_solu = Function(V_pel)
+        f_solv = Function(V_pel)
+        f_solT = Function(V_pt)
+
+        f_solu.assign(u_n1)
+        f_solv.assign(v_n1)
+        f_solT.assign(theta_n1)
+
+        sol_u.append(f_solu)
+        sol_v.append(f_solv)
+        sol_T.append(f_solT)
+
+        u_n.assign(u_n1)
         e_n.assign(e_n1)
 
         u_atP[i] = u_atP[i-1] + dt/2*(v_n.at(Ppoint) + v_n1.at(Ppoint))
+
         v_n.assign(v_n1)
         theta_atP[i] = ept_n1.at(Ppoint)
         print(i)
@@ -218,41 +269,209 @@ def compute_sol(n, r, delta, tfin_hat):
 
     u_atP_hat = u_atP * (lamda + 2 * mu) / (beta * gamma * T_0)
 
-    return t_vec_hat, theta_atP, u_atP_hat
+    # np.save(path_res + "t_ev" + str(delta), t_ev)
+    # np.save(path_res + "sol_u" + str(delta), sol_u)
+    # np.save(path_res + "sol_v" + str(delta), sol_v)
+    # np.save(path_res + "sol_T" + str(delta), sol_T)
 
-n = 100
+
+    return t_vec_hat, theta_atP, u_atP_hat, sol_u, sol_v, sol_T, t_ev
+
+
+n = 200
 r = 1
 t_fin_hat = 4
 
 
-t1, th1, u1 = compute_sol(n, r, 0, t_fin_hat)
-t2, th2, u2 = compute_sol(n, r, 1, t_fin_hat)
+t1, th1, u1, sol_u0, sol_v0, sol_T0, t_plot0 = compute_sol(n, r, 0, t_fin_hat)
+t2, th2, u2, sol_u1, sol_v1, sol_T1, t_plot1 = compute_sol(n, r, 1, t_fin_hat)
 
-t_an1, th_an1, disp_an1, stress_an1 = compute_analytical(0, 1, t_fin_hat)
-t_an2, th_an2, disp_an2, stress_an2 = compute_analytical(1, 1, t_fin_hat)
+# t_an1, th_an1, disp_an1, stress_an1 = compute_analytical(0, 1, t_fin_hat)
+# t_an2, th_an2, disp_an2, stress_an2 = compute_analytical(1, 1, t_fin_hat)
+#
+# save_fig = True
+# plt.figure()
+#
+# plt.plot(t1, th1, '-.', label=r'Approx $\widehat{T}$ ($\delta=0$)')
+# plt.plot(t2, th2, '-.', label=r'Approx $\widehat{T}$ ($\delta=1$)')
+# plt.plot(t_an1, th_an1, ':', label=r'Exact $\widehat{T}$ ($\delta=0$)')
+# plt.plot(t_an2, th_an2, ':', label=r'Exact $\widehat{T}$ ($\delta=1$)')
+# plt.xlabel(r'Dimensionless Time')
+# plt.title(r'Dimensionless Temperature at ' + str(1))
+# plt.legend()
+#
+# plt.savefig(path_fig + "temp_at1_1D.eps", format="eps")
+# plt.figure()
+#
+# plt.plot(t1, u1, '-.', label=r'Approx $\widehat{u}$ ($\delta=0$)')
+# plt.plot(t2, u2, '-.', label=r'Approx $\widehat{u}$ ($\delta=1$)')
+# plt.plot(t_an1, disp_an1, ':', label=r'Exact $\widehat{u}$ ($\delta=0$)')
+# plt.plot(t_an2, disp_an2, ':', label=r'Exact $\widehat{u}$ ($\delta=1$)')
+# plt.xlabel(r'Dimensionless Time')
+# plt.title(r'Dimensionless Displacement at ' + str(1))
+# plt.legend()
+#
+# plt.savefig(path_fig + "disp_at1_1D.eps", format="eps")
+# # plt.show()
 
-path_fig = "/home/a.brugnoli/Plots/Python/Plots/Thermoelasticity/"
-save_fig = True
-plt.figure()
 
-plt.plot(t1, th1, '-.', label=r'Approx $\theta$ $\delta=0$')
-plt.plot(t2, th2, '-.', label=r'Approx $\theta$ $\delta=1$')
-plt.plot(t_an1, th_an1, ':', label=r'Exact $\theta$ $\delta=0$')
-plt.plot(t_an2, th_an2, ':', label=r'Exact $\theta$ $\delta=1$')
-plt.xlabel(r'Dimensionless Time')
-plt.title(r'Dimensionless Temperature at ' + str(1))
-plt.legend()
+nplot_el = 5
+az_angle = 120
 
-plt.savefig(path_fig + "temp_at1_1D", format="eps")
-plt.figure()
+x_plot0, T0_plot0 = calculate_one_dim_points(sol_T0[0], nplot_el)
+x_plot0, u0_plot0 = calculate_one_dim_points(sol_u0[0], nplot_el)
+x_plot0, v0_plot0 = calculate_one_dim_points(sol_v0[0], nplot_el)
 
-plt.plot(t1, u1, '-.', label=r'Approx $u_x$ $\delta=0$')
-plt.plot(t2, u2, '-.', label=r'Approx $u_x$ $\delta=1$')
-plt.plot(t_an1, disp_an1, ':', label=r'Exact $\theta$ $\delta=0$')
-plt.plot(t_an2, disp_an2, ':', label=r'Exact $\theta$ $\delta=1$')
-plt.xlabel(r'Dimensionless Time')
-plt.title(r'Dimensionless Displacement at ' + str(1))
-plt.legend()
+nt_ev0 = len(t_plot0)
+nx_ev0 = len(x_plot0)
 
-plt.savefig(path_fig + "disp_at1_1D", format="eps")
-plt.show()
+T_plot0 = np.zeros((nt_ev0, nx_ev0))
+T_plot0[0] = T0_plot0
+
+U_plot0 = np.zeros((nt_ev0, nx_ev0))
+U_plot0[0] = u0_plot0
+
+V_plot0 = np.zeros((nt_ev0, nx_ev0))
+V_plot0[0] = v0_plot0
+
+for i in range(1, nt_ev0):
+    T_plot0[i] = calculate_one_dim_points(sol_T0[i], nplot_el)[1]
+    U_plot0[i] = calculate_one_dim_points(sol_u0[i], nplot_el)[1]
+    V_plot0[i] = calculate_one_dim_points(sol_v0[i], nplot_el)[1]
+
+
+xx_plot0, tt_plot0 = np.meshgrid(x_plot0, t_plot0)
+
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.set_xlabel('$x \; \mathrm{[cm]}$')
+ax.set_ylabel('$t \; \mathrm{[s]}$')
+ax.set_zlabel('$u \; \mathrm{[cm]}$')
+
+ax.set_title(r'Displacement $\delta=0$', loc='center')
+
+
+surf_u0 = ax.plot_surface(xx_plot0, tt_plot0, U_plot0, cmap=cm.jet, linewidth=0, antialiased=False)
+ax.view_init(azim=az_angle)
+surf_u0._facecolors2d = surf_u0._facecolors3d
+surf_u0._edgecolors2d = surf_u0._edgecolors3d
+fig.colorbar(surf_u0, shrink=0.5, aspect=5)
+
+plt.savefig(path_fig + "plot_u0.eps", format="eps")
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.set_xlabel('$x \; \mathrm{[cm]}$')
+ax.set_ylabel('$t \; \mathrm{[s]}$')
+ax.set_zlabel('$v \; \mathrm{[cm/s]}$')
+
+ax.set_title(r'Velocity $\delta=0$', loc='center')
+
+
+surf_v0 = ax.plot_surface(xx_plot0, tt_plot0, V_plot0, cmap=cm.jet, linewidth=0, antialiased=False)
+ax.view_init(azim=az_angle)
+surf_v0._facecolors2d = surf_v0._facecolors3d
+surf_v0._edgecolors2d = surf_v0._edgecolors3d
+fig.colorbar(surf_v0, shrink=0.5, aspect=5)
+
+plt.savefig(path_fig + "plot_v0.eps", format="eps")
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.set_xlabel('$x \; \mathrm{[cm]}$')
+ax.set_ylabel('$t \; \mathrm{[s]}$')
+# ax.set_zlabel(r'$\theta$')
+
+ax.set_title(r'Dimensionless Temperature $\delta=0$', loc='center')
+
+
+surf_T0 = ax.plot_surface(xx_plot0, tt_plot0, T_plot0, cmap=cm.jet, linewidth=0, antialiased=False)
+ax.set_zlim3d(0, 1)
+
+surf_T0._facecolors2d = surf_T0._facecolors3d
+surf_T0._edgecolors2d = surf_T0._edgecolors3d
+fig.colorbar(surf_T0, shrink=0.5, aspect=5)
+
+plt.savefig(path_fig + "plot_T0.eps", format="eps")
+
+
+x_plot1, T0_plot1 = calculate_one_dim_points(sol_T1[0], nplot_el)
+x_plot1, u0_plot1 = calculate_one_dim_points(sol_u1[0], nplot_el)
+x_plot1, v0_plot1 = calculate_one_dim_points(sol_v1[0], nplot_el)
+
+nt_ev1 = len(t_plot1)
+nx_ev1 = len(x_plot1)
+
+T_plot1 = np.zeros((nt_ev1, nx_ev1))
+T_plot1[0] = T0_plot1
+
+U_plot1 = np.zeros((nt_ev1, nx_ev1))
+U_plot1[0] = u0_plot1
+
+V_plot1 = np.zeros((nt_ev1, nx_ev1))
+V_plot1[0] = v0_plot1
+
+for i in range(1, nt_ev1):
+    T_plot1[i] = calculate_one_dim_points(sol_T1[i], nplot_el)[1]
+    U_plot1[i] = calculate_one_dim_points(sol_u1[i], nplot_el)[1]
+    V_plot1[i] = calculate_one_dim_points(sol_v1[i], nplot_el)[1]
+
+
+xx_plot1, tt_plot1 = np.meshgrid(x_plot1, t_plot1)
+
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.set_xlabel('$x \; \mathrm{[cm]}$')
+ax.set_ylabel('$t \; \mathrm{[s]}$')
+ax.set_zlabel('$u \; \mathrm{[cm]}$')
+
+ax.set_title(r'Displacement $\delta=1$', loc='center')
+
+
+surf_u1 = ax.plot_surface(xx_plot1, tt_plot1, U_plot1, cmap=cm.jet, linewidth=0, antialiased=False)
+ax.view_init(azim=az_angle)
+surf_u1._facecolors2d = surf_u1._facecolors3d
+surf_u1._edgecolors2d = surf_u1._edgecolors3d
+fig.colorbar(surf_u1, shrink=0.5, aspect=5)
+
+plt.savefig(path_fig + "plot_u1.eps", format="eps")
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.set_xlabel('$x \; \mathrm{[cm]}$')
+ax.set_ylabel('$t \; \mathrm{[s]}$')
+ax.set_zlabel('$v \; \mathrm{[cm/s]}$')
+
+ax.set_title(r'Velocity $\delta=1$', loc='center')
+
+
+surf_v1 = ax.plot_surface(xx_plot1, tt_plot1, V_plot1, cmap=cm.jet, linewidth=0, antialiased=False)
+ax.view_init(azim=az_angle)
+surf_v1._facecolors2d = surf_v1._facecolors3d
+surf_v1._edgecolors2d = surf_v1._edgecolors3d
+fig.colorbar(surf_v1, shrink=0.5, aspect=5)
+
+
+plt.savefig(path_fig + "plot_v1.eps", format="eps")
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.set_xlabel('$x \; \mathrm{[cm]}$')
+ax.set_ylabel('$t \; \mathrm{[s]}$')
+# ax.set_zlabel(r'$\theta$')
+
+ax.set_title(r'Dimensionless Temperature $\delta=1$', loc='center')
+
+
+surf_T1 = ax.plot_surface(xx_plot1, tt_plot1, T_plot1, cmap=cm.jet, linewidth=0, antialiased=False)
+ax.set_zlim3d(0, 1)
+
+surf_T1._facecolors2d = surf_T1._facecolors3d
+surf_T1._edgecolors2d = surf_T1._edgecolors3d
+fig.colorbar(surf_T1, shrink=0.5, aspect=5)
+
+plt.savefig(path_fig + "plot_T1.eps", format="eps")
+
+# plt.show()
