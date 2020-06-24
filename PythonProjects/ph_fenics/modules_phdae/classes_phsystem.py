@@ -490,10 +490,10 @@ tol = 1e-8
 
 
 def check_symmetry(mat):
-    print(np.linalg.norm(mat - mat.T), tol)
+#    print(np.linalg.norm(mat - mat.T), tol)
     return np.linalg.norm(mat - mat.T) < tol
 
 
 def check_skew_symmetry(mat):
-    print(np.linalg.norm(mat + mat.T), tol)
+#    print(np.linalg.norm(mat + mat.T), tol)
     return np.linalg.norm(mat + mat.T) < tol
