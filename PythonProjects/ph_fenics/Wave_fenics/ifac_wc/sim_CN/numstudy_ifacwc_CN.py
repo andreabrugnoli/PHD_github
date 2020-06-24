@@ -20,6 +20,8 @@ rcParams['text.usetex'] = True
 
 parameters['allow_extrapolation'] = True
 
+n_mesh = 4
+
 ind_ref = 15
 R_ext = 1
 H_file = 'H_dae_' + str(ind_ref) + '.npy'
@@ -32,8 +34,8 @@ path_result = '/home/a.brugnoli/LargeFiles/results_ifacwc_CN/'
 path_mesh = "/home/a.brugnoli/GitProjects/PythonProjects/ph_fenics/Wave_fenics/meshes_ifacwc/"
 path_figs = "/home/a.brugnoli/Plots/Python/Plots/Waves/IFAC_WC2020_CN/"
 
-path_result_ref = '/home/a.brugnoli/LargeFiles/results_ifacwc2_fenics/'
-#path_result_ref = path_result
+#path_result_ref = '/home/a.brugnoli/LargeFiles/results_ifacwc2_fenics/'
+path_result_ref = path_result
 
 
 H_ref = np.load(path_result_ref + H_file)
@@ -82,8 +84,6 @@ ds1_ref = Measure('ds', domain=mesh1_ref)
 dx2_ref = Measure('dx', domain=mesh2_ref)
 ds2_ref = Measure('ds', domain=mesh2_ref)
 
-
-n_mesh = 2
 
 t_elapsed_dae = np.zeros(n_mesh)
 t_elapsed_ode = np.zeros(n_mesh)
@@ -186,97 +186,97 @@ for i in range(n_mesh):
     err_ep_ode_allt = np.zeros(n_t)
     err_eq_ode_allt = np.zeros(n_t)
         
-#    for j in range(n_t):
-#              
-#        fun_ep_dae_t.vector()[range(Vp_i.dim())] = ep_dae_i[range(Vp_i.dim()), j]
-#        fun_eq_dae_t.vector()[range(Vq_i.dim())] = eq_dae_i[range(Vq_i.dim()), j]
-#        fun_ep_ref_t.vector()[range(Vp_ref.dim())] = ep_ref[range(Vp_ref.dim()), j]     
-#        fun_eq_ref_t.vector()[range(Vq_ref.dim())] = eq_ref[range(Vq_ref.dim()), j]
-#        
-##        fun_ep_dae_t.vector()[range(Vp_i.dim())] = np.ascontiguousarray(ep_dae_i[range(Vp_i.dim()), j])   
-##        fun_eq_dae_t.vector()[range(Vq_i.dim())] = np.ascontiguousarray(eq_dae_i[range(Vq_i.dim()), j])
-##        fun_ep_ref_t.vector()[range(Vp_ref.dim())] = np.ascontiguousarray(ep_ref[range(Vp_ref.dim()), j])       
-##        fun_eq_ref_t.vector()[range(Vq_ref.dim())] = np.ascontiguousarray(eq_ref[range(Vq_ref.dim()), j])
+    for j in range(n_t):
+              
+        fun_ep_dae_t.vector()[range(Vp_i.dim())] = ep_dae_i[range(Vp_i.dim()), j]
+        fun_eq_dae_t.vector()[range(Vq_i.dim())] = eq_dae_i[range(Vq_i.dim()), j]
+        fun_ep_ref_t.vector()[range(Vp_ref.dim())] = ep_ref[range(Vp_ref.dim()), j]     
+        fun_eq_ref_t.vector()[range(Vq_ref.dim())] = eq_ref[range(Vq_ref.dim()), j]
+        
+#        fun_ep_dae_t.vector()[range(Vp_i.dim())] = np.ascontiguousarray(ep_dae_i[range(Vp_i.dim()), j])   
+#        fun_eq_dae_t.vector()[range(Vq_i.dim())] = np.ascontiguousarray(eq_dae_i[range(Vq_i.dim()), j])
+#        fun_ep_ref_t.vector()[range(Vp_ref.dim())] = np.ascontiguousarray(ep_ref[range(Vp_ref.dim()), j])       
+#        fun_eq_ref_t.vector()[range(Vq_ref.dim())] = np.ascontiguousarray(eq_ref[range(Vq_ref.dim()), j])
+
+#        fun_ep_dae_t.vector()[:] = np.ascontiguousarray(ep_dae_i[:, j])   
+#        fun_eq_dae_t.vector()[:] = np.ascontiguousarray(eq_dae_i[:, j])
+#        fun_ep_ref_t.vector()[:] = np.ascontiguousarray(ep_ref[:, j])       
+#        fun_eq_ref_t.vector()[:] = np.ascontiguousarray(eq_ref[:, j])
 #
-##        fun_ep_dae_t.vector()[:] = np.ascontiguousarray(ep_dae_i[:, j])   
-##        fun_eq_dae_t.vector()[:] = np.ascontiguousarray(eq_dae_i[:, j])
-##        fun_ep_ref_t.vector()[:] = np.ascontiguousarray(ep_ref[:, j])       
-##        fun_eq_ref_t.vector()[:] = np.ascontiguousarray(eq_ref[:, j])
-##
-#        int_ep_ref_t = Function(Vp_ref)
-#        int_ep_ref_t.interpolate(fun_ep_ref_t)
-#        
-#        int_ep_dae_t = Function(Vp_ref)
-#        int_ep_dae_t.interpolate(fun_ep_dae_t)
-#
-#        errp_dae_t = np.sqrt(assemble(inner(int_ep_dae_t - int_ep_ref_t, int_ep_dae_t - int_ep_ref_t) * dx_ref))
-#        normp_ref_t = np.sqrt(assemble(inner(int_ep_ref_t, int_ep_ref_t) * dx_ref))
-#        
-#        err_ep_dae_allt[j] = errp_dae_t
-#        norm_ep_ref_allt[j] = normp_ref_t
-#        
-##        int_eq_ref_t = Function(Vq_ref)
-#        int_eq_ref_t = interpolate(fun_eq_ref_t, Vq_ref)
-#        
-##        int_eq_ref_t = Function(Vq_ref)
-#        int_eq_dae_t = interpolate(fun_eq_dae_t, Vq_ref)
-#
-#        errq_dae_t = np.sqrt(assemble(inner(int_eq_dae_t - int_eq_ref_t, int_eq_dae_t - int_eq_ref_t) * dx_ref))
-#        normq_ref_t = np.sqrt(assemble(inner(int_eq_ref_t, int_eq_ref_t) * dx_ref))        
-#        
-#        err_eq_dae_allt[j] = errq_dae_t
-#        norm_eq_ref_allt[j] = normq_ref_t
-#                
-#        fun_ep1_ode_t.vector()[range(n_Vp1_i)] = ep1_ode_i[range(n_Vp1_i), j]
-#        fun_ep2_ode_t.vector()[range(n_Vp2_i)] = ep2_ode_i[range(n_Vp2_i), j]
-#
-#        fun_eq1_ode_t.vector()[range(n_Vq1_i)] = eq1_ode_i[range(n_Vq1_i), j]
-#        fun_eq2_ode_t.vector()[range(n_Vq2_i)] = eq2_ode_i[range(n_Vq2_i), j]
-#        
-#        int_ep1_ode_t = interpolate(fun_ep1_ode_t, Vp1_ref)
-#        int_ep2_ode_t = interpolate(fun_ep2_ode_t, Vp2_ref)
-#        
-#        int_ep1_ref_t = Function(Vp1_ref)
-#        int_ep2_ref_t = Function(Vp2_ref)
-#        
-#        int_ep1_ref_t = interpolate(fun_ep_ref_t, Vp1_ref)
-#        int_ep2_ref_t = interpolate(fun_ep_ref_t, Vp2_ref)
-#        
-##        LagrangeInterpolator.interpolate(int_ep1_ref_t, int_ep_ref_t)
-##        LagrangeInterpolator.interpolate(int_ep2_ref_t, int_ep_ref_t)
-#   
-#        int_eq1_ode_t = interpolate(fun_eq1_ode_t, Vq1_ref)
-#        int_eq2_ode_t = interpolate(fun_eq2_ode_t, Vq2_ref)
-#        
-#        int_eq1_ref_t = Function(Vq1_ref)
-#        int_eq2_ref_t = Function(Vq2_ref)
-#        
-#        int_eq1_ref_t = interpolate(fun_eq_ref_t, Vq1_ref)
-#        int_eq2_ref_t = interpolate(fun_eq_ref_t, Vq2_ref)
-#        
-##        LagrangeInterpolator.interpolate(int_eq1_ref_t, int_eq_ref_t)
-##        LagrangeInterpolator.interpolate(int_eq2_ref_t, int_eq_ref_t)
-#        
-#        
-#        errp1_ode_t = assemble(inner(int_ep1_ode_t - int_ep1_ref_t,\
-#                                            int_ep1_ode_t - int_ep1_ref_t) * dx1_ref)
-#        
-#        errp2_ode_t = assemble(inner(int_ep2_ode_t - int_ep2_ref_t,\
-#                                            int_ep2_ode_t - int_ep2_ref_t) * dx2_ref)
-#        
-#        errp_ode_t = np.sqrt(errp1_ode_t + errp2_ode_t)
-#        
-#        err_ep_ode_allt[j] = errp_ode_t
-#        
-#        errq1_ode_t = assemble(inner(int_eq1_ode_t - int_eq1_ref_t,\
-#                                            int_eq1_ode_t - int_eq1_ref_t) * dx1_ref)
-#        
-#        errq2_ode_t = assemble(inner(int_eq2_ode_t - int_eq2_ref_t,\
-#                                            int_eq2_ode_t - int_eq2_ref_t) * dx2_ref)
-#        
-#        errq_ode_t = np.sqrt(errq1_ode_t + errq2_ode_t)
-#        
-#        err_eq_ode_allt[j] = errq_ode_t
+        int_ep_ref_t = Function(Vp_ref)
+        int_ep_ref_t.interpolate(fun_ep_ref_t)
+        
+        int_ep_dae_t = Function(Vp_ref)
+        int_ep_dae_t.interpolate(fun_ep_dae_t)
+
+        errp_dae_t = np.sqrt(assemble(inner(int_ep_dae_t - int_ep_ref_t, int_ep_dae_t - int_ep_ref_t) * dx_ref))
+        normp_ref_t = np.sqrt(assemble(inner(int_ep_ref_t, int_ep_ref_t) * dx_ref))
+        
+        err_ep_dae_allt[j] = errp_dae_t
+        norm_ep_ref_allt[j] = normp_ref_t
+        
+#        int_eq_ref_t = Function(Vq_ref)
+        int_eq_ref_t = interpolate(fun_eq_ref_t, Vq_ref)
+        
+#        int_eq_ref_t = Function(Vq_ref)
+        int_eq_dae_t = interpolate(fun_eq_dae_t, Vq_ref)
+
+        errq_dae_t = np.sqrt(assemble(inner(int_eq_dae_t - int_eq_ref_t, int_eq_dae_t - int_eq_ref_t) * dx_ref))
+        normq_ref_t = np.sqrt(assemble(inner(int_eq_ref_t, int_eq_ref_t) * dx_ref))        
+        
+        err_eq_dae_allt[j] = errq_dae_t
+        norm_eq_ref_allt[j] = normq_ref_t
+                
+        fun_ep1_ode_t.vector()[range(n_Vp1_i)] = ep1_ode_i[range(n_Vp1_i), j]
+        fun_ep2_ode_t.vector()[range(n_Vp2_i)] = ep2_ode_i[range(n_Vp2_i), j]
+
+        fun_eq1_ode_t.vector()[range(n_Vq1_i)] = eq1_ode_i[range(n_Vq1_i), j]
+        fun_eq2_ode_t.vector()[range(n_Vq2_i)] = eq2_ode_i[range(n_Vq2_i), j]
+        
+        int_ep1_ode_t = interpolate(fun_ep1_ode_t, Vp1_ref)
+        int_ep2_ode_t = interpolate(fun_ep2_ode_t, Vp2_ref)
+        
+        int_ep1_ref_t = Function(Vp1_ref)
+        int_ep2_ref_t = Function(Vp2_ref)
+        
+        int_ep1_ref_t = interpolate(fun_ep_ref_t, Vp1_ref)
+        int_ep2_ref_t = interpolate(fun_ep_ref_t, Vp2_ref)
+        
+#        LagrangeInterpolator.interpolate(int_ep1_ref_t, int_ep_ref_t)
+#        LagrangeInterpolator.interpolate(int_ep2_ref_t, int_ep_ref_t)
+   
+        int_eq1_ode_t = interpolate(fun_eq1_ode_t, Vq1_ref)
+        int_eq2_ode_t = interpolate(fun_eq2_ode_t, Vq2_ref)
+        
+        int_eq1_ref_t = Function(Vq1_ref)
+        int_eq2_ref_t = Function(Vq2_ref)
+        
+        int_eq1_ref_t = interpolate(fun_eq_ref_t, Vq1_ref)
+        int_eq2_ref_t = interpolate(fun_eq_ref_t, Vq2_ref)
+        
+#        LagrangeInterpolator.interpolate(int_eq1_ref_t, int_eq_ref_t)
+#        LagrangeInterpolator.interpolate(int_eq2_ref_t, int_eq_ref_t)
+        
+        
+        errp1_ode_t = assemble(inner(int_ep1_ode_t - int_ep1_ref_t,\
+                                            int_ep1_ode_t - int_ep1_ref_t) * dx1_ref)
+        
+        errp2_ode_t = assemble(inner(int_ep2_ode_t - int_ep2_ref_t,\
+                                            int_ep2_ode_t - int_ep2_ref_t) * dx2_ref)
+        
+        errp_ode_t = np.sqrt(errp1_ode_t + errp2_ode_t)
+        
+        err_ep_ode_allt[j] = errp_ode_t
+        
+        errq1_ode_t = assemble(inner(int_eq1_ode_t - int_eq1_ref_t,\
+                                            int_eq1_ode_t - int_eq1_ref_t) * dx1_ref)
+        
+        errq2_ode_t = assemble(inner(int_eq2_ode_t - int_eq2_ref_t,\
+                                            int_eq2_ode_t - int_eq2_ref_t) * dx2_ref)
+        
+        errq_ode_t = np.sqrt(errq1_ode_t + errq2_ode_t)
+        
+        err_eq_ode_allt[j] = errq_ode_t
         
 
     nt_fin = n_t

@@ -5,7 +5,7 @@ from scipy.sparse.linalg import spsolve
 from scikits import umfpack
 from scipy.sparse import csc_matrix, csr_matrix
 
-def theta_method(M, J, R, B_f, x_0, theta=0.5, t_f=0.1, dt=1e-6, n_ev=1000):
+def theta_method(M, J, R, B_f, x_0, theta=0.5, t_f=0.1, dt=1e-6, n_ev=10000):
     
     assert theta>0
     t_ev = np.linspace(0, t_f, n_ev)
@@ -42,8 +42,43 @@ def theta_method(M, J, R, B_f, x_0, theta=0.5, t_f=0.1, dt=1e-6, n_ev=1000):
     Sys_BJR = spsolve(A_JR_sparse, dt*B_f)
         
         
-#    else:
-#    
+    Nt = int(t_f / dt) + 1
+    if n_ev > Nt:
+        raise ValueError("Choose less evaluation points")
+        
+    
+
+    X_sol = np.zeros((n_sys, n_ev))
+    X_sol[:, 0] = x_0
+
+    X_old = X_sol[:, 0]
+
+    X_new = np.zeros((n_sys,))
+    k = 1
+    
+
+    for i in range(Nt):
+        
+        t = dt * (i + 1)
+        
+        if t<0.2*t_f:
+            X_new = Sys_J @ X_old + Sys_BJ          
+        else:
+            X_new = Sys_JR @ X_old + Sys_BJR            
+            
+        X_old = X_new
+        
+        if k < n_ev and t >= t_ev[k]:
+            X_sol[:, k] = X_new
+            k = k + 1
+        elif k == n_ev:
+            break
+        
+    
+    return t_ev, X_sol
+
+
+    
 #        M_e = M[:-n_lmb, :-n_lmb]
 #        
 #        J_e = J[:-n_lmb, :-n_lmb]
@@ -82,40 +117,3 @@ def theta_method(M, J, R, B_f, x_0, theta=0.5, t_f=0.1, dt=1e-6, n_ev=1000):
 ##        
 ##        Sys_JR = spsolve(A_JR_sparse, B_JR_sparse) 
 ##        Sys_BJR = spsolve(A_JR_sparse, dt*B_pr)
-                                
-        
-    Nt = int(t_f / dt) + 1
-    if n_ev > Nt:
-        raise ValueError("Choose less evaluation points")
-        
-    
-
-    X_sol = np.zeros((n_sys, n_ev))
-#    X_sol[:, 0] = x_0[:n_sys]
-    X_sol[:, 0] = x_0
-
-    X_old = X_sol[:, 0]
-
-    X_new = np.zeros((n_sys,))
-    k = 1
-    
-
-    for i in range(Nt):
-        
-        t = dt * (i + 1)
-        
-        if t<0.2*t_f:
-            X_new = Sys_J @ X_old + Sys_BJ          
-        else:
-            X_new = Sys_JR @ X_old + Sys_BJR            
-            
-        X_old = X_new
-        
-        if k < n_ev and t >= t_ev[k]:
-            X_sol[:, k] = X_new
-            k = k + 1
-        elif k == n_ev:
-            break
-        
-    
-    return t_ev, X_sol
