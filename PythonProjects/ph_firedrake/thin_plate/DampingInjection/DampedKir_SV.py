@@ -132,7 +132,7 @@ def Integration_DAE_SV2_Augmented(M, J, R, B_Dext, e0, Np, Nq, dt, t_fin, n_ev=1
         bar = ('Time-stepping SV2Augmented : |' + '#' * int(perct / 2) + ' ' + str(perct) + '%' + '|')
         sys.stdout.write('\r' + bar)
 
-    print('\n intergation completed \n')
+    print('\n integration completed \n')
 
     return A_pq
 
@@ -327,7 +327,7 @@ n_ev = 1000
 x, y = SpatialCoordinate(mesh)
 
 e_pw_0 = Function(Vp)
-e_pw_0.assign(project(x ** 2, Vp))
+e_pw_0.assign(project(x ** 2*y*(y-1), Vp))
 ep_0 = e_pw_0.vector().get_local()
 eq_0 = np.zeros((n_Vq))
 
@@ -335,7 +335,7 @@ e0 = np.concatenate((ep_0, eq_0))
 
 sol = Integration_DAE_SV2_Augmented(MM, JJ, RR, GG, e0, n_Vp, n_Vq, dt, t_f, n_ev)
 
-path_res = "/home/a.brugnoli/LargeFiles/results_DampKirchh/"
+path_res = "/home/a.brugnoli/LargeFiles/results_DampKirchh2/"
 
 t_ev = np.linspace(0, t_f, n_ev)
 ep_sol = sol[:n_Vp]
@@ -400,7 +400,7 @@ plt.xlabel(r'{Time} $\mathrm{[s]}$')
 plt.ylabel(r'{Hamiltonian} $\mathrm{[J]}$')
 plt.title(r"Hamiltonian")
 # plt.legend(loc='upper left')
-path_out = "/home/a.brugnoli/Plots/Python/Plots/Kirchhoff_plots/Simulations/Article_CDC/DampingInjection2/"
+path_out = "/home/a.brugnoli/Plots/Python/Plots/Kirchhoff_plots/Simulations/Article_CDC/DampingInjection3/"
 
 plt.savefig(path_out + "Hamiltonian.eps", format="eps")
 

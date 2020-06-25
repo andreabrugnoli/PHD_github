@@ -4,7 +4,7 @@
 
 \minitoc
 
-\lettrine{\color{theme}{D}}iscretization is the process of transferring continuous models into discrete counterparts. The discrete model should be faithful to the continuous one. To this aim, it is usually essential that the main properties of the continuous system are preserved at the discrete level. An algorithm that is capable of conserving properties at the discrete level is called structure-preserving \cite{christiansen2011}. In this chapter, a method to spatially discretize infinite-dimensional pHs into finite-dimensional ones in a structure preserving manner is illustrated.
+\lettrine{\color{theme}{D}}iscretization is the process of transferring continuous models into discrete counterparts. The discrete model should be faithful to the continuous one. To this aim, it is usually essential that the main properties of the continuous system be preserved at the discrete level. An algorithm that is capable of conserving properties at the discrete level is called structure-preserving \cite{christiansen2011}. In this chapter, a method to spatially discretize infinite-dimensional pHs into finite-dimensional ones in a structure-preserving manner is illustrated.
 
 \section{Discretization under uniform boundary condition}
 A discrete version of a infinite-dimensional pH system is meant to preserve the underlying properties related to power continuity. To achieve this purpose, the discretization procedure consists of two steps \cite{kotyczka2018weak}:
@@ -14,7 +14,7 @@ A discrete version of a infinite-dimensional pH system is meant to preserve the 
 \end{itemize} 
 A structure-preserving discretization is able to construct an equivalent pH system that possesses the structural properties of the original model:
 \begin{tcbraster}[raster columns=2, raster equal height]
-	\begin{tcolorbox}[width=0.4\textwidth, nobeforeafter, colframe=theme,title=Infinite dimensional pH system]%%
+	\begin{tcolorbox}[width=0.4\textwidth, nobeforeafter, colframe=theme,title=Infinite-dimensional pH system]%%
 		PDE with distributed inputs:
 		\begin{align*}
 		\diffp{\bm{\alpha}}{t}(\bm{x}, t) &= \mathcal{J} {\displaystyle \diffd{H}{\bm{\alpha}}}+ \mathcal{B} \textcolor{red}{\bm{u}_\Omega(\bm{x}, t)}, \\
@@ -50,9 +50,15 @@ In this thesis the Partitioned Finite Element Method (PFEM), originally presente
 	\item A Galerkin method is employed to obtain a finite-dimensional system. For the approximation basis the finite element method is here employed but spectral methods can be used as well.
 \end{enumerate}
 
-Once the system has been put into weak form, a subset of the equations is integrated by parts, so that boundary variables are naturally included into the formulation and appear as control inputs, the collocated outputs being defined accordingly. The discretization of energy and co-energy variables (and the associated test functions) leads directly to a full rank representation for the finite-dimensional pH system.  This approach makes possible the usage of FEM software, like FEniCS \cite{logg2012}, or Firedrake \cite{rathgeber2017firedrake}. The procedure is universal, as it relies on a general integration by parts formula that characterizes multi-dimensional pHs. This is why the methodology is illustrated in all its generality and then detailed for some particular examples.  \\
+Once the system has been put into weak form, a subset of the equations is integrated by parts, so that boundary variables are naturally included into the formulation and appear as control inputs, the collocated outputs being defined accordingly. The discretization of energy and co-energy variables (and the associated test functions) leads directly to a full rank representation for the finite-dimensional pH system.  This approach makes possible the usage of FEM software, like FEniCS \cite{logg2012}, or Firedrake \cite{rathgeber2017firedrake}. The procedure is universal, as it relies on a general integration by parts formula that characterizes multi-dimensional pHs. This is why the methodology is illustrated in all its generality and then detailed for some particular examples of interest:
+\begin{enumerate}
+	\item in \secref{sec:pfem_gen} the 2D non linear irrotational shallow water equations;
+	\item the Euler-Bernoulli beam in \secref{sec:discr_EB};
+	\item the Kirchhoff plate in  \secref{sec:discr_Kir};
+	\item in \secref{sec:discr_Min} the Mindlin plate.
+\end{enumerate}
 
-This methodology is easily applicable under a uniform causality assumption. The case of mixed boundary conditions requires additional care and will be treated in the subsequent Section \secref{sec:mixedbc}.
+This methodology is easily applicable under a uniform causality assumption. The case of mixed boundary conditions requires additional care and will be treated in the subsequent \secref{sec:mixedbc}.
 
 
 \subsection{General procedure}\label{sec:pfem_gen}
@@ -62,8 +68,8 @@ Given an open connected set $\Omega \in \mathbb{R}^d,\, d \in  \{1,2,3\}$, consi
 \begin{align}
 \partial_t {\bm{\alpha}} &= \mathcal{J}\displaystyle \bm{e}, \qquad \;\;\, \bm{\alpha} \in L^2(\Omega, \mathbb{F}), \quad \mathcal{J}: L^2(\Omega, \mathbb{F}) \rightarrow L^2(\Omega, \mathbb{F}) \vert \;  \mathcal{J} = - \mathcal{J}^*, \label{eq:pHsys_dyn} \vspace{3pt}\\
 \bm{e} :&= \displaystyle \delta_{\bm{\alpha}}H, \qquad \;\, \bm{e} \in H^\mathcal{J} :=\left\{\bm{e} \in L^2(\Omega, \mathbb{F}) \vert \; \mathcal{J}\bm{e} \in L^2(\Omega, \mathbb{F})  \right\}, \label{eq:pHsys_const} \\
-\bm{u}_\partial &= \mathcal{B}_\partial  \displaystyle \bm{e}, \qquad \bm{u}_\partial \in \mathbb{R}^m, \label{eq:pHsys_u} \vspace{3pt}\\
-\bm{y}_\partial &= \mathcal{C}_\partial \displaystyle \bm{e}, \qquad \; \bm{y}_\partial \in \mathbb{R}^m. \label{eq:pHsys_y} \vspace{3pt}
+\bm{u}_\partial &= \mathcal{B}_\partial  \displaystyle \bm{e}, \qquad \bm{u}_\partial \in L^2(\partial\Omega, \mathbb{R}^m), \label{eq:pHsys_u} \vspace{3pt}\\
+\bm{y}_\partial &= \mathcal{C}_\partial \displaystyle \bm{e}, \qquad \; \bm{y}_\partial \in L^2(\partial\Omega, \mathbb{R}^m). \label{eq:pHsys_y} \vspace{3pt}
 \end{align}
 \end{subequations}
 The operator $\mathcal{J}: L^2(\Omega, \mathbb{F}) \rightarrow L^2(\Omega, \mathbb{F})$ is a differential, formally skew adjoint operator $\mathcal{J} = - \mathcal{J}^*$ over the space $L^2(\Omega, \mathbb{F})$. The  set $\mathbb{F}$ is an appropriate Cartesian product of either scalar, vectorial or tensorial quantities. Its precise definition depends on the example upon consideration. For scalars $(a,b) \in L^2(\Omega)$, vectors $(\bm{a}, \bm{b})\in L^2(\Omega, \mathbb{R}^d)$ and tensors  $(\bm{A}, \bm{B}) \in L^2(\Omega,\mathbb{R}^{d\times d})$ the $L^2$ inner product is given by 
@@ -81,7 +87,7 @@ H = \int_\Omega \mathcal{H}(\bm{\alpha}) \d\Omega,
 where $\mathcal{H}(\bm{\alpha}): L^2(\Omega, \mathbb{F}) \rightarrow \mathbb{R}$ is a non linear function.
 \\
 
-To applied this methodology the non linearities are restricted to the Hamiltonian and a uniform causality condition is supposed to characterize the system. It is required as well that the system admits a partition of the variables. This requirement is always encountered in the following examples. These hypotheses are resumed in the following assumptions.
+To applied this methodology the non linearities are restricted to the Hamiltonian and a uniform causality condition is supposed to characterize the system. By uniform causality condition we mean the imposition of a single type of boundary condition \cite{kotyczka2019numerical} (as opposed to the mixed boundary conditions case). It is required as well that the system admits a partition of the variables. This requirement is always encountered in the following examples. These hypotheses are summarized in the following assumptions.
 
 \begin{assumption}[Partitioning of the system]
 	\label{ass:linJ}
@@ -225,7 +231,7 @@ To obtain a closed system, the constitutive law \eqref{eq:pHsys_const_ass} and t
 where the test function $\bm{v}_\partial \in L^2(\partial \Omega, \mathbb{R}^m)$ is defined on the boundary $\partial\Omega$ and $\mathcal{C}_\partial$ is defined either by Eq. \eqref{eq:assB2C1} or  \eqref{eq:assB1C2}.
 
 
-\paragraph{Step 2} Next the integration by part has to be carried out. The choice is dictated by the boundary control to be imposed on the system. Consider again Eq. \eqref{eq:weak_dyn}. The integration by parts can be carried out either on term $-\inner[L^2(\Omega, \mathbb{A})]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2}$, or on term $\inner[L^2(\Omega, \mathbb{B})]{\bm{v}_2}{\mathcal{L}\bm{e}_1}$. Depending on which line undergoes the integration by parts (this is why the name Partitioned Finite Element method), two structure preserving weak forms are obtained. These differ by the boundary causality imposed to the system. 
+\paragraph{Step 2} Next the integration by part has to be carried out. The choice is dictated by the boundary control to be imposed on the system. Consider again Eq. \eqref{eq:weak_dyn}. The integration by parts can be carried out either on term $-\inner[L^2(\Omega, \mathbb{A})]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2}$, or on term $\inner[L^2(\Omega, \mathbb{B})]{\bm{v}_2}{\mathcal{L}\bm{e}_1}$. Depending on which line undergoes the integration by parts (this is why the name Partitioned Finite Element method), two structure-preserving weak forms are obtained. These differ by the boundary causality imposed to the system. 
 
 
 \subparagraph{Integration by parts of the term $-\inner[L^2(\Omega, \mathbb{A})]{\bm{v}_1}{\mathcal{L}^*\bm{e}_2}$}
@@ -339,7 +345,7 @@ To conclude the illustration of this methodology, a Galerkin discretization is i
 \end{equation}
 where $\bm{\phi}_1^i  \in \mathbb{A}, \; \bm{\phi}_2^i  \in \mathbb{B}, \; \bm{\phi}_\partial^i \in \mathbb{R}^m$.
 \subparagraph{Discretization of the weak form \eqref{eq:weak_sys_intJ1}}
-Plugging the approximation into the weak form \eqref{eq:weak_sys_intJ1} and considering that the resulting equation holds $\forall \, v_1^i,\, v_2^j,\, v_\partial^k \; (i\in\left\{1,n_1\right\}, \; j\in\left\{1,n_2\right\}, \; k\in\left\{1,n_\partial\right\})$, the finite dimensional system is obtained
+Plugging the approximation into the weak form \eqref{eq:weak_sys_intJ1} and considering that the resulting equation holds $\forall \, v_1^i,\, v_2^j,\, v_\partial^k \; (i\in\left\{1,n_1\right\}, \; j\in\left\{1,n_2\right\}, \; k\in\left\{1,n_\partial\right\})$, the finite-dimensional system is obtained
 
 \begin{equation}\label{eq:pHsys_findim_J1}
 \begin{aligned}
@@ -445,7 +451,7 @@ Plugging \eqref{eq:pH_findin_e} into \eqref{eq:pH_findim_dyn1}, a pH system in c
 	\where \widehat{\mathbf{y}}_\partial &= \mathbf{M}_\partial \mathbf{y}_\partial.
 	\end{aligned}
 \end{equation}
-The structure preserving character of the method is evident from the preservation at the discrete level of the power balance. The finite dimensional counterpart of the energy rate is given by
+The structure-preserving character of the method is evident from the preservation at the discrete level of the power balance. The finite-dimensional counterpart of the energy rate is given by
 \begin{equation}
 \begin{aligned}
 \dot{H}_d &= \nabla^\top H_d(\bm{\alpha}_d) \dot{\bm{\alpha}}_d, \\
@@ -453,10 +459,10 @@ The structure preserving character of the method is evident from the preservatio
 &= {\mathbf{y}}_\partial^\top \mathbf{M}_\partial \mathbf{u}_\partial = \widehat{\mathbf{y}}_\partial^\top \mathbf{u}_\partial.
 \end{aligned}
 \end{equation}
-This result mimics its infinite dimensional equivalent \eqref{eq:powbal_2}.
+This result mimics its infinite-dimensional equivalent \eqref{eq:powbal_2}.
 
 \subparagraph{Discretization of the weak form \eqref{eq:weak_sys_intJ2}}
-Plugging the approximation into the weak form \eqref{eq:weak_sys_intJ2} a finite dimensional system with a different causality is obtained
+Plugging the approximation into the weak form \eqref{eq:weak_sys_intJ2} a finite-dimensional system with a different causality is obtained
 
 \begin{equation}\label{eq:pHsys_findim_J2}
 \begin{aligned}
@@ -509,7 +515,7 @@ The differences with respect to formulation \eqref{eq:pHsys_findim_J1} reside in
 where $i \in \left\{1, n_1\right\}, \; m \in \left\{1, n_2\right\},\; k \in \left\{1, n_\partial \right\}$. System \eqref{eq:pHsys_findim_J2} can be put in canonical form by replacing the co-energy variables by the discretized gradient.
 
 \paragraph{Example: the irrotational shallow water equations}
-Consider as an example the shallow water equations detailed in Sec. \secref{sec:shallowwater}.  The flow is assumed to be irrotational ($\nabla \times \bm{v} = 0$). As a consequence the term $\bm{\mathcal{G}}$ in Eq. \eqref{eq:pHsys_shwater} vanishes.
+Consider as an example the shallow water equations detailed in \secref{sec:shallowwater}.  The flow is assumed to be irrotational ($\nabla \times \bm{v} = 0$). As a consequence the term $\bm{\mathcal{G}}$ in Eq. \eqref{eq:pHsys_shwater} vanishes.
 To fulfill Assumption \ref{ass:operBC}, the incoming volumetric flow is known at the boundary, so that a uniform Neumann condition is imposed. This leads to the following boundary control system, defined on an open connected set $\Omega \subset \mathbb{R}^2$
 \begin{equation}
 \begin{aligned}
@@ -566,7 +572,7 @@ u_\partial &= \mathcal{N}_{\partial, 2} \bm{e}_v = -\gamma_{n} \bm{e}_v = -\bm{e
 y_\partial &= \mathcal{N}_{\partial, 1} {e}_h = \gamma_{0} {e}_h = {e}_h\vert_{\partial\Omega}.
 \end{aligned}
 \end{equation}
-This system represents a particular example of the general formulation of the general framework \eqref{eq:pHsys_ass}, together with boundary conditions \eqref{eq:pHsys_assB2C1}. To obtain a finite dimensional system, the test variables $v_h,\; \bm{v}_v$ are introduced and the integration by parts is performed on the $\div$ operator, leading to the weak form 
+This system represents a particular example of the general formulation of the general framework \eqref{eq:pHsys_ass}, together with boundary conditions \eqref{eq:pHsys_assB2C1}. To obtain a finite-dimensional system, the test variables $v_h,\; \bm{v}_v$ are introduced and the integration by parts is performed on the $\div$ operator, leading to the weak form 
 
 \begin{equation}\label{eq:weak_sys_shwater_grad}
 \begin{aligned}
@@ -595,7 +601,7 @@ Introducing a Galerkin approximation as in \eqref{eq:approx_vaeb}
 {y}_\partial &\approx \sum_{i=1}^{n_\partial} {\phi}_\partial^i(\bm{s}) y_\partial^i(t), \quad \bm{s} \in \partial\Omega,
 \end{aligned}
 \end{equation}
-the finite dimensional system is obtained
+the finite-dimensional system is obtained
 \begin{equation}\label{eq:pHsys_findim_shwater}
 \begin{aligned}
 \begin{bmatrix}
@@ -729,7 +735,7 @@ From equation \eqref{eq:H_coenergy}, the power balance reads
 &= \inner[L^2(\partial \Omega, \mathbb{R}^m)]{\bm{y}_\partial}{\bm{u}_\partial}.
 \end{aligned}
 \end{equation}
-To get a finite dimensional approximation the same procedure detailed in Sec. \secref{sec:pfem_gen} is followed. The only difference is that there is no need to discretize the constitutive relations as those are already incorporated in the dynamics. 
+To get a finite-dimensional approximation the same procedure detailed in \secref{sec:pfem_gen} is followed. The only difference is that there is no need to discretize the constitutive relations as those are already incorporated in the dynamics. 
 
 Once the system is put into weak form, if the operator $\mathcal{-L^*}$ is integrated by parts, one obtains the weak form 
 \begin{equation}\label{eq:weak_linsys_intJ1}
@@ -827,14 +833,14 @@ once differentiated in time, provides the energy rate
 \begin{equation}
 \dot{H}_d = \mathbf{y}_\partial^\top \mathbf{M}_\partial \mathbf{u}_\partial = \widehat{\mathbf{y}}_\partial^\top \mathbf{u}_\partial, \where \widehat{\mathbf{y}}_\partial:=\mathbf{M}_\partial \mathbf{y}_\partial.
 \end{equation}
-This result mimics its finite dimensional counterpart \eqref{eq:powbal_lin}.
+This result mimics its finite-dimensional counterpart \eqref{eq:powbal_lin}.
 \subsection{Linear flexible structures}
 
 In this section, some linear examples from the elasticity realms are considered. We restrict the discussion to linear problems. This case is anyway significant, as these examples are frequently encountered in engineering applications. 
 
 
-\subsubsection{Euler-Bernoulli beam}
-We reconsider the example discussed in Sec. \secref{sec:beamEB}. The relation between energy and co-energy variables is given by Eqs. \eqref{eq:alpha_EB}, \eqref{eq:e_EB}
+\subsubsection{Euler-Bernoulli beam}\label{sec:discr_EB}
+We reconsider the example discussed in \secref{sec:beamEB}. The relation between energy and co-energy variables is given by Eqs. \eqref{eq:alpha_EB}, \eqref{eq:e_EB}
 \begin{equation}
 \alpha_w = \rho A \ e_w, \qquad \alpha_\kappa = \frac{1}{EI}\ e_\kappa
 \end{equation}
@@ -1062,7 +1068,7 @@ where $\rho$ is the mass density, $h$ the plate thickness and $\bm{\mathcal{D}}_
 \begin{equation}\label{eq:bend_compliace}
 \bm{\mathcal{C}}_b = \frac{12}{E h^3}[(1 + \nu)(\cdot) - \nu \Tr(\cdot)\bm{I}_{2\times 2}].
 \end{equation}
-Given an open connected set $\Omega\subset \mathbb{R}^2$, the Kirchhoff plate model \eqref{eq:phsysKir} in co-energy form controlled by forces and momenta is then expressed as 
+Given an open connected set $\Omega\subset \mathbb{R}^2$, the Kirchhoff plate model \eqref{eq:pHsysKir} in co-energy form controlled by forces and momenta is then expressed as 
 \begin{subequations}\label{eq:pHlinsys_Kir1}
 \begin{align}
 \begin{bmatrix}
@@ -1154,7 +1160,7 @@ e_w &= \sum_{i = 1}^{n_w} \phi_w^i e_w^i,
 \end{aligned} \qquad
 \bm{y}_\partial = \sum_{i = 1}^{n_\partial} \bm\phi_\partial^i y_\partial^i.
 \end{equation} 
-the following finite dimensional system is obtained
+the following finite-dimensional system is obtained
 \begin{equation}\label{eq:pHsys_findim_kirchh_hess}
 \begin{aligned}
 \begin{bmatrix}
@@ -1206,7 +1212,7 @@ To lower the regularity requirement for the finite elements many non conforming 
 	Equivalently, the second line of Eq. \eqref{eq:pHdyn_Kir1} can be integrated by parts twice to obtain a discretized system whose inputs are the linear velocity and the angular velocity at the boundary. However, while for the $H^2$ space conforming finite elements are available, for the $H^{\div\Div}$ no conforming finite elements have been proposed. This makes the discretization unfeasible. 
 \end{remark}
 
-\subsubsection{Mindlin plate}
+\subsubsection{Mindlin plate}\label{sec:discr_Min}
 Using Eqs. \eqref{eq:alpha_Min} and \eqref{eq:e_Min}, the relation between co-energy and energy variables for the isotropic Mindlin plate is found to be
 \begin{equation}
 \begin{aligned}
@@ -1222,7 +1228,7 @@ I_\theta &:= {\rho h^3}/{12},\\
 C_s &:= {1}/{(K_{\text{sh}}Gh)}, \\
 \end{aligned}
 \end{equation}
-where $K_{\text{sh}}$ is the shear correction factor, $G$ the shear modulus. The other variables have the same meaning as in Sec. \secref{sec:discr_Kir}. 
+where $K_{\text{sh}}$ is the shear correction factor, $G$ the shear modulus. The other variables have the same meaning as in \secref{sec:discr_Kir}. 
 
 \paragraph{Control through forces and torques} A pH representation in co-energy variables with known forces and momenta at the boundary is given by the system
 
@@ -1369,7 +1375,7 @@ e_w &= \sum_{i = 1}^{n_w} \phi_w^i e_w^i, \\
 \bm{y}_\partial &= \sum_{i = 1}^{n_\partial} \bm\phi_\partial^i y_\partial^i.
 \end{aligned}
 \end{equation} 
-the following finite dimensional system is obtained
+the following finite-dimensional system is obtained
 \begin{equation}
 \begin{aligned}
 \mathrm{Diag}\begin{bmatrix}
@@ -1564,13 +1570,13 @@ Matrix $\mathbf{B}_{q_n}, \, \mathbf{B}_{M_{nn}}, \, \mathbf{B}_{M_{ns}}$ are co
 {B}_{q_n}^{rl} = \inner[L^2(\partial\Omega)]{\gamma_n \bm\phi_\gamma^r}{\phi_{\partial, 1}^l}, \quad {B}_{M_{nn}}^{pl} = \inner[L^2(\partial\Omega)]{\gamma_{nn} \bm\Phi_\kappa^p}{\phi_{\partial, 2}^l},  \quad {B}_{M_{ns}}^{pl} = \inner[L^2(\partial\Omega)]{\gamma_{ns} \bm\Phi_\kappa^p}{\phi_{\partial, 3}^l}.
 \end{equation}
 
-This finite dimensional system represents a purely mixed discretization of the problem and is really close to the plane elasticity system. Conforming finite elements for the plane elasticity system on simplicial meshes have been constructed in \cite{arnold2002mixed}. The resulting element is rather cumbersome and computationally expensive as the stress tensor has at least 24 degrees of freedom on a triangle  For this reason, many finite element discretization imposes the symmetry of the stress tensor weakly \cite{arnold2007mixed}. To actually implement the discretization, in Chap. \ref{ch:conv} the Mindlin plate problem is going to be reformulated so that the momenta tensor is only weakly symmetric. 
+This finite-dimensional system represents a purely mixed discretization of the problem and is really close to the plane elasticity system. Conforming finite elements for the plane elasticity system on simplicial meshes have been constructed in \cite{arnold2002mixed}. The resulting element is rather cumbersome and computationally expensive as the stress tensor has at least 24 degrees of freedom on a triangle  For this reason, many finite element discretization imposes the symmetry of the stress tensor weakly \cite{arnold2007mixed}. To actually implement the discretization, in Chap. \ref{ch:conv} the Mindlin plate problem is going to be reformulated so that the momenta tensor is only weakly symmetric. 
 
 
 \section{Mixed boundary conditions}\label{sec:mixedbc}
 In this section Assumption \ref{ass:operBC} on uniform boundary condition is modified to account for general non homogeneous boundary conditions. The discretization of Stokes-Dirac structure under mixed causality has been already treated in \cite{kotyczka2018weak}. However, to satisfy the power balance at a discrete level, some additional parameters are introduced. This makes the employment of this methodology not simple and dependent on the considered application. Furthermore, elasticity models do not fall within the required assumptions. \\
 
-We propose here two methodologies to tackle mixed boundary conditions within the Partitioned Finite Element Method. The first introduces Lagrange multipliers, and therefore algebraic constraints, to enforce the mixed causality. Finite dimensional differential algebraic port-Hamiltonian systems (pHDAE) have been introduced in \cite{beattie2018linear} for linear systems and in \cite{morandin2019} for non linear systems. This enriched description shares all the crucial features of ordinary pHs, but easily takes into account algebraic constraints, time-dependent transformations and explicit dependence on time in the Hamiltonian. The second method employs a domain decomposition technique to interconnect systems with different causalities. For sake of simplicity the illustration is restricted to the linear case. \\
+We propose here two methodologies to tackle mixed boundary conditions within the Partitioned Finite Element Method. The first introduces Lagrange multipliers, and therefore algebraic constraints, to enforce the mixed causality. Finite-dimensional differential algebraic port-Hamiltonian systems (pHDAE) have been introduced in \cite{beattie2018linear} for linear systems and in \cite{morandin2019} for non linear systems. This enriched description shares all the crucial features of ordinary pHs, but easily takes into account algebraic constraints, time-dependent transformations and explicit dependence on time in the Hamiltonian. The second method employs a domain decomposition technique to interconnect systems with different causalities. For sake of simplicity the illustration is restricted to the linear case. \\
 
 \begin{figure}[tb]
 	\centering
@@ -1772,9 +1778,9 @@ gives rise to the discrete power balance
 &= \widehat{\mathbf{y}}_{\partial, 1}^\top \mathbf{u}_{\partial, 1} + \widehat{\mathbf{y}}_{\partial, 2}^\top \mathbf{u}_{\partial, 2}, \where \widehat{\mathbf{y}}_{\partial, 1} :=\mathbf{M}_{\partial, 1} \mathbf{y}_{\partial, 1}, \quad \widehat{\mathbf{y}}_{\partial, 2} :=\mathbf{M}_{\partial, 2} \mathbf{y}_{\partial, 2}.
 \end{aligned}
 \end{equation}
-This result is the finite dimensional equivalent of \eqref{eq:powbal_mixed}.
+This result is the finite-dimensional equivalent of \eqref{eq:powbal_mixed}.
 
-Equivalently, the weak form Eq.\ref{eq:weak_linsys_intJ2} may be used as a starting point. The computation follows in a completely analogous manner. The only difference is that $\bm{y}_{\partial, 2}=\bm{\lambda}_{\partial, 2}$ plays the role of the Lagrange multiplier. The final finite dimensional system is then given by
+Equivalently, the weak form Eq.\ref{eq:weak_linsys_intJ2} may be used as a starting point. The computation follows in a completely analogous manner. The only difference is that $\bm{y}_{\partial, 2}=\bm{\lambda}_{\partial, 2}$ plays the role of the Lagrange multiplier. The final finite-dimensional system is then given by
 \begin{equation}\label{eq:pHsys_infdim_mult2}
 \begin{aligned}
 \mathrm{Diag}
@@ -1963,7 +1969,7 @@ where $\square$ stays for $v,\, u,\, y$.
 Notice that the same basis functions $\bm{\phi}_{\partial, 12}$ are used for both interface variables. This is necessary in order to dispose of the same degrees of freedom for the interconnection.
 \end{remark}
 
-Replacing approximations $\ref{eq:approx_vaeb_mixed}, \ref{eq:approx_vuy_int}$ into Eqs. \ref{eq:pHlinsys_weak_Om1}, \ref{eq:bdsplit_Om1}, \ref{eq:bc_Om1}, a finite dimensional system for the $\Omega_1$ subdomain is obtained
+Replacing approximations $\ref{eq:approx_vaeb_mixed}, \ref{eq:approx_vuy_int}$ into Eqs. \ref{eq:pHlinsys_weak_Om1}, \ref{eq:bdsplit_Om1}, \ref{eq:bc_Om1}, a finite-dimensional system for the $\Omega_1$ subdomain is obtained
 
 
 \begin{equation}\label{eq:pHlinsys_findim_Om1}
@@ -2042,7 +2048,7 @@ k &\in \{1,n_{\partial, 12}\}.
 \end{equation} 
 
 
-If instead the approximations are plugged into  Eqs. \ref{eq:pHlinsys_weak_Om2}, \ref{eq:bdsplit_Om2}, \ref{eq:bc_Om2}, a finite dimensional system for the $\Omega_2$ subdomain is computed
+If instead the approximations are plugged into  Eqs. \ref{eq:pHlinsys_weak_Om2}, \ref{eq:bdsplit_Om2}, \ref{eq:bc_Om2}, a finite-dimensional system for the $\Omega_2$ subdomain is computed
 
 \begin{equation}\label{eq:pHlinsys_findim_Om2}
 \begin{aligned}
