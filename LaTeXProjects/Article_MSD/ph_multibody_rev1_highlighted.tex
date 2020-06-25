@@ -128,7 +128,7 @@
 \maketitle
 
 \begin{abstract}
-A new formulation for the modular construction of flexible multibody systems is presented. By rearranging the equations for a flexible floating body and introducing the appropriate canonical momenta, the model is recast into a coupled system of ordinary and partial differential equations in port-Hamiltonian (pH) form. This approach relies on a floating frame description and remains valid under the assumption of small deformations. This allows including mechanical models that cannot be easily formulated in terms of differential forms. Once a pH model is established, a finite element based method is then introduced to discretize the dynamics in a structure-preserving manner. Thanks to the features of the pH framework, complex multibody systems are constructed in a modular way. Constraints are imposed at the velocity level, leading to an index 2 quasi-linear differential-algebraic system. Numerical tests are carried out to assess the validity of the proposed approach.
+A new formulation for the modular construction of flexible multibody systems is presented. By rearranging the equations for a flexible floating body and introducing the appropriate canonical momenta, the model is recast into a coupled system of ordinary and partial differential equations in port-Hamiltonian (pH) form. This approach relies on a floating frame description and is valid under the assumption of small deformations. This allows including mechanical models that cannot be easily formulated in terms of differential forms. Once a pH model is established, a finite element based method is then introduced to discretize the dynamics in a structure-preserving manner. Thanks to the features of the pH framework, complex multibody systems are constructed in a modular way. Constraints are imposed at the velocity level, leading to an index 2 quasi-linear differential-algebraic system. Numerical tests are carried out to assess the validity of the proposed approach.
 
 \keywords{Port-Hamiltonian systems \and Floating frame formulation \and Flexible multibody systems \and Structure-preserving discretization \and Substructuring}
 % \PACS{PACS code1 \and PACS code2 \and more}
@@ -140,7 +140,7 @@ A new formulation for the modular construction of flexible multibody systems is 
 \indent In structural control co-design of flexible multibody systems, it is especially useful to dispose of a modular description, to simplify analysis. In this spirit, the transfer matrix method \cite{Rui2005} and the component mode synthesis \cite{HurtyCMS} are two well known substructuring techniques that allow the construction of complex multibody systems by interconnecting subcomponents together. A reformulation of the Finite Element-Transfer Matrix (FE-TM) method \cite{TAN199047} allows an easy construction of reduced models that are suited for decentralized control design. For the component mode synthesis, the controlled component synthesis (CCS), a framework for the design of decentralized controller of flexible structures, has been proposed in \cite{YoungCMS}. Another modeling paradigm based on the component mode synthesis is the two-input two-output port (TITOP) approach \cite{TITOP}. It conceives the dynamical model of each substructure as a transfer between the accelerations and the external forces at the connection points. This feature allows considering different boundary conditions by inverting specific channels in the transfer matrix. A rigorous validation was provided in \cite{Perez,SANFEDINO2018128}, where the robustness of the methodology in handling various boundary conditions was assessed. \\
 \indent The Lagrangian formulation is the most commonly used methodology to retrieve the equations of motion of flexible multibody systems. \firstRev{Using the variational principles of geometric mechanics the equations of motion in Hamiltonian form can be derived either for rigid body dynamics \cite[Proposition 7.1.1]{holm2008geometric} and general non linear elasticity \cite[Chapter 3]{marsden1981lectures}.} The port-Hamiltonian (pH) framework \cite{bookPHs} has been recently employed to describe the dynamics of rigid and flexible links \cite{macchelli_fl,macchelli_flrig}. PH systems are intrinsically modular \cite{CerveraIntFinite}, hence this approach naturally allows constructing complex system by interconnecting together atomic elements. The formulation therein naturally accounts for the non-linearities due to large deformations.  However, this methodology relies on Lie algebra and differential geometry concepts and requires non standard discretization techniques \cite{Golo}. Thus, the overall implementation is not straightforward. \\
 \indent Together with the approach used to derive the equations of motion, the incorporation of the elastic motion represents another important point when dealing with flexible multibody systems. Three descriptions are commonly used: the floating frame formulation, the corotational frame formulation and the inertial frame formulation \cite{Ellenbroek2018}. The choice greatly depends on the foreseen application.  The corotational and inertial frame formulations take into account large deformations of the elastic body, hence are well-suited for accurate simulations. \firstRev{For these formulation many model reduction strategies have been developed in the last two decades \cite{rong2019}.} The inclusion of active control strategies is often unfeasible due to the computational burden \cite{Noor_rev}. The floating frame formulation is less accurate but easily integrates many model reduction techniques \cite{NOWAKOWSKI201240}, making it possible to obtain a low-dimensional problem for control design. \\
-\indent \firstRev{The strong form Lagrangian formulation of flexible dynamics using a floating frame approach is detailed in  \cite[Eq. 4.10]{simeon2013computational} using the least action principle, but without highlighting the Hamiltonian structure of the problem.} In this paper, we propose to combine the pH framework with a floating frame description of the dynamics. Starting from the general equation for the rigid flexible dynamics of a floating body, an equivalent port-Hamiltonian system is found by appropriate selection of the canonical momenta. The flexible behavior is based on the linear elasticity assumption making it possible to include models that cannot be easily formulated in terms of differential form  \cite{BRUGNOLI2019940,BRUGNOLI2019961}. The problem is then written as a coupled system of ordinary and partial differential equations (ODEs and PDEs), extending the general definition of finite-dimensional port-Hamiltonian descriptor systems provided in \cite{mehrmann2019structurepreserving}. A suitable structure-preserving discretization method, based on \cite{cardoso2019partitioned}, is then used to obtain a finite-dimensional pH system. The modularity feature of pH systems makes the proposed approach analogous to a substructuring technique \cite{substructuring}: each individual component can be interconnected to the other bodies using standard interconnection of pH systems, as it is done in \cite{macchelli_flrig}. This feature allows the use of modeling platforms like \textsc{Simulink}$^{\tiny{\textregistered}}$ or \textsc{Modelica}$^{\tiny{\textregistered}}$. \firstRev{Other approaches, commonly used in robotics \cite[Chapter 5]{bremer2008elastic}, allows constructing chain of bodies in a systematic way. However, in the proposed formulation the interconnections among bodies do preserve the Hamiltonian structure and the conservation of energy.} The constraints are imposed on the velocities, leading to a quasi-linear index 2 differential-algebraic port-Hamiltonian system (pHDAE) \cite{phd_steinbrecher,beattie2018linear}. In the linear case, the algebraic constraints can be eliminated, preserving the overall pH structure, using null space methods \cite{nullspaceFlMult}.  As a floating frame formulation is used, model reduction techniques can be employed to lower the computational complexity of the model \cite{phode_red,phdae_red}. These peculiarities make the proposed formulation interesting for control applications, that can benefit from the properties of pH systems \cite{PHadaptive,ORTEGAsurvey}.  \\
+\indent \firstRev{The strong form Lagrangian formulation of flexible dynamics using a floating frame approach is detailed in  \cite[Eq. 4.10]{simeon2013computational} using the least action principle, but without highlighting the Hamiltonian structure of the problem.} In this paper, we propose to combine the pH framework with a floating frame description of the dynamics. Starting from the general equation for the rigid flexible dynamics of a floating body, an equivalent port-Hamiltonian system is found by appropriate selection of the canonical momenta. The flexible behavior is based on the linear elasticity assumption making it possible to include models that cannot be easily formulated in terms of differential form  \cite{BRUGNOLI2019940,BRUGNOLI2019961}. The problem is then written as a coupled system of ordinary and partial differential equations (ODEs and PDEs), extending the general definition of finite-dimensional port-Hamiltonian descriptor systems provided in \cite{mehrmann2019structurepreserving}. A suitable structure-preserving discretization method, based on \cite{cardoso2019partitioned}, is then used to obtain a finite-dimensional pH system. The modularity feature of pH systems makes the proposed approach analogous to a substructuring technique \cite{substructuring}: each individual component can be interconnected to the other bodies using standard interconnection of pH systems, as it is done in \cite{macchelli_flrig}. This feature allows the use of modeling platforms like \textsc{Simulink}$^{\tiny{\textregistered}}$ or \textsc{Modelica}$^{\tiny{\textregistered}}$. \firstRev{Other approaches, commonly used in robotics \cite[Chapter 5]{bremer2008elastic}, allows constructing chain of bodies in a systematic way but do not address the conservation of energy. One of the main interests of this contribution is that the interconnections among bodies do preserve the Hamiltonian structure and the conservation of energy.} The constraints are imposed on the velocities, leading to a quasi-linear index 2 differential-algebraic port-Hamiltonian system (pHDAE) \cite{phd_steinbrecher,beattie2018linear}. In the linear case, the algebraic constraints can be eliminated, preserving the overall pH structure, using null space methods \cite{nullspaceFlMult}.  As a floating frame formulation is used, model reduction techniques can be employed to lower the computational complexity of the model \cite{phode_red,phdae_red}. These peculiarities make the proposed formulation interesting for control applications, that can benefit from the properties of pH systems \cite{PHadaptive,ORTEGAsurvey}.  \\
 \indent The paper is organized in the following manner. In Section \ref{sec:class_model} the classical equations of a flexible floating body are recalled. Using the properties of the cross product, the equations are recast in a form closer to the pH structure. Section \ref{sec:pH_fd} details the pH formulation of a floating flexible body by introducing the proper canonical momenta. In Section \ref{sec:discr} a finite element based discretization is detailed for the elastodynamics problem. The procedure is easily applied to flexible floating bodies. The particular case of thin planar beams is then detailed, as it will be next employed in the simulation part. Section~\ref{sec:MB_pH} explains how to interconnect models together using classical pH interconnection. Section \ref{sec:valid} is devoted to numerical examples, to assess the validity of the proposed methodology. The test cases are taken from previously published articles \cite{Chebbi2017,Ellenbroek2018}.
 
  
@@ -162,7 +162,7 @@ Consider an open connected set $\Omega \subseteq \mathbb{R}^3$, representing a f
 \[
 \bm{v} = \bm{v}_P + \crmat{\bm{\omega}_P}\bm{x}_f + \bm{v}_f,  \qquad \bm{x}_f := \bm{x}+\bm{u}_f,
 \]
-where $\bm{x}$ is the position vector of the current point, $\bm{v}_P, \bm{\omega}_P$ are the linear and angular velocities of point $P$  and $\bm{v}_f := \dot{\bm{u}}_f$ is the time derivative of the deformation displacement $\bm{u}_f$ (computed in the body frame). These quantities are evaluated in the body reference frame $\widehat{\bm{x}}, \widehat{\bm{y}}, \widehat{\bm{z}}$ (see Fig. \ref{fig:float_body}). The notation $\crmat{\bm{a}}$ (cross map) denotes the skew-symmetric matrix associated to vector $\bm{a}$ (see Appendix A). The model for the classical equations derived using the principle of virtual work can be found in \cite{MB_Daepde} and \cite[Chapter 4]{simeon2013computational}. The small difference with respect to the derivation therein is that the equation for the translation is now written in the body frame (see Appendix B). 
+where $\bm{x}$ is the position vector of the current point, $\bm{v}_P, \bm{\omega}_P$ are the linear and angular velocities of point $P$  and $\bm{v}_f := \dot{\bm{u}}_f$ is the time derivative of the deformation displacement $\bm{u}_f$ (computed with respect to the body frame). These quantities are evaluated in the body reference frame $\widehat{\bm{x}}, \widehat{\bm{y}}, \widehat{\bm{z}}$ (see Fig. \ref{fig:float_body}). The notation $\crmat{\bm{a}}$ (cross map) denotes the skew-symmetric matrix associated to vector $\bm{a}$ (see Appendix A). The model for the classical equations derived using the principle of virtual work can be found in \cite{MB_Daepde} and \cite[Chapter 4]{simeon2013computational}. The small difference with respect to the derivation therein is that the equation for the translation is now written in the body frame (see Appendix B). 
 \begin{itemize}
 	\item Linear momentum balance:
 	\begin{equation}
@@ -453,37 +453,7 @@ The power balance equals the power due to body force and surface traction
 \end{equation}
 
 \begin{remark}
-Even if three dimensional elasticity has been taken as example up to this point, other models are easily considered. Beam and plate models \cite{BRUGNOLI2019940,BRUGNOLI2019961} are described by appropriate differential operators that replace the $\Div, \Grad$ appearing in \eqref{eq:ph_mfd_all} (see \secref{sec:ph_floatbeam}). \firstRev{For example in the case of the Kirchhoff plate one obtains the following system
-\begin{equation}
-\footnotesize
-\setlength{\dashlinegap}{2pt}
-\bm{\mathcal{E}}
-\diffp{}{t}
-\underbrace{
-	\begin{pmatrix}
-	^i \bm{r}_P \\ \bm{R}_{\text{v}} \\ \bm{u}_{m} \\ {u}_{b} \\\hdashline  \bm{v}_P \\ \bm\omega_P  \\ \bm{v}_{m} \\ {v}_{b} \\ \bm{N} \\ \bm{M} \\
-	\end{pmatrix}
-}_{\bm{e}} = 
-\underbrace{
-	{\left[ \begin{array}{cccc:cccccc}
-		0 & 0 & 0 & 0 &  \bm{R} & 0 & 0 & 0 & 0 & 0 \\
-		0 & 0 & 0 & 0 & 0 & \crmat{\bm{R}_{\text{v}}} & 0 & 0 & 0  & 0\\
-		0 & 0 & 0 & 0 & 0 & 0 & \bm{I}_{2} & 0 & 0  & 0 \\ 
-		0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0  & 0 \\ 
-		\hdashline
-		-\bm{R}^\top & 0 & 0 & 0 & 0 & \crmat{\widehat{\bm{p}}_t} & 0 & 0  & 0  & 0\\
-		0 & -\crmat{\bm{R}_{\text{v}}}^\top & 0 & 0 & \crmat{\widehat{\bm{p}}_t} & \crmat{\widehat{\bm{p}}_r} & \bm{\mathcal{I}}_{p_{m}}^\Omega & \bm{\mathcal{I}}_{p_{b}}^\Omega  & 0  & 0\\
-		0 & 0 & -\bm{I}_{2} & 0 & 0 & -(\bm{\mathcal{I}}_{p_{m}}^\Omega)^* & 0 & 0  & \Div  & 0\\
-		0 & 0 & 0 & -1& 0 & -(\bm{\mathcal{I}}_{p_b}^\Omega)^* & 0 & 0  & 0  & \div\Div\\
-		0 & 0 & 0 & 0 & 0 & 0 & \Grad & 0  & 0  & 0\\
-		0 & 0 & 0 & 0 & 0 & 0 & 0 & \Hess  & 0  & 0\\
-		\end{array} \right]}
-}_{\bm{\mathcal{J}}}
-\underbrace{\begin{pmatrix}
-	\partial_{\bm{r}_P}H \\ \partial_{\bm{R}_\text{v}}H \\ \delta_{\bm{u}_{m}} H \\ \delta_{u_{b}} H \\\hdashline  \bm{v}_P \\ \bm\omega_P  \\ \bm{v}_{m} \\ {v}_{b} \\ \bm{N} \\ \bm{M} \\
-	\end{pmatrix}}_{\bm{z}},
-\end{equation} 
-where the subscripts $m$ and $b$ denote the membrane and bending contribution, $\bm{u}_{m}, \; {u}_{b}$ are the in-plane and out-of-plane flexible displacements, $\bm{N} , \; \bm{M}$ the membrane and bending stress resultants. The operator $\div\Div \bm{M} = \sum_{i=1}^{2}\sum_{j=1}^{2} \diffp{M}{x_i,x_j}$ is the double divergence of a tensor and $\Hess$ is the Hessian.}
+Even if three dimensional elasticity has been taken as example up to this point, other models are easily considered. Beam and plate models \cite{BRUGNOLI2019940,BRUGNOLI2019961} are described by appropriate differential operators that replace the $\Div, \Grad$ appearing in \eqref{eq:ph_mfd_all} (see \secref{sec:ph_floatbeam}). \firstRev{For example in the case of the Kirchhoff plate the three-dimensional divergence is replaced by a planar divergence  for the membrane behavior and a double divergence for the flexural behavior.}
 \end{remark}
 
 
@@ -1287,7 +1257,7 @@ The modular construction of complex multi-body systems is then analogous to a su
 0 & 0 & 0 \\
 \end{bmatrix}
 \begin{bmatrix}
-\dot{\mathbf{p}}_r \\ \dot{\mathbf{p}}_f^{\text{red}} \\ \dot{\mathbf{\lambda}} \\ 
+\dot{\mathbf{p}}_r \\ \dot{\mathbf{p}}_f^{\text{red}} \\ \dot{\bm{\lambda}} \\ 
 \end{bmatrix} = 
 \begin{bmatrix}
 0 & 0 & \mathbf{G}_r^\top \\ 
@@ -1295,7 +1265,7 @@ The modular construction of complex multi-body systems is then analogous to a su
 -\mathbf{G}_r & -\mathbf{G}_f^{\text{red}} & 0 \\
 \end{bmatrix}
 \begin{bmatrix}
-\mathbf{p}_r \\ \mathbf{p}_f^{\text{red}} \\ {\mathbf{\lambda}} \\ 
+\mathbf{p}_r \\ \mathbf{p}_f^{\text{red}} \\ {\bm{\lambda}} \\ 
 \end{bmatrix} + 
 \begin{bmatrix}
 \mathbf{B}_r \\ \mathbf{B}_f^{\text{red}} \\ 0 \\
@@ -1324,14 +1294,8 @@ Once an equivalent ODE formulation is obtained the concepts and ideas presented 
 
 \section{Validation}
 \label{sec:valid}
-In this section numerical simulations are performed to assess the correctness of the proposed formulation. \secondRev{The examples make use of Euler Bernoulli beam model \eqref{eq:EB_sys}. To discretize the system, Lagrange polynomial of order one and Hermite polynomials of order 3 are used for $v_f^x$ and $v_f^y$ respectively. Discontinuous Galerkin elements of order 0 and 1 are selected for $n_x$ and $m_{x}$ respectively. This choice ensures the conformity with respect to the differential operator. This elements are illustrated in Fig. \ref{fig:fe_beam}. As a first example the vertical vibrations of a simply supported beam are considered. To assess the validity of the finite elements, a convergence study with respect to an analytical solution is performed}. A \secondRev{second} example concerns the computation of eigenvalues of a four bar \secondRev{mechanism} for different geometrical configuration. The \secondRev{third} example is a rotating crank-slider. In this case the non-linearities cannot be neglected. The \secondRev{fourth} example is a hinged beam undergoing external excitations so that the out-of-plane motion becomes important.  The Firedrake python library \cite{rathgeber2017firedrake} is employed to construct the finite-dimensional discretization.  
+In this section numerical simulations are performed to assess the correctness of the proposed formulation. \secondRev{The examples make use of Euler Bernoulli beam model \eqref{eq:EB_sys}. To discretize the system, Lagrange polynomial of order one and Hermite polynomials of order 3 are used for $v_f^x$ and $v_f^y$ respectively. Discontinuous Galerkin elements of order 0 and 1 are selected for $n_x$ and $m_{x}$ respectively. This choice ensures the conformity with respect to the differential operator. As a first example the vertical vibrations of a simply supported beam are considered. To assess the validity of the finite elements, a convergence study with respect to an analytical solution is performed}. A \secondRev{second} example concerns the computation of eigenvalues of a four bar \secondRev{mechanism} for different geometrical configuration. The \secondRev{third} example is a rotating crank-slider. In this case the non-linearities cannot be neglected. The \secondRev{fourth} example is a hinged beam undergoing external excitations so that the out-of-plane motion becomes important.  The Firedrake python library \cite{rathgeber2017firedrake} is employed to construct the finite-dimensional discretization.  
 
-\begin{figure}[t]
-	\centering
-	\includegraphics[width=0.8\textwidth]{fe_beam.eps} \hspace{.5cm}
-	\caption{Finite element choice for Euler Bernoulli beams. The notation $\mathcal{P}_k$ indicates the space of polynomials of degree $k$.}
-	\label{fig:fe_beam}
-\end{figure}
 
 \secondRev{
 \subsection{Convergence test for an analytical solution}
@@ -1364,7 +1328,7 @@ The numerical values used for the simulations are reported in Tab. \ref{tab:parE
 	\captionof{table}{Physical parameters for the convergence analysis.}
 	\label{tab:parEB}
 \end{table}
-The total simulation time is $t_f = 1 \; [\mathrm{s}]$. A crank-Nicholson scheme is used for the time discretization with $\Delta t = h$, where $h$ is the mesh element size. For the bending stress $m_{xx}^y$ the error is computing using the following norm
+The total simulation time is $t_f = 1 \ [\mathrm{s}]$. A crank-Nicholson scheme is used for the time discretization with $\Delta t = \frac{t_f}{L} h$, where $h$ is the mesh element size (same accuracy for the spatial and temporal discretizations).  For the bending stress $m_{xx}^y$ the error is computing using the following norm
 \begin{equation*}
 ||m_{xx}^{y, \text{ex}} -  m_{xx}^{y}||_{L^\infty_{\Delta t} (L^2(\Omega))} := \max_{t \in t_i} ||m_{xx}^{y, \text{ex}} -  m_{xx}^{y}||_{L^2(\Omega)}, 
 \end{equation*}
@@ -1379,7 +1343,7 @@ The errors for the displacement $u_f^{y}$ and the velocity $v_f^{y}$ are compute
 ||v_f^{y, \text{ex}} -  v_f^{y}||_{L^\infty_{\Delta t} (H^2(\Omega))} = \max_{t \in t_i} ||v_f^{y, \text{ex}} -  v_f^{y}||_{H^2(\Omega)}, 
 \end{aligned}	
 \end{equation*}
-where $H^2$ is the Sobolev space of functions with second derivative in $L^2$ with norm
+where $t_i$ are the discrete simulation instants and $H^2$ is the Sobolev space of functions with second derivative in $L^2$ with norm
 \begin{equation*}
 ||f||^2_{H^2(\Omega)} = \int_{0}^{L} f^2 + \left(\diffp{f}{x}\right)^2 + \left(\diffp[2]{f}{x}\right)^2 \d{x}.
 \end{equation*}
@@ -1430,7 +1394,7 @@ where $H^2$ is the Sobolev space of functions with second derivative in $L^2$ wi
 	\end{tabular}
 \end{table}
 
-The four-bar mechanism has one degree of freedom and represents a closed chain of bodies. The data are taken from \cite{KITIS1990267,Chebbi2017} are recalled in Table \ref{tab:data_4bars}. In Fig. \ref{fig:4bars} the mechanism and the corresponding block diagram used for constructing the final pH system are presented. The lumped masses are directly included in the coupler and follower model considering a simple modification of the rigid mass matrix
+The four-bar mechanism has one degree of freedom and represents a closed chain of bodies. The data are taken from \cite{KITIS1990267,Chebbi2017} are recalled in Table \ref{tab:data_4bars}. In Fig. \ref{fig:4bars} the mechanism and the corresponding block diagram used for constructing the final pH system with transformer interconnections between subsystems are presented. The lumped masses are directly included in the coupler and follower model considering a simple modification of the rigid mass matrix
 \begin{equation*}
 \mathbf{M}_{rr}^{i + m_l}[1:2,1:2] = \mathbf{M}_{rr}^{i}[1:2,1:2] + \mathbf{I}_{2\times 2} m_l,
 \end{equation*} 
@@ -1443,12 +1407,12 @@ Once the angles describing the geometrical configuration are known, the transfor
 \begin{equation*}
 \mathbf{v}_{P_1} = 0, \quad \omega^z_{P_1} = 0, \quad \mathbf{v}_{C_3} = 0.
 \end{equation*}
-The resulting system is expressed in pH form as $\mathbf{E}\dot{\mathbf{e}} = \mathbf{J} \mathbf{e}$. The eigenfrequencies are then found by solving the generalized eigenvalue problem $\mathbf{E}\bm{\Phi} = \mathbf{J} \bm{\Phi \Lambda}$. Since $\mathbf{J}$ is skew-symmetric the eigenvalues will be imaginary $\bm{\Lambda} = j \bm{\Omega}$. The first three pulsations  are reported in Fig. \ref{fig:omega_4bars} for different values of the crank angle $\theta_1$. The results match perfectly \cite{KITIS1990267,Chebbi2017}, assessing the validity of the linear model.
+The resulting system is expressed in pH form as $\mathbf{E}\dot{\mathbf{e}} = \mathbf{J} \mathbf{e}$. The eigenfrequencies are then found by solving the generalized eigenvalue problem $\mathbf{E}\bm{\Phi} = \mathbf{J} \bm{\Phi \Lambda}$. Since $\mathbf{J}$ is skew-symmetric the eigenvalues will be imaginary $\bm{\Lambda} = j \bm{\Omega}$. The first three pulsations  are reported in Fig. \ref{fig:omega_4bars} for different values of the crank angle $\theta_1$. The results match \cite{KITIS1990267,Chebbi2017}, assessing the validity of the linear model.
 
 \begin{figure}[tb]
 	\centering
-	\includegraphics[width=0.49\textwidth]{FourBar_Om12_Chebby.eps} 
-	\includegraphics[width=0.49\textwidth]{FourBar_Om3_Chebby.eps} 
+	\includegraphics[width=0.49\textwidth]{FourBar_Om12_Chebbi.eps} 
+	\includegraphics[width=0.49\textwidth]{FourBar_Om3_Chebbi.eps} 
 	\caption{Eigenvalues $\omega_i, \ i=1,2,3$ for the four bar mechanism for varying crank angle.}
 	\label{fig:omega_4bars}
 \end{figure}
@@ -1513,6 +1477,7 @@ Setting the initial conditions properly is of utmost  importance for a DAE solve
 
 
 \begin{table}[tb]
+	\centering
 	% table caption is above the table
 	\caption{\secondRev{Computational performance for the crank slider.}}
 	\label{tab:comp_perf_crslider}       % Give a unique label
@@ -1560,6 +1525,7 @@ A spatial beam rotating about a spherical joint is considered (see Fig. \ref{fig
 
 
 \begin{table}[tb]
+	\centering
 	% table caption is above the table
 	\caption{\secondRev{Computational performance for the hinged spatial beam.}}
 	\label{tab:comp_perf_hinged}       % Give a unique label
@@ -1574,9 +1540,9 @@ A spatial beam rotating about a spherical joint is considered (see Fig. \ref{fig
 \end{table}
 
 \section{Conclusion}
-A port-Hamiltonian formulation for the flexible multibody dynamics has been discussed. \firstRev{The equations were obtained by direct manipulation of pre-existing results. The derivation of equations of motions proposed in the paper through a variational principle represents an insightful possible development.} The proposed methodology, being based on a floating frame formulation, relies on the hypothesis of small deformations. However, the geometric stiffening effect can be accounted for by considering a corresponding energy. The discretization procedure uses a mixed finite element method, hence, the stress distribution is available without any post-processing. This is a valuable characteristic of this framework, as the stress distribution is the most important variable for preliminary analysis of mechanical components. Moreover, this approach allows treating different models (e.g. plates, shells) in a common framework. \firstRev{In principle this formulation works with any kind of rigid and flexible joints.} The construction of multibody system becomes completely modular and well suited for control applications.  \\
+A port-Hamiltonian formulation for the flexible multibody dynamics has been discussed. \firstRev{The equations were obtained by direct manipulation of pre-existing results. The derivation of equations of motions proposed in the paper through a variational principle represents an insightful possible development.} The proposed methodology, being based on a floating frame formulation, relies on the hypothesis of small deformations. However, the geometric stiffening effect can be accounted for by considering a corresponding energy. The discretization procedure uses a mixed finite element method, hence, the stress distribution is available without any post-processing. This is a valuable characteristic of this framework, as the stress distribution is the most important variable for preliminary analysis of mechanical components. Moreover, this approach allows treating different models (e.g. plates, shells) in a common framework. \firstRev{This formulation works with any kind of rigid joints and could be easily extended for any kind of flexible joints.} The construction of multibody system becomes completely modular and well suited for control applications.  \\
 
-\firstRev{There are however many issues that require further investigations. The stability and numerical convergence of the associated finite element is still to be proved. Higher dimensional plate models can be incorporated but their discretization is consistently more difficult. Since this method is based on a floating frame formulation, the numerical implementation requires access to the underlying finite element libraries and therefore not easy and error prone.  The time-domain simulations of the resulting systems have been accomplished using ready-to-use solvers but the computational aspects are still not clear. Numerical methods capable of preserving important structural properties in discrete time have been studied for rigid body dynamics \cite{celledoni2018passivity} and generic ODE \cite{KOTYCZKA_dt} and DAE \cite{mehrmann2019structurepreserving} pH systems. The effectiveness of those with respect to the proposed formulation has to be demonstrated. In this work we have employed a finite element discretization. However spectral methods can be used to achieve a structure preserving discretization that results in simpler models. \secondRev{The constraints  are imposed at a velocity level to preserve the pH structure. To avoid drifting phenomena stabilization technique may be introduced.} Large deformation could be included by employing a substructuring technique \cite{SHABANA_substructure}. Another interesting topic is the application of model reduction techniques. While for linear pHDAE systems consolidated methodologies exist, for the general non linear differential-algebraic case, solutions are not yet available. 
+\firstRev{There are however many issues that require further investigations. The stability and numerical convergence of the associated finite element is still to be proved. Higher dimensional plate models can be incorporated but their discretization is consistently more difficult. Since this method is based on a floating frame formulation, the numerical implementation requires access to the underlying finite element libraries and therefore not easy and error prone.  The time-domain simulations of the resulting systems have been accomplished using ready-to-use solvers but the computational aspects, out of the scope of this paper, should be investigated. Numerical methods capable of preserving important structural properties in discrete time have been studied for rigid body dynamics \cite{celledoni2018passivity} and generic ODE \cite{KOTYCZKA_dt} and DAE \cite{mehrmann2019structurepreserving} pH systems. The effectiveness of those with respect to the proposed formulation has to be demonstrated. In this work we have employed a finite element discretization. However spectral methods can be used to achieve a structure preserving discretization that results in simpler models. \secondRev{The constraints  are imposed at a velocity level to preserve the pH structure. To avoid drifting phenomena stabilization technique may be introduced.} Large deformation could be included by employing a substructuring technique \cite{SHABANA_substructure}. Another interesting topic is the application of model reduction techniques. While for linear pHDAE systems consolidated methodologies exist, for the general non linear differential-algebraic case, solutions are not yet available. 
 }
   
 
@@ -1606,7 +1572,7 @@ This map allows rewriting the cross product as a matrix vector product $\bm{a}\w
 Furthermore, it satisfies the Jacobi Identity
 \begin{equation}
 \label{eq:jacobi}
-\crmat{\bm{a}} (\crmat{\bm{b}} \bm{c}) + \crmat{\bm{b}} (\crmat{\bm{c}} \bm{a}) + \crmat{\bm{c}} (\crmat{\bm{a}} \bm{b}) = 0, \qquad \bm{a}, \bm{b}, \bm{c} \in \mathbb{R}^3.
+\crmat{\bm{a}} \crmat{\bm{b}} \bm{c} + \crmat{\bm{b}} \crmat{\bm{c}} \bm{a} + \crmat{\bm{c}} \crmat{\bm{a}} \bm{b} = 0, \qquad \bm{a}, \bm{b}, \bm{c} \in \mathbb{R}^3.
 \end{equation}
 
 \subsection*{\normalsize \textbf{A.2 Adjoint of operators}}
@@ -1652,7 +1618,7 @@ Because of their structure, pH multibody systems are of index two. Consider for 
 0 &= -\mathbf{G}\mathbf{e}.
 \end{aligned}
 \end{equation*}
-Matrix $\mathbf{M}$ is squared and invertible and matrix $\mathbf{G}$ is full rank. If the second equation is derived twice in time, then it is obtained
+Matrix $\mathbf{M}$ is squared and invertible and matrix $\mathbf{G}$ is full row rank. If the second equation is derived twice in time, then it is obtained
 \[\dot{\bm{\lambda}} = - (\mathbf{G} \mathbf{M}^{-1} \mathbf{G}^\top)^{-1} \mathbf{G} \mathbf{M}^{-1} (\mathbf{J} \dot{\mathbf{e}} + \mathbf{B}\dot{\mathbf{u}}).
 \]
 Therefore, the system index is two.  
@@ -1716,9 +1682,9 @@ If \eqref{eq:acc_rP} is put into \eqref{eq:rig_tr3}, \eqref{eq:rig_rot3}, \eqref
 where $\bm{v}_f = \dot{\bm{u}}_f$.
 \end{itemize}
 
-Consider now the term $\crmat{\bm{\omega}_P} (\crmat{\bm{\omega}_P} \bm{s}_u)$, appearing in \eqref{eq:rig_tr4}. Using the anticommutativity \eqref{eq:anticom} and the fact that the cross map is skew-symmetric $\crmat{\bm{a}} = -\crmat{\bm{a}}^\top$ one finds
+Consider now the term $\crmat{\bm{\omega}_P} \crmat{\bm{\omega}_P} \bm{s}_u$, appearing in \eqref{eq:rig_tr4}. Using the anticommutativity \eqref{eq:anticom} and the fact that the cross map is skew-symmetric $\crmat{\bm{a}} = -\crmat{\bm{a}}^\top$ one finds
 \begin{align*}
--\crmat{\bm{\omega}_P} (\crmat{\bm{\omega}_P} \bm{s}_u) = \crmat{\crmat{\bm{s}_u}^\top\bm{\omega}_{P}} \bm{\omega}_{P}.
+-\crmat{\bm{\omega}_P} \crmat{\bm{\omega}_P} \bm{s}_u = \crmat{\crmat{\bm{s}_u}^\top\bm{\omega}_{P}} \bm{\omega}_{P}.
 \end{align*}
 Eq. \eqref{eq:rig_tr4} is then rewritten as
 \begin{equation}
@@ -1728,10 +1694,10 @@ m\dot{\bm{v}}_P + \crmat{\bm{s}_u}^\top \dot{\bm{\omega}}_P +   \int_{\Omega} \r
 \left[m \crmat{\bm{v}_P} + \crmat{\crmat{\bm{s}_u}^\top \bm\omega_P} +2 \int_{\Omega} \rho \crmat{\bm{v}_f} \d{\Omega} \right] \bm\omega_P +  \int_{\Omega} \bm\beta \d{\Omega} + \int_{\partial \Omega} \bm\tau \d{\Gamma}.
 \end{split}
 \end{equation}
-The terms $\crmat{\bm{s}_u} (\crmat{\bm{\omega}_P} \bm{v}_P), \; 2\rho \crmat{\bm{x}_f} (\crmat{\bm\omega_P} {\bm{v}}_f)$, appearing in \eqref{eq:rig_rot4} can be rewritten using the Jacobi identity \eqref{eq:jacobi}
+The terms $\crmat{\bm{s}_u} \crmat{\bm{\omega}_P} \bm{v}_P, \; 2\rho \crmat{\bm{x}_f} \crmat{\bm\omega_P} {\bm{v}}_f$, appearing in \eqref{eq:rig_rot4} can be rewritten using the Jacobi identity \eqref{eq:jacobi}
 \begin{align}
-\crmat{\bm{s}_u} (\crmat{\bm{\omega}_P} \bm{v}_P) &= - \crmat{\crmat{\bm{s}_u} \bm{v}_P} \bm{\omega}_P - \crmat{\crmat{\bm{s}_u}^\top \bm{\omega}_P} \bm{v}_P, \\
-2\rho \crmat{\bm{x}_f} (\crmat{\bm\omega_P} {\bm{v}}_f) &= - 2\rho \crmat{\crmat{\bm{x}_f} \bm{v}_f}\bm\omega_P - 2\rho \crmat{\crmat{\bm{x}_f}^\top \bm\omega_P} \bm{v}_f
+\crmat{\bm{s}_u} \crmat{\bm{\omega}_P} \bm{v}_P &= - \crmat{\crmat{\bm{s}_u} \bm{v}_P} \bm{\omega}_P - \crmat{\crmat{\bm{s}_u}^\top \bm{\omega}_P} \bm{v}_P, \\
+2\rho \crmat{\bm{x}_f} \crmat{\bm\omega_P} {\bm{v}}_f &= - 2\rho \crmat{\crmat{\bm{x}_f} \bm{v}_f}\bm\omega_P - 2\rho \crmat{\crmat{\bm{x}_f}^\top \bm\omega_P} \bm{v}_f
 \end{align}
 Eq. \eqref{eq:rig_rot4} is then rewritten as
 \begin{equation}

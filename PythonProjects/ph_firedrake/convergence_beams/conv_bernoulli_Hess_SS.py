@@ -25,7 +25,7 @@ plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 matplotlib.rcParams['text.usetex'] = True
 save_res = False
-save_fig = False
+save_fig = True
 bc_input = 'SS_Hess'
 
 
@@ -68,8 +68,8 @@ def compute_err(n, r):
     # Finite element defition
 
     Vp = FunctionSpace(mesh, "Hermite", 3)
-    # Vq = FunctionSpace(mesh, "DG", 1)
-    Vq = FunctionSpace(mesh, "Hermite", 3)
+    Vq = FunctionSpace(mesh, "DG", 1)
+    # Vq = FunctionSpace(mesh, "Hermite", 3)
 
     V = Vp * Vq
 
@@ -299,7 +299,7 @@ def compute_err(n, r):
     return w_err_last, w_err_max, w_err_quad, v_err_last, v_err_max, v_err_quad, sig_err_last, sig_err_max, sig_err_quad
 
 
-n_h = 3
+n_h = 6
 n1_vec = np.array([2**(i+2) for i in range(n_h)])
 h1_vec = 1./n1_vec
 
@@ -445,7 +445,7 @@ print("")
 
 plt.figure()
 
-plt.plot(np.log(h1_vec), np.log(w_errInf_r1), '-.+')
+plt.plot(np.log(h1_vec), np.log(w_errInf_r1), '-.+', label=r'Computed')
 # plt.plot(np.log(h1_vec), np.log(w_errQuad_r1), '--*', label='HER 1 $L^2$')
 plt.plot(np.log(h1_vec), np.log(h1_vec**2), '-v', label=r'$h^2$')
 
@@ -476,7 +476,7 @@ print("")
 plt.figure()
 
 # plt.plot(np.log(h1_vec), np.log(v_r1_atF), ':o', label='HER 1')
-plt.plot(np.log(h1_vec), np.log(v_errInf_r1), '-.+')
+plt.plot(np.log(h1_vec), np.log(v_errInf_r1), '-.+', label=r'Computed')
 # plt.plot(np.log(h1_vec), np.log(v_errQuad_r1), '--*', label='HER 1 $L^2$')
 # plt.plot(np.log(h1_vec), np.log(h1_vec), '-v', label=r'$h$')
 
@@ -505,7 +505,7 @@ print("")
 plt.figure()
 
 # plt.plot(np.log(h1_vec), np.log(sig_r1_atF), ':o', label='HER 1')
-plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+')
+plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+', label=r'Computed')
 # plt.plot(np.log(h1_vec), np.log(sig_errQuad_r1), '--*', label='HER 1 $L^2$')
 # plt.plot(np.log(h1_vec), np.log(h1_vec), '-v', label=r'$h$')
 

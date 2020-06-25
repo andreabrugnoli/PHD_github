@@ -302,22 +302,22 @@ def omegatheta_plot(n_elem, theta_vec, n_om):
 
     plt.plot(theta_vec*180/pi, omega_vec[:, 0], label="Present $\omega_1$")
     plt.plot(theta_vec*180/pi, omega_vec[:, 1], label="Present $\omega_2$")
-    plt.plot(angles_Matlab, mode1_Matlab, label="Chebbi $\omega_1$")
-    plt.plot(angles_Matlab, mode2_Matlab, label="Chebbi $\omega_2$")
+    plt.plot(angles_Matlab, mode1_Matlab, label="[14] $\omega_1$")
+    plt.plot(angles_Matlab, mode2_Matlab, label="[14] $\omega_2$")
     plt.legend(shadow=True)
     plt.xlabel(r'Crank angle $\theta\; \mathrm{[deg]}$')
     plt.ylabel(r'Eigenfrequencies $\mathrm{[rad/s]}$')
 
-    plt.savefig(path_fig + 'FourBar_Om12_Chebby.eps', format="eps")
+    plt.savefig(path_fig + 'FourBar_Om12_Chebbi.eps', format="eps")
 
     plt.figure()
     plt.plot(theta_vec*180/pi, omega_vec[:, 2], label="Present $\omega_3$")
-    plt.plot(angles_Matlab, mode3_Matlab, label="Chebbi $\omega_3$")
+    plt.plot(angles_Matlab, mode3_Matlab, label="[14] $\omega_3$")
     plt.legend(shadow=True)
     plt.xlabel(r'Crank angle $\theta \; \mathrm{[deg]}$')
     plt.ylabel(r'Eigenfrequencies $\mathrm{[rad/s]}$')
 
-    plt.savefig(path_fig + 'FourBar_Om3_Chebby.eps', format="eps")
+    plt.savefig(path_fig + 'FourBar_Om3_Chebbi.eps', format="eps")
 
 
     plt.show()

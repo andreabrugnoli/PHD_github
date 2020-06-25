@@ -20,7 +20,7 @@ rcParams['text.usetex'] = True
 
 parameters['allow_extrapolation'] = True
 
-n_mesh = 4
+n_mesh = 7
 
 ind_ref = 15
 R_ext = 1
