@@ -19,10 +19,10 @@ matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
 matplotlib.rcParams['text.latex.preamble'] = [r"\usepackage{bm}"]
 
 path_res = "./convergence_results_bernoulli/"
-bc_input = "SS_Hess_"
+bc_input = "SS_divDiv_"
 save_res = True
 
-coeff = 1
+coeff = 1.02
 h1_vec = np.load(path_res + bc_input + "h1.npy")
 print(h1_vec)
 
@@ -173,11 +173,11 @@ if bc_input[2:] == '_grgr_':
 
 elif bc_input[2:] == '_divDiv_':
     plt.plot(np.log(h1_vec), np.log(v_errInf_r1), '-.+', label='DG $k=1$')
-    plt.plot(np.log(h1_vec), np.log(h1_vec**2) + coeff * (np.log(v_errInf_r1)[-1] - np.log(h1_vec)[-1]) + np.log(2),
+    plt.plot(np.log(h1_vec), np.log(h1_vec**2) + coeff * (np.log(v_errInf_r1)[-1] - np.log(h1_vec**2)[-1]) + np.log(2),
              '-v', label=r'$h^2$')
 elif bc_input[2:] == '_Hess_':
     plt.plot(np.log(h1_vec), np.log(v_errInf_r1), '-.+', label='Her')
-    plt.plot(np.log(h1_vec), np.log(h1_vec**2) + coeff * (np.log(v_errInf_r1)[-1] - np.log(h1_vec)[-1]) + np.log(2),
+    plt.plot(np.log(h1_vec), np.log(h1_vec**2) + coeff * (np.log(v_errInf_r1)[-1] - np.log(h1_vec**2)[-1]) + np.log(2),
              '-v', label=r'$h^2$')
 
 plt.xlabel(r'log(Mesh size $h$)')
@@ -255,11 +255,11 @@ if bc_input[2:] == '_grgr_':
 
 elif bc_input[2:] == '_divDiv_':
     plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+', label='Her')
-    plt.plot(np.log(h1_vec), np.log(h1_vec**2) + coeff * (np.log(sig_errInf_r1)[-1] - np.log(h1_vec)[-1]) + np.log(2),
+    plt.plot(np.log(h1_vec), np.log(h1_vec**2) + coeff * (np.log(sig_errInf_r1)[-1] - np.log(h1_vec**2)[-1]) + np.log(2),
              '-v', label=r'$h^2$')
 elif bc_input[2:] == '_Hess_':
     plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+', label='DG $k=1$')
-    plt.plot(np.log(h1_vec), np.log(h1_vec**2) + coeff * (np.log(sig_errInf_r1)[-1] - np.log(h1_vec)[-1]) + np.log(2),
+    plt.plot(np.log(h1_vec), np.log(h1_vec**2) + coeff * (np.log(sig_errInf_r1)[-1] - np.log(h1_vec**2)[-1]) + np.log(2),
              '-v', label=r'$h^2$')
 
 plt.xlabel(r'log(Mesh size $h$)')
