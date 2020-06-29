@@ -218,7 +218,6 @@ is given below.
 \begin{tcolorbox}[title=Summary of revisions (Reviewer No. 1), colframe=colorRevBG1]
 \begin{itemize}
 \item The introduction has been revised to address comment a, b d.
-\item The model of the pH flexible Kirchhoff plate has been added in Sec. 3 in connection to comment d.
 \item The notation for the cross map has been corrected (comment c).
 \item Section 4 has been revised to better illustrate the connection with standard discretization of elasticity problems (comment e).
 \item A numerical convergence study has been added to Sec. 6 (comment g and comment 6 of Reviewer 2)
@@ -231,6 +230,7 @@ is given below.
 \begin{itemize}
 	\item Reference \cite{van2000l2} to answer comment 1. 
 	\item Corrections have been made for comments 2, 3, 5.
+	\item To addressee comment 4, a remark has been added in Sec. 4.
 	\item A convergence study has been added to  section 6. The average cpu time and time step have been added for the examples. 
 \end{itemize}
 \end{tcolorbox}
@@ -281,7 +281,7 @@ In our responses, we refer to two families of bibliographic entries:
 to using the numerical style of the \emph{Journal}, e.g. [1].
 \item References\emph{ specific to this document} and not necessarily contained
 in the manuscript. To avoid confusion, these references are quoted
-using an author-year citation style, e.g. \cite{neto2003stabilization}.
+using an author-year citation style, e.g. \cite{rong2019}.
 \end{itemize}
 \clearpage{}
 
@@ -298,7 +298,7 @@ The equations of motion in Hamiltonian  form can be derived from a variational p
 
 
 \begin{tcolorbox}[title=Revision page 2 and page 28 (Reviewer No. 1 -- Comment a),colframe=colorRevBG1]
-Remarks on the Hamiltonian formulation of rigid and general non-linear flexible dynamics have been been made in the introduction (citing \cite[Proposition 7.1.1]{holm2008geometric} and  \cite[Chapter 3]{marsden1981lectures}). In the conclusion an additional remark is made on this point: a derivation based on a variational principle is of course much more insightful.
+Remarks on the Hamiltonian formulation of rigid and general non-linear flexible dynamics have been been made in the introduction (citing \cite[Proposition 7.1.1]{holm2008geometric} and  \cite[Chapter 3]{marsden1981lectures}). 
 \end{tcolorbox}
 
 
@@ -353,7 +353,7 @@ Indeed the numerical applications of the paper only involve beams and this is th
 	\partial_{\bm{r}_P}H \\ \partial_{\bm{R}_\text{v}}H \\ \delta_{\bm{u}_{m}} H \\ \delta_{u_{b}} H \\\hdashline  \bm{v}_P \\ \bm\omega_P  \\ \bm{v}_{m} \\ {v}_{b} \\ \bm{N} \\ \bm{M} \\
 	\end{pmatrix}}_{\bm{z}},
 \end{equation} 
-where the subscripts $m$ and $b$ denote the membrane and bending contribution, $\bm{u}_{m}, \; {u}_{b}$ are the in-plane and out-of-plane flexible displacements, $\bm{N} , \; \bm{M}$ the membrane and bending stress resultant. The operator $\div\Div \bm{M} = \sum_{i=1}^{2}\sum_{j=1}^{2} \diffp{M}{x_i,x_j}$ is the double divergence of a tensor and $\Hess$ is the Hessian. The Mindlin plate \cite{brugnoli2019min} results in a larger system that incorporates the flexible angular deflections. The discretization of these model is much harder than that of one-dimensional system. We have recently submitted an ArXiv preprint on this topic \cite{brugnoli2020convergence}. As a linear multibody application involving the Kirchoff plate, we have recently presented \cite{brugnoli2019int} the interconnection of a cantilever plate to a welded rigid bar. \\
+where the subscripts $m$ and $b$ denote the membrane and bending contribution, $\bm{u}_{m} \in \mathbb{R}^2, \; {u}_{b} \in \mathbb{R}$ are the in-plane and out-of-plane flexible displacements, $\bm{N} \in \mathbb{R}^{2\times 2}_{\text{sym}}, \; \bm{M} \in \mathbb{R}^{2\times 2}_{\text{sym}}$ the membrane and bending stress resultant. The operator $\div\Div \bm{M} = \sum_{i=1}^{2}\sum_{j=1}^{2} \diffp{M}{x_i,x_j}$ is the double divergence of a tensor and $\Hess$ is the Hessian. The Mindlin plate \cite{brugnoli2019min} results in a larger system that incorporates the flexible angular deflections. The discretization of these model is much harder than that of one-dimensional system. We have recently submitted an ArXiv preprint on this topic \cite{brugnoli2020convergence}. As a linear multibody application involving the Kirchoff plate, we have recently presented \cite{brugnoli2019int} the interconnection of a cantilever plate to a welded rigid bar. \\
 
 Other approaches, commonly used in robotics \cite[Chapter 5]{bremer2008elastic}, allows constructing chain of flexible bodies in a systematic way. However, our approach highlights the Hamiltonian structure and the conservation of energy: the interconnections among bodies do preserve these two important features. \\
 
@@ -443,25 +443,16 @@ As far as non linear multibody applications are concerned, we do not claim any c
 \begin{quotebox}{Reviewer No.1 -- Comment h}
 	I am very much missing the "what does not work" and "restrictions" in the conclusions (e.g., does it work for (flexible) sliding joints or multimodal joints?), which should be present in any "new formulation". The proposed approach starts with a very general PDE formulation, but breaks down to beams in the end. Slider-crank and four bar mechanisms are shown, but no really "complex multibody systems". For those who would like to reproduce the formulation, they have a right to know, if it will work out for their application or it will not.
 \end{quotebox}
-This formulation works with any kind of rigid joints and could be easily extended for any kind of flexible joints. There are however many issues that require further investigations. 
-\begin{enumerate} 
-\item Since this method is based on a floating frame formulation, the numerical implementation requires access to the underlying finite element libraries and therefore not easy and error prone \cite{zwolfer2019}.  
-\item Higher dimensional models can be incorporated but their discretization is hard. While it is possible to write plate models in pH form, the reformulation general shell structures in pH form is still an open topic.
-\item The numerical simulation of the resulting systems have been accomplished using ready-to-use libraries but the computational aspects are still not clear.
-\item  It is important to see how classical modal analysis is related to the proposed framework to incorporate modal reduction strategies.
-\item The inclusion of damping requires further attention: 
-	\begin{itemize}
-		\item Rayleigh damping: it is still not clear how to add a stiffness proportional damping.
-		\item Modal damping.
-	\end{itemize}
-\item In our work we have employed a finite element discretization. However, spectral methods can be used to achieve a structure preserving discretization that results in simpler models.
-\item The constraints imposition are imposed at a velocity level to preserve the pH structure. To avoid drifting phenomena stabilization technique may be introduced.
+This formulation works with any kind of rigid joints and could be easily extended for any kind of flexible joints. There are however many points that require further investigations for the simulation of complex multibody systems:
+\begin{enumerate}  
+\item To address complex multibody systems, higher dimensional models (plates, shells and 3D continua) have to be considered. Port-Hamiltonian plate models and 3D continua are readily available, whereas the reformulation of general shell structures in pH form is still an open topic. For 3D continua and thick plate models (Mindlin-Reissner plates) one may employ the method proposed in \cite{cohen2005} to achieve the discretization. The discretization of thin plate models is substantially more difficult.
+\item The employment of finite elements leads to large sparse system to be solved. To limit the computational complexity of these models, model reduction techniques can be incorporated. While for linear pHDAE systems consolidated methodologies exist [15], for the general non linear differential-algebraic case, solutions are not yet available. 
+\item To avoid the problem of dealing with large-scale systems, spectral methods can be equivalently used to achieve a structure preserving discretization made up of small and dense matrices.
+\item The numerical simulation of the resulting systems have been accomplished using ready-to-use libraries but a rigorous numerical analysis is still to be done. In particular a collocation method based on Gauss-Legendre points exactly preserve the energy balance at a discrete level for pH systems [22, Th. 3]. Collocation methods also works for differential-algebraic pH systems [26]. The application of collocation methods to the proposed framework represents an interesting development.
 \end{enumerate}
 
-
-
 \begin{tcolorbox}[title=Revision page 28 (Reviewer No. 1 -- Comment h ),colframe=colorRevBG1]
-	The conclusion section has been modifies to incorporate remarks on the drawbacks and difficult points.
+	The conclusion section has been modifies to discuss the points requiring further investigations in connection to the spatial and temporal discretization of the proposed formulation.
 \end{tcolorbox}
 
 
@@ -515,7 +506,7 @@ Constraints are imposed at the velocity level. It is well-known that a drift app
 No stabilization is used. Imposing the constraints at the velocity level allows preserving the overall pH structure. For linear systems it is possible to use the \textit{Gear-Gupta-Leimkuhler} formulation to preserve the pH structure and enforce the constraints directly on the positions \cite{scholz2019}.
 
 \begin{tcolorbox}[title=Revision page 28 (Reviewer No. 2 -- Comment 4),colframe=colorRevBG2]
-A remark has been added in the conclusion.
+In Section 5.2 a remark has been added to address the enforcement of the constraints.
 \end{tcolorbox}
 
 \begin{quotebox}{Reviewer No.2 -- Comment 5}

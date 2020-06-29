@@ -1180,6 +1180,10 @@ imposes the constraints on the velocity level and gives rise to a quasi-linear i
 \end{aligned}
 \end{equation}
 
+\begin{remark}
+\secondRev{The constraints  are imposed at a velocity level to preserve the pH structure. It is well-known that a drift appears in this case. For linear systems it is possible to use the \textit{Gear-Gupta-Leimkuhler} formulation to preserve the pH structure and enforce the constraints directly on the positions \cite{scholz2019}. In the non-linear case, stabilization techniques may be introduced to avoid drifting phenomena \cite{bauchau2008review,laulusa2008review}.} 
+\end{remark}
+
 The same result can be obtained by using a pHDAE system and a gyrator interconnection. To illustrate this, consider the pHDAE obtained by interchanging the role of output and input of the second system $\mathbf{u}_2^{\text{int}} \leftrightarrow \mathbf{y}_2^{\text{int}}$. The output then plays the role of a Lagrange multiplier. The input $\mathbf{u}_2^{\text{int}}$ is now considered as Lagrange multiplier ${\bm{\lambda}}_2$ and the output $\mathbf{y}_2^{\text{int}}$ plays the role of $\mathbf{u}_2^{\text{int}}$. The discretized system assumes the following differential-algebraic structure
 \begin{equation}
 \begin{aligned}
@@ -1312,7 +1316,6 @@ v_f^{y, {\text{ex}}} \vert_{\partial\Omega} &= 0, \\
 m_{xx}^{y, \text{ex}} \vert_{\partial\Omega} &= 0.
 \end{aligned}
 \end{equation*}
-The numerical values used for the simulations are reported in Tab. \ref{tab:parEB}.
 \begin{table}[tbh]
 	\centering
 	\begin{tabular}{ccccc}
@@ -1328,13 +1331,13 @@ The numerical values used for the simulations are reported in Tab. \ref{tab:parE
 	\captionof{table}{Physical parameters for the convergence analysis.}
 	\label{tab:parEB}
 \end{table}
-The total simulation time is $t_f = 1 \ [\mathrm{s}]$. A crank-Nicholson scheme is used for the time discretization with $\Delta t = \frac{t_f}{L} h$, where $h$ is the mesh element size (same accuracy for the spatial and temporal discretizations).  For the bending stress $m_{xx}^y$ the error is computing using the following norm
+The numerical values used for the simulations are reported in Tab. \ref{tab:parEB}. The total simulation time is $t_f = 1 \ [\mathrm{s}]$. A crank-Nicholson scheme is used for the time discretization with $\Delta t = \frac{t_f}{L} h$, where $h$ is the mesh element size (same accuracy for the spatial and temporal discretizations).  For the bending stress $m_{xx}^y$ the error is computing using the following norm
 \begin{equation*}
 ||m_{xx}^{y, \text{ex}} -  m_{xx}^{y}||_{L^\infty_{\Delta t} (L^2(\Omega))} := \max_{t \in t_i} ||m_{xx}^{y, \text{ex}} -  m_{xx}^{y}||_{L^2(\Omega)}, 
 \end{equation*}
 where $t_i$ are the discrete simulation instants and $L^2$ is the Hilbert space of square integrable functions with norm
 \begin{equation*}
-||f||^2_{L^2(\Omega)} = \int_{0}^{L} f^2\d{x}.
+||f||_{L^2(\Omega)} = \sqrt{\int_{0}^{L} f^2\d{x}}.
 \end{equation*}
 The errors for the displacement $u_f^{y}$ and the velocity $v_f^{y}$ are computed using the following norm
 \begin{equation*}
@@ -1343,22 +1346,22 @@ The errors for the displacement $u_f^{y}$ and the velocity $v_f^{y}$ are compute
 ||v_f^{y, \text{ex}} -  v_f^{y}||_{L^\infty_{\Delta t} (H^2(\Omega))} = \max_{t \in t_i} ||v_f^{y, \text{ex}} -  v_f^{y}||_{H^2(\Omega)}, 
 \end{aligned}	
 \end{equation*}
-where $t_i$ are the discrete simulation instants and $H^2$ is the Sobolev space of functions with second derivative in $L^2$ with norm
+where $H^2$ is the Sobolev space of functions with second derivative in $L^2$ with norm
 \begin{equation*}
-||f||^2_{H^2(\Omega)} = \int_{0}^{L} f^2 + \left(\diffp{f}{x}\right)^2 + \left(\diffp[2]{f}{x}\right)^2 \d{x}.
+||f||_{H^2(\Omega)} = \sqrt{\int_{0}^{L} f^2 + \left(\diffp{f}{x}\right)^2 + \left(\diffp[2]{f}{x}\right)^2 \d{x}}.
 \end{equation*}
  The results are reported in Fig. \ref{fig:errorHerDG1}. A quadratic convergence is obtained for all variables.
 \begin{figure}[tbh]%
 	\centering
-	\subfloat[][$L^\infty_{\Delta t} (H^2(\Omega))$ error for $w$]{%
+	\subfloat[][$L^\infty_{\Delta t} (H^2(\Omega))$ error for $u_f^y$]{%
 		\label{fig:err_dis}%
 		\includegraphics[width=0.48\columnwidth]{SS_Hess_dis.eps}}%
 	\hspace{8pt}%
-	\subfloat[][$L^\infty_{\Delta t} (H^2(\Omega))$ error for $v$]{%
+	\subfloat[][$L^\infty_{\Delta t} (H^2(\Omega))$ error for $v_f^y$]{%
 		\label{fig:err_vel}%
 		\includegraphics[width=0.48\columnwidth]{SS_Hess_vel.eps}}%
 	\hspace{8pt}%
-	\subfloat[][$L^\infty_{\Delta t} (L^2(\Omega))$ error for $m_{xx}$]{%
+	\subfloat[][$L^\infty_{\Delta t} (L^2(\Omega))$ error for $m_{xx}^y$]{%
 		\label{fig:err_sig}%
 		\includegraphics[width=0.48\columnwidth]{SS_Hess_sigma.eps}} \\
 	\caption{Error for the vertical vibrations of a simply supported beam.}%
@@ -1407,7 +1410,7 @@ Once the angles describing the geometrical configuration are known, the transfor
 \begin{equation*}
 \mathbf{v}_{P_1} = 0, \quad \omega^z_{P_1} = 0, \quad \mathbf{v}_{C_3} = 0.
 \end{equation*}
-The resulting system is expressed in pH form as $\mathbf{E}\dot{\mathbf{e}} = \mathbf{J} \mathbf{e}$. The eigenfrequencies are then found by solving the generalized eigenvalue problem $\mathbf{E}\bm{\Phi} = \mathbf{J} \bm{\Phi \Lambda}$. Since $\mathbf{J}$ is skew-symmetric the eigenvalues will be imaginary $\bm{\Lambda} = j \bm{\Omega}$. The first three pulsations  are reported in Fig. \ref{fig:omega_4bars} for different values of the crank angle $\theta_1$. The results match \cite{KITIS1990267,Chebbi2017}, assessing the validity of the linear model.
+The resulting system is expressed in pH form as $\mathbf{E}\dot{\mathbf{e}} = \mathbf{J} \mathbf{e}$. The eigenfrequencies are then found by solving the generalized eigenvalue problem $\mathbf{E}\bm{\Phi} = \mathbf{J} \bm{\Phi \Lambda}$. Since $\mathbf{J}$ is skew-symmetric the eigenvalues will be imaginary $\bm{\Lambda} = j \bm{\Omega}$. The first three pulsations  are reported in Fig. \ref{fig:omega_4bars} for different values of the crank angle $\theta_1$. \firstRev{The results match those of \cite{Chebbi2017} (labeled as TITOP in the figure), assessing the validity of the linear model.}
 
 \begin{figure}[tb]
 	\centering
@@ -1540,10 +1543,13 @@ A spatial beam rotating about a spherical joint is considered (see Fig. \ref{fig
 \end{table}
 
 \section{Conclusion}
-A port-Hamiltonian formulation for the flexible multibody dynamics has been discussed. \firstRev{The equations of motions proposed in the paper  are obtained by direct manipulation of pre-existing results. The derivation of equations of motions through a variational principle represents an insightful development.} The proposed methodology, being based on a floating frame formulation, relies on the hypothesis of small deformations. However, the geometric stiffening effect can be accounted for by considering a corresponding energy. The discretization procedure uses a mixed finite element method, hence, the stress distribution is available without any post-processing. This is a valuable characteristic of this framework, as the stress distribution is the most important variable for preliminary analysis of mechanical components. Moreover, this approach allows treating different models (e.g. plates, shells) in a common framework. \firstRev{This formulation works with any kind of rigid joints and could be easily extended for any kind of flexible joints.} The construction of multibody system becomes completely modular and well suited for control applications.  \\
+A port-Hamiltonian formulation for the flexible multibody dynamics has been discussed. \firstRev{The equations of motions proposed in the paper  are obtained by direct manipulation of pre-existing results, unveiling the Hamiltonian structure of the floating frame of reference formulation.} \\
+\indent The discretization procedure uses a mixed finite element method, hence, the stress distribution is available without any post-processing. This is a valuable characteristic of this framework, as the stress distribution is the most important variable for preliminary analysis of mechanical components. \\
+\indent \firstRev{This approach allows treating different models and their interconnections in a common framework. This formulation works with any kind of rigid joints and could be easily extended for any kind of flexible joints.} The construction of multibody system becomes completely modular and well suited for control applications.  \\
 
-\firstRev{There are however many questions that require further investigations. The stability and numerical convergence of the associated finite element are still to be proved. Higher dimensional plate models can be incorporated but their discretization is consistently more difficult. Since this method is based on a floating frame formulation, the user is required to manipulate low-level functions of the underlying finite element libraries. This makes the implementation not easy and error prone. The time-domain simulations of the resulting systems have been accomplished using ready-to-use solvers but the computational aspects, out of the scope of this paper, should be investigated. Numerical methods capable of preserving important structural properties in discrete time have been studied for rigid body dynamics \cite{celledoni2018passivity} and generic ODE \cite{KOTYCZKA_dt} and DAE \cite{mehrmann2019structurepreserving} pH systems. The effectiveness of these with respect to the proposed formulation has to be demonstrated. In this work we have employed a finite element discretization. However spectral methods can be used to achieve a structure preserving discretization that results in simpler models and could be studied in further works. \secondRev{The constraints  are imposed at a velocity level to preserve the pH structure. To avoid drifting phenomena stabilization technique may be introduced.} Large deformation could be included by employing substructuring techniques \cite{SHABANA_substructure}. Another interesting topic is the application of model reduction techniques. While for linear pHDAE systems consolidated methodologies exist, for the general non linear differential-algebraic case, solutions are not yet available. 
-}
+\firstRev{There are however many questions that require further investigations. To address complex multibody systems, higher dimensional models (plates, shells and 3D continua) have to be considered. Port-Hamiltonian plate models and 3D continua are readily available, whereas the reformulation of shell structures in pH form is still an open topic. For 3D continua and thick plate models (Mindlin-Reissner plates) one may employ the method proposed in \cite{cohen2005} to achieve the discretization. The discretization of thin plate models is substantially more difficult. \\ 
+\indent The employment of finite elements leads to large sparse systems to be solved. To limit the computational complexity of these models, model reduction techniques can be incorporated. While for linear pHDAE systems consolidated methodologies exist, for the  non linear differential-algebraic case solutions are not yet available. To avoid the problem of dealing with large-scale systems, spectral methods can be equivalently used to achieve a structure preserving discretization made up of small and dense matrices.  \\ 
+\indent The time-domain simulations of the resulting systems have been accomplished using ready-to-use solvers. A rigorous numerical analysis, out of the scope of this paper, represents an important future development. In particular, numerical methods capable of preserving important structural properties in discrete time have been studied for rigid body dynamics \cite{celledoni2018passivity} and generic ODE \cite{KOTYCZKA_dt} and DAE \cite{mehrmann2019structurepreserving} pH systems. These methods could be fruitfully employed in the proposed framework. }
   
 
 

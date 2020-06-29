@@ -20,7 +20,7 @@ matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{bm}"]
 
 save_fig = True
 path_res = "./convergence_results_kirchhoff/"
-bc = "SSSS_BellDG3_"
+bc = "CSSF_BellDG3_"
 
 h1_vec = np.load(path_res + bc + "h1.npy")
 print(h1_vec)
@@ -76,8 +76,10 @@ plt.figure()
 # plt.plot(np.log(h1_vec), np.log(v_r1_atF), ':o', label='H2')
 plt.plot(np.log(h1_vec), np.log(v_errInf_r1), '-.+', label='Bell')
 # plt.plot(np.log(h1_vec), np.log(v_errQuad_r1), '--*', label='H2 $L^2$')
-plt.plot(np.log(h1_vec), np.log(h1_vec) + coeff*(np.log(v_errInf_r1)[-1] - np.log(h1_vec)[-1]), '-v', label=r'$h$')
-plt.plot(np.log(h1_vec), np.log(h1_vec**2) + 1.02*(np.log(v_errInf_r1)[-1] - np.log(h1_vec**2)[-1]), '-v', label=r'$h^2$')
+# plt.plot(np.log(h1_vec), np.log(h1_vec) + coeff*(np.log(v_errInf_r1)[-1] - np.log(h1_vec)[-1]), '-v', label=r'$h$')
+# plt.plot(np.log(h1_vec), np.log(h1_vec**2) + 1.02*(np.log(v_errInf_r1)[-1] - np.log(h1_vec**2)[-1]), '-v', label=r'$h^2$')
+plt.plot(np.log(h1_vec), np.log(h1_vec**1.5) + 1.1*(np.log(v_errInf_r1)[-1] - np.log(h1_vec**1.5)[-1]), '-v', label=r'$h^{1.5}$')
+
 
 plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log($||e_w - e_w^h||_{L^\infty H^2}$)')
@@ -107,8 +109,9 @@ plt.figure()
 # plt.plot(np.log(h1_vec), np.log(sig_r1_atF), ':o', label='H2')
 plt.plot(np.log(h1_vec), np.log(sig_errInf_r1), '-.+', label='DG $k =3$')
 # plt.plot(np.log(h1_vec), np.log(sig_errQuad_r1), '--*', label='H2 $L^2$')
-plt.plot(np.log(h1_vec), np.log(h1_vec)+ coeff*(np.log(sig_errInf_r1)[-1] - np.log(h1_vec)[-1]), '-v', label=r'$h$')
-plt.plot(np.log(h1_vec), np.log(h1_vec**2) + 1.02*(np.log(sig_errInf_r1)[-1] - np.log(h1_vec**2)[-1]), '-v', label=r'$h^2$')
+# plt.plot(np.log(h1_vec), np.log(h1_vec)+ coeff*(np.log(sig_errInf_r1)[-1] - np.log(h1_vec)[-1]), '-v', label=r'$h$')
+# plt.plot(np.log(h1_vec), np.log(h1_vec**2) + 1.02*(np.log(sig_errInf_r1)[-1] - np.log(h1_vec**2)[-1]), '-v', label=r'$h^2$')
+plt.plot(np.log(h1_vec), np.log(h1_vec**1.5) + 1.1*(np.log(sig_errInf_r1)[-1] - np.log(h1_vec**1.5)[-1]), '-v', label=r'$h^{1.5}$')
 
 plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log($||\bm{E}_{\kappa} - \bm{E}_{\kappa}^h||_{L^\infty L^2}$)')

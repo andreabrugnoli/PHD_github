@@ -35,7 +35,7 @@ def skew(x):
                      [-x[1], x[0], 0]])
 
 
-save = True
+save = False
 
 # L_beam = 0.14142
 # rho_beam = 7.8 * 10 ** (6)
