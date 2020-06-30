@@ -103,7 +103,7 @@ Consider a smooth tensor-valued function $\bm{M} \in \mathbb{S} = \mathbb{R}^{d\
 
 \end{theorem}
 
-\begin{section}{Bilinear forms}
+\section{Bilinear forms}
 	
 \begin{definition}[Skew-symmetric bilinear form]\label{def:sk_bilinear}
 A bilinear form on the Hilbert space $H$
@@ -119,5 +119,41 @@ b(\bm{v}, \bm{u}) = - b(\bm{u}, \bm{v}).
 \end{equation*}
 \end{definition}
 
+\section{Properties of the cross product}\label{sec:crossprod}
+We denote by $\crmat{\bm{a}}$ the skew symmetric map associated to vector $\bm{a} = [a_x, a_y, a_z]^\top$
+\begin{equation}
+\crmat{\bm{a}} = 
+\begin{bmatrix}
+0 & -a_z & a_y \\
+a_z & 0 & -a_x \\
+-a_y & a_x & 0 \\
+\end{bmatrix}
+\end{equation}
+This map allows rewriting the cross product as a matrix vector product $\bm{a}\wedge \bm{b} = \crmat{\bm{a}}\bm{b}$. The cross product satisfies the anticommutativity property
+\begin{equation}
+\label{eq:anticom}
+\crmat{\bm{a}} \bm{b} = - \crmat{\bm{b}} \bm{a}, \qquad \bm{a}, \bm{b} \in \mathbb{R}^3.
+\end{equation}
+Furthermore, it satisfies the Jacobi Identity
+\begin{equation}
+\label{eq:jacobi}
+\crmat{\bm{a}} \crmat{\bm{b}} \bm{c} + \crmat{\bm{b}} \crmat{\bm{c}} \bm{a} + \crmat{\bm{c}} \crmat{\bm{a}} \bm{b} = 0, \qquad \bm{a}, \bm{b}, \bm{c} \in \mathbb{R}^3.
+\end{equation}
 
-\end{section}
+
+\section{Index of a differential-algebraic system}\label{sec:DAE_index}
+When dealing with differential-algebraic systems an important notion is the index.
+\begin{definition}
+	The index of a DAE is the minimum number of differentiation steps required to transform a DAE into an ODE.
+\end{definition}
+Consider for simplicity a generic linear pH system arising from the weak imposition of the boundary conditions or from a multibody application. The equations are
+\begin{equation*}
+\begin{aligned}
+\mathbf{M} \dot{\mathbf{e}} &=  \mathbf{J}\mathbf{e} + \mathbf{G}^\top \bm{\lambda} + \mathbf{B}\mathbf{u}, \\ 
+0 &= -\mathbf{G}\mathbf{e}.
+\end{aligned}
+\end{equation*}
+Matrix $\mathbf{M}$ is squared and invertible and matrix $\mathbf{G}$ is full row rank. If the second equation is derived twice in time, then it is obtained
+\[\dot{\bm{\lambda}} = - (\mathbf{G} \mathbf{M}^{-1} \mathbf{G}^\top)^{-1} \mathbf{G} \mathbf{M}^{-1} (\mathbf{J} \dot{\mathbf{e}} + \mathbf{B}\dot{\mathbf{u}}).
+\]
+Therefore, the system index is two.  

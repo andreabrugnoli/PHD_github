@@ -43,14 +43,14 @@ A structure-preserving discretization is able to construct an equivalent pH syst
 	\end{tcolorbox}
 \end{tcbraster}
 \vspace{.5cm}
-In this thesis the Partitioned Finite Element Method (PFEM), originally presented in \cite{cardoso2018pfem,cardoso2019partitioned}, is chosen to obtain discretized models of dpHs. This procedure boils down to three simple steps
+In this thesis the Partitioned Finite Element Method (PFEM), originally presented in \cite{cardoso2018pfem,cardoso2019partitioned}, is chosen to obtain discretized models of dpHs. Variational finite element method has been extensively used for discretizing closed linear hyperbolic systems \cite{joly2003variational}. It will be shown that PFEM extends the framework detailed in \cite{joly2003variational} to open (i.e. boundary controlled) Hamiltonian systems. Furthermore, it  is also applicable to non-linear systems \ref{sec:irrsw_discr} and parabolic systems \ref{sec:thelas_wave} (see also \cite{serhani2019modeling,serhani2019discretization}).  This discretization procedure boils down to three simple steps
 \begin{enumerate}
 	\item The system is written in weak form; 
 	\item An integration by parts is applied to highlight the appropriate boundary control;
 	\item A Galerkin method is employed to obtain a finite-dimensional system. For the approximation basis the finite element method is here employed but spectral methods can be used as well.
 \end{enumerate}
 
-Once the system has been put into weak form, a subset of the equations is integrated by parts, so that boundary variables are naturally included into the formulation and appear as control inputs, the collocated outputs being defined accordingly. The discretization of energy and co-energy variables (and the associated test functions) leads directly to a full rank representation for the finite-dimensional pH system.  This approach makes possible the usage of FEM software, like FEniCS \cite{logg2012}, or Firedrake \cite{rathgeber2017firedrake}. The procedure is universal, as it relies on a general integration by parts formula that characterizes multi-dimensional pHs. This is why the methodology is illustrated in all its generality and then detailed for some particular examples of interest:
+Once the system has been put into weak form, a subset of the equations is integrated by parts, so that boundary variables are naturally included into the formulation and appear as control inputs, the collocated outputs being defined accordingly. The discretization of energy and co-energy variables (and the associated test functions) leads directly to a full rank representation for the finite-dimensional pH system.  This approach makes possible the usage of FEM softwares, like FEniCS \cite{logg2012}, or Firedrake \cite{rathgeber2017firedrake}. The procedure is universal, as it relies on a general integration by parts formula that characterizes multi-dimensional pHs. This is why the methodology is illustrated in all its generality and then detailed for some particular examples of interest:
 \begin{enumerate}
 	\item in \secref{sec:pfem_gen} the 2D non-linear irrotational shallow water equations;
 	\item the Euler-Bernoulli beam in \secref{sec:discr_EB};
@@ -520,7 +520,7 @@ The differences with respect to formulation \eqref{eq:pHsys_findim_J1} reside in
 \end{equation}
 where $i \in \left\{1, n_1\right\}, \; m \in \left\{1, n_2\right\},\; k \in \left\{1, n_\partial \right\}$. System \eqref{eq:pHsys_findim_J2} can be put in canonical form by replacing the co-energy variables by the discretized gradient.
 
-{\subsection{Example: the irrotational shallow water equations}}
+\subsection{Example: the irrotational shallow water equations}\label{sec:irrsw_discr}
 Consider as an example the shallow water equations detailed in \secref{sec:shallowwater}.  The flow is assumed to be irrotational ($\nabla \times \bm{v} = 0$). As a consequence the term $\bm{\mathcal{G}}$ in Eq. \eqref{eq:pHsys_shwater} vanishes.
 To fulfill Assumption \ref{ass:operBC}, the incoming volumetric flow is known at the boundary, so that a uniform Neumann condition is imposed. This leads to the following boundary control system, defined on an open connected set $\Omega \subset \mathbb{R}^2$
 \begin{equation}
@@ -1210,9 +1210,9 @@ Matrices $\mathbf{B}_w, \; \mathbf{B}_{\partial_{\bm{n}} w}$ are given by
 {B}_w^{il} = \inner[L^2(\partial\Omega)]{\gamma_0 \phi_w^i}{\phi_{\partial, 1}^l}, \qquad {B}_{\partial_{\bm{n}} w}^{il} = \inner[L^2(\partial\Omega)]{\gamma_1 \phi_w^i}{\phi_{\partial, 2}^l}, \qquad l \in \{1, n_\partial\}.
 \end{equation}
 
-This kind of discretization requires $H^2$-conforming elements. The construction of those is rather involved \cite{argyris1968,bell1969} and they are computationally expensive. Nevertheless, this kind of discretization is able to handle generic boundary conditions \cite{gustafsson2018}. For this reason, it is the most adapted for the pH framework. \\
+This kind of discretization requires $H^2$-conforming elements. The construction of those is rather involved and they are computationally expensive \cite{argyris1968,bell1969}. Nevertheless, this kind of discretization is able to handle generic boundary conditions \cite{gustafsson2018}. For this reason, it is the most adapted for the pH framework. \\
 
-To lower the regularity requirement for the finite elements, many non conforming elements have been proposed. The most employed is the Hellan-Herrmann-Johnson element \cite{arnold1985mixed,blum1990}. However, this method does not handle generic non-homogeneous boundary conditions. Given the unavailability of the boundary for interconnections, the modularity feature of pHs cannot be fully exploited. \\
+To lower the regularity requirement for the finite elements, many non conforming elements have been proposed. The most employed is the Hellan-Herrmann-Johnson element \cite{arnold1985mixed,blum1990}. For what concerns conforming mixed discretization of the Kirchhoff plate, an interesting analysis can be found in \cite{becache2005kirchhoff}. Their method consists in integrating by parts both lines of \ref{eq:pHlinsys_Kir1}. Lagrange polynomials of order 2 (and bubble functions for mass lumping) are then employed for the velocity and bending momenta. However, these two methods do not handle generic non-homogeneous boundary conditions in a straightforward way. Because of this fact, the modularity feature of pHs cannot be fully exploited.   \\
 
 \begin{remark}[On the $H^{\div\Div}$ space]\label{rmk:HdivDiv}
 	Equivalently, the second line of Eq. \eqref{eq:pHdyn_Kir1} can be integrated by parts twice to obtain a discretized system whose inputs are the linear velocity and the angular velocity at the boundary. However, while for the $H^2$ space conforming finite elements are available, for the $H^{\div\Div}$ no conforming finite elements have been proposed. This makes the discretization unfeasible. 
@@ -1583,7 +1583,7 @@ This finite-dimensional system represents a purely mixed discretization of the p
 \section{Mixed boundary conditions}\label{sec:mixedbc}
 In this section Assumption \ref{ass:operBC} on uniform boundary condition is modified to account for general non-homogeneous boundary conditions. The discretization of Stokes-Dirac structure under mixed causality has been already treated in \cite{kotyczka2018weak}. However, to satisfy the power balance at a discrete level, some additional parameters are introduced. This makes the employment of this methodology not simple and dependent on the considered application. Furthermore, elasticity models do not fall within the required assumptions, because of the presence of tensorial variables and higher order differential operators. \\
 
-We propose here two methodologies to tackle mixed boundary conditions within the Partitioned Finite Element Method. The first introduces Lagrange multipliers, and therefore algebraic constraints, to enforce the mixed causality. Finite-dimensional differential algebraic port-Hamiltonian systems (pHDAE) have been introduced in \cite{beattie2018linear} for linear systems and in \cite{morandin2019} for non-linear systems. This enriched description shares all the crucial features of ordinary pHs, but can easily take into account algebraic constraints, time-dependent transformations and explicit dependence on time in the Hamiltonian. The second method employs a domain decomposition technique to interconnect systems with different causalities. For sake of simplicity, the illustration is restricted to the linear case. \\
+We propose here two methodologies to tackle mixed boundary conditions within the Partitioned Finite Element Method. The first introduces Lagrange multipliers, and therefore algebraic constraints, to enforce the mixed causality. Finite-dimensional differential algebraic port-Hamiltonian systems (pHDAE) have been introduced in \cite{beattie2018linear} for linear systems and in \cite{morandin2019} for non-linear systems. This enriched description shares all the crucial features of ordinary pHs, but can easily take into account algebraic constraints, time-dependent transformations and explicit dependence on time in the Hamiltonian. The second method employs a domain decomposition technique to interconnect systems with different causalities. These two methodologies have been presented in \cite{joly2003variational} to tackle complex geometries or geometrical details in diffraction problems. Therein, the numerical analysis relies heavily on the discrete energy conservation. In this section the connection between these two methods and the structure-preserving discretization of pHs under mixed boundary conditions becomes clear. For sake of simplicity, the illustration is restricted to the linear case. \\
 
 \begin{figure}[tb]
 	\centering
@@ -2141,7 +2141,7 @@ Systems \eqref{eq:pHlinsys_findim_Om1}, \eqref{eq:pHlinsys_findim_Om2} are compa
 	\mathbf{B}_{\Gamma_1}^{\Omega_1} \textcolor{blue}{\mathbf{u}_{\partial, 1}} + \mathbf{B}_{\Gamma_{12}}^{\Omega_1}
 	\textcolor{violet}{\mathbf{u}_{\partial, 1}^{\Gamma_{12}}}, \\
 	\mathbf{M}_{\partial, 1} \textcolor{blue}{\mathbf{y}_{\partial, 1}} = \mathbf{B}_{\Gamma_1}^{\Omega_1 \top} \mathbf{e}_{\Omega_1}, \\
-	\mathbf{M}_{\partial, 12} \textcolor{violet}{\mathbf{y}_{\partial, 1}^{\Gamma_{12}}} = \mathbf{B}_{\Gamma_{12}}^{\Omega_1 \top} \mathbf{e}_{\Omega_1}.
+	\mathbf{M}_{\partial, 12} \textcolor{violet}{\mathbf{y}_{\partial, 1}^{\Gamma_{12}}} = \mathbf{B}_{\Gamma_{12}}^{\Omega_1 \top} \mathbf{e}_{\Omega_1},
 	\end{aligned}
 	\end{equation}
 	with Hamiltonian $H_{d, 1} = \frac{1}{2} {\mathbf{e}}_{\Omega_1}^\top \mathbf{M}_{\Omega_1}
@@ -2156,7 +2156,7 @@ Systems \eqref{eq:pHlinsys_findim_Om1}, \eqref{eq:pHlinsys_findim_Om2} are compa
 	\mathbf{B}_{\Gamma_2}^{\Omega_2} \textcolor{red}{\mathbf{u}_{\partial, 2}} + \mathbf{B}_{\Gamma_{12}}^{\Omega_2}
 	\textcolor{violet}{\mathbf{u}_{\partial, 2}^{\Gamma_{12}}}, \\
 	\mathbf{M}_{\partial, 2} \textcolor{red}{\mathbf{y}_{\partial, 2}} = \mathbf{B}_{\Gamma_2}^{\Omega_2 \top} \mathbf{e}_{\Omega_2}, \\
-	\mathbf{M}_{\partial, 12} \textcolor{violet}{\mathbf{y}_{\partial, 2}^{\Gamma_{12}}} = \mathbf{B}_{\Gamma_{12}}^{\Omega_2 \top} \mathbf{e}_{\Omega_2}.
+	\mathbf{M}_{\partial, 12} \textcolor{violet}{\mathbf{y}_{\partial, 2}^{\Gamma_{12}}} = \mathbf{B}_{\Gamma_{12}}^{\Omega_2 \top} \mathbf{e}_{\Omega_2},
 	\end{aligned}
 	\end{equation}
 	with Hamiltonian $H_{d, 2} = \frac{1}{2} {\mathbf{e}}_{\Omega_2}^\top \mathbf{M}_{\Omega_2}

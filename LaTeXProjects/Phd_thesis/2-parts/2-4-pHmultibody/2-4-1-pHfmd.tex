@@ -1,19 +1,21 @@
 \chapter{Modular multibody systems in port-Hamiltonian form}
 
+\epigraph{One of my earliest memories of something that caught my attention was of a steam locomotive. I guess mainly because they have so many moving parts that are out in the open. You can watch the valves moving back and forth — the driving rods.}{\textit{Jim Peebles}}
+
 \minitoc
 
-In this chapter, we propose to combine the pH framework with a floating frame description of the dynamics. Starting from the general equation for the rigid flexible dynamics of a floating body, an equivalent port-Hamiltonian system is found by appropriate selection of the canonical momenta. The flexible behavior is based on the linear elasticity assumption making it possible to include models that cannot be easily formulated in terms of differential form  \cite{brugnoli2019ammmin,brugnoli2019ammkir}. The problem is then written as a coupled system of ordinary and partial differential equations (ODEs and PDEs), extending the general definition of finite-dimensional port-Hamiltonian descriptor systems provided in \cite{mehrmann2019structurepreserving}. A suitable structure-preserving discretization method, based on \cite{cardoso2019partitioned}, is then used to obtain a finite-dimensional pH system. The modularity feature of pH systems makes the proposed approach analogous to a substructuring technique \cite{shabana1985substructure}: each individual component can be interconnected to the other bodies using standard interconnection of pH systems, as it is done in \cite{macchelli2007link}. This feature allows the use of modeling platforms like \textsc{Simulink}$^{\tiny{\textregistered}}$ or \textsc{Modelica}$^{\tiny{\textregistered}}$. {Other approaches, commonly used in robotics \cite[Chapter 5]{bremer2008elastic}, allows constructing chain of bodies in a systematic way but do not address the conservation of energy. One of the main interests of this contribution is that the interconnections among bodies do preserve the Hamiltonian structure and the conservation of energy.} The constraints are imposed on the velocities, leading to a quasi-linear index 2 differential-algebraic port-Hamiltonian system (pHDAE) \cite{steinbrecher2006phd,beattie2018linear}. In the linear case, the algebraic constraints can be eliminated, preserving the overall pH structure, using null space methods \cite{leyendecker2008nullspace}.  As a floating frame formulation is used, model reduction techniques can be employed to lower the computational complexity of the model \cite{chaturantabut2016,egger2018}. These peculiarities make the proposed formulation interesting for control applications, that can benefit from the properties of pH systems \cite{nageshrao2016survey,ortega2004survey}.  \\
-\indent The paper is organized in the following manner. In Section \ref{sec:class_model} the classical equations of a flexible floating body are recalled. Using the properties of the cross product, the equations are recast in a form closer to the pH structure. Section \ref{sec:pH_fd} details the pH formulation of a floating flexible body by introducing the proper canonical momenta. In Section \ref{sec:discr} a finite element based discretization is detailed for the elastodynamics problem. The procedure is easily applied to flexible floating bodies. The particular case of thin planar beams is then detailed, as it will be next employed in the simulation part. Section~\ref{sec:MB_pH} explains how to interconnect models together using classical pH interconnection. Section \ref{sec:valid} is devoted to numerical examples, to assess the validity of the proposed methodology. The test cases are taken from previously published articles \cite{chebbi2017,ellenbroek2018}.
+\lettrine{\color{theme}{I}}n this chapter, the pH framework is combined with a floating frame description of the flexible dynamics under large rigid body displacements. Starting from the general equation for the rigid flexible dynamics of a floating body, an equivalent port-Hamiltonian system is found by appropriate selection of the canonical momenta. The flexible behavior is based on the linear elasticity assumption making it possible to include all kind of linear models. The problem is then written as a coupled system of ordinary and partial differential equations (ODEs and PDEs), extending the general definition of finite-dimensional port-Hamiltonian descriptor systems provided in \cite{mehrmann2019structurepreserving}. The modularity feature of pH systems makes the proposed approach analogous to a substructuring technique: each individual component can be interconnected to the other bodies using standard interconnection of pH systems, as it is done in \cite{macchelli2007link}. This feature allows the use of modeling platforms like {\sc{Simulink}}$^{\tiny{\textregistered}}$ or {\sc{Modelica}}$^{\tiny{\textregistered}}$.  The constraints are imposed on the velocities, leading to a quasi-linear index 2 differential-algebraic port-Hamiltonian system (pHDAE) \cite{steinbrecher2006phd,beattie2018linear}. In the linear case, the algebraic constraints can be eliminated, preserving the overall pH structure, using null space methods \cite{leyendecker2008nullspace}.  As a floating frame formulation is used, model reduction techniques can be employed to lower the computational complexity of the model \cite{chaturantabut2016,egger2018}.  \\
 
 
+\indent The chapter is organized in the following manner. In Section \ref{sec:class_FMD} the classical equations of a flexible floating body are recalled. Using the properties of the cross product, the equations are recast in a form closer to the pH structure. Section \ref{sec:pH_fd} details the pH formulation of a floating flexible body by introducing the proper canonical momenta. In Section \ref{sec:MB_discr} the PFEM is detailed for the elastodynamics problem. The procedure is then easily extended to flexible floating bodies. The particular case of thin planar beams is then detailed. Section~\ref{sec:MB_pH} explains how to interconnect models together using classical pH interconnection. 
 
 \section{Flexible dynamics of a floating body}
-\label{sec:class_model}
+\label{sec:class_FMD}
 
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=0.6\textwidth]{part_4/pHfmd/floating_body.eps} 
-	\caption{Thin floating body undergoing a surface traction $\tau$ and body force density $\beta$}
+	\caption{Thin floating body undergoing a surface traction $\bm\tau$ and body force density $\bm\beta$}
 	\label{fig:float_body}
 \end{figure}
 The coupled ODE-PDE system representing the motion of a single flexible body is here recalled. Then, by exploiting the properties of the cross product, the system of equations is rephrased to highlight the port-Hamiltonian structure.
@@ -34,7 +36,7 @@ where $\bm{x}$ is the position vector of the current point, $\bm{v}_P, \bm{\omeg
 	&\quad - \crmat{\bm{\omega}_P} \crmat{\bm{\omega}_P} \bm{s}_u - \int_{\Omega} 2 \rho \crmat{\bm{\omega}_P} \dot{\bm{u}}_f \d{\Omega} +  \int_{\Omega} \bm\beta \d{\Omega} + \int_{\partial \Omega} \bm\tau \d{\Gamma},
 	\end{split}
 	\end{equation}
-	where $\rho$ is the mass density, $m = \int_{\Omega} \rho \d{\Omega}$ the total mass,  $\bm{s}_u = \int_{\Omega} \rho (\bm{x}_f) \d{\Omega}$ the static moment. Additionally, $\bm\beta$ is a density force and $\bm\tau$ is a surface traction, both expressed in the body reference frame.
+	where $\rho$ is the mass density, $m = \int_{\Omega} \rho \d{\Omega}$ the total mass,  $\bm{s}_u = \int_{\Omega} \rho \bm{x}_f \d{\Omega}$ the static moment. Additionally, $\bm\beta$ is a density force and $\bm\tau$ is a surface traction, both expressed in the body reference frame.
 	\item Angular momentum balance:
 	\begin{equation}
 	\label{eq:rig_rot1}
@@ -52,7 +54,7 @@ where $\bm{x}$ is the position vector of the current point, $\bm{v}_P, \bm{\omeg
 	\Div{\bm\Sigma} + \bm\beta,
 	\end{split}
 	\end{equation}
-	Variable $\bm\Sigma$ is the Cauchy stress tensor. From linear elasticity theory it is well known that the infinitesimal strain is given by $\bm\varepsilon = \Grad(\bm{u}_f)$, where $\Grad=~\frac{1}{2}[\nabla+\nabla^\top]$ is the symmetric gradient. The constitutive equation is expressed as $\bm\Sigma =  \bm{\mathcal{D}} \bm\varepsilon$, where $ \bm{\mathcal{D}}$ is the stiffness tensor. This PDE requires the specifications of boundary conditions.
+	Variable $\bm\Sigma$ is the Cauchy stress tensor. From linear elasticity theory it is well known that the infinitesimal strain is given by $\bm\varepsilon = \Grad(\bm{u}_f)$. The constitutive equation is expressed as $\bm\Sigma =  \bm{\mathcal{D}} \bm\varepsilon$, where $ \bm{\mathcal{D}}$ is the stiffness tensor. This PDE requires the specifications of boundary conditions.
 	\begin{equation}
 	\label{eq:bcPDE}
 	\begin{aligned}
@@ -60,7 +62,7 @@ where $\bm{x}$ is the position vector of the current point, $\bm{v}_P, \bm{\omeg
 	\bm{u}_f|_{\Gamma_D} &= \bm{\bar{u}}_f|_{\Gamma_D},
 	\end{aligned}
 	\end{equation}
-	The boundary $\partial \Omega = \Gamma_D \cup \Gamma_N$ is split into two subsets, one on which the surface traction is imposed ($\Gamma_N$ Neumann condition) and the other where the flexible displacement is known ($\Gamma_D$ Dirichlet condition). 
+	The boundary $\partial \Omega = \overline{\Gamma}_D \cup \overline{\Gamma}_N$ is split into two subsets, one on which the surface traction is imposed ($\Gamma_N$ Neumann condition) and the other where the flexible displacement is known ($\Gamma_D$ Dirichlet condition). 
 \end{itemize}
 
 \subsection{Towards a pH formulation}
@@ -371,7 +373,7 @@ The power balance equals the power due to body force and surface traction
 \end{remark}
 
 \section{Discretization procedure}
-\label{sec:discr}
+\label{sec:MB_discr}
 A finite-element based technique to obtain a finite-dimensional pH system is illustrated. This methodology relies on the results explained in \cite{cardoso2019partitioned}. The essential feature of this method is that it is structure-preserving. Given the lossless infinite-dimensional system \eqref{eq:MFD_pHDAE}, it allows obtaining a finite-dimensional representation that is again lossless (cf. \cite[Definition 3.1.4]{vandershaft2000l2}). The procedure boils down to three simple steps
 \begin{enumerate}
 	\item The system is written in weak form; 
@@ -779,7 +781,7 @@ The control operator reads
 \end{bmatrix}.
 \end{equation}
 
-The discretization procedure detailed in \secref{sec:discr} is extended to this case, considering that the differential operators are 
+The discretization procedure detailed in \secref{sec:MB_discr} is extended to this case, considering that the differential operators are 
 \[
 \bm{\mathcal{J}}_{\Div} = \begin{bmatrix}
 0 & 0 & \partial_x & 0 \\
@@ -854,7 +856,7 @@ This model describes the motion of a flexible floating beam that undergoes small
 
 \section{Multibody systems in pH form}
 \label{sec:MB_pH}
-In Sections \secref{sec:pH_fd}, and \secref{sec:discr}, the pH formulation of a single flexible floating body in infinite- and finite-dimensional form was presented. The construction of a multibody system is accomplished by exploiting the modularity of the port-Hamiltonian framework. Each element of the system is interconnected to the others by means of classical pH interconnections.
+In Sections \secref{sec:pH_fd}, and \secref{sec:MB_discr}, the pH formulation of a single flexible floating body in infinite- and finite-dimensional form was presented. The construction of a multibody system is accomplished by exploiting the modularity of the port-Hamiltonian framework. Each element of the system is interconnected to the others by means of classical pH interconnections.
 
 \subsection{Interconnections of pHDAE systems}
 Consider two generic pHDAE systems of the form
@@ -1157,11 +1159,7 @@ Once an equivalent ODE formulation is obtained the concepts and ideas presented 
 
 
 \section{Conclusion}
-A port-Hamiltonian formulation for the flexible multibody dynamics has been discussed. The equations of motions proposed in the paper  are obtained by direct manipulation of pre-existing results. The derivation of equations of motions through a variational principle represents an insightful development. The proposed methodology, being based on a floating frame formulation, relies on the hypothesis of small deformations. However, the geometric stiffening effect can be accounted for by considering a corresponding energy. The discretization procedure uses a mixed finite element method, hence, the stress distribution is available without any post-processing. This is a valuable characteristic of this framework, as the stress distribution is the most important variable for preliminary analysis of mechanical components. Moreover, this approach allows treating different models (e.g. plates, shells) in a common framework. This formulation works with any kind of rigid joints and could be easily extended to any kind of flexible joints. The construction of multibody system becomes completely modular and well suited for control applications.  \\
-
-There are however many questions that require further investigations. To address complex multibody systems, higher dimensional models (plates, shells and 3D continua) have to be considered. Port-Hamiltonian plate models and 3D continua are readily available, whereas the reformulation of shell structures in pH form is still an open topic. For 3D continua and thick plate models (Mindlin-Reissner plates) one may employ the method proposed in \cite{cohen2005} to achieve the discretization. The discretization of thin plate models is substantially more difficult. \\ 
-The employment of finite elements leads to large sparse systems to be solved. To limit the computational complexity of these models, model reduction techniques can be incorporated. While for linear pHDAE systems consolidated methodologies exist \cite{egger2018}, for the  non linear differential-algebraic case solutions are not yet available. To avoid the problem of dealing with large-scale systems, spectral methods can be equivalently used to achieve a structure preserving discretization made up of small and dense matrices.  \\ 
-The time-domain simulations of the resulting systems have been accomplished using ready-to-use solvers. A rigorous numerical analysis, out of the scope of this paper, represents an important future development. In particular, numerical methods capable of preserving important structural properties in discrete time have been studied for rigid body dynamics \cite{celledoni2018passivity} and generic ODE \cite{kotyczka2019discrete} and DAE \cite{mehrmann2019structurepreserving} pH systems. These methods could be fruitfully employed in the proposed framework. 
+A port-Hamiltonian formulation for the flexible multibody dynamics has been discussed. The equations of motions proposed in the paper  are obtained by direct manipulation of pre-existing results. The derivation of equations of motions through a variational principle represents an insightful development. The proposed methodology, being based on a floating frame formulation, relies on the hypothesis of small deformations. However, the geometric stiffening effect can be accounted for by considering a corresponding energy. The discretization procedure uses a mixed finite element method, hence, the stress distribution is available without any post-processing. This is a valuable characteristic of this framework, as the stress distribution is the most important variable for preliminary analysis of mechanical components. Moreover, this approach allows treating different models (e.g. plates, shells) in a common framework. This formulation works with any kind of rigid joints and could be easily extended to any kind of flexible joints. The construction of multibody system becomes completely modular and well suited for control applications. 
 
 
 
@@ -1170,76 +1168,7 @@ The time-domain simulations of the resulting systems have been accomplished usin
 %and remove the percent signs.
 %\end{acknowledgements}
 
-\section*{Appendix A: Mathematical tools}
-We recall here some identities and definitions that will be used throughout the paper. 
-\subsection*{\normalsize \textbf{A.1 Properties of the cross product}}
-We denote by $\crmat{\bm{a}}$ the skew symmetric map associated to vector $\bm{a} = [a_x, a_y, a_z]^\top$
-\begin{equation}
-\crmat{\bm{a}} = 
-\begin{bmatrix}
-0 & -a_z & a_y \\
-a_z & 0 & -a_x \\
--a_y & a_x & 0 \\
-\end{bmatrix}
-\end{equation}
-This map allows rewriting the cross product as a matrix vector product $\bm{a}\wedge \bm{b} = \crmat{\bm{a}}\bm{b}$. The cross product satisfies the anticommutativity property
-\begin{equation}
-\label{eq:anticom}
-\crmat{\bm{a}} \bm{b} = - \crmat{\bm{b}} \bm{a}, \qquad \bm{a}, \bm{b} \in \mathbb{R}^3.
-\end{equation}
-Furthermore, it satisfies the Jacobi Identity
-\begin{equation}
-\label{eq:jacobi}
-\crmat{\bm{a}} \crmat{\bm{b}} \bm{c} + \crmat{\bm{b}} \crmat{\bm{c}} \bm{a} + \crmat{\bm{c}} \crmat{\bm{a}} \bm{b} = 0, \qquad \bm{a}, \bm{b}, \bm{c} \in \mathbb{R}^3.
-\end{equation}
 
-\subsection*{\normalsize \textbf{A.2 Adjoint of operators}}
-In this paper, the adjoint of an operator is used. We recall the necessary definitions.
-\begin{definition}
-	Given a linear operator $\mathcal{A}: \mathscr{H}^1 \rightarrow \mathscr{H}^2$ between Hilbert spaces, the adjoint $\mathcal{A}^*:\mathscr{H}^2\rightarrow~\mathscr{H}^1$ fulfills 
-	\begin{equation}
-	\langle y, \mathcal{A}x \rangle_{\mathscr{H}^2} = \langle \mathcal{A}^* y, x \rangle_{\mathscr{H}^1}, \qquad x \in \mathscr{H}^1, y \in \mathscr{H}^2.
-	\end{equation}
-\end{definition}
-To illustrate this definition, consider the operator $\mathcal{I}^\Omega = \int_\Omega (\cdot) \d\Omega : \mathscr{L}^2(\Omega, \mathbb{R}^3) \rightarrow \mathbb{R}^3$. Given a function $\bm{u} \in \mathscr{L}^2(\Omega, \mathbb{R}^3)$ and a vector $\bm{v} \in \mathbb{R}^3$, then the adjoint operator $(\mathcal{I}^\Omega)^*$ extends the vector $\bm{v}$ as a constant vector field over $\Omega$
-\begin{equation*} 
-\langle \bm{v}, \mathcal{I}^\Omega \bm{u} \rangle_{\mathbb{R}^3} = \langle (\mathcal{I}^\Omega)^* \bm{v},  \bm{u} \rangle_{\mathscr{L}^2(\Omega, \mathbb{R}^3)}. 
-\end{equation*}
-\begin{definition}
-	A linear bounded operator $\mathcal{A}: \mathscr{H} \rightarrow \mathscr{H}$ is self-adjoint if it holds
-	\begin{equation}
-	\langle y, \mathcal{A}x \rangle_{\mathscr{H}} = \langle \mathcal{A} y, x \rangle_{\mathscr{H}}, \qquad x, y \in \mathscr{H}.
-	\end{equation}
-\end{definition}
-\begin{definition}
-	A linear bounded operator $\mathcal{A}: \mathscr{H} \rightarrow \mathscr{H}$ is  skew-adjoint if it holds
-	\begin{equation}
-	\langle y, \mathcal{A}x \rangle_{\mathscr{H}} = -\langle \mathcal{A} y, x \rangle_{\mathscr{H}}, \qquad x, y \in \mathscr{H}.
-	\end{equation}	
-\end{definition}
-Indeed, the differential operators that appears in $\bm{\mathcal{J}}$ ($\Div, \Grad$), are unbounded in the $\mathscr{L}^2$ topology. Whenever unbounded operators are considered, it is important to define their domain. To avoid the need of specifying domains, the notion of formal (or essential) adjoint can be evoked. The formal adjoint respects the integration by parts formula and is defined only for sufficiently smooth functions with compact support. In this sense $\Div, \Grad$ are formally skew-adjoint, since for smooth functions with compact support, it holds
-\begin{equation*}
-\left\langle y, \, \Grad(x) \right\rangle_{\mathscr{L}^2(\Omega, \mathbb{R}^{3\times 3}_{\text{sym}})} 
-\underbrace{=}_{\text{I.B.P.}} -\left\langle\Div(y), \, x \right\rangle_{\mathscr{L}^2(\Omega, \mathbb{R}^3)}.
-\end{equation*}
-The definition of the domain of the operators, that requires the knowledge of the boundary conditions, has not been specified. For this reason, the $\bm{\mathcal{J}}$ operator is said to be formally skew-adjoint (or simply skew-symmetric).
-
-\subsection*{\normalsize \textbf{A.3 Index of a differential-algebraic system}}
-When dealing with differential-algebraic systems an important notion is the index.
-\begin{definition}
-	The index of a DAE is the minimum number of differentiation steps required to transform a DAE into an ODE.
-\end{definition}
-Because of their structure, pH multibody systems are of index two. Consider for simplicity a generic linear pH multibody system, whose equations are
-\begin{equation*}
-\begin{aligned}
-\mathbf{M} \dot{\mathbf{e}} &=  \mathbf{J}\mathbf{e} + \mathbf{G}^\top \bm{\lambda} + \mathbf{B}\mathbf{u}, \\ 
-0 &= -\mathbf{G}\mathbf{e}.
-\end{aligned}
-\end{equation*}
-Matrix $\mathbf{M}$ is squared and invertible and matrix $\mathbf{G}$ is full row rank. If the second equation is derived twice in time, then it is obtained
-\[\dot{\bm{\lambda}} = - (\mathbf{G} \mathbf{M}^{-1} \mathbf{G}^\top)^{-1} \mathbf{G} \mathbf{M}^{-1} (\mathbf{J} \dot{\mathbf{e}} + \mathbf{B}\dot{\mathbf{u}}).
-\]
-Therefore, the system index is two.  
 \section*{Appendix B: Detailed derivation of the equation of motions}
 
 The detailed derivation of the pH system \eqref{eq:ph_mfd_all} is presented here. We stick to the notation adopted along the paper. First, let us recall the equations for a floating flexible body reported in \cite{simeon2006,simeon2013computational}.
