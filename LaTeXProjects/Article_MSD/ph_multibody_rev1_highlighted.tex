@@ -186,7 +186,7 @@ where $\bm{x}$ is the position vector of the current point, $\bm{v}_P, \bm{\omeg
 	\begin{equation}
 	\label{eq:flex1}
 	\begin{split}
-	\rho (\dot{\bm{v}}_P + \crmat{\bm\omega_P} \bm{v}_P) + \rho (\crmat{\dot{\bm\omega}_P} + \crmat{\bm{\omega}_P}\crmat{\bm{\omega}_P})(\bm{x}_f) + \rho (2 \crmat{\bm{\omega}_P} \dot{\bm{u}}_f + \ddot{\bm{u}}_f) = \\
+	\rho (\dot{\bm{v}}_P + \crmat{\bm\omega_P} \bm{v}_P) + \rho (\crmat{\dot{\bm\omega}_P} + \crmat{\bm{\omega}_P}\crmat{\bm{\omega}_P})\bm{x}_f + \rho (2 \crmat{\bm{\omega}_P} \dot{\bm{u}}_f + \ddot{\bm{u}}_f) = \\
 	 \Div{\bm\Sigma} + \bm\beta,
 		\end{split}
 	\end{equation}
@@ -246,7 +246,7 @@ Consider the total energy (Hamiltonian), given by the sum of kinetic and deforma
 \label{eq:H}
 \begin{aligned}
 H &= H_{\text{kin}} + H_{\text{def}}, \\
-&= \frac{1}{2} \int_{\Omega} \left\{\rho ||\bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}_f) + {\bm{v}}_f||^2 + \bm\Sigma \cddot \bm\varepsilon \right\}  \d{\Omega}.
+&= \frac{1}{2} \int_{\Omega} \left\{\rho ||\bm{v}_P + \crmat{\bm{\omega}_P} \bm{x}_f + {\bm{v}}_f||^2 + \bm\Sigma \cddot \bm\varepsilon \right\}  \d{\Omega}.
 \end{aligned}
 \end{equation}
 The inner product $\bm{A} \cddot \bm{B} = \Tr(\bm{A} \bm{B}^T)$ is the tensor contraction.  
@@ -460,12 +460,12 @@ Even if three dimensional elasticity has been taken as example up to this point,
 \begin{remark}
 	Conservative forces are easily accounted for by introducing an appropriate potential energy. For example if the gravity force is considered, the corresponding potential energy reads
 	\begin{equation*}
-	H_{\text{pot}} = \int_{\Omega} \rho g \, ^i r_z \d{\Omega} = \int_{\Omega} \rho g \left[ ^i r_{P, z} +\bm{R}_z (\bm{x}_f) \right] \d{\Omega},
+	H_{\text{pot}} = \int_{\Omega} \rho g \, ^i r_z \d{\Omega} = \int_{\Omega} \rho g \left[ ^i r_{P, z} +\bm{R}_z \bm{x}_f \right] \d{\Omega},
 	\end{equation*}
 	where $^i r_z$ is the vertical location of a generic point computed in the inertial frame. The associated co-energy variables are easily obtained
 	\begin{align*}
 	\partial_{\bm{r}_P}H_{\text{pot}} &= m g \, \widehat{\bm{Z}}, \quad \text{$\widehat{\bm{Z}}$ is the inertial frame vertical direction},\\
-	\partial_{\bm{R}_\text{v}}H_{\text{pot}} &= [\bm{0}_{(3, 1)}, \; \bm{0}_{(3, 1)}, \; \int_{\Omega} \rho g (\bm{x}_f)^\top \d{\Omega}]^\top, \\
+	\partial_{\bm{R}_\text{v}}H_{\text{pot}} &= [\bm{0}_{(3, 1)}, \; \bm{0}_{(3, 1)}, \; \int_{\Omega} \rho g \bm{x}_f^\top \d{\Omega}]^\top, \\
 	\delta_{\bm{u}_f} H_{\text{pot}} &= \rho g \, \bm{R}_z^\top.
 	\end{align*}
 	These contributions correspond to the forcing terms due to gravity.
@@ -612,7 +612,7 @@ where $\left\langle \cdot,  \cdot \right\rangle_{\mathscr{L}^2(\partial \Omega, 
 \begin{equation}
 \begin{aligned}
 \inner[\mathscr{X}_1]{\bm{w}_1}{\rho \partial_t \bm{e}_1} &=- \left\langle {\Grad} (\bm{w}_1), \; \bm{E}_2 \right\rangle_{\mathscr{X}_2} + \inner[\mathscr{X}_1]{\bm{w}_1}{\bm{u}_d}  + \left\langle \bm{w}_1, \; \bm{u}_\partial \right\rangle_{\mathscr{L}^2(\partial \Omega, \mathbb{R}^3)}, \\
-\inner[\mathscr{X}_2]{\bm{w}_2}{\bm{\mathcal{D}}^{-1}\partial_t \bm{e}_2} &=\left\langle \bm{W}_2, \; {\Grad} (\bm{e}_1) \right\rangle_{\mathscr{X}_2}.
+\inner[\mathscr{X}_2]{\bm{W}_2}{\bm{\mathcal{D}}^{-1}\partial_t \bm{e}_2} &=\left\langle \bm{W}_2, \; {\Grad} (\bm{e}_1) \right\rangle_{\mathscr{X}_2}.
 \end{aligned}
 \end{equation}
 }
@@ -1652,10 +1652,10 @@ The detailed derivation of the pH system \eqref{eq:ph_mfd_all} is presented here
 \item Flexibility PDE:
 \begin{equation}
 \label{eq:flex3}
-\rho  {\bm{R}^{\top}} \ ^{i}\ddot{\bm{r}}_P + \rho (\crmat{\dot{\bm\omega}_P} + \crmat{\bm{\omega}_P}\crmat{\bm{\omega}_P})(\bm{x}_f) + \rho (2 \crmat{\bm{\omega}_P} \dot{\bm{u}}_f + \ddot{\bm{u}}_f) = \Div{\bm\Sigma} + \bm\beta,
+\rho  {\bm{R}^{\top}} \ ^{i}\ddot{\bm{r}}_P + \rho (\crmat{\dot{\bm\omega}_P} + \crmat{\bm{\omega}_P}\crmat{\bm{\omega}_P})\bm{x}_f + \rho (2 \crmat{\bm{\omega}_P} \dot{\bm{u}}_f + \ddot{\bm{u}}_f) = \Div{\bm\Sigma} + \bm\beta,
 \end{equation}
 \end{itemize}
-The first two equations are written in the inertial frame and so they need to be projected in the body frame. Considering that the position of point $P$, i.e. $^{i}{\bm{r}}_P$, is computed in the inertial frame and $\bm{v}_P$ in the body frame, it holds $^{i}\dot{\bm{r}}_P = \bm{R} \bm{v}_P$. The derivative of this gives
+The first equation is written in the inertial frame and so they need to be projected in the body frame. Considering that the position of point $P$, i.e. $^{i}{\bm{r}}_P$, is computed in the inertial frame and $\bm{v}_P$ in the body frame, it holds $^{i}\dot{\bm{r}}_P = \bm{R} \bm{v}_P$. The derivative of this gives
 \begin{equation}
 \label{eq:acc_rP}
 ^{i}\ddot{\bm{r}}_P = \bm{R} \left(\dot{\bm{v}}_P + \crmat{\bm{\omega}_P} \bm{v}_P \right)
@@ -1682,7 +1682,7 @@ If \eqref{eq:acc_rP} is put into \eqref{eq:rig_tr3}, \eqref{eq:rig_rot3}, \eqref
 \begin{equation}
 \label{eq:flex4}
 \begin{split}
-\rho (\dot{\bm{v}}_P + \crmat{\bm\omega_P} \bm{v}_P) + \rho (\crmat{\dot{\bm\omega}_P} + \crmat{\bm{\omega}_P}\crmat{\bm{\omega}_P})(\bm{x}_f) + \rho (2 \crmat{\bm{\omega}_P} {\bm{v}}_f + \dot{\bm{v}}_f) = \\
+\rho (\dot{\bm{v}}_P + \crmat{\bm\omega_P} \bm{v}_P) + \rho (\crmat{\dot{\bm\omega}_P} + \crmat{\bm{\omega}_P}\crmat{\bm{\omega}_P})\bm{x}_f + \rho (2 \crmat{\bm{\omega}_P} {\bm{v}}_f + \dot{\bm{v}}_f) = \\
 \Div{\bm\Sigma} + \bm\beta,
 \end{split}
 \end{equation}
@@ -1711,7 +1711,7 @@ Eq. \eqref{eq:rig_rot4} is then rewritten as
 \label{eq:rig_rot5}
 \begin{split}
 \crmat{\bm{s}_u} \dot{\bm{v}}_P  + \bm{J}_u \dot{\bm\omega}_P + \int_{\Omega} \rho \crmat{\bm{x}_f} \dot{\bm{v}}_f \d{\Omega} = \\
-\left[\crmat{\crmat{\bm{s}_u}^\top \bm\omega_P} + 2 \int_{\Omega} \rho \crmat{\bm{v}_f} \d{\Omega} \right] \bm{v}_P + \left[\crmat{\bm{s}_u} \bm{v}_P + \crmat{\bm{J}_u \bm\omega_P} + 2 \int_{\Omega} \rho \crmat{\crmat{\bm{x}_f} {\bm{v}}_f} \d{\Omega} \right]_\times \bm\omega_P + 
+\left[\crmat{\crmat{\bm{s}_u}^\top \bm\omega_P} + 2 \int_{\Omega} \rho \crmat{\bm{v}_f} \d{\Omega} \right] \bm{v}_P + \left[\crmat{\bm{s}_u} \bm{v}_P + \crmat{\bm{J}_u \bm\omega_P} + 2 \int_{\Omega} \rho \crmat{\crmat{\bm{x}_f} {\bm{v}}_f} \d{\Omega} \right] \bm\omega_P + 
 \\
 2 \int_{\Omega} \left[\rho \crmat{\bm{v}_P} + \rho \crmat{\crmat{\bm{x}_f}^\top \, \bm\omega_P} \right] \bm{v}_f \d{\Omega} + \int_{\Omega}\crmat{\bm{x}_f} \bm\beta \d{\Omega} + \int_{\partial \Omega}\crmat{\bm{x}_f} \bm{\tau} \d{\Gamma}.
 \end{split}
@@ -1759,7 +1759,7 @@ m \bm{I}_{3\times 3} & \crmat{\bm{s}_u}^\top & \mathcal{I}_\rho^{\Omega} & 0 \\
 (\mathcal{I}_\rho^{\Omega})^* & (\bm{\mathcal{I}}_{\rho x}^{\Omega})^* & \rho & 0  \\
 0 & 0 & 0 & \bm{\mathcal{D}}^{-1} \\
 \end{bmatrix}, \qquad \text{see \eqref{eq:mass_op}} \\
-H &= \frac{1}{2} \int_{\Omega} \left\{\rho ||\bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}_f) + {\bm{v}}_f||^2 + \bm\Sigma \cddot \bm\varepsilon \right\}  \d{\Omega}, \qquad \text{see \eqref{eq:H}}.
+H &= \frac{1}{2} \int_{\Omega} \left\{\rho ||\bm{v}_P + \crmat{\bm{\omega}_P} \bm{x}_f + {\bm{v}}_f||^2 + \bm\Sigma \cddot \bm\varepsilon \right\}  \d{\Omega}, \qquad \text{see \eqref{eq:H}}.
 \end{align*}
 Hence, it is clear that Eqs. \eqref{eq:rig_tr3}, \eqref{eq:rig_rot3}, \eqref{eq:flex3} from \cite{MB_Daepde,simeon2013computational} are equivalently recast in the form \eqref{eq:ph_mfd_all}.
 % BibTeX users please use one of
