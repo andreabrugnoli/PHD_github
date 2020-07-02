@@ -18,10 +18,17 @@ from matplotlib import cm
 from firedrake.plot import _two_dimension_triangle_func_val
 from mpl_toolkits.mplot3d import Axes3D
 
+import scipy.sparse as spa
+import scipy.sparse.linalg as sp_la
+
 plt.close('all')
 matplotlib.rcParams['text.usetex'] = True
 
+from tools_plotting import setup
 from scipy.io import savemat
+
+path_fig = "/home/a.brugnoli/Plots/Python/Plots/Kirchhoff_plots/ExperimentSanfe/"
+
 
 Lx = 0.04
 Ly = 0.3
@@ -353,7 +360,7 @@ def plate_model(nx, ny, r):
     return plate, Vp
 
 
-plate, Vp = plate_model(4, 60, 1)
+plate, Vp = plate_model(8, 60, 1)
 np_plate = Vp.dim()
 
 mirror = mirror_model()
@@ -370,11 +377,12 @@ print(model_all.n)
 C_model_all = np.zeros((1, model_all.n_e))
 C_model_all[0, np_plate] = 1
 
-J_sys = model_all.J
-M_sys = model_all.E
-R_sys = model_all.R
+J_sys = spa.csc_matrix(model_all.J)
+M_sys = spa.csc_matrix(model_all.E)
+R_sys = spa.csc_matrix(model_all.R)
 
-eigenvalues, eigvectors = la.eig(J_sys, M_sys)
+n_om = 100
+eigenvalues, eigvectors = sp_la.eigs(J_sys, k=2*n_om, M=M_sys, sigma=1e-6, which='LM', tol=1e-2, maxiter=5000)
 omega_all = np.imag(eigenvalues)
 
 tol = 10 ** (-9)
@@ -396,114 +404,114 @@ for i in range(n_om):
 model_ode, T = model_all.dae_to_odeCE(mass=True)[:2]
 
 # print(T.shape)
-
-
-M_full = model_ode.M
-J_full = model_ode.J
-R_full = model_ode.R
-B_full = model_ode.B
-
-Q_full = la.inv(M_full)
-C_full = C_model_all @ T
-
-# A_sys = (J_full - R_full) @ Q_full
-# B_sys = B_full
-# C_sys = C_full @ Q_full
-# D_sys = np.zeros((len(C_sys), len(C_sys)))
-
-
-eigenvalues, eigvectors = la.eig(J_full, M_full)
-omega_all = np.imag(eigenvalues)
-
-tol = 10 ** (-9)
-index = omega_all >= tol
-
-omega = omega_all[index]
-eigvec_omega = eigvectors[:, index]
-perm = np.argsort(omega)
-eigvec_omega = eigvec_omega[:, perm]
-
-omega.sort()
-
-n_om = 6
-
-for i in range(n_om):
-    print('Omega full ' + str(i+1) + ': ' + str(omega[i]/(2*pi)))
-
-model_red, V = model_ode.reduce_system(1, 22)
-# print(model_red.n)
-
-M_red = model_red.M
-J_red = model_red.J
-R_red = model_red.R
-B_red = model_red.B
-C_red = C_full @ V
-Q_red = la.inv(M_red)
-
-# A_sys = (J_red - R_red) @ Q_red
-# B_sys = B_red
-# C_sys = C_red @ Q_red
-# D_sys = np.zeros((len(C_sys), len(C_sys)))
-
-# pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/PH_Control/Matrices_EB/'
-# A_file = 'A'; B_file = 'B'; C_file = 'C'; D_file = 'D';
-# savemat(pathout + A_file, mdict={A_file: np.array(A_sys)}, appendmat=True)
-# savemat(pathout + B_file, mdict={B_file: np.array(B_sys)}, appendmat=True)
-# savemat(pathout + C_file, mdict={C_file: np.array(C_sys)}, appendmat=True)
-# savemat(pathout + D_file, mdict={D_file: np.array(D_sys)}, appendmat=True)
-
-eigenvalues, eigvectors = la.eig(J_red, M_red)
-omega_all = np.imag(eigenvalues)
-
-tol = 10 ** (-9)
-index = omega_all >= tol
-
-omega = omega_all[index]
-eigvec_omega = eigvectors[:, index]
-perm = np.argsort(omega)
-eigvec_omega = eigvec_omega[:, perm]
-
-omega.sort()
-
-n_om = len(omega)
-
-for i in range(min(n_om, 6)):
-    print('Omega red ' + str(i + 1) + ': ' + str(omega[i] / (2 * pi)))
-
-# sys_red = signal.lti((J_red) @ la.inv(M_red), B_red[:, 0].reshape((-1,1)), C_red, 0)
-# w, mag, phase = signal.bode(sys_red, w=np.linspace(1*2*pi, 120*2*pi, 1000))
-# sys_full = signal.lti(J_full @ la.inv(M_full), B_full[:, 0].reshape((-1,1)), C_full, 0)
-# w, mag, phase = signal.bode(sys_full, w=np.linspace(1*2*pi, 120*2*pi, 1000))
 #
-# fntsize=16
-# plt.figure()
-# plt.semilogx(w/(2*pi), mag)    # Bode magnitude plot
-# plt.xlabel(r'{Frequency} (Hz)', fontsize=fntsize)
-# plt.ylabel(r'{Magnitude} (dB)', fontsize=fntsize)
 #
-# plt.figure()
-# plt.semilogx(w, phase)  # Bode phase plot
-# plt.show()
+# M_full = model_ode.M
+# J_full = model_ode.J
+# R_full = model_ode.R
+# B_full = model_ode.B
+#
+# Q_full = la.inv(M_full)
+# C_full = C_model_all @ T
+#
+# # A_sys = (J_full - R_full) @ Q_full
+# # B_sys = B_full
+# # C_sys = C_full @ Q_full
+# # D_sys = np.zeros((len(C_sys), len(C_sys)))
+#
+#
+# eigenvalues, eigvectors = la.eig(J_full, M_full)
+# omega_all = np.imag(eigenvalues)
+#
+# tol = 10 ** (-9)
+# index = omega_all >= tol
+#
+# omega = omega_all[index]
+# eigvec_omega = eigvectors[:, index]
+# perm = np.argsort(omega)
+# eigvec_omega = eigvec_omega[:, perm]
+#
+# omega.sort()
+#
+# n_om = 6
+#
+# for i in range(n_om):
+#     print('Omega full ' + str(i+1) + ': ' + str(omega[i]/(2*pi)))
+#
+# model_red, V = model_ode.reduce_system(1, 22)
+# # print(model_red.n)
+#
+# M_red = model_red.M
+# J_red = model_red.J
+# R_red = model_red.R
+# B_red = model_red.B
+# C_red = C_full @ V
+# Q_red = la.inv(M_red)
+#
+# # A_sys = (J_red - R_red) @ Q_red
+# # B_sys = B_red
+# # C_sys = C_red @ Q_red
+# # D_sys = np.zeros((len(C_sys), len(C_sys)))
+#
+# # pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/PH_Control/Matrices_EB/'
+# # A_file = 'A'; B_file = 'B'; C_file = 'C'; D_file = 'D';
+# # savemat(pathout + A_file, mdict={A_file: np.array(A_sys)}, appendmat=True)
+# # savemat(pathout + B_file, mdict={B_file: np.array(B_sys)}, appendmat=True)
+# # savemat(pathout + C_file, mdict={C_file: np.array(C_sys)}, appendmat=True)
+# # savemat(pathout + D_file, mdict={D_file: np.array(D_sys)}, appendmat=True)
+#
+# eigenvalues, eigvectors = la.eig(J_red, M_red)
+# omega_all = np.imag(eigenvalues)
+#
+# tol = 10 ** (-9)
+# index = omega_all >= tol
+#
+# omega = omega_all[index]
+# eigvec_omega = eigvectors[:, index]
+# perm = np.argsort(omega)
+# eigvec_omega = eigvec_omega[:, perm]
+#
+# omega.sort()
+#
+# n_om = len(omega)
+#
+# for i in range(min(n_om, 6)):
+#     print('Omega red ' + str(i + 1) + ': ' + str(omega[i] / (2 * pi)))
+#
+# # sys_red = signal.lti((J_red) @ la.inv(M_red), B_red[:, 0].reshape((-1,1)), C_red, 0)
+# # w, mag, phase = signal.bode(sys_red, w=np.linspace(1*2*pi, 120*2*pi, 1000))
+# # sys_full = signal.lti(J_full @ la.inv(M_full), B_full[:, 0].reshape((-1,1)), C_full, 0)
+# # w, mag, phase = signal.bode(sys_full, w=np.linspace(1*2*pi, 120*2*pi, 1000))
+# #
+# # fntsize=16
+# # plt.figure()
+# # plt.semilogx(w/(2*pi), mag)    # Bode magnitude plot
+# # plt.xlabel(r'{Frequency} (Hz)', fontsize=fntsize)
+# # plt.ylabel(r'{Magnitude} (dB)', fontsize=fntsize)
+# #
+# # plt.figure()
+# # plt.semilogx(w, phase)  # Bode phase plot
+# # plt.show()
+#
+#
+#
+#
+# pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/ReductionPHDAE/KP_Experiment/'
+# M_file = 'M'; R_file = 'R'; J_file = 'J'; B_file = 'B'; C_file = 'C'
+# savemat(pathout + M_file, mdict={M_file: np.array(M_full)})
+# savemat(pathout + J_file, mdict={J_file: np.array(J_full)})
+# savemat(pathout + R_file, mdict={R_file: np.array(R_full)})
+# savemat(pathout + B_file, mdict={B_file: np.array(B_full)})
+# savemat(pathout + C_file, mdict={C_file: np.array(C_full)})
+#
+# Mr_file = 'Mr'; Rr_file = 'Rr'; Jr_file = 'Jr'; Br_file = 'Br'; Cr_file = 'Cr'
+# savemat(pathout + Mr_file, mdict={Mr_file: np.array(M_red)})
+# savemat(pathout + Jr_file, mdict={Jr_file: np.array(J_red)})
+# savemat(pathout + Rr_file, mdict={Rr_file: np.array(R_red)})
+# savemat(pathout + Br_file, mdict={Br_file: np.array(B_red)})
+# savemat(pathout + Cr_file, mdict={Cr_file: np.array(C_red)})
 
-
-
-
-pathout = '/home/a.brugnoli/GitProjects/MatlabProjects/PH/ReductionPHDAE/KP_Experiment/'
-M_file = 'M'; R_file = 'R'; J_file = 'J'; B_file = 'B'; C_file = 'C'
-savemat(pathout + M_file, mdict={M_file: np.array(M_full)})
-savemat(pathout + J_file, mdict={J_file: np.array(J_full)})
-savemat(pathout + R_file, mdict={R_file: np.array(R_full)})
-savemat(pathout + B_file, mdict={B_file: np.array(B_full)})
-savemat(pathout + C_file, mdict={C_file: np.array(C_full)})
-
-Mr_file = 'Mr'; Rr_file = 'Rr'; Jr_file = 'Jr'; Br_file = 'Br'; Cr_file = 'Cr'
-savemat(pathout + Mr_file, mdict={Mr_file: np.array(M_red)})
-savemat(pathout + Jr_file, mdict={Jr_file: np.array(J_red)})
-savemat(pathout + Rr_file, mdict={Rr_file: np.array(R_red)})
-savemat(pathout + Br_file, mdict={Br_file: np.array(B_red)})
-savemat(pathout + Cr_file, mdict={Cr_file: np.array(C_red)})
-
-plot_eig = False
+plot_eig = True
 
 if plot_eig:
 
@@ -527,10 +535,10 @@ if plot_eig:
         ax = figure.add_subplot(111, projection="3d")
 
         ax.set_xlabel('$x [m]$', fontsize=fntsize)
-        ax.set_xlim((-0.02, 0.06))
+        ax.set_xlim((-0.01, 0.05))
         ax.set_ylabel('$y [m]$', fontsize=fntsize)
         ax.set_ylim((0, 0.3))
-        ax.set_title('$v_{e_{w}}$', fontsize=fntsize)
+        ax.set_title('Eigenvector $\psi_w$ n$^\circ$ '+str(i+1), fontsize=fntsize)
 
         ax.w_zaxis.set_major_locator(LinearLocator(10))
         ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
@@ -538,12 +546,12 @@ if plot_eig:
 
         if norm_imag_eig > norm_real_eig:
             triangulation, Z = _two_dimension_triangle_func_val(eig_imag_w, 10)
-            plot_pl = ax.plot_trisurf(triangulation, Z, label='Plate', cmap=cm.jet)
+            plot_pl = ax.plot_trisurf(triangulation, Z, cmap=cm.jet)
             # plot_pl = plot(eig_imag_w, axes=ax, plot3d=True, label='Plate', cmap=cm.jet)
             bol_imag = True
         else:
             triangulation, Z = _two_dimension_triangle_func_val(eig_real_w, 10)
-            plot_pl = ax.plot_trisurf(triangulation, Z, label='Plate', cmap=cm.jet)
+            plot_pl = ax.plot_trisurf(triangulation, Z, cmap=cm.jet)
             # plot_pl = plot(eig_real_w, axes=ax, plot3d=True, label='Plate', cmap=cm.jet)
             bol_imag = False
 
@@ -566,8 +574,8 @@ if plot_eig:
         else:
             eig_mir = eig_real_mir
 
-        ax.plot([x_L, x_L], [y_L, y_L], [z_L, z_L + eig_mir], \
-                linewidth=linewidth, linestyle='--', label='Mirror', color='blue')
+        # ax.plot([x_L, x_L], [y_L, y_L], [z_L, z_L + eig_mir], \
+        #         linewidth=linewidth, linestyle='--', label='Mirror', color='blue')
 
         x_A2, y_A2, z_A2 = r_A2
         # z_A2 = 0
@@ -585,8 +593,8 @@ if plot_eig:
         else:
             eig_act2 = eig_real_act2
 
-        ax.plot([x_A2, x_A2], [y_A2, y_A2], [z_A2, z_A2+eig_act2], \
-                linewidth=linewidth, linestyle='--', label='Act 2', color='black')
+        # ax.plot([x_A2, x_A2], [y_A2, y_A2], [z_A2, z_A2+eig_act2], \
+        #         linewidth=linewidth, linestyle='--', label='Actuator 2', color='black')
 
         x_A1, y_A1, z_A1 = r_A1
         # z_A1 = 0
@@ -605,8 +613,8 @@ if plot_eig:
         else:
             eig_act1 = eig_real_act1
 
-        ax.plot([x_A1, x_A1], [y_A1, y_A1], [z_A1, z_A1 + eig_act1], \
-                linewidth=linewidth, linestyle='--', label='Act 1', color='black')
+        # ax.plot([x_A1, x_A1], [y_A1, y_A1], [z_A1, z_A1 + eig_act1], \
+        #         linewidth=linewidth, linestyle='--', label='Actuator 1', color='black')
 
         off_mov = 0
         z_mov2 = z_A2 + off_mov
@@ -625,7 +633,7 @@ if plot_eig:
             eig_mov2 = eig_real_mov2
 
         ax.plot([x_A2, x_A2], [y_A2, y_A2], [z_mov2, z_mov2 + eig_mov2], \
-                linewidth=linewidth, linestyle='-.', label='Mov 2', color='red')
+                linewidth=linewidth, linestyle='-.', label='Inner mass 2', color='red')
 
         z_mov1 = z_A1 + off_mov
         ind_v_mov1 = np_plate + np_mir + np_act + 1
@@ -643,7 +651,7 @@ if plot_eig:
             eig_mov1 = eig_real_mov1
 
         ax.plot([x_A1, x_A1], [y_A1, y_A1], [z_mov1, z_mov1 + eig_mov1], \
-                linewidth=linewidth, linestyle='-.', label='Mov 1', color='red')
+                linewidth=linewidth, linestyle='-.', label='Inner mass 1', color='red')
 
         # print('Eig mir: ' + str(eig_mir))
         # print('Eig act2: ' + str(eig_act2))
@@ -693,6 +701,10 @@ if plot_eig:
         plot_pl._edgecolors2d = plot_pl._edgecolors3d
 
         plt.legend()
+
+        ax.view_init(azim=45)
+
+        plt.savefig(path_fig + 'ActuatedPlate' + str(i) + '.eps', format='eps')
 
 plt.show()
 

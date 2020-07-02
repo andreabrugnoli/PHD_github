@@ -17,13 +17,18 @@ from tools_plotting.animate_surf import animate2D
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as animation
 
+from tools_plotting import setup
+
+from scipy.sparse.linalg import spsolve
+
+
 E = 7e10
 nu = 0.35
 h = 0.05 # 0.01
 rho = 2700  # kg/m^3
 D = E * h ** 3 / (1 - nu ** 2) / 12.
 
-n = 4
+n = 6
 
 
 D_b = as_tensor([
@@ -68,26 +73,27 @@ mesh = UnitSquareMesh(n_x, n_y, quadrilateral=False)
 # plot(mesh)
 # plt.show()
 
-nameFE = 'Bell'
-name_FEp = nameFE
-name_FEq = nameFE
+# nameFE = 'Bell'
+# name_FEp = nameFE
+# name_FEq = nameFE
+#
+# if name_FEp == 'Morley':
+#     deg_p = 2
+# elif name_FEp == 'Hermite':
+#     deg_p = 3
+# elif name_FEp == 'Argyris' or name_FEp == 'Bell':
+#     deg_p = 5
+#
+# if name_FEq == 'Morley':
+#     deg_q = 2
+# elif name_FEq == 'Hermite':
+#     deg_q = 3
+# elif name_FEq == 'Argyris' or name_FEq == 'Bell':
+#     deg_q = 5
 
-if name_FEp == 'Morley':
-    deg_p = 2
-elif name_FEp == 'Hermite':
-    deg_p = 3
-elif name_FEp == 'Argyris' or name_FEp == 'Bell':
-    deg_p = 5
+Vp = FunctionSpace(mesh, 'Argyris', 5)
+Vq = VectorFunctionSpace(mesh, 'DG', 3, dim=3)
 
-if name_FEq == 'Morley':
-    deg_q = 2
-elif name_FEq == 'Hermite':
-    deg_q = 3
-elif name_FEq == 'Argyris' or name_FEq == 'Bell':
-    deg_q = 5
-
-Vp = FunctionSpace(mesh, name_FEp, deg_p)
-Vq = VectorFunctionSpace(mesh, name_FEq, deg_q, dim=3)
 
 V = Vp * Vq
 n_pl = V.dim()
@@ -175,20 +181,24 @@ Bf_pl = assemble(bp_pl, mat_type='aij').vector().get_local()
 
 # Final Assemble
 
-M_sp = csc_matrix(M_pl)
-invM_pl = inv_sp(M_sp)
-invM_pl = invM_pl.toarray()
+M_sparse = csc_matrix(M_pl)
+J_sparse = csc_matrix(J_pl)
+G_sparse = csc_matrix(G_pl)
 
-S = G_pl @ la.inv(G_pl.T @ invM_pl @ G_pl) @ G_pl.T @ invM_pl
+SysJ = spsolve(M_sparse, J_sparse)
+
+prefix = spsolve(M_sparse, G_sparse)
+GMinvGT = csc_matrix(G_sparse.T @ prefix)
+
+Sys_AugJ = csc_matrix(- prefix @ spsolve(GMinvGT, G_sparse.T) @ SysJ)
+Sys_AUGJ = csc_matrix(SysJ + Sys_AugJ)
+
+SysF = spsolve(M_sparse, Bf_pl)
+Sys_AugF = (- prefix @ spsolve(GMinvGT, G_sparse.T) @ SysF).reshape((-1,))
+
+Sys_AUGF = SysF + Sys_AugF
 
 n_tot = n_pl
-I = np.eye(n_tot)
-# Final Assemble
-P = I - S
-
-Jsys = P @ J_pl
-Rsys = P @ R_pl
-Fsys = P @ Bf_pl
 
 
 t0 = 0.0
@@ -197,10 +207,12 @@ n_t = 100
 t_span = [t0, t_fin]
 
 def sys(t,y):
+
+    print(t/t_fin*100)
     if t< 0.2 * t_fin:
         bool_f = 1
     else: bool_f = 0
-    dydt = invM_pl @ ( (Jsys - Rsys) @ y + Fsys * bool_f)
+    dydt = Sys_AUGJ @ y + Sys_AUGF * bool_f
     return dydt
 
 
@@ -263,20 +275,19 @@ for i in range(n_ev):
 
 print(max(Hpl_vec))
 
-fntsize = 16
 fig = plt.figure(0)
-plt.plot(t_ev, Hpl_vec, 'b-', label='Hamiltonian Plate (J)')
-plt.xlabel(r'{Time} (s)', fontsize = fntsize)
-plt.ylabel(r'{Hamiltonian} (J)', fontsize = fntsize)
-plt.title(r"Plate only", fontsize=fntsize)
+plt.plot(t_ev, Hpl_vec, 'b-')
+plt.xlabel(r'{Time} $\mathrm{[s]}$')
+plt.ylabel(r'{Hamiltonian} $\mathrm{[J]}$')
+plt.title(r"Plate only")
 # plt.legend(loc='upper left')
 
 path_out = "/home/a.brugnoli/Plots/Python/Plots/Kirchhoff_plots/Simulations/Article_CDC/InterconnectionRod/"
 path_video = "/home/a.brugnoli/Videos/"
 plt.savefig(path_out + "HamiltonianNoRod.eps", format="eps")
 
-anim = animate2D(minZ, maxZ, wmm_CGvec, t_ev, xlabel = '$x [m]$', ylabel = '$y [m]$', \
-                         zlabel = '$w [mm]$', title = 'Vertical Displacement')
+anim = animate2D(minZ, maxZ, wmm_CGvec, t_ev, xlabel = '$x \; \mathrm{[m]}$', ylabel = '$y \; \mathrm{[m]}$', \
+                         zlabel = '$w \; \mathrm{[mm]}$', title = 'Vertical Displacement')
 
 rallenty = 10
 fps = 20
@@ -285,51 +296,51 @@ writer = Writer(fps= fps, metadata=dict(artist='Me'), bitrate=1800)
 
 
 anim.save(path_out + 'Kirchh_NoRod.mp4', writer=writer)
-#
-plt.show()
 
-# save_solutions = True
-# if save_solutions:
-#
-#
-#     matplotlib.rcParams['text.usetex'] = True
-#
-#     n_fig = 4
-#     tol = 1e-6
-#
-#     for i in range(n_fig):
-#         index = int(n_ev/n_fig*(i+1)-1)
-#         w_fun = Function(Vp)
-#         w_fun.vector()[:] = w_mm[:, index]
-#
-#         Vp_CG = FunctionSpace(mesh, 'Lagrange', 3)
-#         wmm_wCG = project(w_fun, Vp_CG)
-#
-#         from firedrake.plot import _two_dimension_triangle_func_val
-#
-#         triangulation, Z = _two_dimension_triangle_func_val(wmm_wCG, 10)
-#         fig = plt.figure()
-#
-#         ax = fig.add_subplot(111, projection="3d")
-#         ax.collections.clear()
-#
-#         surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False} #, 'vmin': minZ, 'vmax': maxZ}
-#         # lab = 'Time =' + '{0:.2e}'.format(t_ev[index])
-#         surf = ax.plot_trisurf(triangulation, Z, **surf_opts)
-#         # fig.colorbar(surf)
-#
-#         ax.set_xbound(-tol, l_x + tol)
-#         ax.set_xlabel('$x [m]$', fontsize=fntsize)
-#
-#         ax.set_ybound(-tol, l_y + tol)
-#         ax.set_ylabel('$y [m]$', fontsize=fntsize)
-#
-#         ax.w_zaxis.set_major_locator(LinearLocator(10))
-#         ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
-#
-#         ax.set_zlabel('$w [mm]$' +'$(t=$' + '{0:.4f}'.format(t_ev[index]) + '$s)$', fontsize=fntsize)
-#         ax.set_title('Vertical displacement', fontsize=fntsize)
-#
-#         ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
-#
-#         plt.savefig(path_out + "SnapNoRod_t" + str(index + 1) + ".eps", format="eps")
+save_solutions = True
+if save_solutions:
+
+
+    matplotlib.rcParams['text.usetex'] = True
+
+    n_fig = 4
+    tol = 1e-6
+
+    for i in range(n_fig):
+        index = int(n_ev/n_fig*(i+1)-1)
+        w_fun = Function(Vp)
+        w_fun.vector()[:] = w_mm[:, index]
+
+        Vp_CG = FunctionSpace(mesh, 'Lagrange', 3)
+        wmm_wCG = project(w_fun, Vp_CG)
+
+        from firedrake.plot import _two_dimension_triangle_func_val
+
+        triangulation, Z = _two_dimension_triangle_func_val(wmm_wCG, 10)
+        fig = plt.figure()
+
+        ax = fig.add_subplot(111, projection="3d")
+        ax.collections.clear()
+
+        surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False} #, 'vmin': minZ, 'vmax': maxZ}
+        # lab = 'Time =' + '{0:.2e}'.format(t_ev[index])
+        surf = ax.plot_trisurf(triangulation, Z, **surf_opts)
+        # fig.colorbar(surf)
+
+        ax.set_xbound(-tol, l_x + tol)
+        ax.set_xlabel('$x \; \mathrm{[m]}$')
+
+        ax.set_ybound(-tol, l_y + tol)
+        ax.set_ylabel('$y \; \mathrm{[m]}$')
+
+        ax.w_zaxis.set_major_locator(LinearLocator(10))
+        ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
+
+        ax.set_zlabel('$w \; \mathrm{[mm]}$')
+        ax.set_title('Vertical displacement ' +'$(t=$' + '{0:.1f}'.format(1000*t_ev[index]) + '$\; \mathrm{[ms]})$')
+
+        ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
+
+        plt.savefig(path_out + "SnapNoRod_t" + str(index + 1) + ".eps", format="eps")
+
+plt.show()

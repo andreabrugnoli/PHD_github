@@ -19,6 +19,10 @@ from tools_plotting.animate_platerod import animateInt2D
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as animation
 
+from scipy.sparse.linalg import spsolve
+
+from tools_plotting import setup
+
 E = 7e10
 nu = 0.35
 h = 0.05 # 0.01
@@ -29,7 +33,7 @@ L = 1
 l_x = L
 l_y = L
 
-n = 4 #int(input("N element on each side: "))
+n = 6 #int(input("N element on each side: "))
 
 m_rod = 50
 Jxx_rod = 1. / 12 * m_rod * L ** 2
@@ -88,26 +92,26 @@ mesh = UnitSquareMesh(n_x, n_y, quadrilateral=False)
 # plot(mesh)
 # plt.show()
 
-nameFE = 'Bell'
-name_FEp = nameFE
-name_FEq = nameFE
+# nameFE = 'Bell'
+# name_FEp = nameFE
+# name_FEq = nameFE
+#
+# if name_FEp == 'Morley':
+#     deg_p = 2
+# elif name_FEp == 'Hermite':
+#     deg_p = 3
+# elif name_FEp == 'Argyris' or name_FEp == 'Bell':
+#     deg_p = 5
+#
+# if name_FEq == 'Morley':
+#     deg_q = 2
+# elif name_FEq == 'Hermite':
+#     deg_q = 3
+# elif name_FEq == 'Argyris' or name_FEq == 'Bell':
+#     deg_q = 5
 
-if name_FEp == 'Morley':
-    deg_p = 2
-elif name_FEp == 'Hermite':
-    deg_p = 3
-elif name_FEp == 'Argyris' or name_FEp == 'Bell':
-    deg_p = 5
-
-if name_FEq == 'Morley':
-    deg_q = 2
-elif name_FEq == 'Hermite':
-    deg_q = 3
-elif name_FEq == 'Argyris' or name_FEq == 'Bell':
-    deg_q = 5
-
-Vp = FunctionSpace(mesh, name_FEp, deg_p)
-Vq = VectorFunctionSpace(mesh, name_FEq, deg_q, dim=3)
+Vp = FunctionSpace(mesh, 'Argyris', 5)
+Vq = VectorFunctionSpace(mesh, 'DG', 3, dim=3)
 
 V = Vp * Vq
 n_pl = V.dim()
@@ -139,10 +143,8 @@ j_gradgradIP = -inner(Gradgrad_vec(v_p), e_q) * dx
 j_grad = j_gradgrad + j_gradgradIP  #
 j = j_grad
 
-
 J = assemble(j, mat_type='aij')
 M = assemble(m, mat_type='aij')
-
 
 petsc_j = J.M.handle
 petsc_m = M.M.handle
@@ -238,31 +240,38 @@ Rint = la.block_diag(R_pl, R_rod)
 Gint = np.concatenate((G_pl, G_rod), axis=0)
 Bf_int = np.concatenate((Bf_pl, Bf_rod), axis=0)
 
-Mint_sp = csc_matrix(Mint)
-invMint = inv_sp(Mint_sp)
-invMint = invMint.toarray()
+M_sparse = csc_matrix(Mint)
+J_sparse = csc_matrix(Jint)
+G_sparse = csc_matrix(Gint)
 
-S = Gint @ la.inv(Gint.T @ invMint @ Gint) @ Gint.T @ invMint
+SysJ = spsolve(M_sparse, J_sparse)
 
-n_tot = n_pl + n_rod
-I = np.eye(n_tot)
+prefix = spsolve(M_sparse, G_sparse)
+GMinvGT = csc_matrix(G_sparse.T @ prefix)
 
-P = I - S
+Sys_AugJ = csc_matrix(- prefix @ spsolve(GMinvGT, G_sparse.T) @ SysJ)
+Sys_AUGJ = csc_matrix(SysJ + Sys_AugJ)
 
-Jsys = P @ Jint
-Rsys = P @ Rint
-Fsys = P @ Bf_int
+SysF = spsolve(M_sparse, Bf_int)
+Sys_AugF = (- prefix @ spsolve(GMinvGT, G_sparse.T) @ SysF).reshape((-1,))
+
+Sys_AUGF = SysF + Sys_AugF
 
 t0 = 0.0
 t_fin = 0.01
 n_t = 100
 t_span = [t0, t_fin]
 
+n_tot = n_pl + n_rod
+
+
 def sys(t,y):
+    print(t/t_fin*100)
+
     if t< 0.2 * t_fin:
         bool_f = 1
     else: bool_f = 0
-    dydt = invMint @ ( (Jsys - Rsys) @ y + Fsys *bool_f)
+    dydt = Sys_AUGJ @ y + Sys_AUGF * bool_f
     return dydt
 
 
@@ -342,15 +351,13 @@ for i in range(n_ev):
     Hpl_vec[i] = 0.5 * (e_pl[:, i].T @ M_pl @ e_pl[:, i])
     Hrod_vec[i] = 0.5 * (e_rod[:, i].T @ M_rod @ e_rod[:, i])
 
-fntsize = 16
-
 fig = plt.figure()
-plt.plot(t_ev, Hpl_vec, 'b-', label='Hamiltonian Plate (J)')
-plt.plot(t_ev, Hrod_vec, 'r-', label='Hamiltonian Rod (J)')
-plt.plot(t_ev, Hpl_vec + Hrod_vec, 'g-', label='Total Energy (J)')
-plt.xlabel(r'{Time} (s)', fontsize = fntsize)
-plt.ylabel(r'{Hamiltonian} (J)', fontsize = fntsize)
-plt.title(r"Plate and Rod", fontsize=fntsize)
+plt.plot(t_ev, Hpl_vec, 'b-', label='Hamiltonian Plate')
+plt.plot(t_ev, Hrod_vec, 'r-', label='Hamiltonian Rod')
+plt.plot(t_ev, Hpl_vec + Hrod_vec, 'g-', label='Total Energy')
+plt.xlabel(r'{Time} $\mathrm{[s]}$')
+plt.ylabel(r'{Hamiltonian} $\mathrm{[J]}$')
+plt.title(r"Plate and Rod")
 axes = plt.gca()
 axes.set_ylim([0, 200])
 
@@ -362,8 +369,8 @@ path_video = "/home/a.brugnoli/Videos/"
 plt.savefig(path_out + "HamiltonianRod.eps", format="eps")
 
 anim = animateInt2D(minZ, 13, wmm_pl_CGvec, x_rod, y_rod, w_rod_mm, \
-             t_ev, xlabel = '$x [m]$', ylabel = '$y [m]$', \
-                         zlabel = '$w [mm]$', z2label = '$w [mm]$ Rod', title = 'Vertical Displacement')
+             t_ev, xlabel='$x \; \mathrm{[m]}$', ylabel = '$y \; \mathrm{[m]}$', \
+                         zlabel='$w \; \mathrm{[mm]}$', z2label='$w \; \mathrm{[mm]}$ Rod', title='Vertical Displacement')
 
 rallenty = 10
 fps = 20
@@ -372,57 +379,54 @@ writer = Writer(fps= fps, metadata=dict(artist='Me'), bitrate=1800)
 
 anim.save(path_video + 'Kirchh_Rod.mp4', writer=writer)
 
-plt.show()
+save_solutions = True
+if save_solutions:
 
-# save_solutions = True
-# if save_solutions:
-#
-#
-#     matplotlib.rcParams['text.usetex'] = True
-#
-#     n_fig = 4
-#     tol = 1e-6
-#
-#     for i in range(n_fig):
-#         index = int(n_ev/n_fig*(i+1)-1)
-#         w_fun = Function(Vp)
-#         w_fun.vector()[:] = w_pl_mm[:, index]
-#
-#         Vp_CG = FunctionSpace(mesh, 'Lagrange', 3)
-#         wmm_wCG = project(w_fun, Vp_CG)
-#
-#         from firedrake.plot import _two_dimension_triangle_func_val
-#
-#         triangulation, Z = _two_dimension_triangle_func_val(wmm_wCG, 10)
-#         fig = plt.figure()
-#
-#         ax = fig.add_subplot(111, projection="3d")
-#         ax.collections.clear()
-#
-#         surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False} #, 'vmin': minZ, 'vmax': maxZ}
-#         # lab = 'Time =' + '{0:.2e}'.format(t_ev[index])
-#         tri_surf = ax.plot_trisurf(triangulation, Z, **surf_opts)
-#         tri_line = ax.plot(x_rod, y_rod, w_rod_mm[:, index], linewidth = 5, label='Rod $w[mm]$', color='black')
-#
-#         tri_surf._facecolors2d = tri_surf._facecolors3d
-#         tri_surf._edgecolors2d = tri_surf._edgecolors3d
-#         ax.legend(handles=[tri_line[0]])
-#         # fig.colorbar(surf)
-#
-#         ax.set_xbound(-tol, l_x + tol)
-#         ax.set_xlabel('$x [m]$', fontsize=fntsize)
-#
-#         ax.set_ybound(-tol, l_y + tol)
-#         ax.set_ylabel('$y [m]$', fontsize=fntsize)
-#
-#         ax.w_zaxis.set_major_locator(LinearLocator(10))
-#         ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
-#
-#         ax.set_zlabel('$w [mm]$' +'$(t=$' + '{0:.4f}'.format(t_ev[index]) + '$s)$', fontsize=fntsize)
-#         ax.set_title('Vertical displacement', fontsize=fntsize)
-#
-#         ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
-#
-#         plt.savefig(path_out + "SnapRod_t" + str(index + 1) + ".eps", format="eps")
-#
-#         plt.close()
+    matplotlib.rcParams['text.usetex'] = True
+
+    n_fig = 4
+    tol = 1e-6
+
+    for i in range(n_fig):
+        index = int(n_ev/n_fig*(i+1)-1)
+        w_fun = Function(Vp)
+        w_fun.vector()[:] = w_pl_mm[:, index]
+
+        Vp_CG = FunctionSpace(mesh, 'Lagrange', 3)
+        wmm_wCG = project(w_fun, Vp_CG)
+
+        from firedrake.plot import _two_dimension_triangle_func_val
+
+        triangulation, Z = _two_dimension_triangle_func_val(wmm_wCG, 10)
+        fig = plt.figure()
+
+        ax = fig.add_subplot(111, projection="3d")
+        ax.collections.clear()
+
+        surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False} #, 'vmin': minZ, 'vmax': maxZ}
+        # lab = 'Time =' + '{0:.2e}'.format(t_ev[index])
+        tri_surf = ax.plot_trisurf(triangulation, Z, **surf_opts)
+        tri_line = ax.plot(x_rod, y_rod, w_rod_mm[:, index], linewidth=5, label='Rod $w[mm]$', color='black')
+
+        tri_surf._facecolors2d = tri_surf._facecolors3d
+        tri_surf._edgecolors2d = tri_surf._edgecolors3d
+        ax.legend(handles=[tri_line[0]])
+        # fig.colorbar(surf)
+
+        ax.set_xbound(-tol, l_x + tol)
+        ax.set_xlabel('$x \; \mathrm{[m]}$')
+
+        ax.set_ybound(-tol, l_y + tol)
+        ax.set_ylabel('$y \; \mathrm{[m]}$')
+
+        ax.w_zaxis.set_major_locator(LinearLocator(10))
+        ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
+
+        ax.set_zlabel('$w \; \mathrm{[mm]}$')
+        ax.set_title('Vertical displacement ' +'$(t=$' + '{0:.1f}'.format(1000*t_ev[index]) + '$\; \mathrm{[ms]})$', loc='left')
+
+        ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
+
+        plt.savefig(path_out + "SnapRod_t" + str(index + 1) + ".eps", format="eps")
+
+plt.show()

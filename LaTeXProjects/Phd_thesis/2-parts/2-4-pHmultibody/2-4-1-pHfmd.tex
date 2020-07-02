@@ -122,10 +122,7 @@ If \eqref{eq:acc_rP} is put into \eqref{eq:ffb_tr_class}, \eqref{eq:ffb_rot_clas
 	\item Flexibility PDE:
 	\begin{equation}
 	\label{eq:ffb_flex_int}
-	\begin{split}
-	\rho (\dot{\bm{v}}_P + \crmat{\bm\omega_P} \bm{v}_P) + \rho (\crmat{\dot{\bm\omega}_P} + \crmat{\bm{\omega}_P}\crmat{\bm{\omega}_P})\bm{x}_f + \rho (2 \crmat{\bm{\omega}_P} {\bm{v}}_f + \dot{\bm{v}}_f) = \\
-	\Div{\bm\Sigma} + \bm\beta,
-	\end{split}
+	\rho (\dot{\bm{v}}_P + \crmat{\bm\omega_P} \bm{v}_P) + \rho (\crmat{\dot{\bm\omega}_P} + \crmat{\bm{\omega}_P}\crmat{\bm{\omega}_P})\bm{x}_f + \rho (2 \crmat{\bm{\omega}_P} {\bm{v}}_f + \dot{\bm{v}}_f) = \Div{\bm\Sigma} + \bm\beta,
 	\end{equation}
 \end{itemize}
 
@@ -136,10 +133,8 @@ Consider now the term $\crmat{\bm{\omega}_P} \crmat{\bm{\omega}_P} \bm{s}_u$, ap
 Eq. \eqref{eq:ffb_tr_int} is then rewritten as
 \begin{equation}
 \label{eq:ffb_tr_fin}
-\begin{split}
-m\dot{\bm{v}}_P + \crmat{\bm{s}_u}^\top \dot{\bm{\omega}}_P +   \int_{\Omega} \rho \dot{\bm{v}}_f \d{\Omega}  = \\
+m\dot{\bm{v}}_P + \crmat{\bm{s}_u}^\top \dot{\bm{\omega}}_P +   \int_{\Omega} \rho \dot{\bm{v}}_f \d{\Omega}  = 
 \crmat{m \bm{v}_P + \crmat{\bm{s}_u}^\top \bm\omega_P +2 \int_{\Omega} \rho \bm{v}_f \d{\Omega}} \bm\omega_P +  \int_{\Omega} \bm\beta \d{\Omega} + \int_{\partial \Omega} \bm\tau \d{\Gamma}.
-\end{split}
 \end{equation}
 The terms $\crmat{\bm{s}_u} \crmat{\bm{\omega}_P} \bm{v}_P, \; 2\rho \crmat{\bm{x}_f} \crmat{\bm\omega_P} {\bm{v}}_f$, appearing in \eqref{eq:ffb_rot_int} can be rewritten using the Jacobi identity \eqref{eq:jacobi}
 \begin{align}
@@ -159,10 +154,8 @@ Eq. \eqref{eq:ffb_rot_int} is then rewritten as
 Notice that $2 \crmat{\bm{v}_f}\bm{v}_P + 2 \crmat{\bm{v}_P}\bm{v}_f = 0$. Using again the anticommutativity Eq. \eqref{eq:ffb_flex_int} is expressed as 
 \begin{equation}
 \label{eq:ffb_flex_fin}
-\begin{split}
-\rho \dot{\bm{v}}_P + \rho \crmat{\bm{x}_f}^\top \dot{\bm\omega}_P  + \rho \dot{\bm{v}}_f = \\
+\rho \dot{\bm{v}}_P + \rho \crmat{\bm{x}_f}^\top \dot{\bm\omega}_P  + \rho \dot{\bm{v}}_f = 
 \crmat{\rho \bm{v}_P + \rho \crmat{\bm{x}_f}^\top \bm\omega_P + 2 \rho \bm{v}_f} \bm\omega_P + \Div{\bm\Sigma} + \bm\beta.
-\end{split}
 \end{equation}
 Indeed, Eqs. \eqref{eq:ffb_tr_fin}, \eqref{eq:ffb_rot_fin}, \eqref{eq:ffb_flex_fin} are exactly \eqref{eq:ffb_tr_pH}, \eqref{eq:ffb_rot_pH}, \eqref{eq:ffb_flex_pH}.
 \end{proof}
@@ -188,11 +181,10 @@ The momenta (usually called energy variables in the pH framework) are then compu
 \bm{p}_t &:= \diffp{H}{\bm{v}_P} = m \bm{v}_P + \crmat{\bm{s}_u}^\top \, \bm\omega_P + \int_{\Omega} \rho \bm{v}_f \d{\Omega}, \\
 \bm{p}_r &:= \diffp{H}{\bm\omega_P} = \crmat{\bm{s}_u} \bm{v}_P + \bm{J}_u \bm\omega_P + \int_{\Omega} \rho \crmat{\bm{x}_f} \bm{v}_f \d{\Omega}, \\
 \bm{p}_f &:= \diffd{H}{\bm{v}_f} = \rho \bm{v}_P + \rho \crmat{\bm{x}_f}^\top \, \bm\omega_P + \rho \bm{v}_f, \\
-\bm\varepsilon &:= \diffd{H}{\bm\Sigma} = \bm{\mathcal{D}}^{-1} \bm\Sigma,
+\bm\varepsilon &:= \diffd{H}{\bm\Sigma} = \bm{\mathcal{D}}^{-1} \bm\Sigma= \bm{\mathcal{C}} \bm\Sigma,
 \end{aligned}
 \end{equation}
-where the last derivative is computed with respect to a tensor.
-The relation between energy and co-energy variables is then given by
+where the last derivative is computed with respect to a tensor and $\bm{\mathcal{C}}$ is the compliance tensor \eqref{eq:compl3D}. The relation between energy and co-energy variables is then given by
 \begin{equation}
 \label{eq:mass_op}
 \begin{bmatrix}
@@ -202,7 +194,7 @@ The relation between energy and co-energy variables is then given by
 	m \bm{I}_{3\times 3} & \crmat{\bm{s}_u}^\top & \mathcal{I}_\rho^{\Omega} & 0 \\
 	\crmat{\bm{s}_u} & \bm{J}_u & \bm{\mathcal{I}}_{\rho x}^{\Omega} & 0  \\
 	(\mathcal{I}_\rho^{\Omega})^* & (\bm{\mathcal{I}}_{\rho x}^{\Omega})^* & \rho & 0  \\
-	0 & 0 & 0 & \bm{\mathcal{D}}^{-1} \\
+	0 & 0 & 0 & \bm{\mathcal{C}} \\
 	\end{bmatrix}}_{{\mathcal{M}}: \; \text{Mass operator}}
 \begin{bmatrix}
 \bm{v}_P \\ \bm{\omega}_P  \\ \bm{v}_f  \\ \bm\Sigma \\
@@ -447,17 +439,17 @@ To discretize the equation, the dual mixed formulation \ref{sec:dual_mixed} is u
 Recall the port-Hamiltonian representation in co-energy variables of linear elasticity \ref{eq:pHsysElas}
 \begin{equation*}
 \underbrace{\begin{bmatrix}
-	\rho & 0 \\ 0 & \bm{\mathcal{D}}^{-1} \\
+	\rho & 0 \\ 0 & \bm{\mathcal{C}} \\
 	\end{bmatrix}}_{\mathcal{M}}
 \diffp{}{t}
 \begin{pmatrix}
-\bm{e}_1 \\ \bm{E}_2 \\
+\bm{e}_v \\ \bm{E}_\varepsilon \\
 \end{pmatrix} = 
 \underbrace{\begin{bmatrix}
 	0 & \Div \\ \Grad & 0 \\
 	\end{bmatrix}}_{\mathcal{J}}
 \begin{pmatrix}
-\bm{e}_1 \\ \bm{E}_2 \\
+\bm{e}_v \\ \bm{E}_\varepsilon \\
 \end{pmatrix} + 
 \underbrace{\begin{bmatrix}
 	\bm{I} \\ 0 \\
@@ -485,25 +477,25 @@ The total energy is then computed as an inner product modulated by the mass oper
 So the system is lossless and passive with storage function given by the total energy. Once the system is put into weak form and an integration by parts is applied on the $\Div$ operator, it is obtained
 \begin{equation}
 \begin{aligned}
-\inner[L^2(\Omega, \mathbb{R}^3)]{\bm{v}_1}{\rho \partial_t \bm{e}_1} &=- \left\langle {\Grad} (\bm{v}_1), \; \bm{E}_2 \right\rangle_{L^2(\Omega, \mathbb{R}^{3\times 3}_{\text{sym}})} + \inner[L^2(\Omega, \mathbb{R}^3)]{\bm{v}_1}{\bm{u}_\Omega}  + \left\langle \bm{v}_1, \; \bm{u}_\partial \right\rangle_{L^2(\partial \Omega, \mathbb{R}^3)}, \\
-\inner[L^2(\Omega, \mathbb{R}^{3\times 3}_{\text{sym}})]{\bm{V}_2}{\bm{\mathcal{D}}^{-1}\partial_t \bm{e}_2} &=\left\langle \bm{V}_2, \; {\Grad} (\bm{e}_1) \right\rangle_{L^2(\Omega, \mathbb{R}^{3\times 3}_{\text{sym}})}.
+\inner[L^2(\Omega, \mathbb{R}^3)]{\bm{v}_v}{\rho \partial_t \bm{e}_v} &=- \left\langle {\Grad} (\bm{v}_v), \; \bm{E}_\varepsilon \right\rangle_{L^2(\Omega, \mathbb{R}^{3\times 3}_{\text{sym}})} + \inner[L^2(\Omega, \mathbb{R}^3)]{\bm{v}_v}{\bm{u}_\Omega}  + \left\langle \bm{v}_v, \; \bm{u}_\partial \right\rangle_{L^2(\partial \Omega, \mathbb{R}^3)}, \\
+\inner[L^2(\Omega, \mathbb{R}^{3\times 3}_{\text{sym}})]{\bm{V}_\varepsilon}{\bm{\mathcal{C}}\partial_t \bm{E}_\varepsilon} &=\left\langle \bm{V}_\varepsilon, \; {\Grad} (\bm{e}_v) \right\rangle_{L^2(\Omega, \mathbb{R}^{3\times 3}_{\text{sym}})}.
 \end{aligned}
 \end{equation}
 
 The output equation is discretized considering test function $\bm{v}_\partial$ defined over the boundary
 \begin{equation}
-\left\langle \bm{v}_\partial, \; \bm{y}_\partial \right\rangle_{L^2(\partial \Omega, \mathbb{R}^3)} = \left\langle \bm{w}_\partial, \; \bm{e}_1 \right\rangle_{L^2(\partial \Omega, \mathbb{R}^3)}.
+\left\langle \bm{v}_\partial, \; \bm{y}_\partial \right\rangle_{L^2(\partial \Omega, \mathbb{R}^3)} = \left\langle \bm{w}_\partial, \; \bm{e}_v \right\rangle_{L^2(\partial \Omega, \mathbb{R}^3)}.
 \end{equation}
 If a Galerkin method is applied then corresponding test and trial functions are discretized using the same basis
 
 	\begin{equation*}
 	\begin{aligned}
-	\bm{v}_1(\bm{x}) &= \sum_{i=1}^{n_1} \bm{\phi}_1^i(\bm{x}) v_1^i, \\
-	\bm{e}_1(\bm{x},t) &= \sum_{i=1}^{n_1} \bm{\phi}_1^i(\bm{x}) {e}_1^i(t), \\
+	\bm{v}_v(\bm{x}) &= \sum_{i=1}^{n_v} \bm{\phi}_v^i(\bm{x}) v_v^i, \\
+	\bm{e}_v(\bm{x},t) &= \sum_{i=1}^{n_v} \bm{\phi}_v^i(\bm{x}) {e}_v^i(t), \\
 	\end{aligned} \quad
 	\begin{aligned}
-	\bm{V}_2(\bm{x}) &= \sum_{i=1}^{n_2} \bm{\Phi}_2^i(\bm{x}) v_2^i, \\
-	\bm{E}_2(\bm{x},t) &= \sum_{i=1}^{n_2} \bm{\Phi}_2^i(\bm{x}) {e}_2^i(t), \\
+	\bm{V}_\varepsilon(\bm{x}) &= \sum_{i=1}^{n_\varepsilon} \bm{\Phi}_\varepsilon^i(\bm{x}) v_\varepsilon^i, \\
+	\bm{E}_\varepsilon(\bm{x},t) &= \sum_{i=1}^{n_\varepsilon} \bm{\Phi}_\varepsilon^i(\bm{x}) {e}_\varepsilon^i(t), \\
 	\end{aligned} \quad 
 	\begin{aligned}
 	\bm{w}_\partial(\bm{s}) &= \sum_{i=1}^{n_\partial} \bm{\phi}_\partial^i(\bm{s}) w_\partial^i, \\
@@ -515,62 +507,62 @@ If a Galerkin method is applied then corresponding test and trial functions are 
 	\begin{aligned}
 	\underbrace{\begin{bmatrix}
 		\mathbf{M}_\rho & \mathbf{0} \\
-		\mathbf{0} & \mathbf{M}_{\bm{\mathcal{D}}^{-1}} \\
+		\mathbf{0} & \mathbf{M}_{\bm{\mathcal{C}}} \\
 		\end{bmatrix}}_{\mathbf{M}}
 	\begin{pmatrix}
-	\dot{\mathbf{e}}_1 \\
-	\dot{\mathbf{e}}_2 \\
+	\dot{\mathbf{e}}_v \\
+	\dot{\mathbf{e}}_\varepsilon \\
 	\end{pmatrix} &= \underbrace{\begin{bmatrix}
 		\mathbf{0} & -\mathbf{D}_{\Grad}^\top \\
 		\mathbf{D}_{\Grad} & \mathbf{0} \\
 		\end{bmatrix}}_{\mathbf{J}}
 	\begin{pmatrix}
-	\mathbf{e}_{1} \\
-	\mathbf{e}_{2} \\
+	\mathbf{e}_{v} \\
+	\mathbf{e}_{\varepsilon} \\
 	\end{pmatrix} + 
 	\underbrace{\begin{bmatrix}
-		\mathbf{M}_{1}\\
+		\mathbf{M}_{v}\\
 		\mathbf{0}\\
 		\end{bmatrix}}_{\mathbf{B}_\Omega}
 	\mathbf{u}_\Omega
 	+ 
 	\underbrace{\begin{bmatrix}
-		\mathbf{B}_{1}\\
+		\mathbf{B}_{v}\\
 		\mathbf{0}\\
 		\end{bmatrix}}_{\mathbf{B}_\partial}
 	\mathbf{u}_\partial, \\
-	\mathbf{M}_{1} \widetilde{\mathbf{y}}_\Omega &= \begin{bmatrix}
-	\mathbf{M}_{1} & \mathbf{0}
+	\mathbf{M}_{v} \widetilde{\mathbf{y}}_\Omega &= \begin{bmatrix}
+	\mathbf{M}_{v} & \mathbf{0}
 	\end{bmatrix} \begin{pmatrix}
-	\mathbf{e}_{1} \\
-	\mathbf{e}_{2} \\
+	\mathbf{e}_{v} \\
+	\mathbf{e}_{\varepsilon} \\
 	\end{pmatrix},  \\
 	\mathbf{M}_\partial \widetilde{\mathbf{y}}_\partial &= \begin{bmatrix}
-	\mathbf{B}_{1, \partial}^\top & \mathbf{0}
+	\mathbf{B}_{v}^\top & \mathbf{0}
 	\end{bmatrix} \begin{pmatrix}
-	\mathbf{e}_{1} \\
-	\mathbf{e}_{2} \\
+	\mathbf{e}_{v} \\
+	\mathbf{e}_{\varepsilon} \\
 	\end{pmatrix}.
 	\end{aligned}
 	\end{equation}
 	The matrices are defined as follows 
-	\begin{equation}\label{eq:matrices}
+	\begin{equation}\label{eq:matricesElas}
 	\begin{aligned}
-	M_\rho^{ij} &= \inner[L^2(\Omega, \bbR^3)]{\bm\phi_1^i}{\rho \bm\phi_1^j}, \\
-	M_{\bm{\mathcal{D}}^{-1}}^{mn} &= \inner[L^2(\Omega, \bbR^{3\times 3}_{\text{sym}})]{\bm\Phi_2^m}{\bm{\mathcal{D}}^{-1}\bm\Phi_2^n}, \\
-	M_1^{ij} &= \inner[L^2(\Omega, \bbR^3)]{\bm\phi_1^i}{\bm\phi_1^j}, \\
+	M_\rho^{ij} &= \inner[L^2(\Omega, \bbR^3)]{\bm\phi_v^i}{\rho \bm\phi_v^j}, \\
+	M_{\bm{\mathcal{C}}}^{mn} &= \inner[L^2(\Omega, \bbR^{3\times 3}_{\text{sym}})]{\bm\Phi_\varepsilon^m}{\bm{\mathcal{C}}\bm\Phi_\varepsilon^n}, \\
+	M_v^{ij} &= \inner[L^2(\Omega, \bbR^3)]{\bm\phi_v^i}{\bm\phi_v^j}, \\
 	\end{aligned}\quad
 	\begin{aligned}
 	M_\partial^{lk} &= \inner[L^2(\partial \Omega, \mathbb{R}^3)]{\bm\phi_\partial^l}{\bm\phi_\partial^k}, \\
-	{D}_{\Grad}^{mi} &= \inner[L^2(\Omega, \bbR^{3\times 3}_{\text{sym}})]{\bm\Phi_2^m}{\Grad\bm\phi_1^i}, \\
-	{B}_{1}^{ik} &= \inner[L^2(\partial \Omega, \mathbb{R}^3)]{\bm\phi_1^i}{\bm\phi_\partial^k}, \\
+	{D}_{\Grad}^{mi} &= \inner[L^2(\Omega, \bbR^{3\times 3}_{\text{sym}})]{\bm\Phi_\varepsilon^m}{\Grad\bm\phi_v^i}, \\
+	{B}_{v}^{ik} &= \inner[L^2(\partial \Omega, \mathbb{R}^3)]{\bm\phi_1^i}{\bm\phi_\partial^k}, \\
 	\end{aligned}
 	\end{equation}
 	where $i, j \in \left\{1, n_1\right\}, \; m,n \in \left\{1, n_2\right\}, \; l, k \in \left\{1, n_\partial \right\}$. System \eqref{eq:findimEl_ex} is rewritten compactly as
 \begin{equation}
 \begin{aligned}
 \mathbf{M} \dot{\mathbf{e}} &= \mathbf{J} \mathbf{e} + \mathbf{B}_\Omega \mathbf{u}_\Omega + \mathbf{B}_\partial \mathbf{u}_\partial, \\
-\mathbf{y}_\Omega &:= \mathbf{M}_1 \widetilde{\mathbf{y}}_\Omega = \mathbf{B}_\Omega^\top \mathbf{e},  \\
+\mathbf{y}_\Omega &:= \mathbf{M}_v \widetilde{\mathbf{y}}_\Omega = \mathbf{B}_\Omega^\top \mathbf{e},  \\
 \mathbf{y}_\partial &:= \mathbf{M}_\partial \widetilde{\mathbf{y}}_\partial = \mathbf{B}_\partial^\top \mathbf{e}.
 \end{aligned}
 \end{equation}
@@ -578,47 +570,47 @@ If a Galerkin method is applied then corresponding test and trial functions are 
 	\begin{remark}[Connection with standard discretization]
 		A standard finite element discretization of linear elastodynamics provides a system of the form
 		\begin{equation}\label{eq:findim_stand}
-		\mathbf{M}_\rho \ddot{\mathbf{q}} + \mathbf{K} \mathbf{q} = \mathbf{M}_{1}\mathbf{u}_d + \mathbf{B}_{1}\mathbf{u}_\partial,
+		\mathbf{M}_\rho \ddot{\mathbf{q}} + \mathbf{K} \mathbf{q} = \mathbf{M}_{v}\mathbf{u}_\Omega + \mathbf{B}_{v}\mathbf{u}_\partial,
 		\end{equation}
-		where $\mathbf{M}_\rho, \; \mathbf{M}_{1}, \; \mathbf{B}_{1}$ are defined as in \eqref{eq:matrices}. Since the stiffness matrix $\mathbf{K}$ is symmetric and positive definite, it admits the following non unique factorization \cite{horn2012matrix} (see also \cite[Theorem 2]{cohen2005} for the equivalence of standard and mixed finite elements for elastodynamics problems)
+		where $\mathbf{M}_\rho, \; \mathbf{M}_{v}, \; \mathbf{B}_{v}$ are defined as in \eqref{eq:matricesElas}. Since the stiffness matrix $\mathbf{K}$ is symmetric and positive definite, it admits the following non unique factorization \cite{horn2012matrix}
 		\begin{equation*} 
-		\mathbf{K} = \mathbf{D}^\top \mathbf{M}_2^{-1} \mathbf{D}.
+		\mathbf{K} = \mathbf{D}_{\Grad}^\top \mathbf{M}_{\bm{\mathcal{C}}}^{-1} \mathbf{D}_{\Grad}.
 		\end{equation*}
 		Now consider the following new variables
 		\begin{equation*}
-		\mathbf{e}_1 := \dot{\mathbf{q}}, \qquad 
-		\mathbf{e}_2 := \mathbf{M}_2^{-1} \mathbf{D}{\mathbf{q}}. 
+		\mathbf{e}_v := \dot{\mathbf{q}}, \qquad 
+		\mathbf{e}_\varepsilon := \mathbf{M}_{\bm{\mathcal{C}}}^{-1} \mathbf{D}_{\Grad}{\mathbf{q}}. 
 		\end{equation*}
 		Then Sys. \eqref{eq:findim_stand} can be rewritten as
 		\begin{equation}
 		\begin{bmatrix}
-		\mathbf{M}_1 & \mathbf{0} \\
-		\mathbf{0} & \mathbf{M}_2 \\
+		\mathbf{M}_\rho & \mathbf{0} \\
+		\mathbf{0} & \mathbf{M}_{\bm{\mathcal{C}}} \\
 		\end{bmatrix}
 		\begin{pmatrix}
-		\dot{\mathbf{e}}_1 \\
-		\dot{\mathbf{e}}_2 \\
+		\dot{\mathbf{e}}_v \\
+		\dot{\mathbf{e}}_\varepsilon \\
 		\end{pmatrix} = \begin{bmatrix}
-		\mathbf{0} & -\mathbf{D}^\top \\
-		\mathbf{D} & \mathbf{0} \\
+		\mathbf{0} & -\mathbf{D}_{\Grad}^\top \\
+		\mathbf{D}_{\Grad} & \mathbf{0} \\
 		\end{bmatrix}
 		\begin{pmatrix}
-		\mathbf{e}_{1} \\
-		\mathbf{e}_{2} \\
+		\mathbf{e}_{v} \\
+		\mathbf{e}_{\varepsilon} \\
 		\end{pmatrix} + 
 		\begin{bmatrix}
-		\mathbf{M}_{\Omega}\\
+		\mathbf{M}_{v}\\
 		\mathbf{0}\\
 		\end{bmatrix}
 		\mathbf{u}_\Omega
 		+ 
 		\begin{bmatrix}
-		\mathbf{B}_{1}\\
+		\mathbf{B}_{v}\\
 		\mathbf{0}\\
 		\end{bmatrix}
 		\mathbf{u}_\partial,
 		\end{equation}
-		which is exactly \eqref{eq:findimEl_ex}.
+		which is exactly \eqref{eq:findimEl_ex}. The reader may also consult \cite[Theorem 2]{cohen2005} for the equivalence of standard and mixed finite elements for elastodynamics problems.
 	\end{remark}
 
 

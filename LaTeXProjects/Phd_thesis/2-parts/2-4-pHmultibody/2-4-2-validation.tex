@@ -1,23 +1,24 @@
-\chapter{Validation}
+\chapter{Validation}\label{ch:valid}
 
 \epigraph{The logic of validation allows us to move between the two limits of dogmatism and skepticism.}{\textit{The Model of the Text: Meaningful Action Considered as a Text\\
 Paul Ric\oe{}ur}}
 
-
 \minitoc
 
+\lettrine{\color{theme}{N}}umerical simulations are collected in this chapter to assess the correctness of the proposed formulation for flexible multibody dynamics in pH form. Two main sections compose the chapter. The first one is dedicated to systems of beams. The second involves the used of thin plates as mechanical components.
+
 \section{Beam systems}
-\section{Validation}
-\label{sec:valid}
-In this section numerical simulations are performed to assess the correctness of the proposed formulation. {The examples make use of Euler Bernoulli beam model \eqref{eq:EB_sys}. To discretize the system, Lagrange polynomial of order one and Hermite polynomials of order 3 are used for $v_f^x$ and $v_f^y$ respectively. Discontinuous Galerkin elements of order 0 and 1 are selected for $n_x$ and $m_{x}$ respectively. This choice ensures the conformity with respect to the differential operator. As a first example the vertical vibrations of a simply supported beam are considered. To assess the validity of the finite elements, a convergence study with respect to an analytical solution is performed}. A {second} example concerns the computation of eigenvalues of a four bar {mechanism} for different geometrical configuration. The {third} example is a rotating crank-slider. In this case the non-linearities cannot be neglected. The {fourth} example is a hinged beam undergoing external excitations so that the out-of-plane motion becomes important.  The Firedrake python library \cite{rathgeber2017firedrake} is employed to construct the finite-dimensional discretization.  
+The examples presented in this section make use of Euler Bernoulli beam model \eqref{eq:EB_sys}. To discretize the system, Lagrange polynomial of order one and Hermite polynomials of order 3 are used for $v_f^x$ and $v_f^y$ respectively. Discontinuous Galerkin elements of order 0 and 1 are selected for $n_x$ and $m_{x}$ respectively. This choice corresponds to the HerDG1 element \eqref{eq:HerDG1} for the bending behavior and to the CGDG element \eqref{eq:CGDG} for the truss behavior. The {\sc{Firedrake}} python library \cite{rathgeber2017firedrake} is employed to construct the finite-dimensional discretization.  \\
+ 
+The first example concerns the computation of eigenvalues of a four bar mechanism for different geometrical configuration. The second example is a rotating crank-slider. In this case the non-linearities cannot be neglected. The third example is a hinged beam undergoing external excitations so that the out-of-plane motion becomes important.   
 
 
 \subsection{Linear analysis of a four-bar mechanism}
 
 \begin{figure}[tb]
 	\centering
-	\includegraphics[width=0.6\textwidth]{part_4/validation/fourbars.pdf} 
-	\includegraphics[width=0.35\textwidth]{part_4/validation/block_4bars.eps} 
+	\includegraphics[width=0.6\textwidth]{part_4/validation/EB/fourbars.pdf} 
+	\includegraphics[width=0.35\textwidth]{part_4/validation/EB/block_4bars.eps} 
 	\caption{Four bar mechanism illustration (left) and block diagram used for the eigenvalues analysis (right)}
 	\label{fig:4bars}
 \end{figure}
@@ -57,8 +58,8 @@ The resulting system is expressed in pH form as $\mathbf{E}\dot{\mathbf{e}} = \m
 
 \begin{figure}[tb]
 	\centering
-	\includegraphics[width=0.49\textwidth]{part_4/validation/FourBar_Om12_Chebbi.eps} 
-	\includegraphics[width=0.49\textwidth]{part_4/validation/FourBar_Om3_Chebbi.eps} 
+	\includegraphics[width=0.49\textwidth]{part_4/validation/EB/FourBar_Om12_Chebbi.eps} 
+	\includegraphics[width=0.49\textwidth]{part_4/validation/EB/FourBar_Om3_Chebbi.eps} 
 	\caption{Eigenvalues $\omega_i, \ i=1,2,3$ for the four bar mechanism for varying crank angle.}
 	\label{fig:omega_4bars}
 \end{figure}
@@ -68,8 +69,8 @@ To verify the non-linear planar model a crank-slider rotating at high speed is c
 
 \begin{figure}[tb]
 	\centering
-	\includegraphics[width=0.5\textwidth]{part_4/validation/cr_slider.eps} 
-	\includegraphics[width=0.4\textwidth]{part_4/validation/block_crslider.eps} 
+	\includegraphics[width=0.5\textwidth]{part_4/validation/EB/cr_slider.eps} 
+	\includegraphics[width=0.4\textwidth]{part_4/validation/EB/block_crslider.eps} 
 	\caption{Crank slider illustration (left) and block diagram (right)}
 	\label{fig:crsl}
 \end{figure}
@@ -113,8 +114,8 @@ The resulting system is a quasi linear index-2 DAE of the form
 
 \begin{figure}[tb]
 	\centering
-	\includegraphics[width=0.45\textwidth]{part_4/validation/uM_disp.eps} 
-	\includegraphics[width=0.45\textwidth]{part_4/validation/wM_disp.eps} 
+	\includegraphics[width=0.45\textwidth]{part_4/validation/EB/uM_disp.eps} 
+	\includegraphics[width=0.45\textwidth]{part_4/validation/EB/wM_disp.eps} 
 	\caption{Coupler midpoint horizontal (left) and vertical (right) displacement}
 	\label{fig:defM_crsl}
 \end{figure}
@@ -142,15 +143,15 @@ A spatial beam rotating about a spherical joint is considered (see Fig. \ref{fig
 
 \begin{figure}[tb]
 	\centering
-	\includegraphics[width=0.45\textwidth]{part_4/validation/rotbeam_3D.eps} 
+	\includegraphics[width=0.45\textwidth]{part_4/validation/EB/rotbeam_3D.eps} 
 	\caption{Spatial beam on a spherical joint.}
 	\label{fig:beam_3D}
 \end{figure}
 
 \begin{figure}[tb]
 	\centering
-	\includegraphics[width=0.45\textwidth]{part_4/validation/H_3Dbeam.eps} 
-	\includegraphics[width=0.45\textwidth]{part_4/validation/omega_zI.eps} 
+	\includegraphics[width=0.45\textwidth]{part_4/validation/EB/H_3Dbeam.eps} 
+	\includegraphics[width=0.45\textwidth]{part_4/validation/EB/omega_zI.eps} 
 	\caption{Simulation results: kinetic energy (left) and angular velocity about the vertical inertial direction (right).}
 	\label{fig:H_omega}
 \end{figure}
@@ -189,9 +190,278 @@ A spatial beam rotating about a spherical joint is considered (see Fig. \ref{fig
 
 \section{Plate systems}
 \subsection{Boundary interconnection with a rigid element}
+In this section the interconnection of an infinite and finite pH system is explained in both the infinite- and finite-dimensional settings. This paradigm provides an easy way to construct arbitrarily complex system given its basic components. Infinite- and finite-dimensional can be coupled together, making it possible to construct models for complex applications. The interconnection of a flexible plate and a rigid rod along one side of the plate is taken as an illustrative example.
+
+\subsubsection{Infinite-dimensional setting}
+Consider an infinite-dimensional pH system (or distributed pH system, dpH) and a finite-dimensional pH system denoted by equations 
+
+\noindent
+\begin{minipage}{.45\linewidth}
+	\begin{equation}
+	\text{dpH}\qquad
+	\begin{aligned}
+	\partial_t \bm{x}_1 &= \mathcal{J} \delta_{\bm{x}_1} {H_1}, \\
+	\bm{u}_{\partial, 1}  &= \mathcal{B}_\partial \delta_{\bm{x}_1} {H_1}, \\
+	\bm{y}_{\partial, 1} &= \mathcal{C}_\partial \delta_{\bm{x}_1} {H_1}, \\
+	\end{aligned}
+	\end{equation}
+\end{minipage}
+\begin{minipage}{.5\linewidth}
+	\begin{equation}
+	\text{pH} \qquad
+	\begin{aligned}
+	\dot{\mathbf{x}}_2 &= \mathbf{J} \nabla_{\mathbf{x}_2} {H_2} + \mathbf{B} \mathbf{u}_2, \\
+	\mathbf{y}_{2} &= \mathbf{B}^\top \nabla_{\mathbf{x}_2} {H_2}, \\
+	\end{aligned}
+	\end{equation}
+\end{minipage} %
+
+where $\mathbf{x} \in \mathbb{R}^n, \mathbf{u}_2, \mathbf{y}_2 \in \mathbb{R}^m$ and $\bm{x}_1 \in {X}$,  $\bm{u}_{\partial, 1}  \in {U}, \, \bm{y}_{\partial, 1} \in  {Y} = {U}^\prime$ belong to some Hilbert spaces (the prime denotes the topological dual of a space)  and  $\mathcal{B}_\partial: {X} \rightarrow {U}, \; \mathcal{C}_\partial: {X} \rightarrow {Y}$ are boundary operators. The duality pairings for the boundary ports are denoted by
+\[
+\inner[{U} \times {Y}]{\bm{u}_{\partial, 1}}{\bm{y}_{\partial, 1}},  \qquad
+\inner[\mathbb{R}^m]{\mathbf{u}_{2}}{\mathbf{y}_{2}}.
+\]
+For the interconnection, consider the compact operator $\mathcal{W}: Y \rightarrow \mathbb{R}^m$ and the following power preserving interconnection
+\begin{equation}
+\label{eq:int_inf}
+\mathbf{u}_2 = -\mathcal{W} \, \bm{y}_{\partial, 1},  \qquad \bm{u}_{\partial, 1} = \mathcal{W}^* \, \mathbf{y}_2,
+\end{equation}
+where $\mathcal{W}^*$ denotes the adjoint of $\mathcal{W}$. 
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.55\textwidth]{part_4/validation/KP/plate_rod_separated.eps} 
+	\includegraphics[width=0.42\textwidth]{part_4/validation/KP/plate_rod_welded.eps} 
+	\caption{Interconnection of a Kirchhoff plate along its boundary.}
+	\label{fig:sketchRodPlate}
+\end{figure}
+
+As an illustration, a rigid rod welded to the plate is considered  (see Fig. \ref{fig:sketchRodPlate}). The rigid rod, undergoing small displacements about the $z$ axis and small rotation about the $x$ axis, can be written as a pH system in co-energy variables with structure
+\begin{equation}
+\begin{aligned}
+\begin{bmatrix}
+m^{\mathrm{rod}} & 0 \\
+0   & J_G^{\mathrm{rod}} \\
+\end{bmatrix} 
+\displaystyle \diff{}{t}
+\begin{pmatrix}
+v_G \\ \omega_G \\
+\end{pmatrix} & = \begin{pmatrix}
+F_z \\ T_x \\
+\end{pmatrix} = \mathbf{u}_{\text{rod}}\vspace{1mm}, \\
+\mathbf{y}_{\text{rod}} &= \begin{pmatrix}
+v_G \\ \omega_{G} \\
+\end{pmatrix},
+\end{aligned}
+\end{equation}
+with $v_G, \ \omega_{G}, \ J_G^{\mathrm{rod}}$ the linear velocity, angular velocity and rotary inertia about $G$, the center of mass, $m^{\mathrm{rod}}$ the total mass  and $F_z, T_x$ the force along $z$ and the torque along $x$. The Hamiltonian reads $H_{\text{rod}}  = \frac{1}{2} \left(M_G {v_G}^2 + J_G {\omega_G}^2 \right)$. The rod is welded to a rectangular thin plate of sides $L_x, L_y$ on side $x = L_x$. The boundary variables for the plate involved in the interconnection are 
+\begin{equation*}
+u_{\partial, w_t} = \partial_t w(x = L_x, y, t),  \qquad  y_{\partial, w_t} = \widetilde{q}_n(x = L_x, y, t),
+\end{equation*}
+where $w$ is the vertical displacement and $\widetilde{q}_n$ is the effective shear force \eqref{eq:effshearforce}. Space $Y$ is the space of square-integrable functions on with support 
+$$\Gamma_{\text{int}} = \left\{ (x,y) \vert \; x=L_x, 0 \le y \le L_y  \right\}.$$ The compact interconnection operator then reads
+\begin{equation}\label{eq:intKP_infdim}
+\mathcal{W} y_{\partial, w_t} = \begin{pmatrix}
+\int_{\Gamma_{\text{int}}} y_{\partial, w_t} \d{s} \\
+\int_{\Gamma_{\text{int}}} \left( y - L_y/2 \right) y_{\partial, w_t} \d{s} \\
+\end{pmatrix}.
+\end{equation}
+The adjoint operator is then obtained considering that $\mathbf{u}_{\text{rod}} = \mathcal{W} y_{\partial, w_t}$ and that the inner product of $\mathbb{R}^m$ is easily converted to an inner product on the space $L^2(\Gamma_{\text{int}})$ (square-integrable functions on $\Gamma_{\text{int}}$)
+\begin{align*}
+\left\langle \mathcal{W} y_{\partial, w_t}, \; \mathbf{y}_{\text{rod}} \right\rangle_{\mathbb{R}^m} &= \left\langle \mathcal{W}^* \mathbf{y}_{\text{rod}} , \; y_{\partial, w_t} \right\rangle_{L^2(\Gamma_{\text{int}})}, \\
+\mathcal{W}^* \mathbf{y}_{\text{rod}} &= v_G + \omega_{G} \left( y - L_y/2 \right).
+\end{align*}
+
+The interconnection \eqref{eq:int_inf} will ensure that the two components are connected in a power preserving manner.
+
+\subsubsection{Finite-dimensional setting}
+Consider a rectangular plate of size $L_x, L_y$, clamped at $\Gamma_{D} = \left\{(x,y) \vert \;  x=0, \; 0 \le y \le L_y  \right\}$, and welded to a rigid rod on $\Gamma_{\text{int}} = \left\{ (x,y) \vert \;  x=L_x, \; 0 \le y \le L_y  \right\}$. By imposing weakly the boundary conditions as in \eqref{eq:pHsys_findim_bdKir_open}, a finite dimensional system is obtained
+\begin{equation}\label{eq:pHsys_findim_intKir_open}
+\begin{aligned}
+\mathrm{Diag}
+\begin{bmatrix}
+\mathbf{M}_{\rho h}\\
+\mathbf{M}_{\bm{\mathcal{C}}_b}\\
+\mathbf{0}\\
+\mathbf{0}\\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\mathbf{e}}_{w} \\
+\dot{\mathbf{e}}_{\kappa} \\
+\dot{\bm{\lambda}}_{\Gamma_D} \\
+\dot{\bm{\lambda}}_{\widetilde{q}_n, \; \Gamma_{\mathrm{int}}} \\
+\end{pmatrix}
+&= \begin{bmatrix}
+\mathbf{0} & - \mathbf{D}_{\Hess}^\top & \mathbf{B}_{\Gamma_D} & \mathbf{B}_{w, \Gamma_{\mathrm{int}}}\\
+\mathbf{D}_{\Hess} & \mathbf{0} & \mathbf{0} & \mathbf{0} \\
+-\mathbf{B}_{\Gamma_D}^\top & \mathbf{0} & \mathbf{0} & \mathbf{0} \\
+-\mathbf{B}_{w, \Gamma_{\mathrm{int}}}^\top & \mathbf{0} & \mathbf{0} & \mathbf{0} \\
+\end{bmatrix} 
+\begin{pmatrix}
+{\mathbf{e}}_{w} \\
+{\mathbf{e}}_{\kappa} \\
+{\bm{\lambda}}_{\Gamma_D} \\
+{\bm{\lambda}}_{\widetilde{q}_n, \; \Gamma_{\mathrm{int}}} \\
+\end{pmatrix} + 
+\begin{bmatrix}
+\mathbf{0} \\
+\mathbf{0}\\
+\mathbf{0}\\
+\mathbf{M}_{\Gamma_{\mathrm{int}}}\\
+\end{bmatrix}\mathbf{u}_{\partial, w_t}, \\
+\mathbf{M}_{\Gamma_{\mathrm{int}}}\mathbf{y}_{\partial, w_t}
+&= \begin{bmatrix}
+\mathbf{0} &  \mathbf{0} &  \mathbf{0} & \mathbf{M}_{\Gamma_{\mathrm{int}}} \\
+\end{bmatrix}
+\begin{pmatrix}
+{\mathbf{e}}_{w} \\
+{\mathbf{e}}_{\kappa} \\
+{\bm{\lambda}}_{\Gamma_D} \\
+{\bm{\lambda}}_{\widetilde{q}_n, \; \Gamma_{\mathrm{int}}} \\
+\end{pmatrix},
+\end{aligned}
+\end{equation}
+where the Lagrange multiplier ${\bm{\lambda}}_{\Gamma_D}$ contains both the reaction forces and torques whereas ${\bm{\lambda}}_{\widetilde{q}_n, \; \Gamma_{\mathrm{int}}}$ contains only the reaction force $\widetilde{q}_n$ along the interconnected boundary $\Gamma_{\mathrm{int}}$. The rigid rod is written compactly as
+\begin{equation}
+\begin{aligned}
+\mathbf{M}_{\mathrm{rod}} \dot{\mathbf{e}}_{\mathrm{rod}} = \mathbf{u}_{\mathrm{rod}}, \\
+\mathbf{y}_{\mathrm{rod}} = \mathbf{e}_{\mathrm{rod}},
+\end{aligned}
+\end{equation}
+where $\mathbf{e}_{\mathrm{rod}} = [v_G \;  \omega_{G}]^\top, \; \bm{M}_{\text{rod}} = \mathrm{Diag}(M_G, \, J_G)$. The final system is obtained considering the weak form of interconnection \eqref{eq:intKP_infdim}
+\begin{equation}\label{eq:intKP_findim}
+\mathbf{u}_{\mathrm{rod}} = - \mathbf{W} \mathbf{y}_{\partial, w_t}, \qquad \mathbf{M}_{\Gamma_{\mathrm{int}}} \mathbf{u}_{\partial, w_t} = \mathbf{W}^\top \mathbf{y}_{\mathrm{rod}}.
+\end{equation} 
+The interconnection matrix $\mathbf{W}$ is obtained once the operator $\mathcal{W}^*$ is set into weak form
+\begin{align*}
+\mathbf{W}^{\top ij} &= \left\langle \bm{\phi}^i_{w_t}, \; \mathcal{W}^* \bm{\phi}^j_{\mathbb{R}^2} \right\rangle_{L^2(\Gamma_{\text{int}})}, \\
+\mathbf{W}^{\top i} &= \int_{\Gamma_{\text{int}}} [\bm{\phi}^i_{w_t} \quad \bm{\phi}^i_{w_t} (y - L_y/2) ]\d{s},
+\end{align*}
+where $\bm{\phi}^j_{\mathbb{R}^2},  \; \forall j = \{1, 2\}$ is the canonical basis of $\mathbb{R}^2$, and ${\phi}^i_{w_t},  \; \forall i = \{1,n_\partial\}$ is the approximation basis for the boundary variable. Then the augmented system is found plugging \eqref{eq:intKP_findim} into \eqref{eq:pHsys_findim_intKir_open}
+\begin{equation}\label{eq:pHsys_findim_intKir_closed}
+\mathrm{Diag}
+\begin{bmatrix}
+\mathbf{M}_{\rho h}\\
+\mathbf{M}_{\bm{\mathcal{C}}_b}\\
+\mathbf{0}\\
+\mathbf{0}\\
+\mathbf{M}_{\mathrm{rod}}\\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\mathbf{e}}_{w} \\
+\dot{\mathbf{e}}_{\kappa} \\
+\dot{\bm{\lambda}}_{\Gamma_D} \\
+\dot{\bm{\lambda}}_{\widetilde{q}_n, \; \Gamma_{\mathrm{int}}} \\
+\dot{\mathbf{e}}_{\mathrm{rod}} \\
+\end{pmatrix}
+= \begin{bmatrix}
+\mathbf{0} & - \mathbf{D}_{\Hess}^\top & \mathbf{B}_{\Gamma_D} & \mathbf{B}_{w, \Gamma_{\mathrm{int}}} & \mathbf{0}\\
+\mathbf{D}_{\Hess} & \mathbf{0} & \mathbf{0} & \mathbf{0} & \mathbf{0}\\
+-\mathbf{B}_{\Gamma_D}^\top & \mathbf{0} & \mathbf{0} & \mathbf{0} & \mathbf{0} \\
+-\mathbf{B}_{w, \Gamma_{\mathrm{int}}}^\top & \mathbf{0} & \mathbf{0} & \mathbf{0} & \mathbf{W}^\top \\
+\mathbf{0} & \mathbf{0} & \mathbf{0} & - \mathbf{W} & \mathbf{0} \\
+\end{bmatrix} 
+\begin{pmatrix}
+{\mathbf{e}}_{w} \\
+{\mathbf{e}}_{\kappa} \\
+{\bm{\lambda}}_{\Gamma_D} \\
+{\bm{\lambda}}_{\widetilde{q}_n, \;\Gamma_{\mathrm{int}}} \\
+\mathbf{e}_{\mathrm{rod}} \\
+\end{pmatrix}.
+\end{equation}
+
+\subsubsection{Numerical Simulation}
+To validate the approach numerical simulations on system \eqref{eq:pHsys_findim_intKir_closed} are carried out. A  plate clamped in $x=0$ is considered. A final time equal to $t_{\text{end}} = 10 \; \mathrm{[ms]}$ is taken and a vertical distributed force, given by formula
+\begin{equation}\label{eq:force_rod}
+f_w = \begin{cases}
+10^5 \left( y + 10 \left( y - L_y/2 \right)^2 \right) \; \mathrm{[Pa]}, \quad &\forall \, t < 0.2 \, t_{\text{end}}, \\
+0, \quad &\forall \, t \ge 0.2 \, t_{\text{end}},
+\end{cases}
+\end{equation}
+acts on the plate. The rigid rod has mass $M = 50 \; \mathrm{[kg]}$ and length $L_{\text{rod}} = 1 \; \mathrm{[m]}$. The plate parameters and settings for the discretization (a uniform grid is taken) are provided in Table \ref{tab:parKirInt}. The finite element discretization is the same as in \ref{sec:bd_stabKP}.  The constraints are eliminated considering a projection method \cite{benner2015time}.
+
+\begin{table}[hbt]
+	\centering
+	\begin{tabular}{|c|c|}
+		\hline 
+		\multicolumn{2}{|c|}{Plate Parameters} \\ 
+		\hline 
+		$E$ & $70\; \; \mathrm{[GPa]}$ \\ 
+		$\rho$ & $2700\; \; \mathrm{[kg \cdot m^3]}$ \\ 
+		$\nu$& 0.35 \\ 
+		$h/L$& 0.05 \\ 
+		$L_x, \; L_y$& $1\;  \mathrm{[m]}$\\ 
+		\hline 
+	\end{tabular} \hspace{1cm}
+	\begin{tabular}{|c|c|}
+		\hline 
+		\multicolumn{2}{|c|}{Simulation Settings} \\ 
+		\hline 
+		Integrator & Runge-Kutta 45 \\
+		$t_{\text{end}}$ & $10 \; \mathrm{[ms]}$\\
+		N$^\circ$ FE & 6 \\
+		FE space & Argyris $\times$ DG$_3$ $\times$ CG$_2$\\
+		\hline 
+	\end{tabular} 
+	\captionsetup{width=0.95\linewidth}
+	\vspace{1mm}
+	\captionof{table}{Simulation settings and parameters.}
+	\label{tab:parKirInt}
+\end{table}
+
+Snapshots of simulations without and with the rigid rod are reported in Figs. \ref{fig:IntNoRod}, \ref{fig:IntRod}. The deformations undergone by the plate are clearly affected by the presence of the rod: the maximum deformation as well as the Hamiltonian value \ref{fig:HamInt}, once the excitation is removed, are lower when the rigid rod is present. The interconnected side remains straight during the whole simulation, meaning that the constraints are respected.
+
+\begin{figure}[thb]
+	\centering
+	\subfloat[Plate only]{\includegraphics[width=0.5\linewidth]{part_4/validation/KP/HamiltonianNoRod.eps}%
+		\label{fig:H_Norod}}
+	\hfil
+	\subfloat[Plate and rod]{\includegraphics[width=0.5\linewidth]{part_4/validation/KP/HamiltonianRod.eps}%
+		\label{fig:H_rod}}
+	\caption{Hamiltonian trend \ref{fig:H_rod} for the interconnection of a cantilever plate with a rigid rod . For comparison in \ref{fig:H_Norod} the same simulation is performed without including the rod.}
+	\label{fig:HamInt}
+\end{figure}
+
+\begin{figure*}[hp]
+	\centering
+	\subfloat[$t=0.25 \; t_{\text{end}}$]{\includegraphics[width=0.5\linewidth]{part_4/validation/KP/SnapNoRod_t25.eps}%
+		\label{fig:NoRod_1}}
+	\hfil
+	\subfloat[$t=0.5 \; t_{\text{end}}$]{\includegraphics[width=0.5\linewidth]{part_4/validation/KP/SnapNoRod_t50.eps}%
+		\label{fig:NoRod_2}} \\
+	\subfloat[$t=0.75 \; t_{\text{end}}$]{\includegraphics[width=0.5\linewidth]{part_4/validation/KP/SnapNoRod_t75.eps}%
+		\label{fig:NoRod_3}}
+	\hfil
+	\subfloat[$t= t_{\text{end}}$]{\includegraphics[width=0.5\linewidth]{part_4/validation/KP/SnapNoRod_t100.eps}%
+		\label{fig:NoRod_4}}
+	\caption{Snapshots at 4 different times ($t_{\text{end}} = 10 \,[ms]$) of a cantilever plate undergoing solicitation \eqref{eq:force_rod}.}
+	\label{fig:IntNoRod}
+\end{figure*}
+
+\begin{figure*}[hp]
+	\centering
+	\subfloat[$t=0.25 \; t_{\text{end}}$]{\includegraphics[width=0.5\linewidth]{part_4/validation/KP/SnapRod_t25.eps}%
+		\label{fig:Rod_1}}
+	\hfil
+	\subfloat[$t=0.5 \; t_{\text{end}}$]{\includegraphics[width=0.5\linewidth]{part_4/validation/KP/SnapRod_t50.eps}%
+		\label{fig:Rod_2}} \\
+	\subfloat[$t=0.75 \; t_{\text{end}}$]{\includegraphics[width=0.5\linewidth]{part_4/validation/KP/SnapRod_t75.eps}%
+		\label{fig:Rod_3}}
+	\hfil
+	\subfloat[$t= t_{\text{end}}$]{\includegraphics[width=0.5\linewidth]{part_4/validation/KP/SnapRod_t100.eps}%
+		\label{fig:Rod_4}}
+	\caption{Snapshots at 4 different times of a cantilever plate undergoing solicitation \eqref{eq:force_rod}. The plate is connected to a rigid rod in $x = L_x$. Notice the different deformation amplitude with respect to Fig. \ref{fig:IntNoRod}.}
+	\label{fig:IntRod}
+\end{figure*}
+
 \subsection{Actuated plate}
 
 
+Omega full lambda 1: 10.05488286658613
+Omega full lambda 2: 32.820440166701395
+Omega full lambda 3: 34.841016638952
+Omega full lambda 4: 47.23797002941684
+Omega full lambda 5: 63.78852519981024
+Omega full lambda 6: 117.80124510761422
 
 \section{Conclusion}
 
