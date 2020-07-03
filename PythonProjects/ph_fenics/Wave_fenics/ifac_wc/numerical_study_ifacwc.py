@@ -20,6 +20,7 @@ rcParams['text.usetex'] = True
 
 parameters['allow_extrapolation'] = True
 
+save = False 
 ind_ref = 15
 R_ext = 1
 H_file = 'H_dae_' + str(ind_ref) + '.npy'
@@ -274,7 +275,7 @@ for i in range(n_mesh):
         err_eq_ode_allt[j] = errq_ode_t
         
 
-    nt_fin = 500
+    nt_fin = 100
     err_ep_dae[i] = np.linalg.norm(err_ep_dae_allt[:nt_fin])/np.linalg.norm(norm_ep_ref_allt[:nt_fin])
     err_eq_dae[i] = np.linalg.norm(err_eq_dae_allt[:nt_fin])/np.linalg.norm(norm_eq_ref_allt[:nt_fin])
     
@@ -297,8 +298,10 @@ for i in range(n_mesh):
     plt.figure(1)
     plt.plot(t_ref, H_ode_i, label=r'$h = R/$' + str(mesh_ind))
 
-    errHdae[i] = np.sqrt(np.linalg.norm(H_ref - H_dae_i, np.inf))/np.sqrt(np.linalg.norm(H_ref))
-    errHode[i] = np.sqrt(np.linalg.norm(H_ref - H_ode_i, np.inf))/np.sqrt(np.linalg.norm(H_ref))
+    errHdae[i] = np.sqrt(np.linalg.norm(H_ref[:nt_fin] - H_dae_i[:nt_fin],\
+           np.inf))/np.sqrt(np.linalg.norm(H_ref[:nt_fin]))
+    errHode[i] = np.sqrt(np.linalg.norm(H_ref[:nt_fin] - H_ode_i[:nt_fin],\
+           np.inf))/np.sqrt(np.linalg.norm(H_ref[:nt_fin]))
 
 #    errHdae[i] = np.sum(np.abs(H_ref - H_dae_i))/np.sum(np.abs(H_ref))
 #    errHode[i] = np.sum(np.abs(H_ref - H_ode_i))/np.sum(np.abs(H_ref))
@@ -310,12 +313,14 @@ path_figs = "/home/a.brugnoli/Plots/Python/Plots/Waves/IFAC_WC2020/"
 plt.figure(0)
 plt.plot(t_ref, H_ref, label=r'$h_{REF} = R/$' + str(15))
 plt.legend(loc='upper right')
-plt.savefig(path_figs + "Hdae_all.eps", format="eps")
+if save:
+    plt.savefig(path_figs + "Hdae_all.eps", format="eps")
 
 plt.figure(1)
 plt.plot(t_ref, H_ref, label=r'$h_{REF} = R/$' + str(15))
 plt.legend(loc='upper right')
-plt.savefig(path_figs + "Hode_all.eps", format="eps")
+if save:
+    plt.savefig(path_figs + "Hode_all.eps", format="eps")
 
 plt.figure(2)
 plt.plot(t_ref, H_ref, label=r'$H$')
@@ -325,7 +330,8 @@ plt.xlabel(r'Time $\mathrm{[s]}$')
 plt.ylabel(r'Hamiltonian $\mathrm{[J]}$')
 plt.title(r"Reference Hamiltonian")
 plt.legend(loc='upper right')
-plt.savefig(path_figs + "Href.eps", format="eps")
+if save:
+    plt.savefig(path_figs + "Href.eps", format="eps")
 
 # np.save("Hdae_err.npy", errHdae)
 # np.save("Hode_err.npy", errHode)
@@ -356,7 +362,8 @@ plt.ylabel(r'$||H_{REF} - H_{ODE/DAE}||_{L^2}$')
 plt.title(r"$L^2$ norm Hamiltonian difference")
 # plt.yscale('log')
 plt.legend(loc='upper left')
-plt.savefig(path_figs + "Hall_diff.eps", format="eps")
+if save:
+    plt.savefig(path_figs + "Hall_diff.eps", format="eps")
 #
 fig = plt.figure()
 plt.plot(h_vec, err_ep_ode, 'b-', label="ODE")
@@ -366,7 +373,8 @@ plt.ylabel(r'$||p_{REF} - p_{DAE}||_{L^2}$')
 plt.title(r"$L^2$ norm error on p")
 # plt.yscale('log')
 plt.legend(loc='upper left')
-plt.savefig(path_figs + "err_ep.eps", format="eps")
+if save:
+    plt.savefig(path_figs + "err_ep.eps", format="eps")
 
 fig = plt.figure()
 plt.plot(h_vec, err_eq_ode, 'b-',  label="ODE")
@@ -375,8 +383,8 @@ plt.xlabel(r'Mesh size')
 plt.ylabel(r'$||v_{REF} - v_{DAE}||_{L^2}$')
 plt.title(r"$L^2$ norm error on v")
 plt.legend(loc='upper left')
-
-plt.savefig(path_figs + "err_eq.eps", format="eps")
+if save:
+    plt.savefig(path_figs + "err_eq.eps", format="eps")
 
 #
 plt.show()

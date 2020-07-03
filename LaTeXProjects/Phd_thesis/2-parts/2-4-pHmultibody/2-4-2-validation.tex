@@ -5,7 +5,7 @@ Paul Ric\oe{}ur}}
 
 \minitoc
 
-\lettrine{\color{theme}{N}}umerical simulations are collected in this chapter to assess the correctness of the proposed formulation for flexible multibody dynamics in pH form. Two main sections compose the chapter. The first one is dedicated to systems of beams. The second involves the used of thin plates as mechanical components.
+\lettrine{\color{theme}{N}}umerical simulations are collected in this chapter to assess the correctness of the proposed formulation for flexible multibody dynamics in pH form. Two main sections compose the chapter. The first one is dedicated to systems of beams, the second involves the used of thin plates as mechanical components.
 
 \section{Beam systems}
 The examples presented in this section make use of Euler Bernoulli beam model \eqref{eq:EB_sys}. To discretize the system, Lagrange polynomial of order one and Hermite polynomials of order 3 are used for $v_f^x$ and $v_f^y$ respectively. Discontinuous Galerkin elements of order 0 and 1 are selected for $n_x$ and $m_{x}$ respectively. This choice corresponds to the HerDG1 element \eqref{eq:HerDG1} for the bending behavior and to the CGDG element \eqref{eq:CGDG} for the truss behavior. The {\sc{Firedrake}} python library \cite{rathgeber2017firedrake} is employed to construct the finite-dimensional discretization.  \\
@@ -189,6 +189,8 @@ A spatial beam rotating about a spherical joint is considered (see Fig. \ref{fig
 
 
 \section{Plate systems}
+In this section, the Kirchhoff plate model is considered in multibody applications. In the first example a cantilever plate is interconnected to a rigid rod, welded to one side of the plate. The discretization is achieved using the same finite elements as in \ref{sec:bd_stabKP}. The second examples concerns the computation of frequencies of a cantilever plate with in domain actuation. This mechanical system is taken from the experimental setup employed in \cite{preda2020}. The Hellan-Hermann-Johnson elements are used to discretize the plate.
+
 \subsection{Boundary interconnection with a rigid element}
 In this section the interconnection of an infinite and finite pH system is explained in both the infinite- and finite-dimensional settings. This paradigm provides an easy way to construct arbitrarily complex system given its basic components. Infinite- and finite-dimensional can be coupled together, making it possible to construct models for complex applications. The interconnection of a flexible plate and a rigid rod along one side of the plate is taken as an illustrative example.
 
@@ -336,7 +338,7 @@ The interconnection matrix $\mathbf{W}$ is obtained once the operator $\mathcal{
 \mathbf{W}^{\top ij} &= \left\langle \bm{\phi}^i_{w_t}, \; \mathcal{W}^* \bm{\phi}^j_{\mathbb{R}^2} \right\rangle_{L^2(\Gamma_{\text{int}})}, \\
 \mathbf{W}^{\top i} &= \int_{\Gamma_{\text{int}}} [\bm{\phi}^i_{w_t} \quad \bm{\phi}^i_{w_t} (y - L_y/2) ]\d{s},
 \end{align*}
-where $\bm{\phi}^j_{\mathbb{R}^2},  \; \forall j = \{1, 2\}$ is the canonical basis of $\mathbb{R}^2$, and ${\phi}^i_{w_t},  \; \forall i = \{1,n_\partial\}$ is the approximation basis for the boundary variable. Then the augmented system is found plugging \eqref{eq:intKP_findim} into \eqref{eq:pHsys_findim_intKir_open}
+where $\bm{\phi}^j_{\mathbb{R}^2}  \; \forall j = \{1, 2\}$ is the canonical basis of $\mathbb{R}^2$, and ${\phi}^i_{w_t}  \; \forall i = \{1,n_\partial\}$ is the approximation basis for the boundary variable. Then the augmented system is found plugging \eqref{eq:intKP_findim} into \eqref{eq:pHsys_findim_intKir_open}
 \begin{equation}\label{eq:pHsys_findim_intKir_closed}
 \mathrm{Diag}
 \begin{bmatrix}
