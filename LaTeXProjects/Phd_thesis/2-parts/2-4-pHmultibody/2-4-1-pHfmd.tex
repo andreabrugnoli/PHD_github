@@ -252,9 +252,9 @@ The overall port-Hamiltonian formulation, equivalent to Eqs. \eqref{eq:ffb_tr_pH
 \setlength{\dashlinegap}{2pt}
 \underbrace{
 	{\left[ \begin{array}{c:c}
-		\bm{1} & 0 \\
+		\bm{I} & \bm{0} \\
 		\hdashline
-		0 & \mathcal{M} \\
+		\bm{0} & \mathcal{M} \\
 		\end{array} \right]}
 }_{\mathcal{E}}
 \diffp{}{t}
@@ -265,14 +265,14 @@ The overall port-Hamiltonian formulation, equivalent to Eqs. \eqref{eq:ffb_tr_pH
 }_{\bm{e}} = 
 \underbrace{
 	{\left[ \begin{array}{ccc:cccc}
-		0 & 0 & 0 &  \bm{R} & 0 & 0 & 0 \\
-		0 & 0 & 0 & 0 & \crmat{\bm{R}_{\text{v}}} & 0 & 0 \\
-		0 & 0 & 0 & 0 & 0 & \bm{I}_{3\times 3} & 0  \\ 
+		\bm{0} & \bm{0} & \bm{0} &  \bm{R} & \bm{0} & \bm{0} & \bm{0} \\
+		\bm{0} & \bm{0} & \bm{0} & \bm{0} & \crmat{\bm{R}_{\text{v}}} & \bm{0} & \bm{0} \\
+		\bm{0} & \bm{0} & \bm{0} & \bm{0} & \bm{0} & \bm{I}_{3\times 3} & \bm{0}  \\ 
 		\hdashline
-		-\bm{R}^\top & 0 & 0 & 0 & \crmat{\widehat{\bm{p}}_t} & 0 & 0 \\
-		0 & -\crmat{\bm{R}_{\text{v}}}^\top & 0 & \crmat{\widehat{\bm{p}}_t} & \crmat{\widehat{\bm{p}}_r} & \bm{\mathcal{I}}_{p_f}^\Omega & 0 \\
-		0 & 0 & -\bm{I}_{3\times 3} & 0 & -(\bm{\mathcal{I}}_{p_f}^\Omega)^* & 0 & \Div \\
-		0 & 0 & 0 & 0 & 0 & \Grad & 0 \\
+		-\bm{R}^\top & \bm{0} & \bm{0} & \bm{0} & \crmat{\widehat{\bm{p}}_t} & \bm{0} & \bm{0} \\
+		\bm{0} & -\crmat{\bm{R}_{\text{v}}}^\top & \bm{0} & \crmat{\widehat{\bm{p}}_t} & \crmat{\widehat{\bm{p}}_r} & \bm{\mathcal{I}}_{p_f}^\Omega & \bm{0} \\
+		\bm{0} & \bm{0} & -\bm{I}_{3\times 3} & \bm{0} & -(\bm{\mathcal{I}}_{p_f}^\Omega)^* & \bm{0} & \Div \\
+		\bm{0} & \bm{0} & \bm{0} & \bm{0} & \bm{0} & \Grad & \bm{0} \\
 		\end{array} \right]}
 }_{\mathcal{J}}
 \underbrace{\begin{pmatrix}
@@ -326,11 +326,11 @@ Adopting the same nomenclature as in \cite{mehrmann2019structurepreserving}, $\b
 \begin{align*}
 \mathcal{B}_\Omega &= 
 \begin{bmatrix}
-0 & 0 & 0 & \mathcal{I}^\Omega & \bm{\mathcal{I}}_{x}^\Omega & \bm{I} & 0
+\bm{0} & \bm{0} & \bm{0} & \mathcal{I}^\Omega & \bm{\mathcal{I}}_{x}^\Omega & \bm{I} & \bm{0}
 \end{bmatrix}^\top, \\
 \mathcal{B}_r &= 
 \begin{bmatrix}
-0 & 0 & 0 & \mathcal{I}^{\Gamma} & \bm{\mathcal{I}}_{x}^{\Gamma} & 0 & 0 \\
+\bm{0} & \bm{0} & \bm{0} & \mathcal{I}^{\Gamma} & \bm{\mathcal{I}}_{x}^{\Gamma} & \bm{0} & \bm{0} \\
 \end{bmatrix}^\top,
 \end{align*}
 where 
@@ -405,10 +405,10 @@ The power balance equals the power due to body force and surface traction
 	^i\dot{\bm{r}}_P \\ \bm{R}_{\mathrm{v}} \\\dot{\bm{p}}_t \\ \dot{\bm{p}}_r \\
 	\end{pmatrix} = 
 	\begin{bmatrix}
-	0 & 0 & \bm{R} & 0 \\
-	0 & 0 & 0 & \crmat{\bm{R}_{\mathrm{v}}} \\
-	- \bm{R}^\top & 0 & 0 & \crmat{\bm{p}_t}\\
-	0 & -\crmat{\bm{R}_{\mathrm{v}}}^\top & \crmat{\bm{p}_t} & \crmat{\bm{p}_r} \\
+	\bm{0} & \bm{0} &\bm{R} & \bm{0} \\
+	\bm{0} & \bm{0} & \bm{0} & \crmat{\bm{R}_{\mathrm{v}}} \\
+	- \bm{R}^\top & \bm{0} & \bm{0} & \crmat{\bm{p}_t}\\
+	\bm{0} & -\crmat{\bm{R}_{\mathrm{v}}}^\top & \crmat{\bm{p}_t} & \crmat{\bm{p}_r} \\
 	\end{bmatrix}
 	\begin{pmatrix}
 	\partial_{\bm{r}_P} H \\ \partial_{\bm{R}_{\mathrm{v}}} H \\ \bm{v}_P \\ \bm{\omega}_P  \\
@@ -439,20 +439,20 @@ To discretize the equation, the dual mixed formulation \ref{sec:dual_mixed} is u
 Recall the port-Hamiltonian representation in co-energy variables of linear elasticity \ref{eq:pHsysElas}
 \begin{equation*}
 \underbrace{\begin{bmatrix}
-	\rho & 0 \\ 0 & \bm{\mathcal{C}} \\
+	\rho & \bm{0} \\ \bm{0} & \bm{\mathcal{C}} \\
 	\end{bmatrix}}_{\mathcal{M}}
 \diffp{}{t}
 \begin{pmatrix}
 \bm{e}_v \\ \bm{E}_\varepsilon \\
 \end{pmatrix} = 
 \underbrace{\begin{bmatrix}
-	0 & \Div \\ \Grad & 0 \\
+	\bm{0} & \Div \\ \Grad & \bm{0} \\
 	\end{bmatrix}}_{\mathcal{J}}
 \begin{pmatrix}
 \bm{e}_v \\ \bm{E}_\varepsilon \\
 \end{pmatrix} + 
 \underbrace{\begin{bmatrix}
-	\bm{I} \\ 0 \\
+	\bm{I} \\ \bm{0} \\
 	\end{bmatrix}}_{\mathcal{B}_\Omega} \bm{u}_\Omega,
 \end{equation*}
 where $\bm{u}_\Omega$ corresponds to a distributed force. Assuming a Neumann boundary conditions (the normal traction $\bm\tau$ is known at the boundary), this system can be written compactly as a boundary control system
@@ -666,15 +666,15 @@ A thin planar flexible beam is considered as mechanical model. The dependence of
 \label{eq:EB_str_phdae}
 \begin{aligned}
 \begin{bmatrix}
-\bm{1} & 0 \\
-0 & \mathcal{M} \\
+\bm{I} & \bm{0} \\
+\bm{0} & \mathcal{M} \\
 \end{bmatrix}
 \begin{bmatrix}
 \dot{\bm{q}} \\
 \dot{\bm{p}} \\
 \end{bmatrix}
 &= \begin{bmatrix}
-0 & {\mathcal{J}}_{qe} \\
+\bm{0} & {\mathcal{J}}_{qe} \\
 -{\mathcal{J}}_{qe}^* & {\mathcal{J}}_e \\
 \end{bmatrix}
 \begin{bmatrix}
@@ -682,7 +682,7 @@ A thin planar flexible beam is considered as mechanical model. The dependence of
 \bm{p}  \\
 \end{bmatrix} + 
 \begin{bmatrix}
-0 \\
+\bm{0} \\
 {\mathcal{B}}_r \\
 \end{bmatrix} \bm{u}_\partial, \\
 \bm{u}_\partial &= {\mathcal{B}}_{\partial} \bm{p}, \\
@@ -697,7 +697,7 @@ The state and boundary vectors are expressed as
 \bm{y}_\partial &=  [v_{P}^x, \; v_{P}^y, \; \omega_{P}^z, \; v_{C}^x, \; v_{C}^y, \; \omega_{C}^z]^\top.
 \end{align*}
 The state contains the generalized coordinates $\bm{q}$, the linear and angular velocity $v_P^x, \; v_P^y, \; \omega_P^z$ at point $P$, the deformation velocity $ v_f^x, \; v_f^y$ and the traction and bending stress $n_x, \; m_{x}$. The boundary input contains the forces and torques acting at the extremities of the beam, while the boundary output contains the corresponding conjugated variables (velocities and angular velocities).
-The deformation field has to be constrained, to prevent rigid movement (see Remark \ref{rmk:MB_dirich}). The appropriate selection of the boundary condition for the deformation field is an unavoidable problem that depends on the particular case under consideration.  Depending on the application, cantilever or simply supported boundary conditions may be considered (see Sec. \secref{sec:valid})
+The deformation field has to be constrained, to prevent rigid movement (see Remark \ref{rmk:MB_dirich}). The appropriate selection of the boundary condition for the deformation field is an unavoidable problem that depends on the particular case under consideration.  Depending on the application, cantilever or simply supported boundary conditions may be considered
 \begin{equation*}
 \text{Cantilever}
 \begin{cases}
@@ -715,7 +715,7 @@ u_f^y(x=L) = 0. \\
 Partitioning the $\bm{p}$ vector into rigid $\bm{p}_r = [v_P^x, \ v_P^y, \ \omega_P^z]^\top$ and flexible part $\bm{p}_f = [v_f^x, \ v_f^y, \ n_x, \ m_{x}]^\top$, the mass operator is then structured as follows
 \begin{equation}
 \label{eq:EB_M}
-\bm{\mathcal{M}} = 
+{\mathcal{M}} = 
 \left[ \begin{array}{c:c}
 {\mathcal{M}}_{rr} & {\mathcal{M}}_{rf} \\
 \hdashline
@@ -788,9 +788,9 @@ These two operators play the same role as $\Div, \; \Grad$. The 2 PDEs associate
 \label{eq:EB_sys}
 \begin{aligned}
 \begin{bmatrix}
-\mathbf{I} & 0 & 0 \\
-0 & \mathbf{M}_{rr} & \mathbf{M}_{rf}\\ 
-0 & \mathbf{M}_{fr} & \mathbf{M}_{ff}\\
+\mathbf{I} & \mathbf{0} & \mathbf{0} \\
+\mathbf{0} & \mathbf{M}_{rr} & \mathbf{M}_{rf}\\ 
+\mathbf{0} & \mathbf{M}_{fr} & \mathbf{M}_{ff}\\
 \end{bmatrix} 
 \begin{bmatrix}
 \dot{\mathbf{q}} \\ 
@@ -798,7 +798,7 @@ These two operators play the same role as $\Div, \; \Grad$. The 2 PDEs associate
 \dot{\mathbf{p}}_{f} \\ 
 \end{bmatrix} &= 
 \begin{bmatrix}
-0 & \mathbf{J}_{qr}(\mathbf{q}) & \mathbf{J}_{qf} \\
+\mathbf{0} & \mathbf{J}_{qr}(\mathbf{q}) & \mathbf{J}_{qf} \\
 \mathbf{J}_{rq}(\mathbf{q}) & \mathbf{J}_{rr}(\mathbf{p}) & \mathbf{J}_{rf}(\mathbf{p})\\ 
 \mathbf{J}_{fq} & \mathbf{J}_{fr}(\mathbf{p}) & \mathbf{J}_{ff}\\
 \end{bmatrix}  
@@ -808,13 +808,13 @@ These two operators play the same role as $\Div, \; \Grad$. The 2 PDEs associate
 {\mathbf{p}}_{f} \\ 
 \end{bmatrix} + 
 \begin{bmatrix}
-0 \\
+\mathbf{0} \\
 \mathbf{B}_{r} \\ 
 \mathbf{B}_{f} \\ 
 \end{bmatrix}
 \mathbf{u}_\partial, \\
 \mathbf{y}_\partial &= \begin{bmatrix}
-0 \ & \mathbf{B}_{r}^\top & \mathbf{B}_{f}^\top  
+\mathbf{0} \ & \mathbf{B}_{r}^\top & \mathbf{B}_{f}^\top  
 \end{bmatrix} \begin{bmatrix}
 \mathbf{q} \\
 {\mathbf{p}}_{r} \\ 
@@ -822,13 +822,13 @@ These two operators play the same role as $\Div, \; \Grad$. The 2 PDEs associate
 \end{bmatrix},
 \end{aligned}
 \end{equation}
-Matrix $\mathbf{B}_{r} = [\mathbf{I}_{3\times 3}, \; \bm\tau_{CP}^\top]$ accounts for the effect of boundary forces on the rigid part. Matrix $\mathbf{B}_{f}$  is the result of the integration by parts
+Matrix $\mathbf{B}_{r} = [\mathbf{I}_{3\times 3} \quad \bm\tau_{CP}^\top]$ accounts for the effect of boundary forces on the rigid part. Matrix $\mathbf{B}_{f}$  is the result of the integration by parts
 \begin{align*}
 \mathbf{B}_{f} = \begin{bmatrix}
-0_{n_f^{vx} \times 3} & \bm{\phi}_{v_f^x}(L) & 0_{n_f^{vx}} & 0_{n_f^{vx}} \\
-0_{n_f^{vy} \times 3} & 0_{n_f^{vy}} & \bm{\phi}_{v_f^y}(L) & \partial_x \bm{\phi}_{v_f^y}(L) \\
-0_{n_f^{\sigma x} \times 3} & 0_{n_f^{\sigma x}} & 0_{n_f^{\sigma x}} & 0_{n_f^{\sigma x}} \\
-0_{n_f^{\sigma y} \times 3} & 0_{n_f^{\sigma y}} & 0_{n_f^{\sigma y}} & 0_{n_f^{\sigma y}} \\
+\mathbf{0}_{n_f^{vx} \times 3} & \bm{\phi}_{v_f^x}(L) & \mathbf{0}_{n_f^{vx}} & \mathbf{0}_{n_f^{vx}} \\
+\mathbf{0}_{n_f^{vy} \times 3} & \mathbf{0}_{n_f^{vy}} & \bm{\phi}_{v_f^y}(L) & \partial_x \bm{\phi}_{v_f^y}(L) \\
+\mathbf{0}_{n_f^{\sigma x} \times 3} & \mathbf{0}_{n_f^{\sigma x}} & \mathbf{0}_{n_f^{\sigma x}} & \mathbf{0}_{n_f^{\sigma x}} \\
+\mathbf{0}_{n_f^{\sigma y} \times 3} & \mathbf{0}_{n_f^{\sigma y}} & \mathbf{0}_{n_f^{\sigma y}} & \mathbf{0}_{n_f^{\sigma y}} \\
 \end{bmatrix},
 \end{align*}
 where $\bm{\phi}_{v_f^x}, \ \bm{\phi}_{v_f^y}$ are the shape functions for ${v}_f^x, {v}_f^y$ and $\bm{\phi}_{v_f^x}$. Fields ${v}_f^x, {v}_f^y, n_x, m_x$ are approximated using $n_f^{vx}, n_f^{vy}, n_f^{\sigma x}, n_f^{\sigma y}$ degrees of freedom respectively. System \eqref{eq:EB_sys} can be rewritten compactly as
@@ -870,7 +870,7 @@ The gyrator interconnection reads
 This interconnection verifies \eqref{eq:int_balance} and provides the system
 \begin{align*}
 \begin{bmatrix}
-\mathbf{E}_1 & 0 \\ 0 & \mathbf{E}_2 \\
+\mathbf{E}_1 & \mathbf{0} \\ \mathbf{0} & \mathbf{E}_2 \\
 \end{bmatrix}
 \begin{bmatrix}
 \dot{\mathbf{e}}_1 \\ \dot{\mathbf{e}}_2 \\
@@ -884,7 +884,7 @@ This interconnection verifies \eqref{eq:int_balance} and provides the system
 \mathbf{z}_2 \\
 \end{bmatrix}+ 
 \begin{bmatrix}
-\mathbf{B}_1^{\text{ext}} & 0 \\ 0 & \mathbf{B}_2^{\text{ext}} \\
+\mathbf{B}_1^{\text{ext}} & \mathbf{0} \\ \mathbf{0} & \mathbf{B}_2^{\text{ext}} \\
 \end{bmatrix} 
 \begin{bmatrix}
 \mathbf{u}_1^{\text{ext}} \\ \mathbf{u}_2^{\text{ext}} \\
@@ -892,8 +892,8 @@ This interconnection verifies \eqref{eq:int_balance} and provides the system
 \begin{bmatrix}
 \mathbf{y}_1^{\text{ext}} \\ \mathbf{y}_2^{\text{ext}} \\
 \end{bmatrix}  &= \begin{bmatrix}
-\mathbf{B}_1^{\text{ext} \top} & 0 \\
-0 & \mathbf{B}_2^{\text{ext} \top} \\
+\mathbf{B}_1^{\text{ext} \top} & \mathbf{0} \\
+\mathbf{0} & \mathbf{B}_2^{\text{ext} \top} \\
 \end{bmatrix} \begin{bmatrix}
 \mathbf{z}_1 \\ 
 \mathbf{z}_2 \\
@@ -909,17 +909,17 @@ The transformer interconnection reads
 Again, this interconnection verifies \eqref{eq:int_balance}. After the interconnection the final system is differential algebraic:
 \begin{align*}
 \begin{bmatrix}
-\mathbf{E}_1 & 0 & 0 \\ 
-0 & \mathbf{E}_2 & 0 \\
-0 & 0 & 0 \\
+\mathbf{E}_1 & \mathbf{0} & \mathbf{0} \\ 
+\mathbf{0} & \mathbf{E}_2 & \mathbf{0} \\
+\mathbf{0} & \mathbf{0} & \mathbf{0} \\
 \end{bmatrix}
 \begin{bmatrix}
 \dot{\mathbf{e}}_1 \\ \dot{\mathbf{e}}_2 \\ \dot{\bm{\lambda}} \\
 \end{bmatrix} &= 
 \begin{bmatrix}
-\mathbf{J}_1 & 0 & -\mathbf{B}_1^{\text{int}} \mathbf{C} \\ 
-0 & \mathbf{J}_2 & \mathbf{B}_2^{\text{int}} \\
-\mathbf{C}^\top \mathbf{B}_1^{\text{int} \top} & - \mathbf{B}_2^{\text{int} \top} & 0 \\
+\mathbf{J}_1 & \mathbf{0} & -\mathbf{B}_1^{\text{int}} \mathbf{C} \\ 
+\mathbf{0} & \mathbf{J}_2 & \mathbf{B}_2^{\text{int}} \\
+\mathbf{C}^\top \mathbf{B}_1^{\text{int} \top} & - \mathbf{B}_2^{\text{int} \top} & \mathbf{0} \\
 \end{bmatrix}
 \begin{bmatrix}
 \mathbf{z}_1 \\ 
@@ -927,7 +927,9 @@ Again, this interconnection verifies \eqref{eq:int_balance}. After the interconn
 \bm{\lambda} \\
 \end{bmatrix}+ 
 \begin{bmatrix}
-\mathbf{B}_1^{\text{ext}} & 0 \\ 0 & \mathbf{B}_2^{\text{ext}} \\ 0 & 0 \\
+\mathbf{B}_1^{\text{ext}} & \mathbf{0} \\
+\mathbf{0} & \mathbf{B}_2^{\text{ext}} \\
+\mathbf{0} & \mathbf{0} \\
 \end{bmatrix} 
 \begin{bmatrix}
 \mathbf{u}_1^{\text{ext}} \\ 
@@ -936,8 +938,8 @@ Again, this interconnection verifies \eqref{eq:int_balance}. After the interconn
 \begin{bmatrix}
 \mathbf{y}_1^{\text{ext}} \\ \mathbf{y}_2^{\text{ext}} \\
 \end{bmatrix}  &= \begin{bmatrix}
-\mathbf{B}_1^{\text{ext} \top} & 0 & 0 \\
-0 & \mathbf{B}_2^{\text{ext} \top} & 0 \\
+\mathbf{B}_1^{\text{ext} \top} & \mathbf{0} & \mathbf{0} \\
+\mathbf{0} & \mathbf{B}_2^{\text{ext} \top} & \mathbf{0} \\
 \end{bmatrix} \begin{bmatrix}
 \mathbf{z}_1 \\ 
 \mathbf{z}_2 \\
@@ -985,23 +987,23 @@ The transformer interconnection
 \mathbf{u}_1^{\text{int}} = -\mathbf{R}(\theta) \mathbf{u}_2^{\text{int}}, \qquad
 \mathbf{y}_2^{\text{int}} = \mathbf{R}(\theta)^\top \mathbf{y}_1^{\text{int}},
 \end{equation}
-imposes the constraints on the velocity level and gives rise to a quasi-linear index 2 pHDAE (see Appendix A for the index definition):
+imposes the constraints on the velocity level and gives rise to a quasi-linear index 2 pHDAE:
 
 \begin{equation}
 \label{eq:int_beams}
 \begin{aligned}
 \begin{bmatrix}
-\mathbf{E}_1 & 0 & 0 \\ 
-0 & \mathbf{E}_2 & 0 \\
-0 & 0 & 0 \\
+\mathbf{E}_1 & \mathbf{0} & \mathbf{0} \\ 
+\mathbf{0} & \mathbf{E}_2 & \mathbf{0} \\
+\mathbf{0} & \mathbf{0} & \mathbf{0} \\
 \end{bmatrix}
 \begin{bmatrix}
 \dot{\mathbf{e}}_1 \\ \dot{\mathbf{e}}_2 \\ \dot{\bm{\lambda}} \\
 \end{bmatrix} &= 
 \begin{bmatrix}
-\mathbf{J}_1(\mathbf{e}_1) & 0 & -\mathbf{B}_1^{\text{int}} \mathbf{R} \\ 
-0 & \mathbf{J}_2(\mathbf{e}_2) & \mathbf{B}_2^{\text{int}} \\
-\mathbf{R}^\top \mathbf{B}_1^{\text{int} \top} & - \mathbf{B}_2^{\text{int} \top} & 0 \\
+\mathbf{J}_1(\mathbf{e}_1) & \mathbf{0} & -\mathbf{B}_1^{\text{int}} \mathbf{R} \\ 
+\mathbf{0} & \mathbf{J}_2(\mathbf{e}_2) & \mathbf{B}_2^{\text{int}} \\
+\mathbf{R}^\top \mathbf{B}_1^{\text{int} \top} & - \mathbf{B}_2^{\text{int} \top} & \mathbf{0} \\
 \end{bmatrix}
 \begin{bmatrix}
 \mathbf{z}_1  \\ 
@@ -1009,7 +1011,9 @@ imposes the constraints on the velocity level and gives rise to a quasi-linear i
 \bm{\lambda} \\
 \end{bmatrix}+ 
 \begin{bmatrix}
-\mathbf{B}_{\partial 1}^{\text{ext}} & 0 \\ 0 & \mathbf{B}_{\partial 2}^{\text{ext}} \\ 0 & 0 \\
+\mathbf{B}_{\partial 1}^{\text{ext}} & \mathbf{0} \\
+\mathbf{0} & \mathbf{B}_{\partial 2}^{\text{ext}} \\
+\mathbf{0} & \mathbf{0} \\
 \end{bmatrix} 
 \begin{bmatrix}
 \mathbf{u}_1^{\text{ext}} \\ 
@@ -1018,8 +1022,8 @@ imposes the constraints on the velocity level and gives rise to a quasi-linear i
 \begin{bmatrix}
 \mathbf{y}_1^{\text{ext}} \\ \mathbf{y}_2^{\text{ext}} \\
 \end{bmatrix}  &= \begin{bmatrix}
-\mathbf{B}_{\partial 1}^{\text{ext} \top} & 0 & 0 \\
-0 & \mathbf{B}_{\partial 2}^{\text{ext} \top} & 0 \\
+\mathbf{B}_{\partial 1}^{\text{ext} \top} & \mathbf{0} & \mathbf{0} \\
+\mathbf{0} & \mathbf{B}_{\partial 2}^{\text{ext} \top} & \mathbf{0} \\
 \end{bmatrix} \begin{bmatrix}
 \mathbf{z}_1  \\ 
 \mathbf{z}_2  \\ 
@@ -1036,25 +1040,25 @@ The same result can be obtained by using a pHDAE system and a gyrator interconne
 \begin{equation}
 \begin{aligned}
 \begin{bmatrix}
-\mathbf{E}_2 & 0 \\
-0 & 0 \\
+\mathbf{E}_2 & \mathbf{0} \\
+\mathbf{0} & \mathbf{0} \\
 \end{bmatrix} \begin{bmatrix}
 \dot{\mathbf{e}}_2 \\
 \dot{\bm{\lambda}}_2 \\
 \end{bmatrix}
 &= \begin{bmatrix}
 \mathbf{J}_2(\mathbf{e}_2) & \mathbf{B}_2^{\text{int}} \\
--\mathbf{B}_2^{\text{int} \top} & 0\\
+-\mathbf{B}_2^{\text{int} \top} & \mathbf{0}\\
 \end{bmatrix} \begin{bmatrix}
 \mathbf{z}_2 \\
 {\bm{\lambda}}_2
 \end{bmatrix} 
 + \begin{bmatrix}
-0 \\
+\mathbf{0} \\
 \mathbf{I}
 \end{bmatrix} \mathbf{u}_2^{\text{int}} + \begin{bmatrix}
 \mathbf{B}_2^{\text{ext}} \\
-0 \\
+\mathbf{0} \\
 \end{bmatrix} \mathbf{u}_2^{\text{ext}},  \vspace{2mm} \\
 \mathbf{y}_2^{\text{int}} &= {\bm{\lambda}}_2, \\
 \mathbf{y}_2^{\text{ext}} &= \mathbf{B}_2^{\text{ext} \top} \mathbf{z}_2.
@@ -1081,46 +1085,46 @@ If the angular velocities and the relative orientations are small then the syste
 \begin{equation}
 \label{eq:mbd_linear}
 \begin{bmatrix}
-\mathbf{M}_{rr} & \mathbf{M}_{rf} & 0 \\ 
-\mathbf{M}_{fr} & \mathbf{M}_{ff} & 0 \\
-0 & 0 & 0 \\
+\mathbf{M}_{rr} & \mathbf{M}_{rf} & \mathbf{0} \\ 
+\mathbf{M}_{fr} & \mathbf{M}_{ff} & \mathbf{0} \\
+\mathbf{0} & \mathbf{0} & \mathbf{0} \\
 \end{bmatrix}
 \begin{bmatrix}
 \dot{\mathbf{p}}_r \\ \dot{\mathbf{p}}_f \\ \dot{\bm{\lambda}} \\ 
 \end{bmatrix} = 
 \begin{bmatrix}
-0 & 0 & \mathbf{G}_r^\top \\ 
-0 & \mathbf{J}_{ff} & \mathbf{G}_f^\top \\ 
--\mathbf{G}_r & -\mathbf{G}_f & 0 \\
+\mathbf{0} & \mathbf{0} & \mathbf{G}_r^\top \\ 
+\mathbf{0} & \mathbf{J}_{ff} & \mathbf{G}_f^\top \\ 
+-\mathbf{G}_r & -\mathbf{G}_f & \mathbf{0} \\
 \end{bmatrix}
 \begin{bmatrix}
 \mathbf{p}_r \\ \mathbf{p}_f \\ {\bm{\lambda}} \\ 
 \end{bmatrix} + 
 \begin{bmatrix}
-\mathbf{B}_r \\ \mathbf{B}_f \\ 0 \\
+\mathbf{B}_r \\ \mathbf{B}_f \\ \mathbf{0} \\
 \end{bmatrix}\mathbf{u}.
 \end{equation}
 The Hamiltonian is now a quadratic function of the state variables $H = \frac{1}{2} \mathbf{p}^\top\mathbf{M}\mathbf{p}$ \cite{beattie2018linear}.
 The modular construction of complex multi-body systems is then analogous to a substructuring technique \cite{klerk2008}, where the velocities and forces are linked at the interconnection points. Such system can be reduced using Krylov subspace method directly on the DAE formulation \cite{egger2018}. The basic idea relies on the construction of a subspace $\mathbf{V}_f^{\text{red}}$ for the vector $\mathbf{p}_f$ such that $\mathbf{p}_f \approx \mathbf{V}_f^{\text{red}} \mathbf{p}_f^{\text{red}}$. The reduced system then reads
 \begin{equation}
 \begin{bmatrix}
-\mathbf{M}_{rr} & \mathbf{M}_{rf}^{\text{red}} & 0 \\ 
-\mathbf{M}_{fr}^{\text{red}} & \mathbf{M}_{ff}^{\text{red}} & 0 \\
-0 & 0 & 0 \\
+\mathbf{M}_{rr} & \mathbf{M}_{rf}^{\text{red}} & \mathbf{0} \\ 
+\mathbf{M}_{fr}^{\text{red}} & \mathbf{M}_{ff}^{\text{red}} & \mathbf{0} \\
+\mathbf{0} & \mathbf{0} & \mathbf{0} \\
 \end{bmatrix}
 \begin{bmatrix}
 \dot{\mathbf{p}}_r \\ \dot{\mathbf{p}}_f^{\text{red}} \\ \dot{\bm{\lambda}} \\ 
 \end{bmatrix} = 
 \begin{bmatrix}
-0 & 0 & \mathbf{G}_r^\top \\ 
-0 & \mathbf{J}_{ff}^{\text{red}} & \mathbf{G}_f^{\text{red} \top} \\ 
--\mathbf{G}_r & -\mathbf{G}_f^{\text{red}} & 0 \\
+\mathbf{0} & \mathbf{0} & \mathbf{G}_r^\top \\ 
+\mathbf{0} & \mathbf{J}_{ff}^{\text{red}} & \mathbf{G}_f^{\text{red} \top} \\ 
+-\mathbf{G}_r & -\mathbf{G}_f^{\text{red}} & \mathbf{0} \\
 \end{bmatrix}
 \begin{bmatrix}
 \mathbf{p}_r \\ \mathbf{p}_f^{\text{red}} \\ {\bm{\lambda}} \\ 
 \end{bmatrix} + 
 \begin{bmatrix}
-\mathbf{B}_r \\ \mathbf{B}_f^{\text{red}} \\ 0 \\
+\mathbf{B}_r \\ \mathbf{B}_f^{\text{red}} \\ \mathbf{0} \\
 \end{bmatrix}\mathbf{u},
 \end{equation}
 where the second row has been pre-multiplied by $\mathbf{V}_f^{\text{red} \top}$. Alternatively, a null space matrix can employed to eliminate the Lagrange multiplier and preserve the port-Hamiltonian structure. Consider the pHDAE \eqref{eq:mbd_linear}, where the differential and algebraic parts are explicitly separated
@@ -1128,7 +1132,7 @@ where the second row has been pre-multiplied by $\mathbf{V}_f^{\text{red} \top}$
 \begin{equation}
 \begin{aligned}
 \mathbf{M} \dot{\mathbf{p}} &=  \mathbf{J}\mathbf{p} + \mathbf{G}^\top \bm{\lambda} + \mathbf{B}\mathbf{u}, \\ 
-0 &= \mathbf{G}\mathbf{p},
+\mathbf{0} &= \mathbf{G}\mathbf{p},
 \end{aligned}
 \end{equation}
 and consider a matrix $\mathbf{P}$ that satisfies 

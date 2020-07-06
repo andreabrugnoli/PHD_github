@@ -52,7 +52,7 @@ L_1 \sin(\theta_1)+L_2 \sin(\theta_1+\theta_2)+L_3 \sin(\theta_1+\theta_2+\theta
 \end{align*} 
 Once the angles describing the geometrical configuration are known, the transformer interconnection \eqref{eq:int_hinge} is applied to insert a revolute joint between adjacent links. For the deformation field a cantilever condition is imposed for each beam. The resulting system is then constrained to ground by imposing to following equalities
 \begin{equation*}
-\mathbf{v}_{P_1} = 0, \quad \omega^z_{P_1} = 0, \quad \mathbf{v}_{C_3} = 0.
+\mathbf{v}_{P_1} = \mathbf{0}, \quad \omega^z_{P_1} = 0, \quad \mathbf{v}_{C_3} = \mathbf{0}.
 \end{equation*}
 The resulting system is expressed in pH form as $\mathbf{E}\dot{\mathbf{e}} = \mathbf{J} \mathbf{e}$. The eigenfrequencies are then found by solving the generalized eigenvalue problem $\mathbf{E}\bm{\Phi} = \mathbf{J} \bm{\Phi \Lambda}$. Since $\mathbf{J}$ is skew-symmetric the eigenvalues will be imaginary $\bm{\Lambda} = j \bm{\Omega}$. The first three pulsations  are reported in Fig. \ref{fig:omega_4bars} for different values of the crank angle $\theta_1$. The results match those of \cite{chebbi2017} (labeled as TITOP in the figure), assessing the validity of the linear model.
 
@@ -85,28 +85,28 @@ where $\mathbf{R}_y$ is the second line of the rotation matrix and ${\theta}_{P_
 \end{equation*} 
 has to be written in the coupler reference frame to get the input
 \begin{equation*}
-\mathbf{u}_{\text{cl}} = R(\theta_{P_1})^\top \mathbf{v}_{\text{cr}}.
+\mathbf{u}_{\text{cl}} = \mathbf{R}(\theta_{P_1})^\top \mathbf{v}_{\text{cr}}.
 \end{equation*}
 The resulting system is a quasi linear index-2 DAE of the form
 \begin{equation*}
 \begin{bmatrix}
-\mathbf{M} & 0 & 0 \\
-0 & 0 & 0 \\
-0 & 0 & 0 \\
+\mathbf{M} & \mathbf{0} & \mathbf{0} \\
+\mathbf{0} & \mathbf{0} & \mathbf{0} \\
+\mathbf{0} & \mathbf{0} & \mathbf{0} \\
 \end{bmatrix}
 \begin{bmatrix}
 \dot{\mathbf{e}} \\ \dot{\bm{\lambda}}_0 \\ \dot{\bm{\lambda}}_u \\
 \end{bmatrix}= 
 \begin{bmatrix}
 \mathbf{J}(\mathbf{e}) & \mathbf{G}_0^\top(\theta_{P_1}) & \mathbf{G}_u^\top \\
--\mathbf{G}_0(\theta_{P_1}) & 0 & 0 \\
--\mathbf{G}_u & 0 & 0 \\
+-\mathbf{G}_0(\theta_{P_1}) & \mathbf{0} & \mathbf{0} \\
+-\mathbf{G}_u & \mathbf{0} & \mathbf{0} \\
 \end{bmatrix}
 \begin{bmatrix}
 \mathbf{e} \\ \bm{\lambda}_0 \\ \bm{\lambda}_u \\
 \end{bmatrix} + 
 \begin{bmatrix}
-0 \\ 0 \\ R(\theta_{P_1})^\top \\
+\mathbf{0} \\ \mathbf{0} \\ \mathbf{R}(\theta_{P_1})^\top \\
 \end{bmatrix}
 \mathbf{v}_{\text{cr}}.
 \end{equation*}
@@ -189,7 +189,7 @@ A spatial beam rotating about a spherical joint is considered (see Fig. \ref{fig
 
 
 \section{Plate systems}
-In this section, the Kirchhoff plate model is considered in multibody applications. In the first example a cantilever plate is interconnected to a rigid rod, welded to one side of the plate. The discretization is achieved using the same finite elements as in \ref{sec:bd_stabKP}. The second examples concerns the computation of frequencies of a cantilever plate with in domain actuation. This mechanical system is taken from the experimental setup employed in \cite{preda2020}. The Hellan-Hermann-Johnson elements are used to discretize the plate.
+In this section, the Kirchhoff plate model is considered in multibody applications. In the first example a cantilever plate is interconnected to a rigid rod, welded to one side of the plate. The discretization is achieved using the same finite elements as in \secref{sec:bd_stabKP}. The second examples concerns the computation of frequencies of a cantilever plate with in domain actuation. This mechanical system is taken from the experimental setup employed in \cite{preda2020}. The Hellan-Hermann-Johnson elements are used to discretize the plate.
 
 \subsection{Boundary interconnection with a rigid element}
 In this section the interconnection of an infinite and finite pH system is explained in both the infinite- and finite-dimensional settings. This paradigm provides an easy way to construct arbitrarily complex system given its basic components. Infinite- and finite-dimensional can be coupled together, making it possible to construct models for complex applications. The interconnection of a flexible plate and a rigid rod along one side of the plate is taken as an illustrative example.
@@ -228,7 +228,14 @@ For the interconnection, consider the compact operator $\mathcal{W}: Y \rightarr
 \label{eq:int_inf}
 \mathbf{u}_2 = -\mathcal{W} \, \bm{y}_{\partial, 1},  \qquad \bm{u}_{\partial, 1} = \mathcal{W}^* \, \mathbf{y}_2,
 \end{equation}
-where $\mathcal{W}^*$ denotes the adjoint of $\mathcal{W}$. 
+where $\mathcal{W}^*$ denotes the adjoint of $\mathcal{W}$ (cf. Fig. \ref{fig:interconnection_dpH_pH}). 
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.6\textwidth]{part_4/validation/KP/pp_interconnection.eps} 
+	\caption{Boundary interconnection between an infinite- and a finite-dimensional pH systems.}
+	\label{fig:interconnection_dpH_pH}
+\end{figure}
+
 \begin{figure}[tb]
 	\centering
 	\includegraphics[width=0.55\textwidth]{part_4/validation/KP/plate_rod_separated.eps} 
@@ -414,12 +421,12 @@ Snapshots of simulations without and with the rigid rod are reported in Figs. \r
 
 \begin{figure}[thb]
 	\centering
-	\subfloat[Plate only]{\includegraphics[width=0.5\linewidth]{part_4/validation/KP/HamiltonianNoRod.eps}%
-		\label{fig:H_Norod}}
-	\hfil
 	\subfloat[Plate and rod]{\includegraphics[width=0.5\linewidth]{part_4/validation/KP/HamiltonianRod.eps}%
 		\label{fig:H_rod}}
-	\caption{Hamiltonian trend \ref{fig:H_rod} for the interconnection of a cantilever plate with a rigid rod . For comparison in \ref{fig:H_Norod} the same simulation is performed without including the rod.}
+	\hfil
+	\subfloat[Plate only]{\includegraphics[width=0.5\linewidth]{part_4/validation/KP/HamiltonianNoRod.eps}%
+		\label{fig:H_Norod}}
+	\caption{Hamiltonian trend \ref{fig:H_rod} for the interconnection of a cantilever plate with a rigid rod. For comparison in \ref{fig:H_Norod} the same simulation is performed without including the rod.}
 	\label{fig:HamInt}
 \end{figure}
 
@@ -435,7 +442,7 @@ Snapshots of simulations without and with the rigid rod are reported in Figs. \r
 	\hfil
 	\subfloat[$t= t_{\text{end}}$]{\includegraphics[width=0.5\linewidth]{part_4/validation/KP/SnapNoRod_t100.eps}%
 		\label{fig:NoRod_4}}
-	\caption{Snapshots at 4 different times ($t_{\text{end}} = 10 \,[ms]$) of a cantilever plate undergoing solicitation \eqref{eq:force_rod}.}
+	\caption{Snapshots at 4 different times of a cantilever plate undergoing solicitation \eqref{eq:force_rod}.}
 	\label{fig:IntNoRod}
 \end{figure*}
 
@@ -457,13 +464,185 @@ Snapshots of simulations without and with the rigid rod are reported in Figs. \r
 
 \subsection{Actuated plate}
 
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.95\textwidth]{part_4/validation/KP/setup_sanfe.jpg} 
+	\caption{Experimental setup used in \cite{preda2020}. Top down photo of the system (left), schematic diagram of the setup (right).}
+	\label{fig:setup_sanfe}
+\end{figure}
 
+In this section, the experimental setup presented in \cite{preda2020} is modeled using the pH framework. The setup is composed by a cantilever plate controlled by means of two proof-mass actuators and a mirror used to reflect a laser beam for measuring the end-point deflection (see Fig. \ref{fig:setup_sanfe}).
+This system can be constructed modularly considering each component separately. 
+
+\subsubsection{Modular modelling of the system}
+In this section, the model for each component is detailed. The final system is obtained by imposing the appropriate transformer interconnections.
+
+\paragraph{Cantilever plate.} The cantilever plate is model as in Sec. \ref{sec:bd_stabKP}. The difference is that now the force at the free boundary are null and that the other components interact with the plate system by means of reaction forces within the domain $\Omega = (0, L_x) \times (0, L_y)$. The forces exerted by the external components can be modelled by a delta distribution. Then the continuous model can be written as the following distributional system
+
+\begin{equation}
+\begin{aligned}
+\begin{bmatrix}
+\rho h & 0 \\ 
+\bm{0} & \bm{\mathcal{C}_b} \\
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+e_w \\ \bm{E}_\kappa \\
+\end{pmatrix} &= 
+\begin{bmatrix}
+0 & -\div\Div \\ 
+\Hess & \bm{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+e_w \\ \bm{E}_\kappa \\
+\end{pmatrix} + 
+\sum_{i = 1}^{n_{\mathrm{comp}}} 
+\begin{bmatrix}
+1 & -\partial_y & \partial_x \\
+\bm{0} & \bm{0} & \bm{0} \\
+\end{bmatrix} \delta(\bm{x} - \bm{x}_{P_i}) \mathbf{u}_{P_i}, \\
+\mathbf{y}_{P_i} &= \delta(\bm{x} - \bm{x}_{P_i}) \begin{bmatrix}
+1 & \bm{0} \\
+-\partial_y & \bm{0} \\
+\partial_x & \bm{0} \\
+\end{bmatrix}  \begin{pmatrix}
+e_w \\ \bm{E}_\kappa \\
+\end{pmatrix}, \qquad \forall i \in \{1, n_{\mathrm{comp}}\}
+\end{aligned}
+\end{equation}
+where $n_{\mathrm{comp}}$ is the number of external components, $\bm{x}_{P_i}$ is the attachment point of the $i$-th component, $\mathbf{u}_{P_i} = [F_{P_i}^z \; T_{P_i}^x \; T_{P_i}^y]^\top$ contains the external force along $z$ and the external torques along $x$ and $y$. The torques undergo a derivation, analogously to what happens for the effective shear force at the boundary (cf. Eq. \eqref{eq:effshearforce}). This derivation affects  $\delta(\bm{x} - \bm{x}_{P_i})$, the Dirac delta placed at $\bm{x}_{P_i}$. In the adjoint of the control operator the derivation operator and the Dirac distribution swap their positions
+\begin{equation*}
+\mathcal{B}_{\Omega, i} =
+\begin{bmatrix}
+1 & -\partial_y & \partial_x \\
+\bm{0} & \bm{0} & \bm{0} \\
+\end{bmatrix} \delta(\bm{x} - \bm{x}_{P_i}), \qquad 
+\mathcal{B}_{\Omega, i}^* = \delta(\bm{x} - \bm{x}_{P_i}) \begin{bmatrix}
+1 & \bm{0} \\
+-\partial_y & \bm{0} \\
+\partial_x & \bm{0} \\
+\end{bmatrix}.
+\end{equation*} 
+The model is subjected to the following homogeneous boundary conditions
+\begin{align*}
+\begin{aligned}
+\partial_t e_w|_{\Gamma_D} &= 0, \\
+\partial_x e_w|_{\Gamma_D} &= 0, \\
+\end{aligned} \qquad 
+\begin{aligned}
+-\bm{n} \cdot \Div \bm{E}_\kappa - \partial_{\bm{s}} (\bm{E}_\kappa \cddot (\bm{n} \otimes \bm{s}))|_{\Gamma_N}&=0,\\
+\bm{E}_\kappa \cddot (\bm{n}\otimes \bm{n})|_{\Gamma_N}&=0, \; \\
+\end{aligned} .
+\end{align*}
+where ${\Gamma_D} = \left\{y = 0 \right\}, \; {\Gamma_N} = \left\{x = 0 \cup x=L_x \cup y=L_y \right\}$.
+
+\paragraph{Proof-mass actuator model.}
+A proof-mass actuator is mathematically modelled by a hollow cylinder casing of mass $m_{c_i}, \; i \in \{1,2\}$ and inertia with respect to the center of mass $\mathbf{J}_{c_i}=\mathrm{Diag}(J_{c_i}^{xx}, \; J_{c_i}^{yy})$. The casing is connected to a spring-damper-mass system of stiffness $k_i$, damping $c_i$ and internal mass $m_i$. The overall model for this system is the written in co-energies pH form as 
+
+\begin{equation}
+\begin{aligned}
+\begin{bmatrix}
+m_{c_i} & 0 & 0 & 0 & 0\\
+0 & {J}_{c_i}^{xx} & 0 & 0 & 0 \\
+0 & 0 & {J}_{c_i}^{yy} & 0 & 0 \\
+0 & 0 & 0 & m_i & 0 \\
+0 & 0 & 0 & 0 & k_i \\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{v}_{c_i} \\
+\dot{\omega}_{c_i}^x \\
+\dot{\omega}_{c_i}^y \\
+\dot{v}_i \\
+\dot{\Delta x}_i \\
+\end{pmatrix} &= 
+\begin{bmatrix}
+c_i & 0 & 0 & -c_i & k_i\\
+0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 \\
+-c_i & 0 & 0 & c_i & -k_i \\
+-k_i & 0 & 0 & k_i & 0 \\
+\end{bmatrix}
+\begin{pmatrix}
+{v}_{c_i} \\
+{\omega}_{c_i}^x \\
+{\omega}_{c_i}^y \\
+{v}_i \\
+{\Delta x}_i \\
+\end{pmatrix}
++ \begin{bmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1 \\
+0 & 0 & 0 \\
+0 & 0 & 0 \\
+\end{bmatrix} \mathbf{u}_{A_i}, \\
+\mathbf{y}_{A_i} &= \begin{bmatrix}
+1 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 \\
+\end{bmatrix}
+\begin{pmatrix}
+{v}_{c_i} \\
+{\omega}_{c_i}^x \\
+{\omega}_{c_i}^y \\
+{v}_i \\
+{\Delta x}_i \\
+\end{pmatrix},
+\end{aligned}
+\end{equation}
+where $v_{c_i}$ is the velocity of the casing at its center of mass, $\omega_{c_i}^x, \; _{c_i}^y$ are the angular velocities of the casing, $v_i$ is the velocity of the internal mass and $\Delta x_i$ is the elongation of the spring. $\bm{u}_{A_i} = [F_{A_i}^z, \;  T_{A_i}^x, \;  T_{A_i}^y]^\top$ are the external forces and torques acting on the casing.
+
+\paragraph{Mirror model.} The mirror is a simple L-shaped rigid body with mass $m_m$ and inertia $\mathbf{J}_m = \mathrm{Diag}({J}_{m}^{xx}, {J}_{m}^{yy})$
+
+\begin{equation}
+\begin{aligned}
+\begin{bmatrix}
+m_{m} & 0 & 0\\
+0 & {J}_{m}^{xx} & {J}_{m}^{xy} \\
+0 & {J}_{m}^{xy} & {J}_{m}^{yy} \\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{v}_{m} \\
+\dot{\omega}_{m}^x \\
+\dot{\omega}_{m}^y \\
+\end{pmatrix} &= 
+\begin{bmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1 \\
+\end{bmatrix}\mathbf{u}_M, \\
+\mathbf{y}_M &= \begin{bmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1 \\
+\end{bmatrix}
+\begin{pmatrix}
+{v}_{m} \\
+{\omega}_{m}^x \\
+{\omega}_{m}^y \\
+\end{pmatrix},
+\end{aligned}
+\end{equation}
+
+where $v_{m}$ is the velocity of the mirror at its center of mass and $\omega_{c_i}^x, \; _{c_i}^y$ its angular velocities. $\mathbf{u}_M = [F_{M}^z, \;  T_{M}^x, \;  T_{M}^y]^\top$ are the external forces and torques acting on the mirror.
+
+\paragraph{Assembly of the model}
+The overall model is obtained interconnecting each components to the others by means of transformer interconnections
+\begin{align*}
+\mathbf{u}_{P_i}
+\end{align*}
+
+
+
+
+\subsubsection{Numerical results}
 Omega full lambda 1: 10.05488286658613
 Omega full lambda 2: 32.820440166701395
 Omega full lambda 3: 34.841016638952
 Omega full lambda 4: 47.23797002941684
 Omega full lambda 5: 63.78852519981024
 Omega full lambda 6: 117.80124510761422
+
 
 \section{Conclusion}
 

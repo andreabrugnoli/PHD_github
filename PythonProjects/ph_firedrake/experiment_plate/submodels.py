@@ -287,9 +287,9 @@ def plate_model(nx, ny, r):
     RR[:n_p, :n_p] = beta_M * MM[:n_p, :n_p]
     RR[:n_p, n_p:] = - beta_K * DD
 
-    fz_P1 = v_p*delta_app(pos_P1)*dx
-    mx_P1 = v_p.dx(1)*delta_app(pos_P1)*dx
-    my_P1 = -v_p.dx(0)*delta_app(pos_P1)*dx
+    fz_P1 = v_p*delta_app(pos_P1) * dx
+    mx_P1 = v_p.dx(1)*delta_app(pos_P1) * dx
+    my_P1 = -v_p.dx(0)*delta_app(pos_P1) * dx
 
     fz_P2 = v_p * delta_app(pos_P2) * dx
     mx_P2 = v_p.dx(1) * delta_app(pos_P2) * dx
@@ -372,6 +372,10 @@ np_act = actuator.n_p
 pl_mir = SysPhdaeRig.transformer_ordered(plate, mirror, [6, 7, 8], [0, 1, 2], np.eye(3))
 plmir_act2 = SysPhdaeRig.transformer_ordered(pl_mir, actuator, [3, 4, 5], [0, 1, 2], np.eye(3))
 model_all = SysPhdaeRig.transformer_ordered(plmir_act2, actuator, [0, 1, 2], [0, 1, 2], np.eye(3))
+
+# pl_mir = SysPhdaeRig.transformer_ordered(plate, mirror, [6], [0], np.eye(1))
+# plmir_act2 = SysPhdaeRig.transformer_ordered(pl_mir, actuator, [3], [0], np.eye(1))
+# model_all = SysPhdaeRig.transformer_ordered(plmir_act2, actuator, [0], [0], np.eye(1))
 
 print(model_all.n)
 C_model_all = np.zeros((1, model_all.n_e))
@@ -516,7 +520,6 @@ plot_eig = True
 if plot_eig:
 
     n_fig = n_om
-    fntsize = 16
     linewidth = 2
 
     for i in range(n_fig):
@@ -534,11 +537,11 @@ if plot_eig:
         figure = plt.figure(i)
         ax = figure.add_subplot(111, projection="3d")
 
-        ax.set_xlabel('$x [m]$', fontsize=fntsize)
+        ax.set_xlabel('$x [m]$')
         ax.set_xlim((-0.01, 0.05))
-        ax.set_ylabel('$y [m]$', fontsize=fntsize)
+        ax.set_ylabel('$y [m]$')
         ax.set_ylim((0, 0.3))
-        ax.set_title('Eigenvector $\psi_w$ n$^\circ$ '+str(i+1), fontsize=fntsize)
+        ax.set_title('Eigenvector $\psi_w$ n$^\circ$ '+str(i+1))
 
         ax.w_zaxis.set_major_locator(LinearLocator(10))
         ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
@@ -633,7 +636,9 @@ if plot_eig:
             eig_mov2 = eig_real_mov2
 
         ax.plot([x_A2, x_A2], [y_A2, y_A2], [z_mov2, z_mov2 + eig_mov2], \
-                linewidth=linewidth, linestyle='-.', label='Inner mass 2', color='red')
+                linewidth=linewidth, linestyle='-', label='Inner mass 2', color='blue')
+        # ax.plot([x_A2], [y_A2], [z_mov2 + eig_mov2], \
+        #         linewidth=10, linestyle='-o', label='Inner mass 2', color='blue')
 
         z_mov1 = z_A1 + off_mov
         ind_v_mov1 = np_plate + np_mir + np_act + 1
@@ -651,7 +656,9 @@ if plot_eig:
             eig_mov1 = eig_real_mov1
 
         ax.plot([x_A1, x_A1], [y_A1, y_A1], [z_mov1, z_mov1 + eig_mov1], \
-                linewidth=linewidth, linestyle='-.', label='Inner mass 1', color='red')
+                linewidth=linewidth, linestyle='-', label='Inner mass 1', color='red')
+        # ax.plot([x_A1], [y_A1], [z_mov1 + eig_mov1], \
+        #         linewidth=10, linestyle='-o', label='Inner mass 1', color='black')
 
         # print('Eig mir: ' + str(eig_mir))
         # print('Eig act2: ' + str(eig_act2))
@@ -704,7 +711,7 @@ if plot_eig:
 
         ax.view_init(azim=45)
 
-        plt.savefig(path_fig + 'ActuatedPlate' + str(i) + '.eps', format='eps')
+        # plt.savefig(path_fig + 'ActuatedPlate' + str(i+1) + '.eps', format='eps')
 
 plt.show()
 

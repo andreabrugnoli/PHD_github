@@ -406,7 +406,7 @@ if save_solutions:
         surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False} #, 'vmin': minZ, 'vmax': maxZ}
         # lab = 'Time =' + '{0:.2e}'.format(t_ev[index])
         tri_surf = ax.plot_trisurf(triangulation, Z, **surf_opts)
-        tri_line = ax.plot(x_rod, y_rod, w_rod_mm[:, index], linewidth=5, label='Rod $w[mm]$', color='black')
+        tri_line = ax.plot(x_rod, y_rod, w_rod_mm[:, index], linewidth=5, label='Rod', color='black')
 
         tri_surf._facecolors2d = tri_surf._facecolors3d
         tri_surf._edgecolors2d = tri_surf._edgecolors3d
@@ -423,7 +423,7 @@ if save_solutions:
         ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
 
         ax.set_zlabel('$w \; \mathrm{[mm]}$')
-        ax.set_title('Vertical displacement ' +'$(t=$' + '{0:.1f}'.format(1000*t_ev[index]) + '$\; \mathrm{[ms]})$', loc='left')
+        ax.set_title('Vertical displacement ' +'$(t=$' + '{0:.1f}'.format(1000*t_ev[index]) + '$\; \mathrm{[ms]})$', loc='center')
 
         ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
 
