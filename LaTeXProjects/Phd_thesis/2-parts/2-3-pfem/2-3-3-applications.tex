@@ -14,8 +14,7 @@
 
 \section{Boundary stabilization}\label{sec:bd_stab}
 
-In this section, we consider the boundary stabilization of a cantilever Kirchhoff plate of the irrotational shallow water equations. For pHs a simple proportional gain assures asymptotic system of the system thanks to the LaSalle’ invariance principle \cite[chapter
-6, proposition 6.2]{duindam2009}. This can be used to achieve stabilization of the undeformed configuration of the Kirchhoff plate. For the shallow water equation a reference is also added to stabilizes the system around a certain fluid height.
+In this section, we consider the boundary stabilization of a cantilever Kirchhoff plate of the irrotational shallow water equations. For pHs a simple proportional gain assures asymptotic system of the system thanks to the LaSalle’ invariance principle \cite[Proposition 6.2]{duindam2009}. This can be used to achieve stabilization of the undeformed configuration of the Kirchhoff plate. For the shallow water equations a reference is also added to stabilizes the system around a certain fluid height.
 
 
 \subsection{Cantilever Kirchhoff plate}\label{sec:bd_stabKP}
@@ -289,25 +288,25 @@ The corresponding output reads
  The initial conditions are
 \begin{equation}
 \begin{aligned}
-\alpha_h(x, y, 0) = h_{*} + 10^{-1} \sin(\pi r/R) \cos(2 \theta), \qquad r = \sqrt{x^2 + y^2}, \qquad \theta = \arctan(y/r), \\
-\bm\alpha_v(x, y, 0) = \bm{0},
+\alpha_h(x, y, 0) &= h^{\text{des}} + 10^{-1} \sin(\pi r/R) \cos(2 \theta), \qquad r = \sqrt{x^2 + y^2}, \qquad \theta = \arctan(y/r), \\
+\bm\alpha_v(x, y, 0) &= \bm{0},
 \end{aligned}
 \end{equation}
-where $ h_{*}$ is the desired fluid height. It is known that a proportional controller exponentially stabilizes the system \cite{dos2008boundary}. Here, we use a simple control for stabilizing the system around the desired point $h^*$
+where $ h^{\text{des}}$ is the desired fluid height. It is known that a proportional controller exponentially stabilizes the system \cite{dos2008boundary}. Here, we use a simple control for stabilizing the system around the desired point $h^*$
 \begin{equation}\label{eq:ctrllaw_SWE}
-u_\partial = -k (y_\partial - y_\partial^*), \qquad y_\partial^*= \rho g h^*, \quad k>0.
+u_\partial = -k (y_\partial - y_\partial^{\text{des}}), \qquad y_\partial^{\text{des}}= \rho g h^{\text{des}}, \quad k>0.
 \end{equation}
 This control law ensures that the Lyapunov functional
 \begin{equation}
-	V = \frac{1}{2} \int_{\Omega}\left\{\frac{1}{2} \rho g (\alpha_h - \alpha_h^*)^2 + \frac{1}{2\rho} \alpha_h \norm{\bm{\alpha}_v}^2 \right\} d\Omega \ge 0,
+	V = \frac{1}{2} \int_{\Omega}\left\{\frac{1}{2} \rho g (\alpha_h - \alpha_h^{\text{des}})^2 + \frac{1}{2\rho} \alpha_h \norm{\bm{\alpha}_v}^2 \right\} d\Omega \ge 0,
 \end{equation}
-where $\alpha_h^*=h^*$, has negative semi definite time derivative
+where $\alpha_h^{\text{des}}=h^{\text{des}}$, has negative semi definite time derivative
 \begin{equation}
-	\dot{V} = -k \int_{\partial \Omega}\left({y}_\partial - {y}_\partial^* \right)^2 \d{\Gamma} \le 0.
+	\dot{V} = -k \int_{\partial \Omega}\left({y}_\partial - {y}_\partial^{\text{des}} \right)^2 \d{\Gamma} \le 0.
 \end{equation}
 By the LaSalle' principle \cite{henry2006geometric} the point 
 \begin{equation}
-	\alpha_h = h^*, \qquad \bm{\alpha}_v = \bm{0},
+	\alpha_h = h^{\text{des}}, \qquad \bm{\alpha}_v = \bm{0},
 \end{equation}
 is asymptotically stable. \\
 
@@ -341,9 +340,9 @@ The discretization is performed as in \eqref{eq:pHsys_findim_shwater}. Variable 
 \end{equation}
 The control law \eqref{eq:ctrllaw_SWE}, once discretized, is expressed as
 \begin{equation}
-	\mathbf{u}_\partial = -k (\mathbf{y}_\partial - \mathbf{y}_\partial^*),
+	\mathbf{u}_\partial = -k (\mathbf{y}_\partial - \mathbf{y}_\partial^{\text{des}}),
 \end{equation}
-where $\mathbf{y}_\partial^* = \mathbf{M}_\partial^{-1}\int_{\partial\Omega} \rho g h_* \phi_\partial(s) \d\Gamma$. The closed loop system is then
+where $\mathbf{y}_\partial^{\text{des}} = \mathbf{M}_\partial^{-1}\int_{\partial\Omega} \rho g h^{\text{des}} \phi_\partial(s) \d\Gamma$. The closed loop system is then
 \begin{equation}\label{eq:pHsys_findim_shwater_ctrlcl}
 \begin{pmatrix}
 \dot{\bm{\alpha}}_{d, h} \\
@@ -361,7 +360,7 @@ where $\mathbf{y}_\partial^* = \mathbf{M}_\partial^{-1}\int_{\partial\Omega} \rh
 \mathbf{B}_h \\
 \mathbf{0}\\
 \end{bmatrix}
-k \mathbf{y}_\partial^*, 
+k \mathbf{y}_\partial^{\text{des}}, 
 \end{equation}
 Again the matrix 
 \begin{equation*}
@@ -381,7 +380,7 @@ is positive definite and the discretized Lyapunov function rate reads
 		$\rho$ & $1000\; \mathrm{[kg \cdot m^3]}$ \\ 
 		$g$& $10\; \mathrm{[m/s^2]}$ \\ 
 		$R$& $1\; \mathrm{[m]}$\\ 
-		$h^*$& $1\; \mathrm{[m]}$ \\ 
+		$h^{\text{des}}$& $1\; \mathrm{[m]}$ \\ 
 		\hline 
 	\end{tabular} \hspace{1cm}
 	\begin{tabular}{|c|c|}
@@ -782,14 +781,14 @@ e_p \\
 where $e_p \in \mathbb{R}$  and $\bm{e}_v \in \mathbb{R}^3$ denote the variations of pressure and velocity from a steady state, $\mu_0$ is the steady state mass density, and $\chi_s$ represents a constant adiabatic compressibility factor. With $x, r, \theta$ we denote the axial, radial and tangential cylindrical coordinates.  The domain is cylindrical duct of length $L$ and radius $R$. The following boundary conditions are imposed (see Fig. \ref{fig:bc_part_vibro_3D})
 
 \begin{figure}[t]
-	\begin{minipage}[b]{0.5\linewidth}
+	\begin{minipage}[b]{0.48\linewidth}
 		\centering
 		\includegraphics[width=1\columnwidth]{part_3/applications/mixed_bd_waves/bc_3D_sketch.eps} \\
 		\caption{Boundary conditions for the 3D vibroacoustic problem.}
 		\label{fig:bc_part_vibro_3D}
 	\end{minipage}
 	\hspace{0.5cm}
-	\begin{minipage}[b]{0.5\linewidth}
+	\begin{minipage}[b]{0.48\linewidth}
 		\centering
 	\includegraphics[width=1\columnwidth]{part_3/applications/mixed_bd_waves/bc_2D_sketch.eps} \\
 	\caption{Boundary conditions for the reduced 2D vibroacoustic problem.}
@@ -1520,7 +1519,7 @@ In Figs. \ref{fig:disp_at1}, \ref{fig:temp_at1} the analytical and numerical dis
 
 \section{Conclusion}
 In this chapter the Partitioned Finite Element method has been employed for a number of problems.
-Thanks to this method, a structured and general numerical implementation of interconnected infinite-dimensional system is available. For what concerns the mixed boundary conditions enforcement, there is a point that require further investigation: the usage of Lagrange multiplier for the weak imposition of the boundary conditions is absolutely non trivial as the subspace employed for the multiplier has to carefully designed \cite{pitkaranta1979boundary,pitkaranta1980local,pitkaranta1981finite}.
+Thanks to this method, a structured and general numerical implementation of interconnected infinite-dimensional system is available. For what concerns the mixed boundary conditions enforcement, there is a point that require further investigation: the usage of Lagrange multiplier for the weak imposition of the boundary conditions is absolutely non trivial as the subspace employed for the multiplier has to carefully designed \cite{pitkaranta1979boundary,pitkaranta1980local,pitkaranta1981finite,gunzburger1992}. 
 
 
 

@@ -5,10 +5,10 @@ Paul Ric\oe{}ur}}
 
 \minitoc
 
-\lettrine{\color{theme}{N}}umerical simulations are collected in this chapter to assess the correctness of the proposed formulation for flexible multibody dynamics in pH form. Two main sections compose the chapter. The first one is dedicated to systems of beams, the second involves the used of thin plates as mechanical components.
+\lettrine{\color{theme}{N}}umerical simulations are collected in this chapter to assess the correctness of the proposed formulation for flexible multibody dynamics in pH form. Two main sections compose the chapter: the first one is dedicated to systems composed of beams, the second involves  thin plates as mechanical components. The {\sc{Firedrake}} python library \cite{rathgeber2017firedrake} is employed to construct the finite-dimensional discretization.
 
 \section{Beam systems}
-The examples presented in this section make use of Euler Bernoulli beam model \eqref{eq:EB_sys}. To discretize the system, Lagrange polynomial of order one and Hermite polynomials of order 3 are used for $v_f^x$ and $v_f^y$ respectively. Discontinuous Galerkin elements of order 0 and 1 are selected for $n_x$ and $m_{x}$ respectively. This choice corresponds to the HerDG1 element \eqref{eq:HerDG1} for the bending behavior and to the CGDG element \eqref{eq:CGDG} for the truss behavior. The {\sc{Firedrake}} python library \cite{rathgeber2017firedrake} is employed to construct the finite-dimensional discretization.  \\
+The examples presented in this section make use of Euler Bernoulli beam model \eqref{eq:EB_sys}. To discretize the system, Lagrange polynomial of order one and Hermite polynomials of order 3 are used for $v_f^x$ and $v_f^y$ respectively. Discontinuous Galerkin elements of order 0 and 1 are selected for $n_x$ and $m_{x}$ respectively. This choice corresponds to the HerDG1 element \eqref{eq:HerDG1} for the bending behavior and to the CGDG element \eqref{eq:CGDG} for the truss behavior.  \\
  
 The first example concerns the computation of eigenvalues of a four bar mechanism for different geometrical configuration. The second example is a rotating crank-slider. In this case the non-linearities cannot be neglected. The third example is a hinged beam undergoing external excitations so that the out-of-plane motion becomes important.   
 
@@ -18,6 +18,7 @@ The first example concerns the computation of eigenvalues of a four bar mechanis
 \begin{figure}[tb]
 	\centering
 	\includegraphics[width=0.6\textwidth]{part_4/validation/EB/fourbars.pdf} 
+	\hspace{.3cm}
 	\includegraphics[width=0.35\textwidth]{part_4/validation/EB/block_4bars.eps} 
 	\caption{Four bar mechanism illustration (left) and block diagram used for the eigenvalues analysis (right)}
 	\label{fig:4bars}
@@ -139,7 +140,7 @@ Setting the initial conditions properly is of utmost  importance for a DAE solve
 \end{table}
 
 \subsection{Hinged spatial beam}
-A spatial beam rotating about a spherical joint is considered (see Fig. \ref{fig:beam_3D}). This example was considered in \cite{cardona2000,ellenbroek2018}. The physical parameters are briefly recalled in Table \ref{tab:data_3Dbeam}. The spherical joint constraint is imposed by setting to zero the linear velocity, while a cantilever is imposed for the deformation field as the tip is free. For the first $10.2 [\mathrm{s}]$ a torque $ M_z =200 [\mathrm{N/mm}]$ is applied about the vertical axis. Then, an impulsive force $ F_z =100 [\mathrm{N}]$ is applied at the tip of the beam at $15 [\mathrm{s}]$, to excite the out-of-plane movement. The system is solved using an implicit Runge-Kutta method of the Radau IIA family {(see Tab. \ref{tab:comp_perf_hinged} for the computational performance of this test case)}. The simulation results, provided in Fig. \ref{fig:H_omega}, correspond to the total energy and the angular velocity measured in the inertial vertical direction. The result matches with the provided references. Indeed the non-linearities associated to the gyroscopic terms are small as the maximum angular velocity is equal to $0.1 \ [\mathrm{rad/s}] \approx 5 \ [\mathrm{deg/s}]$. 
+A spatial beam rotating about a spherical joint is considered (see Fig. \ref{fig:beam_3D}). This example was considered in \cite{cardona2000,ellenbroek2018}. The physical parameters are briefly recalled in Table \ref{tab:data_3Dbeam}. The spherical joint constraint is imposed by setting to zero the linear velocity, while a cantilever is imposed for the deformation field as the tip is free. For the first $10.2 \; [\mathrm{s}]$ a torque $ M_z =200 \; [\mathrm{N/mm}]$ is applied about the vertical axis. Then, an impulsive force $ F_z =100 \; [\mathrm{N}]$ is applied at the tip of the beam at $15 \; [\mathrm{s}]$, to excite the out-of-plane movement. The system is solved using an implicit Runge-Kutta method of the Radau IIA family {(see Tab. \ref{tab:comp_perf_hinged} for the computational performance of this test case)}. The simulation results, provided in Fig. \ref{fig:H_omega}, correspond to the total energy and the angular velocity measured in the inertial vertical direction. The result matches with the provided references. Indeed the non-linearities associated to the gyroscopic terms are small as the maximum angular velocity is equal to $0.1 \; [\mathrm{rad/s}] \approx 5 \; [\mathrm{deg/s}]$. 
 
 \begin{figure}[tb]
 	\centering
@@ -266,7 +267,7 @@ with $v_G, \ \omega_{G}, \ J_G^{\mathrm{rod}}$ the linear velocity, angular velo
 \begin{equation*}
 u_{\partial, w_t} = \partial_t w(x = L_x, y, t),  \qquad  y_{\partial, w_t} = \widetilde{q}_n(x = L_x, y, t),
 \end{equation*}
-where $w$ is the vertical displacement and $\widetilde{q}_n$ is the effective shear force \eqref{eq:effshearforce}. Space $Y$ is the space of square-integrable functions on with support 
+where $w$ is the vertical displacement and $\widetilde{q}_n$ is the effective shear force \eqref{eq:effshearforce}. Space $Y$ is the space of square-integrable functions on
 $$\Gamma_{\text{int}} = \left\{ (x,y) \vert \; x=L_x, 0 \le y \le L_y  \right\}.$$ The compact interconnection operator then reads
 \begin{equation}\label{eq:intKP_infdim}
 \mathcal{W} y_{\partial, w_t} = \begin{pmatrix}
@@ -395,7 +396,7 @@ acts on the plate. The rigid rod has mass $M = 50 \; \mathrm{[kg]}$ and length $
 		\multicolumn{2}{|c|}{Plate Parameters} \\ 
 		\hline 
 		$E$ & $70\; \; \mathrm{[GPa]}$ \\ 
-		$\rho$ & $2700\; \; \mathrm{[kg \cdot m^3]}$ \\ 
+		$\rho$ & $2700\; \; \mathrm{[kg / m^3]}$ \\ 
 		$\nu$& 0.35 \\ 
 		$h/L$& 0.05 \\ 
 		$L_x, \; L_y$& $1\;  \mathrm{[m]}$\\ 
@@ -515,12 +516,11 @@ where $n_{\mathrm{comp}}$ is the number of external components, $\bm{x}_{P_i}$ i
 \mathcal{B}_{\Omega, i} =
 \begin{bmatrix}
 1 & -\partial_y & \partial_x \\
-\bm{0} & \bm{0} & \bm{0} \\
 \end{bmatrix} \delta(\bm{x} - \bm{x}_{P_i}), \qquad 
 \mathcal{B}_{\Omega, i}^* = \delta(\bm{x} - \bm{x}_{P_i}) \begin{bmatrix}
-1 & \bm{0} \\
--\partial_y & \bm{0} \\
-\partial_x & \bm{0} \\
+1 \\
+-\partial_y \\
+\partial_x \\
 \end{bmatrix}.
 \end{equation*} 
 The model is subjected to the following homogeneous boundary conditions
@@ -534,7 +534,65 @@ The model is subjected to the following homogeneous boundary conditions
 \bm{E}_\kappa \cddot (\bm{n}\otimes \bm{n})|_{\Gamma_N}&=0, \; \\
 \end{aligned} .
 \end{align*}
-where ${\Gamma_D} = \left\{y = 0 \right\}, \; {\Gamma_N} = \left\{x = 0 \cup x=L_x \cup y=L_y \right\}$.
+where ${\Gamma_D} = \left\{y = 0 \right\}$, and ${\Gamma_N} = \left\{x = 0 \cup x=L_x \cup y=L_y \right\}$. The flexible plate is then discretized using the Hellan-Herrmann-Johnson elements \ref{eq:HHJ}. The Dirac distribution is approximated by the following boxcar function
+
+\begin{equation}
+\delta^{\text{app}}(\bm{x} - \bm{x}_{P_i}) =
+\begin{cases}
+4 \, h_x h_y, \qquad |x - x_{P_i}| \le h_x \; \text{ and } \; |y - y_{P_i}| \le h_y, \\
+0, \qquad \text{elsewhere},
+\end{cases}  
+\end{equation}
+where $h_x, \; h_y$ are the mesh sizes along $x$ and $y$ respectively. In particular 8 elements are taken along the $x$ direction and 60 for the $y$ direction. The following finite-dimensional model is then obtained
+
+\begin{equation}
+\begin{aligned}
+\mathrm{Diag}
+\begin{bmatrix}
+\mathbf{M}_{\rho h}\\
+\mathbf{M}_{\bm{\mathcal{C}}_b}\\
+\mathbf{0}\\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\mathbf{e}}_{w} \\
+\dot{\mathbf{e}}_{\kappa} \\
+\dot{\bm{\lambda}}_{\Gamma_D} \\
+\end{pmatrix}
+&= \begin{bmatrix}
+\mathbf{0} & - \mathbf{D}_{\mathrm{HHJ}}^\top & \mathbf{G}_{\Gamma_D}^\top\\
+\mathbf{D}_{\mathrm{HHJ}} & \mathbf{0} & \mathbf{0}\\
+-\mathbf{G}_{\Gamma_D} & \mathbf{0} & \mathbf{0}\\
+\end{bmatrix} 
+\begin{pmatrix}
+{\mathbf{e}}_{w} \\
+{\mathbf{e}}_{\kappa} \\
+{\bm{\lambda}}_{\Gamma_D} \\
+\end{pmatrix} + \sum_{i = 1}^{n_{\text{comp}}}
+\begin{bmatrix}
+\mathbf{B}_{\Omega, i} \\
+\mathbf{0}\\
+\mathbf{0}\\
+\end{bmatrix}\mathbf{u}_{P_i}, \\
+\mathbf{y}_{P_i}
+&= \begin{bmatrix}
+\mathbf{B}_{\Omega, i}^\top &  \mathbf{0} &  \mathbf{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+{\mathbf{e}}_{w} \\
+{\mathbf{e}}_{\kappa} \\
+{\bm{\lambda}}_{\Gamma_D} \\
+\end{pmatrix}, \qquad \forall i \in \{1, n_{\text{comp}}\}.
+\end{aligned}
+\end{equation}
+Matrix $\mathbf{D}_{\mathrm{HHJ}}$ represents the discretization of the bilinear form \eqref{eq:bil_HHJ}. Matrix $\mathbf{G}_{\Gamma_D}$ collects the degrees of freedom subjected to the boundary condition. If the degrees of freedom are ordered so that nodes subjected to boundary conditions are place after the non constrained degrees of freedom, this matrix takes the form $\mathbf{G}_{\Gamma_D}= [\mathbf{0} \quad \mathbf{I}]$. Recalling the property of the derivative delta distribution 
+$$ \delta'[\phi]  = -\delta[\phi'],$$
+where the apostrophe denotes a generic derivative, matrix $\mathbf{B}_{\Omega, i}$ is computed as
+\begin{equation}
+\mathbf{B}_{\Omega, i}^j = \int_\Omega  \delta^{\text{app}}(\bm{x} - \bm{x}_{P_i}) \begin{bmatrix}
+1 & \partial_y & -\partial_x\\
+\end{bmatrix} \phi_w^j \d{\Omega}, \qquad \forall j \in \{1,n_w\},
+\end{equation}
+where $\phi_w^j, \; \forall j \in \{1,n_w\}$ is the test function associated to $e_w$. 
 
 \paragraph{Proof-mass actuator model.}
 A proof-mass actuator is mathematically modelled by a hollow cylinder casing of mass $m_{c_i}, \; i \in \{1,2\}$ and inertia with respect to the center of mass $\mathbf{J}_{c_i}=\mathrm{Diag}(J_{c_i}^{xx}, \; J_{c_i}^{yy})$. The casing is connected to a spring-damper-mass system of stiffness $k_i$, damping $c_i$ and internal mass $m_i$. The overall model for this system is the written in co-energies pH form as 
@@ -592,14 +650,14 @@ c_i & 0 & 0 & -c_i & k_i\\
 \end{equation}
 where $v_{c_i}$ is the velocity of the casing at its center of mass, $\omega_{c_i}^x, \; _{c_i}^y$ are the angular velocities of the casing, $v_i$ is the velocity of the internal mass and $\Delta x_i$ is the elongation of the spring. $\bm{u}_{A_i} = [F_{A_i}^z, \;  T_{A_i}^x, \;  T_{A_i}^y]^\top$ are the external forces and torques acting on the casing.
 
-\paragraph{Mirror model.} The mirror is a simple L-shaped rigid body with mass $m_m$ and inertia $\mathbf{J}_m = \mathrm{Diag}({J}_{m}^{xx}, {J}_{m}^{yy})$
+\paragraph{Mirror model.} The mirror is a simple L-shaped rigid body with mass $m_m$, $s_m^x$ static moment and inertia $\mathbf{J}_m = \mathrm{Diag}({J}_{m}^{xx}, {J}_{m}^{yy})$
 
 \begin{equation}
 \begin{aligned}
 \begin{bmatrix}
-m_{m} & 0 & 0\\
-0 & {J}_{m}^{xx} & {J}_{m}^{xy} \\
-0 & {J}_{m}^{xy} & {J}_{m}^{yy} \\
+m_{m} & s_m^x & 0\\
+s_m^x & {J}_{m}^{xx} & 0 \\
+0 & 0 & {J}_{m}^{yy} \\
 \end{bmatrix}
 \begin{pmatrix}
 \dot{v}_{m} \\
@@ -626,27 +684,100 @@ m_{m} & 0 & 0\\
 
 where $v_{m}$ is the velocity of the mirror at its center of mass and $\omega_{c_i}^x, \; _{c_i}^y$ its angular velocities. $\mathbf{u}_M = [F_{M}^z, \;  T_{M}^x, \;  T_{M}^y]^\top$ are the external forces and torques acting on the mirror.
 
-\paragraph{Assembly of the model}
-The overall model is obtained interconnecting each components to the others by means of transformer interconnections
+\paragraph{Assembly of the model.} The overall model is obtained interconnecting each components to the others by means of transformer interconnections
 \begin{align*}
-\mathbf{u}_{P_i}
+\begin{aligned}
+\mathbf{u}_{P_1} &= - \mathbf{u}_{A_1}, \\
+\mathbf{u}_{P_2} &= - \mathbf{u}_{A_2}, \\
+\mathbf{u}_{P_3} &= - \mathbf{u}_{M},
+\end{aligned}\qquad \qquad
+\begin{aligned}
+\mathbf{y}_{P_1} &= \mathbf{y}_{A_1}, \\
+\mathbf{y}_{P_2} &= \mathbf{y}_{A_2}, \\
+\mathbf{y}_{P_3} &= \mathbf{y}_{M}, \\
+\end{aligned}\qquad \qquad
+\begin{aligned}
+\text{First actuator}, \\
+\text{Second actuator}, \\
+\text{Mirror}. \\
+\end{aligned}
 \end{align*}
 
 
 
-
 \subsubsection{Numerical results}
+The objective is the computation of the natural frequencies to assess the final model in comparison with \cite{preda2020}. For this reason, the damping of the proof-mass actuators is neglected. Once all the components have been assembled together, the overall system takes the form
+\begin{equation*}
+\mathbf{E} \dot{ \mathbf{x} } = \mathbf{J}\mathbf{x}.
+\end{equation*}
+where $\mathbf{E} = \mathrm{Diag}(\mathbf{M}, \mathbf{0})$. The parameters of each subsystem, retrieved from \cite{sanfedino2019phd}, are reported in Table \ref{tab:parSetupSanfe}. In Fig. \ref{fig:om_setup} the eigenvectors $\psi_w$ associated to $e_w$ and corresponding eigenfrequencies $\omega_i$ are reported. Their values and corresponding eigenvectors match those reported in \cite{preda2020,sanfedino2019phd}.
+
+\begin{table}[tbh]
+	\centering
+\begin{tabular}{lllr}
+	\hline 
+Subsystem	& Parameter  & Description & Value \\ 
+	\hline 
+\multirow{6}{*}{\shortstack{Flexible \\ Plate}}	& $\rho$  & Density & $2692 \; \mathrm{[kg / m^3]}$ \\ 
+	& $E$  & Young modulus  &  $69 \; \mathrm{[GPa]}$\\ 
+	& $\nu$ & Poisson's ratio  & 0.33 \\ 
+	& $L_y$ & Length & $28 \; \mathrm{[cm]}$ \\ 
+	& $L_x$ & Width & $4 \; \mathrm{[cm]}$ \\ 
+	& $h$ & Thickness & $3 \; \mathrm{[mm]}$ \\ 
+	\hline 
+\multirow{7}{*}{\shortstack{Proof-mass\\ Actuators}} & $m_i$ & Mass of the moving mass & $23.6 \; \mathrm{[g]}$ \\ 
+	& $m_{c_i}$ & Casing mass  & $182.7 \; \mathrm{[g]}$ \\ 
+	& $J_{c_i}^{xx} $ & Casing inertia along $x$  & $0.3 \; \mathrm{[g \cdot m^2]}$ \\ 
+    & $J_{c_i}^{yy} $ & Casing inertia along $y$  & $0.3 \; \mathrm{[g \cdot m^2]}$ \\ 
+	& $k_i$ & Stiffness  & $1026 \; \mathrm{[N/m]}$ \\ 
+	& $\bm{x}_{A_1}$ & Location 1st actuator & $[-1 \quad 25 \quad 0]^\top \; \mathrm{[cm]}$ \\ 
+	& $\bm{x}_{A_2}$ & Location 2st actuator & $[1 \quad 10.5 \quad 0]^\top \; \mathrm{[cm]}$ \\ 
+	\hline 
+\multirow{5}{*}{Mirror}	& $m_{m} $ & Mass  & $23.4 \; \mathrm{[g]}$ \\ 
+	& $s_{m}^{x} $ & Static moment  & $-0.338 \; \mathrm{[g \cdot m]}$ \\ 
+	& $J_{m}^{xx} $ & Mirror inertia along $x$  & $0.008 \; \mathrm{[g \cdot m^2]}$ \\
+	& $J_{m}^{yy} $ & Mirror inertia along $y$  & $0.058 \; \mathrm{[g \cdot m^2]}$ \\
+	& $\bm{x}_{M}$ & Location mirror & $[0 \quad 28 \quad 0]^\top \; \mathrm{[cm]}$ \\  
+	\hline 
+\end{tabular} 
+\caption{Parameters for each subsystem}
+\label{tab:parSetupSanfe}
+\end{table}
+
+
+\begin{figure*}[p]
+	\centering
+	\subfloat[1st bending mode $\omega_1 = 10.05 \; \mathrm{[Hz]}$]{\includegraphics[width=0.49\linewidth]{part_4/validation/KP/ActuatedPlate1.eps}%
+		\label{fig:om1_setup}}
+	\hfil
+	\subfloat[1st actuator mode $\omega_2 = 32.82 \; \mathrm{[Hz]}$]{\includegraphics[width=0.49\linewidth]{part_4/validation/KP/ActuatedPlate2.eps}%
+		\label{fig:om2_setup}} \\
+	\subfloat[2nd actuator mode $\omega_3 = 34.84 \; \mathrm{[Hz]}$]{\includegraphics[width=0.49\linewidth]{part_4/validation/KP/ActuatedPlate3.eps}%
+	\label{fig:om3_setup}}
+	\hfil
+	\subfloat[1st torsional mode $\omega_4 = 47.23 \; \mathrm{[Hz]}$]{\includegraphics[width=0.49\linewidth]{part_4/validation/KP/ActuatedPlate4.eps}%
+	\label{fig:om4_setup}} \\
+	\subfloat[2nd bending mode $\omega_5 = 63.78 \; \mathrm{[Hz]}$]{\includegraphics[width=0.49\linewidth]{part_4/validation/KP/ActuatedPlate5.eps}%
+	\label{fig:om5_setup}}
+	\hfil
+	\subfloat[2nd torsional mode $\omega_6 = 117.80 \; \mathrm{[Hz]}$]{\includegraphics[width=0.49\linewidth]{part_4/validation/KP/ActuatedPlate6.eps}%
+	\label{fig:om6_setup}} \\
+	\caption{Eigenvectors for the overall system}
+	\label{fig:om_setup}
+\end{figure*}
+
+
+\begin{comment}
 Omega full lambda 1: 10.05488286658613
 Omega full lambda 2: 32.820440166701395
 Omega full lambda 3: 34.841016638952
 Omega full lambda 4: 47.23797002941684
 Omega full lambda 5: 63.78852519981024
 Omega full lambda 6: 117.80124510761422
-
+\end{comment}
 
 \section{Conclusion}
 
 
-There are however many questions that require further investigations. To address complex multibody systems, higher dimensional models (plates, shells and 3D continua) have to be considered. Port-Hamiltonian plate models and 3D continua are readily available, whereas the reformulation of shell structures in pH form is still an open topic. For 3D continua and thick plate models (Mindlin-Reissner plates) one may employ the method proposed in \cite{cohen2005} to achieve the discretization. The discretization of thin plate models is substantially more difficult. \\ 
-The employment of finite elements leads to large sparse systems to be solved. To limit the computational complexity of these models, model reduction techniques can be incorporated. While for linear pHDAE systems consolidated methodologies exist \cite{egger2018}, for the  non linear differential-algebraic case solutions are not yet available. To avoid the problem of dealing with large-scale systems, spectral methods can be equivalently used to achieve a structure preserving discretization made up of small and dense matrices.  \\ 
-The time-domain simulations of the resulting systems have been accomplished using ready-to-use solvers. A rigorous numerical analysis, out of the scope of this paper, represents an important future development. In particular, numerical methods capable of preserving important structural properties in discrete time have been studied for rigid body dynamics \cite{celledoni2018passivity} and generic ODE \cite{kotyczka2019discrete} and DAE \cite{mehrmann2019structurepreserving} pH systems. These methods could be fruitfully employed in the proposed framework. 
+In this chapter the proposed formulation for multibody dynamics has been tested. The employment of finite elements leads to large sparse systems to be solved. To limit the computational complexity of these models, model reduction techniques can be incorporated. While for linear pHDAE systems consolidated methodologies exist \cite{egger2018}, for the  non linear differential-algebraic case solutions are not yet available. To avoid the problem of dealing with large-scale systems, spectral methods can be equivalently used to achieve a structure preserving discretization made up of small and dense matrices. 
+The time-domain simulations of the resulting systems have been accomplished using ready-to-use solvers. A rigorous numerical analysis represents an important future development. In particular, numerical methods capable of preserving important structural properties in discrete time have been studied for rigid body dynamics \cite{celledoni2018passivity} and generic ODE \cite{kotyczka2019discrete} and DAE \cite{mehrmann2019structurepreserving} pH systems. These methods could be fruitfully employed in the proposed framework. 
