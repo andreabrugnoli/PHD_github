@@ -31,7 +31,7 @@ path_fig = "/home/a.brugnoli/Plots/Python/Plots/Kirchhoff_plots/ExperimentSanfe/
 
 
 Lx = 0.04
-Ly = 0.3
+Ly = 0.285
 
 r_EL = 0.01 * np.array([0, 0, 0.81])  # m
 r_PA = 0.01 * np.array([0, 0, 3.08])  # m
@@ -399,7 +399,7 @@ eigvec_omega = eigvec_omega[:, perm]
 
 omega.sort()
 
-n_om = 6
+n_om = 7
 
 for i in range(n_om):
     print('Omega full lambda ' + str(i+1) + ': ' + str(omega[i]/(2*pi)))

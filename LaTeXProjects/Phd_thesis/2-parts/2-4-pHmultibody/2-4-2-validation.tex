@@ -95,17 +95,17 @@ The resulting system is a quasi linear index-2 DAE of the form
 \mathbf{0} & \mathbf{0} & \mathbf{0} \\
 \mathbf{0} & \mathbf{0} & \mathbf{0} \\
 \end{bmatrix}
-\begin{bmatrix}
+\begin{pmatrix}
 \dot{\mathbf{e}} \\ \dot{\bm{\lambda}}_0 \\ \dot{\bm{\lambda}}_u \\
-\end{bmatrix}= 
+\end{pmatrix}= 
 \begin{bmatrix}
 \mathbf{J}(\mathbf{e}) & \mathbf{G}_0^\top(\theta_{P_1}) & \mathbf{G}_u^\top \\
 -\mathbf{G}_0(\theta_{P_1}) & \mathbf{0} & \mathbf{0} \\
 -\mathbf{G}_u & \mathbf{0} & \mathbf{0} \\
 \end{bmatrix}
-\begin{bmatrix}
+\begin{pmatrix}
 \mathbf{e} \\ \bm{\lambda}_0 \\ \bm{\lambda}_u \\
-\end{bmatrix} + 
+\end{pmatrix} + 
 \begin{bmatrix}
 \mathbf{0} \\ \mathbf{0} \\ \mathbf{R}(\theta_{P_1})^\top \\
 \end{bmatrix}
@@ -233,7 +233,7 @@ where $\mathcal{W}^*$ denotes the adjoint of $\mathcal{W}$ (cf. Fig. \ref{fig:in
 \begin{figure}[tb]
 	\centering
 	\includegraphics[width=0.6\textwidth]{part_4/validation/KP/pp_interconnection.eps} 
-	\caption{Boundary interconnection between an infinite- and a finite-dimensional pH systems.}
+	\caption{Boundary interconnection between an infinite- and a finite-dimensional pH system.}
 	\label{fig:interconnection_dpH_pH}
 \end{figure}
 
@@ -398,7 +398,7 @@ acts on the plate. The rigid rod has mass $M = 50 \; \mathrm{[kg]}$ and length $
 		$E$ & $70\; \; \mathrm{[GPa]}$ \\ 
 		$\rho$ & $2700\; \; \mathrm{[kg / m^3]}$ \\ 
 		$\nu$& 0.35 \\ 
-		$h/L$& 0.05 \\ 
+		$h$& $0.05\;  \mathrm{[m]}$ \\ 
 		$L_x, \; L_y$& $1\;  \mathrm{[m]}$\\ 
 		\hline 
 	\end{tabular} \hspace{1cm}
@@ -459,7 +459,7 @@ Snapshots of simulations without and with the rigid rod are reported in Figs. \r
 	\hfil
 	\subfloat[$t= t_{\text{end}}$]{\includegraphics[width=0.5\linewidth]{part_4/validation/KP/SnapRod_t100.eps}%
 		\label{fig:Rod_4}}
-	\caption{Snapshots at 4 different times of a cantilever plate undergoing solicitation \eqref{eq:force_rod}. The plate is connected to a rigid rod in $x = L_x$. Notice the different deformation amplitude with respect to Fig. \ref{fig:IntNoRod}.}
+	\caption{Snapshots at 4 different times of a cantilever plate and a rigid rod undergoing solicitation \eqref{eq:force_rod}. Notice the different deformation amplitude with respect to Fig. \ref{fig:IntNoRod}.}
 	\label{fig:IntRod}
 \end{figure*}
 
@@ -478,7 +478,7 @@ This system can be constructed modularly considering each component separately.
 \subsubsection{Modular modelling of the system}
 In this section, the model for each component is detailed. The final system is obtained by imposing the appropriate transformer interconnections.
 
-\paragraph{Cantilever plate.} The cantilever plate is model as in Sec. \ref{sec:bd_stabKP}. The difference is that now the force at the free boundary are null and that the other components interact with the plate system by means of reaction forces within the domain $\Omega = (0, L_x) \times (0, L_y)$. The forces exerted by the external components can be modelled by a delta distribution. Then the continuous model can be written as the following distributional system
+\paragraph{Cantilever plate} The cantilever plate is model as in Sec. \ref{sec:bd_stabKP}. The difference is that now the force at the free boundary are null and that the other components interact with the plate system by means of reaction forces within the domain $\Omega = (0, L_x) \times (0, L_y)$. The forces exerted by the external components can be modelled by a delta distribution. Then the continuous model can be written as the following distributional system
 
 \begin{equation}
 \begin{aligned}
@@ -594,7 +594,7 @@ where the apostrophe denotes a generic derivative, matrix $\mathbf{B}_{\Omega, i
 \end{equation}
 where $\phi_w^j, \; \forall j \in \{1,n_w\}$ is the test function associated to $e_w$. 
 
-\paragraph{Proof-mass actuator model.}
+\paragraph{Proof-mass actuator model}
 A proof-mass actuator is mathematically modelled by a hollow cylinder casing of mass $m_{c_i}, \; i \in \{1,2\}$ and inertia with respect to the center of mass $\mathbf{J}_{c_i}=\mathrm{Diag}(J_{c_i}^{xx}, \; J_{c_i}^{yy})$. The casing is connected to a spring-damper-mass system of stiffness $k_i$, damping $c_i$ and internal mass $m_i$. The overall model for this system is the written in co-energies pH form as 
 
 \begin{equation}
@@ -650,7 +650,7 @@ c_i & 0 & 0 & -c_i & k_i\\
 \end{equation}
 where $v_{c_i}$ is the velocity of the casing at its center of mass, $\omega_{c_i}^x, \; _{c_i}^y$ are the angular velocities of the casing, $v_i$ is the velocity of the internal mass and $\Delta x_i$ is the elongation of the spring. $\bm{u}_{A_i} = [F_{A_i}^z, \;  T_{A_i}^x, \;  T_{A_i}^y]^\top$ are the external forces and torques acting on the casing.
 
-\paragraph{Mirror model.} The mirror is a simple L-shaped rigid body with mass $m_m$, $s_m^x$ static moment and inertia $\mathbf{J}_m = \mathrm{Diag}({J}_{m}^{xx}, {J}_{m}^{yy})$
+\paragraph{Mirror model} The mirror is a simple L-shaped rigid body with mass $m_m$, $s_m^x$ static moment and inertia $\mathbf{J}_m = \mathrm{Diag}({J}_{m}^{xx}, {J}_{m}^{yy})$
 
 \begin{equation}
 \begin{aligned}
@@ -684,7 +684,7 @@ s_m^x & {J}_{m}^{xx} & 0 \\
 
 where $v_{m}$ is the velocity of the mirror at its center of mass and $\omega_{c_i}^x, \; _{c_i}^y$ its angular velocities. $\mathbf{u}_M = [F_{M}^z, \;  T_{M}^x, \;  T_{M}^y]^\top$ are the external forces and torques acting on the mirror.
 
-\paragraph{Assembly of the model.} The overall model is obtained interconnecting each components to the others by means of transformer interconnections
+\paragraph{Assembly of the model} The overall model is obtained interconnecting each components to the others by means of transformer interconnections
 \begin{align*}
 \begin{aligned}
 \mathbf{u}_{P_1} &= - \mathbf{u}_{A_1}, \\
@@ -706,11 +706,11 @@ where $v_{m}$ is the velocity of the mirror at its center of mass and $\omega_{c
 
 
 \subsubsection{Numerical results}
-The objective is the computation of the natural frequencies to assess the final model in comparison with \cite{preda2020}. For this reason, the damping of the proof-mass actuators is neglected. Once all the components have been assembled together, the overall system takes the form
+The objective is the computation of the natural frequencies to assess the final model in comparison with \cite{preda2020}. For this reason, the damping of the proof-mass actuators $c_i$ is neglected. Once all the components have been assembled together, the overall system takes the form
 \begin{equation*}
 \mathbf{E} \dot{ \mathbf{x} } = \mathbf{J}\mathbf{x}.
 \end{equation*}
-where $\mathbf{E} = \mathrm{Diag}(\mathbf{M}, \mathbf{0})$. The parameters of each subsystem, retrieved from \cite{sanfedino2019phd}, are reported in Table \ref{tab:parSetupSanfe}. In Fig. \ref{fig:om_setup} the eigenvectors $\psi_w$ associated to $e_w$ and corresponding eigenfrequencies $\omega_i$ are reported. Their values and corresponding eigenvectors match those reported in \cite{preda2020,sanfedino2019phd}.
+where $\mathbf{E} = \mathrm{Diag}(\mathbf{M}, \; \mathbf{0})$. The parameters of each subsystem, retrieved from \cite{sanfedino2019phd}, are reported in Table \ref{tab:parSetupSanfe}. In Fig. \ref{fig:om_setup} the eigenvectors $\psi_w$ associated to $e_w$ and corresponding eigenfrequencies $\omega_i$ are reported. Their values and corresponding eigenvectors match those reported in \cite{preda2020,sanfedino2019phd}. The mutual interaction between the flexible plate and the actuators dynamics is particularly evident for the first three frequencies. Above the third frequency, the actuators have little importance in the overall frequency response.
 
 \begin{table}[tbh]
 	\centering
@@ -730,14 +730,14 @@ Subsystem	& Parameter  & Description & Value \\
 	& $J_{c_i}^{xx} $ & Casing inertia along $x$  & $0.3 \; \mathrm{[g \cdot m^2]}$ \\ 
     & $J_{c_i}^{yy} $ & Casing inertia along $y$  & $0.3 \; \mathrm{[g \cdot m^2]}$ \\ 
 	& $k_i$ & Stiffness  & $1026 \; \mathrm{[N/m]}$ \\ 
-	& $\bm{x}_{A_1}$ & Location 1st actuator & $[-1 \quad 25 \quad 0]^\top \; \mathrm{[cm]}$ \\ 
-	& $\bm{x}_{A_2}$ & Location 2st actuator & $[1 \quad 10.5 \quad 0]^\top \; \mathrm{[cm]}$ \\ 
+	& $\bm{x}_{A_1} = \bm{x}_{P_1}$ & Location 1st actuator & $[-1 \quad 25 \quad 0]^\top \; \mathrm{[cm]}$ \\ 
+	& $\bm{x}_{A_2} = \bm{x}_{P_2}$ & Location 2st actuator & $[1 \quad 10.5 \quad 0]^\top \; \mathrm{[cm]}$ \\ 
 	\hline 
-\multirow{5}{*}{Mirror}	& $m_{m} $ & Mass  & $23.4 \; \mathrm{[g]}$ \\ 
+\multirow{5}{*}{Mirror}	& $m_{m} $ & Mirror mass  & $23.4 \; \mathrm{[g]}$ \\ 
 	& $s_{m}^{x} $ & Static moment  & $-0.338 \; \mathrm{[g \cdot m]}$ \\ 
 	& $J_{m}^{xx} $ & Mirror inertia along $x$  & $0.008 \; \mathrm{[g \cdot m^2]}$ \\
 	& $J_{m}^{yy} $ & Mirror inertia along $y$  & $0.058 \; \mathrm{[g \cdot m^2]}$ \\
-	& $\bm{x}_{M}$ & Location mirror & $[0 \quad 28 \quad 0]^\top \; \mathrm{[cm]}$ \\  
+	& $\bm{x}_{M} = \bm{x}_{P_3}$ & Location mirror & $[0 \quad 28 \quad 0]^\top \; \mathrm{[cm]}$ \\  
 	\hline 
 \end{tabular} 
 \caption{Parameters for each subsystem}
@@ -747,20 +747,20 @@ Subsystem	& Parameter  & Description & Value \\
 
 \begin{figure*}[p]
 	\centering
-	\subfloat[1st bending mode $\omega_1 = 10.05 \; \mathrm{[Hz]}$]{\includegraphics[width=0.49\linewidth]{part_4/validation/KP/ActuatedPlate1.eps}%
+	\subfloat[1st bending mode $\omega_1 = 10.21 \; \mathrm{[Hz]}$]{\includegraphics[width=0.49\linewidth]{part_4/validation/KP/ActuatedPlate1.eps}%
 		\label{fig:om1_setup}}
 	\hfil
 	\subfloat[1st actuator mode $\omega_2 = 32.82 \; \mathrm{[Hz]}$]{\includegraphics[width=0.49\linewidth]{part_4/validation/KP/ActuatedPlate2.eps}%
 		\label{fig:om2_setup}} \\
-	\subfloat[2nd actuator mode $\omega_3 = 34.84 \; \mathrm{[Hz]}$]{\includegraphics[width=0.49\linewidth]{part_4/validation/KP/ActuatedPlate3.eps}%
+	\subfloat[2nd actuator mode $\omega_3 = 34.89 \; \mathrm{[Hz]}$]{\includegraphics[width=0.49\linewidth]{part_4/validation/KP/ActuatedPlate3.eps}%
 	\label{fig:om3_setup}}
 	\hfil
-	\subfloat[1st torsional mode $\omega_4 = 47.23 \; \mathrm{[Hz]}$]{\includegraphics[width=0.49\linewidth]{part_4/validation/KP/ActuatedPlate4.eps}%
+	\subfloat[1st torsional mode $\omega_4 = 47.30 \; \mathrm{[Hz]}$]{\includegraphics[width=0.49\linewidth]{part_4/validation/KP/ActuatedPlate4.eps}%
 	\label{fig:om4_setup}} \\
-	\subfloat[2nd bending mode $\omega_5 = 63.78 \; \mathrm{[Hz]}$]{\includegraphics[width=0.49\linewidth]{part_4/validation/KP/ActuatedPlate5.eps}%
+	\subfloat[2nd bending mode $\omega_5 = 64.41 \; \mathrm{[Hz]}$]{\includegraphics[width=0.49\linewidth]{part_4/validation/KP/ActuatedPlate5.eps}%
 	\label{fig:om5_setup}}
 	\hfil
-	\subfloat[2nd torsional mode $\omega_6 = 117.80 \; \mathrm{[Hz]}$]{\includegraphics[width=0.49\linewidth]{part_4/validation/KP/ActuatedPlate6.eps}%
+	\subfloat[2nd torsional mode $\omega_6 = 118.09 \; \mathrm{[Hz]}$]{\includegraphics[width=0.49\linewidth]{part_4/validation/KP/ActuatedPlate6.eps}%
 	\label{fig:om6_setup}} \\
 	\caption{Eigenvectors for the overall system}
 	\label{fig:om_setup}

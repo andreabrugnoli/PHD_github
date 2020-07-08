@@ -4,12 +4,12 @@
 
 \minitoc
 
-\lettrine{\color{theme}{T}}he application of the Partitioned Finite Element leads to finite-dimensional pH systems, that can be discretized using finite elements method. To quantify how well the numerical solution approximates the true one, it is important to estimate the rate of convergence of the finite elements. In this chapter convergence estimates are conjectured for beams and plates systems and numerical experiments are constructed in support to the proposed conjectures. \\
+\lettrine{\color{theme}{T}}he application of the Partitioned Finite Element leads to finite-dimensional pH systems, that can be discretized using finite elements method. To quantify how well the numerical solution approximates the true one, it is important to estimate the rate of convergence of the finite elements. In this chapter convergence estimates are conjectured for beams and plates systems and numerical experiments are constructed to support the proposed conjectures. \\
 
-The first section is consecrated to the Euler-Bernoulli beam. For the discretization of this problem three methodologies are proposed. In the second section of this chapter, pH plate problems are discretized using mixed finite elements. This means that the divergence operator explicitly appears in the weak formulation.  In the third part the discretization of plate problem is of dual-mixed type \cite{arnold1990intro}, meaning that the gradient operator comes out in the weak formulation. The last section gathers all the numerical results. \\
+The first section is devoted to the Euler-Bernoulli beam. For the discretization of this problem three methodologies are proposed. In the second section of this chapter, pH plate problems are discretized using mixed finite elements. This means that the divergence operator explicitly appears in the weak formulation.  In the third part the discretization of plate problem is of dual-mixed type \cite{arnold1990intro}, meaning that the gradient operator comes out in the weak formulation. The last section gathers all the numerical results. \\
 
 \begin{remark}
-Homogeneous boundary conditions will be always considered in this chapter. These are enforced weakly or strongly depending on the specific formulation under analysis.
+Homogeneous boundary conditions will be always considered in this chapter. These are enforced weakly  (i.e. natural boundary conditions $\bm{u}_\partial \equiv \bm{0}$) or strongly (i.e. essential boundary conditions) depending on the specific formulation under analysis.
 \end{remark}
 
 
@@ -51,7 +51,7 @@ In this section the Euler-Bernoulli beam is discretized using conforming finite 
 \begin{itemize}
 	\item the weak formulation \eqref{eq:weak_EB_Hess} corresponding (in absence of inputs) to a free-free beam;
 	\item the weak formulation \eqref{eq:weak_EB_divDiv} corresponding (for zero inputs) to a clamped-clamped beam;
-	\item a novel weak formulation allowing to use $H^1$ conforming finite elements (both lines of  system \eqref{eq:weak_EB} are integrated by parts once).
+	\item a novel weak formulation allowing to use $H^1$ conforming finite elements (both lines of  system \eqref{eq:weak_EB} are integrated by parts once). This formulation corresponds to zero shear forces and zero rotations at the extremities. This kind of boundary conditions appears in the Cahn-Hilliard equation \cite{cahn1958}, but makes little sense in continuum mechanics.   
 \end{itemize}
 
 \subsection{Mixed discretization for the free-free beam}
@@ -118,7 +118,7 @@ H_{h, \text{DG1Her}}^{2}(\Omega) &= \{ w_h \in L^{2}(\Omega) | \ \forall E \in \
 L_{h, \text{DG1Her}}^2(\Omega) &= \{M_h \in H^2(\Omega) | \ \forall E \in \mathcal{I}_h, \ M_h|_{E} \in \mathrm{Her} \}, \\
 \end{aligned}
 \end{equation}
-Since the formulation is symmetrical to \eqref{eq:weak_EB_Hess_nobd}, the following error estimates is conjectured:
+Since the formulation is symmetrical to \eqref{eq:weak_EB_Hess_nobd}, the following error estimates can be conjectured:
 
 \begin{conjecture}[Convergence of the DG1Her elements]\label{conj:DG1Herestimates}
 	Assuming a smooth solution for problem~\eqref{eq:weak_EB_divDiv_nobd}, the following error estimates hold
@@ -131,7 +131,7 @@ Since the formulation is symmetrical to \eqref{eq:weak_EB_Hess_nobd}, the follow
 
 
 \subsection{Mixed discretization with lower regularity requirement}
-Consider the weak formulation \eqref{eq:weak_EB}. If both lines are integrated by parts the following weak form is obtained: find
+Consider the weak formulation \eqref{eq:weak_EB}. If both lines are integrated by parts once, the following weak form is obtained: find
 \begin{equation*}
 \{e_w, e_\kappa\} \in H^1(\Omega) \times H^1(\Omega) 
 \end{equation*}
@@ -168,9 +168,9 @@ where CG is the continuous Galerkin finite element \cite[Chapter 3]{logg2012}.  
 
 \section{Plate problems using known mixed finite elements}
 
-First we focused on the Mindlin plate. This problem is a combination of plane wave dynamics and plane elastodynamics. A classical mixed formulation requires $H^{\div}$ conforming elements both for the wave dynamics \cite{becache2000wave} and elastodynamics \cite{becache2001elas,arnold2014elastodynamics}. To obtain a suitable discretization of the Mindlin problem one has to combine the two. Additional difficulties arising from the symmetry of the stress tensor that can be imposed strongly \cite{becache2001elas} or weakly \cite{arnold2014elastodynamics}.
+First we focus on the Mindlin plate. This problem is a combination of plane wave dynamics and plane elastodynamics. A classical mixed formulation requires $H^{\div}$ conforming elements both for the wave dynamics \cite{becache2000wave} and elastodynamics \cite{becache2001elas,arnold2014elastodynamics}. To obtain a suitable discretization of the Mindlin problem one has to combine the two. Additional difficulties arise from the symmetry of the stress tensor that can be imposed strongly \cite{becache2001elas} or weakly \cite{arnold2014elastodynamics}.
 
-We then discuss the mixed discretization of the Kirchhoff plate problem. For this problem the non-conforming Hellan-Herrmann-Johnson scheme \cite{hellan1967,herrmann1967finite,johnson1973convergence} (HHJ) is the most successful. However, it has been analyzed under generic boundary conditions in the static case only \cite{blum1990}. \\
+Then we discuss the mixed discretization of the Kirchhoff plate problem. For this problem the non-conforming Hellan-Herrmann-Johnson scheme \cite{hellan1967,herrmann1967finite,johnson1973convergence} (HHJ) is the most successful. However, it has been analyzed under generic boundary conditions in the static case only \cite{blum1990}. \\
 
 
 \subsection{Mindlin plate mixed discretization}
@@ -210,7 +210,7 @@ H_{h, \text{BJT}}^{\div}(\Omega, \mathbb{V}) &= \{\bm{q}_h \in H^{\div}(\Omega, 
 \end{aligned}
 \end{equation}
 
-where $\mathrm{BDM}$ are the Brezzi-Douglas-Marini elements \cite{brezzi1985bdm}. BTJ stands for the initials of the authors in \cite{becache2000wave,becache2001elas}. Combining the results of both papers, the following error estimates are conjectured.
+where $\mathrm{BDM}$ are the Brezzi-Douglas-Marini elements \cite{brezzi1985bdm}. BTJ stands for the initials of the authors in \cite{becache2000wave,becache2001elas}. Combining the results of both papers, the following error estimates can be conjectured.
 \begin{conjecture}[Convergence rate for the BJT elements]\label{conj:BJTestimates}
 	Assuming a smooth solution to problem~\eqref{eq:weak_min_div_strong}, the following error estimates hold 
 	\begin{equation}
@@ -229,11 +229,11 @@ where $\mathrm{BDM}$ are the Brezzi-Douglas-Marini elements \cite{brezzi1985bdm}
 
 
 \subsubsection{Mindlin plate with weakly imposed symmetry}\label{sec:min_weak}
-To impose the symmetry of the momenta tensor weakly. we modify the third equation in \eqref{eq:weak_min_div_strong}. The symmetric gradient can be rewritten as 
+To impose the symmetry of the momenta tensor weakly, we modify the third equation in \eqref{eq:weak_min_div_strong}. The symmetric gradient can be rewritten as 
 \[
 \Grad\ \bm{\theta} = \grad \bm{\theta} - \mathrm{skw}(\grad \bm{\theta}),
 \]
-where $\mathrm{skw}(\bm{A})=(\bm{A} - \bm{A}^\top)/2$ is the skew-symmetric part of matrix $\bm{A}$. Consider the weak form of the third equation in \eqref{eq:weak_min_div_strong} before applying the integration by parts
+where $\mathrm{skw}(\bm{A}):=(\bm{A} - \bm{A}^\top)/2$ is the skew-symmetric part of matrix $\bm{A}$. Consider the weak form of the third equation in \eqref{eq:weak_min_div_strong} before applying the integration by parts
 \[
 \inner[L^2(\Omega, \mathbb{M})]{\bm{V}_\kappa}{\bm{\mathcal{C}}_b \partial_t {\bm{E}}_\kappa} = \inner[L^2(\Omega, \mathbb{M})]{\bm{V}_\kappa}{\Grad \bm{e}_\theta}. 
 \] Introducing the new variable $\bm{E}_r = \mathrm{skw}(\mathrm{grad}\ \bm{\theta})$, then $\{\bm{e}_\theta, \bm{E}_\kappa, \bm{E}_r\} \in L^2(\Omega, \mathbb{V}) \times H^{\Div}(\Omega, \mathbb{M}) \times L^2(\Omega, \mathbb{K})$ satisfy (remind that $\bm{e}_\theta = \partial_t {\bm{\theta}}$)
@@ -289,7 +289,7 @@ L_{h, \text{AFW}}^2(\Omega, \mathbb{K}) &= \{\bm{R}_h \in L^2(\Omega, \mathbb{K}
 \end{aligned}
 \end{equation}
 
-where $\mathrm{RT}$ stands for the Raviart-Thomas elements \cite{raviart1977}. The acronym AFW stands for Arnold-Falk-Winther, that proposed this kind on discretization for static elasticity \cite{arnold2007mixed}. A convergence analysis for the general elastodynamics problem with weak symmetry in the $L^\infty (L^2)$ norm is detailed \cite{arnold2014elastodynamics}. A convergence study for the wave equation with mixed finite elements in the $L^\infty (L^2)$ is presented in \cite{geveci1988}. Combining the results of the two, the following error estimates are conjectured:
+where $\mathrm{RT}$ stands for the Raviart-Thomas elements \cite{raviart1977}. The acronym AFW stands for Arnold-Falk-Winther, that proposed this kind of discretization for static elasticity \cite{arnold2007mixed}. A convergence analysis for the general elastodynamics problem with weak symmetry in the $L^\infty (L^2)$ norm is fully detailed in \cite{arnold2014elastodynamics}. A convergence study for the wave equation with mixed finite elements in the $L^\infty (L^2)$ is presented in \cite{geveci1988}. Combining the results of the two, the following error estimates can be conjectured:
 \begin{conjecture}[Rate of convergence for the AFW elements]\label{conj:AWFestimates}
 	Assuming a smooth solution to problem~\eqref{eq:weak_min_div_weak}, the following error estimates hold 
 	\begin{equation}
@@ -307,7 +307,7 @@ where $\mathrm{RT}$ stands for the Raviart-Thomas elements \cite{raviart1977}. T
 \end{conjecture}
 
 \subsection{The  Hellan-Herrmann-Johnson scheme for the Kirchhoff plate}\label{sec:HHJ}
-For the Kirchhoff plate, the Hellan-Herrmann-Johnson scheme \cite{hellan1967,herrmann1967finite,johnson1973convergence} (HHJ) can be used to obtain a structure-preserving discretization. Given the non conforming nature of this scheme, it is necessary to first introduce the discrete functional spaces and state the problem directly in discrete form. The illustration of the method follows closely \cite{arnold2019hellan}. The vertical displacement is approximated using continuous Lagrange polynomials, while the momenta tensor is discretized using the HHJ element
+For the Kirchhoff plate, the Hellan-Herrmann-Johnson scheme \cite{hellan1967,herrmann1967finite,johnson1973convergence} (HHJ) can be used to obtain a structure-preserving discretization. Given the non-conforming nature of this scheme, it is necessary to first introduce the discrete functional spaces and state the problem directly in discrete form. The illustration of the method follows closely \cite{arnold2019hellan}. The vertical displacement is approximated using continuous Lagrange polynomials, while the momenta tensor is discretized using the HHJ element
 \begin{equation}
 \label{eq:HHJ}
 \begin{aligned}
@@ -332,7 +332,7 @@ where $\mathcal{E}_h$ is the set of all edges belonging to the mesh and $[\![a]\
 \[
 \inner[L^2(\partial T)]{v_w}{\Div \bm{E}_\kappa \cdot \bm{n}} = 0, \qquad \inner[L^2(\partial T)]{\partial_{\bm{s}} v_w}{\bm{s}^\top\bm{E}_\kappa \bm{n}} = 0,
 \]
-since $v_w$ is continuous across the edge boundaries and the normal switches sign. We are now in a position to state the final weak form. Given the bilinear form
+since $v_w$ is continuous across the edge boundaries, and the normal switches sign. We are now in a position to state the final weak form. Given the bilinear form
 \begin{equation}\label{eq:bil_HHJ}
 d_h(v_w, \ \bm{E}_{\kappa}) := - \sum_{T \in \mathcal{T}_h} \inner[L^2(T, \mathbb{S})]{\Hess v_w}{\bm{E}_\kappa} + \sum_{E \in \mathcal{E}_h} \inner[L^2(E)]{[\![\partial_n v_w]\!]}{\bm{n}^\top\bm{E}_\kappa \bm{n}}, 
 \end{equation}
@@ -344,8 +344,8 @@ find $(e_w, \bm{E}_\kappa) \in W_h \times S_h$ such that
 \inner[L^2(\Omega, \mathbb{S})]{\bm{V}_\kappa}{\bm{\mathcal{C}}_b \partial_t {\bm{E}}_\kappa} &= -d_h(e_w, \ \bm{V}_{\kappa}), \\ 
 \end{aligned} \qquad
 \begin{aligned}
-v_w &\in W_h, \\
-\bm{V}_\kappa &\in S_h. \\
+\forall \; v_w &\in W_h, \\
+\forall \; \bm{V}_\kappa &\in S_h. \\
 \end{aligned}
 \end{equation}
 
@@ -363,11 +363,11 @@ For the associated static problem, under the hypothesis of smooth solutions, opt
 
 
 \section{Dual mixed discretization of plate problems}\label{sec:dual_mixed}
-In this section the discretization of the Kirchhoff and Mindlin plates is no-more a classical mixed discretization. The application of PFEM to the other partition of the system provides a discretization in which the $\grad$ and $\Grad$ operators appear. In \cite{joly2003variational}, the author refers to this kind of discretization as primal-dual.
+In this section the discretization of the Kirchhoff and Mindlin plates is no more a classical mixed discretization. The application of PFEM to the other partition of the system provides a discretization in which the $\grad$ and $\Grad$ operators appear. In \cite{joly2003variational}, the author refers to this kind of discretization as primal-dual.
 
 \subsection{Dual mixed discretization of the Mindlin plate}
 First of all we construct a family of finite elements capable of discretizing problem \eqref{eq:weak_min_grad}, that seeks
-$$\{e_w, \bm{e}_{\bm{\theta}}, \bm{E}_{\kappa}, \bm{e}_{\gamma}\} \in H^{1}(\Omega) \times H^{\Grad}(\Omega, \mathbb{V}) \times L^2(\Omega, \mathbb{S}) \times L^2(\Omega, \mathbb{V}) $$
+$$\{e_w, \bm{e}_{\bm{\theta}}, \bm{E}_{\kappa}, \bm{e}_{\gamma}\} \in H^{1}(\Omega) \times H^{\Grad}(\Omega, \mathbb{V}) \times L^2(\Omega, \mathbb{S}) \times L^2(\Omega, \mathbb{V}), $$
 so that 
 \begin{equation}\label{eq:weak_min_grad_nobd}
 \begin{aligned}
@@ -393,7 +393,7 @@ L_{h, \text{CGDG}}^2(\Omega, \mathbb{S}) &= \{ \bm{M}_h \in L^2(\Omega, \mathbb{
 L_{h, \text{CGDG}}^2(\Omega, \bbR^2) &= \{\bm{q}_h \in L^2(\Omega, \bbR^2)  \vert \ \forall T \in \mathcal{T}_h,\ \bm{q}_h|_{T} \in (\mathrm{DG}_{k-1})^{2} \}. \\
 \end{aligned}
 \end{equation}
-To approximate spaces $H_h^{1}(\Omega), \; H_h^{\Grad}(\Omega, \bbR^2)$ Lagrange polynomials of order $k$ are selected. For spaces $L_h^2(\Omega, \mathbb{S}), \; L_h^2(\Omega, \bbR^2)$ Discontinous Galerkin polynomials of order $k-1$ are employed. This selection of finite elements can be seen as a standard discretization of the problem combined with a reduced integration of the stress tensor and shear vector. For this reason, the following conjecture on the error estimates is proposed. 
+To approximate spaces $H_h^{1}(\Omega), \; H_h^{\Grad}(\Omega, \bbR^2)$ Lagrange polynomials of order $k$ are selected. For spaces $L_h^2(\Omega, \mathbb{S}), \; L_h^2(\Omega, \bbR^2)$ Discontinous Galerkin polynomials of order $k-1$ are employed. This selection of finite elements can be seen as a standard discretization of the problem combined with a reduced integration of the stress tensor and shear vector. For this reason, the following conjecture on the error estimates can be proposed. 
 
 \begin{conjecture}[Convergence of the CGDG elements]
 	\label{conj:CGDGestimates}
@@ -437,10 +437,10 @@ L_{h, \mathrm{BellDG3}}^2(\Omega, \mathbb{S}) &= \{ \bm{M}_h \in L^2(\Omega, \ma
 \end{aligned}
 \end{equation}
 
-where Bell stands for the Bell element \cite{bell1969}. No conjectured error estimates are proposed to this problem. As it will be shown in \secref{sec:numtest_kir}, the results obtained with this element are of difficult interpretation.
+where Bell stands for the Bell element \cite{bell1969}. No conjectured error estimates are proposed to this problem. As it will be shown in \secref{sec:numtest_kir}, the results obtained with this elements are of difficult interpretation.
 
 \begin{remark}\label{rmk:BellArg}
-	Thanks to a general approach for transforming finite elements \cite{kirby2018general}, $H^2$ conforming elements have been implemented in the {\sc{Firedrake}} library. 	Therefore, for the discretization of the $H^2$ space, the Argyris element \cite{argyris1968} is another valuable possibility.  Unfortunately, the strong imposition of boundary conditions is not possible in {\sc{Firedrake}} at the present time \cite[Sec. 3.2]{kirby2019}. Because of the simpler structure and ordering of its degrees of freedom, the Bell element has been privileged over the Argyris one for the convergence study. In Chap. \ref{ch:applications} the Argyris element will be employed imposing weakly the boundary conditions.
+	Thanks to a general approach for transforming finite elements \cite{kirby2018general}, $H^2$-conforming elements have been implemented in the {\sc{Firedrake}} library. 	Therefore, for the discretization of the $H^2$-space, the Argyris element \cite{argyris1968} is another valuable possibility.  Unfortunately, the strong imposition of boundary conditions is not possible in {\sc{Firedrake}} at the present time \cite[Sec. 3.2]{kirby2019}. Because of the simpler structure and ordering of its degrees of freedom, the Bell element has been privileged over the Argyris one for the convergence study. In Chapter~\ref{ch:applications} the Argyris element will be employed imposing the boundary conditions weakly.
 \end{remark}
 
 \section{Numerical experiments}
@@ -470,7 +470,7 @@ In this section numerical test cases are used to verify the conjectured orders o
 \mathbf{0} \\
 \end{pmatrix}. 
 \end{equation*}
-The mass matrix $\mathbf{M}$ is symmetric and positive definite. In case of weak enforcement of the symmetry \eqref{eq:weak_min_div_weak} the final system reads
+The mass matrix $\mathbf{M}$ is symmetric and positive definite. In case of weak enforcement of the symmetry \eqref{eq:weak_min_div_weak}, the final system reads
 \begin{equation*}
 \underbrace{
 	\begin{bmatrix}
@@ -501,7 +501,7 @@ The mass matrix $\mathbf{M}$ is symmetric and positive definite. In case of weak
 \end{pmatrix}. 
 \end{equation*}
 where $\mathbf{A}_\lambda$ is the matrix obtained by discretization of $\inner[L^2(\Omega, \mathbb{M})]{\bm{V}_r}{\dot{\bm{E}}_\kappa}$. \\
-Because of the presence of the Lagrange multiplier, the mass matrix $\mathbf{M}$ is symmetric and indefinite, giving rise to a saddle point problem. The numerical solution of this kind of problems is notoriously much harder than that of positive definite ones \cite{benzi2005}. The {\sc{Firedrake}} library \cite{rathgeber2017firedrake} is used to generate the matrices. To integrate the equations in time a Crank-Nicholson scheme has been used, for all simulations. The time step is set to $\Delta t = h/10$ to have a lower impact of the time discretization error with respect to the spatial error. The final time is set to one $t_f = 1 [\textrm{s}]$ for all simulations. To compute the $L^\infty ({X})$ space-time dependent norm  the discrete norm $L^\infty_{\Delta t} ({X})$ is used
+Because of the presence of the Lagrange multiplier, the mass matrix $\mathbf{M}$ is symmetric but indefinite, giving rise to a saddle point problem. The numerical solution of this kind of problems is notoriously much harder than that of positive definite ones \cite{benzi2005}. The {\sc{Firedrake}} library \cite{rathgeber2017firedrake} is used to generate the matrices. To integrate the equations in time a Crank-Nicholson scheme has been used, for all simulations. The time step is set to $\Delta t = h/10$ to have a lower impact of the time discretization error with respect to the spatial error. The final time is set to one $t_f = 1 \; [\textrm{s}]$ for all simulations. To compute the $L^\infty ({X})$ space-time dependent norm  the discrete norm $L^\infty_{\Delta t} ({X})$ is used
 \[
 ||\cdot ||_{L^\infty ({X})} \approx || \cdot ||_{L^\infty_{\Delta t} ({X})} = \max_{t \in t_i} ||\cdot||_{{X}},
 \]
@@ -544,7 +544,7 @@ The numerical values used for the simulations are reported in Tab. \ref{tab:parE
 \end{table}
 
 \paragraph{Results for the HerDG1 elements \ref{eq:HerDG1}}
-The results are reported in Fig. \ref{fig:errorHerDG1} and Table \ref{tab:resebDG1Her}. The conjectured error estimates \eqref{eq:errHerDG1} are fulfilled.
+The results are reported in Fig. \ref{fig:errorHerDG1} and Table \ref{tab:resebDG1Her}. The conjectured error estimates \eqref{eq:errHerDG1} are respected.
 
 \begin{figure}[htbp]%
 	\centering
@@ -593,7 +593,7 @@ The results, reported in Fig. \ref{fig:errorCGCG} and Tables \ref{tab:resebCGCG_
 \end{figure}
 
 \subsection{Numerical test for the Mindlin plate}\label{sec:numtest_min}
-To validate the method first we test a finite element combinations on an analytic solution. Constructing an analytical solution for a vibrating Mindlin plate is far from trivial. Therefore, the solution for the static case \cite{veiga2013} is exploited. \\
+To validate the method, we first test a finite element combinations on an analytic solution. Constructing an analytical solution for a vibrating Mindlin plate is far from trivial. Therefore, the solution for the static case \cite{veiga2013} is exploited. \\
 
 Consider a distributed static force given by 
 \begin{equation*}
@@ -652,7 +652,11 @@ e_w^\text{ex}\vert_{\partial\Omega} = 0, \\
 \bm{e}_\theta^\text{ex}\vert_{\partial\Omega} = 0. \\
 \end{aligned}
 \end{equation}
-Variables $(e_w^\text{ex}, \bm{e}_\theta^\text{ex}, \bm{E}_\kappa^\text{ex}, \bm{e}_\gamma^\text{ex})$ under excitations $(f_d, \bm{\tau}_d)$ solve problem~\eqref{eq:pHdyn_Min1}. The solution being smooth, the conjectures \ref{conj:BJTestimates} and \ref{conj:AWFestimates} should hold. The numerical values of the physical parameters are reported in Table \ref{tab:parMin}.  
+Variables $(e_w^\text{ex}, \bm{e}_\theta^\text{ex}, \bm{E}_\kappa^\text{ex}, \bm{e}_\gamma^\text{ex})$ under excitations $(f_d, \bm{\tau}_d)$ solve problem~\eqref{eq:pHdyn_Min1}. The solution being smooth, conjectures \ref{conj:BJTestimates} and \ref{conj:AWFestimates} should hold. The numerical values of the physical parameters are reported in Table \ref{tab:parMin}.  
+
+\begin{remark}
+The numerical values for the parameters in Tab. \ref{tab:parMin} do not represent any physical material. If more realistic values are used, the solver fails when the AFW elements \eqref{eq:AFW} for polynomial degree $k=3$ is employed. This is due to the extremely high condition number of the indefinite mass matrix.
+\end{remark}
 
 \begin{table}[htbp]
 	\centering
@@ -672,7 +676,7 @@ Variables $(e_w^\text{ex}, \bm{e}_\theta^\text{ex}, \bm{E}_\kappa^\text{ex}, \bm
 
 \paragraph{Results for the mixed strong symmetry formulation (BTJ elements \eqref{eq:BTJ})} 
 
-The weak form \eqref{eq:weak_min_div_strong} and its corresponding finite elements \eqref{eq:BTJ} was implemented using {\sc{Firedrake}} extruded mesh functionality \cite{mcrae2016}. A direct solver based on an LU preconditioner is used. In Fig. \ref{fig:errorBTJ} and Tables \ref{tab:resminBTJ_k1}, \ref{tab:resminBTJ_k2}, \ref{tab:resminBTJ_k3} the errors for $(e_w, \bm{e}_\theta, \bm{E}_\kappa, \bm{e}_\gamma)$ are reported. As one can notice, the conjectured error estimates \eqref{eq:errBEC} are respected for all variables. 
+The weak form \eqref{eq:weak_min_div_strong} and its corresponding finite elements \eqref{eq:BTJ} was implemented using {\sc{Firedrake}} extruded mesh functionality \cite{mcrae2016}. A direct solver based on an LU preconditioner is used. In Fig. \ref{fig:errorBTJ} and Tables \ref{tab:resminBTJ_k1}, \ref{tab:resminBTJ_k2}, \ref{tab:resminBTJ_k3} the errors for $(e_w, \bm{e}_\theta, \bm{E}_\kappa, \bm{e}_\gamma)$ are reported. As one can notice, the conjectured error estimates \eqref{eq:errBEC} are recovered for all variables. 
 
 \begin{figure}[htbp]%
 	\centering
@@ -696,7 +700,7 @@ The weak form \eqref{eq:weak_min_div_strong} and its corresponding finite elemen
 
 
 \paragraph{Results for the mixed weak symmetry formulation (AFW elements \eqref{eq:AFW})} 
-Formulation \eqref{eq:weak_min_div_weak} and its element \eqref{eq:AFW} are considered here. A direct solver fails for high order cases (i.e. $k=3$). For this reason a generalized minimal residual method GMRES \cite{saad1986gmres} is used with restart number of iterations equal to 100. In Fig. \ref{fig:errorAFW} and Tables \ref{tab:resminAFW_k1}, \ref{tab:resminAFW_k2}, \ref{tab:resminAFW_k3} the errors for variables $(e_w, \bm{e}_\theta, \bm{E}_\kappa, \bm{e}_\gamma)$  are reported. The errors for $(e_w, \bm{e}_\theta, \bm{e}_\gamma)$ respect the conjectured result \eqref{eq:errAFW}. Variable $\bm{E}_\kappa$ exhibit a superconvergence phenomenon for the case $k=1$. In \cite{arnold2014elastodynamics} no numerical study was carried out for the case $k=1$. The BDM elements might be responsible for such superconvergence. The convergence order of $(\bm{E}_\kappa, \bm{e}_\gamma)$ deteriorates for $k=3$ for the finest mesh. This must be linked to errors due to the underlying large saddle-point problem. Indeed in \cite{arnold2014elastodynamics} an hybridization method is used to transform the saddle-point problem into a positive definite one. The results for the Lagrange multiplier is reported in Fig. \ref{fig:errAFW5} and Table \ref{tab:resminAFW_r}. For this variable an order 2 of convergence is observed for all cases.
+Formulation \eqref{eq:weak_min_div_weak} and its element \eqref{eq:AFW} are considered here. A direct solver fails for high order cases (i.e. $k=3$). For this reason a generalized minimal residual method GMRES \cite{saad1986gmres} is used with restart number of iterations equal to 100. In Fig. \ref{fig:errorAFW} and Tables \ref{tab:resminAFW_k1}, \ref{tab:resminAFW_k2}, \ref{tab:resminAFW_k3} the errors for variables $(e_w, \bm{e}_\theta, \bm{E}_\kappa, \bm{e}_\gamma)$  are reported. The errors for $(e_w, \bm{e}_\theta, \bm{e}_\gamma)$ respect the conjectured result \eqref{eq:errAFW}. Variable $\bm{E}_\kappa$ exhibits a superconvergence phenomenon for the case $k=1$. In \cite{arnold2014elastodynamics} no numerical study was carried out for the case $k=1$. The BDM elements might be responsible for such superconvergence. The convergence order of $(\bm{E}_\kappa, \bm{e}_\gamma)$ deteriorates for $k=3$ for the finest mesh. This must be linked to errors due to the underlying large saddle-point problem. Indeed in \cite{arnold2014elastodynamics} a hybridization method is used to transform the saddle-point problem into a positive definite one. The results for the Lagrange multiplier are reported in Fig. \ref{fig:errAFW5} and Table \ref{tab:resminAFW_r}. For this variable, an order 2 of convergence is observed for all cases.
 
 \begin{figure}[htbp]%
 	\centering
@@ -763,7 +767,7 @@ The forcing term is given by
 \[
 f = (4 D \pi^4 - \rho b) \sin(\pi x) \sin(\pi y) \sin(t), \quad D = \frac{E_Y b^3}{12 (1-\nu^2)}.
 \]
-The corresponding variables in the port-Hamiltonian frame work are
+The corresponding variables in the port-Hamiltonian framework are
 \[
 e_w^{\text{ex}} = \partial_t w^{\text{ex}}, \quad \bm{E}_\kappa^{\text{ex}} = \mathcal{D} \nabla^2 w^{\text{ex}},
 \]
@@ -809,7 +813,7 @@ Results are shown in Fig.~\ref{fig:errorHHJ_SSSS} and Tables \ref{tab:reskirHHJ_
 
 
 \paragraph{Results for the dual mixed formulation (BellDG3 elements)}
-The results are reported in Fig. \ref{fig:errorBellDG3_SSSS} and Tab. \ref{tab:reskirBellDG3_SSSS}. The error is computed in the $L^\infty (H^2(\Omega))$ norm for $e_w$ and in the $L^\infty (L^2(\Omega, \mathbb{S}))$ norm for $\bm{E}_\kappa$. The convergence of the proposed elements is higher than linear, with a rate approaching 1.50 for the finest meshes. It is difficult to interpret this rate of convergence with respect to known convergence results. In particular the convergence rate for the Bell element (measured in the $H^2$ norm) for the classical biharmonic problem is 3 \cite{ciarlet1988mathematical}. The proposed method is not as performing as a standard discretization of the biharmonic problem
+The results are reported in Fig. \ref{fig:errorBellDG3_SSSS} and Tab. \ref{tab:reskirBellDG3_SSSS}. The error is computed in the $L^\infty (H^2(\Omega))$ norm for $e_w$ and in the $L^\infty (L^2(\Omega, \mathbb{S}))$ norm for $\bm{E}_\kappa$. The convergence of the proposed elements is higher than linear, with a rate approaching 1.50 for the finest meshes. It is difficult to interpret this rate of convergence with respect to known convergence results. In particular the convergence rate for the Bell element (measured in the $H^2$-norm) for the classical biharmonic problem is 3 \cite{ciarlet1988mathematical}. The proposed method is not as effective as a standard discretization of the biharmonic problem
 
 
 \begin{figure}[htbp]%
@@ -922,7 +926,7 @@ The results are reported in Fig. \ref{fig:errorBellDG3_CSFS} and Tab. \ref{tab:r
 
 
 \section{Conclusion}
-In this chapter, the link between mixed finite element method and pH flexible structured has been studied. It was shown that existing and non-standard elements can be used to achieve a structure-preserving discretization of the models under consideration.  Apart for the dual discretization of the Kirchhoff plate, error estimates conjectures have been formulated. The numerical examples seem to confirm such conjectures. However a rigorous error analysis is still to be done. \\
+In this chapter, the link between mixed finite element method and pH flexible structured has been studied. It was shown that existing and non-standard elements can be used to achieve a structure-preserving discretization of the models under consideration.  Apart for the dual discretization of the Kirchhoff plate, error estimates conjectures have been formulated. The numerical examples seem to confirm such conjectures. However a rigorous error analysis, apart from the wave equation \cite{haine2020} under uniform boundary condition, is still to be done. \\
 
 
 Since the pH framework provides a powerful description of boundary control systems, it is important that numerical methods be capable of handling generic boundary conditions. Concerning this problem, the mixed discretization of Kirchhoff plate poses additional difficulties \cite{blum1990}.  A promising methodology is detailed in \cite{rafetseder2018siam}, but the dynamical case has not been considered yet. 

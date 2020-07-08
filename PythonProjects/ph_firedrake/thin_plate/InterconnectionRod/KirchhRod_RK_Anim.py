@@ -364,7 +364,7 @@ axes.set_ylim([0, 200])
 plt.legend(loc='best')
 
 path_out = "/home/a.brugnoli/Plots/Python/Plots/Kirchhoff_plots/Simulations/Article_CDC/InterconnectionRod/"
-path_video = "/home/a.brugnoli/Videos/"
+# path_video = "/home/a.brugnoli/Videos/"
 
 plt.savefig(path_out + "HamiltonianRod.eps", format="eps")
 
@@ -377,7 +377,7 @@ fps = 20
 Writer = animation.writers['ffmpeg']
 writer = Writer(fps= fps, metadata=dict(artist='Me'), bitrate=1800)
 
-anim.save(path_video + 'Kirchh_Rod.mp4', writer=writer)
+anim.save(path_out + 'Kirchh_Rod.mp4', writer=writer)
 
 save_solutions = True
 if save_solutions:

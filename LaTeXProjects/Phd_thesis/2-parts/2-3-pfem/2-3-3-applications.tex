@@ -134,7 +134,7 @@ The discretization is performed as in \eqref{eq:pHsys_findim_kirchh_hess}. Varia
 \end{pmatrix},
 \end{aligned}
 \end{equation}
-where $\mathbf{B}_{\Gamma_D} = [\mathbf{B}_{w, \Gamma_D} \; \mathbf{B}_{\partial_n w, \Gamma_D}]$. The discretization of the control law \eqref{eq:ctrllaw_Kir} provides
+where $\mathbf{B}_{\Gamma_D} = [\mathbf{B}_{w, \Gamma_D} \quad \mathbf{B}_{\partial_n w, \Gamma_D}]$. The discretization of the control law \eqref{eq:ctrllaw_Kir} provides
 \begin{equation}
 \begin{aligned}
 \mathbf{u}_{\partial, q} &= -k_q \mathbf{y}_{\partial, q} = - k_q \mathbf{M}_{\Gamma_N}^{-1} \mathbf{B}_{w, \Gamma_N}^\top \mathbf{e}_w, \\
@@ -165,7 +165,7 @@ System \eqref{eq:pHsys_findim_bdKir_open} now reads
 \end{pmatrix}.
 \end{equation}
 The matrix 
-$$\mathbf{R}_w = k_q \mathbf{B}_{w, \Gamma_N} \mathbf{M}_{\Gamma_N}^{-1} \mathbf{B}_{w, \Gamma_N}^\top + k_m \mathbf{B}_{\partial_{\bm{n}} w, \Gamma_N} \mathbf{M}_{\Gamma_N,}^{-1} \mathbf{B}_{\partial_{\bm{n}} w, \Gamma_N}^\top \succ 0$$
+$$\mathbf{R}_w = k_q \mathbf{B}_{w, \Gamma_N} \mathbf{M}_{\Gamma_N}^{-1} \mathbf{B}_{w, \Gamma_N}^\top + k_m \mathbf{B}_{\partial_{\bm{n}} w, \Gamma_N} \mathbf{M}_{\Gamma_N}^{-1} \mathbf{B}_{\partial_{\bm{n}} w, \Gamma_N}^\top \succ 0$$
  is positive definitive because of the collocated input-output feature of pH systems. The energy rate evaluates to \cite[Theorem 13]{beattie2018linear}
 \[\dot{H} _{d} = - \mathbf{e}_{w}^\top \; \mathbf{R}_w \; \mathbf{e}_{w} \le 0. \]
 Therefore, the Hamiltonian energy is a Lyapunov function and the asymptotic stability of configuration $\mathbf{e}_{w} = \mathbf{0}, \; \mathbf{e}_{\kappa} = \mathbf{0}$ is deduced using LaSalle' invariance  principle. \\
@@ -292,7 +292,7 @@ The corresponding output reads
 \bm\alpha_v(x, y, 0) &= \bm{0},
 \end{aligned}
 \end{equation}
-where $ h^{\text{des}}$ is the desired fluid height. It is known that a proportional controller exponentially stabilizes the system \cite{dos2008boundary}. Here, we use a simple control for stabilizing the system around the desired point $h^*$
+where $ h^{\text{des}}$ is the desired fluid height. It is known that a proportional controller exponentially stabilizes the system \cite{dos2008boundary}. Here, we use a simple control for stabilizing the system around the desired point $h^{\text{des}}$
 \begin{equation}\label{eq:ctrllaw_SWE}
 u_\partial = -k (y_\partial - y_\partial^{\text{des}}), \qquad y_\partial^{\text{des}}= \rho g h^{\text{des}}, \quad k>0.
 \end{equation}
@@ -405,7 +405,7 @@ The parameters for the simulation are reported in Table. \eqref{tab:parSWE_damp}
 
 \begin{figure}[htb]%
 	\centering
-	\subfloat[][Totat energy (Hamiltonian)]{%
+	\subfloat[][Total energy (Hamiltonian)]{%
 		\label{fig:H_SWE}%
 		\includegraphics[width=0.48\columnwidth]{part_3/applications/bs_SWE/Hamiltonian.eps}}%
 	\hspace{8pt}%
@@ -1294,7 +1294,7 @@ The Danilovskaya problem is a one-dimensional thermoelastic model in the infinit
 {j}_Q &= -k \, \partial_x T.
 \end{aligned}
 \end{equation}
-All the variables have the same meaning as in Chapter \ref{ch:Thermo}. The initial conditions for this problem are all null. To excite a sudden thermal heating occurs at $x=0$. Furthermore, the variables vanish at $\infty$. Consequently, the following boundary conditions apply
+All the variables have the same meaning as in Chapter \ref{ch:Thermo}. The initial conditions for this problem are all null. The system is excited by a sudden thermal heating at $x=0$. Furthermore, the variables vanish at $\infty$. Consequently, the following boundary conditions apply
 \begin{equation*}
 \begin{aligned}
 T(0, t) = T_1 H(t), \\
@@ -1519,7 +1519,7 @@ In Figs. \ref{fig:disp_at1}, \ref{fig:temp_at1} the analytical and numerical dis
 
 \section{Conclusion}
 In this chapter the Partitioned Finite Element method has been employed for a number of problems.
-Thanks to this method, a structured and general numerical implementation of interconnected infinite-dimensional system is available. For what concerns the mixed boundary conditions enforcement, there is a point that require further investigation: the usage of Lagrange multiplier for the weak imposition of the boundary conditions is absolutely non trivial as the subspace employed for the multiplier has to carefully designed \cite{pitkaranta1979boundary,pitkaranta1980local,pitkaranta1981finite,gunzburger1992}. 
+Thanks to this method, a structured and general numerical implementation of interconnected infinite-dimensional system is available. For what concerns the mixed boundary conditions enforcement, there is a point that require further investigation: the usage of Lagrange multiplier for the weak imposition of the boundary conditions is absolutely non trivial as the subspace employed for the multiplier has to carefully designed \cite{pitkaranta1979boundary,pitkaranta1980local,pitkaranta1981finite,gunzburger1992}. As a general guideline the Lagrange multiplier space must not impose too many boundary conditions to the discrete solution, in order to fulfill the inf-sup condition \cite{joly2003variational}. 
 
 
 
