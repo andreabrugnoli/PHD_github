@@ -31,15 +31,26 @@ import time
 
 n_elem = 2
 
-L_crank = 0.15
-L_coupler = 0.3
+# L_crank = 0.15
+# L_coupler = 0.3
+
+L_crank = 0.152
+L_coupler = 0.304
+rho_coupler = 7.83 * 10 ** 3
+E_coupler = 206.8 * 10**9
+
+
 d = 0.006
 A_coupler = pi * d**2 / 4
 I_coupler = pi * d**4 / 64
 
 
-rho_coupler = 7.87 * 10 ** 3
-E_coupler = 0.2 * 10**12
+# rho_coupler = 7.87 * 10 ** 3
+# E_coupler = 0.2 * 10**12
+
+# omega_cr = 150
+omega_cr = 124.8
+
 
 # L_crank = 150
 # L_coupler = 300
@@ -51,7 +62,6 @@ E_coupler = 0.2 * 10**12
 # rho_coupler = 7.87 * 10 ** (-6)
 # E_coupler = 200 * 10**3
 
-omega_cr = 150
 
 nr_coupler = 3
 nr_mass = 2
@@ -310,7 +320,7 @@ plt.plot(omega_cr*t_ev, uM_B/L_coupler, 'b-')
 plt.xlabel(r'Crank angle $\mathrm{[rad]}$')
 plt.ylabel(r'$u_f^x/L_{cl}$')
 plt.title(r"Midpoint horizontal deflection")
-plt.savefig(path_fig + 'uM_disp.eps', format="eps")
+# plt.savefig(path_fig + 'uM_disp.eps', format="eps")
 
 fig = plt.figure()
 plt.plot(omega_cr*t_ev, wM_B/L_coupler, 'b-')
@@ -319,7 +329,7 @@ plt.ylabel(r'$u_f^y/L_{cl}$')
 plt.title(r"Midpoint vertical deflection")
 axes = plt.gca()
 axes.set_ylim([-0.015, 0.02])
-plt.savefig(path_fig + 'wM_disp.eps', format="eps")
+# plt.savefig(path_fig + 'wM_disp.eps', format="eps")
 
 plt.show()
 # plt.legend(loc='upper left')
