@@ -10,7 +10,7 @@ Paul Ric\oe{}ur}}
 \section{Beam systems}
 The examples presented in this section make use of Euler Bernoulli beam model \eqref{eq:EB_sys}. To discretize the system, Lagrange polynomial of order one and Hermite polynomials of order 3 are used for $v_f^x$ and $v_f^y$ respectively. Discontinuous Galerkin elements of order 0 and 1 are selected for $n_x$ and $m_{x}$ respectively. This choice corresponds to the HerDG1 element \eqref{eq:HerDG1} for the bending behavior and to the CGDG element \eqref{eq:CGDG} for the truss behavior.  \\
  
-The first example concerns the computation of eigenvalues of a four bar mechanism for different geometrical configuration. The second example is a rotating crank-slider. In this case the non-linearities cannot be neglected. The third example is a hinged beam undergoing external excitations so that the out-of-plane motion becomes important.   
+The first example concerns the computation of eigenvalues of a four-bar mechanism for different geometrical configuration. The second example is a rotating crank-slider. In this case the non-linearities cannot be neglected. The third example is a hinged beam undergoing external excitations so that the out-of-plane motion becomes important.   
 
 
 \subsection{Linear analysis of a four-bar mechanism}
@@ -20,7 +20,7 @@ The first example concerns the computation of eigenvalues of a four bar mechanis
 	\includegraphics[width=0.6\textwidth]{part_4/validation/EB/fourbars.pdf} 
 	\hspace{.3cm}
 	\includegraphics[width=0.35\textwidth]{part_4/validation/EB/block_4bars.eps} 
-	\caption{Four bar mechanism illustration (left) and block diagram used for the eigenvalues analysis (right)}
+	\caption{Four-bar mechanism illustration (left) and block diagram used for the eigenvalues analysis (right)}
 	\label{fig:4bars}
 \end{figure}
 
@@ -42,7 +42,7 @@ The first example concerns the computation of eigenvalues of a four bar mechanis
 	\end{tabular}
 \end{table}
 
-The four-bar mechanism has one degree of freedom and represents a closed chain of bodies. The data are taken from \cite{kitis1990natural,chebbi2017} are recalled in Table \ref{tab:data_4bars}. In Fig. \ref{fig:4bars} the mechanism and the corresponding block diagram used for constructing the final pH system with transformer interconnections between subsystems are presented. The lumped masses are directly included in the coupler and follower model considering a simple modification of the rigid mass matrix
+The four-bar mechanism has one degree of freedom and represents a closed chain of bodies. The data, taken from \cite{kitis1990natural,chebbi2017}, are recalled in Table \ref{tab:data_4bars}. In Fig. \ref{fig:4bars} the mechanism and the corresponding block diagram used for constructing the final pH system with transformer interconnections between subsystems are presented. The lumped masses are directly included in the coupler and follower model considering a simple modification of the rigid mass matrix
 \begin{equation*}
 \mathbf{M}_{rr}^{i + m_l}[1:2,1:2] = \mathbf{M}_{rr}^{i}[1:2,1:2] + \mathbf{I}_{2\times 2} m_l,
 \end{equation*} 
@@ -61,12 +61,12 @@ The resulting system is expressed in pH form as $\mathbf{E}\dot{\mathbf{e}} = \m
 	\centering
 	\includegraphics[width=0.49\textwidth]{part_4/validation/EB/FourBar_Om12_Chebbi.eps} 
 	\includegraphics[width=0.49\textwidth]{part_4/validation/EB/FourBar_Om3_Chebbi.eps} 
-	\caption{Eigenvalues $\omega_i, \ i=1,2,3$ for the four bar mechanism for varying crank angle.}
+	\caption{Eigenvalues $\omega_i, \ i=1,2,3$ for the four-bar mechanism for varying crank angle.}
 	\label{fig:omega_4bars}
 \end{figure}
 
 \subsection{Rotating crank-slider}
-To verify the non-linear planar model a crank-slider rotating at high speed is considered. The example is retrieved form \cite{ellenbroek2018}.  The crank is considered as rigid, with length $L_{\text{cr}} = 0.15 \ [\mathrm{m}]$ and rotates at a constant angular rate $\omega_{\text{cr}} = 150 \ [\mathrm{rad/s}]$. The flexible coupler has length $L_{\text{cl}} = 0.3 \ [\mathrm{m}]$ and a circular cross section whose diameter is $d_{\text{cl}} = 6 \ [\mathrm{mm}]$. Its Young modulus and density are given by $E_{\text{cl}}=0.2 \ 10^{12} \ [\mathrm{Pa}]$, and $\rho_{\text{cl}}=7870 \ [\mathrm{kg/m}^3]$. The slider has a total mass equal to half the mass of the coupler $m_{\text{sl}} = 0.033 \ [\mathrm{kg}]$. A simply supported condition is supposed for the coupler deformation field. This choice is motivated by the fact that the slider has a large inertia and does not allow elastic displacement at the tip.
+To verify the non-linear planar model a crank-slider rotating at high speed is considered. The example is retrieved from \cite{ellenbroek2018}.  The crank is considered as rigid, with length $L_{\text{cr}} = 0.15 \ [\mathrm{m}]$ and rotates at a constant angular rate $\omega_{\text{cr}} = 150 \ [\mathrm{rad/s}]$. The flexible coupler has length $L_{\text{cl}} = 0.3 \ [\mathrm{m}]$ and a circular cross section whose diameter is $d_{\text{cl}} = 6 \ [\mathrm{mm}]$. Its Young modulus and density are given by $E_{\text{cl}}=0.2 \ 10^{12} \ [\mathrm{Pa}]$, and $\rho_{\text{cl}}=7870 \ [\mathrm{kg/m}^3]$. The slider has a total mass equal to half the mass of the coupler $m_{\text{sl}} = 0.033 \ [\mathrm{kg}]$. A simply supported condition is supposed for the coupler deformation field. This choice is motivated by the fact that the slider has a large inertia and does not allow elastic displacement at the tip.
 
 \begin{figure}[tb]
 	\centering
@@ -121,7 +121,7 @@ The resulting system is a quasi linear index-2 DAE of the form
 	\label{fig:defM_crsl}
 \end{figure}
 
-Setting the initial conditions properly is of utmost  importance for a DAE solver. For this problem the beam is supposed undeformed at the initial time. The initial conditions for the rigid movement are then found using basic kinematics considerations.  The system is then solved using the IDA algorithm available in the Assimulo library \cite{assimulo2015}. The computational performance for this test case are reported in Tab. \ref{tab:comp_perf_crslider} In Fig. \ref{fig:defM_crsl} the midpoint deformation displacement $u_f^x(L_{\text{cl}/2}),\; u_f^y(L_{\text{cl}/2})$, normalized with respect to the coupler length, is reported. The resulting vertical displacement is in accordance with the results presented in \cite{ellenbroek2018}. The horizontal displacement exhibits high oscillations because of the higher eigenfrequencies of the longitudinal movement. This is due to the fact that null initial conditions are imposed on the deformation \cite{simeon2006}. In order to obtain a smoother solution, the initial deformation has to be computed from the rigid initial condition.
+Setting the initial conditions properly is of utmost  importance for a DAE solver. For this problem the beam is supposed undeformed at the initial time. The initial conditions for the rigid movement are then found using basic kinematics considerations.  The system is then solved using the IDA algorithm available in the Assimulo library \cite{assimulo2015}. The computational performances for this test case are reported in Tab. \ref{tab:comp_perf_crslider} In Fig. \ref{fig:defM_crsl} the midpoint deformation displacement $u_f^x(L_{\text{cl}/2}),\; u_f^y(L_{\text{cl}/2})$, normalized with respect to the coupler length, is reported. The resulting vertical displacement is in accordance with the results presented in \cite{ellenbroek2018}. The horizontal displacement exhibits high oscillations because of the higher eigenfrequencies of the longitudinal movement. This is due to the fact that null initial conditions are imposed on the deformation \cite{simeon2006}. In order to obtain a smoother solution, the initial deformation has to be computed from the rigid initial condition.
 
 
 \begin{table}[tb]
@@ -193,7 +193,7 @@ A spatial beam rotating about a spherical joint is considered (see Fig. \ref{fig
 In this section, the Kirchhoff plate model is considered in multibody applications. In the first example a cantilever plate is interconnected to a rigid rod, welded to one side of the plate. The discretization is achieved using the same finite elements as in \secref{sec:bd_stabKP}. This example is not compared with previously published material, because of the lack of similar simulations in the literature. The second example concerns the computation of frequencies of a cantilever plate with in domain actuation. This mechanical system is taken from the experimental setup employed in \cite{preda2020}. The Hellan-Hermann-Johnson elements are used to discretize the plate.
 
 \subsection{Boundary interconnection with a rigid element}
-In this section the interconnection of an infinite and finite pH system is explained in both the infinite- and finite-dimensional settings. This paradigm provides an easy way to construct arbitrarily complex system given its basic components. Infinite- and finite-dimensional can be coupled together, making it possible to construct models for complex applications. The interconnection of a flexible plate and a rigid rod along one side of the plate is taken as an illustrative example.
+In this section the interconnection of an infinite and finite pH system is explained in both the infinite- and finite-dimensional settings. This paradigm provides an easy way to construct an arbitrarily complex system given its basic components. Infinite- and finite-dimensional can be coupled together, making it possible to construct models for complex applications. The interconnection of a flexible plate and a rigid rod along one side of the plate is taken as an illustrative example.
 
 \subsubsection{Infinite-dimensional setting}
 Consider an infinite-dimensional pH system (or distributed pH system, dpH) and a finite-dimensional pH system denoted by equations 
@@ -245,7 +245,7 @@ where $\mathcal{W}^*$ denotes the adjoint of $\mathcal{W}$ (cf. Fig. \ref{fig:in
 	\label{fig:sketchRodPlate}
 \end{figure}
 
-As an illustration, a rigid rod welded to the plate is considered  (see Fig. \ref{fig:sketchRodPlate}). The rigid rod, undergoing small displacements about the $z$ axis and small rotation about the $x$ axis, can be written as a pH system in co-energy variables with structure
+As an illustration, a rigid rod welded to the plate is considered  (see Fig. \ref{fig:sketchRodPlate}). The rigid rod, undergoing small displacements about the $z$ axis and small rotations about the $x$ axis, can be written as a pH system in co-energy variables with structure
 \begin{equation}
 \begin{aligned}
 \begin{bmatrix}

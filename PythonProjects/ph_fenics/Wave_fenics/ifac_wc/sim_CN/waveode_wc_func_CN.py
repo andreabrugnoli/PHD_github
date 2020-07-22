@@ -315,7 +315,7 @@ def computeH_ode(ind):
         Hq_vec[i] = 0.5 * (eq_sol[:, i].T @ MMq @ eq_sol[:, i])
     
     
-    path_results = "/home/a.brugnoli/LargeFiles/results_ifacwc_CN/"
+    path_results = "/home/a.brugnoli/LargeFiles/results_ifacwc_CN2/"
     np.save(path_results + "t_ode_" + str(ind) + ".npy", t_sol)
     np.save(path_results + "H_ode_" + str(ind) + ".npy", H_vec)
     np.save(path_results + "Hp_ode_" + str(ind) + ".npy", Hp_vec)

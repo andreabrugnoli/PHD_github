@@ -4,12 +4,12 @@
 
 \minitoc
 
-\lettrine{\color{theme}{T}}he application of the Partitioned Finite Element leads to finite-dimensional pH systems, that can be discretized using finite elements method. To quantify how well the numerical solution approximates the true one, it is important to estimate the rate of convergence of the finite elements. In this chapter convergence estimates are conjectured for beams and plates systems and numerical experiments are constructed to support the proposed conjectures. \\
+\lettrine{\color{theme}{T}}he application of the Partitioned Finite Element method leads to finite-dimensional pH systems, that can be discretized using finite elements method. To quantify how well the numerical solution approximates the true one, it is important to estimate the rate of convergence of the finite elements. In this chapter convergence estimates are conjectured for beams and plates systems and numerical experiments are constructed to support the proposed conjectures. \\
 
-The first section is devoted to the Euler-Bernoulli beam. For the discretization of this problem three methodologies are proposed. In the second section of this chapter, pH plate problems are discretized using mixed finite elements. This means that the divergence operator explicitly appears in the weak formulation.  In the third part the discretization of plate problem is of dual-mixed type \cite{arnold1990intro}, meaning that the gradient operator comes out in the weak formulation. The last section gathers all the numerical results. \\
+The first section is devoted to the pH Euler-Bernoulli beam. For the discretization of this problem three strategies are proposed. In the second section of this chapter, pH plate problems are discretized using mixed finite elements. This means that the divergence operator explicitly appears in the weak formulation.  In the third part the discretization of plate problem is of dual-mixed type \cite{arnold1990intro}, meaning that the gradient operator comes out in the weak formulation. The last section gathers all the numerical results. \\
 
 \begin{remark}
-Homogeneous boundary conditions will be always considered in this chapter. These are enforced weakly  (i.e. natural boundary conditions $\bm{u}_\partial \equiv \bm{0}$) or strongly (i.e. essential boundary conditions) depending on the specific formulation under analysis.
+Homogeneous boundary conditions will always be considered in this chapter. These are enforced weakly  (i.e. natural boundary conditions $\bm{u}_\partial \equiv \bm{0}$) or strongly (i.e. essential boundary conditions) depending on the specific formulation under analysis.
 \end{remark}
 
 
@@ -44,7 +44,7 @@ Let ${X}$ be a Hilbert space, and $t_f$ a positive real number. We denote by $L^
 \]
 The notation
 $$||u - u_h || \lesssim  h^k$$
-means $||u - u_h|| \le C h^k$. The constant $C(u, t_f)$ depends only on the exact solution $u$ and on the final time $t_f$.
+means $||u - u_h|| \le C(u, t_f) h^k$. The constant $C(u, t_f)$ depends only on the exact solution $u$ and on the final time $t_f$.
 
 \section{Discretization of the Euler-Bernoulli beam}
 In this section the Euler-Bernoulli beam is discretized using conforming finite elements for three different formulations:
@@ -131,7 +131,7 @@ Since the formulation is symmetrical to \eqref{eq:weak_EB_Hess_nobd}, the follow
 
 
 \subsection{Mixed discretization with lower regularity requirement}
-Consider the weak formulation \eqref{eq:weak_EB}. If both lines are integrated by parts once, the following weak form is obtained: find
+Consider the weak formulation \eqref{eq:weak_EB}. If both lines are integrated by parts once, the resulting weak form seeks
 \begin{equation*}
 \{e_w, e_\kappa\} \in H^1(\Omega) \times H^1(\Omega) 
 \end{equation*}
@@ -155,7 +155,7 @@ H_{h, \text{CGCG}}^{2}(\Omega) &= \{ w_h \in H^{1}(\Omega) | \ \forall E \in \ma
 L_{h, \text{CGCG}}^2(\Omega) &= \{M_h \in H^{1}(\Omega) | \ \forall E \in \mathcal{I}_h, \ M_h|_{E} \in \mathrm{CG}_k \}, \\
 \end{aligned}
 \end{equation}
-where CG is the continuous Galerkin finite element \cite[Chapter 3]{logg2012}.  The following error estimates are conjectured:
+where CG is the Continuous Galerkin finite element \cite[Chapter 3]{logg2012}.  The following error estimates are conjectured:
 
 \begin{conjecture}[Convergence of the CGCG elements]\label{conj:CGCGestimates}
 	Assuming a smooth solution for problem~\eqref{eq:weak_EB_divDiv_nobd}, the following error estimates hold
@@ -196,7 +196,7 @@ $$\{e_w, \bm{e}_{\bm{\theta}}, \bm{E}_{\kappa}, \bm{e}_{\gamma}\} \in L^2(\Omega
 \end{aligned}
 \end{equation}
 
-The plate thickness is indicated by the $b$ symbol, to avoid confusion with the average mesh size indicated by $h$. A distributed force $f$ and torque $\bm{\tau}$ are considered in order to find a manufactured solution for this problem. \\
+The plate thickness is indicated by the symbol $b$, to avoid confusion with the average mesh size indicated by $h$. A distributed force $f$ and torque $\bm{\tau}$ are considered in order to find a manufactured solution for this problem. \\
 
 Obtaining stable finite elements that embed the symmetry of the stress tensor for the elastodynamics problem has proven to be a difficult task \cite{arnold2002mixed}. The easiest construction is the one presented in \cite{becache2001elas}. This finite element solution can be implemented in {\sc{Firedrake}} \cite{rathgeber2017firedrake} thanks to the extruded mesh functionality \cite{mcrae2016}.  The main disadvantage is that this scheme requires the domain to be given by a union of rectangles, as the mesh elements have to be square. However, this allows constructing a simple element for the momenta tensor. Let $\mathcal{R}_h$ be a regular mesh with square elements $Q$. The following spaces are introduced as discretization spaces
 \begin{equation}
@@ -513,7 +513,7 @@ We consider the following exact solution for the Euler-Bernoulli beam under simp
 \begin{equation}
 w^{\text{ex}} = \sin(\pi x/ L)\sin(t), \qquad \Omega = \{0, L\}.
 \end{equation}
-The corresponding pH exact solution are then
+The corresponding pH exact solutions are then
 \begin{equation}
 \begin{aligned}
 e_w^{\text{ex}} &= \sin\left({\pi x}/{L}\right)\cos(t), \\
@@ -544,7 +544,7 @@ The numerical values used for the simulations are reported in Tab. \ref{tab:parE
 \end{table}
 
 \paragraph{Results for the HerDG1 elements \ref{eq:HerDG1}}
-The results are reported in Fig. \ref{fig:errorHerDG1} and Table \ref{tab:resebDG1Her}. The conjectured error estimates \eqref{eq:errHerDG1} are respected.
+The results are reported in Fig. \ref{fig:errorHerDG1} and Table \ref{tab:resebHerDG1}. The conjectured error estimates \eqref{eq:errHerDG1} are respected.
 
 \begin{figure}[htbp]%
 	\centering
@@ -561,7 +561,7 @@ The results are reported in Fig. \ref{fig:errorHerDG1} and Table \ref{tab:resebD
 
 
 \paragraph{Results for the DG1Her elements \ref{eq:DG1Her}}
-The results, reported in Fig. \ref{fig:errorDG1Her} and Table \ref{tab:resebHerDG1}, satisfy the predicted error \eqref{eq:errDG1Her}.
+The results, reported in Fig. \ref{fig:errorDG1Her} and Table \ref{tab:resebDG1Her}, satisfy the predicted error \eqref{eq:errDG1Her}.
 
 \begin{figure}[htbp]%
 	\centering
@@ -612,7 +612,7 @@ y^3(y-1)^3 \ x^2 (x-1)^2 (2x-1) \\
 x^3(x-1)^3 \ y^2 (y-1)^2 (2y-1) \\
 \end{pmatrix}
 \end{align*}
-The static solution solves the following problem defined on the square domain $\Omega=(0,1)\times(0,1)$ under clamped boundary condition:
+The static solution solves the following problem defined on the square domain $\Omega=(0,1)\times(0,1)$ under clamped boundary conditions:
 \begin{equation}
 \begin{aligned}
 0 &= \mathrm{div} \ \bm{q}_s + f_s , \\
@@ -676,7 +676,7 @@ The numerical values for the parameters in Tab. \ref{tab:parMin} do not represen
 
 \paragraph{Results for the mixed strong symmetry formulation (BTJ elements \eqref{eq:BTJ})} 
 
-The weak form \eqref{eq:weak_min_div_strong} and its corresponding finite elements \eqref{eq:BTJ} was implemented using {\sc{Firedrake}} extruded mesh functionality \cite{mcrae2016}. A direct solver based on an LU preconditioner is used. In Fig. \ref{fig:errorBTJ} and Tables \ref{tab:resminBTJ_k1}, \ref{tab:resminBTJ_k2}, \ref{tab:resminBTJ_k3} the errors for $(e_w, \bm{e}_\theta, \bm{E}_\kappa, \bm{e}_\gamma)$ are reported. As one can notice, the conjectured error estimates \eqref{eq:errBEC} are recovered for all variables. 
+The weak form \eqref{eq:weak_min_div_strong} and its corresponding finite elements \eqref{eq:BTJ} are implemented using {\sc{Firedrake}} extruded mesh functionality \cite{mcrae2016}. A direct solver based on an LU preconditioner is used. In Fig. \ref{fig:errorBTJ} and Tables \ref{tab:resminBTJ_k1}, \ref{tab:resminBTJ_k2}, \ref{tab:resminBTJ_k3} the errors for $(e_w, \bm{e}_\theta, \bm{E}_\kappa, \bm{e}_\gamma)$ are reported. As one can notice, the conjectured error estimates \eqref{eq:errBEC} are recovered for all variables. 
 
 \begin{figure}[htbp]%
 	\centering
@@ -700,7 +700,7 @@ The weak form \eqref{eq:weak_min_div_strong} and its corresponding finite elemen
 
 
 \paragraph{Results for the mixed weak symmetry formulation (AFW elements \eqref{eq:AFW})} 
-Formulation \eqref{eq:weak_min_div_weak} and its element \eqref{eq:AFW} are considered here. A direct solver fails for high order cases (i.e. $k=3$). For this reason a generalized minimal residual method GMRES \cite{saad1986gmres} is used with restart number of iterations equal to 100. In Fig. \ref{fig:errorAFW} and Tables \ref{tab:resminAFW_k1}, \ref{tab:resminAFW_k2}, \ref{tab:resminAFW_k3} the errors for variables $(e_w, \bm{e}_\theta, \bm{E}_\kappa, \bm{e}_\gamma)$  are reported. The errors for $(e_w, \bm{e}_\theta, \bm{e}_\gamma)$ respect the conjectured result \eqref{eq:errAFW}. Variable $\bm{E}_\kappa$ exhibits a superconvergence phenomenon for the case $k=1$. In \cite{arnold2014elastodynamics} no numerical study was carried out for the case $k=1$. The BDM elements might be responsible for such superconvergence. The convergence order of $(\bm{E}_\kappa, \bm{e}_\gamma)$ deteriorates for $k=3$ for the finest mesh. This must be linked to errors due to the underlying large saddle-point problem. Indeed in \cite{arnold2014elastodynamics} a hybridization method is used to transform the saddle-point problem into a positive definite one. The results for the Lagrange multiplier are reported in Fig. \ref{fig:errAFW5} and Table \ref{tab:resminAFW_r}. For this variable, an order 2 of convergence is observed for all cases.
+Formulation \eqref{eq:weak_min_div_weak} and its elements \eqref{eq:AFW} are considered here. A direct solver fails for high order cases (i.e. $k=3$). For this reason a generalized minimal residual method GMRES \cite{saad1986gmres} is used with restart number of iterations equal to 100. In Fig. \ref{fig:errorAFW} and Tables \ref{tab:resminAFW_k1}, \ref{tab:resminAFW_k2}, \ref{tab:resminAFW_k3} the errors for variables $(e_w, \bm{e}_\theta, \bm{E}_\kappa, \bm{e}_\gamma)$  are reported. The errors for $(e_w, \bm{e}_\theta, \bm{e}_\gamma)$ respect the conjectured result \eqref{eq:errAFW}. Variable $\bm{E}_\kappa$ exhibits a superconvergence phenomenon for the case $k=1$. In \cite{arnold2014elastodynamics} no numerical study was carried out for the case $k=1$. The BDM elements might be responsible for such superconvergence. The convergence order of $(\bm{E}_\kappa, \bm{e}_\gamma)$ deteriorates for $k=3$ for the finest mesh. This must be linked to errors due to the underlying large saddle-point problem. Indeed in \cite{arnold2014elastodynamics} a hybridization method is used to transform the saddle-point problem into a positive definite one. The results for the Lagrange multiplier are reported in Fig. \ref{fig:errAFW5} and Table \ref{tab:resminAFW_r}. For this variable, an order 2 of convergence is observed for all cases.
 
 \begin{figure}[htbp]%
 	\centering
@@ -730,7 +730,7 @@ Formulation \eqref{eq:weak_min_div_weak} and its element \eqref{eq:AFW} are cons
 
 
 \paragraph{Results for dual mixed formulation (CGDG elements \eqref{eq:CGDG})}
-For this formulation have to imposed strongly on $e_w, \bm{e}_\theta$. A direct solver based on an LU preconditioner is used. In Fig. \ref{fig:errorCGDG} and Tables \ref{tab:resminCGDG_k1} the errors are reported. Conjecture \ref{conj:CGDGestimates} is verified for this test. 
+For this formulation the boundary conditions have to imposed strongly on $e_w, \bm{e}_\theta$. A direct solver based on an LU preconditioner is used. In Fig. \ref{fig:errorCGDG} and Tables \ref{tab:resminCGDG_k1} the errors are reported. Conjecture \ref{conj:CGDGestimates} is verified for this test. 
 
 \begin{figure}[htbp]%
 	\centering
@@ -813,7 +813,7 @@ Results are shown in Fig.~\ref{fig:errorHHJ_SSSS} and Tables \ref{tab:reskirHHJ_
 
 
 \paragraph{Results for the dual mixed formulation (BellDG3 elements)}
-The results are reported in Fig. \ref{fig:errorBellDG3_SSSS} and Tab. \ref{tab:reskirBellDG3_SSSS}. The error is computed in the $L^\infty (H^2(\Omega))$ norm for $e_w$ and in the $L^\infty (L^2(\Omega, \mathbb{S}))$ norm for $\bm{E}_\kappa$. The convergence of the proposed elements is higher than linear, with a rate approaching 1.50 for the finest meshes. It is difficult to interpret this rate of convergence with respect to known convergence results. In particular the convergence rate for the Bell element (measured in the $H^2$-norm) for the classical biharmonic problem is 3 \cite{ciarlet1988mathematical}. The proposed method is not as effective as a standard discretization of the biharmonic problem
+The results are reported in Fig. \ref{fig:errorBellDG3_SSSS} and Tab. \ref{tab:reskirBellDG3_SSSS}. The error is computed in the $L^\infty (H^2(\Omega))$ norm for $e_w$ and in the $L^\infty (L^2(\Omega, \mathbb{S}))$ norm for $\bm{E}_\kappa$. The convergence of the proposed elements is higher than linear, with a rate approaching 1.50 for the finest meshes. It is difficult to interpret this rate of convergence with respect to known convergence results. In particular the convergence rate for the Bell element (measured in the $H^2$-norm) for the classical biharmonic problem is 3 \cite{ciarlet1988mathematical}. The proposed method is not as effective as a standard discretization of the biharmonic problem.
 
 
 \begin{figure}[htbp]%
@@ -846,7 +846,7 @@ The exact static solution is given by
 w_s(x, y) = [(c_1 + c_2 x) \cosh(\pi x) + (c_3 + c_4 x) \sinh(\pi x) + \sin(\pi x)] \sin(\pi y).
 \end{equation*}
 
-The coefficient are then computed depending on the boundary conditions. For the considered case (CSFS) it is obtained
+The coefficients are then computed depending on the boundary conditions. For the considered case (CSFS) it is obtained
 \begin{align*}
 c_1 &= -2 \frac{\sinh(\pi) - 3 \sinh(3\pi) + \pi[4\pi\sinh(\pi)+7\cosh(\pi) - 3\cosh(3 \pi)]}{5 + 8\pi^2 + 3\cosh(4\pi)}, \\
 c_2 &= - \frac{8\pi[2\pi\sinh(\pi) + \cosh(\pi)]}{5 + 8\pi^2 + 3\cosh(4\pi)}, \\
@@ -861,7 +861,7 @@ The dynamical force is then given by
 \begin{equation*}
 f_d(x,y,t) = f_s(x,y)\sin(t) +  \rho b \partial_{tt} w_d
 \end{equation*}
-For the port-Hamiltonian system the exact solution  are thus given by
+For the port-Hamiltonian system the exact solution is thus given by
 \begin{equation}
 e_w^\text{ex} = w_s(x,y) \cos(t), \qquad \bm{E}_\kappa^\text{ex} =  \bm{\mathcal{D}}_b \ \mathrm{Grad} \ \bm{\theta}_d.
 \end{equation}
@@ -926,7 +926,7 @@ The results are reported in Fig. \ref{fig:errorBellDG3_CSFS} and Tab. \ref{tab:r
 
 
 \section{Conclusion}
-In this chapter, the link between mixed finite element method and pH flexible structured has been studied. It was shown that existing and non-standard elements can be used to achieve a structure-preserving discretization of the models under consideration.  Apart for the dual discretization of the Kirchhoff plate, error estimates conjectures have been formulated. The numerical examples seem to confirm such conjectures. However a rigorous error analysis, apart from the wave equation \cite{haine2020} under uniform boundary condition, is still to be done. \\
+In this chapter, the link between mixed finite element method and pH flexible structures has been studied. It was shown that existing and non-standard elements can be used to achieve a structure-preserving discretization of the models under consideration.  Apart for the dual discretization of the Kirchhoff plate, error estimates conjectures have been formulated. The numerical examples seem to confirm such conjectures. However a rigorous error analysis, apart from the wave equation \cite{haine2020} under uniform boundary condition, is still to be done. \\
 
 
 Since the pH framework provides a powerful description of boundary control systems, it is important that numerical methods be capable of handling generic boundary conditions. Concerning this problem, the mixed discretization of Kirchhoff plate poses additional difficulties \cite{blum1990}.  A promising methodology is detailed in \cite{rafetseder2018siam}, but the dynamical case has not been considered yet. 

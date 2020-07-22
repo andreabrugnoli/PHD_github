@@ -6,15 +6,15 @@
 \lettrine{\color{theme}{T}}he proposed finite element discretization can be employed for different numerical applications. The chapter is organized as follows:
 \begin{itemize}
 	\item a boundary stabilization problem for the Kirchhoff plate and for the irrotational shallow water equations is presented in \secref{sec:bd_stab};
-	\item Sec. \ref{sec:mixbd_enfor} presents a comparison of the Lagrange multiplier \ref{sec:lagrMul} and the virtual domain decomposition method \ref{sec:vdd} for the enforcement of mixed boundary conditions;
-	\item a thermoelastic problem for which an analytic solution is available is illustrated in \secref{sec:thelas_wave}.
+	\item Sec. \ref{sec:mixbd_enfor} presents a comparison between the Lagrange multiplier \ref{sec:lagrMul} and the virtual domain decomposition method \ref{sec:vdd} for the enforcement of mixed boundary conditions;
+	\item a thermoelastic problem, for which an analytic solution is available, is illustrated in \secref{sec:thelas_wave}.
 \end{itemize}
 
 
 
 \section{Boundary stabilization}\label{sec:bd_stab}
 
-In this section, we consider the boundary stabilization of a cantilever Kirchhoff plate of the irrotational shallow water equations. For pHs a simple proportional gain assures asymptotic system of the system thanks to the LaSalle’ invariance principle \cite[Proposition 6.2]{duindam2009}. This can be used to achieve stabilization of the undeformed configuration of the Kirchhoff plate. For the shallow water equations a reference is also added to stabilizes the system around a certain fluid height.
+In this section, we consider the boundary stabilization of a cantilever Kirchhoff plate and of the irrotational shallow water equations. For pHs a simple proportional gain assures asymptotic system of the system thanks to the LaSalle’ invariance principle \cite[Proposition 6.2]{duindam2009}. This can be used to achieve stabilization of the undeformed configuration of the Kirchhoff plate. For the shallow water equations a reference is also added to stabilize the system around a desired fluid height.
 
 
 \subsection{Cantilever Kirchhoff plate}\label{sec:bd_stabKP}
@@ -44,7 +44,7 @@ e_w \\ \bm{E}_\kappa \\
 e_w \\ \bm{E}_\kappa \\
 \end{pmatrix} \qquad (x, y) \in \Omega = [0, 1]\times[0,1]
 \end{equation*}
-subjected to the following Dirichlet homogeneous conditions
+subject to the following Dirichlet homogeneous conditions
 \begin{align*}
 \begin{aligned}
 \partial_t e_w|_{\Gamma_D} &= 0, \\
@@ -82,7 +82,7 @@ u_{\partial, m} &= - k_m \partial_{\bm{n}} e_w|_{\Gamma_N}  = - k_m y_{\partial,
 \end{equation}
 \\
 
-The discretization is performed as in \eqref{eq:pHsys_findim_kirchh_hess}. Variables $e_w$ and $\bm{E}_\kappa$ are discretized using the Argyris element and Discontinuous Galerkin elements of order 3. A structured mesh with 6 elements for side is used. The Dirichlet conditions are imposed weakly using Lagrange multipliers (cf. \eqref{eq:pHsys_infdim_mult1} and Remark \ref{rmk:BellArg}), that are discretized using Lagrange polynomials of order 2. The resulting system read
+The discretization is performed as in \eqref{eq:pHsys_findim_kirchh_hess}. Variables $e_w$ and $\bm{E}_\kappa$ are discretized using the Argyris element and Discontinuous Galerkin elements of order 3. A structured mesh with 6 elements per side is used. The Dirichlet conditions are imposed weakly using Lagrange multipliers (cf. \eqref{eq:pHsys_infdim_mult1} and Remark \ref{rmk:BellArg}), that are discretized using Lagrange polynomials of order 2. The resulting system reads
 
 \begin{equation}\label{eq:pHsys_findim_bdKir_open}
 \begin{aligned}
@@ -166,7 +166,7 @@ System \eqref{eq:pHsys_findim_bdKir_open} now reads
 \end{equation}
 The matrix 
 $$\mathbf{R}_w = k_q \mathbf{B}_{w, \Gamma_N} \mathbf{M}_{\Gamma_N}^{-1} \mathbf{B}_{w, \Gamma_N}^\top + k_m \mathbf{B}_{\partial_{\bm{n}} w, \Gamma_N} \mathbf{M}_{\Gamma_N}^{-1} \mathbf{B}_{\partial_{\bm{n}} w, \Gamma_N}^\top \succ 0$$
- is positive definitive because of the collocated input-output feature of pH systems. The energy rate evaluates to \cite[Theorem 13]{beattie2018linear}
+ is positive definitive because of the collocated input-output feature of pH systems. The energy decreases as \cite[Theorem 13]{beattie2018linear}
 \[\dot{H} _{d} = - \mathbf{e}_{w}^\top \; \mathbf{R}_w \; \mathbf{e}_{w} \le 0. \]
 Therefore, the Hamiltonian energy is a Lyapunov function and the asymptotic stability of configuration $\mathbf{e}_{w} = \mathbf{0}, \; \mathbf{e}_{\kappa} = \mathbf{0}$ is deduced using LaSalle' invariance  principle. \\
 
@@ -206,7 +206,7 @@ The parameters for the numerical simulation are given in Table~\ref{tab:parKir_d
 	k_q = 10, \qquad k_m = 10.
 \end{equation}
 
-The system is simulated using a St\"ormer-Verlet time integrator \cite{hairer2003geometric} using a time step $\Delta t = 10^{-6}$ for a total simulation time of $t_{\text{end}} = 5 \; \mathrm{[s]}$. The Lagrange multiplier is eliminated using a projection method \cite{benner2015time}. The control law is activated after 1 second. Snapshots of the simulation are reported in Fig. \ref{fig:SnapDamp_Kir}. The discrete Hamiltonian goes almost to zero in 4 seconds (Fig. \ref{fig:H_bs_Kirchhoff}).
+The system is simulated using a St\"ormer-Verlet time integrator \cite{hairer2003geometric} using a time step $\Delta t = 10^{-6}$ for a total simulation time of $t_{\text{end}} = 5 \; \mathrm{[s]}$. The Lagrange multiplier is eliminated using a projection method \cite{benner2015time}. The control law is activated after 1 second. The discrete Hamiltonian goes almost to zero in 4 seconds (Fig. \ref{fig:H_bs_Kirchhoff}). Snapshots of the displacement are reported in Fig. \ref{fig:SnapDamp_Kir}. 
 
 
 \begin{figure}[htb]
@@ -304,13 +304,14 @@ where $\alpha_h^{\text{des}}=h^{\text{des}}$, has negative semi definite time de
 \begin{equation}
 	\dot{V} = -k \int_{\partial \Omega}\left({y}_\partial - {y}_\partial^{\text{des}} \right)^2 \d{\Gamma} \le 0.
 \end{equation}
-By the LaSalle' principle \cite{henry2006geometric} the point 
+The precompactness of the trajectories in the energy space is guaranteed
+By the LaSalle' principle for infinite dimensional system \cite{henry2006geometric}, the point 
 \begin{equation}
 	\alpha_h = h^{\text{des}}, \qquad \bm{\alpha}_v = \bm{0},
 \end{equation}
 is asymptotically stable. \\
 
-The discretization is performed as in \eqref{eq:pHsys_findim_shwater}. Variable $\alpha_h$ is discretized suing Lagrange polynomials of order 1. Discontinuous Galerkin of order 0 defined on the domain and on the boundary are used for $\bm{\alpha}_v, \bm{u}_\partial$.
+The discretization is performed as in \eqref{eq:pHsys_findim_shwater}. Variable $\alpha_h$ is discretized using Lagrange polynomials of order 1. Discontinuous Galerkin of order 0 defined on the domain and on the boundary are used for $\bm{\alpha}_v, \bm{u}_\partial$.
 \begin{equation}\label{eq:pHsys_findim_shwater_ctrl}
 \begin{aligned}
 \begin{pmatrix}
@@ -399,7 +400,7 @@ is positive definite and the discretized Lyapunov function rate reads
 	\label{tab:parSWE_damp}
 \end{table}
 
-The parameters for the simulation are reported in Table. \eqref{tab:parSWE_damp}. The controller gain is set to $k = 10^{-3}$. The control law is activated after $0.5$ seconds. The system is simulated using a Runge-Kutta method. Snapshots are collected in Fig. \ref{fig:SnapDamp_SWE}. The discretized Hamiltonian and Lyapunov functional trends (Fig. \ref{fig:HL_SWE}) clearly show that, while the Lyapunov function monotonically decrease, the Hamiltonian oscillates around the desired equilibrium.
+The parameters for the simulation are reported in Table. \eqref{tab:parSWE_damp}. The controller gain is set to $k = 10^{-3}$. The control law is activated after $0.5$ seconds. The system is simulated using a Runge-Kutta method. Snapshots are collected in Fig. \ref{fig:SnapDamp_SWE}. The discretized Hamiltonian and Lyapunov functional trends (Fig. \ref{fig:HL_SWE}) clearly show that, while the Lyapunov function monotonically decreases, the Hamiltonian oscillates around the desired equilibrium.
 
 
 
@@ -529,7 +530,7 @@ $$
 Next we concisely reported the discretization strategy for the imposition of mixed boundary conditions.
 
 \paragraph{Lagrange multipliers}
-If a Lagrange multipliers is used for the Neumann boundary condition the following weak form is obtained
+If Lagrange multipliers are used for the Neumann boundary condition the following weak form is obtained
 
 \begin{equation}
 \begin{aligned}
@@ -713,7 +714,7 @@ For what concerns the choice of the approximations, System \eqref{eq:pHfindim_EB
 
 
 \paragraph{Numerical results}
-The settings for the numerical simulation are reported in Tab. \ref{tab:parEBmotion}. The frequency of the reference output is set to $\omega=4$. The analytical solution for the reference displacement and velocity together with their numerical discretization are plotted in Figs. \ref{fig:refw_EB} and \ref{fig:refv_EB}. The displacement is retrieved from the velocity using the trapezoidal rule. The numerical predictions perfectly match the analytical solution. In Fig. \ref{fig:w_motplan_EB} the numerical solution for the vertical displacement obtained using the virtual domain decomposition is shown. 
+The settings for the numerical simulation are reported in Tab. \ref{tab:parEBmotion}. The frequency of the reference output is set to $\omega=4$. The analytical solutions for the reference displacement and velocity together with their numerical discretization are plotted in Figs. \ref{fig:refw_EB} and \ref{fig:refv_EB}. The displacement is retrieved from the velocity using the trapezoidal rule. The numerical predictions perfectly match the analytical solution. In Fig. \ref{fig:w_motplan_EB} the numerical solution for the vertical displacement obtained using the virtual domain decomposition is shown. 
 
 \begin{table}[th]
 	\centering
@@ -1151,7 +1152,7 @@ where $\mathbf{C} = \mathbf{B}_{\Gamma_{\text{int}}}^{\Omega_D} \mathbf{M}_{\Gam
 \mathbf{b}_{\Gamma_N}^{\Omega_N}\\
 \end{pmatrix},
 \end{equation}
-where $\mathbf{R}_{\Omega_D} = \mathbf{B}_{\Gamma_D}^{\Omega_D} \mathbf{M}_{\Gamma_D}^{-1} \mathbf{B}_{\Gamma_D}^{\Omega_D \top}$ is symmetric and positive definite.
+where $\mathbf{R}_{\Omega_D} = \mathbf{B}_{\Gamma_D}^{\Omega_D} \mathbf{M}_{\Gamma_D}^{-1} \mathbf{M}_{\Gamma_D, \mathcal{Z}} \mathbf{M}_{\Gamma_D}^{-1} \mathbf{B}_{\Gamma_D}^{\Omega_D \top}$ is symmetric and positive definite.
 
 \paragraph{Numerical results and discussion}
 In this section a numerical illustration of the two methodologies is presented. The Hamiltonian and the state variables trends given by the DAE (obtained from the Lagrange's multiplier method) and the ODE formulation (obtained from the virtual domain decomposition method) are compared with respect to a reference solution. The reference is set to the DAE solution on a very fine mesh. The physical parameters are provided in Tab. \ref{tab:parWaves}. 
@@ -1192,12 +1193,12 @@ e_p^0(x, r) = 0 , \quad e_v^{x, 0}(x, r) = f(r), \quad e_v^{r, 0}(x, r) = g(r).
 A radial component of the velocity allows highlighting the effect of the impedance. The velocity profile satisfies some regularity conditions so that the transition between Neumann and Dirichlet boundary conditions is smooth. In order to get a finite-dimensional discretization the fields are approximated using the following finite element families for both approaches:
 
 \begin{itemize}
-	\item $e_p$ is interpolated using order~1 Lagrange polynomials (GC$_1)$;
+	\item $e_p$ is interpolated using order~1 Lagrange (Continuous Galerkin) polynomials (CG$_1)$;
 	\item $\bm{e}_v$ is interpolated using order~1 Raviart-Thomas polynomials (RT$_1$);
 	\item Boundary variables are approximated by Lagrange polynomial of order~1 defined on the boundary $\Gamma_D$ (for $\lambda_D, u_D, y_D$) or $\Gamma_N$ (for $u_N, y_N$).
 \end{itemize}
 
-Such a choice guarantees the conformity with respect to the differential operators. The {\sc{FEniCS}} library, that allows interpolating functions on different meshes, is used for the computations. The reference solution, obtained by using the DAE approach on a very fine mesh, is plotted in Fig. \ref{fig:Hdae15}, where the two contribution to the total energy
+Such a choice guarantees the conformity with respect to the differential operators. The {\sc{FEniCS}} library, that allows interpolating functions on different meshes, is used for the computations. The reference solution, obtained by using the DAE approach on a very fine mesh, is plotted in Fig. \ref{fig:Hdae15}, where the two contributions to the total energy
 \[
 H_{p, d} \approx \frac{1}{2} \mathbf{e}_p^\top \mathbf{M}_{\chi_s} \mathbf{e}_p, \qquad H_{v, d} \approx \frac{1}{2} \mathbf{e}_v^\top \mathbf{M}_{\mu_0} \mathbf{e}_v, \]
 are highlighted. The Dirichlet condition induces a continuous transfer from radial kinetic energy into pressure potential. The impedance acts by dissipating the radial component of the velocity so that only the axial flow contribution is left. The total energy at the initial time of the simulation is given only by the kinetic energy
@@ -1281,7 +1282,7 @@ The total energy obtained with several meshes is shown in Figs. \ref{fig:Htrend_
 In this section the pH discretization of the Danilovskaya problem \cite{danilovskaya1950} is performed. For this problem an analytical solution in the Laplace domain is available \cite{balla1991}. First the classical and pH formulation are illustrated. Second the discretization strategy is discussed. Numerical results are then presented.
 
 \subsection{The Danilovskaya problem}
-The Danilovskaya problem is a one-dimensional thermoelastic model in the infinite half-space $x\ge 0$. We recall the system of equation for the thermoelastic problem in 1D
+The Danilovskaya problem is a one-dimensional thermoelastic model in the infinite half-space $x\ge 0$. We recall the system of equations for the thermoelastic problem in 1D:
 
 \begin{equation}
 \begin{aligned}

@@ -4,10 +4,10 @@
 
 \minitoc
 
-\lettrine{\color{theme}{I}}n this chapter, the pH framework is combined with a floating frame description of the flexible dynamics under large rigid body displacements. Starting from the general equation for the rigid flexible dynamics of a floating body, an equivalent port-Hamiltonian system is found by appropriate selection of the canonical momenta. The flexible behavior is based on the linear elasticity assumption making it possible to include all kind of linear models. The problem is then written as a coupled system of ordinary and partial differential equations (ODEs and PDEs), extending the general definition of finite-dimensional port-Hamiltonian descriptor systems provided in \cite{mehrmann2019structurepreserving}. The modularity feature of pH systems makes the proposed approach analogous to a substructuring technique: each individual component can be interconnected to the other bodies using standard interconnection of pH systems, as it is done in \cite{macchelli2007link}. This feature allows the use of modeling platforms like {\sc{Simulink}}$^{\tiny{\textregistered}}$ or {\sc{Modelica}}$^{\tiny{\textregistered}}$.  The constraints are imposed on the velocities, leading to a quasi-linear index 2 differential-algebraic port-Hamiltonian system (pHDAE) \cite{steinbrecher2006phd,beattie2018linear}. In the linear case, the algebraic constraints can be eliminated, preserving the overall pH structure, using null space methods \cite{leyendecker2008nullspace}.  As a floating frame formulation is used, model reduction techniques can be employed to lower the computational complexity of the model \cite{chaturantabut2016,egger2018}.  \\
+\lettrine{\color{theme}{I}}n this chapter, the pH framework is combined with a floating frame description of the flexible dynamics under large rigid body displacements. Starting from the general equation for the rigid flexible dynamics of a floating body, an equivalent port-Hamiltonian system is found by appropriate selection of the canonical momenta. The flexible behavior is based on the linear elasticity assumption making it possible to include all kinds of linear models. The problem is then written as a coupled system of ordinary and partial differential equations (ODEs and PDEs), extending the general definition of finite-dimensional port-Hamiltonian descriptor systems provided in \cite{mehrmann2019structurepreserving}. The modularity feature of pH systems makes the proposed approach analogous to a substructuring technique: each individual component can be interconnected to the other bodies using standard interconnection of pH systems, as it is done in \cite{macchelli2007link}. This feature allows the use of modeling platforms like {\sc{Simulink}}$^{\tiny{\textregistered}}$ or {\sc{Modelica}}$^{\tiny{\textregistered}}$.  The constraints are imposed on the velocities, leading to a quasi-linear index 2 differential-algebraic port-Hamiltonian system (pHDAE) \cite{steinbrecher2006phd,beattie2018linear}. In the linear case, the algebraic constraints can be eliminated, preserving the overall pH structure, using null space methods \cite{leyendecker2008nullspace}.  As a floating frame formulation is used, model reduction techniques can be employed to lower the computational complexity of the model \cite{chaturantabut2016,egger2018}.  \\
 
 
-\indent The chapter is organized in the following manner. In Section \ref{sec:class_FMD} the classical equations of a flexible floating body are recalled. Using the properties of the cross product, the equations are recast in a form closer to the pH structure. Section \ref{sec:pH_fd} details the pH formulation of a floating flexible body by introducing the proper canonical momenta. In Section \ref{sec:MB_discr} the PFEM is detailed for the elastodynamics problem. The procedure is then easily extended to flexible floating bodies. The particular case of thin planar beams is then detailed. Section~\ref{sec:MB_pH} explains how to interconnect models together using classical pH interconnection. 
+\indent The chapter is organized in the following manner. In Section \ref{sec:class_FMD} the classical equations of a flexible floating body are recalled. Using the properties of the cross product, the equations are recast in a form closer to the pH structure. Section \ref{sec:pH_fd} details the pH formulation of a floating flexible body by introducing the proper canonical momenta. In Section \ref{sec:MB_discr} the PFEM is detailed for the elastodynamics problem. The procedure is easily extended to flexible floating bodies. The particular case of thin planar beams is detailed. Section~\ref{sec:MB_pH} explains how to interconnect models together using classical pH interconnection. 
 
 \section{Flexible dynamics of a floating body}
 \label{sec:class_FMD}
@@ -64,7 +64,7 @@ where $\bm{x}$ is the position vector of the current point, $\bm{v}_P, \bm{\omeg
 \end{itemize}
 
 \subsection{Towards a port-Hamiltonian formulation}
-The gyroscopic terms in Eqs. \eqref{eq:ffb_tr_class}, \eqref{eq:ffb_rot_class}, \eqref{eq:ffb_flex_class} need some manipulations so that the skew-symmetric interconnection operator can be more easily highlighted. The following proposition show that the classical equations can be rewritten in a more structured form.
+The gyroscopic terms in Eqs. \eqref{eq:ffb_tr_class}, \eqref{eq:ffb_rot_class}, \eqref{eq:ffb_flex_class} need some manipulations so that the skew-symmetric interconnection operator can be more easily highlighted. The following proposition shows that the classical equations can be rewritten in a more structured form.
 
 \begin{proposition}
 	Denoting by $\bm{v}_f = \dot{\bm{u}}_f$ the derivative of the flexible displacement in the body frame, Equations. \eqref{eq:ffb_tr_class}, \eqref{eq:ffb_rot_class}, \eqref{eq:ffb_flex_class} can be equivalently reformulate as follows
@@ -433,7 +433,7 @@ The power balance equals the power due to body force and surface traction
 
 \section{Discretization procedure}
 \label{sec:MB_discr}
-To discretize the equation, the dual mixed formulation \ref{sec:dual_mixed} is used to highlight as boundary control the Neumann condition. This means that the forces at the boundary appear as input. The uncontrolled system corresponds to the free conditions, meaning that the body is floating.
+To discretize the equation, the dual mixed formulation \ref{sec:dual_mixed} is used to highlight as boundary control the Neumann condition. This means that the forces at the boundary appear as inputs. The uncontrolled system corresponds to the free conditions, meaning that the body is floating.
 
 \subsection{Illustration for the Elastodynamics problem}
 Recall the port-Hamiltonian representation in co-energy variables of linear elasticity \ref{eq:pHsysElas}
@@ -455,7 +455,7 @@ Recall the port-Hamiltonian representation in co-energy variables of linear elas
 	\bm{I} \\ \bm{0} \\
 	\end{bmatrix}}_{\mathcal{B}_\Omega} \bm{u}_\Omega,
 \end{equation*}
-where $\bm{u}_\Omega$ corresponds to a distributed force. Assuming a Neumann boundary conditions (the normal traction $\bm\tau$ is known at the boundary), this system can be written compactly as a boundary control system
+where $\bm{u}_\Omega$ corresponds to a distributed force. Assuming Neumann boundary conditions (the normal traction $\bm\tau$ is known at the boundary), this system can be written compactly as a boundary control system
 \begin{equation}
 \label{eq:eldyn_PDE}
 \begin{aligned}
@@ -502,7 +502,7 @@ If a Galerkin method is applied then corresponding test and trial functions are 
 	\bm{u}_\partial(\bm{s},t) &= \sum_{i=1}^{n_\partial} \bm{\phi}_\partial^i(\bm{s}) u_\partial^i(t), \\
 	\end{aligned}
 	\end{equation*}
-	where $\bm{x} \in \Omega, \; \bm{s} \in \partial\Omega$.} A finite-dimensional pH system is readily obtained
+	where $\bm{x} \in \Omega, \; \bm{s} \in \partial\Omega$. A finite-dimensional pH system is readily obtained
 	\begin{equation}\label{eq:findimEl_ex}
 	\begin{aligned}
 	\underbrace{\begin{bmatrix}
@@ -732,7 +732,7 @@ m & 0 & 0 & \mathcal{I}_\rho^L & 0 & 0 & 0 \\
 0 & 0 & 0 & 0 & 0 & 0 & (EI)^{-1} \\
 \end{array} \right],
 \end{equation}
-where  $s^x = \int_{0}^{L} \rho A x \d{x}$ is the static moment, $J^{zz} = \int_{0}^{L} \rho A x^2 \d{x}$ is the moment of inertia, $\mathcal{I}_\rho^L := \int_{0}^L \rho A (\cdot) \d{x}, \; \mathcal{I}_{\rho x}^L := \int_{0}^L \rho A x (\cdot) \d{x}$. Differently from standard Lagrangian formulations, the mass operator include the coefficients $(EA)^{-1}$ and $(EI)^{-1}$. These coefficients represent the compliance of the beam and appear in the mass operator to include the deformation energy
+where  $s^x = \int_{0}^{L} \rho A x \d{x}$ is the static moment, $J^{zz} = \int_{0}^{L} \rho A x^2 \d{x}$ is the moment of inertia, $\mathcal{I}_\rho^L := \int_{0}^L \rho A (\cdot) \d{x}, \; \mathcal{I}_{\rho x}^L := \int_{0}^L \rho A x (\cdot) \d{x}$. Differently from standard Lagrangian formulations, the mass operator includes the coefficients $(EA)^{-1}$ and $(EI)^{-1}$. These coefficients represent the compliance of the beam and appear in the mass operator to include the deformation energy
 	\begin{equation*}
 	H_{\text{def}} = \frac{1}{2}\int_{0}^L \frac{1}{EA} n_x^2 + \frac{1}{EI} m_x^2  \d\Omega.
 	\end{equation*}
@@ -1080,7 +1080,7 @@ This system is improper, since the input appears in the algebraic part. Now, a g
 \mathbf{u}_1^{\text{int}} = -\mathbf{R}(\theta) \mathbf{y}_2^{\text{int}}, \qquad
 \mathbf{u}_2^{\text{int}} = \mathbf{R}(\theta)^\top \mathbf{y}_1^{\text{int}}.
 \end{equation}
-The resulting differential-algebraic system is exactly \eqref{eq:int_beams}, which is proper. The equivalence between the two representation is represented in Fig. \ref{fig:beam_int_block}. This approach allows the modular construction of systems of arbitrary complexity. Other kind of lossless joints (prismatic, spherical) can be modeled by appropriate interconnections. The system can then be simulated by using specific DAE solvers \cite{brenan1995dae}. 
+The resulting differential-algebraic system is exactly \eqref{eq:int_beams}, which is proper. The equivalence between the two representations is represented in Fig. \ref{fig:beam_int_block}. This approach allows the modular construction of systems of arbitrary complexity. Other kinds of lossless joints (prismatic, spherical) can be modeled by appropriate interconnections. The system can then be simulated by using specific DAE solvers \cite{brenan1995dae}. 
 
 \begin{figure}[t]
 	\centering
