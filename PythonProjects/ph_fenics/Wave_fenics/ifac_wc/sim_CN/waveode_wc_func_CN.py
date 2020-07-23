@@ -10,6 +10,24 @@ from Wave_fenics.ifac_wc.sim_CN.theta_method_wc import theta_method
 from math import pi
 import time
 
+import matplotlib.pyplot as plt
+SMALL_SIZE = 14
+MEDIUM_SIZE = 16
+BIGGER_SIZE = 18
+
+plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+plt.rc('axes', titlesize=BIGGER_SIZE)    # fontsize of the axes title
+plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+from matplotlib import rcParams
+rcParams.update({'figure.autolayout': True})
+rcParams['text.usetex'] = True
+
+
 
 def computeH_ode(ind):
 
@@ -30,11 +48,12 @@ def computeH_ode(ind):
     
         R_ext = 1
         L_duct = 2
-        tol_geo = 1e-9
-    
-        Vp1 = FunctionSpace(mesh1, "CG", deg_p1)
+        tol_geo = 1e-6
+        
+        Vp1 = FunctionSpace(mesh1, "DG", deg_p1)
+#        Vp1 = FunctionSpace(mesh1, "CG", deg_p1)
         Vq1 = FunctionSpace(mesh1, "RT", deg_q1)
-    
+
         np_1 = Vp1.dim()
         nq_1 = Vq1.dim()
         
@@ -69,7 +88,7 @@ def computeH_ode(ind):
         J1[:np_1, np_1:] = J_div
         J1[np_1:, :np_1] = -J_div.T
     
-        Vf1 = FunctionSpace(mesh1, "CG", 1)
+        Vf1 = FunctionSpace(mesh1, "DG", 0)
         f_D = TrialFunction(Vf1)
         v_D = TestFunction(Vf1)
         u_D = TrialFunction(Vf1)
@@ -94,11 +113,13 @@ def computeH_ode(ind):
     
         controlD_dofs = np.where(B_D.any(axis=0))[0]
     
-        B_D = B_D[:, controlD_dofs]
         M_D = assemble(v_D * u_D * is_uD * r1 * ds1).array()
-        M_D = M_D[:, controlD_dofs]
-        M_D = M_D[controlD_dofs, :]
+        controlD_dofs = np.where(M_D.any(axis=0))[0]
     
+        M_D = M_D[:, controlD_dofs][controlD_dofs, :]
+        
+        B_D = B_D[:, controlD_dofs]
+
         nu_D = len(controlD_dofs)
     
         b_int1 = dot(v_q1, n_ver1) * f_D * is_int1 * r1 * ds1
@@ -135,7 +156,9 @@ def computeH_ode(ind):
         x2, r2 = SpatialCoordinate(mesh2)
     
         Vp2 = FunctionSpace(mesh2, "CG", deg_p2)
-        Vq2 = FunctionSpace(mesh2, "RT", deg_q2)
+#        Vq2 = FunctionSpace(mesh2, "RT", deg_q2)
+        Vq2 = VectorFunctionSpace(mesh2, "DG", deg_q2)
+
     
         np_2 = Vp2.dim()
         nq_2 = Vq2.dim()
@@ -170,7 +193,7 @@ def computeH_ode(ind):
         J2[np_2:, :np_2] = J_grad
         J2[:np_2, np_2:] = -J_grad.T
     
-        Vf2 = FunctionSpace(mesh2, "CG", 1)
+        Vf2 = FunctionSpace(mesh2, "DG", 0)
         f_N = TrialFunction(Vf2)
         v_N = TestFunction(Vf2)
         u_N = TrialFunction(Vf2)
@@ -258,11 +281,11 @@ def computeH_ode(ind):
     # plot(mesh2, axes=ax)
     # plt.show()
     
-    degp1 = 1
-    degq1 = 2
+    degp1 = 0
+    degq1 = 1
     
     degp2 = 1
-    degq2 = 2
+    degq2 = 0
     
     sys_DN, Vp1, Vp2, ep_0, eq_0, M_D = create_sys(mesh1, mesh2, degp1, degq1, degp2, degq2)
     JJ = sys_DN.J
@@ -314,7 +337,19 @@ def computeH_ode(ind):
         Hp_vec[i] = 0.5 * (ep_sol[:, i].T @ MMp @ ep_sol[:, i])
         Hq_vec[i] = 0.5 * (eq_sol[:, i].T @ MMq @ eq_sol[:, i])
     
-    
+#    fig = plt.figure()
+#    plt.plot(t_sol, H_vec, 'b-', label= "H")
+#    plt.plot(t_sol, Hp_vec, 'r-', label= "Hp")
+#    plt.plot(t_sol, Hq_vec, 'g-', label= "Hq")
+#    
+#    plt.xlabel(r'{Time} (s)')
+#    plt.ylabel(r'{Hamiltonian} (J)')
+#    plt.title(r"Hamiltonian trend")
+#    plt.legend(loc='upper right')
+#    
+#    plt.show()
+
+
     path_results = "/home/a.brugnoli/LargeFiles/results_ifacwc_CN2/"
     np.save(path_results + "t_ode_" + str(ind) + ".npy", t_sol)
     np.save(path_results + "H_ode_" + str(ind) + ".npy", H_vec)

@@ -193,7 +193,7 @@ A spatial beam rotating about a spherical joint is considered (see Fig. \ref{fig
 In this section, the Kirchhoff plate model is considered in multibody applications. In the first example a cantilever plate is interconnected to a rigid rod, welded to one side of the plate. The discretization is achieved using the same finite elements as in \secref{sec:bd_stabKP}. This example is not compared with previously published material, because of the lack of similar simulations in the literature. The second example concerns the computation of frequencies of a cantilever plate with in domain actuation. This mechanical system is taken from the experimental setup employed in \cite{preda2020}. The Hellan-Hermann-Johnson elements are used to discretize the plate.
 
 \subsection{Boundary interconnection with a rigid element}
-In this section the interconnection of an infinite and finite pH system is explained in both the infinite- and finite-dimensional settings. This paradigm provides an easy way to construct an arbitrarily complex system given its basic components. Infinite- and finite-dimensional can be coupled together, making it possible to construct models for complex applications. The interconnection of a flexible plate and a rigid rod along one side of the plate is taken as an illustrative example.
+In this section the interconnection of an infinite- and finite-pH system is explained in both the infinite- and finite-dimensional settings. This paradigm provides an easy way to construct an arbitrarily complex system, given its basic components. Infinite- and finite-dimensional can be coupled together, making it possible to construct models for complex applications. The interconnection of a flexible plate and a rigid rod along one side of the plate is taken as an illustrative example.
 
 \subsubsection{Infinite-dimensional setting}
 Consider an infinite-dimensional pH system (or distributed pH system, dpH) and a finite-dimensional pH system denoted by equations 
@@ -203,9 +203,9 @@ Consider an infinite-dimensional pH system (or distributed pH system, dpH) and a
 	\begin{equation}
 	\text{dpH}\qquad
 	\begin{aligned}
-	\partial_t \bm{x}_1 &= \mathcal{J} \delta_{\bm{x}_1} {H_1}, \\
-	\bm{u}_{\partial, 1}  &= \mathcal{B}_\partial \delta_{\bm{x}_1} {H_1}, \\
-	\bm{y}_{\partial, 1} &= \mathcal{C}_\partial \delta_{\bm{x}_1} {H_1}, \\
+	\partial_t \bm{x}_1 &= \mathcal{J} \, \delta_{\bm{x}_1} {H_1}, \\
+	\bm{u}_{\partial, 1}  &= \mathcal{B}_\partial \, \delta_{\bm{x}_1} {H_1}, \\
+	\bm{y}_{\partial, 1} &= \mathcal{C}_\partial \, \delta_{\bm{x}_1} {H_1}, \\
 	\end{aligned}
 	\end{equation}
 \end{minipage}
@@ -224,7 +224,7 @@ where $\mathbf{x} \in \mathbb{R}^n, \mathbf{u}_2, \mathbf{y}_2 \in \mathbb{R}^m$
 \inner[{U} \times {Y}]{\bm{u}_{\partial, 1}}{\bm{y}_{\partial, 1}},  \qquad
 \inner[\mathbb{R}^m]{\mathbf{u}_{2}}{\mathbf{y}_{2}}.
 \]
-For the interconnection, consider the compact operator $\mathcal{W}: Y \rightarrow \mathbb{R}^m$ and the following power preserving interconnection
+For the interconnection, consider the compact operator $\mathcal{W}: Y \rightarrow \mathbb{R}^m$ and the following power-preserving interconnection
 \begin{equation}
 \label{eq:int_inf}
 \mathbf{u}_2 = -\mathcal{W} \, \bm{y}_{\partial, 1},  \qquad \bm{u}_{\partial, 1} = \mathcal{W}^* \, \mathbf{y}_2,
@@ -263,11 +263,11 @@ v_G \\ \omega_{G} \\
 \end{pmatrix},
 \end{aligned}
 \end{equation}
-with $v_G, \ \omega_{G}, \ J_G^{\mathrm{rod}}$ the linear velocity, angular velocity and rotary inertia about $G$, the center of mass, $m^{\mathrm{rod}}$ the total mass  and $F_z, T_x$ the force along $z$ and the torque along $x$. The Hamiltonian reads $H_{\text{rod}}  = \frac{1}{2} \left(M_G {v_G}^2 + J_G {\omega_G}^2 \right)$. The rod is welded to a rectangular thin plate of sides $L_x, L_y$ on side $x = L_x$. The boundary variables for the plate involved in the interconnection are 
+with $v_G, \ \omega_{G}, \ J_G^{\mathrm{rod}}$ the linear velocity, angular velocity and rotary inertia about $G$, the center of mass, $m^{\mathrm{rod}}$ the total mass  and $F_z, T_x$ the force along $z$ and the torque along $x$. The Hamiltonian reads $H_{\text{rod}}  = \frac{1}{2} \left(M_G \, {v_G}^2 + J_G \, {\omega_G}^2 \right)$. The rod is welded to a rectangular thin plate of sides $L_x, L_y$ on side $x = L_x$. The boundary variables for the plate involved in the interconnection are 
 \begin{equation*}
 u_{\partial, w_t} = \partial_t w(x = L_x, y, t),  \qquad  y_{\partial, w_t} = \widetilde{q}_n(x = L_x, y, t),
 \end{equation*}
-where $w$ is the vertical displacement and $\widetilde{q}_n$ is the effective shear force \eqref{eq:effshearforce}. Space $Y$ is the space of square-integrable functions on
+where $w$ is the vertical displacement and $\widetilde{q}_n$ is the effective shear force \eqref{eq:effshearforce}. The space $Y$ is the space of square-integrable functions with support
 $$\Gamma_{\text{int}} = \left\{ (x,y) \vert \; x=L_x, 0 \le y \le L_y  \right\}.$$ The compact interconnection operator then reads
 \begin{equation}\label{eq:intKP_infdim}
 \mathcal{W} y_{\partial, w_t} = \begin{pmatrix}
@@ -281,10 +281,10 @@ The adjoint operator is then obtained considering that $\mathbf{u}_{\text{rod}} 
 \mathcal{W}^* \mathbf{y}_{\text{rod}} &= v_G + \omega_{G} \left( y - L_y/2 \right).
 \end{align*}
 
-The interconnection \eqref{eq:int_inf} will ensure that the two components are connected in a power preserving manner.
+The interconnection \eqref{eq:int_inf} will ensure that the two components are connected in a power-preserving manner.
 
 \subsubsection{Finite-dimensional setting}
-Consider a rectangular plate of size $L_x, L_y$, clamped at $\Gamma_{D} = \left\{(x,y) \vert \;  x=0, \; 0 \le y \le L_y  \right\}$, and welded to a rigid rod on $\Gamma_{\text{int}} = \left\{ (x,y) \vert \;  x=L_x, \; 0 \le y \le L_y  \right\}$. By imposing weakly the boundary conditions as in \eqref{eq:pHsys_findim_bdKir_open}, a finite dimensional system is obtained
+Consider a rectangular plate of size $L_x, L_y$, clamped at $\Gamma_{D} = \left\{(x,y) \vert \;  x=0, \; 0 \le y \le L_y  \right\}$, and welded to a rigid rod on $\Gamma_{\text{int}} = \left\{ (x,y) \vert \;  x=L_x, \; 0 \le y \le L_y  \right\}$. By imposing the boundary conditions weakly as in \eqref{eq:pHsys_findim_bdKir_open}, a finite dimensional system is obtained
 \begin{equation}\label{eq:pHsys_findim_intKir_open}
 \begin{aligned}
 \mathrm{Diag}
@@ -380,14 +380,14 @@ where $\bm{\phi}^j_{\mathbb{R}^2}  \; \forall j = \{1, 2\}$ is the canonical bas
 \end{equation}
 
 \subsubsection{Numerical Simulation}
-To validate the approach numerical simulations on system \eqref{eq:pHsys_findim_intKir_closed} are carried out. A  plate clamped in $x=0$ is considered. A final time equal to $t_{\text{end}} = 10 \; \mathrm{[ms]}$ is taken and a vertical distributed force, given by formula
+To validate this approach, numerical simulations on system \eqref{eq:pHsys_findim_intKir_closed} are carried out. A  plate clamped in $x=0$ is considered. A final time equal to $t_{\text{end}} = 10 \; \mathrm{[ms]}$ is taken and a vertical distributed force, given by the formula
 \begin{equation}\label{eq:force_rod}
 f_w = \begin{cases}
 10^5 \left( y + 10 \left( y - L_y/2 \right)^2 \right) \; \mathrm{[Pa]}, \quad &\forall \, t < 0.2 \, t_{\text{end}}, \\
 0, \quad &\forall \, t \ge 0.2 \, t_{\text{end}},
 \end{cases}
 \end{equation}
-acts on the plate. The rigid rod has mass $M = 50 \; \mathrm{[kg]}$ and length $L_{\text{rod}} = 1 \; \mathrm{[m]}$. The plate parameters and settings for the discretization (a uniform grid is taken) are provided in Table \ref{tab:parKirInt}. The finite element discretization is the same as in \ref{sec:bd_stabKP}.  The constraints are eliminated considering a projection method \cite{benner2015time}.
+acts on the plate. The rigid rod has mass $M = 50 \; \mathrm{[kg]}$ and length $L_{\text{rod}} = 1 \; \mathrm{[m]}$. The plate parameters and settings for the discretization (a uniform grid is taken) are provided in Table~\ref{tab:parKirInt}. The finite element discretization is the same as in \ref{sec:bd_stabKP}.  The constraints are eliminated considering a projection method \cite{benner2015time}.
 
 \begin{table}[hbt]
 	\centering
@@ -418,7 +418,7 @@ acts on the plate. The rigid rod has mass $M = 50 \; \mathrm{[kg]}$ and length $
 	\label{tab:parKirInt}
 \end{table}
 
-Snapshots of simulations without and with the rigid rod are reported in Figs. \ref{fig:IntNoRod}, \ref{fig:IntRod}. The deformations undergone by the plate are clearly affected by the presence of the rod: the maximum deformation as well as the Hamiltonian value \ref{fig:HamInt}, once the excitation is removed, are lower when the rigid rod is present. The interconnected side remains straight during the whole simulation, meaning that the constraints are respected.
+Snapshots of simulations without and with the rigid rod are reported in Figs. \ref{fig:IntNoRod}, \ref{fig:IntRod}. The deformations undergone by the plate are clearly affected by the presence of the rod: the maximum deformation as well as the Hamiltonian value (cf. Fig. \ref{fig:HamInt}), once the excitation is removed, are lower when the rigid rod is present. The interconnected side remains straight during the whole simulation, meaning that the constraints are respected.
 
 \begin{figure}[thb]
 	\centering
@@ -478,7 +478,7 @@ This system can be constructed modularly considering each component separately.
 \subsubsection{Modular modelling of the system}
 In this section, the model for each component is detailed. The final system is obtained by imposing the appropriate transformer interconnections.
 
-\paragraph{Cantilever plate} The cantilever plate is model as in Sec. \ref{sec:bd_stabKP}. The difference is that now the force at the free boundary are null and that the other components interact with the plate system by means of reaction forces within the domain $\Omega = (0, L_x) \times (0, L_y)$. The forces exerted by the external components can be modelled by a delta distribution. Then the continuous model can be written as the following system in distributional form
+\paragraph{Cantilever plate} The cantilever plate is modelled as in Sec. \ref{sec:bd_stabKP}. The difference is that now the forces at the free boundary are null and that the other components interact with the plate system by means of reaction forces within the domain $\Omega = (0, L_x) \times (0, L_y)$. The forces exerted by the external components can be modelled by a delta distribution. Then the continuous model can be written as the following system in distributional form
 
 \begin{equation}
 \begin{aligned}
@@ -504,8 +504,8 @@ e_w \\ \bm{E}_\kappa \\
 \end{bmatrix} \delta(\bm{x} - \bm{x}_{P_i}) \mathbf{u}_{P_i}, \\
 \mathbf{y}_{P_i} &= \delta(\bm{x} - \bm{x}_{P_i}) \begin{bmatrix}
 1 & \bm{0} \\
--\partial_y & \bm{0} \\
-\partial_x & \bm{0} \\
+\partial_y & \bm{0} \\
+-\partial_x & \bm{0} \\
 \end{bmatrix}  \begin{pmatrix}
 e_w \\ \bm{E}_\kappa \\
 \end{pmatrix}, \qquad \forall i \in \{1, n_{\mathrm{comp}}\}
@@ -519,11 +519,24 @@ where $n_{\mathrm{comp}}$ is the number of external components, $\bm{x}_{P_i}$ i
 \end{bmatrix} \delta(\bm{x} - \bm{x}_{P_i}), \qquad 
 \mathcal{B}_{\Omega, i}^* = \delta(\bm{x} - \bm{x}_{P_i}) \begin{bmatrix}
 1 \\
--\partial_y \\
-\partial_x \\
+\partial_y \\
+-\partial_x \\
 \end{bmatrix}.
 \end{equation*} 
-The model is subjected to the following homogeneous boundary conditions
+This is rigorously justified using the integration by parts
+\begin{equation}
+\begin{aligned}
+\inner[L^2(\Omega)]{e_w}{\mathcal{B}_{\Omega, i} \mathbf{u}_{P_i}} &= \int_\Omega e_w \begin{bmatrix}
+1 & -\partial_y & \partial_x \\
+\end{bmatrix} \delta(\bm{x} - \bm{x}_{P_i}) \mathbf{u}_{P_i} \d\Omega \\
+& = \int_\Omega \delta(\bm{x} - \bm{x}_{P_i})\begin{bmatrix}
+1 \\
+\partial_y \\
+-\partial_x \\
+\end{bmatrix} e_w \cdot \mathbf{u}_{P_i} = \inner[L^2(\Omega)]{\mathcal{B}_{\Omega, i}^* e_w}{\mathbf{u}_{P_i}}
+\end{aligned}
+\end{equation}
+The model is subject to the following homogeneous boundary conditions
 \begin{align*}
 \begin{aligned}
 \partial_t e_w|_{\Gamma_D} &= 0, \\
@@ -584,7 +597,7 @@ where $h_x, \; h_y$ are the mesh sizes along $x$ and $y$ respectively. In partic
 \end{pmatrix}, \qquad \forall i \in \{1, n_{\text{comp}}\}.
 \end{aligned}
 \end{equation}
-Matrix $\mathbf{D}_{\mathrm{HHJ}}$ represents the discretization of the bilinear form \eqref{eq:bil_HHJ}. Matrix $\mathbf{G}_{\Gamma_D}$ collects the degrees of freedom subjected to the boundary condition. If the degrees of freedom are ordered so that nodes subjected to boundary conditions are place after the non constrained degrees of freedom, this matrix takes the form $\mathbf{G}_{\Gamma_D}= [\mathbf{0} \quad \mathbf{I}]$. Recalling the property of the derivative of the delta distribution 
+Matrix $\mathbf{D}_{\mathrm{HHJ}}$ represents the discretization of the bilinear form \eqref{eq:bil_HHJ}. Matrix $\mathbf{G}_{\Gamma_D}$ collects the degrees of freedom subject to the boundary condition. If the degrees of freedom are ordered so that nodes subject to boundary conditions are placed after the non constrained degrees of freedom, this matrix takes the form $\mathbf{G}_{\Gamma_D}= [\mathbf{0} \quad \mathbf{I}]$. Recalling the property of the derivative of the delta distribution 
 $$ \delta'[\phi]  = -\delta[\phi'],$$
 where the apostrophe denotes a generic derivative, matrix $\mathbf{B}_{\Omega, i}$ is computed as
 \begin{equation}
@@ -595,7 +608,7 @@ where the apostrophe denotes a generic derivative, matrix $\mathbf{B}_{\Omega, i
 where $\phi_w^j, \; \forall j \in \{1,n_w\}$ is the test function associated to $e_w$. 
 
 \paragraph{Proof-mass actuator model}
-A proof-mass actuator is mathematically modelled by a hollow cylinder casing of mass $m_{c_i}, \; i \in \{1,2\}$ and inertia with respect to the center of mass $\mathbf{J}_{c_i}=\mathrm{Diag}(J_{c_i}^{xx}, \; J_{c_i}^{yy})$. The casing is connected to a spring-damper-mass system of stiffness $k_i$, damping $c_i$ and internal mass $m_i$. The overall model for this system is the written in co-energies pH form as 
+A proof-mass actuator is mathematically modelled by a hollow cylinder casing of mass $m_{c_i}, \; i \in \{1,2\}$ and inertia with respect to the center of mass $\mathbf{J}_{c_i}=\mathrm{Diag}(J_{c_i}^{xx}, \; J_{c_i}^{yy})$. The casing is connected to a spring-damper-mass system of stiffness $k_i$, damping $c_i$ and internal mass $m_i$. The overall model for this system is written in co-energies pH form as 
 
 \begin{equation}
 \begin{aligned}
@@ -648,9 +661,9 @@ c_i & 0 & 0 & -c_i & k_i\\
 \end{pmatrix},
 \end{aligned}
 \end{equation}
-where $v_{c_i}$ is the velocity of the casing at its center of mass, $\omega_{c_i}^x, \; _{c_i}^y$ are the angular velocities of the casing, $v_i$ is the velocity of the internal mass and $\Delta x_i$ is the elongation of the spring. $\bm{u}_{A_i} = [F_{A_i}^z, \;  T_{A_i}^x, \;  T_{A_i}^y]^\top$ are the external forces and torques acting on the casing.
+where $v_{c_i}$ is the velocity of the casing at its center of mass, $\omega_{c_i}^x, \; \omega_{c_i}^y$ are the angular velocities of the casing, $v_i$ is the velocity of the internal mass and $\Delta x_i$ is the elongation of the spring. $\bm{u}_{A_i} = [F_{A_i}^z, \;  T_{A_i}^x, \;  T_{A_i}^y]^\top$ are the external forces and torques acting on the casing.
 
-\paragraph{Mirror model} The mirror is a simple L-shaped rigid body with mass $m_m$, $s_m^x$ static moment and inertia $\mathbf{J}_m = \mathrm{Diag}({J}_{m}^{xx}, {J}_{m}^{yy})$
+\paragraph{Mirror model} The mirror is a simple L-shaped rigid body with mass $m_m$, static moment $s_m^x$ and inertia $\mathbf{J}_m = \mathrm{Diag}({J}_{m}^{xx}, {J}_{m}^{yy})$
 
 \begin{equation}
 \begin{aligned}
@@ -682,9 +695,9 @@ s_m^x & {J}_{m}^{xx} & 0 \\
 \end{aligned}
 \end{equation}
 
-where $v_{m}$ is the velocity of the mirror at its center of mass and $\omega_{c_i}^x, \; _{c_i}^y$ its angular velocities. $\mathbf{u}_M = [F_{M}^z, \;  T_{M}^x, \;  T_{M}^y]^\top$ are the external forces and torques acting on the mirror.
+where $v_{m}$ is the velocity of the mirror at its center of mass and $\omega_{c_i}^x, \; \omega_{c_i}^y$ its angular velocities. $\mathbf{u}_M = [F_{M}^z, \;  T_{M}^x, \;  T_{M}^y]^\top$ are the external forces and torques acting on the mirror.
 
-\paragraph{Assembly of the model} The overall model is obtained interconnecting each components to the others by means of transformer interconnections
+\paragraph{Assembly of the model} The overall model is obtained interconnecting each component to the others by means of transformer interconnections
 \begin{align*}
 \begin{aligned}
 \mathbf{u}_{P_1} &= - \mathbf{u}_{A_1}, \\
@@ -762,7 +775,7 @@ Subsystem	& Parameter  & Description & Value \\
 	\hfil
 	\subfloat[2nd torsional mode $\omega_6 = 118.09 \; \mathrm{[Hz]}$]{\includegraphics[width=0.49\linewidth]{part_4/validation/KP/ActuatedPlate6.eps}%
 	\label{fig:om6_setup}} \\
-	\caption{Eigenvectors for the overall system}
+	\caption{Eigenvectors for the experimental test-bench in \cite{preda2020}}
 	\label{fig:om_setup}
 \end{figure*}
 
@@ -779,5 +792,5 @@ Omega full lambda 6: 117.80124510761422
 \section{Conclusion}
 
 
-In this chapter the proposed formulation for multibody dynamics has been tested. The employment of finite elements leads to large sparse systems to be solved. To limit the computational complexity of these models, model reduction techniques can be incorporated. While for linear pHDAE systems consolidated methodologies exist \cite{egger2018}, for the  non linear differential-algebraic case solutions are not yet available. To avoid the problem of dealing with large-scale systems, spectral methods can be equivalently used to achieve a structure preserving discretization made up of small and dense matrices. 
+In this chapter the proposed formulation for multibody dynamics has been tested. The employment of finite elements leads to large sparse systems to be solved. To limit the computational complexity of these models, model reduction techniques can be incorporated. While for linear pHDAE systems consolidated methodologies exist \cite{egger2018}, for non linear differential-algebraic systems solutions are not yet available. To avoid the problem of dealing with large-scale systems, spectral methods can be equivalently used to achieve a structure preserving discretization made up of small and dense matrices. 
 The time-domain simulations of the resulting systems have been accomplished using ready-to-use solvers. A rigorous numerical analysis represents an important future development. In particular, numerical methods capable of preserving important structural properties in discrete time have been studied for rigid body dynamics \cite{celledoni2018passivity} and generic ODE \cite{kotyczka2019discrete} and DAE \cite{mehrmann2019structurepreserving} pH systems. These methods could be fruitfully employed in the proposed framework. 

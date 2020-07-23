@@ -5,7 +5,7 @@ from scipy.sparse.linalg import spsolve
 from scikits import umfpack
 from scipy.sparse import csc_matrix, csr_matrix
 
-def theta_method(M, J, R, B_f, x_0, theta=0.5, t_f=0.1, dt=1e-7, n_ev=1000):
+def theta_method(M, J, R, B_f, x_0, theta=0.5, t_f=0.1, dt=1e-6, n_ev=1000):
     
     assert theta>0
     t_ev = np.linspace(0, t_f, n_ev)
@@ -64,6 +64,7 @@ def theta_method(M, J, R, B_f, x_0, theta=0.5, t_f=0.1, dt=1e-7, n_ev=1000):
         if t<0.2*t_f:
             X_new = Sys_J @ X_old + Sys_BJ          
         else:
+#            X_new = Sys_J @ X_old + Sys_BJ
             X_new = Sys_JR @ X_old + Sys_BJR            
             
         X_old = X_new

@@ -272,8 +272,8 @@ def computeH_ode(ind):
     degp1 = 1
     degq1 = 2
     
-    degp2 = 1
-    degq2 = 2
+    degp2 = 2
+    degq2 = 1
     
     sys_DN, Vp1, Vp2, ep_0, eq_0, M_D = create_sys(mesh1, mesh2, degp1, degq1, degp2, degq2)
     JJ = sys_DN.J
@@ -371,7 +371,7 @@ def computeH_ode(ind):
         Hq_vec[i] = 0.5 * (eq_sol[:, i].T @ MMq @ eq_sol[:, i])
     
     
-    path_results = "/home/a.brugnoli/GitProjects/PythonProjects/ph_fenics/Wave_fenics/results_ifacwc/"
+    path_results = "/home/a.brugnoli/LargeFiles/results_ifacwc4_fenics/"
     np.save(path_results + "t_ode_" + str(ind) + ".npy", t_sol)
     np.save(path_results + "H_ode_" + str(ind) + ".npy", H_vec)
     np.save(path_results + "Hp_ode_" + str(ind) + ".npy", Hp_vec)

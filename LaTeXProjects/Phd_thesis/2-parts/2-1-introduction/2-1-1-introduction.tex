@@ -45,10 +45,7 @@ The complete characterization of pH in arbitrary dimension is still an open rese
 
 This thesis tries to fill this gap and to establish a clear connection between linear structural mechanics models and port-Hamiltonian systems, both for the modelling and discretization task. These two tasks are indeed strongly related in the context of pHs. A brief discussion can spread light on this statement: to get a pH formulation for elasticity models, one has to introduce the stress variable, associated to the deformation energy, as a additional principal unknown. Adding the stress variable as an unknown is the starting point of mixed finite elements \cite{arnold1990intro}. This leads to the decomposition of the initial elliptic operator (i.e. the Laplacian or bi-Laplacian), into two formal adjoint operators. Then the dynamics is regulated by a formally skew adjoint operator, hence leading to an Hamiltonian system. After performing an integration by parts, a mixed discretization is immediately achieved \cite{joly2003variational}. This very concise reasoning informally elucidates the strong connection between port-Hamiltonian modelling of continuum mechanics and mixed finite elements. 
 
-The potential of the pH framework as modelling paradigm has been explored by researchers only recently. For instance, in \cite{egger2018damped} the authors consider a port-Hamiltonian model for pressure waves propagation in networks of pipes. By employing a mixed finite element scheme, the authors achieve a structure-preserving discretization of the original model. A model reduction algorithm for this discretized model of pipeline network is then discussed in \cite{egger2018}. These recent works substantiate the validity of this framework to tackle complex application scenarios. \\
-
-Disposing of methodologies capable of constructing structure-preserving discretization is important non only for simulation, but also for control purposes. In particular in \cite{toledo2020} the authors develop a systematic synthesis method for observer-based boundary controller design for boundary controlled pHs on one dimensional spatial domains. To design the observer, a suitable discretized version of the system is assumed to be available. These reasons justify the need for reliable discretization procedures.
-
+The potential of the pH framework as modelling paradigm has been recently explored by researchers. For instance, in \cite{egger2018damped} the authors consider a port-Hamiltonian model for pressure waves propagation in networks of pipes. By employing a mixed finite element scheme, the authors achieve a structure-preserving discretization of the original model. A model reduction algorithm for this discretized model of pipeline network is then discussed in \cite{egger2018}. These recent works substantiate the validity of this framework to tackle complex application scenarios and highlight the importance of structure-preserving discretization algorithms. Disposing of methodologies capable of constructing reliable discretizations is important non only for simulation, but also for control purposes. In particular in \cite{toledo2020} the authors develop a systematic synthesis method for observer-based boundary controller design for boundary controlled pHs on one dimensional spatial domains. To design the observer, a suitable discretized version of the system is assumed to be available. 
 
 \section{Literature review}
 A brief literature review of the topics considered in the thesis is made here. Throughout the chapters of the thesis, the literature is also referenced.
@@ -72,22 +69,76 @@ This discretization technique is a mature research topic, that is rather advanta
 	\item efficiency (e.g. few necessary integration points).
 \end{itemize}
 
-Mixed finite elements for the wave equation have been studied in \cite{geveci1988,becache2000wave}. For elastodynamics the construction of stable elements gets more complicated because of the presence of the symmetric stress tensor. Existing elements enforce symmetry either strongly \cite{becache2001elas,arnold2002mixed} or weakly \cite{arnold2007mixed,arnold2014elastodynamics}. A complete comparative study about this topic can be found in \cite{lee2012mixed}. \\
+Mixed finite elements for the wave equation have been studied in \cite{geveci1988,becache2000wave}. For elastodynamics the construction of stable elements gets more complicated because of the presence of the symmetric stress tensor. Existing elements enforce symmetry either strongly \cite{becache2001elas,arnold2002mixed} or weakly \cite{arnold2007mixed,arnold2014elastodynamics}. A complete comparative study on this topic can be found in \cite{lee2012mixed}. \\
 
-For what concern the mixed discretization of Kirchhoff like plate, non-conforming elements are the most common solution to lower the regularity requirement for this problem \cite{arnold1990intro}. In particular the Hellan-Herrmann-Johnson method \cite{hellan1967,herrmann1967finite,johnson1973convergence} is the most successful one \cite{blum1990,arnold2019hellan}. Recently a mixed discretization requiring $C^0$ elements and valid for all kind of boundary condition has been proposed in \cite{rafetseder2018siam} for static bending problems. However, this method requires the resolution of three consecutive to solve problems, hence the extension to the dynamical case is not straightforward. 
+For what concern the mixed discretization of Kirchhoff like plate, non-conforming elements are the most common solution to lower the regularity requirement for this problem \cite{arnold1990intro}. In particular the Hellan-Herrmann-Johnson method \cite{hellan1967,herrmann1967finite,johnson1973convergence} is the most successful one \cite{blum1990,arnold2019hellan}. Recently a mixed discretization requiring $C^0$ elements and valid for all kind of boundary condition has been proposed in \cite{rafetseder2018siam} for static bending problems. However, this method requires the resolution of three consecutive to solve problems, hence the extension to the dynamical case is not straightforward. \\
+
+There are many more important papers on this topic. Those cited here are significant since many proposed discretizations are based on them.
 
  
 \subsection{Modular multibody dynamics modelling}
 
 In structural control co-design of flexible multibody systems, it is especially useful to dispose of a modular description, to simplify analysis. In this spirit, the transfer matrix method \cite{rong2010transfer} and the component mode synthesis \cite{hurty1965cms} are two well known substructuring techniques that allow the construction of complex multibody systems by interconnecting subcomponents together. A reformulation of the Finite Element-Transfer Matrix (FE-TM) method \cite{tan1990transfer} allows an easy construction of reduced models that are suited for decentralized control design. For the component mode synthesis, the controlled component synthesis (CCS), a framework for the design of decentralized controller of flexible structures, has been proposed in \cite{young1990}. Another modeling paradigm based on the component mode synthesis is the two-input two-output port (TITOP) approach \cite{alazard2015titop}. It conceives the dynamical model of each substructure as a transfer between the accelerations and the external forces at the connection points. This feature allows considering different boundary conditions by inverting specific channels in the transfer matrix. A rigorous validation was provided in \cite{perez2016flexible,sanfedino2018finite}, where the robustness of the methodology in handling various boundary conditions was assessed. \\
 
-The Lagrangian formulation is the most commonly used methodology to retrieve the equations of motion of flexible multibody systems. Using the variational principles of geometric mechanics the equations of motion in Hamiltonian form can be derived either for rigid body dynamics \cite[Proposition 7.1.1]{holm2008geometric} and general non linear elasticity \cite[Chapter 3]{marsden1981lectures}. The port-Hamiltonian (pH) framework \cite{duindam2009} has been recently employed to describe the dynamics of rigid and flexible links \cite{macchelli2007link,macchelli2009multi}. Being intrinsically modular , hence the pH approach naturally allows constructing complex system by interconnecting together atomic elements. The formulation therein naturally accounts for the non-linearities due to large deformations.  However, this methodology relies on Lie algebra and differential geometry concepts and requires non standard discretization techniques. Thus, the overall implementation is not straightforward. \\
+The Lagrangian formulation is the most commonly used methodology to retrieve the equations of motion of flexible multibody systems. Using the variational principles of geometric mechanics the equations of motion in Hamiltonian form can be derived either for rigid body dynamics \cite[Proposition 7.1.1]{holm2008geometric} and general non linear elasticity \cite[Chapter 3]{marsden1981lectures}. The port-Hamiltonian (pH) framework \cite{duindam2009} has been recently employed to describe the dynamics of rigid and flexible links \cite{macchelli2007link,macchelli2009multi}. Being intrinsically modular, the pH approach naturally allows constructing complex system by interconnecting together atomic elements. The formulation therein naturally accounts for the non-linearities due to large deformations.  However, this methodology relies on Lie algebra and differential geometry concepts and requires non standard discretization techniques. Thus, the overall implementation is not straightforward. \\
 
 \indent Together with the approach used to derive the equations of motion, the incorporation of the elastic motion represents another important point when dealing with flexible multibody systems. Three descriptions are commonly used: the floating frame formulation, the corotational frame formulation and the inertial frame formulation \cite{ellenbroek2018}. The choice greatly depends on the foreseen application.  The corotational and inertial frame formulations take into account large deformations of the elastic body, hence are well-suited for accurate simulations. For these formulation many model reduction strategies have been developed in the last two decades \cite{rong2019}. The inclusion of active control strategies is often unfeasible due to the computational burden \cite{wasfy2003survey}. The floating frame formulation is less accurate but easily integrates many model reduction techniques \cite{nowakowski2012}, making it possible to obtain a low-dimensional problem for control design. \\
 
 The strong form Lagrangian formulation of flexible dynamics using a floating frame approach is detailed in  \cite[Eq. 4.10]{simeon2013computational} using the least action principle, but without highlighting the Hamiltonian structure of the problem. 
 
-\section{Overview of chapters}
+\section{Outline}
+
+The thesis in divided into four main parts.
+
+\paragraph{Part I}
+This part gives a general introduction of the following work. Chapter \ref{ch:reminder} briefly remind what  a finite- or infinite- dimensional pH system is and how these systems are deeply related to the geometric Dirac  or Stokes-Dirac structure (for the finite- and infinite- dimensional case respectively).
+
+\paragraph{Part II}
+This part is devoted to the formulation of suitable models for elasticity and thermoelasticity. This part is subdivided into three chapters.
+\begin{itemize}
+\item Chapter \ref{ch:elasPH} details the pH formulation for general n-D linear elasticity.
+\item A pH formulation of thin (Kirchhoff-Love) and thick (Mindlin-Reissner) plate models is given in Chapter \ref{ch:platePH}.
+\item The linear fully coupled thermoelastic problem is modelled as a coupled pH system in Chapter \ref{ch:Thermo}. 
+\end{itemize}
+
+
+\paragraph{Part III} This part is dedicated to the discussion and implementation of the main discretization tool: the Partitioned Finite Element method. This method is a natural extension to pHs of mixed finite elements. This part consists of three chapters.
+\begin{itemize}
+	\item A detailed description of the operating principle of PFEM is given in Chapter \ref{ch:pfem}. The approximation bases for this discretization are not explicitly defined in this chapter, since the method can be implemented through finite elements and spectral methods.
+	\item A convergence study of several finite elements is illustrated in Chapter \ref{ch:conv} for the bending of thin structures (beams and plates). This is by no means a rigorous mathematical convergence analysis. However, thanks to preexisting results in the literature, error estimates are conjectured and validated through numerical experiments.
+	\item Chapter \ref{ch:applications} is dedicated to the applications of the PFEM. In particular, the focus is on stabilization by damping injection, enforcement of mixed boundary conditions and validation of the thermoelastic pH model for an analytical solution.
+\end{itemize}
+ 
+\paragraph{Part IV} In this part a pH formulation of flexible multibody system is discussed an validated. Chapter \ref{ch:fmdPH} details the derivation of a pH system associated to a flexible floating body under small deformation assumption. Several tests are then performed in Chapter \ref{ch:valid}.
 
 
 \section{Contributions}
+As an outcome of this pHD work several contributions have appeared or been submitted in international reviews and conferences. \\
+
+Publications in conference with full paper in proceedings \cite{brugnoli2019cpde,brugnoli2019cdc,cardoso2019cdc,brugnoli2020wc,brugnoli2020mtns}
+\begin{enumerate}
+\item A. Brugnoli, D. Alazard, V. Pommier-Budinger, and D. Matignon. \textit{Partitioned finite element method for the Mindlin plate as a port-Hamiltonian system.} In 3rd IFAC Workshop on Control of Systems Governed by Partial Differential Equations CPDE 2019, pages 88 – 95, Oaxaca, MX, 2019.
+\item A. Brugnoli, D. Alazard, V. Pommier-Budinger, and D. Matignon. \textit{Interconnection of the Kirchhoff plate within the port-Hamiltonian framework.} In Proceedings of the 59th IEEE Conference on Decision and Control, Dec 2019.
+\item F.L. Cardoso-Ribeiro, A. Brugnoli, D. Matignon, and L. Lefèvre. \textit{Port-Hamiltonian modeling, discretization and feedback control of a circular water tank.} In Proceedings of the 59th IEEE Conference on Decision and Control, Dec 2019.
+\item A. Brugnoli, F. L. Cardoso-Ribeiro, G. Haine, and P. Kotyzca. \textit{Partitioned finite element method for power-preserving structured discretization with mixed boundary conditions.} Accepted for the 21st IFAC World congress, Jul 2020.
+\item A. Brugnoli, D. Alazard, V. Pommier-Budinger, and D. Matignon. \textit{Structure-preserving discretization of port-Hamiltonian plate models.} Accepted for the 24st International Symposium on Mathematical Theory of Networks and Systems, Aug 2021.
+\end{enumerate}
+
+Accepted journal papers \cite{brugnoli2019ammmin,brugnoli2019ammkir}
+\begin{enumerate}
+\item A. Brugnoli, D. Alazard, V. Pommier-Budinger, and D. Matignon. \textit{Port-Hamiltonian formulation and symplectic discretization of plate models. Part I: Mindlin model for thick plates.} Applied Mathematical Modelling, 75:940 – 960, Nov 2019. 
+\item A. Brugnoli, D. Alazard, V. Pommier-Budinger, and D. Matignon. \textit{Port-Hamiltonian formulation and symplectic discretization of plate models. Part II: Kirchhoff model for thin plates.} Applied Mathematical Modelling, 75:961 – 981, Nov 2019. 
+\end{enumerate}
+
+
+Submitted journal papers \cite{brugnoli2020msd,brugnoli2020numerical}
+\begin{enumerate}
+\item A. Brugnoli, D. Alazard, V. Pommier-Budinger, and D. Matignon. \textit{Port-Hamiltonian flexible multibody dynamics.} arXiv preprint arXiv:2002.12816, 2020. Under Review.
+\item A. Brugnoli, G. Haine, A. Serhani, and X. Vasseur. \textit{Numerical approximation of port-Hamiltonian systems for hyperbolic or parabolic PDEs with boundary control.} arXiv preprint arXiv:2007.08326, 2020. Under Review.
+\end{enumerate}
+
+
+
+
+
+

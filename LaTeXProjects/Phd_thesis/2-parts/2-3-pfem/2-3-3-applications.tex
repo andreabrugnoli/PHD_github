@@ -311,7 +311,7 @@ By the LaSalle' principle for infinite dimensional system \cite{henry2006geometr
 \end{equation}
 is asymptotically stable. \\
 
-The discretization is performed as in \eqref{eq:pHsys_findim_shwater}. Variable $\alpha_h$ is discretized using Lagrange polynomials of order 1. Discontinuous Galerkin of order 0 defined on the domain and on the boundary are used for $\bm{\alpha}_v, \bm{u}_\partial$.
+The discretization is performed as in \eqref{eq:pHsys_findim_shwater}. Variable $\alpha_h$ is discretized using Lagrange polynomials of order 1. Discontinuous Galerkin elements of order 0 defined on the domain and on the boundary are used for $\bm{\alpha}_v, \bm{u}_\partial$.
 \begin{equation}\label{eq:pHsys_findim_shwater_ctrl}
 \begin{aligned}
 \begin{pmatrix}
@@ -343,7 +343,7 @@ The control law \eqref{eq:ctrllaw_SWE}, once discretized, is expressed as
 \begin{equation}
 	\mathbf{u}_\partial = -k (\mathbf{y}_\partial - \mathbf{y}_\partial^{\text{des}}),
 \end{equation}
-where $\mathbf{y}_\partial^{\text{des}} = \mathbf{M}_\partial^{-1}\int_{\partial\Omega} \rho g h^{\text{des}} \phi_\partial(s) \d\Gamma$. The closed loop system is then
+where $\mathbf{y}_\partial^{\text{des}} = \mathbf{M}_\partial^{-1}\int_{\partial\Omega} \rho g h^{\text{des}} \phi_\partial(s) \d\Gamma$. The closed-loop system is then
 \begin{equation}\label{eq:pHsys_findim_shwater_ctrlcl}
 \begin{pmatrix}
 \dot{\bm{\alpha}}_{d, h} \\
@@ -454,13 +454,13 @@ In this section the Lagrange multiplier method \secref{sec:lagrMul} and the virt
 \end{enumerate}
 
 \subsection{Motion planning of a thin beam}
-Consider the motion planning problem for the Euler Bernoulli beam \cite[Chapter 12]{krstic2008boundary}
+Consider the motion planning problem for the Euler-Bernoulli beam \cite[Chapter 12]{krstic2008boundary}
 \begin{align}
 \partial_{tt} w + \partial_{xxxx} w = 0,  \qquad x\in \Omega=\{0, 1\} \label{eq:classEB_1}\\
 \partial_{xx} w(0, t) = 0, \qquad \partial_{xxx} w (0, t) = 0, \label{eq:bcEB_hom}\\
 w^r(0, t) = \sin(\omega t), \qquad \partial_x w^r(0, t) = 0. \label{eq:bcEB_r}
 \end{align}
-The equation \eqref{eq:classEB_1} represents the Euler-Bernoulli beam \eqref{eq:classEB} with unitary coefficients. Conditions \eqref{eq:bcEB_hom} represent an homogeneous free boundary conditions at the left side. The objective is to find controls $u_1 = w^r(1, t), \; u_2 =\partial_x w^r(1, t)$ to match the reference outputs $y_1^r = w^r(0, t), \; y_2^r=\partial_x w^r(0, t)$. The reference solution for this problem can be found by postulating the existence of a function of the form
+Equation \eqref{eq:classEB_1} represents the Euler-Bernoulli beam \eqref{eq:classEB} with unitary coefficients. Conditions \eqref{eq:bcEB_hom} represent homogeneous free boundary conditions at the left side. The objective is to find controls $u_1 = w^r(1, t), \; u_2 =\partial_x w^r(1, t)$ to match the reference outputs $y_1^r = w^r(0, t), \; y_2^r=\partial_x w^r(0, t)$. The reference solution for this problem can be found by postulating the existence of a function of the form
 \begin{equation*}
 	w^r(x, t) = \sum_{k=0}^{\infty} a_k(t) \frac{x^k}{k !}.
 \end{equation*}
@@ -483,7 +483,7 @@ w^r(1, t) = \frac{1}{2}[\cosh(\sqrt{\omega}) + \cos(\sqrt{\omega})]\sin(\omega t
 	\label{fig:prob_def_EB}
 \end{figure}
 
-This problem can be equivalently cast as a boundary control pH system with mixed boundary conditions (see Fig. \ref{fig:prob_def_EB})
+This problem can be equivalently recast as a boundary-control pH system with mixed boundary conditions (see Fig. \ref{fig:prob_def_EB})
 \begin{subequations}
 	\begin{align}
 	\diffp{}{t}\begin{pmatrix}
@@ -527,10 +527,10 @@ The inputs assures that the outputs $y_{N}^1 = -\partial_x e_w(0, t), \; y_{N}^2
 $$ y_{N}^1 =  -\partial_t \partial_x w^r(0,t) = 0, \qquad y_{N}^2 = \partial_t w^r(0, t) = \omega \cos(\omega t).
 $$
 
-Next we concisely reported the discretization strategy for the imposition of mixed boundary conditions.
+Next we concisely report the discretization strategy for the imposition of mixed boundary conditions.
 
 \paragraph{Lagrange multipliers}
-If Lagrange multipliers are used for the Neumann boundary condition the following weak form is obtained
+If Lagrange multipliers are used for the Neumann boundary condition, the following weak form is obtained
 
 \begin{equation}
 \begin{aligned}
@@ -610,7 +610,7 @@ The DG1Her element \eqref{eq:DG1Her} is employed for the discretization.
 
 \paragraph{Virtual domain decomposition}
 For the decomposition, the beam is split into halves (see Fig. \ref{fig:dom_dec_EC}).
-Applying the PFEM methodology as in \ref{sec:vdd} two finite-dimensional systems are obtained. For $\Omega_N$ the system is analogous to \eqref{eq:pHfindim_Om2}, while for $\Omega_D$ to \eqref{eq:pHfindim_Om1}.
+Applying the PFEM methodology as in \ref{sec:vdd}, two finite-dimensional systems are obtained. For $\Omega_N$ the system is analogous to \eqref{eq:pHfindim_Om2}, while for $\Omega_D$ to \eqref{eq:pHfindim_Om1}.
 
 \begin{tcolorbox}[colframe=red,title=Subdomain $\Omega_N$, coltitle=white]%%
 	\begin{equation}\label{eq:pHfindim_EB_OmN}
@@ -683,7 +683,7 @@ Applying the PFEM methodology as in \ref{sec:vdd} two finite-dimensional systems
 	\end{aligned}
 	\end{equation}
 \end{tcolorbox} 
-In order to get a system with mixed causality, systems \eqref{eq:pHfindim_EB_OmN} and \eqref{eq:pHfindim_EB_OmD} have to be interconnected using a classical gyrator interconnection. The correct interconnection reads (cf. Fig. \ref{fig:dom_int_EB})
+In order to get a system with mixed causality, systems \eqref{eq:pHfindim_EB_OmN} and \eqref{eq:pHfindim_EB_OmD} have to be interconnected using a classical gyrator interconnection. Since the velocities and rotations have to be continuous at the interface and the action-reaction principle holds for the stresses, the appropriate interconnection reads (cf. Fig. \ref{fig:dom_int_EB})
 \begin{align*}
 \mathbf{u}_N^{\text{int}} &= 
 \begin{pmatrix}
@@ -779,7 +779,7 @@ e_p \\
 \bm{e}_v \\
 \end{pmatrix}, \qquad \Omega = \{x \in [0, L], r \in [0, R], \theta = [0, 2 \pi)\},
 \end{equation}
-where $e_p \in \mathbb{R}$  and $\bm{e}_v \in \mathbb{R}^3$ denote the variations of pressure and velocity from a steady state, $\mu_0$ is the steady state mass density, and $\chi_s$ represents a constant adiabatic compressibility factor. With $x, r, \theta$ we denote the axial, radial and tangential cylindrical coordinates.  The domain is cylindrical duct of length $L$ and radius $R$. The following boundary conditions are imposed (see Fig. \ref{fig:bc_part_vibro_3D})
+where $e_p \in \mathbb{R}$  and $\bm{e}_v \in \mathbb{R}^3$ denote the variations of pressure and velocity from a steady state, $\mu_0$ is the steady state mass density, and $\chi_s$ represents a constant adiabatic compressibility factor. With $x, r, \theta$ we denote the axial, radial and tangential cylindrical coordinates.  The domain is a cylindrical duct of length $L$ and radius $R$. The following boundary conditions are imposed (see Fig. \ref{fig:bc_part_vibro_3D})
 
 \begin{figure}[t]
 	\begin{minipage}[b]{0.48\linewidth}
@@ -823,7 +823,18 @@ f(r) &= \left( 1 - \frac{r^2}{R^2} \right) v_0, \\
 g(r) &= 16 \frac{r^2}{R^4} \left( R - r \right)^2 v_0. \\
 \end{aligned}
 \end{equation*}
-The impedance operator $\mathcal{Z}$ is non invertible. If it were invertible than the impedance condition could be treated as a Robin condition. This model describes the behavior of an axis-symmetrical flow subjected to an impedance condition on the lateral surface. Because of symmetry the model can be reduced to a 2D problem in polar coordinates over the domain $\Omega_{\text{r}} = \{x \in [0, L], r \in [0, R]\}$. The reduced system reads
+The impedance operator $\mathcal{Z}$ is non invertible. If it were invertible than the impedance condition could be treated as a Robin condition. To illustrate this, consider the impedance condition
+\[
+e_p = - \mathcal{Z} \, e_v^r.
+\]
+Assume that $\mathcal{Z}(x, t)$ is an invertible operator. Then the impedance condition can be written as a Robin condition
+\[
+e_v^r = - \mathcal{Z}^{-1} \, e_p,
+\]
+that can be imposed as a Neumann condition. \\
+
+
+ This model describes the behavior of an axis-symmetrical flow subjected to an impedance condition on the lateral surface. Because of symmetry the model can be reduced to a 2D problem in polar coordinates over the domain $\Omega_{\text{r}} = \{x \in [0, L], r \in [0, R]\}$. The reduced system reads
 \begin{equation}
 \label{eq:red_mod}
 \begin{bmatrix}
@@ -866,7 +877,7 @@ where $\Gamma_D, \; \Gamma_D$ denote the boundary partitions.
 \[
 H = \frac{1}{2} \inner[\Omega_{\text{r}}]{e_p}{\chi_s e_p} + \frac{1}{2} \inner[\Omega_{\text{r}}]{\bm{e}_v}{\mu_0 \bm{e}_v}
 \]
-where $\inner[\Omega_{\text{r}}]{\cdot}{\cdot}$ is the standard $L^2$ inner product in polar coordinates, defined for scalar or vector fields as
+where $\inner[\Omega_{\text{r}}]{\cdot}{\cdot}$ is the standard $L^2$-inner product in polar coordinates, defined for scalar or vector fields as
 \[
 \inner[\Omega_{\text{r}}]{\alpha}{\beta}= \int_{\Omega_{\text{r}}} \alpha \cdot \beta \ r \d{r} \d{x} = \int_{\Omega_{\text{r}}} \alpha \cdot \beta \ \d{\Omega_r}.
 \]
@@ -939,10 +950,10 @@ where $v_N, v_D$ are the test functions associated to the output discretization 
 \end{pmatrix}.
 \end{aligned}
 \end{equation}
-The matrices are computed as in \eqref{eq:pHsys_infdim_mult1}. To impose the actual boundary conditions consider the weak form of \eqref{eq:bc_imp} $u_D=-\mathcal{Z}\lambda_D=-\mathcal{Z}y_D$:
+The matrices are computed as in \eqref{eq:pHsys_infdim_mult1}. To impose the actual boundary conditions consider the weak form of \eqref{eq:bc_imp} $u_D=-\mathcal{Z}\lambda_D=-\mathcal{Z}y_D$ \cite{serhani2019par}:
 \[ \mathbf{M}_{\Gamma_D} \mathbf{u}_D = - \mathbf{M}_{\Gamma_D, \mathcal{Z}} {\mathbf{y}}_D,
 \]
-where $\mathbf{M}_{\Gamma_D, \mathcal{Z}}$ corresponds to the mass matrix associated to the weighted inner product $\inner[\Gamma_D]{v_D}{\mathcal{Z} y_D}$. The Neumann boundary condition is imposed by projection on the $u_N$ space.   The boundary controlled system becomes   
+where $\mathbf{M}_{\Gamma_D, \mathcal{Z}}$ corresponds to the mass matrix associated to the weighted inner product $\inner[\Gamma_D]{v_D}{\mathcal{Z} y_D}$. The Neumann boundary condition is imposed by projection on the $u_N$ space.   The boundary-controlled system becomes   
 \begin{equation}\label{eq:pHfindim_waves_phdae_bc}
 \begin{bmatrix}
 \mathbf{M}_{\chi_s} & \mathbf{0} & \mathbf{0}\\
@@ -972,7 +983,7 @@ where $\mathbf{M}_{\Gamma_D, \mathcal{Z}}$ corresponds to the mass matrix associ
 
 \paragraph{Virtual domain decomposition}
 
-In order to apply this methodology the domain has to be split into two sub-domains. The shared boundary connecting the two sub-domains can be freely chosen. For the given geometry, the separation line that provide the most regular simplicial meshes is the trapezoidal one given in Fig. \ref{fig:dom_dec_vibro}. 
+In order to apply this methodology the domain has to be split into two sub-domains. The shared boundary connecting the two sub-domains can be freely chosen. For the given geometry, the separation line that provides the most regular simplicial meshes is the trapezoidal one given in Fig. \ref{fig:dom_dec_vibro}. 
 \begin{figure}[t]
 	\begin{minipage}[b]{0.48\linewidth}
 			\centering
@@ -1214,10 +1225,10 @@ Given the physical parameters in Tab. \ref{tab:parWaves}, the numerical values o
 		\label{fig:Hdae15}%
 		\includegraphics[width=0.48\columnwidth]{part_3/applications/mixed_bd_waves/Href.eps}}%
 	\hspace{8pt}%
-	\subfloat[][$L^2$ Hamiltonian error.]{%
+	\subfloat[][$L^2$-Hamiltonian error.]{%
 		\label{fig:Hdiff}%
 		\includegraphics[width=0.48\columnwidth]{part_3/applications/mixed_bd_waves/Hall_diff.eps}} \\
-	\caption[]{Reference Hamiltonian and $L^2$ error.}%
+	\caption[]{Reference Hamiltonian and $L^2$-error.}%
 	\label{fig:Href_err}%
 \end{figure}
 
@@ -1254,7 +1265,7 @@ In order to demonstrate the consistency of the two proposed approaches the follo
 \varepsilon^p_{\text{ODE}/\text{DAE}} = \frac{||p_{\text{REF}} - p_{\text{ODE}/\text{DAE}} ||_{L^2}}{||p_{\text{REF}}||_{L^2}}, \\
 \varepsilon^v_{\text{ODE}/\text{DAE}} = \frac{||\bm{v}_{\text{REF}} - \bm{v}_{\text{ODE}/\text{DAE}} ||_{L^2}}{||\bm{v}_{\text{REF}}||_{L^2}}. 
 \end{align*}
-The total energy obtained with several meshes is shown in Figs. \ref{fig:Htrend_dae}, \ref{fig:Htrend_ode} for the DAE and ODE approach respectively. It can be noticed that the Hamiltonian tends to the value $H_{vx}^0$ as expected. The overall Hamiltonian trend is well captured and even for coarse meshes the relative error does not exceed 6\% (see Fig. \ref{fig:Hdiff}). The convergence of the Hamiltonian is non monotonic. This may be due to the employment of adaptive methods (IDA and RK45) for the time integration. Nevertheless, both methods converge monotonically to the reference solution, as illustrated in Figs. \ref{fig:p_err}, \ref{fig:v_err}. The faster convergence of one method on the other cannot be established. For what concerns the computational cost, in Tab. \ref{tab:deltaT} the simulation time required by each solver is shown. The ODE approach is less time consuming for mesh size sufficiently small.
+The total energy obtained with several meshes is shown in Figs. \ref{fig:Htrend_dae}, \ref{fig:Htrend_ode} for the DAE and ODE approaches respectively. It can be noticed that the Hamiltonian tends to the value $H_{vx}^0$, as expected. The overall Hamiltonian trend is well captured and even for coarse meshes the relative error does not exceed 6\% (see Fig. \ref{fig:Hdiff}). The convergence of the Hamiltonian is non monotonic. This may be due to the employment of adaptive methods (IDA and RK45) for the time integration. Nevertheless, both methods converge monotonically to the reference solution, as illustrated in Figs. \ref{fig:p_err}, \ref{fig:v_err}. The faster convergence of one method on the other cannot be established. For what concerns the computational cost, in Tab. \ref{tab:deltaT} the simulation time required by each solver is shown. The ODE approach is less time consuming for sufficiently small mesh size.
 
 \begin{table}[t]
 	\centering
@@ -1310,7 +1321,7 @@ where $H(t)$ is the Heaviside function. Since the effect of the elastic vibratio
 \begin{equation}\label{eq:c_delta}
 c_\delta = \delta \frac{\rho c_\epsilon (2 \mu + \lambda)}{\beta^2 (3 \lambda + 2 \mu)^2 T_0},
 \end{equation}
-where $\delta \in \{0, 1\}$ is a variable for switching on and off the strong coupling from the mechanical to the thermal domain. The problem can be now recast as a pH system in co-energy variables
+where $\delta \in \{0, 1\}$ is a variable for switching on and off the strong coupling from the mechanical to the thermal domain. The problem can now be recast as a pH system in co-energy variables
 \begin{equation}\label{eq:pHsys_ThElas1D}
 \begin{bmatrix}
 {\rho} & {0} & {0} & {0}\\
@@ -1417,7 +1428,7 @@ The other matrices are computed as in Chapter \ref{ch:pfem}.
 
 
 \subsection{Numerical results}
-In Tab. \ref{tab:parTherElas} the parameter for the simulation are reported. The constant $C_x, C_v$ are the characteristic length and velocity of the problem \cite{rabizadeh2016}. The dimensionless constant $\widehat{L}, \; \widehat{t}_{\text{end}}$ are the dimensionless length and time of the problem. For the discretization  CG elements of order 1 are employed for $e_v, e_T$, while DG of order 0 are used for $e_\varepsilon, j_Q$. 
+In Tab. \ref{tab:parTherElas} the parameters for the simulation are reported. The constant $C_x, C_v$ are the characteristic length and velocity of the problem \cite{rabizadeh2016}. The dimensionless constant $\widehat{L}, \; \widehat{t}_{\text{end}}$ are the dimensionless length and time of the problem. For the discretization  CG elements of order 1 are employed for $e_v, e_T$, while DG of order 0 are used for $e_\varepsilon, j_Q$. 
 
 \begin{table}[htb]
 	\centering
@@ -1471,7 +1482,7 @@ C_1(s) = \left[\frac{s}{2} [(1+\delta+s)+[(1+\delta+s)^2-4s]^{\frac{1}{2}} ]\rig
 C_2(s) = \left[\frac{s}{2} [(1+\delta+s)-[(1+\delta+s)^2-4s]^{\frac{1}{2}} ]\right]^{\frac{1}{2}}. \\
 \end{aligned}
 \end{equation}
-In Figs. \ref{fig:disp_at1}, \ref{fig:temp_at1} the analytical and numerical displacement and temperature at $\widehat{x}=1$ are compared for weak $\delta=0$ and strong coupling $\delta=1$. The inverse of the Laplace transform is computed using the de Hoog method \cite{dehoog1982}. The displacement is retrieved from the velocity field using the trapezoidal rule. The numerical solution matches the analytical one, thus assessing the validity of the model \eqref{eq:pHsys_ThElas1D} and its discretization \eqref{eq:pHfindim_ThermoElas}. In Figs. \ref{fig:u_therElas} \ref{fig:theta_therElas} the numerical solutions for the displacement and dimensionless temperature are reported for weak $\delta=0$ and strong coupling $\delta=1$.
+In Figs. \ref{fig:disp_at1}, \ref{fig:temp_at1} the analytical and numerical displacement and temperature at $\widehat{x}=1$ are compared for weak $\delta=0$ and strong coupling $\delta=1$. The inverse of the Laplace transform is computed using the de~Hoog method \cite{dehoog1982} (available trough the \verb|invertlaplace| function of the \verb|mpmath| Python library). The displacement is retrieved from the velocity field using the trapezoidal rule. The numerical solution matches the analytical one, thus assessing the validity of the model \eqref{eq:pHsys_ThElas1D} and its discretization \eqref{eq:pHfindim_ThermoElas}. In Figs. \ref{fig:u_therElas} \ref{fig:theta_therElas} the numerical solutions for the displacement and dimensionless temperature are reported for weak $\delta=0$ and strong coupling $\delta=1$.
 
 
 \begin{figure}[p]

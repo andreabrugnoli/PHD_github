@@ -6,6 +6,26 @@ from scipy import linalg as la
 
 from Wave_fenics.ifac_wc.sim_CN.theta_method_wc import theta_method
 
+import matplotlib.pyplot as plt
+from Mindlin_PHs_fenics.tests.AnimateSurf import animate2D
+#from matplotlib import animation
+SMALL_SIZE = 14
+MEDIUM_SIZE = 16
+BIGGER_SIZE = 18
+
+plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
+plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+from matplotlib import rcParams
+rcParams.update({'figure.autolayout': True})
+rcParams['text.usetex'] = True
+
+
 import time
 
 def computeH_dae(ind):
@@ -32,10 +52,11 @@ def computeH_dae(ind):
     c_0 = 340  # 340 m/s
     
     deg_p = 1
-    deg_q = 2
+    deg_q = 0
     Vp = FunctionSpace(mesh, "CG", deg_p)
-    Vq = FunctionSpace(mesh, "RT", deg_q)
-    
+#    Vq = FunctionSpace(mesh, "RT", deg_q)
+    Vq = VectorFunctionSpace(mesh, "DG", deg_q)
+
     n_p = Vp.dim()
     n_q = Vq.dim()
     n_e = n_p + n_q
@@ -94,7 +115,7 @@ def computeH_dae(ind):
     # controlN_dofs = np.where(B_N)[0]
     
     # B matrices based on Lagrange
-    V_bc = FunctionSpace(mesh, 'CG', 1)
+    V_bc = FunctionSpace(mesh, 'DG', 0)
     lmb_D = TrialFunction(V_bc)
     v_D = TestFunction(V_bc)
     u_D = TrialFunction(V_bc)
@@ -105,9 +126,8 @@ def computeH_dae(ind):
     x_cor = tab_coord[:, 0]
     r_cor = tab_coord[:, 1]
     
-    assert max(x_cor) == L_duct
-    ind_x = np.where(np.logical_and(np.isclose(x_cor, 0),\
-                                    np.isclose(r_cor, 0, rtol=1e-2)))[0][0]
+    
+#    assert max(x_cor) == L_duct
     
     is_lmbD = conditional(gt(r, R_ext - tol_geo), 1, 0)
     g_D = v_p * lmb_D * is_lmbD * r * ds
@@ -205,8 +225,35 @@ def computeH_dae(ind):
         H_vec[i] = 0.5 * (e_sol[:, i].T @ MM @ e_sol[:, i])
         Hp_vec[i] = 0.5 * (ep_sol[:, i].T @ M_p @ ep_sol[:, i])
         Hq_vec[i] = 0.5 * (eq_sol[:, i].T @ M_q @ eq_sol[:, i])
+        
+#    fig = plt.figure()
+#    plt.plot(t_sol, H_vec, 'b-', label= "$H$")
+#    plt.plot(t_sol, Hp_vec, 'r-', label= "$H_p$")
+#    plt.plot(t_sol, Hq_vec, 'g-', label= "$H_v$")
+#    
+#    plt.xlabel(r'{Time} (s)')
+#    plt.ylabel(r'{Hamiltonian} (J)')
+#    plt.title(r"Hamiltonian trend for the reference solution")
+#    plt.legend(loc='upper right')
+#    
+#    plt.show()
+
+#    tab_coord_p = Vp.tabulate_dof_coordinates().reshape((-1, d))
+#    
+#    x_cor_p = tab_coord_p[:, 0]
+#    r_cor_p = tab_coord_p[:, 1]
+
+#    anim = animate2D(x_cor_p, r_cor_p, ep_sol, t_sol, xlabel = '$x[m]$', ylabel = '$r [m]$', \
+#                              zlabel='$p$', title='pressure')
     
-    
+    #rallenty = 10
+    #fps = 20
+    #Writer = animation.writers['ffmpeg']
+    #writer = Writer(fps=fps, metadata=dict(artist='Me'), bitrate=1800)
+    #path_videos = "/home/a.brugnoli/Plot/Python/Videos/Waves/IFAC_WC2020/"
+    #anim.save(path_videos + 'wave_dae' + str(ind) + '.mp4', writer=writer)
+
+
     path_results = "/home/a.brugnoli/LargeFiles/results_ifacwc_CN2/"
     np.save(path_results + "t_dae_" + str(ind) + ".npy", t_sol)
     np.save(path_results + "H_dae_" + str(ind) + ".npy", H_vec)
@@ -218,3 +265,5 @@ def computeH_dae(ind):
     
 
     return H_vec, t_sol
+
+

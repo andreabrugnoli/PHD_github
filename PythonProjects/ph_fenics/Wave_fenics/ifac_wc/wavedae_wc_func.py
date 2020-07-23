@@ -38,8 +38,8 @@ def computeH_dae(ind):
     xi_s = 1/q_2
     c_0 = 340  # 340 m/s
     
-    deg_p = 1
-    deg_q = 2
+    deg_p = 2
+    deg_q = 1
     Vp = FunctionSpace(mesh, "CG", deg_p)
     Vq = FunctionSpace(mesh, "RT", deg_q)
     
@@ -285,7 +285,7 @@ def computeH_dae(ind):
         Hq_vec[i] = 0.5 * (eq_sol[:, i].T @ MMq @ eq_sol[:, i])
     
     
-    path_results = "/home/a.brugnoli/GitProjects/PythonProjects/ph_fenics/Wave_fenics/results_ifacwc/"
+    path_results = "/home/a.brugnoli/LargeFiles/results_ifacwc4_fenics/"
     np.save(path_results + "t_dae_" + str(ind) + ".npy", t_sol)
     np.save(path_results + "H_dae_" + str(ind) + ".npy", H_vec)
     np.save(path_results + "Hp_dae_" + str(ind) + ".npy", Hp_vec)

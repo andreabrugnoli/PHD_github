@@ -321,7 +321,7 @@ n_mul = len(bd_dofs_mul)
 t_0 = 0
 dt = 1e-6
 
-t_f = 5
+t_f = 10
 n_ev = 1000
 
 x, y = SpatialCoordinate(mesh)
@@ -400,7 +400,7 @@ plt.xlabel(r'{Time} $\mathrm{[s]}$')
 plt.ylabel(r'{Hamiltonian} $\mathrm{[J]}$')
 plt.title(r"Hamiltonian")
 # plt.legend(loc='upper left')
-path_out = "/home/a.brugnoli/Plots/Python/Plots/Kirchhoff_plots/Simulations/Article_CDC/DampingInjection3/"
+path_out = "/home/a.brugnoli/Plots/Python/Plots/Kirchhoff_plots/Simulations/Article_CDC/DampingInjection4/"
 
 plt.savefig(path_out + "Hamiltonian.eps", format="eps")
 
@@ -457,7 +457,7 @@ if plot_solutions:
 
         ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
 
-        plt.savefig(path_out + "Snapshot_t" + str(index + 1) + ".eps", format="eps")
+        plt.savefig(path_out + "Snapshot10s_t" + str(index + 1) + ".eps", format="eps")
 
 
 

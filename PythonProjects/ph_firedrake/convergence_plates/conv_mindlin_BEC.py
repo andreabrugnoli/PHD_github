@@ -23,10 +23,10 @@ def compute_err(n, r):
 
     h_mesh = 1/n
 
-    E = Constant(1)
+    E = Constant(136 * 10**9)
     nu = Constant(0.3)
 
-    rho = Constant(1)
+    rho = Constant(5600)
     k = Constant(5/6)
     h = Constant(0.1)
 
@@ -309,14 +309,14 @@ def compute_err(n, r):
         #                                  + inner(div(eqw_n1 - q_ex), div(eqw_n1 - q_ex)) * dx))
         q_err_L2[i] = np.sqrt(assemble(inner(eqw_n1 - q_ex, eqw_n1 - q_ex) * dx))
 
-    plt.figure()
-    plt.plot(t_vec, v_atP, 'r-', label=r'approx $v$')
-    wst_atP = interpolate(w_st, V_pw).at(Ppoint)
-    vex_atP = wst_atP*beta*np.cos(beta*t_vec)
-    plt.plot(t_vec, vex_atP, 'b-', label=r'exact $v$')
-    plt.xlabel(r'Time [s]')
-    plt.title(r'Displacement at ' + str(Ppoint))
-    plt.legend()
+    # plt.figure()
+    # plt.plot(t_vec, v_atP, 'r-', label=r'approx $v$')
+    # wst_atP = interpolate(w_st, V_pw).at(Ppoint)
+    # vex_atP = wst_atP*beta*np.cos(beta*t_vec)
+    # plt.plot(t_vec, vex_atP, 'b-', label=r'exact $v$')
+    # plt.xlabel(r'Time [s]')
+    # plt.title(r'Displacement at ' + str(Ppoint))
+    # plt.legend()
 
     v_err_max = max(v_err_L2)
     v_err_quad = np.sqrt(np.sum(dt * np.power(v_err_L2, 2)))
@@ -337,7 +337,7 @@ def compute_err(n, r):
            q_err_max, q_err_quad
 
 
-n_h = 2
+n_h = 3
 n1_vec = np.array([2**(i+2) for i in range(n_h)])
 n2_vec = np.array([2**(i+1) for i in range(n_h)])
 h1_vec = 1./n1_vec
