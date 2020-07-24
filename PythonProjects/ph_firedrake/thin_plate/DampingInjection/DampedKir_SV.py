@@ -265,10 +265,10 @@ JJ = np.array(petsc_j.convert("dense").getDenseArray())
 n = FacetNormal(mesh)
 # s = as_vector([-n[1], n[0]])
 
-V_qn = FunctionSpace(mesh, 'Lagrange', 2)
-V_Mnn = FunctionSpace(mesh, 'Lagrange', 2)
+V_qn = FunctionSpace(mesh, 'CG', 1)
+V_Mnn = FunctionSpace(mesh, 'CG', 1)
 
-Vu = V_qn * V_Mnn
+Vu = V_qn * V_Mnns
 q_n, M_nn = TrialFunction(Vu)
 
 v_omn = dot(grad(v_p), n)
@@ -321,7 +321,7 @@ n_mul = len(bd_dofs_mul)
 t_0 = 0
 dt = 1e-6
 
-t_f = 10
+t_f = 5
 n_ev = 1000
 
 x, y = SpatialCoordinate(mesh)
