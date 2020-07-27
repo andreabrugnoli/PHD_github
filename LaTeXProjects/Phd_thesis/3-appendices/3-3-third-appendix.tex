@@ -1,10 +1,26 @@
 \chapter{Implementation using FEniCS and Firedrake}
 
-In this appendix, the main tools needed for low-level manipulation of the {\sc{FEniCS}} and {\sc{Firedrake}} are illustrated. It is assumed to a recent version of {\sc{FEniCS}} and {\sc{Firedrake}} is avaiable, either through local installation (Anaconda and installation from source for {\sc{FEniCS}} and virtual Python environment for {\sc{Firedrake}}). Additional information concerning the installation can be found at \url{https://fenicsproject.org/download/} for {\sc{FEniCS}} and \url{https://www.firedrakeproject.org/download.html} for {\sc{FEniCS}}. The {\sc{FEniCS}} library possesses a vast documentation \cite{logg2012}. On the contrary the {\sc{Firedrake}} developers have not released a comprehensive book, and employ tutorials to illustrate the functioning of the library. For the illustrated boxes colored in red are used for {\textcolor{red}{\sc{FEniCS}} and blue for {\textcolor{blue}{\sc{Firedrake}}}.
-
+In this appendix, the main tools needed for low-level manipulation of the {\sc{FEniCS}} and {\sc{Firedrake}} are illustrated. It is assumed to a recent version of {\sc{FEniCS}} and {\sc{Firedrake}} is avaiable, either through local installation (Anaconda and installation from source for {\sc{FEniCS}} and virtual Python environment for {\sc{Firedrake}}). Additional information concerning the installation can be found at \url{https://fenicsproject.org/download/} for {\sc{FEniCS}} and \url{https://www.firedrakeproject.org/download.html} for {\sc{FEniCS}}. The {\sc{FEniCS}} library possesses a vast documentation \cite{logg2012}. On the contrary the {\sc{Firedrake}} developers have not released a comprehensive book, and employ tutorials to illustrate the functioning of the library. For the illustrated boxes colored in red are used for \textcolor{red}{{\sc{FEniCS}}} and blue for \textcolor{blue}{{\sc{Firedrake}}}. The librairies are assumed to be load through the star import:	
+\begin{verbatim}
+from fenics import *
+\end{verbatim}
+or
+\begin{verbatim}
+from firedrake import *
+\end{verbatim}
+\paragraph{Creation of a mixed function space}
+For the discretization of pHs one has to use a mixed function space, i.e. a collection of more than one function space. Consider for example the creation of a mixed function space where the variable are Lagrange polynomials of order 1 and Discontinuous Galerkin of order 0.
 \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm, colframe=red, enlarge top by=0.25em, enlarge bottom by=0.5em]
-	%\prompt{In}{incolor}{5}{\boxspacing}
 	\begin{verbatim}
-ciao
+	V1 = FunctionSpace(mesh, 'CG', 1)
+	V2 = FunctionSpace(mesh, 'DG', 0)
+	V  = V1 * V2
+	\end{verbatim}
+\end{tcolorbox}
+\begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm, colframe=blue, enlarge top by=0.25em, enlarge bottom by=0.5em]
+	\begin{verbatim}
+	V1 = FunctionSpace(mesh, 'CG', 1)
+	V2 = FunctionSpace(mesh, 'DG', 0)
+	V  = V1 * V2
 	\end{verbatim}
 \end{tcolorbox}
