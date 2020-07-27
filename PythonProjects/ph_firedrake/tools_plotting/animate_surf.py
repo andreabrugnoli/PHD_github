@@ -41,7 +41,7 @@ def animate2D(minSol, maxSol, solFun_list, t, xlabel=None, ylabel=None,  zlabel=
     ax.w_zaxis.set_major_locator(LinearLocator(10))
     ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
 
-    ax.set_title(title, fontsize=fntsize, loc='left')
+    ax.set_title(title, fontsize=fntsize, loc='center')
 
     lab = 'Time =' + '{0:.2e}'.format(t[0])
     triangulation, Z = _two_dimension_triangle_func_val(solFun_list[0], 10)
