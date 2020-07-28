@@ -7,9 +7,29 @@ np.set_printoptions(threshold=np.inf)
 from matplotlib import pyplot as plt
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from matplotlib import cm
+SMALL_SIZE = 14
+MEDIUM_SIZE = 16
+BIGGER_SIZE = 18
+
+plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
+plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+import matplotlib
+matplotlib.rcParams["legend.loc"] = 'best'
+matplotlib.rcParams['text.usetex'] = True
+matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{amsmath}"]
+matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{bm}"]
+
 from firedrake.plot import _two_dimension_triangle_func_val
 from mpl_toolkits.mplot3d import Axes3D
 plt.rc('text', usetex=True)
+
+path_fig = "/home/a.brugnoli/Plots/Python/Plots/Mindlin_plots/Figures_Eig_Min/"
 
 
 from firedrake.petsc import PETSc
@@ -20,13 +40,13 @@ except ImportError:
     warning("Unable to import SLEPc, eigenvalue computation not possible (try firedrake-update --slepc)")
     sys.exit(0)
 
-n = 20
-deg = 2
+n = 80
+deg = 1
 
 rho = 2700
 E = 1e12
 nu = 0.3
-thick = 'n'
+thick = 'y'
 if thick == 'y':
     h = 0.1
 else:
@@ -150,7 +170,7 @@ M = assemble(m_form, bcs=bcs, mat_type='aij')
 petsc_j = J.M.handle
 petsc_m = M.M.handle
 
-num_eigenvalues = 10
+num_eigenvalues = 500
 
 target = 1/(L*((2*(1+nu)*rho)/E)**0.5)
 
@@ -161,7 +181,7 @@ opts.setValue("eps_type", "krylovschur")
 opts.setValue("eps_tol", 1e-10)
 opts.setValue("st_type", "sinvert")
 # opts.setValue("eps_target_imaginary", None)
-opts.setValue("st_shift", target)
+# opts.setValue("st_shift", target)
 opts.setValue("eps_target", target)
 
 
@@ -178,6 +198,8 @@ es.solve()
 
 nconv = es.getConverged()
 
+print(nconv)
+
 if nconv == 0:
     import sys
     warning("Did not converge any eigenvalues")
@@ -185,7 +207,7 @@ if nconv == 0:
 
 vr, vi = petsc_j.getVecs()
 
-tol = 1e-6
+tol = 1e-5
 lamda_vec = np.zeros((nconv))
 
 n_stocked_eig = 0
@@ -196,7 +218,6 @@ eig_imag_w_vec = []
 
 eig_real_w = Function(Vp_w)
 eig_imag_w = Function(Vp_w)
-fntsize = 15
 
 n_pw = Vp_w.dim()
 for i in range(nconv):
@@ -240,11 +261,13 @@ for i in range(n_fig):
 
     ax.plot_trisurf(triangulation, z_goodeig, cmap=cm.jet)
 
-    ax.set_xlabel('$x [m]$', fontsize=fntsize)
-    ax.set_ylabel('$y [m]$', fontsize=fntsize)
-    ax.set_title(r'Eigenvector num ' + str(i + 1), fontsize=fntsize)
+    ax.set_xlabel('$x \; \mathrm{[m]}$')
+    ax.set_ylabel('$y \; \mathrm{[m]}$')
+    ax.set_title(r'Eigenvector num ' + str(i + 1))
 
     ax.w_zaxis.set_major_locator(LinearLocator(10))
     ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
+
+    plt.savefig(path_fig + "Eig" + str(i+1) + ".eps", format="eps")
 
 plt.show()

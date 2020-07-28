@@ -5,20 +5,35 @@ from fenics import *
 import numpy as np
 np.set_printoptions(threshold=np.inf)
 import mshr
-import matplotlib.pyplot as plt
-
 import scipy.linalg as la
 
-import matplotlib
 import matplotlib.pyplot as plt
+import matplotlib
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from matplotlib import cm
 
+SMALL_SIZE = 14
+MEDIUM_SIZE = 16
+BIGGER_SIZE = 18
+
+plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
+plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+
+plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+matplotlib.rcParams["legend.loc"] = 'best'
+matplotlib.rcParams['text.usetex'] = True
+matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{amsmath}"]
+matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{bm}"]
 matplotlib.rcParams['text.usetex'] = True
 
-n = 20 #int(input("Number of elements for side: "))
-deg = 2 #int(input('Degree for FE: '))
+n = 40 #int(input("Number of elements for side: "))
+deg = 1 #int(input('Degree for FE: '))
 nreq = 10
 
 E = 1e12
@@ -210,7 +225,7 @@ solver.parameters["problem_type"] = "pos_gen_non_hermitian"
 solver.parameters["spectrum"] = "target imaginary"
 solver.parameters["spectral_transform"] = "shift-and-invert"
 solver.parameters["spectral_shift"] = shift
-neigs = 15
+neigs = 40
 solver.solve(neigs)
 
 nconv = solver.get_number_converged()
@@ -289,23 +304,19 @@ if plot_eigenvector == 'y':
 
             ax = fig.add_subplot(111, projection='3d')
 
-            ax.set_xbound(min(x) - tol, max(x) + tol)
-            ax.set_xlabel('$x$', fontsize=fntsize)
-
-            ax.set_ybound(min(y) - tol, max(y) + tol)
-            ax.set_ylabel('$y$', fontsize=fntsize)
-
-            ax.set_title('$v_{e_{p,w}}$', fontsize=fntsize)
-
+            ax.set_xlabel('$x \; \mathrm{[m]}$')
+            ax.set_ylabel('$y \; \mathrm{[m]}$')
+            ax.set_title(r'Eigenvector num ' + str(i + 1))
+            
             ax.set_zlim3d(minZ - 0.01*abs(minZ), maxZ + 0.01*abs(maxZ))
             ax.w_zaxis.set_major_locator(LinearLocator(10))
             ax.w_zaxis.set_major_formatter(FormatStrFormatter('%.2g'))
 
             ax.plot_trisurf(x, y, z, cmap=cm.jet, linewidth=0, antialiased=False)
 
-            # path_out = "/home/a.brugnoli/PycharmProjects/Mindlin_Phs_fenics/Figures_Eig_Min/RealEig/"
-            # plt.savefig(path_out1 + "Case" + case_study + "_el" + str(n) + "_deg" + str(deg) + "_thick_" + \
-            #             str(thick) + "_eig_" + str(i+1) + ".eps", format="eps")
+            path_fig = "/home/a.brugnoli/Plots/Python/Plots/Mindlin_plots/Figures_Eig_Min/"
+            plt.savefig(path_fig + "Eig" + str(i+1) + ".eps", format="eps")
+
 
 plt.show()
 
