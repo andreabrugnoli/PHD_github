@@ -5,7 +5,7 @@ import numpy as np
 
 np.set_printoptions(threshold=np.inf)
 from math import floor, sqrt, pi
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from firedrake.plot import _two_dimension_triangle_func_val
 
 import scipy.linalg as la

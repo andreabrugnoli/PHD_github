@@ -40,7 +40,7 @@ except ImportError:
     warning("Unable to import SLEPc, eigenvalue computation not possible (try firedrake-update --slepc)")
     sys.exit(0)
 
-n = 80
+n = 40
 deg = 1
 
 rho = 2700
@@ -170,7 +170,7 @@ M = assemble(m_form, bcs=bcs, mat_type='aij')
 petsc_j = J.M.handle
 petsc_m = M.M.handle
 
-num_eigenvalues = 500
+num_eigenvalues = 40
 
 target = 1/(L*((2*(1+nu)*rho)/E)**0.5)
 
@@ -178,11 +178,12 @@ opts = PETSc.Options()
 opts.setValue("pos_gen_non_hermitian", None)
 opts.setValue("st_pc_factor_shift_type", "NONZERO")
 opts.setValue("eps_type", "krylovschur")
-opts.setValue("eps_tol", 1e-10)
 opts.setValue("st_type", "sinvert")
+opts.setValue("eps_target", target)
+
+# opts.setValue("eps_tol", 1e-10)
 # opts.setValue("eps_target_imaginary", None)
 # opts.setValue("st_shift", target)
-opts.setValue("eps_target", target)
 
 
 es = SLEPc.EPS().create(comm=COMM_WORLD)
@@ -242,7 +243,7 @@ for i in range(nconv):
 for i in range(n_stocked_eig):
     print("Eigenvalue num " + str(i + 1) + ":" + str(omega_tilde[i]))
 
-n_fig = min(n_stocked_eig, 4)
+n_fig = min(n_stocked_eig, 6)
 
 for i in range(n_fig):
     norm_real_eig = np.linalg.norm(eig_real_w_vec[i])
