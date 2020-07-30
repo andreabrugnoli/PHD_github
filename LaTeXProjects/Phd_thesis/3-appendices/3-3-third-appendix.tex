@@ -1,10 +1,10 @@
 \chapter{Implementation using FEniCS and Firedrake}
 
-In this appendix, some tools needed for manipulation of the \fenics and \firedrake libraries are illustrated. It is assumed to a recent version of \fenics and \firedrake is available, either through local installation (Anaconda or installation from source for \fenics and virtual Python environment for \firedrake) or through Docker containers. Additional information concerning the installation can be found at \url{https://fenicsproject.org/download/} for \fenics and \url{https://www.firedrakeproject.org/download.html} for \firedrake. \\
+In this appendix, the main tools needed for implementing PFEM  in \fenics and \firedrake libraries are illustrated. It is assumed to a recent version of \fenics and \firedrake is available, either through local installation (Anaconda or installation from source for \fenics and virtual Python environment for \firedrake) or through Docker containers. Additional information concerning the installation can be found at \url{https://fenicsproject.org/download/} for \fenics and \url{https://www.firedrakeproject.org/download.html} for \firedrake. \\
 
-This tutorial is by no means a complete introductory tutorial. It is intended to provide the general commands needed for the implementation of PFEM. For readers interested in a comprehensive documentation, the \fenics developers have written a book to explain the functioning of the library \cite{logg2012}, whereas the \firedrake developers employ illustrative tutorials\footnote{\url{https://www.firedrakeproject.org/documentation.html}}. \\
+This tutorial is by no means a complete introductory tutorial. It is intended to provide the general commands needed for the implementation of PFEM and to highlight similarities and differences between \fenics and \firedrake. For readers interested in a comprehensive documentation, the \fenics developers have written a book to explain the functioning of the library \cite{logg2012}, whereas the \firedrake developers employ illustrative tutorials\footnote{\url{https://www.firedrakeproject.org/documentation.html}}. \\
 
-In this appendix, boxes colored in red are used for \textcolor{red}{\fenics}, cyan for \textcolor{cyan}{\firedrake} and gray for identical commands in both libraries. The libraries are assumed to be loaded through the star import:	
+In this appendix, boxes colored in red are used for \textcolor{red}{\fenics}, cyan for \textcolor{cyan}{\firedrake}, gray for identical commands in both libraries and green for implementations based on \textsc{Scipy}. The \fenics or \firedrake library is assumed to be loaded through the star import:	
 \begin{verbatim}
 from fenics import *
 \end{verbatim}
@@ -12,9 +12,17 @@ or
 \begin{verbatim}
 from firedrake import *
 \end{verbatim}
-As an illustration we consider the discretization of the Mindlin plate using the CGDG elements  \eqref{eq:CGDG}. We first illustrate how to compute the mass and interconnection matrices. Then, the construction of the boundary control matrix is explained by retrieving a \textsc{Scipy}\footnote{\url{https://www.scipy.org/}} sparse matrix from the matrix computed using \fenics or \firedrake.
+Furthermore, the \textsc{Numpy} library and some method of the \textsc{Scipy} sparse library  are needed\footnote{\url{https://www.scipy.org/}}:
+\begin{Verbatim}
+import numpy as np
+from scipy.sparse import csr_matrix
+from scipy.sparse import lil_matrix
+from scipy.sparse import vstack, hstack, block_diag
+from scipy.sparse.linalg import eigs
+\end{Verbatim}
+As an illustration we consider the discretization of the Mindlin plate using the CGDG elements  \eqref{eq:CGDG}. We first illustrate how to compute the mass and interconnection matrices. Then, the construction of the boundary control matrix is explained by retrieving a \textsc{Scipy} sparse matrix from the matrix computed by \fenics or \firedrake.
 
-\paragraph{Creation of a mixed function space}
+\subsection*{Creation of a mixed function space}
 For the discretization of pHs one has to use a mixed function space, i.e. a collection of more than one function space. Consider the creation of the Mindlin plate CGDG elements \eqref{eq:CGDG} on a unit square simplicial mesh with 40 elements per side.
 \begin{tcolorbox}[title = Mixed function space in  \fenics, coltitle=black, breakable, size=fbox, boxrule=1pt, pad at break*=1mm, colframe=red, enlarge top by=0.25em, enlarge bottom by=0.5em]
 \begin{Verbatim}[tabsize=4]
@@ -24,7 +32,7 @@ P_w   = FiniteElement('CG', triangle, 1)   	# vertical velocity
 P_th  = VectorElement('CG', triangle, 1)   	# angular velocity
 P_kap = VectorElement('DG', triangle, 0, dim=3)	# bending momenta			
 P_gam = VectorElement('DG', triangle, 0)	# shear stress 
-elem  = MixedElement([P_pw, P_pth, P_qth, P_qw])
+elem  = MixedElement([P_w, P_th, P_kap, P_gam])
 V     = FunctionSpace(mesh, elem)
 \end{Verbatim}
 \end{tcolorbox}
@@ -39,12 +47,14 @@ V_gam = VectorFunctionSpace(mesh, "DG", 0)
 V     = MixedFunctionSpace([V_w, V_th, V_kap, V_gam])
 \end{Verbatim}
 \end{tcolorbox}
-The space $\verb|V_kap|$ has dimension 3 since it corresponds to variable $\bm{E}_\kappa \in \bbR^{2\times 2}_{\text{sym}} \cong  \bbR^3$.
+The space $\verb|V_kap|$ has dimension 3 since it corresponds to variable $\bm{E}_\kappa \in \bbR^{2\times 2}_{\text{sym}} \cong  \bbR^3$, ($\cong$ stands for isomorphic).
 
-\paragraph{Definition of a variational form}
-The precedent commands create a function space that can be used to construct variational forms trough the Unified Form Language\footnote{\url{https://readthedocs.org/projects/fenics-ufl/downloads/pdf/latest/}} \cite{alnaes2014} (UFL). UFL is a core component of \fenics and has been adopted in \firedrake as well. It is an expressive domain-specific language for abstractly representing (finite element) variational formulations of differential equations. In particular, this language defines a syntax for the integration of variational forms over various domains. This simply leads to an expressive implementation that is close to the abstract mathematical formulations. Given the previously defined function space, consider the definition of variational forms representing the mass matrix $\mathbf{M}$ and interconnection matrix $\mathbf{J}$ (the implementation is the same in both libraries since UFL is a common component).
+\subsection*{Definition of variational forms}
+The precedent commands create a mixed function space that can be used to construct variational forms trough the Unified Form Language\footnote{\url{https://readthedocs.org/projects/fenics-ufl/downloads/pdf/latest/}} \cite{alnaes2014} (UFL). UFL is a core component of \fenics and has been adopted in \firedrake as well. It is an expressive domain-specific language for abstractly representing (finite element) variational formulations of differential equations. In particular, this language defines a syntax for the integration of variational forms over various domains. \\
+
+Given the previously defined mixed function space, consider the definition of the mass and interconnection variational forms (the implementation is the same in both libraries since UFL is a common component).
  
-\begin{tcolorbox}[title = Definition of the variational form (\fenics \& \firedrake), coltitle=white, breakable, size=fbox, boxrule=1pt, pad at break*=1mm, enlarge top by=0.25em, enlarge bottom by=0.5em]
+\begin{tcolorbox}[title = Definition of the variational forms (\fenics \& \firedrake), coltitle=white, breakable, size=fbox, boxrule=1pt, pad at break*=1mm, enlarge top by=0.25em, enlarge bottom by=0.5em]
 \begin{Verbatim}[tabsize=4]
 # Physical parameters 
 E   = 1e12
@@ -91,8 +101,9 @@ j_form = dot(v_gam, grad(e_w)) * dx - dot(grad(v_w), e_gam) * dx + \
 		 dot(v_th, e_gam) * dx - dot(v_gam, e_th) * dx
 \end{Verbatim}
 \end{tcolorbox}
+This sample code highlights the strength of the UFL library. The expressive implementation is really close to the abstract mathematical formulation.
 
-\paragraph{Matrices assemble}
+\subsection*{Matrices assemble}
 Once the forms have been declared, it is possible to actually construct the associated matrices. Consider the case of a clamped (i.e. Dirichlet) boundary condition. For the CGDG elements a clamped condition corresponds to essential boundary conditions. These are defined in the same way in \fenics and \firedrake
 \begin{tcolorbox}[title = Dirichlet boundary conditions (\fenics \& \firedrake), coltitle=white, breakable, size=fbox, boxrule=1pt, pad at break*=1mm, enlarge top by=0.25em, enlarge bottom by=0.5em]
 \begin{Verbatim}[tabsize=4]
@@ -102,7 +113,7 @@ bcs.append(DirichletBC(V.sub(1), Constant((0.0, 0.0)), "on_boundary"))
 \end{Verbatim}
 \end{tcolorbox}
 The subspaces \verb|V.sub(0)|, \verb|V.sub(1)| correspond to spaces \verb|V_w|, \verb|V_th| associated to the vertical velocity and the angular velocity, respectively. The boundary conditions can now be incorporated in the matrices. The final assemble of the matrices is achieved in \fenics by the following code snippet.
-\begin{tcolorbox}[title = Matrices assembly in  \fenics, coltitle=black, breakable, size=fbox, boxrule=1pt, pad at break*=1mm, colframe=red, enlarge top by=0.25em, enlarge bottom by=0.5em]
+\begin{tcolorbox}[title = Matrices assemble in  \fenics, coltitle=black, breakable, size=fbox, boxrule=1pt, pad at break*=1mm, colframe=red, enlarge top by=0.25em, enlarge bottom by=0.5em]
 \begin{Verbatim}[tabsize=4]
 J, M = PETScMatrix(), PETScMatrix()
 dummy = v_w * dx
@@ -111,7 +122,7 @@ assemble_system(m_form, dummy, bcs, A_tensor=M)
 \end{Verbatim}
 \end{tcolorbox}
 Matrices are first defined as {\sc{PETSc}}\footnote{\url{https://www.mcs.anl.gov/petsc/}} matrices and forms are assembled into it. The boundary conditions have been applied to the stiffness matrix using \verb|assemble_system| so as to preserve symmetry (a dummy right-hand side vector have been introduced to call this function). The same matrices are constructed in \firedrake by the following code
-\begin{tcolorbox}[title = Matrices assembly in  \firedrake, coltitle=black, breakable, size=fbox, boxrule=1pt, pad at break*=1mm, colframe=cyan, enlarge top by=0.25em, enlarge bottom by=0.5em]
+\begin{tcolorbox}[title = Matrices assemble in  \firedrake, coltitle=black, breakable, size=fbox, boxrule=1pt, pad at break*=1mm, colframe=cyan, enlarge top by=0.25em, enlarge bottom by=0.5em]
 \begin{Verbatim}[tabsize=4]
 J_ass = assemble(j_form, bcs=bcs, mat_type='aij')
 M_ass = assemble(m_form, bcs=bcs, mat_type='aij')
@@ -123,7 +134,7 @@ The option \verb|mat_type| specifies the desired format for the matrix represent
 
 For what concerns the ordering of the degrees of freedom, \firedrake just piles up the degrees of freedom of each subspace. The final matrices have the same structure as in \eqref{eq:pHfindim_Min_grad}. For \fenics the default option is a not-natural ordering to cluster the non-zero entries closer to the diagonal. A natural ordering can be set by changing the \verb|reorder_dofs_serial| parameter\footnote{\url{https://fenicsproject.discourse.group/t/ordering-of-mixed-elements/946}}.
 
-\paragraph{Eigenvalues computation}
+\subsection*{Eigenvalues computation with SLEPc}
 A simple test to assess the validity of the finite element discretization consists in computing the eigenvalues of the matrices, to assess the absence of spurious modes. The {\sc{SLEPc}} library is used to this end \footnote{\url{https://slepc.upv.es/documentation/slepc.pdf}} \cite{hernandez2005slepc}. Since we are interested in the lowest eigenvalues, a shift-and-invert method is used. It is known that for this problem the first normalized eigenfrequencies
 \[
 \widehat{\omega}_i = \omega_i \; (2(1+\nu)\rho/E)^{1/2}
@@ -141,8 +152,14 @@ solver.parameters["spectral_transform"] = "shift-and-invert"
 solver.parameters["spectral_shift"] = 1/((2*(1+nu)*rho)/E)**0.5
 solver.solve(40)
 n_conv = solver.get_number_converged()
+
+omega_tilde = []
 for i in range(n_conv):
-	r, c, rx, cx = solver.get_eigenpair(i)
+	lam_r, lam_i, psi_r, psi_i = solver.get_eigenpair(i)
+	
+	# Discard the zero eigenvalues due to the bcs.
+	if lam_i > 1e-5:
+		omega_tilde.append(lam_i *((2 * (1 + nu) * rho) / E) ** 0.5)
 \end{Verbatim}
 \end{tcolorbox}
  For \firedrake the equivalent code snippet is the following.
@@ -174,12 +191,18 @@ es.setFromOptions()
 es.solve()
 
 n_conv = es.getConverged()
-vr, vi = J.getVecs()
+psi_r, psi_i = J.getVecs()
+omega_tilde = []
 for i in range(n_conv):
-	lam = es.getEigenpair(i, vr, vi)
+	lam = es.getEigenpair(i, psi_r, psi_i)
+	lam_i = np.imag(lam)
+	
+	if lam_i > 1e-5:
+		omega_tilde.append(lam_i*((2*(1+nu)*rho)/E)**0.5)
 \end{Verbatim}
 \end{tcolorbox}
 
+In Fig. \ref{fig:EigMin} the 6 first eigenvectors are plotted. The associated eigenvalues are consistent with the results reported in \cite{dawe1980rayleigh}. 
 
 \begin{figure*}[hp]
 	\centering
@@ -204,7 +227,7 @@ for i in range(n_conv):
 
 
 
-\paragraph{Conversion to \textsc{Scipy} for direct manipulation of the boundary matrices}
+\subsection*{Conversion to \textsc{Scipy} for direct manipulation of the boundary matrices}
 If boundary control has to be taken into account, it is preferable to move to \textsc{Scipy} for manipulating and constructing the final matrices. Consider now the case of a Mindlin plate with Neumann boundary control. The construction of the mass and interconnection matrices is the same, without imposing any boundary conditions. For the boundary variables we choose Lagrange polynomials of order~1. 
 
 \begin{remark}[Construction of the $\mathbf{B}$ matrix]\label{rmk:Bmatrix}
@@ -214,8 +237,8 @@ Notice that \fenics and \firedrake do not support Function spaces defined on the
 \begin{tcolorbox}[title = Control matrix construction in  \fenics, coltitle=black, breakable, size=fbox, boxrule=1pt, pad at break*=1mm, colframe=red, enlarge top by=0.25em, enlarge bottom by=0.5em]
 \begin{Verbatim}[tabsize=4]
 P_qn  = FiniteElement('CG', triangle, 1)   # shear force
-P_Mnn = FiniteElement('CG', triangle, 1)   # torsional momentum
-P_Mns = FiniteElement('CG', triangle, 1)   # flexural momentum
+P_Mnn = FiniteElement('CG', triangle, 1)   # flexural momentum
+P_Mns = FiniteElement('CG', triangle, 1)   # torsional momentum
 elem  = MixedElement([P_qn, P_Mnn, P_Mns])
  
 V_u   = FunctionSpace(mesh, elem)
@@ -231,13 +254,13 @@ assemble(b_form, B_petsc)
 B = B_petsc.mat()
 \end{Verbatim}
 \end{tcolorbox}	
-The method \verb|mat()| provides a PETCs matrix manageable by \verb|petsc4py|, similarly to the method \verb|M.handle|.
+The method \verb|mat()| in \fenics provides a PETCs matrix manageable by \verb|petsc4py|, similarly to the method \verb|M.handle| in \firedrake.
 
 \begin{tcolorbox}[title = Control matrix construction in  \firedrake, coltitle=black, breakable, size=fbox, boxrule=1pt, pad at break*=1mm, colframe=cyan, enlarge top by=0.25em, enlarge bottom by=0.5em]
 \begin{Verbatim}[tabsize=4]
-V_qn  = FunctionSpace(mesh, 'Lagrange', 1)
-V_Mnn = FunctionSpace(mesh, 'Lagrange', 1)
-V_Mns = FunctionSpace(mesh, 'Lagrange', 1)
+V_qn  = FunctionSpace(mesh, 'CG', 1)
+V_Mnn = FunctionSpace(mesh, 'CG', 1)
+V_Mns = FunctionSpace(mesh, 'CG', 1)
 
 V_u = V_qn * V_Mnn * V_Mns
 q_n, M_nn, M_ns = TrialFunction(V_u)
@@ -253,37 +276,94 @@ B = B_ass.M.handle
 \end{tcolorbox}
 
 The matrix \verb|B| computed with \fenics and \firedrake has now the type \verb|petsc4py.PETSc.Mat| and can be converted to a \textsc{Scipy} sparse CSR matrix (compressed sparse row format). As anticipated in Remark \ref{rmk:Bmatrix}, the zero columns associated with interior degrees of freedom have to be removed from the matrix.
-\begin{tcolorbox}[title = Construction of the final $\mathbf{B}$ matrix (\textsc{Scipy}), coltitle=white, breakable, size=fbox, boxrule=1pt, pad at break*=1mm, enlarge top by=0.25em, enlarge bottom by=0.5em]
+\begin{tcolorbox}[title = Construction of the final $\mathbf{B}$ matrix (\textsc{Scipy}), coltitle=black, breakable, size=fbox, boxrule=1pt, pad at break*=1mm, colframe=green, enlarge top by=0.25em, enlarge bottom by=0.5em]
 \begin{Verbatim}[tabsize=4]
-import numpy as np
-from scipy.sparse import csr_matrix
-
 # Conversion to CSR scipy format
-Ball_scipy = csr_matrix(B.getValuesCSR()[::-1])
+B_scipy_cols = csr_matrix(B.getValuesCSR()[::-1])
 
 # Non zero rows and columns
-rows, cols = csr_matrix.nonzero(B_scipy)
+rows, cols = csr_matrix.nonzero(B_scipy_cols)
 
 # Indexes of non zero columns
 set_cols = np.array(list(set(cols)))
 
-# Number of non zero columns
-n_cols = len(set(cols))
+# Number of non zero columns (i.e. number of inputs)
+n_u = len(set(cols))
 
-# Initialization of the final matrix
-B_scipy = csr_matrix((V.dim(), n_cols))
+# Initialization of the final matrix in lil folmat
+# for efficient incremental construction.
+B_scipy = lil_matrix((V.dim(), n_u))
 
 for r, c in zip(rows, cols):
 	# Column index in the final matrix
 	ind_col = np.where(set_cols == c)[0]
 	
 	# Fill the matrix with the values
-	B_scipy[r, ind_col] = Ball_scipy[r, c]
+	B_scipy[r, ind_col] = B_scipy_cols[r, c]
+	
+# Convert to csr format
+B_scipy.tocsr()	
+\end{Verbatim}
+\end{tcolorbox}
+Similarly \textsc{Scipy} matrices in CSR format can be obtained for the mass $\mathbf{M}$ and interconnection $\mathbf{J}$ matrix, thus obtaining the final boundary controlled system
+\begin{equation*}
+\mathbf{M} \dot{\mathbf{e}} = \mathbf{J} \mathbf{e} + \mathbf{B} \mathbf{u}.
+\end{equation*}
+This system can then be simulated using time integrator libraries available in \textsc{Scipy}\footnote{\url{https://docs.scipy.org/doc/scipy/reference/integrate.html}}.
+
+\subsection*{Stability check of the boundary subspace}
+To check if the discretization of the boundary variable is appropriate, one can solve the eigenvalues problem
+\begin{equation*}
+	\begin{bmatrix}
+	\mathbf{M} & \mathbf{0} \\
+	\mathbf{0} & \mathbf{0}
+	\end{bmatrix}
+	\begin{pmatrix}
+	\bm{\psi}_e^i \\
+	\bm{\psi}_\lambda^i
+	\end{pmatrix} j \omega_i  = 
+	\begin{bmatrix}
+	\mathbf{J} & \mathbf{B} \\
+	-\mathbf{B}^\top & \mathbf{0}
+	\end{bmatrix}
+	\begin{pmatrix}
+	\bm{\psi}_e^i \\
+	\bm{\psi}_\lambda^i
+	\end{pmatrix},
+\end{equation*}
+and check the consistency of the eigenvalues, i.e. no spurious modes appear.
+\begin{tcolorbox}[title = Eigenvalues computation using Lagrange multipliers (\textsc{Scipy}), coltitle=black, breakable, size=fbox, boxrule=1pt, pad at break*=1mm, colframe=green, enlarge top by=0.25em, enlarge bottom by=0.5em]
+\begin{Verbatim}[tabsize=4]
+# Conversion to scipy CSR matrices 
+# Important: no boundary conditions imposed
+J_scipy = csr_matrix(J.getValuesCSR()[::-1])  # for fenics J.mat() 
+M_scipy = csr_matrix(M.getValuesCSR()[::-1])  # for fenics M.mat() 
+
+Z_mat = csr_matrix((n_u, n_u))
+J_aug = vstack((hstack((J_scipy, B_scipy)), hstack((-B_scipy.T, Z_mat))))
+M_aug = block_diag((M_scipy, Z_mat))
+
+# Shift value
+shift = 1/(((2*(1+nu)*rho)/E)**0.5)
+# Resolution of the eigenproblem
+eigenvalues, eigvectors = eigs(J_aug, k=40, M=M_aug,\
+	 					  sigma=shift, which='LM', tol=1e-6)
+
+omega_all = np.imag(eigenvalues)
+index = omega_all >= 1e-5
+omega = omega_all[index]
+omega.sort()
+
+omega_tilde = omega*((2*(1+nu)*rho)/E)**0.5
 \end{Verbatim}
 \end{tcolorbox}
 
-Similarly \textsc{Scipy} matrices in CSR format can be obtained for the mass $\mathbf{M}$ and interconnection $\mathbf{J}$ matrix, thus obtaining the final boundary controlled system
-\begin{equation*}
-	\mathbf{M} \dot{\mathbf{e}} = \mathbf{J} \mathbf{e} + \mathbf{B} \mathbf{u}.
-\end{equation*}
-This system can then be simulated using time integrator libraries available in \textsc{Scipy}.
+The following values are obtained 
+\begin{align*}
+\widehat{\omega}_1 = 1.59, \qquad\qquad \widehat{\omega}_2 = 3.04, \qquad\qquad \widehat{\omega}_3 = 3.06, \\
+\widehat{\omega}_4 = 4.29, \qquad\qquad \widehat{\omega}_5 = 5.05, \qquad\qquad \widehat{\omega}_6 = 5.10. \\
+\end{align*}
+Since no spurious eigenvalues occur, it is legit to assume that the Lagrange multiplier subspace is a stable one (among others). This is just an heuristic reasoning, since the rigorous mathematical justification of the boundary subspace stability comes from the fulfillment of the \textit{inf-sup} condition.
+
+\subsection*{Concluding remarks}
+This appendix provides all the tools needed for constructing of the matrices and for handling a uniform boundary conditions. If one has to consider mixed boundary conditions, the boundary forms and Dirichlet conditions have to be defined over a subset of the boundary (consult \href{https://fenicsproject.org/pub/tutorial/sphinx1/._ftut1005.html}{mixed~fenics} for an explanation in \fenics and \href{https://www.firedrakeproject.org/variational-problems.html}{mixed~firedrake} for \firedrake). 
