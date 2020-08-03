@@ -121,7 +121,7 @@ assemble_system(j_form, dummy, bcs, A_tensor=J)
 assemble_system(m_form, dummy, bcs, A_tensor=M)
 \end{Verbatim}
 \end{tcolorbox}
-Matrices are first defined as {\sc{PETSc}}\footnote{\url{https://www.mcs.anl.gov/petsc/}} matrices and forms are assembled into it. The boundary conditions have been applied to the stiffness matrix using \verb|assemble_system| so as to preserve symmetry (a dummy right-hand side vector have been introduced to call this function). The same matrices are constructed in \firedrake by the following code
+Matrices are first defined as {\sc{PETSc}}\footnote{\url{https://www.mcs.anl.gov/petsc/}} matrices and forms are assembled into it. The boundary conditions have been applied to the stiffness matrix using \verb|assemble_system| so as to preserve symmetry (a dummy right-hand side vector has been introduced to call this function). The same matrices are constructed in \firedrake by the following code
 \begin{tcolorbox}[title = Matrices assemble in  \firedrake, coltitle=black, breakable, size=fbox, boxrule=1pt, pad at break*=1mm, colframe=cyan, enlarge top by=0.25em, enlarge bottom by=0.5em]
 \begin{Verbatim}[tabsize=4]
 J_ass = assemble(j_form, bcs=bcs, mat_type='aij')
@@ -130,7 +130,7 @@ J = J_ass.M.handle
 M = M_ass.M.handle
 \end{Verbatim}
 \end{tcolorbox}
-The option \verb|mat_type| specifies the desired format for the matrix representation. To get a final {\sc{PETSc}} matrix, the AIJ format is used. The method \verb|M.handle| provide as outputs {\sc{PETSc}} matrices that can be manipulated by the \verb|pesct4py| library\footnote{\url{https://www.mcs.anl.gov/petsc/petsc4py-current/docs/apiref/index.html}}. \\
+The option \verb|mat_type| specifies the desired format for the matrix representation. To get a final {\sc{PETSc}} matrix, the AIJ format is used. The method \verb|M.handle| provides as outputs {\sc{PETSc}} matrices that can be manipulated by the \verb|pesct4py| library\footnote{\url{https://www.mcs.anl.gov/petsc/petsc4py-current/docs/apiref/index.html}}. \\
 
 For what concerns the ordering of the degrees of freedom, \firedrake just piles up the degrees of freedom of each subspace. The final matrices have the same structure as in \eqref{eq:pHfindim_Min_grad}. For \fenics the default option is a not-natural ordering to cluster the non-zero entries closer to the diagonal. A natural ordering can be set by changing the \verb|reorder_dofs_serial| parameter\footnote{\url{https://fenicsproject.discourse.group/t/ordering-of-mixed-elements/946}}.
 
@@ -139,7 +139,7 @@ A simple test to assess the validity of the finite element discretization consis
 \[
 \widehat{\omega}_i = \omega_i \; (2(1+\nu)\rho/E)^{1/2}
 \]
-are close to 1 \cite{dawe1980rayleigh}. Hence, a good choice for the spectral shift is $\sigma = (2(1+\nu)\rho/E)^{-1/2}$.  The following code compute the eigenvalues.
+are close to 1 \cite{dawe1980rayleigh}. Hence, a good choice for the spectral shift is $\sigma = (2(1+\nu)\rho/E)^{-1/2}$.  The following code computes the eigenvalues.
 \begin{tcolorbox}[title = Eigenvalues computation in  \fenics, coltitle=black, breakable, size=fbox, boxrule=1pt, pad at break*=1mm, colframe=red, enlarge top by=0.25em, enlarge bottom by=0.5em]
 \begin{Verbatim}[tabsize=4]
 solver = SLEPcEigenSolver(J, M)
@@ -221,7 +221,7 @@ In Fig. \ref{fig:EigMin} the 6 first eigenvectors are plotted. The associated ei
 	\hfil
 	\subfloat[$\widehat{\omega}_4 = 5.13$]{\includegraphics[width=0.5\linewidth]{appendix/Eig6.eps}%
 		\label{fig:Eig6}}
-	\caption{Eigenvectors for the clamped Mindlin plate computed with \firedrake. The eigenfrequencies are normalized $\widetilde{\omega} = \omega((2(1+\nu)\rho/E)^{1/2}$.}
+	\caption{Eigenvectors for the clamped Mindlin plate computed with \firedrake. The eigenfrequencies are normalized $\widehat{\omega} = \omega((2(1+\nu)\rho/E)^{1/2}$.}
 	\label{fig:EigMin}
 \end{figure*}
 
@@ -231,7 +231,7 @@ In Fig. \ref{fig:EigMin} the 6 first eigenvectors are plotted. The associated ei
 If boundary control has to be taken into account, it is preferable to move to \textsc{Scipy} for manipulating and constructing the final matrices. Consider now the case of a Mindlin plate with Neumann boundary control. The construction of the mass and interconnection matrices is the same, without imposing any boundary conditions. For the boundary variables we choose Lagrange polynomials of order~1. 
 
 \begin{remark}[Construction of the $\mathbf{B}$ matrix]\label{rmk:Bmatrix}
-Notice that \fenics and \firedrake do not support Function spaces defined on the boundary. It is therefore necessary to construct the $\mathbf{B}$ matrix using function defined on the domain and then eliminate the useless columns. First, we show how to construct the $\mathbf{B}$ matrix cointaing all degrees of freedom. Later on, the extraction of the boundary degrees of freedom is illustrated using \textsc{Scipy}. 
+Notice that \fenics and \firedrake do not support Function spaces defined on the boundary. It is therefore necessary to construct the $\mathbf{B}$ matrix using functions defined on the domain and then eliminate the useless columns. First, we show how to construct the $\mathbf{B}$ matrix containing all degrees of freedom. Later on, the extraction of the boundary degrees of freedom is illustrated using \textsc{Scipy}. 
 \end{remark}
 
 \begin{tcolorbox}[title = Control matrix construction in  \fenics, coltitle=black, breakable, size=fbox, boxrule=1pt, pad at break*=1mm, colframe=red, enlarge top by=0.25em, enlarge bottom by=0.5em]
@@ -363,7 +363,7 @@ The following values are obtained
 \widehat{\omega}_1 = 1.59, \qquad\qquad \widehat{\omega}_2 = 3.04, \qquad\qquad \widehat{\omega}_3 = 3.06, \\
 \widehat{\omega}_4 = 4.29, \qquad\qquad \widehat{\omega}_5 = 5.05, \qquad\qquad \widehat{\omega}_6 = 5.10. \\
 \end{align*}
-Since no spurious eigenvalues occur, it is legit to assume that the Lagrange multiplier subspace is a stable one (among others). This is just an heuristic reasoning, since the rigorous mathematical justification of the boundary subspace stability comes from the fulfillment of the \textit{inf-sup} condition.
+Since no spurious eigenvalues occur, it is legitimate to assume that the Lagrange multiplier subspace is a stable one (among others). This is just a heuristic reasoning, since the rigorous mathematical justification of the boundary subspace stability comes from the fulfillment of the \textit{inf-sup} condition.
 
 \subsection*{Concluding remarks}
-This appendix provides all the tools needed for constructing of the matrices and for handling a uniform boundary conditions. If one has to consider mixed boundary conditions, the boundary forms and Dirichlet conditions have to be defined on a subset of the boundary (consult \url{https://fenicsproject.org/pub/tutorial/sphinx1/._ftut1005.html} for an explanation in \fenics and \url{https://www.firedrakeproject.org/variational-problems.html} for \firedrake). 
+This appendix provides all the tools needed for constructing of the matrices and for handling uniform boundary conditions. If one has to consider mixed boundary conditions, the boundary forms and Dirichlet conditions have to be defined on a subset of the boundary (consult \url{https://fenicsproject.org/pub/tutorial/sphinx1/._ftut1005.html} for an explanation in \fenics and \url{https://www.firedrakeproject.org/variational-problems.html} for \firedrake). 
