@@ -1,0 +1,138 @@
+%\setcounter{chapter}{18}% Equivalent to "letter O"
+%\renewcommand{\thechapter}{\Alph{chapter}}%
+
+\chapter*{R\'esum\'e en fran\c{c}ais}
+\addstarredchapter{R\'esum\'e en fran\c{c}ais}
+\chaptermark{R\'esum\'e en fran\c{c}ais}
+
+\minitoc
+
+\section{Contexte et motivations}
+
+Ce travail vise à explorer le formalisme port-Hamiltonien (pH) comme paradigme de modélisation, en particulier pour le cas des structures flexibles. Ce formalisme bénéficie de nombreuses propriétés intéressantes, car il fusionne intrinsèquement la géométrie avec la théorie des réseaux et du contrôle \cite{vanderschaft2006book}. Une caractéristique puissante de ce formalisme, en particulier pour la tâche de modélisation, est sa modularité. Les systèmes port-Hamiltonien (pHs) de dimension finie peuvent être facilement interconnectés entre eux \cite{cervera2007interconnection}. L'interconnexion est également possible dans le cas de dimension infinie \cite{kurula2010,augner2020int}. Finalement, il est également possible de coupler des systèmes de pH finis et infinis \cite{pasumarthy2006}. Cette fonctionnalité est particulièrement utile pour simplifier la tâche de modélisation dans les analyses préliminaires, ou, au contraire, pour réaliser des modèles haute fidélité de phénomènes multiphysiques complexes. \\
+
+Le cadre port-Hamiltonien a été largement utilisé pour modéliser et contrôler des systèmes distribués issus de divers modèles physiques: les poutres de Timoshenko \cite{macchelli2004timo} et Euler-Bernoulli \cite{aoues2017modeling}, propagations d'ondes acoustiques \cite{trenchant2018}, réacteurs chimiques \cite{ramirez2013irreversible}, plasma dans les tomahawks \cite{vu2016plasma} et interactions fluide-structure \cite{cardoso2017}. La grande majorité de ces exemples se réfèrent à des modèles unidimensionnels. En effet, pour les systèmes pH linéaires unidimensionnels avec un opérateur anti-adjoint généralisé, \cite{legorrec2005} donne des conditions sur l'affectation des entrées et sorties aux limites pour que l'opérateur système génère un semi-groupe de contraction. Ce résultat a été largement utilisé pour construire des contrôleurs de frontière passifs pour les systèmes hyperboliques \cite{villegas2009exponential,macchelli2016synthesis,macchelli2020exponential}. \\
+
+Depuis leur introduction, les systèmes port-Hamiltoniens distribués (dpH) ont été définis sur des domaines spatiaux multidimensionnels en utilisant le langage des formes différentielles \cite{vanderschaft2002}. Dans \cite{villegas2007}, la modélisation pH et l'approche en semi-groupe de systèmes à dimension infinie sont fusionnées. Ici, le cas des domaines multidimensionnels n'est que brièvement discuté. De nombreux autres exemples de pH sur des domaines multidimensionnels sont détaillés dans \cite[Chapitre 4]{duindam2009}. Cependant, les résultats d'existence et unicité n'y sont pas présentés. Une première contribution en ce sens peut être trouvée dans \cite{zwart2015wave}, où les auteurs démontrent l'existence et unicité de l'équation d'onde linéaire dans des dimensions géométriques arbitraires. Le récent article \cite{skrepek2019wellposedness} généralise ce résultat pour traiter le cas des pH linéaires génériques du premier ordre dans des dimensions géométriques arbitraires. Malgré toute cette littérature préexistante, les modèles issus de la mécanique structurale sur des domaines multidimensionnels n'ont quasiment jamais été considérés (à l'exception notable de \cite{macchelli2005mindlin} pour la modélisation de la plaque de Mindlin). \\
+
+Le potentiel du cadre de pH comme paradigme de modélisation a été récemment exploré par les chercheurs. Par exemple, dans \cite{egger2018damped}, les auteurs considèrent un modèle port-Hamiltonien pour la propagation des ondes de pression dans les réseaux de tuyaux. En employant un schéma d'éléments finis mixtes, les auteurs réalisent une discrétisation préservant la structure du modèle d'origine. Un algorithme de réduction de modèle pour ce modèle discrétisé de réseau de pipelines est ensuite discuté dans \ cite {egger2018}. Ces travaux récents confirment la validité de ce cadre pour aborder des scénarios d'application complexes et soulignent l'importance des algorithmes de discrétisation préservant la structure. Disposer de méthodologies capables de construire des discrétisations fiables est important non seulement pour la simulation, mais aussi à des fins de contrôle. En particulier, dans \cite{toledo2020}, les auteurs développent une méthode de synthèse systématique pour la conception de contrôleurs-observateurs pour le contrôle frontière des pHs sur des domaines spatiaux unidimensionnels. Pour construire l'observateur, une version discrétisée appropriée du système est supposée disponible. \\
+
+Cette thèse tente d'établir un lien clair entre les modèles de mécanique structurale linéaire et les systèmes port-Hamiltoniens, à la fois pour les tâches de modélisation et de discrétisation. Ces deux finalités sont en effet fortement liées dans le contexte des pH. Pour obtenir une formulation de pH pour les modèles d'élasticité, il faut introduire la variable d'effort, associée à l'énergie de déformation, comme inconnue principale supplémentaire. Ajouter la variable de contrainte comme inconnue est le point de départ des éléments finis mixtes \cite{arnold1990intro}. Cela conduit à la décomposition de l'opérateur elliptique initial (c'est-à-dire le Laplacien ou bi-Laplacien), en deux opérateurs formellement adjoints. Par conséquent, la dynamique est régulée par un opérateur adjoint formellement antisymétrique, conduisant ainsi à un système Hamiltonien. Après avoir effectué une intégration par parties, une discrétisation mixte est immédiatement réalisée \cite{joly2003variational}. Ce raisonnement très concis élucide de manière informelle le lien étroit entre la modélisation port-Hamiltonienne de la mécanique des milieux continuum et les éléments finis mixtes.
+
+\section{Outline}
+
+L'organigramme de la thèse est illustré sur la Fig. \ref{fig:organigramme}. La thèse est divisée en quatre parties principales.
+
+\paragraph{Partie I (Chapitres 1, 2)}
+Cette partie donne une introduction générale des travaux suivants. Le chapitre \ref{ch:reminder} rappelle brièvement ce que sont les systèmes pH de dimension finie ou infinie et comment ces systèmes sont profondément liés à la structure géométrique de Dirac ou de Stokes-Dirac (pour le cas de dimension finie et infinie respectivement).
+
+\paragraph{Partie II (Chapitres 3, 4, 5)}
+Cette partie est consacrée à la formulation de modèles appropriés d'élasticité et de thermoélasticité. Cette partie est subdivisée en trois chapitres.
+\begin{itemize}
+\item Le chapitre \ref{ch:elasPH} détaille la formulation du pH pour l'élasticité linéaire n-D générale.
+\item Une formulation de pH de modèles de plaques minces (Kirchhoff-Love) et épaisses (Mindlin-Reissner) est donnée dans le chapitre \ref{ch:platePH}.
+\item Le problème thermoélastique linéaire entièrement couplé est modélisé comme un système de pH couplé dans le chapitre \ref{ch:Thermo}.
+\end{itemize}
+
+
+\paragraph{Partie III (Chapitres 6, 7, 8)}
+Cette partie est consacrée à la discussion et à l'implémentation du principal outil de discrétisation: la méthode des éléments finis partitionnés (PFEM). Cette méthode est une extension naturelle des éléments finis mixtes pour la discrétisation des pH. Cette partie se compose de trois chapitres.
+\begin{itemize}
+\item Une description détaillée du principe de fonctionnement de PFEM est donnée au chapitre \ref{ch:pfem}. Les bases d'approximation de cette discrétisation ne sont pas explicitement définies dans ce chapitre, car la méthode peut être mise en \oe{}uvre par des éléments finis et des méthodes spectrales.
+\item Une étude de convergence de plusieurs éléments finis est illustrée au chapitre \ref{ch:conv} pour le flexion de structures minces (poutres et plaques). Il ne s'agit en aucun cas d'une analyse mathématique rigoureuse de la convergence. Cependant, grâce à des résultats préexistants dans la littérature, les estimations d'erreur sont conjecturées et validées par des expériences numériques.
+\item Le chapitre \ref{ch:applications} est dédié aux applications de la méthode PFEM. En particulier, l'accent est mis sur la stabilisation par injection d'amortissement, l'application des conditions aux limites mixtes et la validation du modèle pH thermoélastique pour une solution analytique.
+\end{itemize}
+
+\paragraph {Partie IV (Chapitres 9, 10)}
+Dans cette partie, une formulation pH de systèmes multi-corps flexibles est discutée et validée. Le chapitre \ref{ch:fmdPH} détaille la dérivation d'un système pH associé à un corps flottant flexible sous l'hypothèse d'une petite déformation. Plusieurs applications sont alors considérées dans le chapitre \ref{ch:valid}.
+
+
+\begin{sidewaysfigure}
+\centering
+\includegraphics[width=0.95\columnwidth]{part_1/scheme_outline.eps}%
+\caption[]{Organigramme de la thèse.}%
+\label{fig:organigramme}%
+\end{sidewaysfigure}
+
+\section{Mod\'elisation port-Hamiltonien des systèmes flexibles linéaires}
+Dans cette section, un résumé concis des résultats concernant la modélisation de l'élasticité et la thermoélasticité linéaire est reporté. Une tractation détaillé peut être retrouvée dans les chapitres \ref{ch:elasPH}, \ref{ch:platePH} et \ref{ch:Thermo}
+
+
+\subsection{L'élasticité linéaire comme système port-Hamiltonien}
+
+Dans cette section, une formulation port-Hamiltonienne de l'élasticité est déduite du problème classique d'élastodynamique. Il faut souligner que déjà dans les années soixante-dix une formulation purement hyperbolique de l'élasticité était détaillée \cite{hughes1978classical}. Le point manquant est le lien clair avec la théorie des EDP Hamiltoniens. Une formulation Hamiltonienne peut être trouvée dans \cite[Chapitre 16]{grinfield2015}, mais sans aucun lien avec le concept de structure de Stokes-Dirac induit par la géométrie sous-jacente. \\
+
+\paragraph{Variables d'énergie et de co-énergie}
+Considérons un ensemble ouvert connecté $\Omega \subset \mathbb{R}^d, \; d \in \{2,3 \} $. Le déplacement dans un continuum déformable est donné par l'Eq. \eqref{eq:lin_elastodyn}.
+\begin{equation}
+\rho \diffp[2]{\bm{u}}{t} - \Div(\bm{\mathcal{D}} \Grad \bm{u}) = 0, \qquad \bm{x} \in \Omega.
+\end{equation}
+Pour dériver une formulation pH, l'énergie totale, qui comprend l'énergie cinétique et de déformation, est nécessaire
+\begin{equation}
+	H = \energy {\rho \norm{\partial_t \bm{u}}^2 + \bm{\Sigma} \cddot \bm{\varepsilon}}.
+\end{equation}
+La notation $ \bm{A} \cddot \bm{B} = \Tr (\bm{A}^\top \bm{B}) = \sum_{i, j} A_{ij} B_{ij} $ désigne la contraction des tenseurs. Souvenez-vous que $\bm{\varepsilon} = \Grad {\bm{u}} $ et $ \bm{\Sigma} = \bm{\mathcal{D}} \bm{\varepsilon}$ où $\bm{\mathcal{D}}$ est le tenseur de rigidité (cf. Eq. \ref{eq:stiff3D}). Les variables d'énergie sont alors l'impulsion linéaire et le champ de déformation
+\begin{equation*}
+\bm{\alpha}_v = \rho \bm{v}, \qquad \bm{A}_{\varepsilon} = \bm{\varepsilon},
+\end{equation*}
+où $ \bm{v}: = \partial_t \bm{u}$. L'Hamiltonien peut être réécrit comme une fonctionnelle quadratique dans les variables d'énergie
+\begin{equation}
+H = \energy{\frac{1}{\rho} \bm{\alpha}_v^2 + (\bm{\mathcal{D}} \bm{A}_{\varepsilon}) \cddot \bm{A}_{\varepsilon}}.
+\end{equation}
+Les variables de co-énergie sont données par
+\begin{equation}
+\bm{e}_v: = \diffd{H}{\bm{\alpha}_v} = \bm{v}, \qquad \bm{E}_\varepsilon: = \diffd{H}{\bm{A}_{\varepsilon}} = \bm{\Sigma}.
+\end{equation}
+
+\paragraph{Formulation port-Hamiltonien finale}
+Il est maintenant possible d'expliciter la forme pH du système
+
+\begin{equation}
+\diffp{}{t}
+\begin{pmatrix}
+\bm{\alpha}_v \\
+\bm{A}_\varepsilon
+\end{pmatrix} = 
+\begin{bmatrix}
+\bm{0} & \Div \\
+\Grad & \bm{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+\bm{e}_v \\
+\bm{E}_\varepsilon
+\end{pmatrix}.
+\end{equation}
+La première équation du système est la conservation du moment linéaire. Le second représente une condition de compatibilité
+\begin{equation}
+\begin{aligned}
+\partial_t {\bm{A}_\varepsilon} &= \Grad(\bm{e}_v), \\
+\partial_t\bm{\varepsilon} &= \Grad(\bm{v}), \\
+\partial_t \Grad \bm{u} &= \Grad(\partial_t \bm{u}). \\
+\end{aligned}
+\end{equation}
+
+En supposant que $ \bm{u} \in C^2$, les dérivés d'ordre supérieur commutent (théorème de Clairaut). Par conséquent, l'équation est vérifiée. Le théorème \ref{th:adjDiv} assure que l'opérateur différentiel est formellement anti-adjoint (on peut également trouver ce résultat dans \cite[Lemme 3.3] {pauly2020elasticity}, disponible sous la forme de pré-impression arXiv). \\
+
+Les variables aux bord sont ensuite trouvées en évaluant le bilan de puissance
+\begin{equation}
+\begin{aligned}
+\dot{H} &= \int_{\Omega} \left\{ \bm{e}_v \cdot \partial_t \bm\alpha_v + \bm{E}_\varepsilon \cddot \partial_t \bm{A}_\varepsilon \right\} \d\Omega, \\
+&= \int_{\Omega} \left\{\bm{e}_v \cdot \Div \bm{E}_\varepsilon + \bm{E}_\varepsilon \cddot \Grad \bm{e}_v \right\}\d\Omega,\\
+&= \int_{\Omega} \div(\bm{E}_\varepsilon \, \bm{e}_v) \d\Omega, \qquad &\text{Stokes theorem (see  Appendix \ref{app:math} Eq. \eqref{eq:intbypartsSymTens}}), \\
+&= \int_{\partial \Omega} \bm{e}_v \cdot (\bm{E}_\varepsilon\bm{n}) \d{S} = \inner[L^2(\partial\Omega, \bbR^d)]{\bm{e}_v}{\bm{E}_\varepsilon \, \bm{n}}.
+\end{aligned}
+\end{equation}
+
+L'imposition du champ de vitesse le long de la frontière $ \bm{e}_v = \partial_t \bm{u} $ correspond à une condition de Dirichlet. Si c'est la traction a être imposée $ \bm{E}_\varepsilon \, \bm{n} = \bm{\Sigma} \, \bm{n} = \bm{t}$, on a une condition de Neumann. Considérons une partition de la frontière $\partial \Omega = \overline{\Gamma}_N \cup \overline{\Gamma}_D $ et $\Gamma_N \cap \Gamma_D = \{\emptyset\} $, où une condition de Dirichlet et une de Neumann s'appliquent respectivement au sous-ensemble ouvert $\Gamma_D $ et $\Gamma_N $ (voir Fig. \ref{fig: bc_elas2D}). Ensuite, la formulation finale du pH lit
+
+
+
+
+\section{Développement d'une nouvelle méthode de discrétisation: la methode PFEM}
+
+\section{Mod\'elisation port-Hamiltonien de systèmes multi-corps flexibles}
+
+
+
+\newpage
+\section{Conclusions et perspectives}
