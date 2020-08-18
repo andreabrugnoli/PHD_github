@@ -43,14 +43,14 @@ A structure-preserving discretization is able to construct an equivalent pH syst
 	\end{tcolorbox}
 \end{tcbraster}
 \vspace{.5cm}
-In this thesis the Partitioned Finite Element Method (PFEM), originally presented in \cite{cardoso2018pfem,cardoso2019partitioned}, is chosen to obtain discretized models of dpHs. Variational finite element method has been extensively used for discretizing closed linear hyperbolic systems \cite{joly2003variational}. It will be shown that PFEM extends the framework detailed in \cite{joly2003variational} to open (i.e. boundary controlled) Hamiltonian systems. Furthermore, it  is also applicable to non-linear systems \ref{sec:irrsw_discr} and parabolic systems \ref{sec:thelas_wave} (see also \cite{serhani2019modeling,serhani2019discretization}).  This discretization procedure boils down to three simple steps
+In this thesis the Partitioned Finite Element Method (PFEM), originally presented in \cite{cardoso2018pfem,cardoso2019partitioned}, is chosen to obtain discretized models of dpHs. Variational finite element method has been extensively used for discretizing closed linear hyperbolic systems \cite{joly2003variational}. It will be shown that PFEM extends the framework detailed in \cite{joly2003variational} to open (i.e. boundary controlled) Hamiltonian systems. Furthermore, it  is also applicable to non-linear systems \secref{sec:irrsw_discr} and parabolic systems \secref{sec:thelas_wave} (see also \cite{serhani2019modeling,serhani2019discretization}).  This discretization procedure boils down to three simple steps
 \begin{enumerate}
 	\item The system is written in weak form; 
 	\item An integration by parts is applied to highlight the appropriate boundary control;
 	\item A Galerkin method is employed to obtain a finite-dimensional system. For the approximation basis the finite element method is here employed but spectral methods can be used as well.
 \end{enumerate}
 
-Once the system has been put into weak form, a subset of the equations is integrated by parts, so that boundary variables are naturally included into the formulation and appear as control inputs, the collocated outputs being defined accordingly. The discretization of energy and co-energy variables (and the associated test functions) leads directly to a full rank representation for the finite-dimensional pH system.  This approach makes possible the usage of FEM softwares, like FEniCS \cite{logg2012}, or Firedrake \cite{rathgeber2017firedrake}. The procedure is universal, as it relies on a general integration by parts formula that characterizes multi-dimensional pHs. This is why the methodology is illustrated in all its generality and then detailed for some particular examples of interest:
+Once the system has been put into weak form, a subset of the equations is integrated by parts, so that boundary variables are naturally included into the formulation and appear as control inputs, the collocated outputs being defined accordingly. The discretization of energy and co-energy variables (and the associated test functions) leads directly to a full rank representation for the finite-dimensional pH system.  This approach makes possible the usage of FEM softwares, like \fenics \cite{logg2012}, or \firedrake \cite{rathgeber2017firedrake}. The procedure is universal, as it relies on a general integration by parts formula that characterizes multi-dimensional pHs. This is why the methodology is illustrated in all its generality and then detailed for some particular examples of interest:
 \begin{enumerate}
 	\item in \secref{sec:pfem_gen} the 2D non-linear irrotational shallow water equations;
 	\item the Euler-Bernoulli beam in \secref{sec:discr_EB};
@@ -413,8 +413,8 @@ M_\partial^{lk} &= \inner[L^2(\partial \Omega, \mathbb{R}^m)]{\bm\phi_\partial^l
 \end{equation}
 where $i, j \in \left\{1, n_1\right\}, \; m,n \in \left\{1, n_2\right\}, \; l, k \in \left\{1, n_\partial \right\}$. Introducing the definitions
 \begin{align*}
-	\delta_{\bm{\alpha}_{d, 1}} H_d := \delta_{\bm{\alpha}_{1}} H\left(\bm{\alpha}_1 = \sum_{i=1}^{n_1} \bm{\phi}_1^i \alpha_1^i, \;  \bm{\alpha}_2 = \sum_{i=1}^{n_1} \bm{\phi}_2^i \alpha_2^i\right), \\
-	\delta_{\bm{\alpha}_{d, 2}} H_d := \delta_{\bm{\alpha}_{2}} H\left(\bm{\alpha}_1 = \sum_{i=1}^{n_1} \bm{\phi}_1^i \alpha_1^i, \;  \bm{\alpha}_2 = \sum_{i=1}^{n_1} \bm{\phi}_2^i \alpha_2^i\right),
+	\delta_{\bm{\alpha}_{d, 1}} H_d := \delta_{\bm{\alpha}_{1}} H\left(\bm{\alpha}_1 = \sum_{i=1}^{n_1} \bm{\phi}_1^i \alpha_1^i, \;  \bm{\alpha}_2 = \sum_{j=1}^{n_2} \bm{\phi}_2^j \alpha_2^j\right), \\
+	\delta_{\bm{\alpha}_{d, 2}} H_d := \delta_{\bm{\alpha}_{2}} H\left(\bm{\alpha}_1 = \sum_{i=1}^{n_1} \bm{\phi}_1^i \alpha_1^i, \;  \bm{\alpha}_2 = \sum_{j=1}^{n_2} \bm{\phi}_2^j \alpha_2^j\right),
 \end{align*}
 the discretized gradient of the Hamiltonian reads
 \begin{equation}

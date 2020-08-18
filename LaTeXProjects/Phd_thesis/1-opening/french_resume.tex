@@ -58,36 +58,36 @@ Dans cette partie, une formulation pH de systèmes multi-corps flexibles est dis
 Dans cette section, un résumé concis des résultats concernant la modélisation de l'élasticité et la thermoélasticité linéaire est reporté. Une tractation détaillé peut être retrouvée dans les chapitres \ref{ch:elasPH}, \ref{ch:platePH} et \ref{ch:Thermo}
 
 
-\subsection{L'élasticité linéaire comme système port-Hamiltonien}
+\subsection*{L'élasticité linéaire comme système port-Hamiltonien}
 
 Dans cette section, une formulation port-Hamiltonienne de l'élasticité est déduite du problème classique d'élastodynamique. Il faut souligner que déjà dans les années soixante-dix une formulation purement hyperbolique de l'élasticité a été détaillée \cite{hughes1978classical}. Le point manquant est le lien clair avec la théorie des EDP Hamiltoniens. Une formulation Hamiltonienne peut être trouvée dans \cite[Chapitre 16]{grinfield2015}, mais sans aucun lien avec le concept de structure de Stokes-Dirac induit par la géométrie sous-jacente. \\
 
 \paragraph{Variables d'énergie et de co-énergie}
 Considérons un ensemble ouvert connecté $\Omega \subset \mathbb{R}^d, \; d \in \{2,3 \} $. Dans le cadre de l'élasticité linéaire, le déplacement dans un continuum déformable est donné par
-\begin{equation}
+\begin{equation*}
 \rho \diffp[2]{\bm{u}}{t} - \Div(\bm{\mathcal{D}} \Grad \bm{u}) = 0, \qquad \bm{x} \in \Omega.
-\end{equation}
+\end{equation*}
 où $\rho$ est la densité et $\bm{\mathcal{D}}$ est le tenseur de rigidité (cf. Eq. \ref{eq:stiff3D}). Les opérateurs différentielles $\Div, \; \Grad$ sont définis dans l'appendice \ref{app:math}. Pour dériver une formulation pH, l'énergie totale, qui comprend l'énergie cinétique et de déformation, est nécessaire
-\begin{equation}
+\begin{equation*}
 	H = \energy {\rho \norm{\partial_t \bm{u}}^2 + \bm{\Sigma} \cddot \bm{\varepsilon}}.
-\end{equation}
+\end{equation*}
 La notation $ \bm{A} \cddot \bm{B} = \Tr (\bm{A}^\top \bm{B}) = \sum_{i, j} A_{ij} B_{ij} $ désigne la contraction des tenseurs. Souvenez-vous que $\bm{\varepsilon} = \Grad {\bm{u}} $ et $ \bm{\Sigma} = \bm{\mathcal{D}} \bm{\varepsilon}$. Les variables d'énergie sont alors l'impulsion linéaire et le champ de déformation
 \begin{equation*}
 \bm{\alpha}_v = \rho \bm{v}, \qquad \bm{A}_{\varepsilon} = \bm{\varepsilon},
 \end{equation*}
 où $ \bm{v}: = \partial_t \bm{u}$. L'Hamiltonien peut être réécrit comme une fonctionnelle quadratique dans les variables d'énergie
-\begin{equation}
-H = \energy{\frac{1}{\rho} \bm{\alpha}_v^2 + (\bm{\mathcal{D}} \bm{A}_{\varepsilon}) \cddot \bm{A}_{\varepsilon}}.
-\end{equation}
+\begin{equation*}
+H = \energy{\frac{1}{\rho} \norm{\bm{\alpha}_v}^2 + (\bm{\mathcal{D}} \bm{A}_{\varepsilon}) \cddot \bm{A}_{\varepsilon}}.
+\end{equation*}
 Les variables de co-énergie sont données par
-\begin{equation}
+\begin{equation*}
 \bm{e}_v: = \diffd{H}{\bm{\alpha}_v} = \bm{v}, \qquad \bm{E}_\varepsilon: = \diffd{H}{\bm{A}_{\varepsilon}} = \bm{\Sigma}.
-\end{equation}
+\end{equation*}
 
 \paragraph{Formulation port-Hamiltonien finale}
 Il est maintenant possible d'expliciter la forme pH du système
 
-\begin{equation}
+\begin{equation*}
 \diffp{}{t}
 \begin{pmatrix}
 \bm{\alpha}_v \\
@@ -101,22 +101,22 @@ Il est maintenant possible d'expliciter la forme pH du système
 \bm{e}_v \\
 \bm{E}_\varepsilon
 \end{pmatrix}.
-\end{equation}
+\end{equation*}
 La première équation du système est la conservation du moment linéaire. Le second représente une condition de compatibilité. Le théorème \ref{th:adjDiv} assure que l'opérateur différentiel est formellement anti-adjoint (on peut également trouver ce résultat dans \cite[Lemme 3.3] {pauly2020elasticity}, disponible sous la forme de pré-impression arXiv). \\
 
 Les variables aux bord sont ensuite trouvées en évaluant le bilan de puissance
-\begin{equation}
+\begin{equation*}
 \begin{aligned}
 \dot{H} &= \int_{\Omega} \left\{ \bm{e}_v \cdot \partial_t \bm\alpha_v + \bm{E}_\varepsilon \cddot \partial_t \bm{A}_\varepsilon \right\} \d\Omega, \\
 &= \int_{\Omega} \left\{\bm{e}_v \cdot \Div \bm{E}_\varepsilon + \bm{E}_\varepsilon \cddot \Grad \bm{e}_v \right\}\d\Omega,\\
 &= \int_{\Omega} \div(\bm{E}_\varepsilon \, \bm{e}_v) \d\Omega, \qquad \text{Théorème de Stokes (voir  Appendix \ref{app:math} Eq. \eqref{eq:intbypartsSymTens}}), \\
 &= \int_{\partial \Omega} \bm{e}_v \cdot (\bm{E}_\varepsilon\bm{n}) \d{S} = \inner[L^2(\partial\Omega, \bbR^d)]{\bm{e}_v}{\bm{E}_\varepsilon \, \bm{n}}.
 \end{aligned}
-\end{equation}
+\end{equation*}
 
 L'imposition du champ de vitesse le long de la frontière $ \bm{e}_v = \partial_t \bm{u} $ correspond à une condition de Dirichlet. Si c'est la traction a être imposée $ \bm{E}_\varepsilon \, \bm{n} = \bm{\Sigma} \, \bm{n} = \bm{t}$, on a une condition de Neumann. Considérons une partition de la frontière $\partial \Omega = \overline{\Gamma}_N \cup \overline{\Gamma}_D $ et $\Gamma_N \cap \Gamma_D = \{\emptyset\} $, où une condition de Dirichlet et une de Neumann s'appliquent respectivement au sous-ensemble ouvert $\Gamma_D $ et $\Gamma_N $ (voir Fig. \ref{fig:bc_elas2D}). Ensuite, la formulation pH finale devient
 
-\begin{equation}
+\begin{equation*}
 \begin{aligned}
 \displaystyle
 \diffp{}{t}
@@ -139,8 +139,8 @@ L'imposition du champ de vitesse le long de la frontière $ \bm{e}_v = \partial_
 	\end{bmatrix}}_{\mathcal{B}_\partial} \begin{pmatrix}
 \bm{e}_v \\
 \bm{E}_\varepsilon
-\end{pmatrix}, \vspace{3pt}\\
-\bm{y}_\partial &= \underbrace{
+\end{pmatrix}, \qquad
+\bm{y}_\partial = \underbrace{
 	\begin{bmatrix}
 	\bm{0} & \bm\gamma_{n}^{\Gamma_D} \\
 	\bm\gamma_0^{\Gamma_N} & \bm{0} \\
@@ -150,28 +150,28 @@ L'imposition du champ de vitesse le long de la frontière $ \bm{e}_v = \partial_
 \bm{E}_\varepsilon
 \end{pmatrix},
 \end{aligned}
-\end{equation}
+\end{equation*}
 où $\bm\gamma_{0}^{\Gamma_*}$ désigne la trace sur l'ensemble $\Gamma_* $, soit $ \bm\gamma_{0}^{\Gamma_*} \bm{e}_v = \bm{e}_v \vert_{\Gamma_*} $. De plus, $ \bm\gamma_{n}^{\Gamma_*} $ désigne la trace normale sur l'ensemble $\Gamma_*$, à savoir $\bm\gamma_{n}^{\Gamma_*} \bm{E}_\varepsilon = \bm{E}_\varepsilon \bm{n} \vert_{\Gamma_*}$. Les opérateurs de frontière $\mathcal{B}_\partial, \mathcal{C}_\partial $ sont non bornés.
 
-\subsection{Le modèles de plaques en forme port-Hamiltonien}
+\subsection*{Le modèles de plaques en forme port-Hamiltonien}
 Dans cette section on résume les modèles port-Hamiltonien de plaques minces. On s'intéresse en particulier aux modèles dus à Mindlin \cite{mindlin1951} et Kirchhoff. 
 
 \paragraph{Plaque de Mindlin}
 Ce modèle décrit les déformations de plaque modérément épaisses, i.e. le rapport entre l'épaisseur et la longueur est de l'ordre de $10^{-1}$. Le système finale est donné par 2 EDP couplées ayant comme inconnus le déplacement vertical $w$ et la rotation $\bm{\theta}$ des segment perpendiculaire à la surface non déformée (pour les détails de calculs voir \cite[Chapter 10]{reddy2006theory})
-\begin{equation}
+\begin{equation*}
 \begin{aligned}
 \rho h \diffp[2]{w}{t} &= \div \bm{q}, \qquad (x,y) \in \Omega, \\
 \frac{\rho h^3}{12} \diffp[2]{\bm{\theta}}{t} &=\Div \bm{M} + \bm{q},
 \end{aligned}
-\end{equation}
+\end{equation*}
 où $h$ est l'épaisseur, $\bm{M}= \bm{\mathcal{D}}_b\,\Grad{\bm{\theta}}$ et $\bm{q}= K_{\text{sh}} Gh\,(\grad w - \bm{\theta})$. $\Omega \subset \mathbb{R}^2$ est un domaine connecté et borné. Le tenseur de rigidité à flexion $\bm{\mathcal{D}}_b$ est donné, dans la cas d'un matériel isotrope, par l'Eq. \eqref{eq:Db}. $K_{\text{sh}}$ est le facteur correctif du au cisaillement et $G$ le module du cisaillement.
 
 Considérons l'Hamiltonien (énergie totale)
-\begin{equation}
+\begin{equation*}
 H = \frac{1}{2} \int_{\Omega}  \left\{ \rho h \left(\diffp{w}{t} \right)^2 + \frac{\rho h^3}{12} \norm{\diffp{\bm{\theta}}{t}}^2 +   \bm{M} \cddot \bm{\kappa} + \bm{q} \cdot \bm{\gamma}  \right\}  \d\Omega, 
-\end{equation}
-où $\bm{M}, \, \bm{\kappa}, \, \bm{q}, \, \bm{\gamma}$ sont définis dans les équations. \eqref {eq:bend_momenta}, \eqref{eq:kappa}, \eqref{eq:shearstress}, \eqref{eq:gamma} respectivement. Le choix des variables d'énergie est le même que dans \cite{macchelli2005mindlin} mais ici des variables scalaires, vectorielles et tensorielles sont regroupées:
-\begin{equation}
+\end{equation*}
+où $\bm{\kappa} = \Grad \bm{\theta}, \; \bm{\gamma} = \grad w - \bm{\theta}$. Le choix des variables d'énergie est le même que dans \cite{macchelli2005mindlin} mais ici des variables scalaires, vectorielles et tensorielles sont regroupées:
+\begin{equation*}
 \begin{aligned}
 \alpha_w &= \rho h \diffp{w}{t}, \quad &\text{Moment linéaire,} \\
 \bm{A}_{\kappa} &= \bm{\kappa}, \quad &\text{Tenseur de courbure,} \\
@@ -180,13 +180,13 @@ où $\bm{M}, \, \bm{\kappa}, \, \bm{q}, \, \bm{\gamma}$ sont définis dans les �
 \bm\alpha_{\theta} &=  \frac{\rho h^3}{12} \diffp{\bm{\theta}}{t}, \quad &\text{Moment angulaire,}\\
 \bm\alpha_{\gamma} &= \bm{\gamma}. \quad &\text{Deformation au cisaillement.}\\
 \end{aligned}
-\end{equation}
+\end{equation*}
 L'Hamiltonien est maintenant un fonctionnelle quadratique dans les variables d'énergies
-\begin{equation}
+\begin{equation*}
 H = \frac{1}{2} \int_{\Omega}  \left\{ \frac{1}{\rho h}\alpha_w^2 + \frac{12}{\rho h^3} \norm{\bm{\alpha}_{\theta}}^2 + (\bm{\mathcal{D}}_b \bm{A}_\kappa) \cddot \bm{A}_\kappa + (\bm{\mathcal{D}}_s \bm{\alpha}_\gamma) \cdot  \bm{\alpha}_\gamma  \right\}  \d\Omega, 
-\end{equation}
+\end{equation*}
 Les variables de co-énergie sont trouvées en calculant la dérivée variationnelle de l'Hamiltonien:
-\begin{equation}
+\begin{equation*}
 \begin{aligned}
 e_w &:= \diffd{H}{\alpha_w} = \diffp{w}{t},  \quad &\text{Vitesse linéaire,} \\
 \bm{E}_{\kappa} &:= \diffd{H}{\bm{A}_{\kappa}} = \bm{M}, \quad &\text{Tenseur de moments,}\\
@@ -195,9 +195,9 @@ e_w &:= \diffd{H}{\alpha_w} = \diffp{w}{t},  \quad &\text{Vitesse linéaire,} \\
 \bm{e}_{\theta} &:= \diffd{H}{\bm\alpha_{\theta}} = \diffp{\bm{\theta}}{t}, \quad &\text{Vitesse angulaire,}  \\
 \bm{e}_{\gamma} &:= \diffd{H}{\bm\alpha_{\gamma}} = \bm{q} \quad &\text{Effort tranchant.} \\
 \end{aligned}
-\end{equation}
+\end{equation*}
 Une fois les variables concaténées, le système pH est exprimé comme suit
-\begin{equation}
+\begin{equation*}
 \diffp{}{t}
 \begin{pmatrix}
 \alpha_w \\
@@ -217,26 +217,23 @@ e_w \\
 \bm{E}_{\kappa} \\
 \bm{e}_{\gamma} \\
 \end{pmatrix}.
-\end{equation}
+\end{equation*}
 Nous allons maintenant établir le bilan énergétique total en termes de variables au bord car elles feront partie de la structure de Stokes-Dirac sous-jacente de ce modèle. Le bilan de puissance devient
-\begin{equation}
-\label{eq:enrateMin_fr}
+\begin{equation*}
 \dot{H}= \int_{\partial \Omega} \left\{ w_t \, q_n  + \omega_n \, M_{nn} + \omega_s \, M_{ns} \right\} \d{s},  
-\end{equation}
-Le résultat est obtenu en appliquant le théorème de Stokes. Les variables au bord apparaissant dans la dernière ligne de \eqref{eq:enrateMin_fr} et illustrées dans la Fig.~\ref{fig:Cauchy_law} sont définies comme suit:
-\begin{equation}
-\label{eq:QnMnnMns_fr}
+\end{equation*}
+Le résultat est obtenu en appliquant le théorème de Stokes. Les variables au bord (illustrées dans la Fig.~\ref{fig:Cauchy_law}) sont définies comme suit:
+\begin{equation*}
 \begin{aligned}
 \text{Effort de cisaillement}  \qquad q_{n} &:= \bm{q} \cdot \bm{n}=  \bm{e}_{\gamma} \cdot \bm{n},  \\
 \text{Moment de flexion} \quad 
 M_{nn} &:=  \bm{M} \cddot (\bm{n}\otimes{\bm{n}}) = \bm{E}_{\kappa} \cddot (\bm{n}\otimes{\bm{n}}), 	\\
 \text{Moment de torsion} \quad M_{ns} &:= \bm{M} \cddot (\bm{s}\otimes{\bm{n}}) = \bm{E}_{\kappa} \cddot (\bm{s}\otimes{\bm{n}}),	
 \end{aligned}
-\end{equation}
+\end{equation*}
 
 Étant donné deux vecteurs $\bm{a} \in \mathbb{R}^n, \, \bm{b} \in \mathbb{R}^m $, la notation $ \bm{a} \otimes {\bm{b}} = \bm{a} \bm{b}^\top \in \mathbb{R}^{n \times m} $ désigne le produit extérieur (ou dyadique) de deux vecteurs. Les vecteurs $\bm{n} $ et $ \bm{s}$ désignent les vecteurs unitaires normaux et tangentiels à la frontière, comme le montre la Fig. \ref{fig:plate_ref}. Les variables conjuguées au sens de la puissance sont
-\begin{equation} 
-\label{eq:wtwnws_fr}
+\begin{equation*} 
 \begin{aligned}
 \text{Vitesse verticale}  \quad w_t &:= \diffp{w}{t} = e_w, \\
 \text{Rotation en flexion} \quad 
@@ -244,15 +241,15 @@ M_{nn} &:=  \bm{M} \cddot (\bm{n}\otimes{\bm{n}}) = \bm{E}_{\kappa} \cddot (\bm{
 \text{Rotation en torsion} \quad 
 \omega_{s} &:= \diffp{\bm{\theta}}{t} \cdot \bm{s} = \bm{e}_\theta \cdot \bm{s}.	
 \end{aligned},
-\end{equation}
-Considérons une partition de la frontière $\partial\Omega = \overline{\Gamma}_{C} \cup \overline {\Gamma}_{S} \cup \overline {\Gamma}_{F}, \; {\Gamma}_{C} \cap{\Gamma}_{S} \cap {\Gamma}_{F} = \{\emptyset\} $. Le sous-ensemble ouvert $\Gamma_{C}, \, \Gamma_{S}, \, \Gamma_{F} $ peut être vide. Étant donné les définitions \eqref{eq:QnMnnMns_fr}, \eqref{eq:wtwnws_fr}, les conditions aux limites de la plaque Mindlin \cite{duran1999approximation} (voir Fig. \ref{fig:bcs_min}) qui sont considérées sont:
+\end{equation*}
+Considérons une partition de la frontière $\partial\Omega = \overline{\Gamma}_{C} \cup \overline {\Gamma}_{S} \cup \overline {\Gamma}_{F}, \; {\Gamma}_{C} \cap{\Gamma}_{S} \cap {\Gamma}_{F} = \{\emptyset\} $. Le sous-ensemble ouvert $\Gamma_{C}, \, \Gamma_{S}, \, \Gamma_{F} $ peut être vide. Les conditions aux limites de la plaque Mindlin \cite{duran1999approximation} (voir Fig. \ref{fig:bcs_min}) qui sont considérées sont:
 \begin{itemize}
 \item Encastrement (C) sur $\Gamma_{C} \subseteq \partial \Omega $: $ w_t, \ \omega_{n}, \ \omega_{s}$ connus;
 \item Bord simplement appuyé  (S) sur $\Gamma_{S} \subseteq \partial \Omega $: $ w_t, \ \omega_{s}, \ M_{nn} $ connus;
 \item  Bord libre (F) sur $ \Gamma_{F} \subseteq \partial \Omega $: $ M_{nn}, \ M_{ns}, \ q_n$ connus.
 \end{itemize}
 Ensuite, la formulation finale du pH devient
-\begin{equation}
+\begin{equation*}
 \begin{aligned}
 \displaystyle
 \diffp{}{t}
@@ -310,30 +307,30 @@ e_w \\
 \bm{e}_{\gamma} \\
 \end{pmatrix},
 \end{aligned}
-\end{equation}
+\end{equation*}
 où $\gamma_{0}^{\Gamma_*} a = a \vert_{\Gamma_*} $ désigne la trace sur l'ensemble $\Gamma_*$. De plus, les notations $\gamma_{n}^{\Gamma_*} \bm{a} = \bm{a} \cdot \bm{n} \vert_{\Gamma_*}, \, \gamma_{s}^{\Gamma_*} \bm{a} = \bm{a} \cdot \bm{s} \vert_{\Gamma_*} $ indiquent respectivement les traces normales et tangentielles sur l'ensemble $\Gamma_* $. Les symboles $\gamma_{nn}^{\Gamma_*}, \gamma_{ns}^{\Gamma_*} $ désignent la trace normale-normale et la trace normale-tangentielle des fonctions tensorielles et $ \gamma_{nn}^{\Gamma_*} \bm{A} = \bm{A} \cddot (\bm{n} \otimes \bm{n}) \vert_{\Gamma_*}, \, \gamma_{ns}^{\Gamma_*} \bm{A} = \bm{A} \cddot (\bm{n} \otimes \bm{s}) \vert_{\Gamma_*} $. 
 
 \paragraph{Plaque de Kirchhoff}
 Le modèle de Kirchhoff corresponds à une EDP scalaire qui décrit l'évolution du déplacement verticale pour plaque mince (rapport entre épaisseur et longueur de l'ordre de $10^{-3}$). Le modèle peut être dérivée en utilisant le principe de Hamilton et est donné par l'équation suivante (pour les calculs détaillés, le lecteur peut consulter \cite[Chapter 3]{reddy2006theory})
-\begin{equation}
+\begin{equation*}
 \rho h \diffp[2]{w}{t} = - \div\Div (\bm{\mathcal{D}}_b\, \Grad\grad{w}), \qquad (x,y) \in \Omega.
-\end{equation}
+\end{equation*}
 
 Encore une fois, le point de départ pour obtenir une formulation port-Hamiltonien est l'Hamiltonien (énergie totale)
-\begin{equation}
+\begin{equation*}
 H = \frac{1}{2} \int_{\Omega} \left\{\rho h \left(\diffp{w}{t} \right)^2 + \bm{M} \cddot \bm{\kappa}  \right\}  \d{\Omega},
-\end{equation}
-où $ \bm{M}, \ \bm{\kappa} $ sont définis dans les équations. \eqref{eq:bend_momenta}, \eqref{eq:kappaKir}. Pour ce qui concerne le choix des variables d'énergie, une variable scalaire et une tensorielle sont considérés:
-\begin{equation}
+\end{equation*}
+où $ \bm{\kappa} = \Grad\grad{w}, \; \bm{M} = \bm{\mathcal{D}}_b \Grad\grad{w}$. Pour ce qui concerne le choix des variables d'énergie, une variable scalaire et une tensorielle sont considérés:
+\begin{equation*}
 \alpha_w = \rho h \diffp{w}{t}, \quad \text{Moment linéaire}, \qquad \bm{A}_{\kappa} = \bm{\kappa}, \quad \text{Tenseur de corbure}.	
-\end{equation}
+\end{equation*}
 Les variables de co-énergie sont trouvées en calculant la dérivée variationnelle de l'Hamiltonien:
-\begin{equation}
+\begin{equation*}
 e_w := \diffd{H}{\alpha_w} = \diffp{w}{t}, \quad \text{Vitesse linéaire},  \qquad  \bm{E}_{\kappa} := \diffd{H}{\bm{A}_{\kappa}} = \bm{M}, \quad \text{Tenseur de moment}.
-\end{equation}
+\end{equation*}
 
 Le système port-Hamiltonien associé s'écrit de la manière suivante
-\begin{equation}
+\begin{equation*}
 \diffp{}{t}
 \begin{pmatrix}
 \alpha_w \\
@@ -347,37 +344,34 @@ Le système port-Hamiltonien associé s'écrit de la manière suivante
 e_w \\
 \bm{E}_{\kappa} \\
 \end{pmatrix}.
-\end{equation}
+\end{equation*}
 La première équation représente la dynamique, la seconde le fait que les dérivés d'ordre supérieur commutent. Le théorème \ref{th:adjdivDiv} assure que l'opérateur qui régis la dynamique est anti-symétrique. Le bilan de puissance fournit les variables au bord
-\begin{equation}
+\begin{equation*}
 \dot{H} = \int_{\partial \Omega} \left\{ w_t \, \widetilde{q}_n + \partial_{\bm{n}}{w_t} \, M_{nn}\right\} \, \d{s}, 
-\end{equation} 
+\end{equation*} 
 Les variables au bord sont définis 
-\begin{subequations}
-	\label{eq:QnTilMnn_fr}
-	\begin{align}
+\begin{equation*}
+	\begin{aligned}
 	\text{Effort de cisaillement}  \qquad \widetilde{q}_{n} &:= - \bm{n} \cdot \mathrm{Div}(\bm{E}_{\kappa}) - \partial_{\bm{s}}{M_{ns}}, \\
 	\text{Moment de flexion} \quad M_{nn} &:=  \bm{M} \cddot (\bm{n}\otimes{\bm{n}}) = \bm{E}_{\kappa} \cddot (\bm{n}\otimes{\bm{n}}),
-	\end{align}
-\end{subequations}
+	\end{aligned}
+\end{equation*}
 Les variables conjuguées au sens de la puissance sont données par
-\begin{subequations}
-	\label{eq:wtdwdn_fr}
-	\begin{align}
+\begin{equation*}
+	\begin{aligned}
 	\text{Vitesse verticale}  \qquad w_t &:= \diffp{w}{t} = e_w, \\
 	\text{Rotation en flexion} \quad 
 	\partial_{\bm{n}}{w_t} &:= \nabla{e_w} \cdot \bm{n}.
-	\end{align},
-\end{subequations}
-Considérons une partition de la frontière $ \partial \Omega = \overline{\Gamma}_{C} \cup \overline{\Gamma}_{S} \cup \overline {\Gamma}_{F}, \; {\Gamma}_{C} \cap {\Gamma}_{S} \cap {\Gamma}_{F} = \{\emptyset\} $, où $ {\Gamma}_{C}, {\Gamma}_{S}, {\Gamma}_{F} $ sont un sous-ensemble ouvert de $\partial \Omega $. Étant donné les définitions \eqref{eq:QnTilMnn_fr}, \eqref{eq:wtdwdn_fr}, les conditions aux limites pour la plaque de Kirchhoff \cite{gustafsson2018} sont les suivantes (voir Fig. \ref{fig:bcs_kirchh}):
+	\end{aligned},
+\end{equation*}
+Considérons une partition de la frontière $ \partial \Omega = \overline{\Gamma}_{C} \cup \overline{\Gamma}_{S} \cup \overline {\Gamma}_{F}, \; {\Gamma}_{C} \cap {\Gamma}_{S} \cap {\Gamma}_{F} = \{\emptyset\} $, où $ {\Gamma}_{C}, {\Gamma}_{S}, {\Gamma}_{F} $ sont un sous-ensemble ouvert de $\partial \Omega $. Les conditions aux limites pour la plaque de Kirchhoff \cite{gustafsson2018} sont les suivantes (voir Fig. \ref{fig:bcs_kirchh}):
 \begin{itemize}
-\item Clamped (C) sur $ \Gamma_{C} \subseteq \partial \Omega $: $ w_t, \ \partial_{\bm{n}} {w_t} $ connu;
-\item Simplement pris en charge (S) sur $ \Gamma_{S} \subseteq \partial\Omega $: $ w_t, \ M_{nn} $ connu;
-\item Gratuit (F) sur $ \Gamma_{F} \subseteq \partial \Omega $: $ \widetilde {q}_n, \ M_{nn} $ connu.
+\item Encastrée (C) sur $ \Gamma_{C} \subseteq \partial \Omega $: $ w_t, \ \partial_{\bm{n}} {w_t} $ connu;
+\item Appui simple (S) sur $ \Gamma_{S} \subseteq \partial\Omega $: $ w_t, \ M_{nn} $ connu;
+\item Libre (F) sur $ \Gamma_{F} \subseteq \partial \Omega $: $ \widetilde {q}_n, \ M_{nn} $ connu.
 \end{itemize}
 Ensuite, la formulation finale du pH devient
-	
-\begin{equation}
+\begin{equation*}
 \begin{aligned}
 \displaystyle
 \diffp{}{t}
@@ -404,8 +398,8 @@ e_w \\
 	\end{bmatrix}}_{\mathcal{B}_\partial} \begin{pmatrix}
 e_w \\
 \bm{E}_{\kappa} \\
-\end{pmatrix}, \vspace{3pt}\qquad
-\bm{y}_\partial &= \underbrace{
+\end{pmatrix},\qquad
+\bm{y}_\partial = \underbrace{
 	\begin{bmatrix}
 	{0} & \gamma_{nn, 1}^{\Gamma_C} \\
 	{0} & \gamma_{nn}^{\Gamma_C} \\
@@ -419,10 +413,278 @@ e_w \\
 \bm{E}_{\kappa} \\
 \end{pmatrix},
 \end{aligned}
-\end{equation}
+\end{equation*}
 où $ \gamma_{0}^{\Gamma_*} a = a \vert_{\Gamma_*} $ et $ \gamma_{1}^{\Gamma_*} a = \partial_{\bm{n}} a \vert_{\Gamma_*} $ désignent respectivement la trace et la trace dérivée normale sur l'ensemble $\Gamma_*$. Le symbole $\gamma_{nn, 1}^{\Gamma_*}$ désigne la trace $\gamma_{nn, 1}^{\Gamma_*} \bm{A} = -\bm{n} \cdot \Div \bm{A} - \partial_{\bm{s}} (\bm{A} \cddot (\bm{n} \otimes \bm{s})) \vert_{\Gamma_*}$, tandis que $\gamma_{nn}^{\Gamma_*} \bm{A} = \bm{A} \cddot (\bm{n} \otimes \bm{n}) \vert_{\Gamma_*} $ indique la  trace normale-normale d'une fonction tensorielle. 
 
+\subsection*{Le problème thermoélastique linéaire couplé}
+Pour les problèmes thermoélastiques linéaires, on s'aperçoit que les modèles classique peuvent être réécrits comme deux systèmes port-Hamiltonien couplés. Considérons à nouveau l'équation d'élasticité sur $\Omega \subset \mathbb{R}^d, \, d \ in \{1, 2, 3 \} $, avec une entrée distribuée $\bm{u}_E$ qui joue le rôle d'une force externe
+\begin{equation*}
+\begin{aligned}
+\diffp{}{t}
+\begin{pmatrix}
+\bm{\alpha}_v \\
+\bm{A}_{\varepsilon} \\
+\end{pmatrix} &= 
+\begin{bmatrix}
+\bm{0} & \Div \\
+\Grad & \bm{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+\bm{e}_v \\
+\bm{E}_{\varepsilon} \\
+\end{pmatrix} + 
+\begin{bmatrix}
+\bm{I}_{d\times d} \\
+\bm{0} \\
+\end{bmatrix}\bm{u}_E, \\
+\bm{y}_E &= \begin{bmatrix}
+\bm{I}_{d\times d} & \bm{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+\bm{e}_v \\
+\bm{E}_{\varepsilon}
+\end{pmatrix},
+\end{aligned}
+\end{equation*}
+avec Hamiltonien
+\[
+H_E = \energy{\bm{\alpha}_v \cdot \bm{e}_v + \bm{A}_{\varepsilon} \cddot \bm{E}_{\varepsilon}}.
+\]
+L'équation de la chaleur admet la représentation différentielle-algébrique (pHDAE) suivante
+\begin{equation*}
+\begin{aligned}
+\begin{bmatrix}
+1 & 0 \\
+\bm{0} & \bm{0} \\
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+\alpha_T \\
+\bm{j}_Q \\
+\end{pmatrix} &= 
+\begin{bmatrix}
+0 & -\div \\
+-\grad & -(T_0 k)^{-1} \\
+\end{bmatrix}
+\begin{pmatrix}
+e_T \\
+\bm{j}_Q \\
+\end{pmatrix} + 
+\begin{bmatrix}
+1 \\
+\bm{0} \\
+\end{bmatrix} u_T, \\
+y_T &= \begin{bmatrix}
+1 & \bm{0} \\
+\end{bmatrix} \begin{pmatrix}
+e_T \\
+\bm{j}_Q \\
+\end{pmatrix},
+\end{aligned}
+\end{equation*} 
+où les variables sont définies comme suit
+\begin{equation*}
+\alpha_T := \rho c_\epsilon (T-T_0), \qquad e_T := \frac{T-T_0}{T_0} =: \theta, \qquad \bm{j}_Q := -k \grad T.
+\end{equation*}
+Les paramètres $c_\epsilon, \; k, \; T_0$ sont la capacité thermique à déformation constante, le coefficient de diffusivité et une température de référence.
+L'entrée $u_T$ joue le rôle d'une source de chaleur distribuée. L'Hamiltonien corresponds à une fonctionnelle quadratique (c'est n'est pas l'énergie interne)
+\begin{equation*}
+H_T = \frac{1}{2}\int_\Omega {e}_T {\alpha}_T \d\Omega.
+\end{equation*}
+Considérez l'interconnexion suivante
+\begin{equation*}
+\bm{u}_E = - \Div(\bm{\mathcal{C}}_\beta \, y_T), \qquad
+u_T = - \bm{\mathcal{C}}_\beta \cddot\Grad(\bm{y}_E). 
+\end{equation*}
+où on a introduit l'opérateur de couplage
+\[\bm{\mathcal{C}}_\beta:=T_0 \beta(2\mu + 3 \lambda)\bm{I}_{d\times d} \]
+avec $\beta$ le coefficient de dilatation thermique et $\lambda, \mu$ les coefficients de Lamé. L'interconnexion préserve l'énergie car elle peut être écrite de manière compacte comme
+\begin{equation*}
+\bm{u}_E = \mathcal{A}_\beta(y_T), \qquad u_T = - \mathcal{A}_\beta^*(\bm{y}_E), \where  \mathcal{A}_\beta(\cdot) = - \Div(\bm{\mathcal{C}}_\beta \, \cdot),
+\end{equation*}
+où $\mathcal{A}_\beta^*$ indique l'adjoint formelle. Le problème thermoélastique couplé peut maintenant être écrit comme
+\begin{equation*}
+\begin{bmatrix}
+\bm{1} & \bm{0} & \bm{0} & \bm{0}\\
+\bm{0} & \bm{1} & \bm{0} & \bm{0}\\
+0 & 0 & 1 & 0\\
+\bm{0} & \bm{0} & \bm{0} & \bm{0}\\
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+\bm{\alpha}_v \\
+\bm{A}_\varepsilon \\
+{\alpha}_T \\
+\bm{j}_Q \\
+\end{pmatrix} = 
+\begin{bmatrix}
+\bm{0} & \Div & \mathcal{A}_\beta & \bm{0}\\
+\Grad & \bm{0} & \bm{0} & \bm{0} \\
+- \mathcal{A}_\beta^* & 0 & 0 & -\div \\
+\bm{0} & \bm{0} & -\grad & - (T_0 k)^{-1} \\
+\end{bmatrix}
+\begin{pmatrix}
+\bm{e}_v \\
+\bm{E}_\varepsilon \\
+{e}_T \\
+\bm{j}_Q \\
+\end{pmatrix},
+\end{equation*}
+Le bilan de puissance global est facilement calculé comme
+\begin{equation*}
+\begin{aligned}
+\dot{H} = \dot{H}_E + \dot{H}_T \le \int_{\partial \Omega} \left\{\left[\bm{E}_\varepsilon - e_T \bm{\mathcal{C}}_\beta \right] \cdot \bm{n}\right\}  \cdot \bm{e}_v  \d{S} - \int_{\partial\Omega} \theta \ \bm{j}_Q \cdot \bm{n} \d{S}.
+\end{aligned}
+\end{equation*}
+Le système finale et le bilan de puissance associé sont identique aux résultats reportés in \cite[page 326, 332]{carlson1973}. Soit une partition de la frontière $\partial \Omega = \Gamma_D^E \cup \Gamma_N^E = \Gamma_D^T \cup \Gamma_N^T$ pour le domaine élastique et thermique. Les conditions aux limites générales sont données par (voir Fig. \ref{fig:bc_TherElas2D})
+\begin{equation*}
+\begin{aligned}
+\bm{u} \text{ connu sur } \Gamma_D^E \times (0, +\infty), \\
+\bm{\Sigma}_{ET} \cdot \bm{n} \text{ connu sur } \Gamma_N^E \times (0, +\infty), 
+\end{aligned} \qquad
+\begin{aligned}
+T \text{ connu sur } \Gamma_D^T \times (0, +\infty), \\
+\bm{j}_Q \cdot \bm{n} \text{ connu sur } \Gamma_N^T \times (0, +\infty).
+\end{aligned}
+\end{equation*}
+À partir du bilan de puissance, les conditions aux limites classiques sont extraites. Cela permet de définir des opérateurs de frontière appropriés pour le problème thermoélastique
+\begin{equation*}
+\bm{u}_\partial = 
+\underbrace{\begin{bmatrix}
+	\bm{\gamma}_{0}^{\Gamma_D^E} & \bm{0} & \bm{0} & \bm{0} \\
+	\bm{0} & \bm{\gamma}_n^{\Gamma_N^E} & - \bm{\gamma}_n^{\Gamma_N^E}(\bm{\mathcal{C}}_\beta\, \cdot )  & \bm{0}  \\ 
+	{0} & {0} & {\gamma}_{0}^{\Gamma_D^T} & {0} \\
+	\bm{0} & \bm{0} & \bm{0} & \bm{\gamma}_{n}^{\Gamma_N^T} \\
+	\end{bmatrix}}_{\mathcal{B}_\partial}
+\begin{pmatrix}
+\bm{e}_v \\
+\bm{E}_\varepsilon \\
+{e}_T \\
+\bm{j}_Q \\
+\end{pmatrix}, \; 
+\bm{y}_\partial = 
+\underbrace{\begin{bmatrix}
+	\bm{0} & \bm{\gamma}_n^{\Gamma_D^E} & - \bm{\gamma}_n^{\Gamma_D^E}(\bm{\mathcal{C}}_\beta\, \cdot )  & \bm{0}  \\ 
+	\bm{\gamma}_{0}^{\Gamma_N^E} & \bm{0} & \bm{0} & \bm{0} \\
+	\bm{0} & \bm{0} & \bm{0} & \bm{\gamma}_{n}^{\Gamma_D^T} \\
+	{0} & {0} & {\gamma}_{0}^{\Gamma_N^T} & {0} \\
+	\end{bmatrix}}_{\mathcal{C}_\partial}
+\begin{pmatrix}
+\bm{e}_v \\
+\bm{E}_\varepsilon \\
+{e}_T \\
+\bm{j}_Q \\
+\end{pmatrix}.
+\end{equation*} 
+
 \section{Développement de la méthode PFEM}
+Une discrétisation préservant la structure est capable de construire un système de pH équivalent qui possède les propriétés structurelles du modèle d'origine:
+\begin{tcbraster}[raster columns=2, raster equal height]
+	\begin{tcolorbox}[width=0.4\textwidth, nobeforeafter, colframe=theme,title=Système pH de dimension infinie]%%
+		EDP avec entrées distribuées:
+		\begin{align*}
+		\partial_t {\bm{\alpha}}(\bm{x}, t) &= \mathcal{J} {\displaystyle \delta_{\bm{\alpha}} {H}}+ \mathcal{B} \textcolor{red}{\bm{u}_\Omega(\bm{x}, t)}, \\
+		\textcolor{red}{\bm{y}_\Omega(\bm{x}, t)} &= \mathcal{B}^* {\displaystyle  \delta_{\bm{\alpha}} {H}}.
+		\end{align*}
+		Conditions aux limites: 
+		\[\textcolor{blue}{\bm{u}_\partial} = \mathcal{B}_\partial{\displaystyle  \delta_{\bm{\alpha}} {H}}, \quad \textcolor{blue}{\bm{y}_\partial} = \mathcal{C}_\partial {\displaystyle  \delta_{\bm{\alpha}} {H}}. \]
+		Bilan de puissance (Théorème de Stokes): 
+		\[ \dot{H} = \displaystyle \int_{\partial \Omega} \textcolor{blue}{\bm{u}_\partial} \cdot \textcolor{blue}{\bm{y}_\partial} \d{S} +  \int_{\Omega} \textcolor{red}{\bm{u}_\Omega} \cdot \textcolor{red}{\bm{y}_\Omega} \d{\Omega}.
+		\]
+	\end{tcolorbox} 
+	\begin{tcolorbox}[width=0.4\textwidth, nobeforeafter,  colframe=theme,title=Discretisation préservant la structure]%%
+		EDO résultante:
+		\begin{align*}
+		\dot{\bm{\alpha}}_d &= \mathbf{J} \, {\nabla {H}_d} + \mathbf{B}_\Omega \textcolor{red}{\mathbf{u}_\Omega} + \mathbf{B}_\partial \textcolor{blue}{\mathbf{u}_\partial}, \\
+		\textcolor{red}{\mathbf{y}_\Omega} &= \mathbf{B}_\Omega^\top \, {\nabla {H}_d}, \\
+		\textcolor{blue}{\mathbf{y}_\partial} &= \mathbf{B}_\partial^\top \,{\nabla {H}_d}.
+		\end{align*}
+		Hamiltonien discrétisé:
+		\[
+		H_d := H(\bm{\alpha} \equiv \bm{\alpha}_d).
+		\]
+		Bilan de puissance discret: 
+		\[ \dot{H} = \textcolor{blue}{\mathbf{u}_\partial^\top \mathbf{y}_\partial} +  \textcolor{red}{\mathbf{u}_\Omega^\top \mathbf{y}_\Omega}.
+		\]
+	\end{tcolorbox}
+\end{tcbraster}
+\vspace{.5cm}
+Dans cette thèse, la méthode des éléments finis partitionnés (PFEM), présentée à l'origine dans \cite{cardoso2018pfem,cardoso2019partitioned}, est choisie pour obtenir des modèles discrétisés de dpH. Les éléments finis variationnels ont été largement utilisées pour discrétiser des systèmes hyperboliques linéaires fermés \cite{joly2003variational}. On montrera que PFEM étend le cadre détaillé dans \cite{joly2003variational} aux systèmes hamiltoniens ouverts (c'est-à-dire contrôlés par les limites). De plus, il est également applicable aux systèmes non linéaires \secref{sec:irrsw_discr} et aux systèmes paraboliques \secref{sec:thelas_wave} (voir aussi \cite{serhani2019modeling,serhani2019discretization}). Cette procédure de discrétisation se résume à trois étapes simples
+\begin{enumerate}
+\item Le système est écrit sous une forme faible;
+\item Une intégration par parties est appliquée pour mettre en évidence le contrôle de frontière approprié;
+\item Une méthode de Galerkin est utilisée pour obtenir un système de dimension finie. Pour la base d'approximation, la méthode des éléments finis est utilisée ici, mais des méthodes spectrales peuvent également être utilisées.
+\end{enumerate}
+
+Une fois le système mis en forme faible, un sous-ensemble d'équations est intégré par parties, de sorte que les variables limites sont naturellement incluses dans la formulation et apparaissent comme des entrées de contrôle, les sorties colocalisées étant définies en conséquence. La discrétisation des variables d'énergie et de co-énergie (et les fonctions de test associées) conduit directement à une représentation de rang complet pour le système de pH de dimension finie. Cette approche rend possible l'utilisation de logiciels FEM, comme \fenics \cite{logg2012}, ou \firedrake \cite{rathgeber2017firedrake}. La procédure est universelle, car elle repose sur une formule générale d'intégration par parties qui caractérise les pH multidimensionnels. \\
+
+Pour pouvoir appliquer cette méthodologie, deux hypothèses doivent être vérifiées. 
+
+\begin{enumerate}
+\item Le système doit posséder une structure partitionnée (cf. hypothèse \ref{ass:linJ})
+\begin{equation*}
+\mathcal{J} = 
+\begin{bmatrix}
+0 & -\mathcal{L}^* \\
+\mathcal{L} & 0 \\
+\end{bmatrix}, \qquad 
+\begin{aligned}
+&\mathcal{L}^* : L^2(\Omega, \mathbb{B}) \rightarrow L^2(\Omega, \mathbb{A}), \\
+&\mathcal{L}\;\, : L^2(\Omega, \mathbb{A}) \rightarrow L^2(\Omega, \mathbb{B}). \\
+\end{aligned}
+\end{equation*}
+\item Les opérateurs au bord doivent vérifiée une formule d'intégration par partie abstraite (cf. hypothèse \ref{ass:operBC})
+\begin{equation*}
+\inner[L^2(\Omega, \mathbb{B})]{\bm{u}_2}{\mathcal{L}\,\bm{u}_1} - \inner[L^2(\Omega, \mathbb{A})]{\mathcal{L}^* \, \bm{u}_2}{\bm{u}_1} = \inner[L^2(\partial \Omega, \mathbb{R}^m)]{\mathcal{N}_{\partial, 1} \bm{u}_1}{\mathcal{N}_{\partial, 2} \bm{u}_2}. 
+\end{equation*}
+Les opérateurs de frontière $\mathcal{B}_\partial, \, \mathcal{C}_\partial$ sont alors supposés vérifier, de manière exclusive, soit
+\begin{equation*}
+\mathcal{B}_\partial = \begin{bmatrix}
+0 & \mathcal{N}_{\partial, 2} \\
+\end{bmatrix}, \qquad 
+\mathcal{C}_\partial = \begin{bmatrix}
+\mathcal{N}_{\partial, 1} & 0 \\
+\end{bmatrix},
+\end{equation*}
+ou bien 
+\begin{equation*}
+\mathcal{B}_\partial = \begin{bmatrix}
+\mathcal{N}_{\partial, 1} & 0 \\
+\end{bmatrix}, \qquad \mathcal{C}_\partial = \begin{bmatrix}
+0 & \mathcal{N}_{\partial, 2} \\
+\end{bmatrix}.
+\end{equation*}
+\end{enumerate}
+
+Un système qui vérifie ces deux hypothèses, s'écrit alors sous la forme
+\begin{equation*}
+	\begin{aligned}
+	\partial_t \begin{pmatrix}
+	{\bm{\alpha}}_1 \\ {\bm{\alpha}}_2
+	\end{pmatrix} &= \begin{bmatrix}
+	0 & -\bm{L}^\top - \mathcal{L}^* \\
+	\bm{L} + \mathcal{L} & 0 \\
+	\end{bmatrix}\begin{pmatrix}
+	\bm{e}_1 \\ \bm{e}_2
+	\end{pmatrix},  \vspace{3pt}\\
+	\begin{pmatrix}
+	\bm{e}_1 \\ \bm{e}_2
+	\end{pmatrix} &:= \begin{pmatrix}
+	\delta_{\bm{\alpha}_1}H \\ \delta_{\bm{\alpha}_2}H
+	\end{pmatrix}.
+	\end{aligned}
+\end{equation*}
+
+Les variables au bord sont alors données par
+\begin{equation*}
+\bm{u}_\partial = \mathcal{N}_2 \displaystyle \bm{e}_2, \qquad  \bm{y}_\partial = \mathcal{N}_1 \displaystyle \bm{e}_1, 
+\end{equation*}
+ou bien
+\begin{equation*}
+\bm{u}_\partial = \mathcal{N}_1 \displaystyle \bm{e}_1, \qquad 
+\bm{y}_\partial = \mathcal{N}_2 \displaystyle \bm{e}_2.
+\end{equation*}
+
 
 \section{Mod\'elisation port-Hamiltonien des systèmes multi-corps flexibles}
 
