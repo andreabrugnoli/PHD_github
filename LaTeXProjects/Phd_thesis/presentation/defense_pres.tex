@@ -11,18 +11,40 @@
 
 %\usepackage{multimedia}
 \usepackage{media9}
-\usepackage[backend=bibtex]{biblatex}
+\usepackage[backend=bibtex,doi=false,isbn=false,url=false,eprint=false]{biblatex}
 
 \graphicspath{{../images/}}
 
-%\bibliography{../mybibliography}
+\bibliography{../mybibliography}
 
-\DeclareMathOperator{\Tr}{Tr}
+% Math macros
 \DeclareMathOperator*{\grad}{grad}
 \DeclareMathOperator*{\Grad}{Grad}
 \DeclareMathOperator*{\Div}{Div}
 \renewcommand{\div}{\operatorname{div}}
 \DeclareMathOperator*{\Hess}{Hess}
+\DeclareMathOperator*{\curl}{curl}
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator{\Dom}{Dom}
+\DeclareMathOperator*{\esssup}{ess\,sup}
+
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\bbF}{\mathbb{F}}
+\newcommand{\bbA}{\mathbb{A}}
+\newcommand{\bbB}{\mathbb{B}}
+\newcommand{\bbS}{\mathbb{S}}
+
+\newcommand*{\norm}[1]{\ensuremath{\left\|#1\right\|}}
+\newcommand{\where}{\qquad \text{where} \qquad}
+\newcommand{\inner}[3][]{\ensuremath{\left\langle #2, \, #3 \right\rangle_{#1}}}
+\newcommand{\bilprod}[2]{\left\langle \left\langle \, #1, #2 \, \right\rangle \right\rangle}
+\newcommand{\pder}[2]{\ensuremath{\partial_{#2} #1}}
+\newcommand{\dder}[2]{\ensuremath{\delta_{#2} #1}}
+\newcommand{\secref}[1]{\S\ref{#1}}
+\newcommand{\energy}[1]{\frac{1}{2} \int_{\Omega} \left\{ #1 \right\} \d\Omega}
+\newcommand{\crmat}[1]{\ensuremath{\left[#1\right]_\times}}
+\newcommand{\fenics}{\textsc{FEniCS}\xspace}
+\newcommand{\firedrake}{\textsc{Firedrake}\xspace}
 
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
@@ -65,28 +87,76 @@ Modelling and structure preserving finite element discretization}
 
 \end{frame}
 
-\section{Introduction: discretization of pH Systems}
+\section{Introduction}
 
-\begin{frame}{Infinite dimensional pH systems}
-\begin{block}{\only<1>{General}\only<2>{Linear} infinite dimensional pH system}
-	\begin{equation*}
-	\begin{cases}
-	\displaystyle \diffp{x}{t}(z, t) &= \mathcal{J} \only<1>{\displaystyle \diffd{H}{x}} \only<2>{\mathcal{Q} x} + B \textcolor{red}{u(z, t)}, \vspace{3pt} \\
-	\displaystyle \textcolor{red}{y(z, t)} &= B^* \only<1>{\displaystyle \diffd{H}{x}} \only<2>{\mathcal{Q} x}.
-	\end{cases}
-	\end{equation*}
-	With boundary conditions
-	\[\textcolor{blue}{u_\partial} = \mathcal{B} \only<1>{\displaystyle \diffd{H}{x}} \only<2>{\mathcal{Q} x}, \quad \textcolor{blue}{y_\partial} = \mathcal{C} \only<1>{\displaystyle \diffd{H}{x}} \only<2>{\mathcal{Q} x} \]
-	Energy rate: $\dot{H} = \displaystyle \int_{\partial \Omega} \textcolor{blue}{u_\partial y_\partial} \d{s} +  \int_{\Omega} \textcolor{red}{u(z, t) y(z, t)} \d{\Omega}$
-	\begin{itemize}
-		\item $x$ energy variables, $e = \delta_x H = \only<2>{\mathcal{Q} x}$: co-energy variables \only<2>{($\mathcal{Q}$ symmetric positive operator)};
-		\item $\mathcal{J}$: skew-symmetric differential operator;
-		\item $\mathcal{B}, \mathcal{C}$: boundary operator;
-		\item $u, y, B$: distributed input, output and control operator.
-	\end{itemize}
+\begin{frame}{Twenty years of distributed port-Hamiltonian systems}
+Distributed port-Hamiltonian systems were first introduced twenty years ago. \\ They have been used for simulating and controlling a variety of applications:
+\begin{itemize}
+	\item {flexible thin beams;}
+	\item {acoustic waves;}
+	\item {stirred tank reactors;}
+	\item {plasma in tomahawks;}
+	\item {fluid-structure interactions.}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Motivation \& Research Objectives}
+
+\begin{alertblock}{A missing piece in the port-Hamiltonian literature}
+Despite all the preexisting literature, models arising from structural mechanics on multidimensional geometrical domains have rarely been considered\footfullcite{macchelli2005mindlin}. 
+\end{alertblock}
+
+\begin{block}{Purpose of this work}
+This thesis tries to establish a clear connection between linear structural mechanics models
+and port-Hamiltonian systems, both for the modelling and discretization tasks.
 \end{block}
 
+\begin{exampleblock}{Methodologies}
+The numerical implementation relies on efficient and well-established libraries. No need to construct everything from scratch.
+\end{exampleblock}
+
 \end{frame}
+
+\section{Port-Hamiltonian formulation of Elasticity and Thermoelasticity}
+
+\subsection{Linear elasticity and plate models}
+
+\begin{frame}{The Linear Elastodynamics problem}
+For small deformations, the displacement within a continuum $\bm{u}$ satisfies the PDE
+\begin{equation*}
+\rho \diffp[2]{\bm{u}}{t} - \Div(\bm{\mathcal{D}} \Grad \bm{u}) =0, \qquad \bm{x} \in \Omega \subset \bbR^d, \; d \in \{2,3\}.
+\end{equation*}
+\only<1>{
+\begin{itemize}
+\item $\rho$ mass density;
+\item $\bm{\mathcal{D}}(\cdot) = \frac{E}{1 + \nu} \left[(\cdot) + \frac{\nu}{1-2\nu}\Tr(\cdot) \bm{I} \right]$ the stiffness tensor;
+\item $\Grad \bm{u} = \frac{1}{2}\left[\nabla\bm{u} + \nabla^\top\bm{u} \right]$ the symmetric gradient;
+\item $\bm{\Sigma} = \bm{\mathcal{D}} \bm{\varepsilon}, \; \bm{\varepsilon} = \Grad \bm{u}$ the stress and strain tensor;
+\item $\Div \bm{\Sigma} = \left(\sum_{i=1}^d \diffp{\Sigma_{ij}}{x_i}\right)_{1\le j\le d }$ the tensor divergence.
+\end{itemize}
+}
+\only<2>{
+\begin{figure}
+	\centering
+	\includegraphics[height=0.5\textheight]{part_2/bc_elas2D.eps}
+	\caption{A 2D continuum with Neumann and Dirichlet boundary conditions}
+\end{figure}
+}
+\end{frame}
+
+\begin{frame}{The port-Hamiltonian formulation}
+	To derive a pH formulation, the total energy is needed
+	\begin{equation*}
+	H = \energy{\rho \norm{\partial_t \bm{u}}^2 + \bm{\Sigma} \cddot \bm{\varepsilon}}, \qquad \bm{A} \cddot \bm{B} \quad \text{Tensor contraction}.
+	\end{equation*}
+	Consider the energy variables
+	\[\bm{\alpha}_v = \rho \bm{v}, \qquad \bm{A}_{\varepsilon} = \bm{\varepsilon}. \]
+	The Hamiltonian is a quadratic functional in this variables
+	\begin{equation*}
+	H = \energy{\frac{1}{\rho} \norm{\bm{\alpha}_v}^2 + (\bm{\mathcal{D}} \bm{A}_{\varepsilon}) \cddot  \bm{A}_{\varepsilon}}.
+	\end{equation*} 
+\end{frame}
+
 
 
 \begin{frame}{Structure preserving discretization}
