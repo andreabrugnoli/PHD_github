@@ -2,6 +2,7 @@
 \usefonttheme[onlymath]{serif}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{bm}
+\usepackage{xcolor}
 
 \usepackage{graphicx}
 \usepackage{diffcoeff}
@@ -49,6 +50,8 @@
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
 
+\newtheorem{proposition}{Proposition}
+
 \def\onedot{$\mathsurround0pt\ldotp$}
 \def\cddot{% two dots stacked vertically
 	\mathbin{\vcenter{\baselineskip.67ex
@@ -62,7 +65,7 @@
 		\;\mathrm{d}#1\@ifnextchar\d{\!}{}}}
 \makeatother
 
-\title[58th CDC conference]{A port-Hamiltonian formulation of flexible structures \\
+\title[PHD Defense]{A port-Hamiltonian formulation of flexible structures \\
 Modelling and structure preserving finite element discretization}
 
 %\institute[ISAE]
@@ -71,7 +74,7 @@ Modelling and structure preserving finite element discretization}
 \author[Andrea Brugnoli]{Andrea Brugnoli\\
 	{\and} \\
 	{\textit{Supervisors}} \\
-	{Daniel Alazard} \\ {Valérie Pommier-Budinger}}
+	{Daniel Alazard} \\ {Val\'erie Pommier-Budinger}}
 
 \date[Toulouse, 9/11/20]{November, the 9th, 2020}
 
@@ -112,16 +115,17 @@ and port-Hamiltonian systems, both for the modelling and discretization tasks.
 \end{block}
 
 \begin{exampleblock}{Methodologies}
-The numerical implementation relies on efficient and well-established libraries. No need to construct everything from scratch.
+The numerical implementation relies on efficient and well-established libraries, so to avoid constructing everything from scratch.
 \end{exampleblock}
 
 \end{frame}
 
 \section{Port-Hamiltonian formulation of Elasticity and Thermoelasticity}
 
-\subsection{Linear elasticity and plate models}
+\subsection{Linear elasticity}
 
 \begin{frame}{The Linear Elastodynamics problem}
+\begin{overlayarea}{\textwidth}{\textheight}
 For small deformations, the displacement within a continuum $\bm{u}$ satisfies the PDE
 \begin{equation*}
 \rho \diffp[2]{\bm{u}}{t} - \Div(\bm{\mathcal{D}} \Grad \bm{u}) =0, \qquad \bm{x} \in \Omega \subset \bbR^d, \; d \in \{2,3\}.
@@ -131,7 +135,7 @@ For small deformations, the displacement within a continuum $\bm{u}$ satisfies t
 \item $\rho$ mass density;
 \item $\bm{\mathcal{D}}(\cdot) = \frac{E}{1 + \nu} \left[(\cdot) + \frac{\nu}{1-2\nu}\Tr(\cdot) \bm{I} \right]$ the stiffness tensor;
 \item $\Grad \bm{u} = \frac{1}{2}\left[\nabla\bm{u} + \nabla^\top\bm{u} \right]$ the symmetric gradient;
-\item $\bm{\Sigma} = \bm{\mathcal{D}} \bm{\varepsilon}, \; \bm{\varepsilon} = \Grad \bm{u}$ the stress and strain tensor;
+\item $\bm{\Sigma} = \bm{\mathcal{D}} \bm{\varepsilon}, \; \bm{\varepsilon} = \Grad \bm{u}$ the stress and strain tensors;
 \item $\Div \bm{\Sigma} = \left(\sum_{i=1}^d \diffp{\Sigma_{ij}}{x_i}\right)_{1\le j\le d }$ the tensor divergence.
 \end{itemize}
 }
@@ -142,22 +146,96 @@ For small deformations, the displacement within a continuum $\bm{u}$ satisfies t
 	\caption{A 2D continuum with Neumann and Dirichlet boundary conditions}
 \end{figure}
 }
+\end{overlayarea}
 \end{frame}
 
-\begin{frame}{The port-Hamiltonian formulation}
+\begin{frame}{Energies and co-energies}
+\begin{overlayarea}{\textwidth}{\textheight}
 	To derive a pH formulation, the total energy is needed
 	\begin{equation*}
 	H = \energy{\rho \norm{\partial_t \bm{u}}^2 + \bm{\Sigma} \cddot \bm{\varepsilon}}, \qquad \bm{A} \cddot \bm{B} \quad \text{Tensor contraction}.
 	\end{equation*}
+	\onslide<2->{
 	Consider the energy variables
-	\[\bm{\alpha}_v = \rho \bm{v}, \qquad \bm{A}_{\varepsilon} = \bm{\varepsilon}. \]
+	\[\bm{\alpha}_v = \rho \partial_t \bm{u}, \qquad \bm{A}_{\varepsilon} = \bm{\varepsilon}. \]
 	The Hamiltonian is a quadratic functional in this variables
 	\begin{equation*}
-	H = \energy{\frac{1}{\rho} \norm{\bm{\alpha}_v}^2 + (\bm{\mathcal{D}} \bm{A}_{\varepsilon}) \cddot  \bm{A}_{\varepsilon}}.
+	H(\bm{\alpha}_v, \bm{A}_{\varepsilon}) = \energy{\frac{1}{\rho} \norm{\bm{\alpha}_v}^2 + (\bm{\mathcal{D}} \bm{A}_{\varepsilon}) \cddot  \bm{A}_{\varepsilon}}.
 	\end{equation*} 
+	}
+	\only<3>{The co-energies are consequently obtained
+	\begin{equation*}
+	\bm{e}_v = \diffd{H}{\bm{\alpha}_v} = \partial_t \bm{u}, \qquad \bm{E}_{\varepsilon} = \diffd{H}{\bm{A}_{\varepsilon}} = \bm{\mathcal{D}} \bm{A}_{\varepsilon} = \bm{\Sigma}.
+	\end{equation*}
+	}
+\end{overlayarea}
+\end{frame}
+
+\begin{frame}{The boundary variables}
+From the time derivative of the Hamiltonian, the classical boundary conditions are retrieved
+\begin{equation*}
+\begin{aligned}
+\dot{H} &= \int_{\Omega} \left\{ \bm{e}_v \cdot \partial_t \bm\alpha_v + \bm{E}_\varepsilon \cddot \partial_t \bm{A}_\varepsilon \right\} \d\Omega, \\
+&= \int_{\Omega} \left\{\bm{e}_v \cdot \Div \bm{E}_\varepsilon + \bm{E}_\varepsilon \cddot \Grad \bm{e}_v \right\}\d\Omega,\\
+&= \int_{\Omega} \div(\bm{E}_\varepsilon \, \bm{e}_v) \d\Omega, \qquad &\text{Stokes theorem}, \\
+&= \int_{\partial \Omega} \bm{e}_v \cdot (\bm{E}_\varepsilon\bm{n}) \d{S} = \inner[\partial\Omega]{\textcolor{blue}{\bm{e}_v}}{\textcolor{red}{\bm{E}_\varepsilon\bm{n}}}.
+\end{aligned}
+\end{equation*}
+The boundary variables are therefore the \textcolor{blue}{Dirichlet trace of the velocity} and the \textcolor{red}{normal trace of the stress tensor}.
 \end{frame}
 
 
+\begin{frame}{The port-Hamiltonian formulation}
+	Given the fact that mixed boundary conditions are considered, the trace operators are restricted to the boundary partitions:
+	\begin{itemize} 
+		\item $\bm\gamma_{0}^{\Gamma_*}$ denotes the Dirichlet trace over the set $\Gamma_*$, $\bm\gamma_{0}^{\Gamma_*} \bm{e}_v = \bm{e}_v\vert_{\Gamma_*}$;
+		\item $\bm\gamma_{n}^{\Gamma_*}$ denotes the normal trace over the set $\Gamma_*$, $\bm{\gamma_{n}}^{\Gamma_*}\bm{E}_\varepsilon = \bm{E}_\varepsilon \bm{n}\vert_{\Gamma_*}$.
+	\end{itemize}
+
+	\begin{block}{PH linear elasticity}
+	\begin{equation*}
+	\begin{aligned}
+	\displaystyle
+	\diffp{}{t}
+	\begin{pmatrix}
+	\bm{\alpha}_v \\
+	\bm{A}_\varepsilon
+	\end{pmatrix} &= \underbrace{
+		\begin{bmatrix}
+		\bm{0} & \Div \\
+		\Grad & \bm{0} \\
+		\end{bmatrix}}_{\mathcal{J}}
+	\begin{pmatrix}
+	\bm{e}_v \\
+	\bm{E}_\varepsilon
+	\end{pmatrix}, \vspace{3pt}\\
+	\bm{u}_\partial &= \underbrace{
+		\begin{bmatrix}
+		\bm\gamma_{0}^{\Gamma_D} & \bm{0} \\
+		\bm{0} & \bm\gamma_n^{\Gamma_N} \\
+		\end{bmatrix}}_{\mathcal{B}_\partial} \begin{pmatrix}
+	\bm{e}_v \\
+	\bm{E}_\varepsilon
+	\end{pmatrix}, \vspace{3pt}\qquad
+	\bm{y}_\partial = \underbrace{
+		\begin{bmatrix}
+		\bm{0} & \bm\gamma_{n}^{\Gamma_D} \\
+		\bm\gamma_0^{\Gamma_N} & \bm{0} \\
+		\end{bmatrix}}_{\mathcal{C}_\partial}
+	\begin{pmatrix}
+	\bm{e}_v \\
+	\bm{E}_\varepsilon
+	\end{pmatrix},
+	\end{aligned}
+	\end{equation*}
+	\end{block}
+\end{frame}
+
+\subsection{Plates models}
+
+\begin{frame}
+	content...
+\end{frame}
 
 \begin{frame}{Structure preserving discretization}
 The main properties of the dpH (conservative, passive system) are preserved at a discrete level.
