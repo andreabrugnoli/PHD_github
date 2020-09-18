@@ -52,6 +52,7 @@
 \DeclareMathOperator*{\argmin}{arg\,min}
 
 \newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
 
 \def\onedot{$\mathsurround0pt\ldotp$}
 \def\cddot{% two dots stacked vertically
@@ -95,11 +96,11 @@ Modelling and structure preserving finite element discretization}
 
 \begin{frame}{Twenty years of distributed port-Hamiltonian systems}
 
-\begin{block}{Distributed port-Hamiltonian systems }
+\begin{block}{Distributed port-Hamiltonian systems \only<2>{(Linear case)}}
 \begin{equation*}
 \begin{aligned}
 \partial_t {\bm{\alpha}} &= \mathcal{J} \, \bm{e}, \\
-\bm{e} &:= \delta_{\bm{\alpha}}{H}, \\
+\bm{e} &:= \only<1>{\delta_{\bm{\alpha}}{H}} \only<2>{\mathcal{Q}\bm{\alpha}}, \\
 \bm{u}_\partial &= \mathcal{B}_\partial  \, \bm{e}, \\
 \bm{y}_\partial &= \mathcal{C}_\partial \, \bm{e}, 
 \end{aligned} \qquad
@@ -111,7 +112,7 @@ Modelling and structure preserving finite element discretization}
 \end{aligned} \qquad
 \begin{aligned}
 \mathcal{J} &\quad\text{Interconnection operator},\\
-\\
+\only<2>{\mathcal{Q} &\quad\text{Positive operator},}\\
 \mathcal{B}_\partial &\quad\text{Input operator}, \\
 \mathcal{C}_\partial &\quad\text{Output operator}. \\
 \end{aligned}
@@ -223,10 +224,10 @@ From the time derivative of the Hamiltonian, the classical boundary conditions a
 \begin{equation*}
 \begin{aligned}
 \dot{H} &= \int_{\Omega} \left\{\bm{e}_v \cdot \Div \bm{E}_\varepsilon + \bm{E}_\varepsilon \cddot \Grad \bm{e}_v \right\}\d\Omega, \qquad &\text{Stokes theorem},\\
-&= \int_{\partial \Omega} \bm{e}_v \cdot (\bm{E}_\varepsilon\bm{n}) \d{S} = \inner[\partial\Omega]{\textcolor{blue}{\bm\gamma_{0}\bm{e}_v}}{\textcolor{red}{\bm\gamma_{n}\bm{E}_\varepsilon\bm{n}}}.
+&= \int_{\partial \Omega} \bm{e}_v \cdot (\bm{E}_\varepsilon\bm{n}) \d{S} = \inner[\partial\Omega]{\bm\gamma_{0}\bm{e}_v}{\bm\gamma_{n}\bm{E}_\varepsilon}.
 \end{aligned}
 \end{equation*}
-The boundary variables are therefore the \textcolor{blue}{Dirichlet trace of the velocity} and the \textcolor{red}{normal trace of the stress tensor}.
+The boundary variables are therefore the Dirichlet trace of the velocity $\bm\gamma_{0}\bm{e}_v$ and the normal trace of the stress tensor $\bm\gamma_{n}\bm{E}_\varepsilon$.
 \end{frame}
 
 
@@ -256,21 +257,36 @@ The boundary variables are therefore the \textcolor{blue}{Dirichlet trace of the
 	\end{pmatrix}, \\
 	\bm{u}_\partial &= \underbrace{
 		\begin{bmatrix}
-		\bm\gamma_{0}^{\Gamma_D} & \bm{0} \\
-		\bm{0} & \bm\gamma_n^{\Gamma_N} \\
+		\textcolor{blue}{\bm\gamma_{0}^{\Gamma_D}} & \bm{0} \\
+		\bm{0} & \textcolor{red}{\bm\gamma_n^{\Gamma_N}} \\
 		\end{bmatrix}}_{\mathcal{B}_\partial} \begin{pmatrix}
 	\bm{e}_v \\
 	\bm{E}_\varepsilon
 	\end{pmatrix}, \vspace{3pt}\qquad
-	\bm{y}_\partial = \underbrace{
+	\end{aligned}
+	\begin{aligned}
+	\begin{pmatrix}
+	\bm{e}_v \\
+	\bm{E}_\varepsilon
+	\end{pmatrix} &= 
+	\underbrace{
 		\begin{bmatrix}
-		\bm{0} & \bm\gamma_{n}^{\Gamma_D} \\
-		\bm\gamma_0^{\Gamma_N} & \bm{0} \\
+		\frac{1}{\rho} & \bm{0} \\
+		\bm{0} & \bm{\mathcal{D}} \\
+		\end{bmatrix}}_{\mathcal{Q}}
+	\begin{pmatrix}
+	\bm{\alpha}_v \\
+	\bm{A}_\varepsilon
+	\end{pmatrix}, \\
+	\bm{y}_\partial &= \underbrace{
+		\begin{bmatrix}
+		\bm{0} & \textcolor{blue}{\bm\gamma_{n}^{\Gamma_D}} \\
+		\textcolor{red}{\bm\gamma_0^{\Gamma_N}} & \bm{0} \\
 		\end{bmatrix}}_{\mathcal{C}_\partial}
 	\begin{pmatrix}
 	\bm{e}_v \\
 	\bm{E}_\varepsilon
-	\end{pmatrix},
+	\end{pmatrix}.
 	\end{aligned}
 	\end{equation*}
 	\end{block}
@@ -280,12 +296,13 @@ The boundary variables are therefore the \textcolor{blue}{Dirichlet trace of the
 The derivation of the Hamiltonian system relies on few simple steps  
 \begin{enumerate}
 \item Starting from the total energy, the energy variables are selected to make the Hamiltonian quadratic: the new variables are the linear momentum and the strain tensor;
-\item The dynamics makes appear a formally skew-adjoint operator $\mathcal{J}$;
-\item The boundary variables are found thank to the Stokes theorem
+\item The resulting dynamics is regulated by a formally skew-adjoint operator $\mathcal{J}$;
+\item The boundary variables are found thanks to the Stokes theorem
 \[
 \int_{\Omega} \left\{\bm{e}_v \cdot \Div \bm{E}_\varepsilon + \bm{E}_\varepsilon \cddot \Grad \bm{e}_v \right\}\d\Omega = \inner[\partial\Omega]{\bm{e}_v}{\bm{E}_\varepsilon\bm{n}}.
 \]
 \end{enumerate}
+
 The construction is exactly the same for plate models, as they represent particular cases of this problem.
 \end{frame}
 
@@ -302,9 +319,11 @@ Model describing the bending deflection of thick plates
 
 \begin{itemize}
 	\item $h$ plate thickness;
-	\item $\bm{M}= \bm{\mathcal{D}}_b\,\bm{\kappa}$ the momenta tensor and $\bm{\kappa} = \Grad{\bm{\theta}}$ the curvature tensor;
+	\item $\bm{M}= \bm{\mathcal{D}}_b\,\bm{\kappa}$ the momenta tensor;
+	\item  $\bm{\kappa} = \Grad{\bm{\theta}}$ the curvature tensor;
 	\item $\bm{\mathcal{D}}_{b} = \frac{E h^3}{12(1-\nu^2)} \left[ (1-\nu) (\cdot) + \nu \Tr(\cdot) \bm{I}_{2\times 2} \right]$ the bending stiffness tensor;
-	\item $\bm{q}= K_{\text{sh}} Gh\,\bm{\gamma}$ the shear stress and $\bm{\gamma} = \grad w - \bm{\theta}$ the shear strain ($G$ is the shear modulus and $K_{\text{sh}}$ the shear correction factor).
+	\item $\bm{q}= K_{\text{sh}} Gh\,\bm{\gamma}$ the shear stress ($G$ is the shear modulus and $K_{\text{sh}}$ the shear correction factor);
+	\item $\bm{\gamma} = \grad w - \bm{\theta}$ the shear strain.
 \end{itemize}
 
 \end{frame}
@@ -317,9 +336,9 @@ Model describing the bending deflection of thick plates
 		\hline 
 		\multicolumn{2}{c}{Dirichlet conditions}&  \multicolumn{2}{c}{Neumann conditions} \\ 
 		\hline 
-		Vertical velocity  & $\partial_t {w}$ & Shear force  & $\bm{q} \cdot \bm{n}$ \\ 
-		Flexural rotation  & $\partial_t {\bm{\theta}} \cdot \bm{n}$ & Flexural momentum & $\bm{n}^\top\bm{M}\bm{n}$ \\  
-		Torsional rotation & $\partial_t {\bm{\theta}} \cdot \bm{s}$ & Torsional momentum  & $\bm{s}^\top\bm{M}\bm{n}$  \\ 
+		Vertical velocity  & $w_t = \partial_t {w}$ & Shear force  & $q_n = \bm{q} \cdot \bm{n}$ \\ 
+		Flexural rotation  & $\omega_n = \partial_t {\bm{\theta}} \cdot \bm{n}$ & Flexural momentum & $M_{nn} = \bm{n}^\top\bm{M}\bm{n}$ \\  
+		Torsional rotation & $\omega_s = \partial_t {\bm{\theta}} \cdot \bm{s}$ & Torsional momentum  & $ M_{ns} = \bm{s}^\top\bm{M}\bm{n}$  \\ 
 		\hline 
 	\end{tabular}
 \end{table}
@@ -341,23 +360,44 @@ Model describing the bending deflection of thick plates
 \end{frame}
 
 \begin{frame}{Energies and co-energies for the Mindlin plate}
+\begin{overlayarea}{\textwidth}{\textheight}
 \begin{block}{Total energy}
 	\begin{equation*}
 	H = \frac{1}{2} \int_{\Omega}  \left\{ \rho h \left(\diffp{w}{t} \right)^2 + \frac{\rho h^3}{12} \norm{\diffp{\bm{\theta}}{t}}^2 +   \bm{M} \cddot \bm{\kappa} + \bm{q} \cdot \bm{\gamma}  \right\}  \d\Omega, 
 	\end{equation*}
 \end{block}
 
+\only<1>{
 \begin{block}{Energy variables}
 	\begin{equation*}
-	\alpha_w = \rho h \diffp{w}{t}, \qquad \bm{A}_{\kappa} = \bm{\kappa}, \qquad \bm\alpha_{\theta} =  \frac{\rho h^3}{12} \diffp{\bm{\theta}}{t}, \qquad \bm\alpha_{\gamma} = \bm{\gamma}. 
+	\begin{aligned}
+	\alpha_w &= \rho h \diffp{w}{t}, \quad &\text{Linear momentum,} \\
+	\bm{A}_{\kappa} &= \bm{\kappa}, \quad &\text{Curvature tensor,} \\
+	\end{aligned} \qquad
+	\begin{aligned}
+	\bm\alpha_{\theta} &=  \frac{\rho h^3}{12} \diffp{\bm{\theta}}{t}, \quad &\text{Angular momentum,}\\
+	\bm\alpha_{\gamma} &= \bm{\gamma}. \quad &\text{Shear deformation.}\\
+	\end{aligned}
 	\end{equation*}
 \end{block}	
+}
 
+\only<2>{
 \begin{block}{Co-energy variables}
 	\begin{equation*}
-	e_w  = \diffp{w}{t},  \qquad \bm{E}_{\kappa}  = \bm{M}, \qquad \bm{e}_{\theta} = \diffp{\bm{\theta}}{t}, \qquad \bm{e}_{\gamma}  = \bm{q}. 
+	\begin{aligned}
+	e_w &:= \diffd{H}{\alpha_w} = \diffp{w}{t},  \quad &\text{Linear velocity,} \\
+	\bm{E}_{\kappa} &:= \diffd{H}{\bm{A}_{\kappa}} = \bm{M}, \quad &\text{Momenta tensor,}\\
+	\end{aligned} \qquad
+	\begin{aligned}
+	\bm{e}_{\theta} &:= \diffd{H}{\bm\alpha_{\theta}} = \diffp{\bm{\theta}}{t}, \quad &\text{Angular velocity,}  \\
+	\bm{e}_{\gamma} &:= \diffd{H}{\bm\alpha_{\gamma}} = \bm{q} \quad &\text{Shear stress.} \\
+	\end{aligned}
 	\end{equation*}
 \end{block}	
+}
+
+\end{overlayarea}	
 \end{frame}
 
 \begin{frame}{Interconnection operator and boundary variables}
@@ -386,12 +426,12 @@ Again the interconnection operator is formally skew-adjoint. The classical bound
 \begin{equation*}
 \begin{aligned}
 \dot{H}&= \int_{\Omega} \left\{ \div(\bm{e}_{\gamma}) e_w  + \Div(\bm{E}_{\kappa}) \cdot \bm{e}_\theta + \; \Grad(\bm{e}_{\theta}) \cddot \bm{E}_{\kappa}  + \grad (e_w) \cdot \bm{e}_{\gamma} \right\} \d\Omega, \\
-&= \inner[\partial\Omega]{\textcolor{blue}{\gamma_{0} e_w}}{\textcolor{red}{\gamma_{n} \bm{e}_\gamma}} + \inner[\partial\Omega]{\textcolor{blue}{\gamma_{n}\bm{e}_\theta}}{\textcolor{red}{\gamma_{nn}\bm{E}_\kappa}} + \inner[\partial\Omega]{\textcolor{blue}{\gamma_{s}\bm{e}_\theta}}{\textcolor{red}{\gamma_{ns}\bm{E}_\kappa}},  \\
+&= \inner[\partial\Omega]{\gamma_{0} e_w}{\gamma_{n} \bm{e}_\gamma} + \inner[\partial\Omega]{\gamma_{n}\bm{e}_\theta}{\gamma_{nn}\bm{E}_\kappa} + \inner[\partial\Omega]{\gamma_{s}\bm{e}_\theta}{\gamma_{ns}\bm{E}_\kappa},  \\
 \end{aligned}
 \end{equation*}
 \begin{itemize}
-\item $\gamma_{nn}\bm{A} = \bm{n}^\top \bm{A} \bm{n}$ denotes the normal-normal trace  of tensor-valued functions;
-\item $\gamma_{ns}\bm{A} = \bm{s}^\top \bm{A} \bm{n}$ denotes the normal-tangential trace of tensor-valued functions;
+\item $\gamma_{nn}\bm{E}_\kappa = \bm{n}^\top \bm{E}_\kappa \bm{n}\vert_{\partial\Omega}$ denotes the normal-normal trace  of tensor-valued functions;
+\item $\gamma_{ns}\bm{E}_\kappa = \bm{s}^\top \bm{E}_\kappa \bm{n}\vert_{\partial\Omega}$ denotes the normal-tangential trace of tensor-valued functions.
 \end{itemize}
 \end{frame}
 
@@ -424,32 +464,52 @@ Again the interconnection operator is formally skew-adjoint. The classical bound
 		\end{pmatrix}, \vspace{3pt}\\
 		\bm{u}_\partial &= \underbrace{
 			\begin{bmatrix}
-			\gamma_{0}^{\Gamma_C} & {0} & {0} & {0} \\
-			{0} & \gamma_n^{\Gamma_C} &  {0} & {0} \\
-			{0} & \gamma_s^{\Gamma_C} &  {0} & {0} \\
-			\gamma_{0}^{\Gamma_S} & {0} & {0} & {0} \\
-			{0} & \gamma_s^{\Gamma_S} & {0} & {0} \\
-			{0} &  {0} & \gamma_{nn}^{\Gamma_S} & {0} \\
-			{0} &  {0} & \gamma_{nn}^{\Gamma_F} & {0} \\
-			{0} &  {0} & \gamma_{ns}^{\Gamma_F} & {0} \\
-			{0} &  {0} & {0} & \gamma_{n}^{\Gamma_F} \\
+			\textcolor{blue}{\gamma_{0}^{\Gamma_C}} & {0} & {0} & {0} \\
+			{0} & \textcolor{blue}{\gamma_n^{\Gamma_C}} &  {0} & {0} \\
+			{0} & \textcolor{blue}{\gamma_s^{\Gamma_C}} &  {0} & {0} \\
+			\textcolor{red}{\gamma_{0}^{\Gamma_S}} & {0} & {0} & {0} \\
+			{0} & \textcolor{red}{\gamma_s^{\Gamma_S}} & {0} & {0} \\
+			{0} &  {0} & \textcolor{red}{\gamma_{nn}^{\Gamma_S}} & {0} \\
+			{0} &  {0} & \textcolor{orange}{\gamma_{nn}^{\Gamma_F}} & {0} \\
+			{0} &  {0} & \textcolor{orange}{\gamma_{ns}^{\Gamma_F}} & {0} \\
+			{0} &  {0} & {0} & \textcolor{orange}{\gamma_{n}^{\Gamma_F}} \\
 			\end{bmatrix}}_{\mathcal{B}_\partial} \begin{pmatrix}
 		e_w \\
 		\bm{e}_{\theta} \\
 		\bm{E}_{\kappa} \\
 		\bm{e}_{\gamma} \\
-		\end{pmatrix}, \qquad
-		\bm{y}_\partial = \underbrace{
+		\end{pmatrix}, 
+		\end{aligned} \quad
+		\begin{aligned}
+		\begin{pmatrix}
+		e_w \\
+		\bm{e}_{\theta} \\
+		\bm{E}_{\kappa} \\
+		\bm{e}_{\gamma} \\
+		\end{pmatrix} &= 
+		\underbrace{\begin{bmatrix}
+			\frac{1}{\rho h}  & 0 & 0  & 0 \\
+			\bm{0} & \frac{12}{\rho h^3} &  \bm{0} & \bm{0}\\
+			\bm{0} & \bm{0} & \bm{\mathcal{D}}_b  & \bm{0}\\
+			\bm{0} & \bm{0} &  \bm{0} & K_{\text{sh}} G h \\
+			\end{bmatrix}}_{\mathcal{Q}}
+		\begin{pmatrix}
+		\alpha_w \\
+		\bm\alpha_\theta \\
+		\bm{A}_\kappa \\
+		\bm\alpha_{\gamma} \\
+		\end{pmatrix}, \\
+		\bm{y}_\partial &= \underbrace{
 			\begin{bmatrix}
-			{0} & {0} & {0} & \gamma_{n}^{\Gamma_C} \\
-			{0} & {0} & \gamma_{nn}^{\Gamma_C} & {0} \\
-			{0} & {0} & \gamma_{ns}^{\Gamma_C} & {0} \\
-			{0} & {0} & {0} & \gamma_{n}^{\Gamma_S} \\
-			{0} & {0} & \gamma_{ns}^{\Gamma_S} & {0} \\
-			{0} & \gamma_{n}^{\Gamma_S} & {0} & {0} \\
-			{0} & \gamma_{n}^{\Gamma_F} & {0} & {0} \\
-			{0} & \gamma_{s}^{\Gamma_F} & {0} & {0} \\
-			\gamma_{0}^{\Gamma_F} & {0} & {0} & {0} \\
+			{0} & {0} & {0} & \textcolor{blue}{\gamma_{n}^{\Gamma_C}} \\
+			{0} & {0} & \textcolor{blue}{\gamma_{nn}^{\Gamma_C}} & {0} \\
+			{0} & {0} & \textcolor{blue}{\gamma_{ns}^{\Gamma_C}} & {0} \\
+			{0} & {0} & {0} & \textcolor{red}{\gamma_{n}^{\Gamma_S}} \\
+			{0} & {0} & \textcolor{red}{\gamma_{ns}^{\Gamma_S}} & {0} \\
+			{0} & \textcolor{red}{\gamma_{n}^{\Gamma_S}} & {0} & {0} \\
+			{0} & \textcolor{orange}{\gamma_{n}^{\Gamma_F}} & {0} & {0} \\
+			{0} & \textcolor{orange}{\gamma_{s}^{\Gamma_F}} & {0} & {0} \\
+			\textcolor{orange}{\gamma_{0}^{\Gamma_F}} & {0} & {0} & {0} \\
 			\end{bmatrix}}_{\mathcal{C}_\partial}
 		\begin{pmatrix}
 		e_w \\
@@ -465,13 +525,163 @@ Again the interconnection operator is formally skew-adjoint. The classical bound
 \begin{frame}{Kirchhoff plate classical model}
 	This model describes the bending deflection of thin plates
 	\begin{equation*}
-	\rho h \diffp[2]{w}{t} = - \div\Div \bm{M}, \qquad (x,y) \in \Omega \subset \Omega.
+	\rho h \diffp[2]{w}{t} = - \div\Div \bm{M}, \qquad (x,y) \in \Omega \subset \bbR^2.
 	\end{equation*}
 
 	As for the Mindlin plate the stress tensor is defined as 
 	$$\bm{M} = \bm{\mathcal{D}}_b \bm{\kappa}.$$
 	However, the curvature tensor is now given by the Hessian of the displacement field
 	$$\bm{\kappa} = \Grad\grad w = \Hess w.$$
+\end{frame}
+
+\begin{frame}{Kirchhoff plate boundary conditions}
+
+\begin{table}
+	\centering
+	\begin{tabular}{cc|cc}
+		\hline 
+		\multicolumn{2}{c}{Dirichlet conditions}&  \multicolumn{2}{c}{Neumann conditions} \\ 
+		\hline 
+		Vertical velocity  & $w_t$ & Effective shear force  & $\widetilde{q}_n = -\Div \bm{M} \cdot \bm{n} - \partial_{\bm{s}} (\bm{s}^\top \bm{M} \bm{n})$ \\ 
+		Flexural rotation  & $\partial_{\bm{n}} w_t $  & Flexural momentum & $M_{nn} = \bm{n}^\top\bm{M}\bm{n}$ \\  
+		\hline 
+	\end{tabular}
+\end{table}
+
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.6\textwidth]{part_2/kirchh_plate_bcs.eps}
+	\caption{Boundary conditions for the Kirchhoff plate.}
+\end{figure}
+		
+\end{frame}
+
+\begin{frame}{Energies and co-energies for the Kirchhoff plate}
+\begin{overlayarea}{\textwidth}{\textheight}
+\begin{block}{Total energy}
+	\setlength{\abovedisplayskip}{1pt}
+	\setlength{\belowdisplayskip}{1pt}
+	\begin{equation*}
+	H = \frac{1}{2} \int_{\Omega}  \left\{ \rho h \left(\partial_t {w} \right)^2 + \bm{M} \cddot \bm{\kappa}\right\}  \d\Omega, 
+	\end{equation*}
+\end{block}
+	
+\begin{block}{Energy variables}
+	\begin{equation*}
+	\alpha_w = \rho h \partial_t {w}, \quad \text{Linear momentum,} \qquad
+	\bm{A}_{\kappa} = \bm{\kappa}, \quad \text{Curvature tensor.} 
+	\end{equation*}
+\end{block}	
+
+\begin{block}{Co-energy variables}
+	\begin{equation*}
+	e_w := \diffd{H}{\alpha_w} = \partial_t {w},  \quad \text{Linear velocity,} \qquad
+	\bm{E}_{\kappa} := \diffd{H}{\bm{A}_{\kappa}} = \bm{M}, \quad \text{Momenta tensor.}
+	\end{equation*}
+\end{block}	
+	
+\end{overlayarea}	
+\end{frame}
+
+\begin{frame}{Interconnection operator and boundary variables}
+\begin{equation*}
+\diffp{}{t}
+\begin{pmatrix}
+\alpha_w \\
+\bm{A}_{\kappa} \\
+\end{pmatrix} = 
+\underbrace{\begin{bmatrix}
+0  &  - \div \circ \Div \\
+\Grad \circ \grad & \bm{0} \\
+\end{bmatrix}}_{\mathcal{J}}
+\begin{pmatrix}
+e_w \\
+\bm{E}_{\kappa} \\
+\end{pmatrix}.
+\end{equation*}
+
+\begin{theorem}
+The formal anti-adjoint of the $-\div\Div$ operator is the Hessian operator.
+\end{theorem}
+Assuming a regular boundary $\partial\Omega \in C^1$
+\begin{equation*}
+\begin{aligned}
+\dot{H}&= \int_{\Omega} \left\{ - \div\Div \bm{E}_{\kappa} \, e_w + \Grad\grad e_w \cddot \bm{E}_{\kappa} \right\} \d\Omega, \\
+&=\inner[\partial\Omega]{\gamma_{0} e_w}{\gamma_{nn, 1}\bm{E}_\kappa} + \inner[\partial\Omega]{\gamma_{1} e_w}{\gamma_{nn}\bm{E}_\kappa}.  
+\end{aligned}
+\end{equation*}
+\begin{itemize}
+	\item $\gamma_{1} e_w = \partial_{\bm{n}} e_w \vert_{\partial\Omega}$ denote the normal derivative trace;
+	\item $\gamma_{nn, 1}$ denotes the map $\gamma_{nn, 1}\bm{E}_\kappa = -\bm{n} \cdot \Div \bm{E}_\kappa - \partial_{\bm{s}} (\bm{s}^\top\bm{E}_\kappa\bm{n})\vert_{\partial\Omega}$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The Kirchhoff plate as a pH system}
+	\begin{block}{PH Kirchhoff plate}
+		\begin{equation*}
+		\begin{aligned}
+		\displaystyle
+		\diffp{}{t}
+		\begin{pmatrix}
+		\alpha_w \\
+		\bm{A}_{\kappa} \\
+		\end{pmatrix} &= 
+		\underbrace{\begin{bmatrix}
+			0  &  - \div \circ \Div \\
+			\Grad \circ \grad & \bm{0} \\
+			\end{bmatrix}}_{\mathcal{J}}
+		\begin{pmatrix}
+		e_w \\
+		\bm{E}_{\kappa} \\
+		\end{pmatrix}, \vspace{3pt}\\
+		\bm{u}_\partial &= \underbrace{
+			\begin{bmatrix}
+			\textcolor{blue}{\gamma_{0}^{\Gamma_C}} & {0}  \\
+			\textcolor{blue}{\gamma_1^{\Gamma_C}} &  {0} \\
+			\textcolor{red}{\gamma_{0}^{\Gamma_S}} &  {0}  \\
+			{0} & \textcolor{red}{\gamma_{nn}^{\Gamma_S}} \\
+			{0} & \textcolor{orange}{\gamma_{nn, 1}^{\Gamma_F}}  \\
+			{0} & \textcolor{orange}{\gamma_{nn}^{\Gamma_F}}\\
+			\end{bmatrix}}_{\mathcal{B}_\partial} \begin{pmatrix}
+		e_w \\
+		\bm{E}_{\kappa} \\
+		\end{pmatrix}, 
+		\end{aligned} \qquad
+		\begin{aligned}
+		\begin{pmatrix}
+		e_w \\
+		\bm{E}_{\kappa} \\
+		\end{pmatrix} &= 
+		\underbrace{\begin{bmatrix}
+		\frac{1}{\rho h}  &  0 \\
+		\bm{0} & \bm{\mathcal{D}}_b \\
+		\end{bmatrix}}_{\mathcal{Q}}
+		\begin{pmatrix}
+		\alpha_w \\
+		\bm{A}_{\kappa} \\
+		\end{pmatrix}, \\
+		\bm{y}_\partial &= \underbrace{
+			\begin{bmatrix}
+			{0} & \textcolor{blue}{\gamma_{nn, 1}^{\Gamma_C}} \\
+			{0} & \textcolor{blue}{\gamma_{nn}^{\Gamma_C}} \\
+			{0} & \textcolor{red}{\gamma_{nn, 1}^{\Gamma_S}} \\
+			\textcolor{red}{\gamma_{1}^{\Gamma_S}} & {0} \\
+			\textcolor{orange}{\gamma_{0}^{\Gamma_F}} & {0} \\
+			\textcolor{orange}{\gamma_{1}^{\Gamma_F}} & {0} \\
+			\end{bmatrix}}_{\mathcal{C}_\partial}
+		\begin{pmatrix}
+		e_w \\
+		\bm{E}_{\kappa} \\
+		\end{pmatrix}.
+		\end{aligned}
+		\end{equation*}
+	\end{block}
+\end{frame}
+
+\subsection{Few words on thermoelasticity}
+
+\begin{frame}{}
+	content...
 \end{frame}
 
 \begin{frame}{Structure preserving discretization}
@@ -504,6 +714,10 @@ Again the interconnection operator is formally skew-adjoint. The classical bound
 			\]
 		\end{tcolorbox}
 	\end{tcbraster}
+\end{frame}
+
+\begin{frame}{The Kirchoff plate as a pH system}
+	content...
 \end{frame}
 
 \begin{frame}{}
