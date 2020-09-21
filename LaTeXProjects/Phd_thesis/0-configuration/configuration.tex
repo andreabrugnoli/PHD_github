@@ -78,8 +78,9 @@
 
 % Lines to correct
 \usepackage{comment}
-\usepackage{lineno}
-\linenumbers
+
+%\usepackage{lineno}
+%\linenumbers
 
 % d in integral
 \makeatletter \renewcommand\d[1]{\ensuremath{%
@@ -203,7 +204,14 @@ urlcolor=theme
 \WarningFilter{minitoc(hints)}{W0028}
 \WarningFilter{minitoc(hints)}{W0030}
 
-
+% Eliminate zeros from resume
+\makeatletter
+\renewcommand{\thesection}{%
+	\ifnum\c@chapter<1 \@arabic\c@section
+	\else \thechapter.\@arabic\c@section
+	\fi
+}
+\makeatother
 % Matlab listings
 \usepackage{listings}
 \definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
