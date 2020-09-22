@@ -680,9 +680,177 @@ Assuming a regular boundary $\partial\Omega \in C^1$
 
 \subsection{Few words on thermoelasticity}
 
-\begin{frame}{}
-	content...
+\begin{frame}{The heat equation as a pHDAE}
+\begin{overlayarea}{\textwidth}{\textheight}
+Consider the heat equation
+\begin{equation*}\label{eq:heatEq}
+\rho c_\epsilon \partial_t T = k \Delta T + r_Q, \qquad \quad \bm{x} \in \Omega \subset \mathbb{R}^d,
+\end{equation*}
+\only<1>{
+\begin{itemize}
+\item $c_\epsilon$ the specific heat density at constant strain;
+\item $k$ the thermal diffusivity;
+\item $r_Q$ an heat source.
+\end{itemize}
+}
+\only<2>{
+Given the Hamiltonian
+\begin{equation*}
+H_T = \frac{1}{2} \int_\Omega \rho c_\epsilon T_0 \left(\frac{T-T_0}{T_0} \right)^2 \d\Omega,
+\end{equation*}
+the energy variable and corresponding co-energy are
+\begin{equation*}
+\alpha_T := \rho c_\epsilon (T-T_0), \qquad e_T := \delta_{\alpha_T} {H_T} ={T-T_0}/{T_0}.
+\end{equation*}
+Introducing the heat flux $\bm{j}_Q := -k \grad T$ as algebraic variable
+\begin{equation*}
+\begin{aligned}
+\begin{bmatrix}
+1 & 0 \\
+\bm{0} & \bm{0} \\
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+\alpha_T \\
+\bm{j}_Q \\
+\end{pmatrix} &= 
+\begin{bmatrix}
+0 & -\div \\
+-\grad & -(T_0 k)^{-1} \\
+\end{bmatrix}
+\begin{pmatrix}
+e_T \\
+\bm{j}_Q \\
+\end{pmatrix} + 
+\begin{bmatrix}
+1 \\
+\bm{0} \\
+\end{bmatrix} u_T, \\
+y_T &= \begin{bmatrix}
+1 & \bm{0} \\
+\end{bmatrix} \begin{pmatrix}
+e_T \\
+\bm{j}_Q \\
+\end{pmatrix}.
+\end{aligned}
+\end{equation*}
+}
+\end{overlayarea}
+
 \end{frame}
+
+\begin{frame}{Classical thermoelasticity as two interconnected systems}
+Consider again the equation of elasticity with a distributed input $\bm{u}_E$ (a distributed force)
+\begin{equation*}
+\begin{aligned}
+\diffp{}{t}
+\begin{pmatrix}
+\bm{\alpha}_v \\
+\bm{A}_{\varepsilon} \\
+\end{pmatrix} &= 
+\begin{bmatrix}
+\bm{0} & \Div \\
+\Grad & \bm{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+\bm{e}_v \\
+\bm{E}_{\varepsilon} \\
+\end{pmatrix} + 
+\begin{bmatrix}
+\bm{I}_{d\times d} \\
+\bm{0} \\
+\end{bmatrix}\bm{u}_E, \\
+\bm{y}_E &= \begin{bmatrix}
+\bm{I}_{d\times d} & \bm{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+\bm{e}_v \\
+\bm{E}_{\varepsilon}
+\end{pmatrix},
+\end{aligned}
+\end{equation*}
+and the heat equation
+\begin{equation*}
+\begin{aligned}
+\begin{bmatrix}
+1 & 0 \\
+\bm{0} & \bm{0} \\
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+\alpha_T \\
+\bm{j}_Q \\
+\end{pmatrix} &= 
+\begin{bmatrix}
+0 & -\div \\
+-\grad & -(T_0 k)^{-1} \\
+\end{bmatrix}
+\begin{pmatrix}
+e_T \\
+\bm{j}_Q \\
+\end{pmatrix} + 
+\begin{bmatrix}
+1 \\
+\bm{0} \\
+\end{bmatrix} u_T, \\
+y_T &= \begin{bmatrix}
+1 & \bm{0} \\
+\end{bmatrix} \begin{pmatrix}
+e_T \\
+\bm{j}_Q \\
+\end{pmatrix},
+\end{aligned}
+\end{equation*} 
+
+ 
+ 
+\end{frame}
+
+\begin{frame}{The interconnection}
+ Consider the  interconnection
+\begin{equation*}
+\bm{u}_E = - \Div(\bm{\mathcal{C}}_\beta \, y_T), \qquad
+u_T = - \bm{\mathcal{C}}_\beta \cddot\Grad(\bm{y}_E). 
+\end{equation*}
+The interconnection is power preserving since
+\begin{equation*}
+\bm{u}_E = \mathcal{A}_\beta(y_T), \qquad u_T = - \mathcal{A}_\beta^*(\bm{y}_E), \where  \mathcal{A}_\beta(\cdot) = - \Div(\bm{\mathcal{C}}_\beta \, \cdot).
+\end{equation*}
+\begin{block}{PH thermoelasticity}
+The coupled thermoelastic problem can now be written as
+\begin{equation*}
+\begin{bmatrix}
+\bm{1} & \bm{0} & \bm{0} & \bm{0}\\
+\bm{0} & \bm{1} & \bm{0} & \bm{0}\\
+0 & 0 & 1 & 0\\
+\bm{0} & \bm{0} & \bm{0} & \bm{0}\\
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+\bm{\alpha}_v \\
+\bm{A}_\varepsilon \\
+{\alpha}_T \\
+\bm{j}_Q \\
+\end{pmatrix} = 
+\begin{bmatrix}
+\bm{0} & \Div & \mathcal{A}_\beta & \bm{0}\\
+\Grad & \bm{0} & \bm{0} & \bm{0} \\
+- \mathcal{A}_\beta^* & 0 & 0 & -\div \\
+\bm{0} & \bm{0} & -\grad & - (T_0 k)^{-1} \\
+\end{bmatrix}
+\begin{pmatrix}
+\bm{e}_v \\
+\bm{E}_\varepsilon \\
+{e}_T \\
+\bm{j}_Q \\
+\end{pmatrix},
+\end{equation*}
+with total energy given by $H=H_E + H_T$.
+\end{block}
+
+\end{frame}
+
+\section{A structure preserving discretization method}
 
 \begin{frame}{Structure preserving discretization}
 	\begin{tcbraster}[raster columns=2, raster equal height]
@@ -745,12 +913,6 @@ Assuming a regular boundary $\partial\Omega \in C^1$
 	\end{itemize}
 \end{exampleblock}
 \end{frame}
-
-
-\section{Structure preserving discretization}
-
-\subsection{The partitioned finite element method}
-
 
 
 \begin{frame}{The partitioned finite element method (PFEM)}
