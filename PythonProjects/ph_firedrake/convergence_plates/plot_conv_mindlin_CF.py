@@ -20,7 +20,7 @@ matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{bm}"]
 
 
 path_res = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/convergence_plates/convergence_results_mindlin/"
-bc_input= "CCCC_CGDG_"
+bc_input= "CCCC_CF_Phys_"
 save_res = True
 
 coeff = 0.95

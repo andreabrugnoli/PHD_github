@@ -47,7 +47,7 @@ def animate2D(x, y, sol2D, t, xlabel = None, ylabel = None,  zlabel = None, titl
 
     lab = 'Time =' + '{0:.2e}'.format(t[0])
     plot = ax.plot_trisurf(x, y, sol2D[:, 0], label = lab, **surf_opts)
-    fig.colorbar(plot)
+    # fig.colorbar(plot)
     anim =  animation.FuncAnimation(fig, update_plot, frames=len(t), interval = 10, fargs=(sol2D, plot))
 
     return anim

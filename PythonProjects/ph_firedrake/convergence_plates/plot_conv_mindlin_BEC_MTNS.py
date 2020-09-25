@@ -20,8 +20,8 @@ matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{bm}"]
 
 
 path_res = "/home/a.brugnoli/GitProjects/PythonProjects/ph_firedrake/convergence_plates/convergence_results_mindlin/"
-bc_input= "CCCC_BEC_"
-save_res = False
+bc_input= "CCCC_BEC_Phys_"
+save_res = True
 
 coeff = 0.95
 h1_vec = np.load(path_res + bc_input + "h1.npy")

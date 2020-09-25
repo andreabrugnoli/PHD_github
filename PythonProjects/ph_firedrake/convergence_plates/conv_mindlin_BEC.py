@@ -16,17 +16,17 @@ import matplotlib.pyplot as plt
 
 matplotlib.rcParams['text.usetex'] = True
 
-bc_input = 'CCCC_BEC'
-save_res = False
+bc_input = 'CCCC_BEC_Phys'
+save_res = True
+save_fig = False
 
 def compute_err(n, r):
 
     h_mesh = 1/n
 
-    E = Constant(136 * 10**9)
+    E = Constant(7.4*10**10)
     nu = Constant(0.3)
-
-    rho = Constant(5600)
+    rho = Constant(2700)
     k = Constant(5/6)
     h = Constant(0.1)
 
@@ -257,8 +257,12 @@ def compute_err(n, r):
 
     t_vec = np.linspace(0, t_fin, num=n_t)
 
-    # param = {"ksp_type": "gmres", "ksp_gmres_restart":100, "ksp_atol":1e-30}
+    # param = {"ksp_type": "gmres", "ksp_gmres_restart":100, "pc_type": "lu"}  # try also ilu
+    # param = {"ksp_type": "cg", "pc_type": "lu"}  # try also ilu
+
     param = {"ksp_type": "preonly", "pc_type": "lu"}
+    # param = {"ksp_type": "preonly", "pc_type": "jacobi"}
+    # param = {"ksp_type": "preonly", "pc_type": "hypre", 'pc_hypre_type': 'boomeramg'}
 
     for i in range(1, n_t):
 
@@ -337,7 +341,7 @@ def compute_err(n, r):
            q_err_max, q_err_quad
 
 
-n_h = 3
+n_h = 4
 n1_vec = np.array([2**(i+2) for i in range(n_h)])
 n2_vec = np.array([2**(i+1) for i in range(n_h)])
 h1_vec = 1./n1_vec
@@ -553,7 +557,7 @@ plt.ylabel(r'log(Error Velocity)')
 plt.title(r'Velocity Error vs Mesh size')
 plt.legend()
 path_fig = "/home/a.brugnoli/Plots/Python/Plots/Mindlin_plots/Convergence/firedrake/"
-if save_res:
+if save_fig:
     plt.savefig(path_fig  + bc_input + "_vel.eps", format="eps")
 
 om_r1int_max = np.polyfit(np.log(h1_vec), np.log(om_errInf_r1), 1)[0]
@@ -604,7 +608,7 @@ plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log(Error omega)')
 plt.title(r'Omega Error vs Mesh size')
 plt.legend()
-if save_res:
+if save_fig:
     plt.savefig(path_fig + bc_input + "_om.eps", format="eps")
 
 sig_r1int_max = np.polyfit(np.log(h1_vec), np.log(sig_errInf_r1), 1)[0]
@@ -655,7 +659,7 @@ plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log(Error sigma)')
 plt.title(r'Sigma Error vs Mesh size')
 plt.legend()
-if save_res:
+if save_fig:
     plt.savefig(path_fig + bc_input + "_sig.eps", format="eps")
 
 
@@ -707,7 +711,7 @@ plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log(Error q)')
 plt.title(r'q Error vs Mesh size')
 plt.legend()
-if save_res:
+if save_fig:
     plt.savefig(path_fig + bc_input + "_q.eps", format="eps")
 
 plt.show()

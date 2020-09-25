@@ -207,7 +207,7 @@ For small deformations, the displacement within a continuum $\bm{u}$ satisfies t
 \begin{figure}
 	\centering
 	\includegraphics[height=0.5\textheight]{part_2/bc_elas2D.eps}
-	\caption{A 2D continuum with Neumann and Dirichlet boundary conditions}
+
 \end{figure}
 }
 \end{overlayarea}
@@ -958,7 +958,6 @@ with total energy given by $H=H_E + H_T$.
 
 \begin{frame}{Underlying hypotheses of PFEM}
 \only<1>{
-Wave-like equations (e.g. linear elastic models) possesses a peculiar structure that can be deduced from their primal (or classical) formulation \footfullcite{joly2003variational}.
 \begin{assumption}[Partitioned structure of the pH system]
 The pH system has the partitioned form
 \begin{align*}
@@ -986,6 +985,7 @@ The pH system has the partitioned form
 \end{align*}
 The  sets $\mathbb{A}, \mathbb{B}$ are Cartesian product of either scalar, vectorial or tensorial quantities.
 \end{assumption}
+Wave-like equations (e.g. linear elastic models) possess this structure  \footfullcite{joly2003variational}.
 }
 
 \only<2>{
@@ -1021,21 +1021,22 @@ or
 \end{frame}
 
 \begin{frame}{The partitioned finite element method (PFEM)}
-This discretization procedure boils down to three simple steps
+This discretization procedure boils down to three simple steps:
 \begin{enumerate}
-	\item The system is written in weak form; 
-	\item An integration by parts is applied to highlight the appropriate boundary control;
-	\item A Galerkin method is employed to obtain a finite-dimensional system. For the approximation basis the finite element method is here employed but spectral methods can be used as well.
+	\item \onslide<2->{The system is written in weak form;} 
+	\item \onslide<3->{An integration by parts is applied to highlight the appropriate boundary control;}
+	\item \onslide<4->{A Galerkin method is employed to obtain a finite-dimensional system. For the approximation basis the finite element method is here employed but spectral methods can be used as well.}
 \end{enumerate}
 \end{frame}
 
-\begin{frame}{The general discretized system}
+\begin{frame}{The discretized system}
+\only<1>{
 Consider the causality
 \begin{equation*}
 \bm{u}_\partial = \mathcal{N}_2 \displaystyle \bm{e}_2, \qquad  \bm{y}_\partial = \mathcal{N}_1 \displaystyle \bm{e}_1.
 \end{equation*}
-By integrating by parts  $-\mathcal{L}^*$ to obtain the appropriate causality.
-\begin{exampleblock}{Finite dimensional system}
+By integrating by parts  $-\mathcal{L}^*$ the appropriate causality is obtained for the discretized system.
+\begin{exampleblock}{Finite dimensional system for $\bm{u}_\partial = \mathcal{N}_2 \displaystyle \bm{e}_2$}
 \begin{equation*}
 \begin{aligned}
 \begin{bmatrix}
@@ -1079,23 +1080,65 @@ By integrating by parts  $-\mathcal{L}^*$ to obtain the appropriate causality.
 \end{pmatrix}.
 \end{aligned}
 \end{equation*}
-
-The matrices are defined as follows 
-\begin{equation}
-\begin{aligned}
-M_1^{ij} &= \inner[L^2(\Omega, \mathbb{A})]{\bm\phi_1^i}{\bm\phi_1^j}, \\
-M_2^{mn} &= \inner[L^2(\Omega, \mathbb{B})]{\bm\phi_2^m}{\bm\phi_2^n}, \\
-\end{aligned}\quad
-\begin{aligned}
-{D}_{\mathcal{L}}^{mi} &= \inner[L^2(\Omega, \mathbb{B})]{\bm\phi_2^m}{\mathcal{L}\bm\phi_1^i}, \\
-{B}_{1}^{ik} &= \inner[L^2(\partial \Omega, \mathbb{R}^m)]{\mathcal{N}_{\partial, 1}\bm\phi_1^i}{\bm\phi_\partial^k}, \\
-\end{aligned}\quad  
-\begin{aligned}
-M_\partial^{lk} &= \inner[L^2(\partial \Omega, \mathbb{R}^m)]{\bm\phi_\partial^l}{\bm\phi_\delta^k},
-\end{aligned}
-\end{equation}
-
 \end{exampleblock}
+}
+
+\only<2>{
+Consider the causality 
+\begin{equation*}
+\bm{u}_\partial = \mathcal{N}_1 \displaystyle \bm{e}_1, \qquad  \bm{y}_\partial = \mathcal{N}_2 \displaystyle \bm{e}_2.
+\end{equation*}
+By integrating by parts  $\mathcal{L}$ the appropriate causality is obtained for the discretized system.
+\begin{exampleblock}{Finite dimensional system for $\bm{u}_\partial = \mathcal{N}_1 \displaystyle \bm{e}_1$}
+	\begin{equation*}
+	\begin{aligned}
+	\begin{bmatrix}
+	\mathbf{M}_1 & \mathbf{0} \\
+	\mathbf{0} & \mathbf{M}_2 \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	\dot{\bm{\alpha}}_{d, 1} \\
+	\dot{\bm{\alpha}}_{d, 2} \\
+	\end{pmatrix}
+	&= \begin{bmatrix}
+	\mathbf{0} & \mathbf{D}_{-\mathcal{L}^*} \\
+	- \mathbf{D}_{-\mathcal{L}^*}^\top & \mathbf{0} \\
+	\end{bmatrix} 
+	\begin{pmatrix}
+	\mathbf{e}_{1} \\
+	\mathbf{e}_{2} \\
+	\end{pmatrix} + 
+	\begin{bmatrix}
+	\mathbf{0}\\
+	\mathbf{B}_2\\
+	\end{bmatrix}
+	\mathbf{u}_\partial, \\
+	\begin{bmatrix}
+	\mathbf{M}_1 & \mathbf{0} \\
+	\mathbf{0} & \mathbf{M}_2 \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	\mathbf{e}_{1} \\
+	\mathbf{e}_{2} \\
+	\end{pmatrix}
+	&= \begin{pmatrix}
+	\partial_{\bm{\alpha}_{d, 1}} H_d(\bm{\alpha}_d)\\
+	\partial_{\bm{\alpha}_{d, 2}} H_d(\bm{\alpha}_d)\\
+	\end{pmatrix}, \\
+	\mathbf{M}_\partial {\mathbf{y}_\partial} &= 
+	\begin{bmatrix}
+	\mathbf{0} & \mathbf{B}_2^\top 
+	\end{bmatrix}\begin{pmatrix}
+	\mathbf{e}_{1} \\
+	\mathbf{e}_{2} \\
+	\end{pmatrix}.
+	\end{aligned}
+	\end{equation*}
+\end{exampleblock}
+
+
+}
+
 
 \end{frame}
 
