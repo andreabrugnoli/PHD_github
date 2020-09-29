@@ -213,7 +213,7 @@ name_FEq = 'DG'
 Vp = FunctionSpace(mesh, name_FEp, 5)
 Vq = VectorFunctionSpace(mesh, name_FEq, 3, dim=3)
 
-V =Vp*Vq
+V = Vp * Vq
 n_Vp = Vp.dim()
 n_Vq = Vq.dim()
 
@@ -268,7 +268,7 @@ n = FacetNormal(mesh)
 V_qn = FunctionSpace(mesh, 'CG', 1)
 V_Mnn = FunctionSpace(mesh, 'CG', 1)
 
-Vu = V_qn * V_Mnns
+Vu = V_qn * V_Mnn
 q_n, M_nn = TrialFunction(Vu)
 
 v_omn = dot(grad(v_p), n)

@@ -13,6 +13,7 @@
 \usepackage[most]{tcolorbox}
 
 \usepackage{xspace}
+\usepackage{appendixnumberbeamer}
 
 %\usepackage{multimedia}
 \usepackage{media9}
@@ -124,6 +125,7 @@ Modelling and structure preserving finite element discretization}
 \end{equation*}
 \end{block}
 
+\only<2>{
 They have been used for simulating and controlling a variety of applications:
 \begin{multicols}{2}
 	\begin{itemize}
@@ -135,6 +137,7 @@ They have been used for simulating and controlling a variety of applications:
 		\item {fluid-structure interactions.}
 	\end{itemize}
 \end{multicols}
+}
 
 \end{frame}
 
@@ -336,7 +339,7 @@ The derivation of the Hamiltonian system relies on few simple steps
 \item The resulting dynamics is regulated by a formally skew-adjoint operator $\mathcal{J}$;
 \item The boundary variables are found thanks to the Stokes theorem
 \[
-\int_{\Omega} \left\{\bm{e}_v \cdot \Div \bm{E}_\varepsilon + \bm{E}_\varepsilon \cddot \Grad \bm{e}_v \right\}\d\Omega = \inner[\partial\Omega]{\bm{e}_v}{\bm{E}_\varepsilon\bm{n}}.
+\int_{\Omega} \left\{\bm{e}_v \cdot \Div \bm{E}_\varepsilon + \bm{E}_\varepsilon \cddot \Grad \bm{e}_v \right\}\d\Omega = \inner[\partial\Omega]{\bm{\gamma}_0\bm{e}_v}{\bm{\gamma_n}\bm{E}_\varepsilon}.
 \]
 \end{enumerate}
 
@@ -822,7 +825,7 @@ Assume that there exists  two boundary operators $\mathcal{N}_{\partial, 1}, \; 
 \begin{equation*}
 \inner[L^2(\Omega, \mathbb{B})]{\bm{e}_2}{\mathcal{L}\,\bm{e}_1} - \inner[L^2(\Omega, \mathbb{A})]{\mathcal{L}^* \, \bm{e}_2}{\bm{e}_1} = \inner[\partial \Omega]{\mathcal{N}_{\partial, 1} \bm{e}_1}{\mathcal{N}_{\partial, 2} \bm{e}_2}. 
 \end{equation*}
-where $\inner[\partial \Omega]{\cdot}{\cdot}$ denotes an appropriate duality pairing (\textit{e.g.} $H^{1/2}(\partial\Omega) \times H^{-1/2}(\partial\Omega)$).
+where $\inner[\partial \Omega]{\cdot}{\cdot}$ denotes an appropriate duality pairing.
 \end{assumption}
 
 \begin{assumption}[Uniform causality condition]
@@ -1075,9 +1078,8 @@ The corresponding output reads
 	\end{equation*}
 \end{frame}
 
-\begin{frame}{Simulation settings and results}
+\begin{frame}{Discretization strategy}
 
-\only<1>{
 Given the Neumann control, the $\div$ operator is integrated by parts to highlight the appropriate control.
 \begin{table}[th]
 	\centering
@@ -1096,13 +1098,13 @@ Given the Neumann control, the $\div$ operator is integrated by parts to highlig
 		\multicolumn{2}{|c|}{Simulation Settings} \\
 		\hline 
 		Integrator & Runge-Kutta 45 \\
-		N$^\circ$ FE along $R$ & 20 \\
-		N$_{\text{dof}}^\circ$ & 3973 \\
+		N$_{\text{dof}}^\circ$ & $3973$ \\
 		FE spaces & ($\alpha_h\approx$ CG$_1$) $\times$ ($\bm{\alpha}_v\approx$ DG$_0$) $\times$ ($u_\partial\approx$ DG$_0$)\\
 		$t_{\text{end}}$ & $3\; \mathrm{[s]}$\\ 
 		\hline 
 	\end{tabular} 
 \end{table}
+\vspace{.5cm}
 Control parameter
 \begin{equation*}
 k = 
@@ -1112,9 +1114,11 @@ k =
 \end{cases}
 \end{equation*}
 		
-}	
+\end{frame}
 
-\only<2>{
+\begin{frame}{Results irrotational SWE}
+
+\only<1>{
 \begin{center}
 	\includemedia[
 	label=vidDam,
@@ -1133,9 +1137,7 @@ k =
 \end{center}
 }
 	
-
-
-\only<3>{
+\only<2>{
 \begin{center}
 \includegraphics[width=0.48\textwidth]{part_3/applications/bs_SWE/Hamiltonian.eps}
 \includegraphics[width=0.48\textwidth]{part_3/applications/bs_SWE/Lyapunov.eps}
@@ -1307,7 +1309,7 @@ The operator $\mathcal{N}_{\partial, *}^{\Gamma_\circ}$ with $*, \circ \in \{1, 
 \end{frame}
 
 \begin{frame}{Lagrange multiplier method}
-A Lagrange multiplier can be introduced to include the input that does not explicitly appear in the weak formulation. 
+A Lagrange multiplier can be introduced to include the input that does not explicitly appear in the weak formulation, i;e. to enforce the essential boundary condition. 
 \only<1>{
 \begin{block}{Integration by parts of $-\mathcal{L}^*$ ($\bm\lambda=\bm{u}_{\partial, 1}$) }
 \begin{equation*}
@@ -1421,6 +1423,216 @@ A Lagrange multiplier can be introduced to include the input that does not expli
 
 \end{frame}
 
+\begin{frame}{Example: cantilever Kirchhoff plate}
+
+\begin{equation*}
+\begin{bmatrix}
+\rho h & 0 \\ 
+\bm{0} & \bm{\mathcal{D}_b}^{-1} \\
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+e_w \\ \bm{E}_\kappa \\
+\end{pmatrix} = 
+\begin{bmatrix}
+0 & -\div\Div \\ 
+\Hess & \bm{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+e_w \\ \bm{E}_\kappa \\
+\end{pmatrix} \qquad (x, y) \in \Omega = [0, 1]\times[0,1],
+\end{equation*}
+subject to Dirichlet homogeneous conditions and Neumann boundary control
+\begin{align*}
+\begin{aligned}
+\partial_t e_w|_{\Gamma_D} &= 0, \\
+\partial_x e_w|_{\Gamma_D} &= 0, \\
+\end{aligned} \qquad {\Gamma_D} = \left\{x = 0 \right\}, \qquad
+\begin{aligned}
+u_{\partial, q} & = \widetilde{q}_n|_{\Gamma_N},\\
+u_{\partial, m} &= M_{nn}|_{\Gamma_N}.\\
+\end{aligned} \qquad {\Gamma_N} = \left\{y = 0 \cup x=1 \cup y=1 \right\}.
+\end{align*}
+
+\begin{columns}
+	\begin{column}{.5\textwidth}
+		The corresponding boundary outputs read
+		\begin{equation*}
+		\begin{aligned}
+		y_{\partial, q} &= e_w|_{\Gamma_N}, \\
+		y_{\partial, m} &=\partial_{\bm{n}} e_w|_{\Gamma_N}.
+		\end{aligned}
+		\end{equation*}
+	\end{column}
+
+	\begin{column}{.5\textwidth}
+		\begin{figure}[b]
+			\centering
+			\includegraphics[width=0.9\columnwidth]{part_3/applications/bs_Kirchh/plate_controlled.eps}
+		\end{figure}
+	\end{column}
+\end{columns}
+
+\end{frame}
+
+\begin{frame}{Example: cantilever Kirchhoff plate}
+The initial conditions (compatible with the constraints) are given by
+\[
+e_w(x,y,0) = x^2 y (y-1), \qquad \bm{E}_\kappa(x,y,0) ={0}.
+\]
+The following control law asymptotically stabilizes the system\footfullcite{lagnese1989}
+\begin{equation*}
+\begin{aligned}
+u_{\partial, q} & = - k y_{\partial, q} = - k_q e_w|_{\Gamma_N}, \\
+u_{\partial, m} & = - k y_{\partial, m} = - k_m \partial_{\bm{n}} e_w|_{\Gamma_N}, \\
+\end{aligned} \qquad k_q>0.
+\end{equation*}
+
+\end{frame}
+
+\begin{frame}{Discretization strategy}
+
+The $\Hess$ operator is integrated by parts twice to enforce weekly the Neumann conditions. The Dirichlet condition is imposed weakly through a Lagrange multiplier. 
+
+\begin{table}[t]
+	\centering
+	\begin{tabular}{|c|c|}
+		\hline 
+		\multicolumn{2}{|c|}{Plate Parameters} \\ 
+		\hline 
+		$E$ & $70\; \mathrm{[GPa]}$ \\ 
+		$\rho$ & $2700\; \mathrm{[kg \cdot m^3]}$ \\ 
+		$\nu$& $0.35$ \\ 
+		$h/L$& $0.05$ \\ 
+		$L_x = L_y$& $1\; \mathrm{[m]}$\\ 
+		\hline 
+	\end{tabular} \hspace{.1cm}
+	\begin{tabular}{|c|c|}
+		\hline 
+		\multicolumn{2}{|c|}{Simulation Settings} \\
+		\hline 
+		Integrator & St\"ormer-Verlet \\
+		$\Delta t $ & $1 \; \mathrm{[\mu s]}$ \\  
+		N$_{\text{dof}}^\circ$ & $2574$ \\
+		FE spaces & ($e_w \approx $ Argyris) $\times$ ($\bm{E}_\kappa \approx$ DG$_3$) $\times$ ($\bm{\lambda} \approx$ CG$_2$)\\
+		$t_{\text{end}}$ & $5\; \mathrm{[s]}$\\ 
+		\hline 
+	\end{tabular} 
+\end{table}
+	\vspace{.5cm}
+	Control parameter 
+	\begin{equation*}
+	k_* = 
+	\begin{cases}
+	0, \quad &\forall t < 1 \, [\mathrm{s}], \\
+	10, \quad &\forall t \ge 1 \, [\mathrm{s}].
+	\end{cases}
+	\end{equation*}
+
+	
+\end{frame}
+
+\begin{frame}{Results cantilever Kirchoff plate}
+\only<1>{
+\begin{center}
+\includemedia[
+label=vidDam,
+addresource=/home/a.brugnoli/Videos_defense/Kirchh_Damped_3s.mp4,
+activate=pageopen,
+width=10cm, height=5cm,
+flashvars={
+	source=/home/a.brugnoli/Videos_defense/Kirchh_Damped_3s.mp4
+	&loop=true
+}
+]{}{VPlayer.swf}
+
+\mediabutton[
+mediacommand=vidDam:playPause,
+]{\fbox{Play/Pause}}
+\end{center}
+}
+\only<2>{
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=0.7\textwidth]{part_3/applications/bs_Kirchh/Hamiltonian.eps}
+\end{figure}
+}
+%\movie[width=0.42\textwidth, height = 0.7 \textheight]{Damped Kirchhoff Plate}{../Videos/Kirchh_Damped_4faster.mp4}
+\end{frame}
+
+
+\begin{frame}{Virtual domain decomposition}
+The idea is based on the fact that a mixed boundary conditions problem can be split into two problems with uniform causality. The two systems are then appropriately interconnected.
+
+\begin{figure}[b]
+	\begin{minipage}[b]{0.4\linewidth}
+		\centering
+		\includegraphics[width=0.95\textwidth]{part_3/pfem/dom_part.eps}
+		\caption{Splitting of the domain.}
+	\end{minipage}
+	\hspace{0.5cm}
+	\begin{minipage}[b]{0.55\linewidth}
+		\centering
+		\includegraphics[width=0.95\textwidth]{part_3/pfem/dom_part_int.eps}
+		\caption{Interconnection at the interface $\Gamma_{12}$.}
+	\end{minipage}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Core idea}
+For $\Omega_1$ subdomain, we set
+
+\begin{equation*} 
+\begin{pmatrix}
+\bm{u}_{\partial, 1}\\
+\textcolor{blue}{\bm{u}_{\partial, 1}^{\Gamma_{12}}}\\
+\end{pmatrix} = \begin{bmatrix}
+\mathcal{N}_{\partial, 1}^{\Gamma_1} & 0\\
+\mathcal{N}_{\partial, 1}^{\Gamma_{12}} & 0 \\
+\end{bmatrix} \begin{pmatrix}
+\bm{e}_1 \\ \bm{e}_2
+\end{pmatrix}, \qquad
+\begin{pmatrix}
+\bm{y}_{\partial, 1}\\
+\textcolor{red}{\bm{y}_{\partial, 1}^{\Gamma_{12}}} \\
+\end{pmatrix} = \begin{bmatrix}
+0 & \mathcal{N}_{\partial, 2}^{\Gamma_1} \\
+0 & \mathcal{N}_{\partial, 2}^{\Gamma_{12}} \\
+\end{bmatrix} \begin{pmatrix}
+\bm{e}_1 \\ \bm{e}_2
+\end{pmatrix},
+\end{equation*}
+whereas for the $\Omega_2$ subdomain
+\begin{equation*}
+\begin{pmatrix}
+\bm{u}_{\partial, 2}\\
+\textcolor{red}{\bm{u}_{\partial, 2}^{\Gamma_{12}}}\\
+\end{pmatrix} = \begin{bmatrix}
+0 & \mathcal{N}_{\partial, 2}^{\Gamma_2}\\
+0 & \mathcal{N}_{\partial, 2}^{\Gamma_{12}} \\
+\end{bmatrix} \begin{pmatrix}
+\bm{e}_1 \\ \bm{e}_2
+\end{pmatrix}, \qquad
+\begin{pmatrix}
+\bm{y}_{\partial, 2}\\
+\textcolor{blue}{\bm{y}_{\partial, 2}^{\Gamma_{12}}}\\
+\end{pmatrix} = \begin{bmatrix}
+\mathcal{N}_{\partial, 1}^{\Gamma_1} & 0 \\
+\mathcal{N}_{\partial, 1}^{\Gamma_{12}}  & 0 \\
+\end{bmatrix} \begin{pmatrix}
+\bm{e}_1 \\ \bm{e}_2
+\end{pmatrix}.
+\end{equation*}
+The following relations then hold
+\begin{equation*}
+\textcolor{blue}{\bm{u}_{\partial, 1}^{\Gamma_{12}}} =\pm \textcolor{blue}{\bm{y}_{\partial, 2}^{\Gamma_{12}}}, \qquad \textcolor{red}{\bm{u}_{\partial, 2}^{\Gamma_{12}}} = \mp \textcolor{red}{\bm{y}_{\partial, 1}^{\Gamma_{12}}}.
+\end{equation*}
+The plus or minus sign is due to the fact that either $\mathcal{N}_{\partial, 1}^{\Gamma_{12}}$ or $\mathcal{N}_{\partial, 2}^{\Gamma_{12}}$ contains a scalar product with the outgoing normal (or the tangent unit vector) at ${\Gamma_{12}}$ (that has opposite direction depending on which subdomain is considered).
+\end{frame}
+
+\section{PH flexible multibody dynamics}
+
 \begin{frame}{Results}
 \begin{center}
 	\onslide*<1>{
@@ -1471,145 +1683,17 @@ A Lagrange multiplier can be introduced to include the input that does not expli
 \end{center}
 \end{frame}
 
-\section{Stabilization by boundary injection}
 
-\begin{frame}{Boundary stabilization of the Kirchhoff plate}
-\only<1>{Consider the problem
-	\begin{equation*}\small
-	\begin{bmatrix}
-	\rho h & 0 \\ 0 & \mathbb{D}^{-1} \\
-	\end{bmatrix}
-	\diffp{}{t}
-	\begin{bmatrix}
-	\partial_t w \\ \bm{M} \\
-	\end{bmatrix} = 
-	\begin{bmatrix}
-	0 & -\div\Div \\ \nabla^2 & 0 \\
-	\end{bmatrix}
-	\begin{bmatrix}
-	\partial_t w \\ \bm{M} \\
-	\end{bmatrix} \quad (x, y) \in \Omega = [0, 1]\times[0,1]
-	\end{equation*}
-	subjected to the following boundary conditions
-	\begin{align*}
-	\begin{aligned}
-	\partial_t w|\textcolor{blue}{\Gamma_D} &= 0, \\
-	\partial_x \partial_t w|\textcolor{blue}{\Gamma_D} &= 0, \\
-	\end{aligned} \qquad \textcolor{blue}{\Gamma_D} &= \left\{x = 0 \right\}\\
-	\begin{aligned}
-	{M}_{nn}|\textcolor{red}{\Gamma_N} &= u_M, \; \\
-	\widetilde{q}|\textcolor{red}{\Gamma_N} &= u_F,\\
-	\end{aligned} \qquad \textcolor{red}{\Gamma_N} &= \left\{y = 0 \cup x=1 \cup y=1 \right\}
-	\end{align*}
-	
-	with initial conditions (compatible with the constraints):
-	\[
-	\partial_t w(x,y,0) = x^2; \qquad \bm{M}(x,y,0) ={0}.
-	\]
-}
-\only<2>{ Obtain a finite-dimensional uncontrolled system
-	\begin{equation*}
-	\begin{aligned}
-	\begin{bmatrix}
-	{M} & {0} \\
-	{0} & {0} \\
-	\end{bmatrix}\frac{d}{d t}
-	\begin{pmatrix}
-	\bm{e}\\
-	\bm{\lambda} \\
-	\end{pmatrix}
-	&= \begin{bmatrix}
-	{J} & {G} \\
-	-{G}^T & {0} \\
-	\end{bmatrix}
-	\begin{pmatrix}
-	\bm{e} \\
-	\bm{\lambda} \\
-	\end{pmatrix} + \begin{bmatrix}
-	{B} \\
-	0 \\
-	\end{bmatrix} \bm{u}, \\
-	{y} &= \begin{bmatrix}
-	{B}^T & {0} \\
-	\end{bmatrix} \begin{pmatrix}
-	\bm{e}\\
-	\bm{\lambda} \\
-	\end{pmatrix},
-	\end{aligned} 
-	\end{equation*}
-	Apply the control law $\bm{u} = -K\bm{y}, \ K>0$
-	\begin{equation*}
-	\begin{bmatrix}
-	M & {0} \\
-	{0} & {0} \\
-	\end{bmatrix}
-	\frac{d}{d t}
-	\begin{pmatrix}
-	\bm{e}\\
-	\bm{\lambda} \\
-	\end{pmatrix}
-	= \begin{bmatrix}
-	{J} - {R} & {G} \\
-	-{G}^T & {0} \\
-	\end{bmatrix}
-	\begin{pmatrix}
-	\bm{e}\\
-	\bm{\lambda} \\
-	\end{pmatrix},
-	\end{equation*}
-	with ${R} = {B} {K} {B}^T \succeq 0$. \\
-	The Hamiltonian $\dot{H} = - \bm{e}^T R \bm{e} \le 0$ is a non increasing function and by La~Salle principle the equilibrium point $\bm{e} = 0$ is asymptotically stable.	
-}
 
-\end{frame}
 
-\begin{frame}
-\begin{center}
-	\only<1>{Control parameter ($t_{\text{end}} = 5 [\mathrm{s}]$)
-		\begin{equation*}
-		K = 
-		\begin{cases}
-		0, \quad &\forall t < 1 \, [\mathrm{s}], \\
-		100, \quad &\forall t \ge 1 \, [\mathrm{s}].
-		\end{cases}
-		\end{equation*}
-		\vspace{.1cm} \\
-		\includemedia[
-		label=vidDam,
-		addresource=/home/a.brugnoli/Videos_defense/Kirchh_Damped.mp4,
-		activate=pageopen,
-		width=10cm, height=5cm,
-		flashvars={
-			source=/home/a.brugnoli/Videos_defense/Kirchh_Damped.mp4
-			&loop=true
-		}
-		]{}{VPlayer.swf}
-		
-		\mediabutton[
-		mediacommand=vidDam:playPause,
-		]{\fbox{Play/Pause}}
-		
-		%\movie[width=0.42\textwidth, height = 0.7 \textheight]{Damped Kirchhoff Plate}{../Videos/Kirchh_Damped_4faster.mp4}			
-	}
-
-\end{center}
-\end{frame}
 
 \begin{frame}{Conclusion}
-The following has been presented:
-	\begin{itemize}
-	\onslide<2->{\item the Kirchhoff plate model as a port Hamiltonian system;}
-	\onslide<3->{\item a structure preserving discretization method capable of dealing with generic bcs;}
-	\onslide<4->{\item interconnection with rigid elements (multibody framework);}
-		\onslide<5->{\item a simple control application by damping injection;}
-	\end{itemize}
-	\onslide<6->{Still no rigorous proof of convergence for the finite elements. Existing solutions (only for static problems):}
-	\begin{itemize}
-		\onslide<7->{\item The Hellan-Herrmann-Johnson  method, but difficulties when dealing with inhomogeneous bcs;}
-		\onslide<8->{\item New discretization method capable that handles inhomogeneous bcs.}
-	\end{itemize}
+
 \end{frame}
 
+\begin{frame}{Future developments}
+	content...
+\end{frame}
 
 \begin{frame}{}
 \centering
@@ -1618,7 +1702,9 @@ The following has been presented:
 \end{frame}
 
 
-\subsection{Few words on thermoelasticity}
+\appendix
+
+\section{Few words on thermoelasticity}
 
 \begin{frame}{The heat equation as a pHDAE}
 \begin{overlayarea}{\textwidth}{\textheight}
