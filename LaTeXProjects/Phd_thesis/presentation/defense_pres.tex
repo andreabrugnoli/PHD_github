@@ -5,6 +5,7 @@
 \usepackage{color}
 \definecolor{theme}{RGB}{0,73,114}
 \usepackage{multicol}
+\usepackage[caption=false]{subfig}
 
 \usepackage{graphicx}
 \usepackage{diffcoeff}
@@ -200,9 +201,9 @@ For small deformations, the displacement within a continuum $\bm{u}$ satisfies t
 \only<1>{
 \begin{itemize}
 \item $\rho$ mass density;
-\item $\bm{\mathcal{D}}(\cdot) = \frac{E}{1 + \nu} \left[(\cdot) + \frac{\nu}{1-2\nu}\Tr(\cdot) \bm{I} \right]$ the stiffness tensor;
+\item $\bm{\mathcal{D}}(\cdot) = \frac{E}{1 + \nu} \left[(\cdot) + \frac{\nu}{1-2\nu}\Tr(\cdot) \bm{I} \right]$ the stiffness tensor (symmetric and positive);
 \item $\Grad \bm{u} = \frac{1}{2}\left[\nabla\bm{u} + \nabla^\top\bm{u} \right]$ the symmetric gradient;
-\item $\bm{\Sigma} = \bm{\mathcal{D}} \bm{\varepsilon}, \; \bm{\varepsilon} = \Grad \bm{u}$ the stress and strain tensors;
+\item $\bm{\Sigma} = \bm{\mathcal{D}} \bm{\varepsilon}, \; \bm{\varepsilon} = \Grad \bm{u}$ the stress and strain symmetric tensors;
 \item $\Div \bm{\Sigma} = \left(\sum_{i=1}^d \diffp{\Sigma_{ij}}{x_i}\right)_{1\le j\le d }$ the tensor divergence.
 \end{itemize}
 }
@@ -220,7 +221,7 @@ For small deformations, the displacement within a continuum $\bm{u}$ satisfies t
 \begin{overlayarea}{\textwidth}{\textheight}
 	To derive a pH formulation, the total energy is needed
 	\begin{equation*}
-	H = \energy{\rho \norm{\partial_t \bm{u}}^2 + \bm{\Sigma} \cddot \bm{\varepsilon}}, \qquad \bm{A} \cddot \bm{B} \quad \text{Tensor contraction}.
+	H = \energy{\rho \norm{\partial_t \bm{u}}^2 + \bm{\Sigma} \cddot \bm{\varepsilon}}, \qquad \bm{A} \cddot \bm{B} = \Tr(\bm{A}^\top \bm{B}) \quad \text{Tensor contraction}.
 	\end{equation*}
 	\onslide<2->{
 	Consider the energy variables
@@ -1483,16 +1484,16 @@ e_w(x,y,0) = x^2 y (y-1), \qquad \bm{E}_\kappa(x,y,0) ={0}.
 The following control law asymptotically stabilizes the system\footfullcite{lagnese1989}
 \begin{equation*}
 \begin{aligned}
-u_{\partial, q} & = - k y_{\partial, q} = - k_q e_w|_{\Gamma_N}, \\
-u_{\partial, m} & = - k y_{\partial, m} = - k_m \partial_{\bm{n}} e_w|_{\Gamma_N}, \\
-\end{aligned} \qquad k_q>0.
+u_{\partial, q} & = - k y_{\partial, q} = - k e_w|_{\Gamma_N}, \\
+u_{\partial, m} & = - k y_{\partial, m} = - k \partial_{\bm{n}} e_w|_{\Gamma_N}, \\
+\end{aligned} \qquad k>0.
 \end{equation*}
 
 \end{frame}
 
 \begin{frame}{Discretization strategy}
 
-The $\Hess$ operator is integrated by parts twice to enforce weekly the Neumann conditions. The Dirichlet condition is imposed weakly through a Lagrange multiplier. 
+The $\Hess$ operator is integrated by parts twice to enforce weekly the Neumann conditions. The Dirichlet condition is imposed weakly through a Lagrange multiplier (strong imposition of boundary conditions for $H^2$ conforming elements is not trivial \footfullcite{kirby2019}). 
 
 \begin{table}[t]
 	\centering
@@ -1631,6 +1632,119 @@ The following relations then hold
 The plus or minus sign is due to the fact that either $\mathcal{N}_{\partial, 1}^{\Gamma_{12}}$ or $\mathcal{N}_{\partial, 2}^{\Gamma_{12}}$ contains a scalar product with the outgoing normal (or the tangent unit vector) at ${\Gamma_{12}}$ (that has opposite direction depending on which subdomain is considered).
 \end{frame}
 
+\subsection{Convergence study: the Mindlin plate example}
+
+
+\begin{frame}{The Mindlin plate under clamped boundary conditions}
+
+\begin{equation*}
+	\begin{bmatrix}
+	\rho h  & 0  & 0  & 0 \\
+	\bm{0} & I_\theta &  \bm{0} & \bm{0}\\
+	\bm{0}  & \bm{0}  & \bm{\mathcal{C}}_b  & \bm{0}\\
+	\bm{0} & \bm{0} &  \bm{0} & C_s \\
+	\end{bmatrix}
+	\diffp{}{t}
+	\begin{pmatrix}
+	e_w \\
+	\bm{e}_\theta \\
+	\bm{E}_\kappa \\
+	\bm{e}_{\gamma} \\
+	\end{pmatrix} = 
+	\begin{bmatrix}
+	0  & 0  & 0  & \div \\
+	\bm{0} & \bm{0} &  \Div & \bm{I}_{2 \times 2}\\
+	\bm{0}  & \Grad  & \bm{0}  & \bm{0}\\
+	\grad & -\bm{I}_{2 \times 2} &  \bm{0} & \bm{0} \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	e_w \\
+	\bm{e}_{\theta} \\
+	\bm{E}_{\kappa} \\
+	\bm{e}_{\gamma} \\
+	\end{pmatrix}, \qquad
+	\begin{aligned}
+	{e}_w\vert_{\partial\Omega} &= 0, \\
+	\bm{e}_\theta\vert_{\partial\Omega} &= \bm{0}.
+	\end{aligned}	
+\end{equation*}
+where $I_\theta$ is the rotary inertia, $\bm{C}_b, \; C_s$ are the bending and shear compliance compliance respectively.
+
+For this example, the $\mathcal{L}, \; \mathcal{N}_{\partial, 1}, \; \mathcal{N}_{\partial, 2}$ operators are given by
+\begin{equation*}
+\mathcal{L} = \begin{bmatrix}
+\bm{0} & \Grad\\
+\grad & -\bm{I}_{2 \times 2}\\
+\end{bmatrix}, \qquad
+-\mathcal{L}^* = \begin{bmatrix}
+\bm{0} & \div\\
+\Div & \bm{I}_{2 \times 2}\\
+\end{bmatrix}, \qquad
+\mathcal{N}_{\partial, 1} = \begin{bmatrix}
+\gamma_0 & 0 \\ 
+0 &  \bm\gamma_0\\
+\end{bmatrix}, \qquad 
+\mathcal{N}_{\partial, 2} = \begin{bmatrix}
+0 & \gamma_{n}  \\
+\bm\gamma_n & 0 \\
+\end{bmatrix}.
+\end{equation*}
+
+\end{frame}
+
+\begin{frame}{Mixed discretization}
+After integrating by parts $\mathcal{L}$, the following weak form is obtained. Find
+$$\{e_w, \bm{e}_{\bm{\theta}}, \bm{E}_{\kappa}, \bm{e}_{\gamma}\} \in L^2(\Omega) \times L^2(\Omega, \mathbb{V}) \times H^{\Div}(\Omega, \mathbb{S}) \times H^{\div}(\Omega, \mathbb{V})$$
+so that 
+\begin{equation*}
+\begin{aligned}
+\inner[L^2(\Omega)]{v_w}{\rho b \partial_t {e}_w} &= \inner[L^2(\Omega)]{v_w}{\div \bm{e}_\gamma} + (v_w, f), \\ 
+\inner[L^2(\Omega, \mathbb{V})]{\bm{v}_\theta}{I_\theta \partial_t {\bm{e}}_\theta} &= \inner[L^2(\Omega, \mathbb{V})]{\bm{v}_\theta}{\Div \bm{E}_\kappa + \bm{e}_\gamma} + \inner[L^2(\Omega, \mathbb{V})]{\bm{v}_\theta}{\bm{\tau}}, \\  
+\inner[L^2(\Omega, \mathbb{S})]{\bm{V}_\kappa}{\bm{\mathcal{C}}_{b} \partial_t{\bm{E}}_\kappa} &= -\inner[L^2(\Omega, \mathbb{S})]{\Div \bm{V}_\kappa}{\bm{e}_\theta}, \\ 
+\inner[L^2(\Omega, \mathbb{V})]{\bm{v}_\gamma}{C_s \partial_t{\bm{e}}_\gamma} &= -\inner[L^2(\Omega)]{\mathrm{div} \bm{v}_\gamma}{e_w} + \inner[L^2(\Omega, \mathbb{V})]{\bm{v}_\gamma}{\bm{e}_{\theta}}, \\ 
+\end{aligned} \qquad
+\begin{aligned}
+\forall\; v_w &\in L^2(\Omega), \\
+\forall\; \bm{v}_\theta &\in L^2(\Omega, \bbR^2), \\
+\forall\; \bm{V}_\kappa &\in H^{\Div}(\Omega, \bbR^{2\times 2}_{\text{sym}}), \\
+\forall\; \bm{v}_\gamma &\in H^{\div}(\Omega, \bbR^2).
+\end{aligned}
+\end{equation*}
+
+The clamped condition is a natural one in this setting.
+\end{frame}
+
+\begin{frame}{The BTJ element}
+For this case, a simple element is the one proposed in Becaché 2001 \footfullcite{becache2001elas}. This element is constructed as a tensor product on interval elements. \\
+
+\begin{block}{BJT element}
+\only<1>{
+Let $\mathcal{R}_h$ be a regular mesh with square elements $Q$. The following spaces are introduced as discretization spaces
+\begin{equation*}
+\label{eq:BTJ}
+\begin{aligned}
+L_{h, \text{BJT}}^2(\Omega) &= \{w_h \in L^2(\Omega) | \ \forall Q \in \mathcal{R}_h, \ w_h|_{Q} \in \mathrm{DG}_{k-1} \}, \\
+L_{h, \text{BJT}}^2(\Omega, \bbR^2) &= \{\bm{\theta}_h \in L^2(\Omega, \bbR^2) | \ \forall Q \in \mathcal{R}_h,\ \bm{\theta}_h|_{Q} \in (\mathrm{DG}_{k-1})^2 \}, \\
+H_{h, \text{BJT}}^{\Div}(\Omega, \bbR^{2\times 2}_{\text{sym}}) &= \{m_{12} \in H^1(\Omega)| \ \forall Q \in \mathcal{R}_h,\ m_{12}|_{Q} \in \mathrm{CG}_{k} \}  \\
+&\cup \{(m_{11}, m_{22}) \in H^{\div}(\Omega, \bbR^2)| \; \forall Q\in \mathcal{R}_h,\ (m_{11}, m_{22})|_{Q} \in \mathrm{BDM}_{k} \}, \\
+H_{h, \text{BJT}}^{\div}(\Omega, \bbR^2) &= \{\bm{q}_h \in H^{\div}(\Omega, \bbR^2) | \ \forall Q\in \mathcal{R}_h,\ \bm{q}_h|_{Q} \in \mathrm{BDM}_{k} \}, \\ 
+\end{aligned}
+\end{equation*}
+where $\mathrm{BDM}$ are the Brezzi-Douglas-Marini elements.
+}
+
+\only<2>{
+\begin{figure}
+\centering
+\includegraphics[width=0.95\textwidth]{presentation/fe_BJT.eps}
+\caption{Lowest order BJT element.}
+\end{figure}
+
+}
+\end{block}
+
+\end{frame}
+
 \section{PH flexible multibody dynamics}
 
 \begin{frame}{Results}
@@ -1702,7 +1816,14 @@ The plus or minus sign is due to the fact that either $\mathcal{N}_{\partial, 1}
 \end{frame}
 
 
+
 \appendix
+
+\begin{frame}
+\end{frame}
+
+\begin{frame}
+\end{frame}
 
 \section{Few words on thermoelasticity}
 
@@ -1873,6 +1994,528 @@ with total energy given by $H=H_E + H_T$.
 \end{block}
 
 \end{frame}
+
+\section{Vibroacoustic under mixed boundary conditions}
+
+\begin{frame}{Model description}
+\begin{overlayarea}{\textwidth}{\textheight}
+	Model for the propagation of sound in air
+	\begin{equation*}
+	\diffp{}{t}
+	\begin{bmatrix}
+	\chi_s p \\
+	\mu_0 \bm{v} \\
+	\end{bmatrix} = -
+	\begin{bmatrix}
+	0 & \mathrm{div} \\
+	\mathrm{grad} & 0 \\
+	\end{bmatrix}
+	\begin{bmatrix}
+	p \\
+	\bm{v} \\
+	\end{bmatrix}, \qquad \text{on } \Omega = \{x \in [0, L],\; r \in [0, R],\; \theta = [0, 2 \pi)\}.
+	\end{equation*}
+	\only<1>{
+		\begin{itemize}
+			\item $p \in \mathbb{R}$  and $\bm{v} \in \mathbb{R}^3$: variations of pressure and velocity from a steady state;
+			\item $\mu_0$: the steady state mass density;
+			\item $\chi_s$: adiabatic compressibility factor;
+			\item $x, r, \theta$: axial, radial and tangential coordinates.
+		\end{itemize}
+	}
+	\only<2>{
+		\begin{columns}[T]
+			\setlength{\abovedisplayskip}{3pt}
+			\setlength{\belowdisplayskip}{3pt}
+			\begin{column}{.45\textwidth}
+				Boundary conditions
+				\begin{align*}
+				p(x, R, \theta) &= - \mathcal{Z}(x, t) \, v_r(x, R, \theta), \\
+				\bm{v} \cdot \bm{n}(0, r, \theta) &= -v_x(0, r, \theta) = - f(r), \\
+				\bm{v} \cdot \bm{n}(L, r, \theta) &= +v_x(L, r, \theta) = + f(r), 
+				\end{align*}
+			\end{column}
+			\begin{column}{.45\textwidth}
+				Initial conditions
+				\begin{equation*}
+				\begin{aligned}
+				p^0(x, r, \theta) &= 0, \\
+				v_x^0(x, r, \theta) &= f(r), 
+				\end{aligned}  \qquad
+				\begin{aligned}
+				v_r^0(x, r, \theta) &= g(r), \\
+				v_\theta^0(x, r, \theta) &= 0.
+				\end{aligned}    
+				\end{equation*}
+			\end{column}
+		\end{columns}
+		\vspace{5pt}
+		The impedance $\mathcal{Z}$ and the axial $f(r)$ and radial flow $g(r)$ expressions are the following
+		\begin{equation*}
+		\begin{aligned}
+		\mathcal{Z}(x, t) = \mathds{1}\left\{ \frac{1}{3} L \leq \ x \ \leq \frac{2}{3} L, \,  t \geq 0.2 \ t_{\text{fin}} \right\} \mu_0 \, c_0, \\
+		f(r) = \left( 1 - \frac{r^2}{R^2} \right) v_0, \qquad
+		g(r) = 16 \frac{r^2}{R^4} \left( R - r \right)^2 v_0. 
+		\end{aligned}
+		\end{equation*}
+	}
+	\only<3>{
+		\centering
+		\vspace{2cm}
+		\includegraphics[width=0.8\textwidth]{part_3/applications/mixed_bd_waves/bc_3D_sketch.eps}	
+	}
+\end{overlayarea}
+\end{frame}
+
+
+
+\begin{frame}{Model reduction by symmetry}
+\begin{overlayarea}{\textwidth}{\textheight}
+
+Because of symmetry the model can be reduced to a 2D problem 
+\begin{equation*}
+\diffp{}{t}
+\begin{bmatrix}
+\chi_s p \\
+\mu_0 v_x \\
+\mu_0 v_r \\
+\end{bmatrix} = -
+\begin{bmatrix}
+0 & \partial_x & \partial_r + 1/r \\
+\partial_x & 0 & 0 \\
+\partial_r & 0 & 0 \\
+\end{bmatrix}
+\begin{bmatrix}
+p \\
+v_x \\
+v_r \\
+\end{bmatrix}, \quad \text{on } \Omega_{\text{r}} = \{x \in [0, L], r \in [0, R]\}.
+\end{equation*}
+\only<2>{
+	The boundary conditions must now account for the symmetry condition at $r=0$
+	\begin{align*}
+	p(x, R, \theta) &= - \mathcal{Z}(x, t) \, v_r(x, R, \theta), \\
+	\bm{v} \cdot \bm{n}(0, r, \theta) &= -v_x(0, r, \theta) = - f(r), \\
+	\bm{v} \cdot \bm{n}(L, r, \theta) &= +v_x(L, r, \theta) = + f(r), \\
+	\bm{v}\cdot \bm{n}(x, 0) &= v_r(x, 0) =0
+	\end{align*}	
+}
+\only<3>{
+	\centering
+	\includegraphics[width=0.7\textwidth]{part_3/applications/mixed_bd_waves/bc_2D_sketch.eps}	
+}
+\end{overlayarea}
+\end{frame}
+
+\subsection{Finite dimensional discretization}
+
+\begin{frame}{Mixed boundary condition}
+To tackle mixed boundary conditions two approaches are developed:
+\begin{itemize}
+\item a Lagrange multiplier based method;
+\item a virtual domain decomposition method.
+\end{itemize} 	
+\begin{figure}[b]%
+\centering
+\includegraphics[width=0.4\columnwidth]{presentation/vibroacoustic_boundary_part.eps} \\
+\caption[bcpart]{Boundary partition for the problem.}
+\end{figure}
+\end{frame}
+
+
+\subsubsection{Lagrange multiplier approach}
+
+
+
+\begin{frame}{DAE discretized system}
+
+Integrating by parts the $\div$ operator, the Neumann condition becomes a natural one, whereas the Dirichlet is an essential one.
+\begin{equation*}
+\begin{aligned}
+\begin{bmatrix}
+\mathbf{M}_{\chi_s} & \mathbf{0} & \mathbf{0}\\
+\mathbf{0} & \mathbf{M}_{\mu_0} & \mathbf{0} \\
+\mathbf{0} & \mathbf{0} & \mathbf{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\mathbf{e}}_p\\
+\dot{\mathbf{e}}_v\\
+\dot{\bm{\lambda}}_D \\
+\end{pmatrix}
+&= \begin{bmatrix}
+\mathbf{0} & \mathbf{D}_{\grad}^\top & \mathbf{B}_{p, \Gamma_D}\\
+-\mathbf{D}_{\grad} & \mathbf{0} & \mathbf{0} \\
+-\mathbf{B}_{p, \Gamma_D}^\top & \mathbf{0} & \mathbf{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+{\mathbf{e}}_p\\
+{\mathbf{e}}_v\\
+{\bm{\lambda}}_D \\
+\end{pmatrix} + \begin{bmatrix}
+\mathbf{B}_{p, \Gamma_N} & \mathbf{0}\\
+\mathbf{0}& \mathbf{0}\\
+\mathbf{0} & \mathbf{M}_{\Gamma_D} \\
+\end{bmatrix}
+\begin{pmatrix}
+\mathbf{u}_N \\
+\mathbf{u}_D \\
+\end{pmatrix}, \\
+\begin{bmatrix}
+\mathbf{M}_{\Gamma_N} & \mathbf{0} \\
+\mathbf{0} & \mathbf{M}_{\Gamma_D} \\
+\end{bmatrix}
+\begin{pmatrix}
+\mathbf{y}_N \\
+\mathbf{y}_D \\
+\end{pmatrix} &=
+\begin{bmatrix}
+\mathbf{B}_{p, \Gamma_D}^\top & \mathbf{0} & \mathbf{0}\\ 
+\mathbf{0} & \mathbf{0} & \mathbf{M}_{\Gamma_D} \\ 
+\end{bmatrix}
+\begin{pmatrix}
+{\mathbf{e}}_p\\
+{\mathbf{e}}_v\\
+{\bm{\lambda}}_D \\
+\end{pmatrix}.
+\end{aligned}
+\end{equation*}
+
+\end{frame}
+
+\begin{frame}{Imposition of the boundary conditions}
+The discretization of the boundary condition provides
+\[ u_D=-\mathcal{Z}\lambda_D=-\mathcal{Z}y_D \longrightarrow \mathbf{M}_{\Gamma_D} \mathbf{u}_D = - \mathbf{M}_{\Gamma_D, \mathcal{Z}} {\mathbf{y}}_D.
+\]
+$\mathbf{M}_{\Gamma_D, \mathcal{Z}}$ is associated to the weighted inner product $\inner[\Gamma_D]{v_D}{\mathcal{Z} y_D}$. The Neumann boundary condition is imposed by projection on the $u_N$ space.   
+
+\begin{block}{Vibroacoustic (Lagrange multiplier)}
+\begin{equation*}
+\begin{bmatrix}
+\mathbf{M}_{\chi_s} & \mathbf{0} & \mathbf{0}\\
+\mathbf{0} & \mathbf{M}_{\mu_0} & \mathbf{0} \\
+\mathbf{0} & \mathbf{0} & \mathbf{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\mathbf{e}}_p\\
+\dot{\mathbf{e}}_v\\
+\dot{\bm{\lambda}}_D \\
+\end{pmatrix}
+= \begin{bmatrix}
+\mathbf{0} & \mathbf{D}_{\grad}^\top & \mathbf{B}_{p, \Gamma_D}\\
+-\mathbf{D}_{\grad} & \mathbf{0} & \mathbf{0} \\
+-\mathbf{B}_{p, \Gamma_D}^\top & \mathbf{0} & -\mathbf{M}_{\Gamma_D, \mathcal{Z}} \\
+\end{bmatrix}
+\begin{pmatrix}
+{\mathbf{e}}_p\\
+{\mathbf{e}}_v\\
+{\bm{\lambda}}_D \\
+\end{pmatrix} + \begin{pmatrix}
+\mathbf{b}_N \\
+\mathbf{0}\\
+\mathbf{0}\\
+\end{pmatrix}.
+\end{equation*}
+\end{block}
+
+
+
+\end{frame}
+
+\subsubsection{Virtual domain decomposition}
+
+\begin{frame}{Decomposition of the domain}
+First of all the domain has to be decomposed. \\
+
+The interface between the two subdomain is chosen to get regular meshes on both subdomains.
+\begin{figure}[t]%
+\centering
+\includegraphics[width=0.5\columnwidth]{part_3/applications/mixed_bd_waves/dom_split.eps} \\
+\caption{Virtual decomposition of the domain.}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Discretized subsystems}
+
+\begin{tcolorbox}[colframe=blue,title=Subdomain $\Omega_D$ (I.B.P. $\grad$),  coltitle=white]%%
+	\setlength{\abovedisplayskip}{1pt}
+	\setlength{\belowdisplayskip}{1pt}
+	\begin{equation*}
+	\hspace*{-0.3cm}
+	\begin{aligned}
+	\begin{bmatrix}
+	\mathbf{M}_{\chi_s}^{\Omega_D} & \mathbf{0} \\
+	\mathbf{0} & \mathbf{M}_{\mu_0}^{\Omega_D} \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	\dot{\mathbf{e}}_{p, \Omega_D} \\
+	\dot{\mathbf{e}}_{v, \Omega_D} \\
+	\end{pmatrix}
+	&= \begin{bmatrix}
+	\mathbf{0} & -\mathbf{D}_{\div}^{\Omega_D}\\
+	\mathbf{D}_{\div}^{\Omega_D \top} & \mathbf{0}\\
+	\end{bmatrix}
+	\begin{pmatrix}
+	{\mathbf{e}}_{p, \Omega_D}\\
+	{\mathbf{e}}_{v, \Omega_D}\\
+	\end{pmatrix} + \begin{bmatrix}
+	\mathbf{0} & \mathbf{0}\\
+	\mathbf{B}_{v, \Gamma_{D}}^{\Omega_D} & \mathbf{B}_{v, \Gamma_{\text{int}}}^{\Omega_D}\\
+	\end{bmatrix}
+	\begin{pmatrix}
+	\mathbf{u}_D \\
+	\mathbf{u}_D^{\text{int}}
+	\end{pmatrix}, \\
+	\begin{bmatrix}
+	\mathbf{M}_{\Gamma_D} & \mathbf{0} \\
+	\mathbf{0} & \mathbf{M}_{\Gamma_{\text{int}}} \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	\mathbf{y}_D \\
+	\mathbf{y}_D^{\text{int}}
+	\end{pmatrix} &=
+	\begin{bmatrix}
+	\mathbf{0} & \mathbf{B}_{v, \Gamma_{D}}^{\Omega_D \top} \\ 
+	\mathbf{0} & \mathbf{B}_{v, \Gamma_{\text{int}}}^{\Omega_D \top} \\ 
+	\end{bmatrix}
+	\begin{pmatrix}
+	{\mathbf{e}}_{p, \Omega_D} \\
+	{\mathbf{e}}_{v, \Omega_D} \\
+	\end{pmatrix}.
+	\end{aligned}	
+	\end{equation*}
+\end{tcolorbox} 
+\begin{tcolorbox}[colframe=red,title=Subdomain $\Omega_N$ (I.B.P. $\div$), coltitle=white]%%
+	\setlength{\abovedisplayskip}{1pt}
+	\setlength{\belowdisplayskip}{1pt}
+	\begin{equation*}
+	\hspace*{-0.3cm}
+	\begin{aligned}
+	\begin{bmatrix}
+	\mathbf{M}_{\chi_s}^{\Omega_N} & \mathbf{0} \\
+	\mathbf{0} & \mathbf{M}_{\mu_0}^{\Omega_N} \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	\dot{\mathbf{e}}_{p, \Omega_N} \\
+	\dot{\mathbf{e}}_{v, \Omega_N} \\
+	\end{pmatrix}
+	&= \begin{bmatrix}
+	\mathbf{0} & \mathbf{D}_{\grad}^{\Omega_N \top}\\
+	-\mathbf{D}_{\grad}^{\Omega_N} & \mathbf{0}\\
+	\end{bmatrix}
+	\begin{pmatrix}
+	{\mathbf{e}}_{p, \Omega_N}\\
+	{\mathbf{e}}_{v, \Omega_N}\\
+	\end{pmatrix} + \begin{bmatrix}
+	\mathbf{B}_{v, \Gamma_{N}}^{\Omega_N} & \mathbf{B}_{v, \Gamma_{\text{int}}}^{\Omega_N}\\
+	\mathbf{0} & \mathbf{0}\\
+	\end{bmatrix}
+	\begin{pmatrix}
+	\mathbf{u}_N \\
+	\mathbf{u}_N^{\text{int}}
+	\end{pmatrix}, \\
+	\begin{bmatrix}
+	\mathbf{M}_{\Gamma_N} & \mathbf{0} \\
+	\mathbf{0} & \mathbf{M}_{\Gamma_{\text{int}}} \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	\mathbf{y}_N \\
+	\mathbf{y}_N^{\text{int}}
+	\end{pmatrix} &=
+	\begin{bmatrix}
+	\mathbf{B}_{v, \Gamma_{N}}^{\Omega_N \top} & \mathbf{0} \\ 
+	\mathbf{B}_{v, \Gamma_{\text{int}}}^{\Omega_N \top} & \mathbf{0}\\ 
+	\end{bmatrix}
+	\begin{pmatrix}
+	{\mathbf{e}}_{p, \Omega_N} \\
+	{\mathbf{e}}_{v, \Omega_N} \\
+	\end{pmatrix}.
+	\end{aligned}
+	\end{equation*}
+\end{tcolorbox}
+\end{frame}
+
+
+\begin{frame}{Power preserving interconnection}
+Considering that the pressure field is continuous at $\Gamma_{\text{int}}$ and that the outward normal verifies $\bm{n}_D \vert_{\Gamma_{\text{int}}}= - \bm{n}_N \vert_{\Gamma_{\text{int}}}$, the correct interconnection reads 
+\begin{equation*}
+\mathbf{u}_N^{\text{int}} = - \mathbf{y}_D^{\text{int}}, \qquad
+\mathbf{u}_D^{\text{int}} = \mathbf{y}_N^{\text{int}}.
+\end{equation*}
+
+The actual boundary conditions can then be applied leading to the final system.
+
+\begin{block}{Vibroacoustic (Virtual domain decomposition)}
+\setlength{\abovedisplayskip}{1pt}
+\setlength{\belowdisplayskip}{1pt}
+\begin{equation*}
+\begin{bmatrix}
+\mathbf{M}_{\Omega_D} & \mathbf{0} \\
+\mathbf{0} & \mathbf{M}_{\Omega_N} \\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\mathbf{e}}_{\Omega_D} \\
+\dot{\mathbf{e}}_{\Omega_N} \\
+\end{pmatrix}
+= \begin{bmatrix}
+\mathbf{J}_{\Omega_D} - \mathbf{R}_{\Omega_D}  & \mathbf{C}\\
+-\mathbf{C}^\top & \mathbf{J}_{\Omega_N} \\
+\end{bmatrix} 
+\begin{pmatrix}
+{\mathbf{e}}_{\Omega_D} \\
+{\mathbf{e}}_{\Omega_N} \\
+\end{pmatrix} + 
+\begin{pmatrix}
+\mathbf{0}\\
+\mathbf{b}_{\Gamma_N}^{\Omega_N}\\
+\end{pmatrix},
+\end{equation*}
+where 
+\[\mathbf{C} = \mathbf{B}_{\Gamma_{\text{int}}}^{\Omega_D} \mathbf{M}_{\Gamma_{\text{int}}}^{-1} \mathbf{B}_{\Gamma_{\text{int}}}^{\Omega_N \top}\]
+is the coupling matrix and
+\[
+\mathbf{R}_{\Omega_D} = \mathbf{B}_{\Gamma_D}^{\Omega_D} \mathbf{M}_{\Gamma_D}^{-1} \mathbf{M}_{\Gamma_D, \mathcal{Z}} \mathbf{M}_{\Gamma_D}^{-1} \mathbf{B}_{\Gamma_D}^{\Omega_D \top}
+\]
+is the dissipation matrix.
+\end{block}
+
+\end{frame}
+
+\subsection{Results}
+
+\begin{frame}{Physical interpretation of the impedance}
+The energy accounts for the pressure and velocity contribution
+\[
+H_p = \frac{1}{2} \int \chi_s p^2 \d{\Omega}_r  \approx \frac{1}{2} \mathbf{p}^T \mathbf{M}_p \mathbf{p}, \qquad H_v = \frac{1}{2} \int \mu_0 \, ||\mathbf{v}||^2 \d{\Omega}_r \approx \frac{1}{2} \mathbf{v}^T \mathbf{M}_v \mathbf{v}, \]
+The total energy at the initial time is the kinetic energy only
+\[
+H_v^0 = H_{vx}^0 + H_{vr}^0 = \frac{1}{2} \int_{0}^L\int_{0}^R  \mu_0 \left[(v_x^0)^2 + (v_r^0)^2 \right] \ r \d{r}\d{x}.
+\]
+The numerical values of the energy contribution are 
+\[H_v^0 = 0.453 [J], \ \; H_{vx}^0 = 0.204 [J], \ \; H_{vr}^0 = 0.249 [J].\]
+The impedance acts by dissipating the radial component of the velocity 
+\begin{equation*}
+\lim_{t \rightarrow \infty} H_{vr} \rightarrow 0, \qquad \lim_{t \rightarrow \infty} H_v \rightarrow H_{vx}^0 = 0.204 [J]
+\end{equation*}
+\end{frame}
+
+\begin{frame}{Finite element choice}
+\only<1>{
+\begin{tcolorbox}[title = Pressure field approximation, colframe=green, coltitle=black]
+The pressure $\phi_p(x, r)$ is interpolated using order~1 Lagrange polynomials.
+\end{tcolorbox}
+\begin{tcolorbox}[title = Velocity field approximation, colframe=orange, coltitle=black]
+The velocity field $\bm{\phi}_v(x, r)$ is interpolated using order~2 Raviart-Thomas polynomials.
+\end{tcolorbox}
+\begin{tcolorbox}[title = Boundary variables approximation, colframe=violet, coltitle=white]
+The boundary variables ${\phi}_\Gamma(s)$ are approximated by Lagrange polynomial of order~1 defined on the boundary $\Gamma_D$ (for $\lambda_D, u_D, y_D$) or $\Gamma_N$ (for $u_N, y_N$).
+\end{tcolorbox}
+}
+\only<2>{
+\centering
+\includegraphics[width=0.9\columnwidth]{presentation/vibroacoustic_fe_sketch.eps}
+}
+
+\end{frame}
+
+\begin{frame}[fragile]{Results}
+
+\onslide*<1>{
+\begin{figure}[ht]%
+\centering
+\subfloat[][DAE system.]{%
+\label{fig:Htrend_dae}%
+\includegraphics[width=0.48\columnwidth]{part_3/applications/mixed_bd_waves/Hdae_all.eps}}%
+\hspace{8pt}%
+\subfloat[][ODE system.]{%
+\label{fig:Htrend_ode}%
+\includegraphics[width=0.48\columnwidth]{part_3/applications/mixed_bd_waves/Hode_all.eps}} \\
+\caption[]{Hamiltonian trend for different mesh size.}%
+\end{figure}
+}
+\onslide*<2>{
+\begin{figure}[ht]%
+\centering
+\subfloat[][Reference Hamiltonian.]{%
+\label{fig:Hdae15}%
+\includegraphics[width=0.48\columnwidth]{part_3/applications/mixed_bd_waves/Href.eps}}%
+\hspace{8pt}%
+\subfloat[][$L^2$ Hamiltonian error.]{%
+\label{fig:Hdiff}%
+\includegraphics[width=0.48\columnwidth]{part_3/applications/mixed_bd_waves/Hall_diff.eps}} \\
+\caption[]{Reference Hamiltonian and $L^2$ error.}%
+\label{fig:Href_err}%
+\end{figure}
+}
+\onslide*<3>{
+\begin{figure}[ht]%
+\centering
+\subfloat[][$L^2$ pressure error.]{%
+\label{fig:p_err}%
+\includegraphics[width=0.48\columnwidth]{part_3/applications/mixed_bd_waves/err_ep.eps}}%
+\hspace{8pt}%
+\subfloat[][$L^2$ velocity error.]{%
+\label{fig:v_err}%
+\includegraphics[width=0.48\columnwidth]{part_3/applications/mixed_bd_waves/err_eq.eps}} \\
+\caption[]{Error on the state variables for different mesh size.}%
+\label{fig:error_x}%
+\end{figure}
+}
+
+\begin{center}
+	\onslide*<4>{
+		\begin{columns}
+			\begin{column}{.3\textwidth}
+				\includemedia[
+				label=vidNoRod,
+				addresource=/home/a.brugnoli/Videos_defense/wave_dae15.mp4,
+				activate=pageopen,
+				width=4cm, height=5cm,
+				flashvars={
+					source=/home/a.brugnoli/Videos_defense/wave_dae15.mp4
+					&loop=true
+				}
+				]{}{VPlayer.swf}
+				Reference solution
+			\end{column}		
+			\begin{column}{.3\textwidth}
+				\includemedia[
+				label=vidNoRod,
+				addresource=/home/a.brugnoli/Videos_defense/wave_dae10.mp4,
+				activate=pageopen,
+				width=4cm, height=5cm,
+				flashvars={
+					source=/home/a.brugnoli/Videos_defense/wave_dae10.mp4
+					&loop=true
+				}
+				]{}{VPlayer.swf}
+				DAE $h = L/10$
+			\end{column}
+			\begin{column}{.3\textwidth}
+				\includemedia[
+				label=vidRod,
+				addresource=/home/a.brugnoli/Videos_defense/wave_ode10.mp4,
+				activate=pageopen,
+				width=4cm, height=5cm,
+				flashvars={
+					source=/home/a.brugnoli/Videos_defense/wave_ode10.mp4
+					&loop=true
+				}
+				]{}{VPlayer.swf}
+				ODE $h = L/10$
+			\end{column}
+		\end{columns}	
+		\mediabutton[
+		mediacommand=vidNoRod:playPause,
+		mediacommand=vidRod:playPause
+		]{\fbox{Play/Pause}}	
+	}
+\end{center}
+
+
+\end{frame}
+
+
+
 
 
 \end{document}
