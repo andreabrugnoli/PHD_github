@@ -371,10 +371,10 @@ $$\{e_w, \bm{e}_{\bm{\theta}}, \bm{E}_{\kappa}, \bm{e}_{\gamma}\} \in H^{1}(\Ome
 so that 
 \begin{equation}\label{eq:weak_min_grad_nobd}
 \begin{aligned}
-\inner[L^2(\Omega)]{v_w}{\rho h \partial_t e_w} &= -\inner[L^2(\Omega, \mathbb{R}^{2})]{\grad v_w}{\bm{e}_\gamma}, \\
-\inner[L^2(\Omega, \mathbb{R}^{2})]{\bm{v}_\theta}{I_\theta \partial_t \bm{e}_\theta} &= -\inner[L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}})]{\Grad \bm{v}_\theta}{\bm{E}_\kappa} + \inner[L^2(\Omega)]{\bm{v}_\theta}{\bm{e}_\gamma}, \\
-\inner[L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}})]{\bm{V}_\kappa}{\bm{\mathcal{C}_b} \partial_t \bm{E}_\kappa} &= \inner[L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}})]{\bm{V}_\kappa}{\Grad \bm{e}_\theta}, \\
-\inner[L^2(\Omega, \mathbb{R}^{2})]{\bm{v}_\gamma}{C_s \partial_t \bm{e}_\gamma} &= \inner[L^2(\Omega, \mathbb{R}^{2})]{\bm{v}_\gamma}{\grad e_w} - \inner[L^2(\Omega, \mathbb{R}^{2})]{\bm{v}_\gamma}{\bm{e}_\theta}, \\
+\inner[L^2(\Omega)]{v_w}{\rho h \partial_t e_w} &= -\inner[L^2(\Omega, \mathbb{V})]{\grad v_w}{\bm{e}_\gamma}, \\
+\inner[L^2(\Omega, \mathbb{V})]{\bm{v}_\theta}{I_\theta \partial_t \bm{e}_\theta} &= -\inner[L^2(\Omega, \mathbb{S})]{\Grad \bm{v}_\theta}{\bm{E}_\kappa} + \inner[L^2(\Omega)]{\bm{v}_\theta}{\bm{e}_\gamma}, \\
+\inner[L^2(\Omega, \mathbb{S})]{\bm{V}_\kappa}{\bm{\mathcal{C}_b} \partial_t \bm{E}_\kappa} &= \inner[L^2(\Omega, \mathbb{S})]{\bm{V}_\kappa}{\Grad \bm{e}_\theta}, \\
+\inner[L^2(\Omega, \mathbb{V})]{\bm{v}_\gamma}{C_s \partial_t \bm{e}_\gamma} &= \inner[L^2(\Omega, \mathbb{V})]{\bm{v}_\gamma}{\grad e_w} - \inner[L^2(\Omega, \mathbb{V})]{\bm{v}_\gamma}{\bm{e}_\theta}, \\
 \end{aligned} \qquad
 \begin{aligned}
 \forall\; v_w &\in H^{1}(\Omega), \\
@@ -388,9 +388,9 @@ Consider a regular triangulation $\mathcal{T}_h$ with elements $T$. The followin
 \begin{equation}\label{eq:CGDG}
 \begin{aligned}
 H_{h, \text{CGDG}}^{1}(\Omega) &= \{w_h \in H^1(\Omega) \vert \ \forall T \in \mathcal{T}_h, \ w_h|_{T} \in \mathrm{CG}_{k} \}, \\
-H_{h, \text{CGDG}}^{\Grad}(\Omega, \bbR^2) &= \{ \bm{\theta}_h \in H^{\Grad}(\Omega, \bbR^2) \vert \ \forall T \in \mathcal{T}_h,\ \bm{\theta}_h|_{T} \in (\mathrm{CG}_{k})^2 \}, \\
+H_{h, \text{CGDG}}^{\Grad}(\Omega, \mathbb{V}) &= \{ \bm{\theta}_h \in H^{\Grad}(\Omega, \mathbb{V}) \vert \ \forall T \in \mathcal{T}_h,\ \bm{\theta}_h|_{T} \in (\mathrm{CG}_{k})^2 \}, \\
 L_{h, \text{CGDG}}^2(\Omega, \mathbb{S}) &= \{ \bm{M}_h \in L^2(\Omega, \mathbb{S}) \vert \ \forall T \in \mathcal{T}_h, \bm{M}_h|_{T} \in (\mathrm{DG}_{k-1})^{2 \times 2}_{\text{sym}} \}, \\
-L_{h, \text{CGDG}}^2(\Omega, \bbR^2) &= \{\bm{q}_h \in L^2(\Omega, \bbR^2)  \vert \ \forall T \in \mathcal{T}_h,\ \bm{q}_h|_{T} \in (\mathrm{DG}_{k-1})^{2} \}. \\
+L_{h, \text{CGDG}}^2(\Omega, \mathbb{V}) &= \{\bm{q}_h \in L^2(\Omega, \mathbb{V})  \vert \ \forall T \in \mathcal{T}_h,\ \bm{q}_h|_{T} \in (\mathrm{DG}_{k-1})^{2} \}. \\
 \end{aligned}
 \end{equation}
 To approximate spaces $H_h^{1}(\Omega), \; H_h^{\Grad}(\Omega, \bbR^2)$ Lagrange polynomials of order $k$ are selected. For spaces $L_h^2(\Omega, \mathbb{S}), \; L_h^2(\Omega, \bbR^2)$ Discontinous Galerkin polynomials of order $k-1$ are employed. This selection of finite elements can be seen as a standard discretization of the problem combined with a reduced integration of the stress tensor and shear vector. For this reason, the following conjecture on the error estimates can be proposed. 
@@ -402,11 +402,11 @@ To approximate spaces $H_h^{1}(\Omega), \; H_h^{\Grad}(\Omega, \bbR^2)$ Lagrange
 	\label{eq:errCGDG}
 	\begin{aligned}
 	||e_w - e_w^h||_{L^{\infty}(H^1(\Omega))} &\lesssim h^{k}, \\
-	||\bm{e}_\theta - \bm{e}_\theta^h||_{L^{\infty}(H^{\Grad}(\Omega, \bbR^2))} &\lesssim h^{k}, \\
+	||\bm{e}_\theta - \bm{e}_\theta^h||_{L^{\infty}(H^{\Grad}(\Omega, \mathbb{V}))} &\lesssim h^{k}, \\
 	\end{aligned} \qquad
 	\begin{aligned}
-	||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty}(L^2(\Omega))} &\lesssim  h^{k}, \\
-	||\bm{e}_\gamma - \bm{e}_\gamma^ h||_{L^{\infty}(L^2(\Omega, \mathbb{S}))} &\lesssim  h^{k}. \\
+	||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty}(L^2(\Omega, \mathbb{S}))} &\lesssim  h^{k}, \\
+	||\bm{e}_\gamma - \bm{e}_\gamma^ h||_{L^{\infty}(L^2(\Omega, \mathbb{V}))} &\lesssim  h^{k}. \\
 	\end{aligned} 
 	\end{equation}
 	
@@ -419,8 +419,8 @@ $$\{e_w,\bm{E}_{\kappa}\} \in H^{2}(\Omega) \times L^2(\Omega, \mathbb{S}) $$
 so that 
 \begin{equation}\label{eq:weak_kir_Hess_nobd}
 \begin{aligned}
-\inner[L^2(\Omega)]{v_w}{\rho h \partial_t e_w} &= -\inner[L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}})]{\Hess v_w}{\bm{E}_\kappa}, \\
-\inner[L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}})]{\bm{V}_\kappa}{\bm{\mathcal{C}_b} \partial_t \bm{V}_\kappa} &= \inner[L^2(\Omega, \mathbb{R}^{2\times 2}_{\text{sym}})]{\bm{V}_\kappa}{\Hess e_w}. \\
+\inner[L^2(\Omega)]{v_w}{\rho h \partial_t e_w} &= -\inner[L^2(\Omega, \mathbb{S})]{\Hess v_w}{\bm{E}_\kappa}, \\
+\inner[L^2(\Omega, \mathbb{R}^{S})]{\bm{V}_\kappa}{\bm{\mathcal{C}_b} \partial_t \bm{V}_\kappa} &= \inner[L^2(\Omega, \mathbb{S})]{\bm{V}_\kappa}{\Hess e_w}. \\
 \end{aligned} \qquad
 \begin{aligned}
 \forall \; v_w &\in H^2(\Omega), \\
@@ -440,7 +440,7 @@ L_{h, \mathrm{BellDG3}}^2(\Omega, \mathbb{S}) &= \{ \bm{M}_h \in L^2(\Omega, \ma
 where Bell stands for the Bell element \cite{bell1969}. No conjectured error estimates are proposed to this problem. As it will be shown in \secref{sec:numtest_kir}, the results obtained with this elements are of difficult interpretation.
 
 \begin{remark}\label{rmk:BellArg}
-	Thanks to a general approach for transforming finite elements \cite{kirby2018general}, $H^2$-conforming elements have been implemented in the {\sc{Firedrake}} library. 	Therefore, for the discretization of the $H^2$-space, the Argyris element \cite{argyris1968} is another valuable possibility.  Unfortunately, the strong imposition of boundary conditions is not possible in {\sc{Firedrake}} at the present time \cite[Sec. 3.2]{kirby2019}. Because of the simpler structure and ordering of its degrees of freedom, the Bell element has been privileged over the Argyris one for the convergence study. In Chapter~\ref{ch:applications} the Argyris element will be employed imposing the boundary conditions weakly.
+	Thanks to a general approach for transforming finite elements \cite{kirby2018general}, $H^2$-conforming elements have been implemented in the {\sc{Firedrake}} library. 	Therefore, for the discretization of the $H^2$-space, the Argyris element \cite{argyris1968} is another valuable possibility.  Unfortunately, the strong imposition of boundary conditions for $H^2$ conforming elements is not possible in {\sc{Firedrake}} at the present time \cite[Sec. 3.2]{kirby2019}. Because of the simpler structure and ordering of its degrees of freedom, the Bell element has been privileged over the Argyris one for the convergence study. In Chapter~\ref{ch:applications} the Argyris element will be employed imposing the boundary conditions weakly.
 \end{remark}
 
 \section{Numerical experiments}

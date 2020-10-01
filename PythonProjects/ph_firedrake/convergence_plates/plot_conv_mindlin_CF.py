@@ -192,7 +192,7 @@ plt.plot(np.log(h2_vec), np.log(h2_vec**3) + coeff*(np.log(v_errInf_r3)[-1] - np
 
 plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log($||e_w - e_w^h||_{L^\infty H^1}$)')
-plt.title(r'$e_w$ error (CF element)')
+plt.title(r'$e_w$ error (CG element)')
 plt.legend()
 path_fig = "/home/a.brugnoli/Plots/Python/Plots/Mindlin_plots/Convergence/firedrake/"
 if save_res:
@@ -247,7 +247,7 @@ plt.plot(np.log(h2_vec), np.log(h2_vec**3) + coeff*(np.log(om_errInf_r3)[-1] - n
 
 plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log($||\bm{e}_\theta - \bm{e}_\theta^h||_{L^\infty H^{\mathrm{Grad}}}$)')
-plt.title(r'$\bm{e}_\theta$ error (CF element)')
+plt.title(r'$\bm{e}_\theta$ error (CG element)')
 plt.legend()
 if save_res:
     plt.savefig(path_fig + bc_input + "_om.eps", format="eps")
@@ -301,7 +301,7 @@ plt.plot(np.log(h2_vec), np.log(h2_vec**3) + coeff*(np.log(sig_errInf_r3)[-1] - 
 
 plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log($||\bm{E}_{\kappa} - \bm{E}_{\kappa}^h||_{L^\infty L^2}$)')
-plt.title(r'$\bm{E}_\kappa$ error (CF element)')
+plt.title(r'$\bm{E}_\kappa$ error (CG element)')
 plt.legend()
 if save_res:
     plt.savefig(path_fig + bc_input + "_sig.eps", format="eps")
@@ -356,7 +356,7 @@ plt.plot(np.log(h2_vec), np.log(h2_vec**3) + coeff*(np.log(q_errInf_r3)[-1] - np
 
 plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log($||\bm{e}_{\gamma} - \bm{e}_{\gamma}^h||_{L^\infty L^2}$)')
-plt.title(r'$\bm{e}_\gamma$ error (CF element)')
+plt.title(r'$\bm{e}_\gamma$ error (CG element)')
 plt.legend()
 if save_res:
     plt.savefig(path_fig + bc_input + "_q.eps", format="eps")
