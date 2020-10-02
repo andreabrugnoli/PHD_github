@@ -2762,6 +2762,8 @@ Open problems and possible developments:
 
 \section{Thermoelasticity}
 
+\subsection{General 3D thermoelasticity as coupled pH systems}
+
 \begin{frame}{The heat equation as a pHDAE}
 \begin{overlayarea}{\textwidth}{\textheight}
 Consider the heat equation
@@ -2928,6 +2930,223 @@ The coupled thermoelastic problem can now be written as
 with total energy given by $H=H_E + H_T$.
 \end{block}
 
+\end{frame}
+
+\subsection{Example: the Danilovskaya problem}
+
+\begin{frame}{The classical problem}
+The Danilovskaya problem is a one-dimensional thermoelastic model in the infinite half-space $x\ge 0$. We recall the system of equations for the thermoelastic problem in 1D:
+
+\begin{equation*}
+\begin{aligned}
+\displaystyle \rho \partial_{tt} u &= \partial_x ({\sigma}_{ET}), \qquad x\ge 0,  \\
+\displaystyle \rho c_\epsilon \partial_{t} T &= -\partial_x(j_Q) - {C}_\beta \partial_t \varepsilon, \where {C}_\beta:=T_0 \beta(2\mu + 3\lambda),\\
+{\sigma}_{ET} &= {\sigma}_E + {\sigma}_{T}, \\
+{\sigma}_E &= (2\mu + \lambda) \varepsilon , \\
+{\sigma}_T &= - {C}_\beta \theta,  \\
+{\varepsilon} &= \partial_x u, \\
+{j}_Q &= -k \, \partial_x T.
+\end{aligned}
+\end{equation*}
+the following boundary conditions apply
+\begin{equation*}
+\begin{aligned}
+T(0, t) = T_1 H(t), \\
+\lim_{x \rightarrow \infty} T(x, t) = 0, \\
+\end{aligned} \qquad 
+\begin{aligned}
+\sigma_{ET}(0, t) = 0, \\
+\lim_{x \rightarrow \infty} u(x, t) = 0, \\
+\end{aligned}
+\end{equation*}
+where $H(t)$ is the Heaviside function.
+\end{frame}
+
+\begin{frame}{PH formulation}
+A dimensionless constant $c_\delta$ is usually introduced to strengthen the coupling from the mechanical to the thermal domain 
+\begin{equation*}
+c_\delta = \delta \frac{\rho c_\epsilon (2 \mu + \lambda)}{\beta^2 (3 \lambda + 2 \mu)^2 T_0},
+\end{equation*}
+where $\delta \in \{0, 1\}$ is a variable for switching on and off the strong coupling. \\
+ The problem can now be recast as a pH system in co-energy variables
+\begin{equation*}
+\begin{bmatrix}
+{\rho} & {0} & {0} & {0}\\
+{0} & (2\mu + \lambda)^{-1} & {0} & {0}\\
+0 & 0 & \rho c_\epsilon T_0 & 0\\
+{0} & {0} & {0} & {0}\\
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+{e}_v \\
+{e}_\varepsilon \\
+{e}_T \\
+{j}_Q \\
+\end{pmatrix} = 
+\begin{bmatrix}
+{0} & \partial_x & \mathcal{A}_\beta & {0}\\
+\partial_x & {0} & {0} & {0} \\
+- c_\delta \mathcal{A}_\beta^* & 0 & 0 & -\partial_x \\
+{0} & {0} & -\partial_x & - (T_0 k)^{-1} \\
+\end{bmatrix}
+\begin{pmatrix}
+{e}_v \\
+{e}_\varepsilon \\
+{e}_T \\
+\bm{j}_Q \\
+\end{pmatrix},
+\end{equation*}
+where $\mathcal{A}_\beta(\cdot):=-\partial_x({C}_\beta \, \cdot)$, and boundary conditions
+\begin{equation*}
+\begin{aligned}
+e_T(0, t) &= (T_1 - T_0)/T_0 \; H(t), \\
+(e_\varepsilon - {C}_\beta e_v)(L, t) &= 0,
+\end{aligned}  \qquad 
+\begin{aligned}
+(e_\varepsilon - {C}_\beta e_v)(0, t) &= 0, \\
+j_Q(L, t) &= 0.
+\end{aligned}
+\end{equation*}
+\end{frame}
+
+\begin{frame}{Discretization}
+One possible strategy consists in integrating by parts the whole first line and the $\partial_x$ operator in the third line.
+\begin{equation*}
+\begin{bmatrix}
+\mathbf{M}_{\rho} & \mathbf{0} & \mathbf{0} & \mathbf{0}\\
+\mathbf{0} & \mathbf{M}_{(2\mu + \lambda)^{-1}} & \mathbf{0} & \mathbf{0} \\
+\mathbf{0} & \mathbf{0} & \mathbf{M}_{\rho c_\epsilon T_0} & \mathbf{0} \\
+\mathbf{0} & \mathbf{0} & \mathbf{0} & \mathbf{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\mathbf{e}}_v\\
+\dot{\mathbf{e}}_\varepsilon\\
+\dot{\mathbf{e}}_T\\
+\dot{\mathbf{e}}_Q\\
+\end{pmatrix}
+= \begin{bmatrix}
+\mathbf{0} & -\mathbf{D}_{\grad}^\top & \mathbf{A}_{\beta} & \mathbf{0}\\
+\mathbf{D}_{\grad} & \mathbf{0} & \mathbf{0} & \mathbf{0} \\
+-c_\delta \mathbf{A}_{\beta}^\top & \mathbf{0} &  \mathbf{0} & \mathbf{D}_{\grad}^\top \\
+\mathbf{0} & \mathbf{0} & -\mathbf{D}_{\grad} & -\mathbf{R}_Q \\
+\end{bmatrix}
+\begin{pmatrix}
+{\mathbf{e}}_v\\
+{\mathbf{e}}_\varepsilon\\
+{\mathbf{e}}_T\\
+{\mathbf{e}}_Q\\
+\end{pmatrix}.
+\end{equation*}
+The coupling matrix $\mathbf{A}_{\beta}$ arises from the discretization of the coupling operator $\mathcal{A}_\beta^*$ where $\mathbf{R}_Q$ represent a dissipation matrix. \\
+For this discretization the boundary condition 
+\begin{equation*}
+e_T(0, t) = \frac{T_1 - T_0}{T_0} H(t), 
+\end{equation*}
+is imposed strongly as an essential condition.
+\end{frame}
+
+\begin{frame}{Settings and parameters}
+
+\only<1>{
+The constant $C_x, C_v$ are the characteristic length and velocity of the problem and $\widehat{L}, \; \widehat{t}_{\text{end}}$ are the dimensionless length and time of the problem. 
+\begin{table}[htb]
+	\centering
+	\begin{tabular}{|c|c|}
+		\hline 
+		\multicolumn{2}{|c|}{Physical Parameters} \\
+		\hline 	
+		$\lambda$ & $0.85\ 10^9 \; [\mathrm{kg/(cm\cdot s^2)}]$ \\ 
+		$\mu$ & $0.56\ 10^9 \; [\mathrm{kg/(cm\cdot s^2)}]$ \\
+		$\rho$ & $7.82\ 10^{-3} \; [\mathrm{kg}/\textrm{cm}^3]$ \\ 
+		$c_\epsilon$ & $4.61\ 10^6 \; [\mathrm{cm^2/(K\cdot s^2)}]$ \\
+		$k$ & $1.7\ 10^3 \; [\mathrm{kg \cdot cm/ (K\cdot s^3)}]$ \\ 
+		$\beta$ & $9.03\ 10^{-6} \; [\mathrm{K}^{-1}]$ \\ 
+		$T_0$ & $300 \; [\mathrm{K}]$ \\ 
+		$L$ & $C_x \ \widehat{L}$ \\
+		$C_x$ & ${k}/{(\rho c_\epsilon C_v)}$ \\
+		$\widehat{L}$ & $10$ \\
+		\hline 
+	\end{tabular} \hspace{.5cm}
+	\begin{tabular}{|c|c|}
+		\hline 
+		\multicolumn{2}{|c|}{Simulation Settings} \\ 
+		\hline 
+		Integrator & Crank-Nicholson\\
+		$t_{\text{end}}$& ${C_v}/{C_x} \; \widehat{t}_{\text{end}}$ \\ 
+		$C_v$ & $\sqrt{(\lambda + 2 \mu) / \rho}$ \\
+		$\widehat{t}_{\text{end}}$ & $4$ \\
+		$\Delta t$ & $10^{-3} \ t_{\text{end}}$ \\
+		FE spaces& CG$_1$ $\times$ DG$_0$ $\times$ CG$_1$ $\times$ DG$_0$ \\
+		N$^\circ$ FE & 200 \\
+		\hline 
+	\end{tabular} 
+	
+\end{table}
+}
+
+\only<2>{
+ The dimensionless displacement field $\widehat{u}$ and temperature $\theta$ are introduced
+$$\widehat{u} = \frac{(\lambda + 2\mu)}{C_x {C}_\beta} u,  \qquad \widehat{T} = \frac{T-T_0}{T_0}.$$
+The solution in the Laplace domain for the dimensionless variable is given by
+\begin{equation*}
+\begin{aligned}
+\widehat{T}(s) &= \frac{1}{s(C_1^2 - C_2^2)}[(C_1^2- s^2)\exp(-C_1 \widehat{x}) - (C_2^2 - s^2)\exp(-C_2 \widehat{x})], \\
+\widehat{u}(s) &= -\frac{1}{s(C_1^2 - C_2^2)}[C_1\exp(-C_1 \widehat{x}) - C_2\exp(-C_2 \widehat{x})], \\
+\end{aligned}
+\end{equation*}
+where $\widehat{x} = x/C_x$ is the dimensionless space variable and $C_1, \; C_2$ are given by
+\begin{equation*}
+C_1/2(s) = \left[\frac{s}{2} [(1+\delta+s)\pm[(1+\delta+s)^2-4s]^{\frac{1}{2}} ]\right]^{\frac{1}{2}}.
+\end{equation*}
+
+}
+\end{frame}
+
+\begin{frame}{Numerical results}
+\only<1>{
+\begin{figure}[p]
+	\begin{minipage}[t]{0.48\linewidth}
+		\centering
+		\includegraphics[width=1\textwidth]{part_3/applications/thermoelasticity/disp_at1_1D.eps} \\
+		\caption{Dimensionless displacement ($\widehat{x} = 1$).}
+		\label{fig:disp_at1}
+	\end{minipage}
+	\begin{minipage}[t]{0.48\linewidth}
+		\centering
+		\includegraphics[width=1\textwidth]{part_3/applications/thermoelasticity/temp_at1_1D.eps}
+		\caption{Dimensionless temperature ($\widehat{x} = 1$).}
+		\label{fig:temp_at1}
+	\end{minipage}
+\end{figure}
+}
+\only<2>{
+\begin{figure}%
+	\centering
+	\subfloat[][$\delta = 0$]{%
+		\label{fig:u_delta0}%
+		\includegraphics[width=0.48\columnwidth]{part_3/applications/thermoelasticity/plot_u0.eps}}%
+	\hspace{8pt}%
+	\subfloat[][$\delta = 1$]{%
+		\label{fig:u_delta1}%
+		\includegraphics[width=0.48\columnwidth]{part_3/applications/thermoelasticity/plot_u1.eps}} \\
+	\caption[]{Displacement solution for the Danilovskaya problem.}%
+	\label{fig:u_therElas}%
+\end{figure}
+}
+\only<3>{
+\begin{figure}
+	\centering
+	\subfloat[][$\delta = 0$]{%
+		\label{fig:theta_delta0}%
+		\includegraphics[width=0.48\columnwidth]{part_3/applications/thermoelasticity/plot_T0.eps}}%
+	\hspace{8pt}%
+	\subfloat[][$\delta = 1$]{%
+		\label{fig:theta_delta1}%
+		\includegraphics[width=0.48\columnwidth]{part_3/applications/thermoelasticity/plot_T1.eps}} \\
+	\caption[]{Temperature solution for the Danilovskaya problem.}%
+	\label{fig:theta_therElas}%
+\end{figure}
+}
 \end{frame}
 
 \section{Vibroacoustic under mixed boundary conditions}
