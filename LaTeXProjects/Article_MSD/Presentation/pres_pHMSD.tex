@@ -73,15 +73,15 @@ Using Lie Algebra and differential forms a pH model of a flexible link has alrea
 	\setlength{\belowdisplayskip}{1pt}
 Advantages:
 \begin{itemize}
-	\item \onslide*<2->{Modular construction of flexible systems;}
-	\item \onslide*<3->{Large deformations naturally considered.}
+	\item {Modular construction of flexible systems;}
+	\item {Large deformations naturally considered.}
 \end{itemize}
 Drawbacks:
 \begin{itemize}
-	\item \onslide*<4->{Implementation really does not look trivial;}
-	\item \onslide*<5->{Limited to one-dimensional systems;}
-	\item \onslide*<6->{Numerical analysis not feasible;}
-	\item \onslide*<7->{Model reduction techniques not easily applicable.} 
+	\item {Implementation really does not look trivial;}
+	\item {Limited to one-dimensional systems;}
+	\item {Numerical analysis not feasible;}
+	\item {Model reduction techniques not easily applicable.} 
 \end{itemize}
 \end{overlayarea}
 \end{frame}
@@ -95,13 +95,13 @@ The floating frame approach relies on the hypothesis of small deformations: elas
 \begin{overlayarea}{\textwidth}{0.5\textheight}
 Advantages 
 \begin{itemize}
-	\item \onslide*<2->{The most used paradigm in multibody dynamics;}
-	\item \onslide*<3->{For control applications other approaches are too complex;}
-	\item \onslide*<4->{Linear model reduction techniques are applicable.} 
+	\item {The most used paradigm in multibody dynamics;}
+	\item {For control applications other approaches are too complex;}
+	\item {Linear model reduction techniques are applicable.} 
 \end{itemize}
 Drawbacks:
 \begin{itemize}
-	\item \onslide*<5->{Effect due to geometric non-linearities are not considered: not suitable for large deformations (substructuring can be employed to alleviate this).}
+	\item {Effect due to geometric non-linearities are not considered: not suitable for large deformations (substructuring can be employed to alleviate this).}
 \end{itemize}
 \end{overlayarea}
 \end{frame}
@@ -133,175 +133,204 @@ This equation is expressed in the body reference frame $\widehat{\bm{x}}, \wideh
 }
 \end{frame}
 
+\begin{frame}{Canonical momenta}
+\begin{overlayarea}{\textwidth}{0.95\textheight}
+	Consider the total energy (Hamiltonian), given by the sum of kinetic and deformation energy:
+	\begin{equation*}
+	H = H_{\text{kin}} + H_{\text{def}}= \frac{1}{2} \int_{\Omega} \left\{\rho ||\bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}+\bm{u}_f) + {\bm{v}}_f||^2 + \bm\Sigma \cddot \bm\varepsilon \right\}  \d{\Omega}.
+	\end{equation*}
+	
+	\only<1>{ 
+		\begin{exampleblock}{Canonical momenta}
+			\begin{equation*}
+			\begin{aligned}
+			\bm{p}_t &:= \diffp{H}{\bm{v}_P} = m \bm{v}_P + \crmat{\bm{s}_u}^\top \, \bm\omega_P + \int_{\Omega} \rho \bm{v}_f \d{\Omega}, \\
+			\bm{p}_r &:= \diffp{H}{\bm\omega_P} = \crmat{\bm{s}_u} \bm{v}_P + \bm{J}_u \bm\omega_P + \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f} \bm{v}_f \d{\Omega}, \\
+			\bm{p}_f &:= \diffd{H}{\bm{v}_f} = \rho \bm{v}_P + \rho \crmat{\bm{x}+\bm{u}_f}^\top \, \bm\omega_P + \rho \bm{v}_f, \\
+			\bm\varepsilon &:= \diffd{H}{\bm\Sigma} = \bm{\mathcal{D}}^{-1} \bm\Sigma,
+			\end{aligned}
+			\end{equation*}
+		\end{exampleblock} 
+		
+	}
+	\only<2>{
+		\begin{exampleblock}{Canonical momenta}
+			\setlength{\abovedisplayskip}{1pt}
+			\setlength{\belowdisplayskip}{1pt}
+			\begin{equation*}
+			\begin{bmatrix}
+			\bm{p}_t \\ \bm{p}_r \\ \bm{p}_f \\ \bm\varepsilon \\
+			\end{bmatrix} = 
+			\underbrace{\begin{bmatrix}
+				m \bm{I}_{3\times 3} & \crmat{\bm{s}_u}^\top & \mathcal{I}_\rho^{\Omega} & 0 \\
+				\crmat{\bm{s}_u} & \bm{J}_u & \bm{\mathcal{I}}_{\rho x}^{\Omega} & 0  \\
+				(\mathcal{I}_\rho^{\Omega})^* & (\bm{\mathcal{I}}_{\rho x}^{\Omega})^* & \rho & 0  \\
+				0 & 0 & 0 & \bm{\mathcal{D}}^{-1} \\
+				\end{bmatrix}}_{\bm{\mathcal{M}}: \; \text{Mass operator}}
+			\begin{bmatrix}
+			\bm{v}_P \\ \bm{\omega}_P  \\ \bm{v}_f  \\ \bm\Sigma \\
+			\end{bmatrix}, \qquad 
+			\begin{aligned}
+			\mathcal{I}_\rho^\Omega &:=\int_{\Omega} \rho (\cdot) \d{\Omega}, \\
+			\bm{\mathcal{I}}_{\rho x}^{\Omega} &:= \int_\Omega \rho \crmat{\bm{x}+\bm{u}_f} (\cdot). \\
+			\end{aligned}
+			\end{equation*}	
+			The mass operator $\bm{\mathcal{M}}$ is a self-adjoint, positive operator. It holds
+			\begin{equation*}
+			H_{\text{kin}} + H_{\text{def}} = \frac{1}{2} \langle \bm{e}_{\text{kd}}, \ \bm{\mathcal{M}} \bm{e}_{\text{kd}} \rangle, \qquad \bm{e}_{\text{kd}} = [\bm{v}_P; \, \bm{\omega}_P; \, \bm{v}_f; \bm{\Sigma}]
+			\end{equation*}
+		\end{exampleblock} 
+	}
+	
+	\only<3>{
+		\begin{exampleblock}{Modified canonical momenta}
+			\setlength{\abovedisplayskip}{1pt}
+			\setlength{\belowdisplayskip}{1pt}
+			\begin{equation*}
+			\begin{aligned}
+			\widehat{\bm{p}}_t &:=  m \bm{v}_P + \crmat{\bm{s}_u}^\top \, \bm\omega_P + 2\int_{\Omega} \rho \bm{v}_f \d{\Omega}, \\
+			\widehat{\bm{p}}_r &:=  \crmat{\bm{s}_u} \bm{v}_P + \bm{J}_u \bm\omega_P + 2 \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f} \bm{v}_f \d{\Omega}, \\
+			\end{aligned} \qquad 
+			\begin{aligned}
+			\widehat{\bm{p}}_f &:= \rho \bm{v}_P + \rho \crmat{\bm{x}+\bm{u}_f}^\top \, \bm\omega_P + 2\rho \bm{v}_f, \\
+			\bm{\mathcal{I}}_{p_f}^\Omega &:= \int_\Omega \left\{ \crmat{\bm{p}_f} + \crmat{\widehat{\bm{p}}_f} \right\}(\cdot) \d{\Omega},
+			\end{aligned}
+			\end{equation*}
+		\end{exampleblock} 
+		Notice that the kinetic energy also depends on the flexible displacement
+		\[
+		\diffd{H_{\text{kin}}}{\bm{u}_f} = \crmat{\bm{p}_f} \bm{\omega_{P}}.
+		\]
+	}
+\end{overlayarea}
+\end{frame}
+
 \begin{frame}{Equations of motion}
 The equations are obtained by application of the virtual work principle \footfullcite[Chapter 4]{simeon2013computational}. \\
 \begin{overlayarea}{\textwidth}{0.8\textheight}
-\only<1-2> {
-	\begin{block}{Linear momentum balance}
-		\setlength{\abovedisplayskip}{1pt}
-		\setlength{\belowdisplayskip}{1pt}
-		\only<1>{ 
-		\begin{equation*}
-		\begin{split}
-		&m (\dot{\bm{v}}_P + \crmat{\bm{\omega}_P} \bm{v}_P) + \crmat{\bm{s}_u}^\top \dot{\bm{\omega}}_P  + \int_{\Omega} \rho \ddot{\bm{u}}_f \d{\Omega} = \\
-		&\quad - \crmat{\bm{\omega}_P} \crmat{\bm{\omega}_P} \bm{s}_u - \int_{\Omega} 2 \rho \crmat{\bm{\omega}_P} \dot{\bm{u}}_f \d{\Omega} +  \int_{\Omega} \bm\beta \d{\Omega} + \int_{\partial \Omega} \bm\tau \d{\Gamma},
-		\end{split}
-		\end{equation*}
-		}
-		\only<2>{
-			\begin{equation*}
-			\begin{split}
-			m\dot{\bm{v}}_P + \crmat{\bm{s}_u}^\top \dot{\bm{\omega}}_P +   \int_{\Omega} \rho \dot{\bm{v}}_f \d{\Omega}  = \\
-			\textcolor{red}{\left[m \bm{v}_P + \crmat{\bm{s}_u}^\top \bm\omega_P +2 \int_{\Omega} \rho \bm{v}_f \d{\Omega} \right]_\times} \bm\omega_P +  \int_{\Omega} \bm\beta \d{\Omega} + \int_{\partial \Omega} \bm\tau \d{\Gamma}.
-			\end{split}
-			\end{equation*}
-		}
-	\end{block}
-
-	\begin{itemize}
-		\item $\rho$ is the mass density;
-		\item $m = \int_{\Omega} \rho \d{\Omega}$ the total mass;
-		\item  $\bm{s}_u = \int_{\Omega} \rho (\bm{x}+\bm{u}_f) \d{\Omega}$ the static moment.
-	\end{itemize}
+	\only<1-3> {
+		\begin{block}{Linear momentum balance}
+			\setlength{\abovedisplayskip}{1pt}
+			\setlength{\belowdisplayskip}{1pt}
+			\only<1>{ 
+				\begin{equation*}
+				\begin{split}
+				&m (\dot{\bm{v}}_P + \crmat{\bm{\omega}_P} \bm{v}_P) + \crmat{\bm{s}_u}^\top \dot{\bm{\omega}}_P  + \int_{\Omega} \rho \ddot{\bm{u}}_f \d{\Omega} = \\
+				&\quad - \crmat{\bm{\omega}_P} \crmat{\bm{\omega}_P} \bm{s}_u - \int_{\Omega} 2 \rho \crmat{\bm{\omega}_P} \dot{\bm{u}}_f \d{\Omega} + \int_{\partial \Omega} \bm\tau \d{\Gamma},
+				\end{split}
+				\end{equation*}
+			}
+			\only<2>{
+				\begin{equation*}
+				\begin{split}
+				m\dot{\bm{v}}_P + \crmat{\bm{s}_u}^\top \dot{\bm{\omega}}_P +   \int_{\Omega} \rho \dot{\bm{v}}_f \d{\Omega}  = \\
+				\textcolor{red}{\left[m \bm{v}_P + \crmat{\bm{s}_u}^\top \bm\omega_P +2 \int_{\Omega} \rho \bm{v}_f \d{\Omega} \right]_\times} \bm\omega_P + \int_{\partial \Omega} \bm\tau \d{\Gamma}.
+				\end{split}
+				\end{equation*}
+			}
+			
+			\only<3>{
+				\begin{equation*}
+				\begin{split}
+				m\dot{\bm{v}}_P + \crmat{\bm{s}_u}^\top \dot{\bm{\omega}}_P +   \int_{\Omega} \rho \dot{\bm{v}}_f \d{\Omega}  = \textcolor{red}{\left[\widehat{\bm{p}}_t \right]_\times} \bm\omega_P + \int_{\partial \Omega} \bm\tau \d{\Gamma}.
+				\end{split}
+				\end{equation*}
+			}
+		\end{block}
+		
+		\begin{itemize}
+			\item $m = \int_{\Omega} \rho \d{\Omega}$ the total mass;
+			\item  $\bm{s}_u = \int_{\Omega} \rho (\bm{x}+\bm{u}_f) \d{\Omega}$ the static moment;
+			\item $\bm{\tau}$ the surface traction.
+		\end{itemize}
 	}
-
-\only<3-4> {
-	\begin{block}{Angular momentum balance}
-	\setlength{\abovedisplayskip}{1pt}
-	\setlength{\belowdisplayskip}{1pt}
-	\only<3>{
-	\begin{equation*}
-	\begin{split}
-	\crmat{\bm{s}_u} (\dot{\bm{v}}_P + \crmat{\bm{\omega}_P} \bm{v}_P) + \bm{J}_u \dot{\bm\omega}_P + \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f} \ddot{\bm{u}}_f \d{\Omega} + \crmat{\bm{\omega}_P} \bm{J}_u \bm{\omega}_P = \\ 
-	- \int_{\Omega} 2\rho \crmat{\bm{x}+\bm{u}_f} \crmat{\bm\omega_P} \dot{\bm{u}}_f \d{\Omega} + \int_{\Omega}\crmat{\bm{x}+\bm{u}_f} \bm\beta \d{\Omega} + \int_{\partial \Omega}\crmat{\bm{x}+\bm{u}_f} \bm\tau \d{\Gamma}, \\
-	\end{split}
-	\end{equation*}
-	}
-	\only<4>{
-		\begin{equation*}
-		\begin{split}
-		\crmat{\bm{s}_u} \dot{\bm{v}}_P  + \bm{J}_u \dot{\bm\omega}_P + \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f} \dot{\bm{v}}_f \d{\Omega} = \\
-		 \textcolor{red}{\left[\crmat{\bm{s}_u}^\top \bm\omega_P + 2 \int_{\Omega} \rho \bm{v}_f \d{\Omega} \right]_\times} \bm{v}_P +  \textcolor{red}{\left[\crmat{\bm{s}_u} \bm{v}_P + \bm{J}_u \bm\omega_P + 2 \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f} {\bm{v}}_f \d{\Omega} \right]_\times} \bm\omega_P + 
-		\\
-		\int_{\Omega} \textcolor{red}{2 \left[\rho \bm{v}_P + \rho \crmat{\bm{x}+\bm{u}_f}^\top \, \bm\omega_P \right]_\times} \bm{v}_f \d{\Omega} + \int_{\Omega}\crmat{\bm{x}+\bm{u}_f} \bm\beta \d{\Omega} + \int_{\partial \Omega}\crmat{\bm{x}+\bm{u}_f} \bm{\tau} \d{\Gamma}.
-		\end{split}
-		\end{equation*}
-	}	
-	\end{block}
-$\bm{J}_u:= \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f}^\top\crmat{\bm{x}+\bm{u}_f} \d{\Omega}$ is the inertia matrix.
-}
-\only<5-6> {
-	\begin{block}{Flexibility PDE}
-		\setlength{\abovedisplayskip}{1pt}
-		\setlength{\belowdisplayskip}{1pt}
-	\only<5>{
-	\begin{equation*}
-	\begin{split}
-	\rho (\dot{\bm{v}}_P + \crmat{\bm\omega_P} \bm{v}_P) + \rho (\crmat{\dot{\bm\omega}_P} + \crmat{\bm{\omega}_P}\crmat{\bm{\omega}_P})(\bm{x}+\bm{u}_f) + \rho (2 \crmat{\bm{\omega}_P} \dot{\bm{u}}_f + \ddot{\bm{u}}_f) = \\
-	\Div{\bm\Sigma} + \bm\beta,
-	\end{split}
-	\end{equation*}
-	}
-	\only<6>{
-	\begin{equation*}
-	\begin{split}
-	\rho \dot{\bm{v}}_P + \rho \crmat{\bm{x}+\bm{u}_f}^\top \dot{\bm\omega}_P  + \rho \dot{\bm{v}}_f = \\
-	\textcolor{red}{\left[\rho \bm{v}_P + \rho \crmat{\bm{x}+\bm{u}_f}^\top \bm\omega_P + 2 \rho \bm{v}_f \right]_\times} \bm\omega_P + \Div{\bm\Sigma} + \bm\beta.
-	\end{split}
-	\end{equation*}
-	}
-	together with boundary conditions
-	\begin{equation*}
-	\begin{aligned}
-	&\text{Neumann condition} \\
-	&\text{Dirichlet condition} \\
-	\end{aligned} \quad
-	\begin{aligned}
-	\bm\Sigma \cdot \bm{n}|_{\Gamma_N} &= \bm\tau|_{\Gamma_N}, \quad \text{$\bm{n}$ is the outward normal,} \\
-	\bm{u}_f|_{\Gamma_D} &= \bm{\bar{u}}_f|_{\Gamma_D},
-	\end{aligned}
-	\end{equation*}
-	\end{block}	
 	
-	\begin{itemize}
-		\item $\bm\Sigma$ is the Cauchy stress tensor;
-		\item The infinitesimal strain is given by $\bm\varepsilon  =  \Grad(\bm{u}_f) \quad \Grad = \frac{1}{2}[\nabla+\nabla^\top]$;
-		\item To close the system,  Hooke's law $\bm\Sigma =  \bm{\mathcal{D}} \bm\varepsilon$, where $ \bm{\mathcal{D}}$ is the stiffness tensor.
-	\end{itemize}
+	\only<4-6> {
+		\begin{block}{Angular momentum balance}
+			\setlength{\abovedisplayskip}{1pt}
+			\setlength{\belowdisplayskip}{1pt}
+			\only<4>{
+				\begin{equation*}
+				\begin{split}
+				\crmat{\bm{s}_u} (\dot{\bm{v}}_P + \crmat{\bm{\omega}_P} \bm{v}_P) + \bm{J}_u \dot{\bm\omega}_P + \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f} \ddot{\bm{u}}_f \d{\Omega} + \crmat{\bm{\omega}_P} \bm{J}_u \bm{\omega}_P = \\ 
+				- \int_{\Omega} 2\rho \crmat{\bm{x}+\bm{u}_f} \crmat{\bm\omega_P} \dot{\bm{u}}_f \d{\Omega} + \int_{\partial \Omega}\crmat{\bm{x}+\bm{u}_f} \bm\tau \d{\Gamma}, \\
+				\end{split}
+				\end{equation*}
+			}
+			\only<5>{
+				\begin{equation*}
+				\begin{split}
+				\crmat{\bm{s}_u} \dot{\bm{v}}_P  + \bm{J}_u \dot{\bm\omega}_P + \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f} \dot{\bm{v}}_f \d{\Omega} = \\
+				\textcolor{red}{\left[\crmat{\bm{s}_u}^\top \bm\omega_P + 2 \int_{\Omega} \rho \bm{v}_f \d{\Omega} \right]_\times} \bm{v}_P +  \textcolor{red}{\left[\crmat{\bm{s}_u} \bm{v}_P + \bm{J}_u \bm\omega_P + 2 \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f} {\bm{v}}_f \d{\Omega} \right]_\times} \bm\omega_P + 
+				\\
+				\int_{\Omega} \textcolor{red}{2 \left[\rho \bm{v}_P + \rho \crmat{\bm{x}+\bm{u}_f}^\top \, \bm\omega_P \right]_\times} \bm{v}_f \d{\Omega} + \int_{\partial \Omega}\crmat{\bm{x}+\bm{u}_f} \bm{\tau} \d{\Gamma}.
+				\end{split}
+				\end{equation*}
+			}	
+			
+			\only<6>{
+				\begin{equation*}
+				\begin{split}
+				\crmat{\bm{s}_u} \dot{\bm{v}}_P  + \bm{J}_u \dot{\bm\omega}_P + \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f} \dot{\bm{v}}_f \d{\Omega} = \\
+				\textcolor{red}{\left[\widehat{\bm{p}}_t \right]_\times} \bm{v}_P +  \textcolor{red}{\left[\widehat{\bm{p}}_r \right]_\times} \bm\omega_P + \textcolor{red}{\bm{\mathcal{I}}_{p_f}^{\Omega} } \bm{v}_f + \int_{\partial \Omega}\crmat{\bm{x}+\bm{u}_f} \bm{\tau} \d{\Gamma}.
+				\end{split}
+				\end{equation*}
+			}	
+		\end{block}
+		$\bm{J}_u:= \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f}^\top\crmat{\bm{x}+\bm{u}_f} \d{\Omega}$ is the inertia matrix.
 	}
-\end{overlayarea}
-\end{frame}
-
-
-\subsection{Energy variables and momenta}
-
-\begin{frame}{Energy variables and canonical momenta}
-\begin{overlayarea}{\textwidth}{0.95\textheight}
-Consider the total energy (Hamiltonian), given by the sum of kinetic and deformation energy:
-\begin{equation*}
-H = H_{\text{kin}} + H_{\text{def}}= \frac{1}{2} \int_{\Omega} \left\{\rho ||\bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}+\bm{u}_f) + {\bm{v}}_f||^2 + \bm\Sigma \cddot \bm\varepsilon \right\}  \d{\Omega}.
-\end{equation*}
-
-\only<1>{ 
-	\begin{exampleblock}{Canonical momenta}
+	\only<7-9> {
+		\begin{block}{Flexibility PDE}
+			\setlength{\abovedisplayskip}{1pt}
+			\setlength{\belowdisplayskip}{1pt}
+			\only<7>{
+				\begin{equation*}
+				\begin{split}
+				\rho (\dot{\bm{v}}_P + \crmat{\bm\omega_P} \bm{v}_P) + \rho (\crmat{\dot{\bm\omega}_P} + \crmat{\bm{\omega}_P}\crmat{\bm{\omega}_P})(\bm{x}+\bm{u}_f) + \rho (2 \crmat{\bm{\omega}_P} \dot{\bm{u}}_f + \ddot{\bm{u}}_f) = \Div{\bm\Sigma},
+				\end{split}
+				\end{equation*}
+			}
+			\only<8>{
+				\begin{equation*}
+				\begin{split}
+				\rho \dot{\bm{v}}_P + \rho \crmat{\bm{x}+\bm{u}_f}^\top \dot{\bm\omega}_P  + \rho \dot{\bm{v}}_f = 
+				\textcolor{red}{\left[\rho \bm{v}_P + \rho \crmat{\bm{x}+\bm{u}_f}^\top \bm\omega_P + 2 \rho \bm{v}_f \right]_\times} \bm\omega_P + \Div{\bm\Sigma}.
+				\end{split}
+				\end{equation*}
+			}
+			
+			\only<9>{
+				\begin{equation*}
+				\begin{split}
+				\rho \dot{\bm{v}}_P + \rho \crmat{\bm{x}+\bm{u}_f}^\top \dot{\bm\omega}_P  + \rho \dot{\bm{v}}_f = 
+				\textcolor{red}{- \delta_{\bm{u}_f} H - \bm{\mathcal{I}}_{p_f}^*\bm\omega_P  }  + \Div{\bm\Sigma}.
+				\end{split}
+				\end{equation*}
+			}
+		\end{block}	
+		
+		together with boundary conditions
 		\begin{equation*}
-		\label{eq:momenta}
 		\begin{aligned}
-		\bm{p}_t &:= \diffp{H}{\bm{v}_P} = m \bm{v}_P + \crmat{\bm{s}_u}^\top \, \bm\omega_P + \int_{\Omega} \rho \bm{v}_f \d{\Omega}, \\
-		\bm{p}_r &:= \diffp{H}{\bm\omega_P} = \crmat{\bm{s}_u} \bm{v}_P + \bm{J}_u \bm\omega_P + \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f} \bm{v}_f \d{\Omega}, \\
-		\bm{p}_f &:= \diffd{H}{\bm{v}_f} = \rho \bm{v}_P + \rho \crmat{\bm{x}+\bm{u}_f}^\top \, \bm\omega_P + \rho \bm{v}_f, \\
-		\bm\varepsilon &:= \diffd{H}{\bm\Sigma} = \bm{\mathcal{D}}^{-1} \bm\Sigma,
+		&\text{Neumann condition} \\
+		&\text{Dirichlet condition} \\
+		\end{aligned} \quad
+		\begin{aligned}
+		\bm\Sigma \cdot \bm{n}|_{\Gamma_N} &= \bm\tau|_{\Gamma_N}, \quad \text{$\bm{n}$ is the outward normal,} \\
+		\bm{u}_f|_{\Gamma_D} &= \bm{\bar{u}}_f|_{\Gamma_D},
 		\end{aligned}
 		\end{equation*}
-	\end{exampleblock} 
-
-}
-\only<2>{
-	\begin{exampleblock}{Canonical momenta}
-	\setlength{\abovedisplayskip}{1pt}
-	\setlength{\belowdisplayskip}{1pt}
-	\begin{equation*}
-	\begin{bmatrix}
-	\bm{p}_t \\ \bm{p}_r \\ \bm{p}_f \\ \bm\varepsilon \\
-	\end{bmatrix} = 
-	\underbrace{\begin{bmatrix}
-		m \bm{I}_{3\times 3} & \crmat{\bm{s}_u}^\top & \mathcal{I}_\rho^{\Omega} & 0 \\
-		\crmat{\bm{s}_u} & \bm{J}_u & \bm{\mathcal{I}}_{\rho x}^{\Omega} & 0  \\
-		(\mathcal{I}_\rho^{\Omega})^* & (\bm{\mathcal{I}}_{\rho x}^{\Omega})^* & \rho & 0  \\
-		0 & 0 & 0 & \bm{\mathcal{D}}^{-1} \\
-		\end{bmatrix}}_{\bm{\mathcal{M}}: \; \text{Mass operator}}
-	\begin{bmatrix}
-	\bm{v}_P \\ \bm{\omega}_P  \\ \bm{v}_f  \\ \bm\Sigma \\
-	\end{bmatrix}, \qquad 
-	\begin{aligned}
-	\mathcal{I}_\rho^\Omega &:=\int_{\Omega} \rho (\cdot) \d{\Omega}, \\
-	\bm{\mathcal{I}}_{\rho x}^{\Omega} &:= \int_\Omega \rho \crmat{\bm{x}+\bm{u}_f} (\cdot). \\
-	\end{aligned}
-	\end{equation*}	
-	The mass operator $\bm{\mathcal{M}}$ is a self-adjoint, positive operator. It holds
-	\begin{equation*}
-	H_{\text{kin}} + H_{\text{def}} = \frac{1}{2} \langle \bm{e}_{\text{kd}}, \ \bm{\mathcal{M}} \bm{e}_{\text{kd}} \rangle, \qquad \bm{e}_{\text{kd}} = [\bm{v}_P; \, \bm{\omega}_P; \, \bm{v}_f; \bm{\Sigma}]
-	\end{equation*}
-\end{exampleblock} 
-}
-\only<3>{
-Notice that the kinetic energy also depends on the flexible displacement
-\[
-\diffd{H_{\text{kin}}}{\bm{u}_f} = \crmat{\bm{p}_f} \bm{\omega_{P}}.
-\]
-This term is responsible for a coupling between the kinematic coordinates and the velocities.
-}
+	}
 \end{overlayarea}
 \end{frame}
 
-\subsection{PH formulation}
 
 \begin{frame}{Generalized coordinates}
 Generalized coordinates are required for a complete formulation:
 \begin{itemize}
-	\item $^i \bm{r}_P$ the position of point $P$ in the inertial frame of reference;
-	\item $\bm{R}$ the direction cosine matrix (other attitude parametrizations are possible);
-	\item $\bm{u}_f$ the flexible displacement;
+\item $^i \bm{r}_P$ the position of point $P$ in the inertial frame of reference;
+\item $\bm{R}$ the direction cosine matrix (other attitude parametrizations are possible);
+\item $\bm{u}_f$ the flexible displacement;
 \end{itemize}
 The direction cosine matrix is converted into a vector by concatenating its rows
 \begin{equation*}
@@ -320,57 +349,51 @@ where $\bm{R}_{1}, \bm{R}_{2}, \bm{R}_{3}$ are the rows of matrix $\bm{R}$. Furt
 \end{frame}
 
 \begin{frame}{PH formulation}
-The overall port-Hamiltonian formulation
+The overall port-Hamiltonian formulation (without including the boundary traction $\bm{\tau}$)
 \begin{equation*}
 \setlength{\dashlinegap}{2pt}
 \underbrace{
-	{\left[ \begin{array}{c:c}
-		\bm{I} & 0 \\
-		\hdashline
-		0 & \bm{\mathcal{M}} \\
-		\end{array} \right]}
+{\left[ \begin{array}{c:c}
+\bm{I} & 0 \\
+\hdashline
+0 & \bm{\mathcal{M}} \\
+\end{array} \right]}
 }_{\bm{\mathcal{E}}}
-\diff{}{t}
+\diffp{}{t}
 \underbrace{\begin{bmatrix}
-	^i \bm{r}_P \\ \bm{R}_{\text{v}} \\ \bm{u}_f \\\hdashline  \bm{v}_P \\ \bm\omega_P  \\ \bm{v}_f  \\ \bm\Sigma \\
-	\end{bmatrix}}_{\bm{e}} = 
+^i \bm{r}_P \\ \bm{R}_{\text{v}} \\ \bm{u}_f \\\hdashline  \bm{v}_P \\ \bm\omega_P  \\ \bm{v}_f  \\ \bm\Sigma \\
+\end{bmatrix}}_{\bm{e}} = 
 \underbrace{
-	{\left[ \begin{array}{ccc:cccc}
-		0 & 0 & 0 &  \bm{R} & 0 & 0 & 0 \\
-		0 & 0 & 0 & 0 & \crmat{\bm{R}_{\text{v}}} & 0 & 0 \\
-		0 & 0 & 0 & 0 & 0 & \bm{I}_{3\times 3} & 0  \\ 
-		\hdashline
-		-\bm{R}^\top & 0 & 0 & 0 & \crmat{\widetilde{\bm{p}}_t} & 0 & 0 \\
-		0 & -\crmat{\bm{R}_{\text{v}}}^\top & 0 & \crmat{\widetilde{\bm{p}}_t} & \crmat{\widetilde{\bm{p}}_r} & \bm{\mathcal{I}}_{p_f}^\Omega & 0 \\
-		0 & 0 & -\bm{I}_{3\times 3} & 0 & -(\bm{\mathcal{I}}_{p_f}^\Omega)^* & 0 & \Div \\
-		0 & 0 & 0 & 0 & 0 & \Grad & 0 \\
-		\end{array} \right]}
+{\left[ \begin{array}{ccc:cccc}
+0 & 0 & 0 &  \bm{R} & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & \crmat{\bm{R}_{\text{v}}} & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & \bm{I}_{3\times 3} & 0  \\ 
+\hdashline
+-\bm{R}^\top & 0 & 0 & 0 & \crmat{\widetilde{\bm{p}}_t} & 0 & 0 \\
+0 & -\crmat{\bm{R}_{\text{v}}}^\top & 0 & \crmat{\widetilde{\bm{p}}_t} & \crmat{\widetilde{\bm{p}}_r} & \bm{\mathcal{I}}_{p_f}^\Omega & 0 \\
+0 & 0 & -\bm{I}_{3\times 3} & 0 & -(\bm{\mathcal{I}}_{p_f}^\Omega)^* & 0 & \Div \\
+0 & 0 & 0 & 0 & 0 & \Grad & 0 \\
+\end{array} \right]}
 }_{\bm{\mathcal{J}}}
 \underbrace{\begin{bmatrix}
-	\partial_{\bm{r}_P}H \\ \partial_{\bm{R}_\text{v}}H \\ \delta_{\bm{u}_f} H \\\hdashline  \bm{v}_P \\ \bm\omega_P  \\ \bm{v}_f  \\ \bm\Sigma \\
-	\end{bmatrix}}_{\bm{z}}.
+\partial_{\bm{r}_P}H \\ \partial_{\bm{R}_\text{v}}H \\ \delta_{\bm{u}_f} H \\\hdashline  \bm{v}_P \\ \bm\omega_P  \\ \bm{v}_f  \\ \bm\Sigma \\
+\end{bmatrix}}_{\bm{z}}.
 \end{equation*} 
-Variables $\widetilde{\bm{p}}_t, \widetilde{\bm{p}}_r$ are defined as: 
-\[\widetilde{\bm{p}}_t = \bm{p}_t + \int_{\Omega} \rho \bm{v}_f \d{\Omega}, \qquad \widetilde{\bm{p}}_r = \bm{p}_r + \int_{\Omega} \rho \crmat{\bm{x} + \bm{u}_f}\bm{v}_f \d{\Omega}.\]
-The operator $\bm{\mathcal{I}}_{p_f}^\Omega$ is defined as: $\bm{\mathcal{I}}_{p_f}^\Omega := \int_\Omega \left\{2 \crmat{\bm{p}_f} + \rho \crmat{\bm{v}_f} \right\}(\cdot) \d{\Omega}$.
 
 \end{frame}
 
 \begin{frame}{Floating body as a pHDAE system}
 \begin{exampleblock}{Final pHDAE system}
-	\setlength{\abovedisplayskip}{1pt}
-	\setlength{\belowdisplayskip}{1pt}
 This system fits into the framework detailed in \footfullcite{mehrmann2019structurepreserving} and extends it.
 \begin{equation*}
 \begin{aligned}
-\bm{\mathcal{E}}(\bm{e}) \diffp{\bm{e}}{t} &= \bm{\mathcal{J}}(\bm{e}) \bm{z}(\bm{e}) + \bm{\mathcal{B}}_d(\bm{e}) \bm{u}_d + \bm{\mathcal{B}}_r(\bm{e}) \bm{u}_\partial, \qquad \text{where } \bm{u}_d:=\bm\beta \\
-\bm{y}_d &= \bm{\mathcal{B}}_d^*(\bm{e}) \bm{z}(\bm{e}), \\
+\bm{\mathcal{E}}(\bm{e}) \partial_t \bm{e} &= \bm{\mathcal{J}}(\bm{e}) \bm{z}(\bm{e}) + \bm{\mathcal{B}}_r(\bm{e}) \bm{u}_\partial, \\
 \bm{y}_r &= \bm{\mathcal{B}}_r^*(\bm{e}) \bm{z}(\bm{e}), \\
 \bm{u}_\partial &= \bm{\mathcal{B}}_{\partial} \bm{z}(\bm{e}) =  \bm\Sigma \cdot \bm{n}|_{\partial \Omega} = \bm\tau|_{\partial \Omega}, \\
 \bm{y}_\partial &= \bm{\mathcal{C}}_{\partial} \bm{z}(\bm{e}) = \bm{v}_f|_{\partial \Omega},
 \end{aligned}
 \end{equation*}
-with $\bm{y}_r = (\bm{v}_P + \crmat{\bm{x}+\bm{u}_f}^\top \bm{\omega}_P)\vert_{\partial\Omega}, \; \bm{y}_d = (\bm{v}_P + \crmat{\bm{x}+\bm{u}_f}^\top \bm{\omega}_P + \bm{v}_f)\vert_{\Omega}$.
+with $\bm{y}_r = (\bm{v}_P + \crmat{\bm{x}+\bm{u}_f}^\top \bm{\omega}_P)\vert_{\partial\Omega}$.
 \end{exampleblock}
 Operator $\bm{\mathcal{E}}$ is positive self-adjoint, $\bm{\mathcal{J}}$ is formally skew-symmetric.
 The Hamiltonian  satisfies 
@@ -380,46 +403,22 @@ The Hamiltonian  satisfies
 \end{frame}
 
 \begin{frame}{Energy balance}
-\onslide*<1-6>{
-\begin{overlayarea}{\textwidth}{0.95\textheight}
-State space $\mathscr{X} = \mathbb{R}^3 \times \mathbb{R}^9 \times \mathscr{L}^2(\Omega, \mathbb{R}^{3}) \times \mathbb{R}^3 \times \mathbb{R}^3 \times \mathscr{L}^2(\Omega, \mathbb{R}^{3}) \times \mathscr{L}^2(\Omega, \mathbb{R}^{3\times 3}_{\text{sym}}).$
 
-\begin{equation*}
-\begin{aligned}
-\dot{H}(\bm{e}) &= \langle \partial_{\bm{e}} H, \partial_t {\bm{e}} \rangle_{\mathscr{X}},\\
-\onslide*<2-6>{&= \langle \bm{\mathcal{E}}^* \bm{z}, \partial_t {\bm{e}} \rangle_{\mathscr{X}}, } \\
-\onslide*<3-6>{&= \langle \bm{z}, \bm{\mathcal{E}} \partial_t {\bm{e}} \rangle_{\mathscr{X}}, \quad \text{Adjoint definition}, } \\
-\onslide*<4-6>{&= \langle \bm{z}, \bm{\mathcal{J}}\bm{z} + \bm{\mathcal{B}}_d(\bm{e}) \bm{u}_d + \bm{\mathcal{B}}_r(\bm{e}) \bm{u}_\partial \rangle_{\mathscr{X}}, } \\
-\onslide*<5-6>{&= \langle \bm{y}_\partial,  \bm{u}_\partial \rangle_{\mathscr{L}^2(\partial\Omega, \mathbb{R}^3)} + \langle \bm{\mathcal{B}}_d^* \bm{z}, \bm{u}_d \rangle_{\mathscr{X}} + \langle \bm{\mathcal{B}}_r^* \bm{z}, \bm{u}_\partial \rangle_{\mathscr{L}^2(\partial\Omega, \mathbb{R}^3)}, \quad \text{I.B.P. on } \bm{\mathcal{J}}, } \\
-\onslide*<6>{&= \langle \bm{y}_\partial + \bm{y}_r,  \bm{u}_\partial \rangle_{\mathscr{L}^2(\partial\Omega, \mathbb{R}^3)} + \langle \bm{y}_d,  \bm{u}_d \rangle_{\mathscr{L}^2(\Omega, \mathbb{R}^3)}, } \\
-\end{aligned}
-\end{equation*}
-
-\onslide*<5-6>{
-where the integration by parts (Stokes theorem) has been used
-\begin{equation*}
-\setlength{\abovedisplayskip}{5pt}
-\setlength{\belowdisplayskip}{5pt}
-\int_{\Omega} \bm\Sigma \cddot \Grad(\bm{v}_f) \d{\Omega} + \int_{\Omega} \Div(\bm\Sigma) \cdot \bm{v}_f \d{\Omega} = \int_{\partial \Omega} (\bm\Sigma \cdot \bm{n}) \cdot \bm{v}_f \d{\Gamma} = \langle \bm{y}_\partial,  \bm{u}_\partial \rangle_{\mathscr{L}^2(\partial\Omega)}.
-\end{equation*}}
-
-\end{overlayarea}
-}
-\only<7->{\centering
 \begin{exampleblock}{Power balance}
-The power balance equals the power due to body force and surface traction
-\begin{equation*}
-\setlength{\abovedisplayskip}{5pt}
-\setlength{\belowdisplayskip}{5pt}
-\begin{aligned}
-\dot{H}(\bm{e}) &= \int_{\partial \Omega} \bm\tau \cdot \bm{v} \d\Gamma + \int_{\Omega} \bm{\beta} \cdot \bm{v}  \d{\Omega},  \\
-&= \int_{\Omega} \bm{u}_d \cdot \bm{y}_d \d\Gamma + \int_{\partial\Omega} \bm{u}_\partial \cdot (\bm{y}_\partial + \bm{y}_r)  \d{\Omega},
-\end{aligned}
-\end{equation*}
-where $\bm{v} := \bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}+\bm{u}_f) + {\bm{v}}_f$ is the velocity field with the body
+	The power balance equals the power due to the surface traction
+	\begin{equation*}
+	\setlength{\abovedisplayskip}{5pt}
+	\setlength{\belowdisplayskip}{5pt}
+	\begin{aligned}
+	\dot{H}(\bm{e}) &= \langle \partial_{\bm{e}} H, \partial_t {\bm{e}} \rangle_{X},\\
+	&= \langle \bm{z}, \bm{\mathcal{E}} \partial_t {\bm{e}} \rangle_{{X}}, \quad \text{Adjoint definition},  \\
+	&= \langle \bm{y}_\partial,  \bm{u}_\partial \rangle_{\partial\Omega} + \langle \bm{\mathcal{B}}_r^* \bm{z}, \bm{u}_\partial \rangle_{\partial\Omega}, \quad \text{I.B.P. on } \bm{\mathcal{J}}, \\
+	&=  \int_{\partial \Omega} \bm{u}_\partial \cdot (\bm{y}_\partial + \bm{y}_r)  \d{\Omega}, \\
+	&= \int_{\partial \Omega} \bm\tau \cdot \bm{v} \d\Gamma,  \\
+	\end{aligned}
+	\end{equation*}
+	where $\bm{y}_\partial + \bm{y}_r := (\bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}+\bm{u}_f) + {\bm{v}}_f)\vert_{\partial\Omega} = \bm{v}\vert_{\partial\Omega}$ is the velocity field at the boundary.
 \end{exampleblock}
-
-}
 
 \end{frame}
 
@@ -434,9 +433,13 @@ where $\bm{v} := \bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}+\bm{u}_f) + {\bm{v}}_f
 	\item Geometric stiffening could be considered by adding a potential energy associated to centrifugal forces or using a substructuring technique.
 	\item If case of vanishing deformations $\bm{u}_f \equiv 0$, the Newton-Euler equations on the Euclidean group $SE(3)$ are retrieved
 	\begin{equation*}
-	\begin{bmatrix}
-	^i\dot{\bm{r}}_P \\ \bm{R}_{\text{v}} \\\dot{\bm{p}}_t \\ \dot{\bm{p}}_r \\
-	\end{bmatrix} = 
+	\diff{}{t}
+	\begin{pmatrix}
+	^i{\bm{r}}_P \\
+	\bm{R}_{\mathrm{v}} \\
+	{\bm{p}}_t \\ 
+	{\bm{p}}_r \\
+	\end{pmatrix} = 
 	\begin{bmatrix}
 	0 & 0 & \bm{R} & 0 \\
 	0 & 0 & 0 & \crmat{\bm{R}_{\text{v}}} \\
@@ -444,17 +447,10 @@ where $\bm{v} := \bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}+\bm{u}_f) + {\bm{v}}_f
 	0 & -\crmat{\bm{R}_{\text{v}}}^\top & \crmat{\bm{p}_t} & \crmat{\bm{p}_r} \\
 	\end{bmatrix}
 	\begin{bmatrix}
-	\partial_{\bm{r}_P} H \\ \partial_{\bm{R}_{\text{v}}} H \\ \bm{v}_P \\ \bm{\omega}_P  \\
-	\end{bmatrix}, \qquad
-	\begin{bmatrix}
-	\bm{p}_t \\ \bm{p}_r \\ 
-	\end{bmatrix} = 
-	\begin{bmatrix}
-	m \bm{I} & \crmat{\bm{s}}^\top \\
-	\crmat{\bm{s}} & \bm{J} \\
-	\end{bmatrix}
-	\begin{bmatrix}
-	\bm{v}_P \\ \bm{\omega}_P  \\ 
+	\partial_{\bm{r}_P} H \\ 
+	\partial_{\bm{R}_{\text{v}}} H \\ 
+	\partial_{\bm{p}_t} H \\ 
+	\partial_{\bm{p}_r} H \\ 
 	\end{bmatrix}.
 	\end{equation*}
 \end{itemize}
@@ -463,7 +459,7 @@ where $\bm{v} := \bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}+\bm{u}_f) + {\bm{v}}_f
 \section{Discretization}
 
 \begin{frame}{Discretized system}
-	Same procedure as always but the integration by parts is applied to the $\Div$ operator to highlight the Neumann condition
+	Same procedure as always but the integration by parts is applied to the $\Div$ operator to highlight the Neumann condition.
 	\begin{exampleblock}{Finite-dimensional pHDAE system}
 		\setlength{\abovedisplayskip}{3pt}
 		\setlength{\belowdisplayskip}{3pt}
@@ -478,7 +474,7 @@ where $\bm{v} := \bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}+\bm{u}_f) + {\bm{v}}_f
 	\end{exampleblock}
 	
 	\begin{block}{Dirichlet conditions}
-		The set $\Gamma_D$ for the Dirichlet condition has to be non empty, otherwise the deformation field is allowed for rigid movement, leading to a singular mass matrix. Test and state shape functions must verify an homogeneous Dirichlet condition. 
+		The set $\Gamma_D$ for the Dirichlet condition has to be non empty, otherwise the deformation field is allowed for rigid movement, leading to a singular mass matrix. Test and state shape functions must verify an homogeneous Dirichlet condition\footfullcite{agrawal1986application}. 
 	\end{block}
 \end{frame}
 
