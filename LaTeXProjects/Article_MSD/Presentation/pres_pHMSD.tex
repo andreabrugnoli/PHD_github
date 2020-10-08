@@ -24,6 +24,10 @@
 \renewcommand{\div}{\operatorname{div}}
 \DeclareMathOperator*{\Hess}{Hess}
 
+\newcommand{\inner}[3][]{\ensuremath{\left\langle #2, \, #3 \right\rangle_{#1}}}
+\newcommand{\bilprod}[2]{\left\langle \left\langle \, #1, #2 \, \right\rangle \right\rangle}
+
+
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
 
@@ -88,7 +92,6 @@ Drawbacks:
 
 \section{PH formulation of a floating body}
 
-\subsection{Floating frame formulation}
 
 \begin{frame}{Floating frame based approach}
 The floating frame approach relies on the hypothesis of small deformations: elastic motion is described w.r.t a reference that follows the large rigid motion\footfullcite{Noor_rev}. \\
@@ -202,7 +205,7 @@ This equation is expressed in the body reference frame $\widehat{\bm{x}}, \wideh
 		\end{exampleblock} 
 		Notice that the kinetic energy also depends on the flexible displacement
 		\[
-		\diffd{H_{\text{kin}}}{\bm{u}_f} = \crmat{\bm{p}_f} \bm{\omega_{P}}.
+		\diffd{H_{\text{kin}}}{\bm{u}_f} = \crmat{\bm{p}_f} \bm{\omega}_{P}.
 		\]
 	}
 \end{overlayarea}
@@ -366,8 +369,8 @@ The overall port-Hamiltonian formulation (without including the boundary tractio
 0 & 0 & 0 & 0 & \crmat{\bm{R}_{\text{v}}} & 0 & 0 \\
 0 & 0 & 0 & 0 & 0 & \bm{I}_{3\times 3} & 0  \\ 
 \hdashline
--\bm{R}^\top & 0 & 0 & 0 & \crmat{\widetilde{\bm{p}}_t} & 0 & 0 \\
-0 & -\crmat{\bm{R}_{\text{v}}}^\top & 0 & \crmat{\widetilde{\bm{p}}_t} & \crmat{\widetilde{\bm{p}}_r} & \bm{\mathcal{I}}_{p_f}^\Omega & 0 \\
+-\bm{R}^\top & 0 & 0 & 0 & \crmat{\widehat{\bm{p}}_t} & 0 & 0 \\
+0 & -\crmat{\bm{R}_{\text{v}}}^\top & 0 & \crmat{\widehat{\bm{p}}_t} & \crmat{\widehat{\bm{p}}_r} & \bm{\mathcal{I}}_{p_f}^\Omega & 0 \\
 0 & 0 & -\bm{I}_{3\times 3} & 0 & -(\bm{\mathcal{I}}_{p_f}^\Omega)^* & 0 & \Div \\
 0 & 0 & 0 & 0 & 0 & \Grad & 0 \\
 \end{array} \right]}
@@ -705,6 +708,170 @@ with $\widehat{\mathbf{M}} = \mathbf{P}^\top \mathbf{M} \mathbf{P}, \; \widehat{
 
 \end{frame}
 
+\subsection{Example: boundary interconnection of the Kirchhoff plate}
+
+\begin{frame}{Rigid rod welded to a cantilever plate }
+\begin{tcolorbox}
+	\centering
+	\only<1>{ \includegraphics[width=0.9\textwidth]{plate_rod_separated.eps}}
+	\only<2>{\includegraphics[width=0.7\textwidth]{plate_rod_welded.eps}}
+\end{tcolorbox}
+
+\end{frame}
+
+\begin{frame}{Boundary interconnection}
+\only<1>{
+	The system is composed by a cantilever plate (distributed pH) connected to a rigid rod:
+	\begin{minipage}{.45\linewidth}
+		\begin{equation*}
+		\text{dpH}\qquad
+		\begin{aligned}
+		\partial_t \bm{x}_1 &= \mathcal{J} \, \delta_{\bm{x}_1} {H_1}, \\
+		\bm{u}_{\partial, 1}  &= \mathcal{B}_\partial \, \delta_{\bm{x}_1} {H_1}, \\
+		\bm{y}_{\partial, 1} &= \mathcal{C}_\partial \, \delta_{\bm{x}_1} {H_1}, \\
+		\end{aligned}
+		\end{equation*}
+	\end{minipage}
+	\begin{minipage}{.5\linewidth}
+		\begin{equation*}
+		\text{pH} \qquad
+		\begin{aligned}
+		\dot{\mathbf{x}}_2 &= \mathbf{J} \nabla_{\mathbf{x}_2} {H_2} + \mathbf{B} \mathbf{u}_2, \\
+		\mathbf{y}_{2} &= \mathbf{B}^\top \nabla_{\mathbf{x}_2} {H_2}, \\
+		\end{aligned}
+		\end{equation*}
+	\end{minipage} %
+	
+	\vspace{.3cm}
+	
+	where $\mathbf{x} \in \mathbb{R}^n, \mathbf{u}_2, \mathbf{y}_2 \in \mathbb{R}^m$ and $\bm{x}_1 \in {X}$,  $\bm{u}_{\partial, 1}  \in {U}, \, \bm{y}_{\partial, 1} \in  {Y} = {U}^\prime$ belong to and Hilbert spaces  and  $\mathcal{B}_\partial: {X} \rightarrow {U}, \; \mathcal{C}_\partial: {X} \rightarrow {Y}$ are boundary operators. \\ The duality pairings for the boundary ports are denoted by
+	\[
+	\inner[{U} \times {Y}]{\bm{u}_{\partial, 1}}{\bm{y}_{\partial, 1}},  \qquad
+	\inner[\mathbb{R}^m]{\mathbf{u}_{2}}{\mathbf{y}_{2}}.
+	\]
+	For the interconnection, consider the compact operator $\mathcal{W}: Y \rightarrow \mathbb{R}^m$ and the following power-preserving interconnection
+	\begin{equation*}
+	\label{eq:int_inf}
+	\mathbf{u}_2 = -\mathcal{W} \, \bm{y}_{\partial, 1},  \qquad \bm{u}_{\partial, 1} = \mathcal{W}^* \, \mathbf{y}_2.
+	\end{equation*}
+}
+
+\only<2>{\vspace{.5cm}\centering \includegraphics[width=0.6\textwidth]{pp_interconnection.eps}}
+
+\end{frame}
+
+\begin{frame}{Kirchhoff plate welded to a rigid rod}
+\begin{equation*}\small
+\begin{aligned}
+\text{Plate} \; (\Omega &= [0, L_x] \times [0, L_y]) \\
+\begin{bmatrix}
+\rho h & 0 \\ 0 & \mathcal{\bm{C}}_b \\
+\end{bmatrix}
+\diffp{}{t}
+\begin{bmatrix}
+{e}_w \\ \bm{E}_\kappa \\
+\end{bmatrix} &= 
+\begin{bmatrix}
+0 & -\div\Div \\ \nabla^2 & 0 \\
+\end{bmatrix}
+\begin{bmatrix}
+{e}_w \\ \bm{E}_\kappa \\
+\end{bmatrix} \\
+u_{\partial, \text{pl}} &= {e}_w (x = L_x, y), \\
+y_{\partial, \text{pl}} &= \widetilde{q}_n(x = L_x, y).
+\end{aligned} \qquad \quad
+\begin{aligned}
+\text{Rigid rod} \\
+\begin{bmatrix}
+M & 0 \\
+0   & J_G \\
+\end{bmatrix} 
+\displaystyle \diff{}{t}
+\begin{pmatrix}
+v_G \\ \omega_G \\
+\end{pmatrix} & = \begin{pmatrix}
+F_z \\ T_x \\
+\end{pmatrix} = \bm{u}_{\text{rod}}\vspace{1mm}, \\
+\bm{y}_{\text{rod}} &= \begin{pmatrix}
+v_G \\ \omega_{G} \\
+\end{pmatrix},
+\end{aligned}
+\end{equation*}
+Space $Y$ is the space of square-integrable functions with support on $\Gamma_{\text{int}} = \left\{x=L_x\right\}$. \\
+The interconnection operator  provides the total force and torque acting on the rigid rod
+\begin{equation*}
+\mathcal{W} y_{\partial, \text{pl}} =  - \begin{pmatrix}
+F_z \\
+T_x \\
+\end{pmatrix} = \begin{pmatrix}
+\int_{\Gamma_{\text{int}}} y_{\partial, \text{pl}} \d{s} \\
+\int_{\Gamma_{\text{int}}} \left( y - L_y/2 \right) y_{\partial, \text{pl}} \d{s} \\
+\end{pmatrix}.
+\end{equation*}
+The adjoint operator provides a rigid movement as the plate input at $\Gamma_{\text{int}}$
+\begin{align*}
+\left\langle \mathcal{W} y_{\partial, \text{pl}}, \; \bm{y}_{\text{rod}} \right\rangle_{\mathbb{R}^m} &= \left\langle y_{\partial, \text{pl}}, \, \mathcal{W}^* \bm{y}_{\text{rod}}\right\rangle_{L^2(\Gamma_{\text{int}})}, \\
+\mathcal{W}^* {y}_{\text{rod}} &= v_G + \omega_{G} \left( y - L_y/2 \right).
+\end{align*}
+\end{frame}
+
+
+
+\begin{frame}{Results}
+\begin{center}
+\onslide*<1>{
+\setlength{\abovedisplayskip}{0pt}
+\setlength{\belowdisplayskip}{0pt}
+\begin{equation*}
+\text{Load} \qquad f = \begin{cases}
+10^5 \left[ y + 10 \left( y - L_y/2 \right)^2 \right] [\mathrm{Pa}], \quad &\forall \, t < 2 \, [\mathrm{ms}], \\
+0, \quad &\forall \, t \ge 2 \, [\mathrm{ms}],
+\end{cases}
+\quad t_{\text{end}} = 10 \, [\mathrm{ms}].
+\end{equation*}
+\begin{columns}
+	\begin{column}{.45\textwidth}
+		\includemedia[
+		label=vidNoRod,
+		addresource=/home/a.brugnoli/Videos_defense/Kirchh_NoRod.mp4,
+		activate=pageopen,
+		width=6cm, height=5cm,
+		flashvars={
+			source=/home/a.brugnoli/Videos_defense/Kirchh_NoRod.mp4
+			&loop=true
+		}
+		]{}{VPlayer.swf}
+	\end{column}
+	\begin{column}{.45\textwidth}
+		\includemedia[
+		label=vidRod,
+		addresource=/home/a.brugnoli/Videos_defense/Kirchh_Rod.mp4,
+		activate=pageopen,
+		width=6cm, height=5cm,
+		flashvars={
+			source=/home/a.brugnoli/Videos_defense/Kirchh_Rod.mp4
+			&loop=true
+		}
+		]{}{VPlayer.swf}
+	\end{column}
+\end{columns}
+
+\mediabutton[
+mediacommand=vidNoRod:playPause,
+mediacommand=vidRod:playPause
+]{\fbox{Play/Pause}}
+
+%\movie[width=0.8\textwidth, height=0.6\textheight]{Plate and rod}{../Videos/Comparison_RodNoRod.mp4}	
+}
+
+\onslide*<2>{
+\includegraphics[width=0.48\textwidth]{HamiltonianNoRod.eps}
+\includegraphics[width=0.48\textwidth]{HamiltonianRod.eps}
+}
+
+\end{center}
+\end{frame}
+
 \begin{frame}{Conclusion}
 Summarizing:
 	\begin{itemize}
@@ -721,7 +888,7 @@ Some open questions:
 	\item Control strategies.
 \end{itemize}
 \centering
-\Large Additional information\footfullcite{brugnoli2020msd} \url{https://arxiv.org/abs/2002.12816} \\
+\Large Additional information\footfullcite{brugnoli2020msd} 
 \end{frame}
 
 
