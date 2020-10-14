@@ -79,7 +79,7 @@ $^{\dagger}$DISC, ISAE-SUPAERO, France\\
 
 \section{Classical model}
 
-The classical full von-Karman dynamical model is detailed in \cite{bilbao2015conservative}. In dimensionless variables the problem, defined an open connected set $\Omega \subset \bbR^2$, it reads
+The classical full von-Karman dynamical model is detailed in \cite{bilbao2015conservative}. The problem, defined an open connected set $\Omega \subset \bbR^2$, takes the dimensionless form
 
 \begin{equation}\label{eq:class}
 \begin{aligned}
@@ -92,32 +92,44 @@ The classical full von-Karman dynamical model is detailed in \cite{bilbao2015con
 \end{aligned} \qquad \qquad
 \begin{aligned}
 \bm{\varepsilon} &= \Grad \bm{u} + 1/2 \grad w \otimes \grad w, \\
-\bm{\kappa} &= \Grad \grad w
+\bm{\kappa} &= \Grad \grad w,
 \end{aligned}
 \end{equation}
-where $\bm{u} \in \bbR^2$ is the in-plane displacement, $w$ is the vertical displacement, $\bm{\varepsilon}$ is the in-plane strain tensor, $\bm{\kappa}$ is the curvature tensor, $\bm{N}$ is the in-plane stress resultant and $\bm{M}$ is the bending stress resultant. The notation $\bm{a} \otimes \bm{b} = \bm{a} \bm{b}^\top$ denotes the outer product of two tensors.  The operator $\div$ is the divergence of a vector field and $\grad$ the gradient of a scalar field. The symmetric part of the gradient operator $\mathrm{Grad}$ (i. e. the deformation gradient in continuum mechanics) is given by
-\begin{equation*}
-\Grad(\bm{u}) := \frac{1}{2} \left(\nabla \bm{u} + (\nabla\bm{u})^\top \right) \in \mathbb{S}:= \bbR^{2\times 2}_{\text{sym}}.
-\end{equation*}
-The Hessian operator of a scalar field $u$ is then computed as follows
-\begin{equation*}
-\Hess(u) = \Grad(\grad(u))  \in \mathbb{S}.
-\end{equation*}
-For a tensor field $\bm{U}: \Omega \rightarrow \mathbb{M}$, with components $U_{ij}$, the divergence $\Div$ is a vector, defined column-wise as
+where $\bm{u} \in \bbR^2$ is the in-plane displacement, $w$ is the vertical displacement, $\bm{\varepsilon}$ is the in-plane strain tensor, $\bm{\kappa}$ is the curvature tensor, $\bm{N}$ is the in-plane stress resultant and $\bm{M}$ is the bending stress resultant. The notation $\bm{a} \otimes \bm{b} = \bm{a} \bm{b}^\top$ denotes the outer product of two tensors.  The operator $\div$ is the divergence of a vector field and $\grad$ the gradient of a scalar field. The  operator $\mathrm{Grad} = \frac{1}{2} \left(\nabla + \nabla^\top \right)$ designates the symmetric part of the gradient (i. e. the deformation gradient in continuum mechanics). For a tensor field $\bm{U}: \Omega \rightarrow \mathbb{M}$, with components $U_{ij}$, the divergence $\Div$ is a vector, defined column-wise as
 \begin{equation*}
 \Div(\bm U) := \sum_{i = 1}^2 \partial_{x_i} U_{ij}, \qquad \forall j = \{1, 2\}.
 \end{equation*}
 The tensor mapping $\bm{\Phi}$ is positive and preserves the symmetry
 \begin{equation*}
-	\Phi (\bm{A}) = \nu \Tr(\bm{A})\bm{I}_{2\times 2} + (1 - \nu) \bm{A}, \qquad \bm{A} = \bm{A}^\top \implies \bm{\Phi}(\bm{A}) = \bm{\Phi}(\bm{A})^\top.
+	\bm\Phi (\bm{A}) = \nu \Tr(\bm{A})\bm{1} + (1 - \nu) \bm{A}, \qquad \bm{A} = \bm{A}^\top \implies \bm{\Phi}(\bm{A}) = \bm{\Phi}(\bm{A})^\top, \where \bm{1} = \mathrm{Diag}(1,1).
 \end{equation*}
-The total energy of the model is computed 
+Its inverse is given by 
 \begin{equation}
-	H = \frac{1}{2} \int_{\Omega}\left\{ \norm{\dot{\bm{u}}}^2 + \dot{w}^2 + \bm{N} \cddot \bm{\varepsilon} + \bm{M} \cddot \bm{\kappa} \right\} \d\Omega, \qquad \where \bm{A} \cddot \bm{B} = \Tr(\bm{A}^\top\bm{B}).
+	\bm{\Phi}^{-1}(\bm{A}) = \frac{1}{1 - \nu} \bm{A} - \frac{\nu}{1 - \nu^2} \Tr(\bm{A}) \bm{1}.
 \end{equation}
-Conservativeness of this model is well-understood \cite{bilbao2015conservative}. Indeed, this implies that a port-Hamiltonian realization of the system exists. We shall demonstrate how to construct a port-Hamiltonian realization, equivalent to \eqref{eq:class}.
+The total energy of the model (Hamiltonian functional)
+\begin{equation}
+	H = \frac{1}{2} \int_{\Omega}\left\{ \norm{\dot{\bm{u}}}^2 + \dot{w}^2 + \bm{N} \cddot \bm{\varepsilon} + \bm{M} \cddot \bm{\kappa} \right\} \d\Omega, \qquad \where \bm{A} \cddot \bm{B} = \Tr(\bm{A}^\top\bm{B})
+\end{equation}
+consists of the kinetic energy and membrane and bending deformation energies.
+This model is conservative \cite{bilbao2015conservative}. Indeed, this implies that a port-Hamiltonian realization of the system exists. We shall demonstrate how to construct a port-Hamiltonian realization, equivalent to \eqref{eq:class}.
+
 
 \section{The equivalent port-Hamiltonian system}
+To find a suitable port-Hamiltonian (pH) system, we first select a set of new variables to make the Hamiltonian functional quadratic. The selection is the same as for a linear plate problem \cite{brugnoli2020thesis}
+\begin{equation}
+\bm{\alpha}_u = \dot{\bm{u}}, \qquad \alpha_w = \dot{w}, \qquad \bm{A}_\varepsilon = \bm{\varepsilon}, \qquad \bm{A}_\kappa = \bm{\kappa}.
+\end{equation}
+The energy is quadratic in these variables
+\begin{equation}
+ H = \frac{1}{2} \int_{\Omega} \left\{\norm{\bm{\alpha}_u}^2 + \alpha_w^2 + \bm{\Phi}(\bm{A}_\varepsilon) \cddot \bm{A}_\varepsilon + \bm{\Phi}(\bm{A}_\kappa) \cddot \bm{A}_\kappa \right\}.
+\end{equation}
+By computing the variational derivative of the Hamiltonian, one obtains the co-energy variables
+\begin{equation}
+	\bm{e}_u := \delta_{\bm\alpha_u} H = \dot{\bm{u}}, \qquad \bm{e}_w := \delta_{\bm\alpha_w} H = \dot{w}, \qquad \bm{E}_\varepsilon := \delta_{\bm{A}_\varepsilon} H = \bm{\Phi}(\bm{A}_\varepsilon), \qquad \bm{E}_\kappa := \delta_{\bm{A}_\kappa} H = \bm{\Phi}(\bm{A}_\kappa).
+\end{equation}
+Before stating
+
 
 \subsection{Electronic submission of the Extended Abstract in PDF format}
 The Extended Abstract will be used as the sole means of selection of papers for presentation at the Conference. \\
