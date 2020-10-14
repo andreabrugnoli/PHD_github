@@ -7,6 +7,63 @@
 %% This file was generated with a LateX2e version.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \documentclass{enoc2020}
+\usepackage{natbib}
+
+\bibliographystyle{unsrtnat}
+
+
+% Math macros
+\DeclareMathOperator*{\grad}{grad}
+\DeclareMathOperator*{\Grad}{Grad}
+\DeclareMathOperator*{\Div}{Div}
+\renewcommand{\div}{\operatorname{div}}
+\DeclareMathOperator*{\Hess}{Hess}
+\DeclareMathOperator*{\curl}{curl}
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator{\Dom}{Dom}
+\DeclareMathOperator*{\esssup}{ess\,sup}
+
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\bbF}{\mathbb{F}}
+\newcommand{\bbA}{\mathbb{A}}
+\newcommand{\bbB}{\mathbb{B}}
+\newcommand{\bbS}{\mathbb{S}}
+
+\newcommand*{\norm}[1]{\ensuremath{\left\|#1\right\|}}
+\newcommand{\where}{\qquad \text{where} \qquad}
+\newcommand{\inner}[3][]{\ensuremath{\left\langle #2, \, #3 \right\rangle_{#1}}}
+\newcommand{\bilprod}[2]{\left\langle \left\langle \, #1, #2 \, \right\rangle \right\rangle}
+\newcommand{\pder}[2]{\ensuremath{\partial_{#2} #1}}
+\newcommand{\dder}[2]{\ensuremath{\delta_{#2} #1}}
+\newcommand{\secref}[1]{\S\ref{#1}}
+\newcommand{\energy}[1]{\frac{1}{2} \int_{\Omega} \left\{ #1 \right\} \d\Omega}
+\newcommand{\crmat}[1]{\ensuremath{\left[#1\right]_\times}}
+\newcommand{\fenics}{\textsc{FEniCS}\xspace}
+\newcommand{\firedrake}{\textsc{Firedrake}\xspace}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+\newtheorem{hypothesis}{Hypothesis}
+\newtheorem{assumption}{Assumption}
+\newtheorem{conjecture}{Conjecture}
+
+
+\def\onedot{$\mathsurround0pt\ldotp$}
+\def\cddot{% two dots stacked vertically
+	\mathbin{\vcenter{\baselineskip.67ex
+			\hbox{\onedot}\hbox{\onedot}}%
+}}
+
+%\renewcommand\bibfont{\scriptsize}
+
+
+\makeatletter \renewcommand\d[1]{\ensuremath{%
+		\;\mathrm{d}#1\@ifnextchar\d{\!}{}}}
+\makeatother
+
 
 \title{A port-Hamiltonian formulation for the full Von-Karman plate model}
 
@@ -16,39 +73,51 @@
 $^{\dagger}$DISC, ISAE-SUPAERO, France\\
 }
 
-\abstract{The following guidelines have been prepared for authors of papers to be presented at the forthcoming ENOC 2020 in Lyon (France), July 5-10, 2020. 
-They provide the rules for the preparation of Extended Abstracts (maximum 2 pages). Authors are requested to follow these guidelines in order to achieve uniformity in 
-the presentation of the digital Proceedings. Participants of the previous ENOC 2017 in Budapest will benefit from their work, since the layout of the extended abstract and of 
-the full paper are almost unchanged.}
+\abstract{In this contribution, a port-Hamiltonian reformulation of the full von-Karman dynamical model for geometrically non-linear plates is detailed. Starting from the canonical equations, a set of variables is chosen so that that make the total energy quadratic. The model, reformulated in these variables, highlights a port-Hamiltonian structure ruled by a state-modulated interconnection operator. }
 
 \begin{document}
 
-\section{Manuscript preparation}
+\section{Classical model}
 
-Conference participants are encouraged to submit papers from any area of Nonlinear Dynamics ranging from dynamical systems theory to emerging nonlinear 
-dynamics-enabled engineering applications, within the context of theoretical and applied mechanics, applied mathematics, physics, acoustics, bio-engineering, etc.
+The classical full von-Karman dynamical model is detailed in \cite{bilbao2015conservative}. In dimensionless variables the problem, defined an open connected set $\Omega \subset \bbR^2$, it reads
 
-The web site will be open for paper submission from June 18, 2019. 
-The deadline for the submission of an extended abstract is \emph{December 15, 2019}. Contributors will be informed of the decision of 
-the Scientific Committee and on the assignment 
-of their paper to a Mini-Symposium by February 2020.\\ 
-The paper must be in English, and should present material that is novel and preferably unpublished at the time of the Conference. Prospective
-presenters are asked to submit their paper through the Conference web site. 
-Submission of a paper consists in the electronic submission of a 2-page Extended Abstract (PDF format only). The layout of the 2-page Extended Abstract and the optional Full Paper should follow the style of this document, starting with a title, followed by the name(s) of author(s) and affiliation(s). 
-\underline{The name of the presenting author should be underlined}.
-The submission of the 6-page Full Paper is optional. If the contribution is accepted for publication but no Full Paper is submitted then the 2-page Extended Abstract will appear in the electronic Proceedings. 
+\begin{equation}\label{eq:class}
+\begin{aligned}
+\ddot{\bm{u}} &= \Div{\bm{N}}, \\
+\ddot{w} &= -\div\Div{\bm{M}} + \div{(\bm{N}\grad w)}, \\
+\end{aligned} \qquad \qquad 
+\begin{aligned}
+\bm{N} &= \bm{\Phi} (\bm{\varepsilon}), \\
+\bm{M} &= \bm{\Phi} (\bm{\kappa}), \\
+\end{aligned} \qquad \qquad
+\begin{aligned}
+\bm{\varepsilon} &= \Grad \bm{u} + 1/2 \grad w \otimes \grad w, \\
+\bm{\kappa} &= \Grad \grad w
+\end{aligned}
+\end{equation}
+where $\bm{u} \in \bbR^2$ is the in-plane displacement, $w$ is the vertical displacement, $\bm{\varepsilon}$ is the in-plane strain tensor, $\bm{\kappa}$ is the curvature tensor, $\bm{N}$ is the in-plane stress resultant and $\bm{M}$ is the bending stress resultant. The notation $\bm{a} \otimes \bm{b} = \bm{a} \bm{b}^\top$ denotes the outer product of two tensors.  The operator $\div$ is the divergence of a vector field and $\grad$ the gradient of a scalar field. The symmetric part of the gradient operator $\mathrm{Grad}$ (i. e. the deformation gradient in continuum mechanics) is given by
+\begin{equation*}
+\Grad(\bm{u}) := \frac{1}{2} \left(\nabla \bm{u} + (\nabla\bm{u})^\top \right) \in \mathbb{S}:= \bbR^{2\times 2}_{\text{sym}}.
+\end{equation*}
+The Hessian operator of a scalar field $u$ is then computed as follows
+\begin{equation*}
+\Hess(u) = \Grad(\grad(u))  \in \mathbb{S}.
+\end{equation*}
+For a tensor field $\bm{U}: \Omega \rightarrow \mathbb{M}$, with components $U_{ij}$, the divergence $\Div$ is a vector, defined column-wise as
+\begin{equation*}
+\Div(\bm U) := \sum_{i = 1}^2 \partial_{x_i} U_{ij}, \qquad \forall j = \{1, 2\}.
+\end{equation*}
+The tensor mapping $\bm{\Phi}$ is positive and preserves the symmetry
+\begin{equation*}
+	\Phi (\bm{A}) = \nu \Tr(\bm{A})\bm{I}_{2\times 2} + (1 - \nu) \bm{A}, \qquad \bm{A} = \bm{A}^\top \implies \bm{\Phi}(\bm{A}) = \bm{\Phi}(\bm{A})^\top.
+\end{equation*}
+The total energy of the model is computed 
+\begin{equation}
+	H = \frac{1}{2} \int_{\Omega}\left\{ \norm{\dot{\bm{u}}}^2 + \dot{w}^2 + \bm{N} \cddot \bm{\varepsilon} + \bm{M} \cddot \bm{\kappa} \right\} \d\Omega, \qquad \where \bm{A} \cddot \bm{B} = \Tr(\bm{A}^\top\bm{B}).
+\end{equation}
+Conservativeness of this model is well-understood \cite{bilbao2015conservative}. Indeed, this implies that a port-Hamiltonian realization of the system exists. We shall demonstrate how to construct a port-Hamiltonian realization, equivalent to \eqref{eq:class}.
 
-\subsection{Electronic submission of an Abstract}
-
-The Abstract must be submitted on-line using the abstract submission form available on the ENOC 2020 web site \cite{ENOC}. The Book of Abstracts/Full length papers will be available on the same web site \cite{ENOC}. Submissions will be accepted until \emph{December 15, 2019}.\\ 
-The ENOC Committee will award two ENOC 2020 prizes, each consisting of 300 euro and a certificate, to the best two presentations given during ENOC 2020 by young scientists. Presenting authors wishing to be considered for this award should indicate their interest while submitting their paper online.
-
-\emph{Eligibility:} 1) Candidates must have been born in 1985 or later. 2) Only candidates who have submitted a Paper for presentation at the Congress are eligible for this program.
-3) One applicant per accepted paper.
-
-\emph{Documents Required:} 1) Paper submission 2) Government issued identification proving age 3) Interest in being considered for an ENOC 2020 prize must be indicated online with paper submission.
-
-A maximum of three authors is allowed for the presentation to be rewarded. In addition to the requirements for the ENOC 2020 Proceedings the prize recipients are invited to write a contribution with respect to their presentation to be published in the EUROMECH Newsletter. 
+\section{The equivalent port-Hamiltonian system}
 
 \subsection{Electronic submission of the Extended Abstract in PDF format}
 The Extended Abstract will be used as the sole means of selection of papers for presentation at the Conference. \\
@@ -59,24 +128,6 @@ If the Extended Abstract is divided into sections and subsections, please adopt 
 In order to submit an Extended Abstract, all authors must use the ENOC 2020 online submission system, available via the ENOC 2020 homepage. All submissions must be uploaded and completed by \emph{December 15, 2019}.
 
 \section{General guidelines}
-Authors are urged to make their Extended Abstract as attractive as possible, much like a manuscript for journal submission. In the Extended Abstract, you are encouraged to use figures, 
-diagrams, and photographs, centered and with captions in lower case letters (9 pt). The Extended Abstract will enable the reviewers and the Scientific Committee to decide upon 
-the suitability of your paper for presentation at the Conference. It should contain the main assumptions, techniques and results, accompanied by background information 
-about how your work relates to other work in the field. Only essential formulae and figures should be included and only key references need to be given. A communicative 
-title, a clearly presented Extended Abstract will all assist the Scientific Committee in making a positive decision with regard to the acceptance of your paper.
-
-%% Equation example
-%\begin{equation}\label{eq:1}
-%\rho \ddot{\vect{u}} + \vect{\div} (\tens{\sigma}) + \vect{f} = \vect{0}
-%\end{equation}
-
-% Figure example
-\begin{figure}[!tb]
-\centering
-\includegraphics[width=.1\textwidth]{enoc2020_logo.pdf}
-\caption{Greatest figure of all time}
-\label{fig:Enoc}
-\end{figure}
 
 \section{Oral presentation}
 Papers selected for presentation as lectures will be arranged by subject into parallel sessions. A period of 15 minutes, plus 5 minutes discussion, will be allotted to each paper. 
@@ -92,12 +143,5 @@ Posters should be prepared directly on one sheet. Be warned that posters made by
 Prepare Extended Abstract as a PDF file, visit the ENOC 2020 web page enoc2020.sciencesconf.org \cite{ENOC}, create a sciencesconf.org account (if you have not already done so), 
 and submit your Abstract following the instructions. Confirmation by e-mail will be sent to your e-mail address.
  
-\begin{thebibliography}{99}
-
-\bibitem{Cooler} Cooler A. S. (1999) Binary Flow Systems.  {\em J. Fluid Mech}  {\bf 999}:999-996.
-\bibitem{Icer}  Icer D.F., Adams J.A. (1977) Mathematical Elements for Computer Simulation. McGraw Hill, NY.
-\bibitem{Nygus} Nygus, G. (1983) Numerical Analysis Using Finite Element Method.  {\em PhD Thesis},  NTU Mech.  Eng.  Dept., Lagos.
-\bibitem{ENOC}  ENOC 2020 web site, https://enoc2020.sciencesconf.org
-
-\end{thebibliography}
+\bibliography{biblio_ENOC} 
  \end{document}
