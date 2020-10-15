@@ -8,6 +8,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \documentclass{enoc2020}
 \usepackage{natbib}
+\usepackage{diffcoeff}
 
 \bibliographystyle{unsrtnat}
 
@@ -45,6 +46,7 @@
 \DeclareMathOperator*{\argmin}{arg\,min}
 
 \newtheorem{proposition}{Proposition}
+\newtheorem{proof}{Proof}
 \newtheorem{remark}{Remark}
 \newtheorem{hypothesis}{Hypothesis}
 \newtheorem{assumption}{Assumption}
@@ -95,7 +97,7 @@ The classical full von-Karman dynamical model is detailed in \cite{bilbao2015con
 \bm{\kappa} &= \Grad \grad w,
 \end{aligned}
 \end{equation}
-where $\bm{u} \in \bbR^2$ is the in-plane displacement, $w$ is the vertical displacement, $\bm{\varepsilon}$ is the in-plane strain tensor, $\bm{\kappa}$ is the curvature tensor, $\bm{N}$ is the in-plane stress resultant and $\bm{M}$ is the bending stress resultant. The notation $\bm{a} \otimes \bm{b} = \bm{a} \bm{b}^\top$ denotes the outer product of two tensors.  The operator $\div$ is the divergence of a vector field and $\grad$ the gradient of a scalar field. The  operator $\mathrm{Grad} = \frac{1}{2} \left(\nabla + \nabla^\top \right)$ designates the symmetric part of the gradient (i. e. the deformation gradient in continuum mechanics). For a tensor field $\bm{U}: \Omega \rightarrow \mathbb{M}$, with components $U_{ij}$, the divergence $\Div$ is a vector, defined column-wise as
+where $\bm{u} \in \bbR^2$ is the in-plane displacement, $w$ is the vertical displacement, $\bm{\varepsilon}$ is the in-plane strain tensor, $\bm{\kappa}$ is the curvature tensor, $\bm{N}$ is the in-plane stress resultant and $\bm{M}$ is the bending stress resultant. The notation $\bm{a} \otimes \bm{b} = \bm{a} \bm{b}^\top$ denotes the dyadic product of two vectors.  The operator $\div$ is the divergence of a vector field and $\grad$ the gradient of a scalar field. The  operator $\mathrm{Grad} = \frac{1}{2} \left(\nabla + \nabla^\top \right)$ designates the symmetric part of the gradient (i. e. the deformation gradient in continuum mechanics). For a tensor field $\bm{U}: \Omega \rightarrow \bbR^{2\times 2}$, with components $U_{ij}$, the divergence $\Div$ is a vector, defined column-wise as
 \begin{equation*}
 \Div(\bm U) := \sum_{i = 1}^2 \partial_{x_i} U_{ij}, \qquad \forall j = \{1, 2\}.
 \end{equation*}
@@ -128,32 +130,63 @@ By computing the variational derivative of the Hamiltonian, one obtains the co-e
 \begin{equation}
 	\bm{e}_u := \delta_{\bm\alpha_u} H = \dot{\bm{u}}, \qquad \bm{e}_w := \delta_{\bm\alpha_w} H = \dot{w}, \qquad \bm{E}_\varepsilon := \delta_{\bm{A}_\varepsilon} H = \bm{\Phi}(\bm{A}_\varepsilon), \qquad \bm{E}_\kappa := \delta_{\bm{A}_\kappa} H = \bm{\Phi}(\bm{A}_\kappa).
 \end{equation}
-Before stating
+Before stating the final formulation, consider the operator $\mathcal{C}(w)(\cdot): L^2(\Omega, \bbR^{2\times 2}_{\text{sym}}) \rightarrow L^2(\Omega)$ acting on symmetric tensors 
+\begin{equation}
+	\mathcal{C}(w)(\cdot) = \div(\cdot \grad w).
+\end{equation}
+\begin{proposition}
+The formal anti-adjoint of the $\mathcal{C}(w)(\cdot)$ is given by
+\begin{equation}
+-\mathcal{C}(w)^*(\cdot) = \frac{1}{2} \left[\grad (\cdot) \otimes \grad(w) + \grad(w) \otimes \grad(\cdot) \right] .
+\end{equation}
+\end{proposition}
+\begin{proof}
+Consider a smooth scalar $v \in C^\infty_0(\Omega)$ and a smooth symmetric tensor field $\bm{U} \in C^\infty_0(\Omega, \bbR^{2\times 2}_{\text{sym}})$ with compact support. The formal adjoint of $\mathcal{C}(w)(\cdot)$ satisfies the relation
+\begin{equation}
+\inner[L^2(\Omega)]{v}{\mathcal{C}(w)(\bm{U})} = \inner[L^2(\Omega, \bbR^{2\times 2}_{\text{sym}})]{\mathcal{C}(w)(v)^*}{\bm{U}}.
+\end{equation}
+The proof follows the a simple computation
+\begin{equation}
+\begin{aligned}
+\inner[L^2(\Omega)]{v}{\mathcal{C}(w)(\bm{U})} &= \inner[L^2(\Omega)]{v}{\div(\bm{U} \grad w)}, \qquad \text{Integration by parts}\\
+&= \inner[L^2(\Omega, \bbR^2)]{-\grad v}{\bm{U} \grad w}, \qquad \text{Dyadic product properties}\\
+&= \inner[L^2(\Omega, \bbR^{2\times 2}_{\text{sym}})]{-\grad v \otimes \grad w}{\bm{U}}, \qquad \text{Since $\bm{U}$ is symmetric}\\
+&= \inner[L^2(\Omega, \bbR^{2\times 2}_{\text{sym}})]{-1/2(\grad v \otimes \grad w + \grad w \otimes \grad v)}{\bm{U}}.
+\end{aligned} 
+\end{equation}
+This means
+\begin{equation}
+\mathcal{C}(w)^*(\cdot) = -\frac{1}{2} \left[\grad (\cdot) \otimes \grad(w) + \grad(w) \otimes \grad(\cdot) \right],
+\end{equation}
+leading to the final result.
+\end{proof}
 
-
-\subsection{Electronic submission of the Extended Abstract in PDF format}
-The Extended Abstract will be used as the sole means of selection of papers for presentation at the Conference. \\
-All accepted Extended Abstracts will be published in digital format. 
-The Extended Abstract is limited to a maximum of two A4 pages (including figures) and it must be submitted as a PDF document. \textbf{WHEN PREPARING THE PDF FILE REMEMBER TO EMBED ALL THE FONTS} into your PDF file, use TrueType fonts as much as possible, and avoid any Asian fonts. If the reviewers cannot read your PDF file it is unlikely they will accept it.\\ 
-The text should be written using Times New Roman font and should start with a title followed by the authors' names and affiliations. \underline{The name of the author presenting the paper should be underlined}. The title should appear 20 mm below the top edge of the page.  It should be brief, clear and descriptive.  Use all bold lower case letters starting with a capital centered on the width of the typing area. Leave one blank line after the title and another after the affiliation. A short summary (max. 250 words) should be given at the start of the text. \\
-If the Extended Abstract is divided into sections and subsections, please adopt the format used here, in which first-level headings are centered in bold lower case letters (11 pt) and second level headings are left aligned in bold lower case letters (10 pt), starting with a capital. Do not number sections. The text should be single-spaced using 10-pt font. Begin paragraphs flush at the left margin without indentation.  The typing area of all pages should be 170 x 257 mm, leaving 20 mm margins on left, right, top and bottom. The total length of the Extended Abstract, including all figures and references if any, should be two pages. The contribution should be prepared as accurately and carefully as possible, much like a manuscript for journal submission.\\ 
-In order to submit an Extended Abstract, all authors must use the ENOC 2020 online submission system, available via the ENOC 2020 homepage. All submissions must be uploaded and completed by \emph{December 15, 2019}.
-
-\section{General guidelines}
-
-\section{Oral presentation}
-Papers selected for presentation as lectures will be arranged by subject into parallel sessions. A period of 15 minutes, plus 5 minutes discussion, will be allotted to each paper. 
-Standard audio-visual equipment (data projector, screen, laser pointer and an audio system) will be available in each lecture room. Details regarding the Conference presentation 
-facilities will be provided on the ENOC 2020 web site.
-
-\section{Poster presentation}
-Authors of papers selected for presentation in poster format will be expected to present their work concurrently with the aid of a A0 poster during a dedicated poster session. The poster session will start with a quick presentation of all posters, during which the PDF version of each poster will be displayed and each presenting author will be given a maximum of 90 seconds to provide an attractive overview of its poster. \\ 
-The Conference will provide poster boards. The usable area of a poster panel will correspond the size of an A0 sheet, i.e., approximately 1.2 m (height) by 0.85m (width).\\ 
-Posters should be prepared directly on one sheet. Be warned that posters made by taping together several sheets tend to look amateurish. The lettering should be large enough to be read by someone standing 2 m back from the poster and the following text sizes are suggested. Title: 2-3 cm; Authors' names and affiliations: 2 cm; Section headings (ABSTRACT, RESULTS, etc.): 2 cm. The text itself should be approximately 10 mm high.  The use of more diagrams, colour, and fewer words is recommended for clarity. Use phrases and short sentences in "bullet points". It is recommended that the poster be divided into sections:  a one or two sentence abstract; problem definition and/or aims; methods; results; conclusions.
+The pH realization is then given by the following system
+\begin{equation}\label{eq:pHsys}
+\diffp{}{t}
+\begin{pmatrix}
+\bm{\alpha}_u \\
+\bm{A}_\varepsilon \\
+\alpha_w \\
+\bm{A}_\kappa
+\end{pmatrix} = 
+\begin{bmatrix}
+\bm{0} & \Div & \bm{0} & \bm{0} \\
+\Grad & \bm{0} & -\mathcal{C}(w)^* & \bm{0} \\
+0 & \mathcal{C}(w) & 0 & -\div\Div \\
+\bm{0} & \bm{0} & \Grad\grad & \bm{0} \\ 
+\end{bmatrix}
+\begin{pmatrix}
+\bm{e}_u \\
+\bm{E}_\varepsilon \\
+e_w \\
+\bm{E}_\kappa
+\end{pmatrix},
+\end{equation}
+The second line of system \eqref{eq:pHsys} represents the time derivative of the membrane strain tensor.
 
 \section{Conclusions}
-Prepare Extended Abstract as a PDF file, visit the ENOC 2020 web page enoc2020.sciencesconf.org \cite{ENOC}, create a sciencesconf.org account (if you have not already done so), 
-and submit your Abstract following the instructions. Confirmation by e-mail will be sent to your e-mail address.
+
  
 \bibliography{biblio_ENOC} 
  \end{document}
