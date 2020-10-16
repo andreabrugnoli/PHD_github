@@ -9,6 +9,7 @@
 \documentclass{enoc2020}
 \usepackage{natbib}
 \usepackage{diffcoeff}
+\usepackage{comment}
 
 \bibliographystyle{unsrtnat}
 
@@ -67,12 +68,11 @@
 \makeatother
 
 
-\title{A port-Hamiltonian formulation for the full Von-Karman plate model}
+\title{A port-Hamiltonian formulation for the full von-K\'arm\'an plate model}
 
-\author{\underline{Andrea Brugnoli}$^\ast$, Denis Matignon$^{\dagger}$}
+\author{{Andrea Brugnoli}$^\ast$, Denis Matignon$^{\ast}$}
 
-\address{$^\ast$DCAS, ISAE-SUPAERO, France\\  
-$^{\dagger}$DISC, ISAE-SUPAERO, France\\
+\address{$^\ast$ISAE-SUPAERO, Université de Toulouse, France 
 }
 
 \abstract{In this contribution, a port-Hamiltonian reformulation of the full von-Karman dynamical model for geometrically non-linear plates is detailed. Starting from the canonical equations, a set of variables is chosen so that that make the total energy quadratic. The model, reformulated in these variables, highlights a port-Hamiltonian structure ruled by a state-modulated interconnection operator. }
@@ -81,7 +81,7 @@ $^{\dagger}$DISC, ISAE-SUPAERO, France\\
 
 \section{Classical model}
 
-The classical full von-Karman dynamical model is detailed in \cite{bilbao2015conservative}. The problem, defined an open connected set $\Omega \subset \bbR^2$, takes the dimensionless form
+The classical full von-Karman dynamical model is detailed in \cite{bilbao2015conservative}. The problem, defined on an open connected set $\Omega \subset \bbR^2$, takes the dimensionless form
 
 \begin{equation}\label{eq:class}
 \begin{aligned}
@@ -105,10 +105,14 @@ The tensor mapping $\bm{\Phi}$ is positive and preserves the symmetry
 \begin{equation*}
 	\bm\Phi (\bm{A}) = \nu \Tr(\bm{A})\bm{1} + (1 - \nu) \bm{A}, \qquad \bm{A} = \bm{A}^\top \implies \bm{\Phi}(\bm{A}) = \bm{\Phi}(\bm{A})^\top, \where \bm{1} = \mathrm{Diag}(1,1).
 \end{equation*}
+
+\begin{comment}
 Its inverse is given by 
 \begin{equation}
-	\bm{\Phi}^{-1}(\bm{A}) = \frac{1}{1 - \nu} \bm{A} - \frac{\nu}{1 - \nu^2} \Tr(\bm{A}) \bm{1}.
+\bm{\Phi}^{-1}(\bm{A}) = \frac{1}{1 - \nu} \bm{A} - \frac{\nu}{1 - \nu^2} \Tr(\bm{A}) \bm{1}.
 \end{equation}
+\end{comment}
+
 The total energy of the model (Hamiltonian functional)
 \begin{equation}
 	H = \frac{1}{2} \int_{\Omega}\left\{ \norm{\dot{\bm{u}}}^2 + \dot{w}^2 + \bm{N} \cddot \bm{\varepsilon} + \bm{M} \cddot \bm{\kappa} \right\} \d\Omega, \qquad \where \bm{A} \cddot \bm{B} = \Tr(\bm{A}^\top\bm{B})
@@ -128,13 +132,13 @@ The energy is quadratic in these variables
 \end{equation}
 By computing the variational derivative of the Hamiltonian, one obtains the co-energy variables
 \begin{equation}
-	\bm{e}_u := \delta_{\bm\alpha_u} H = \dot{\bm{u}}, \qquad \bm{e}_w := \delta_{\bm\alpha_w} H = \dot{w}, \qquad \bm{E}_\varepsilon := \delta_{\bm{A}_\varepsilon} H = \bm{\Phi}(\bm{A}_\varepsilon), \qquad \bm{E}_\kappa := \delta_{\bm{A}_\kappa} H = \bm{\Phi}(\bm{A}_\kappa).
+	\bm{e}_u := \delta_{\bm\alpha_u} H = \dot{\bm{u}}, \qquad \bm{e}_w := \delta_{\alpha_w} H = \dot{w}, \qquad \bm{E}_\varepsilon := \delta_{\bm{A}_\varepsilon} H = \bm{\Phi}(\bm{A}_\varepsilon), \qquad \bm{E}_\kappa := \delta_{\bm{A}_\kappa} H = \bm{\Phi}(\bm{A}_\kappa).
 \end{equation}
 Before stating the final formulation, consider the operator $\mathcal{C}(w)(\cdot): L^2(\Omega, \bbR^{2\times 2}_{\text{sym}}) \rightarrow L^2(\Omega)$ acting on symmetric tensors 
 \begin{equation}
 	\mathcal{C}(w)(\cdot) = \div(\cdot \grad w).
 \end{equation}
-\begin{proposition}
+\begin{proposition}\label{prop:adjC}
 The formal anti-adjoint of the $\mathcal{C}(w)(\cdot)$ is given by
 \begin{equation}
 -\mathcal{C}(w)^*(\cdot) = \frac{1}{2} \left[\grad (\cdot) \otimes \grad(w) + \grad(w) \otimes \grad(\cdot) \right] .
@@ -145,12 +149,12 @@ Consider a smooth scalar $v \in C^\infty_0(\Omega)$ and a smooth symmetric tenso
 \begin{equation}
 \inner[L^2(\Omega)]{v}{\mathcal{C}(w)(\bm{U})} = \inner[L^2(\Omega, \bbR^{2\times 2}_{\text{sym}})]{\mathcal{C}(w)(v)^*}{\bm{U}}.
 \end{equation}
-The proof follows the a simple computation
+The proof follows from the computation
 \begin{equation}
 \begin{aligned}
-\inner[L^2(\Omega)]{v}{\mathcal{C}(w)(\bm{U})} &= \inner[L^2(\Omega)]{v}{\div(\bm{U} \grad w)}, \qquad \text{Integration by parts}\\
-&= \inner[L^2(\Omega, \bbR^2)]{-\grad v}{\bm{U} \grad w}, \qquad \text{Dyadic product properties}\\
-&= \inner[L^2(\Omega, \bbR^{2\times 2}_{\text{sym}})]{-\grad v \otimes \grad w}{\bm{U}}, \qquad \text{Since $\bm{U}$ is symmetric}\\
+\inner[L^2(\Omega)]{v}{\mathcal{C}(w)(\bm{U})} &= \inner[L^2(\Omega)]{v}{\div(\bm{U} \grad w)}, \qquad \text{Integration by parts,}\\
+&= \inner[L^2(\Omega, \bbR^2)]{-\grad v}{\bm{U} \grad w}, \qquad \text{Dyadic product properties,}\\
+&= \inner[L^2(\Omega, \bbR^{2\times 2}_{\text{sym}})]{-\grad v \otimes \grad w}{\bm{U}}, \qquad \text{Symmetry of $\bm{U}$,}\\
 &= \inner[L^2(\Omega, \bbR^{2\times 2}_{\text{sym}})]{-1/2(\grad v \otimes \grad w + \grad w \otimes \grad v)}{\bm{U}}.
 \end{aligned} 
 \end{equation}
@@ -177,16 +181,47 @@ The pH realization is then given by the following system
 \bm{0} & \bm{0} & \Grad\grad & \bm{0} \\ 
 \end{bmatrix}
 \begin{pmatrix}
-\bm{e}_u \\
-\bm{E}_\varepsilon \\
-e_w \\
-\bm{E}_\kappa
+\delta_{\bm\alpha_u} H \\
+\delta_{\bm{A}_\varepsilon} H \\
+\delta_{\bm\alpha_w} H \\
+\delta_{\bm{A}_\kappa} H
 \end{pmatrix},
 \end{equation}
-The second line of system \eqref{eq:pHsys} represents the time derivative of the membrane strain tensor.
+The second line of system \eqref{eq:pHsys} represents the time derivative of the membrane strain tensor. To close the system, variable $w$ has to be accessible. For this reason, its dynamics has to be included. The augmented system reads
+\begin{equation}\label{eq:pHsys_aug}
+\diffp{}{t}
+\begin{pmatrix}
+\bm{\alpha}_u \\
+\bm{A}_\varepsilon \\
+w \\
+\alpha_w \\
+\bm{A}_\kappa
+\end{pmatrix} = 
+\underbrace{\begin{bmatrix}
+\bm{0} & \Div & \bm{0} & \bm{0} & \bm{0}\\
+\Grad & \bm{0} & \bm{0} & -\mathcal{C}(w)^* & \bm{0} \\
+0 & 0 & 0 & 1 & 0 \\
+0 & \mathcal{C}(w) & -1 & 0 & -\div\Div \\
+\bm{0} & \bm{0} & \bm{0} & \Grad\grad & \bm{0} \\ 
+\end{bmatrix}}_{\mathcal{J}}
+\begin{pmatrix}
+\delta_{\bm\alpha_u} H \\
+\delta_{\bm{A}_\varepsilon} H \\
+\delta_{w} H \\
+\delta_{\alpha_w} H \\
+\delta_{\bm{A}_\kappa} H
+\end{pmatrix}.
+\end{equation}
+Given the results in \cite{brugnoli2019mindlin,brugnoli2019kirchhoff} and Proposition \ref{prop:adjC}, the operator $\mathcal{J}$ is formally skew-adjoint. If only the kinetic and deformation energies are considered, it holds $\delta_{w} H=0$. In general this terms allows accommodating other potentials, for example the gravitational one. Suitable boudary variables are then obtained considering the power balance
+\begin{equation}
+\dot{H} = \inner[\partial\Omega]{\gamma_0\bm{e}_u}{\gamma_\perp \bm{E}_\varepsilon} + \inner[\partial\Omega]{\gamma_0\bm{e}_w}{\gamma_{\perp\perp, 1} \bm{E}_\kappa} + \inner[\partial\Omega]{\gamma_1\bm{e}_w}{\gamma_{\perp\perp} \bm{E}_\kappa},
+\end{equation}
+where $\gamma_0\bm{e}_u= \bm{e}_u\vert_{\partial\Omega}$ is the Dirichlet trace, $\gamma_\perp \bm{E}_\varepsilon = \bm{E}_\varepsilon \bm{n}\vert_{\partial\Omega}$ is the normal trace ($\bm{n}$ is the outward normal versor), $\gamma_{\perp\perp, 1} \bm{E}_\kappa = - \bm{n} \cdot \Div \bm{E}_\kappa - \partial_{\bm{s}}(\bm{n}^\top \bm{E}_\kappa \bm{s})\vert_{\partial\Omega}$ is the effective shear force at the boundary, $\gamma_1 \bm{e}_w = \partial_{\bm{n}} \bm{e}_w\vert_{\partial\Omega}$ is the normal derivative trace and $\gamma_{\perp\perp} \bm{E}_\kappa = \bm{n}^\top \bm{E}_\kappa \bm{n}$ is the normal to normal trace.
+
+
 
 \section{Conclusions}
-
+We have presented a pH formulation of the full von-K\'arm\'an model. The dynamics of the system exhibits a state modulated interconnection operator, while the energy remains quadratic in the chosen variables. Of particular interest is the discretization of such model for simulation and control purposes. Mixed finite elements seems to be particularly suited to achieve a structure-preserving discretization of this model.
  
 \bibliography{biblio_ENOC} 
  \end{document}

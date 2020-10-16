@@ -176,13 +176,13 @@ The numerical implementation relies on efficient and well-established libraries,
 \subsection{Linear elasticity}
 
 \begin{frame}{Main steps for the derivation}
-The derivation of the Hamiltonian system relies on few simple steps  
+The derivation of the Hamiltonian system relies on few simple steps to define:
 \begin{enumerate}
-	\item Starting from the total energy, the energy variables are selected to make the Hamiltonian quadratic: the new variables are the linear momentum and the strain tensor;
-	\item The resulting dynamics is regulated by a formally skew-adjoint operator $\mathcal{J}$;
-	\item The boundary variables are found by considering the Energy rate and using the Stokes theorem.
+	\item the total energy, the energy and co-energy variables;
+	\item the resulting dynamics  $\mathcal{J}$;
+	\item the boundary variables (energy rate and the Stokes theorem).
 \end{enumerate}
-
+\vspace{10pt}
 The construction is exactly the same for plate models, as they represent particular instances of this problem.
 \end{frame}
 
@@ -221,9 +221,8 @@ Operators:
 \end{overlayarea}
 \end{frame}
 
-\begin{frame}{Energies and co-energies}
+\begin{frame}{Energy and co-energy variables}
 \begin{overlayarea}{\textwidth}{\textheight}
-	To derive a pH formulation, the total energy is needed
 	\begin{block}{Total energy}
 	\begin{equation*}
 	H = \energy{\rho \norm{\partial_t \bm{u}}^2 + \bm{\Sigma} \cddot \bm{\varepsilon}}, \qquad \bm{A} \cddot \bm{B} = \Tr(\bm{A}^\top \bm{B}) \quad \text{Tensor contraction}.
@@ -896,7 +895,8 @@ or
 
 \end{frame}
 
-\begin{frame}{The Partitioned finite element method}
+\begin{frame}{The mixed finite element method}
+\begin{overlayarea}{\textwidth}{.4\textheight}
 This discretization procedure boils down to three simple steps:
 \setbeamercovered{transparent}
 \begin{enumerate}
@@ -904,6 +904,7 @@ This discretization procedure boils down to three simple steps:
 	\item \only<3-4>{An integration by parts is applied to highlight the appropriate boundary control;} \only<5>{\textcolor{red}{An integration by parts is applied to highlight the appropriate boundary control;}}
 	\item \only<4->{A Galerkin method is employed to obtain a finite-dimensional system. For the approximation basis the Finite Element Method FEM (large sparse matrices) is here employed but Spectral Methods SM (small full matrices) can be used as well.}
 \end{enumerate}
+\end{overlayarea}
 \end{frame}
 
 \begin{frame}{The discretized system}
@@ -2086,34 +2087,36 @@ Using Lie Algebra and differential forms a pH model of a flexible link has alrea
 \end{overlayarea}
 \end{frame}
 
-\begin{frame}{Floating frame based approach}
-The floating frame approach relies on the hypothesis of small deformations: elastic motion is described w.r.t a reference that follows the large rigid motion\footfullcite{wasfy2003survey}. \\
-\begin{overlayarea}{\textwidth}{0.5\textheight}
-	Advantages 
-	\begin{itemize}
-		\item {The most used paradigm in multibody dynamics;}
-		\item {For control applications other approaches are too complex;}
-		\item {Linear model reduction techniques are applicable.} 
-	\end{itemize}
-	Drawbacks:
-	\begin{itemize}
-		\item {Effect due to geometric non-linearities are not considered: not suitable for large deformations (substructuring can be employed to alleviate this).}
-	\end{itemize}
-\end{overlayarea}
+\begin{frame}{Floating frame of reference approach}
+\begin{columns}
+\begin{column}{.5\textwidth}
+The elastic motion is described in a reference frame that follows the large rigid motion. \\
+
+Advantages 
+\begin{itemize}
+	\item {Most used paradigm in multibody dynamics;}
+	\item {For control other approaches are too complex;}
+	\item {Linear model reduction techniques are applicable.} 
+\end{itemize}
+Drawbacks:
+\begin{itemize}
+	\item {Not suitable for large deformations.}
+\end{itemize}	
+\end{column}
+\begin{column}{.5\textwidth}
+\begin{tcolorbox}
+	\begin{figure}[t]
+		\centering
+		\includegraphics[width=1\textwidth]{presentation/floating_body_small.eps} 
+	\end{figure}
+\end{tcolorbox}
+\end{column}
+\end{columns}
+
 \end{frame}
 
 \begin{frame}{Floating body kinematics}
-\onslide*<1>{
-	\begin{tcolorbox}
-		\begin{figure}[t]
-			\centering
-			\includegraphics[width=0.6\textwidth]{part_4/pHfmd/floating_body.eps} 
-			\caption{Thin floating body undergoing a surface traction $\bm\tau$ and body force density $\bm\beta$}
-			\label{fig:float_body}
-		\end{figure}
-	\end{tcolorbox}
-}
-\onslide*<2->{
+\onslide*<1->{
 	The velocity of a generic point is expressed by considering a small flexible displacement superimposed to the rigid motion
 	\[
 	\bm{v} = \bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}+\bm{u}_f) + \bm{v}_f.
@@ -2123,7 +2126,7 @@ The floating frame approach relies on the hypothesis of small deformations: elas
 	This equation is expressed in the body reference frame $\widehat{\bm{x}}, \widehat{\bm{y}}, \widehat{\bm{z}}$. 
 	
 }
-\onslide<3->{
+\onslide<2->{
 \vspace{5pt}
 Kinematic variables:  
 \begin{itemize}
@@ -2132,7 +2135,7 @@ Kinematic variables:
 	\item $\bm{v}_f := \dot{\bm{u}}_f$ the deformation velocity.
 \end{itemize}
 }
-\onslide<4>{
+\onslide<3>{
 Inertia terms:
 \begin{itemize}
 	\item $m:= \int_{\Omega} \rho \d{\Omega}$ the total mass;
@@ -2373,17 +2376,31 @@ Same procedure as always but the integration by parts is applied to the $\Div$ o
 \subsection{Example: boundary interconnection of the Kirchhoff plate}
 
 \begin{frame}{Rigid rod welded to a cantilever plate }
+\begin{columns}
+\begin{column}{.57\textwidth}
 \begin{tcolorbox}
 	\centering
-	\only<1>{ \includegraphics[width=0.9\textwidth]{part_4/validation/KP/plate_rod_separated.eps}}
-	\only<2>{\includegraphics[width=0.7\textwidth]{part_4/validation/KP/plate_rod_welded.eps}}
+	\includegraphics[height=0.355\textheight]{presentation/plate_rod_separated.eps}
 \end{tcolorbox}
+\end{column}
+
+\begin{column}{.43\textwidth}
+\begin{tcolorbox}
+	\centering
+	\includegraphics[height=0.355\textheight]{presentation/plate_rod_welded.eps}
+\end{tcolorbox}	
+\end{column}
+\end{columns}
+
 
 \end{frame}
 
 
 \begin{frame}{Boundary Interconnection}
-\centering \includegraphics[width=0.6\textwidth]{part_4/validation/KP/pp_interconnection.eps}
+\centering 
+\includegraphics[width=0.48\textwidth]{part_4/validation/KP/pp_interconnection.eps}
+\hspace{5pt}
+\includegraphics[width=0.48\textwidth]{presentation/pp_interconnection_platerod.eps}
 \end{frame}
 
 
@@ -2392,13 +2409,13 @@ Same procedure as always but the integration by parts is applied to the $\Div$ o
 \onslide*<1>{
 \setlength{\abovedisplayskip}{0pt}
 \setlength{\belowdisplayskip}{0pt}
-\begin{equation*}
-\text{Load} \qquad f = \begin{cases}
-10^5 \left[ y + 10 \left( y - L_y/2 \right)^2 \right] [\mathrm{Pa}], \quad &\forall \, t < 2 \, [\mathrm{ms}], \\
-0, \quad &\forall \, t \ge 2 \, [\mathrm{ms}],
-\end{cases}
-\quad t_{\text{end}} = 10 \, [\mathrm{ms}].
-\end{equation*}
+%\begin{equation*}
+%\text{Load} \qquad f = \begin{cases}
+%10^5 \left[ y + 10 \left( y - L_y/2 \right)^2 \right] [\mathrm{Pa}], \quad &\forall \, t < 2 \, [\mathrm{ms}], \\
+%0, \quad &\forall \, t \ge 2 \, [\mathrm{ms}],
+%\end{cases}
+%\quad t_{\text{end}} = 10 \, [\mathrm{ms}].
+%\end{equation*}
 \begin{columns}
 \begin{column}{.45\textwidth}
 	\includemedia[
