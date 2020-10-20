@@ -8,10 +8,11 @@
 \usepackage{dsfont}
 \usepackage{mathrsfs}
 \usepackage{tcolorbox}
+\usepackage{multicol}
 
 %\usepackage{multimedia}
 \usepackage{media9}
-\usepackage[backend=bibtex]{biblatex}
+\usepackage[backend=bibtex,doi=true,isbn=false,url=false,eprint=false]{biblatex}
 
 \graphicspath{{../Figures/},{./Figures/}}
 
@@ -51,7 +52,7 @@
 \institute[ISAE]
 {\inst{1}ISAE-SUPAERO, Toulouse}
 
-\author[Andrea Brugnoli]{Andrea Brugnoli}
+\author[Andrea Brugnoli]{Andrea Brugnoli\inst{1}}
 
 %\date[Toulouse, 24/03/20]{Tuesday, the 24th, 2020}
 
@@ -93,51 +94,66 @@ Drawbacks:
 \section{PH formulation of a floating body}
 
 
-\begin{frame}{Floating frame based approach}
-The floating frame approach relies on the hypothesis of small deformations: elastic motion is described w.r.t a reference that follows the large rigid motion\footfullcite{Noor_rev}. \\
-\begin{overlayarea}{\textwidth}{0.5\textheight}
-Advantages 
-\begin{itemize}
-	\item {The most used paradigm in multibody dynamics;}
-	\item {For control applications other approaches are too complex;}
-	\item {Linear model reduction techniques are applicable.} 
-\end{itemize}
-Drawbacks:
-\begin{itemize}
-	\item {Effect due to geometric non-linearities are not considered: not suitable for large deformations (substructuring can be employed to alleviate this).}
-\end{itemize}
-\end{overlayarea}
+\begin{frame}{Floating frame of reference approach}
+\begin{columns}
+	\begin{column}{.5\textwidth}
+		The elastic motion is described in a reference frame that follows the large rigid motion. \\
+		
+		Advantages 
+		\begin{itemize}
+			\item {Most used paradigm in multibody dynamics;}
+			\item {For control other approaches are too complex;}
+			\item {Linear model reduction techniques are applicable.} 
+		\end{itemize}
+		Drawbacks:
+		\begin{itemize}
+			\item {Not suitable for large deformations.}
+		\end{itemize}	
+	\end{column}
+	\begin{column}{.5\textwidth}
+		\begin{tcolorbox}
+			\begin{figure}[t]
+				\centering
+				\includegraphics[width=1\textwidth]{floating_body_small.eps} 
+			\end{figure}
+		\end{tcolorbox}
+	\end{column}
+\end{columns}
+
 \end{frame}
 
 \begin{frame}{Floating body kinematics}
-\onslide*<1>{
-\begin{tcolorbox}
-	\begin{figure}[t]
-		\centering
-		\includegraphics[width=0.6\textwidth]{floating_body.eps} 
-		\caption{Thin floating body undergoing a surface traction $\bm\tau$ and body force density $\bm\beta$}
-		\label{fig:float_body}
-	\end{figure}
-\end{tcolorbox}
+\onslide*<1->{
+	The velocity of a generic point is expressed by considering a small flexible displacement superimposed to the rigid motion
+	\[
+	\bm{v} = \bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}+\bm{u}_f) + \bm{v}_f.
+	\]
+	where the cross map $\crmat{\bm{a}}$ denotes the skew-symmetric matrix associated to vector $\bm{a}$. \\
+	
+	This equation is expressed in the body reference frame $\widehat{\bm{x}}, \widehat{\bm{y}}, \widehat{\bm{z}}$. 
+	
 }
-\onslide*<2>{
-The velocity of a generic point is expressed by considering a small flexible displacement superimposed to the rigid motion
-\[
-\bm{v} = \bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}+\bm{u}_f) + \bm{v}_f.
-\]
-where the cross map $\crmat{\bm{a}}$ denotes the skew-symmetric matrix associated to vector $\bm{a}$. \\
-
-This equation is expressed in the body reference frame $\widehat{\bm{x}}, \widehat{\bm{y}}, \widehat{\bm{z}}$.  
-\begin{itemize}
-	\item $\bm{x}$ is the position vector of the current point;
-	\item $\bm{v}_P,\, \bm{\omega}_P$ are the linear and angular velocities of point $P$;
-	\item $\bm{v}_f := \dot{\bm{u}}_f$ the deformation velocity ; 
-	\item $m:= \int_{\Omega} \rho \d{\Omega}$ the total mass;
-	\item $\bm{s}_u:= \int_{\Omega} \rho (\bm{x}+\bm{u}_f) \d{\Omega}$ the static moment;
-	\item $\bm{J}_u:= \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f}^\top\crmat{\bm{x}+\bm{u}_f} \d{\Omega}$ the inertia matrix.
-\end{itemize}
+\onslide<2->{
+	\vspace{5pt}
+	Kinematic variables:  
+	\begin{itemize}
+		\item $\bm{x}$ is the position vector of the current point;
+		\item $\bm{v}_P,\, \bm{\omega}_P$ are the linear and angular velocities of point $P$;
+		\item $\bm{v}_f := \dot{\bm{u}}_f$ the deformation velocity.
+	\end{itemize}
+}
+\onslide<3>{
+	Inertia terms:
+	\begin{itemize}
+		\item $m:= \int_{\Omega} \rho \d{\Omega}$ the total mass;
+		\item $\bm{s}_u:= \int_{\Omega} \rho (\bm{x}+\bm{u}_f) \d{\Omega}$ the static moment;
+		\item $\bm{J}_u:= \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f}^\top\crmat{\bm{x}+\bm{u}_f} \d{\Omega}$ the inertia matrix.
+	\end{itemize}
+	
 }
 \end{frame}
+
+\subsection{Canonical and modified momenta}
 
 \begin{frame}{Canonical momenta}
 \begin{overlayarea}{\textwidth}{0.95\textheight}
@@ -210,6 +226,8 @@ This equation is expressed in the body reference frame $\widehat{\bm{x}}, \wideh
 	}
 \end{overlayarea}
 \end{frame}
+
+\subsection{Towards a pH formulation}
 
 \begin{frame}{Equations of motion}
 The equations are obtained by application of the virtual work principle \footfullcite[Chapter 4]{simeon2013computational}. \\
@@ -348,6 +366,8 @@ where $\bm{R}_{1}, \bm{R}_{2}, \bm{R}_{3}$ are the rows of matrix $\bm{R}$. Furt
 \end{equation*}
 \end{frame}
 
+\subsection{The pHDAE system}
+
 \begin{frame}{PH formulation}
 The overall port-Hamiltonian formulation (without including the boundary traction $\bm{\tau}$)
 \begin{equation*}
@@ -456,7 +476,7 @@ The Hamiltonian  satisfies
 \end{itemize}
 \end{frame}
 
-\section{Discretization}
+\subsection{Discretization}
 
 \begin{frame}{Discretized system}
 	Same procedure as always but the integration by parts is applied to the $\Div$ operator to highlight the Neumann condition.
@@ -478,28 +498,8 @@ The Hamiltonian  satisfies
 	\end{block}
 \end{frame}
 
-\begin{frame}{Computation of the effort functions}
-The computation of vector $\mathbf{z}$ is based on the discrete Hamiltonian  gradient:
-\[
-\diffp{H_d}{\mathbf{e}} = \mathbf{E}^\top \mathbf{z}, \qquad H_d = H_{d, \text{kin}}+H_{d, \text{def}}+H_{d, \text{pot}}.
-\]
-	The only term that requires additional care is $\bm{z}_{u}=\delta_{\bm{u}_f} H$.  \\
-	Flexible displacement contribution to the power balance
-	\[
-	\dot{H}_u = \int_{\Omega} \diffp{\bm{u}_f}{t} \cdot \bm{z}_{u} \d{\Omega} = \int_{\Omega} \diffp{\bm{u}_f}{t} \cdot \diffd{H}{\bm{u}_f} \d{\Omega}
-	\]
-	Given that $\bm{u}_f = \bm{\phi}_u^\top \mathbf{u}_f, \; \bm{z}_u = \bm{\phi}_u^\top \mathbf{z}_u$, the discrete Hamiltonian rate assumes the expressions
-	\begin{equation*}
-	\dot{H}_{u, d}(\mathbf{u}_f) = 
-	\begin{cases}
-	\dot{\mathbf{u}}_f^\top \mathbf{M}_u \; \mathbf{z}_u, \\
-	\displaystyle \dot{\mathbf{u}}_f^\top \diffp{H_d}{\mathbf{u}_f},
-	\end{cases} \implies \mathbf{z}_u = \mathbf{M}_u^{-1} \diffp{H_d}{\mathbf{u}_f}, \quad \text{where } \mathbf{M}_u=\int_{\Omega} \bm{\phi}_u \, \bm{\phi}_u^\top \d{\Omega}
-	\end{equation*}
-	
-\end{frame}
 
-\section{Construction of multibody chain}
+\section{Construction of multibody systems}
 
 \subsection{General procedure for planar beams}
 \begin{frame}{Thin planar beam case}
@@ -661,7 +661,7 @@ The same result can be obtained by using a pHDAE system and a gyrator interconne
 \begin{frame}{Model and index reduction}
 \only<1>{
 \begin{block}{Model reduction}
-Such system can be reduced using Linear model reduction methods directly in the DAE\footfullcite{phdae_red}. Vector $\mathbf{p}_f$ is projected on a meaningful subspace $\mathbf{p}_f \approx \mathbf{V}_f^{\text{red}} \mathbf{p}_f^{\text{red}}$
+Such system can be reduced using linear model reduction methods directly in the DAE\footfullcite{phdae_red}. Vector $\mathbf{p}_f$ is projected on a meaningful subspace $\mathbf{p}_f \approx \mathbf{V}_f^{\text{red}} \mathbf{p}_f^{\text{red}}$
 \begin{equation*}
 \begin{bmatrix}
 \mathbf{M}_{rr} & \mathbf{M}_{rf}^{\text{red}} & 0 \\ 
@@ -720,43 +720,12 @@ with $\widehat{\mathbf{M}} = \mathbf{P}^\top \mathbf{M} \mathbf{P}, \; \widehat{
 \end{frame}
 
 \begin{frame}{Boundary interconnection}
-\only<1>{
-	The system is composed by a cantilever plate (distributed pH) connected to a rigid rod:
-	\begin{minipage}{.45\linewidth}
-		\begin{equation*}
-		\text{dpH}\qquad
-		\begin{aligned}
-		\partial_t \bm{x}_1 &= \mathcal{J} \, \delta_{\bm{x}_1} {H_1}, \\
-		\bm{u}_{\partial, 1}  &= \mathcal{B}_\partial \, \delta_{\bm{x}_1} {H_1}, \\
-		\bm{y}_{\partial, 1} &= \mathcal{C}_\partial \, \delta_{\bm{x}_1} {H_1}, \\
-		\end{aligned}
-		\end{equation*}
-	\end{minipage}
-	\begin{minipage}{.5\linewidth}
-		\begin{equation*}
-		\text{pH} \qquad
-		\begin{aligned}
-		\dot{\mathbf{x}}_2 &= \mathbf{J} \nabla_{\mathbf{x}_2} {H_2} + \mathbf{B} \mathbf{u}_2, \\
-		\mathbf{y}_{2} &= \mathbf{B}^\top \nabla_{\mathbf{x}_2} {H_2}, \\
-		\end{aligned}
-		\end{equation*}
-	\end{minipage} %
-	
-	\vspace{.3cm}
-	
-	where $\mathbf{x} \in \mathbb{R}^n, \mathbf{u}_2, \mathbf{y}_2 \in \mathbb{R}^m$ and $\bm{x}_1 \in {X}$,  $\bm{u}_{\partial, 1}  \in {U}, \, \bm{y}_{\partial, 1} \in  {Y} = {U}^\prime$ belong to and Hilbert spaces  and  $\mathcal{B}_\partial: {X} \rightarrow {U}, \; \mathcal{C}_\partial: {X} \rightarrow {Y}$ are boundary operators. \\ The duality pairings for the boundary ports are denoted by
-	\[
-	\inner[{U} \times {Y}]{\bm{u}_{\partial, 1}}{\bm{y}_{\partial, 1}},  \qquad
-	\inner[\mathbb{R}^m]{\mathbf{u}_{2}}{\mathbf{y}_{2}}.
-	\]
-	For the interconnection, consider the compact operator $\mathcal{W}: Y \rightarrow \mathbb{R}^m$ and the following power-preserving interconnection
-	\begin{equation*}
-	\label{eq:int_inf}
-	\mathbf{u}_2 = -\mathcal{W} \, \bm{y}_{\partial, 1},  \qquad \bm{u}_{\partial, 1} = \mathcal{W}^* \, \mathbf{y}_2.
-	\end{equation*}
-}
 
-\only<2>{\vspace{.5cm}\centering \includegraphics[width=0.6\textwidth]{pp_interconnection.eps}}
+\centering 
+\includegraphics[width=0.48\textwidth]{pp_interconnection.eps}
+\hspace{5pt}
+\includegraphics[width=0.48\textwidth]{pp_interconnection_platerod.eps}
+
 
 \end{frame}
 
@@ -791,13 +760,13 @@ M & 0 \\
 v_G \\ \omega_G \\
 \end{pmatrix} & = \begin{pmatrix}
 F_z \\ T_x \\
-\end{pmatrix} = \bm{u}_{\text{rod}}\vspace{1mm}, \\
-\bm{y}_{\text{rod}} &= \begin{pmatrix}
+\end{pmatrix} = \mathbf{u}_{\text{rod}}\vspace{1mm}, \\
+\mathbf{y}_{\text{rod}} &= \begin{pmatrix}
 v_G \\ \omega_{G} \\
 \end{pmatrix},
 \end{aligned}
 \end{equation*}
-Space $Y$ is the space of square-integrable functions with support on $\Gamma_{\text{int}} = \left\{x=L_x\right\}$. \\
+
 The interconnection operator  provides the total force and torque acting on the rigid rod
 \begin{equation*}
 \mathcal{W} y_{\partial, \text{pl}} =  - \begin{pmatrix}
@@ -810,8 +779,8 @@ T_x \\
 \end{equation*}
 The adjoint operator provides a rigid movement as the plate input at $\Gamma_{\text{int}}$
 \begin{align*}
-\left\langle \mathcal{W} y_{\partial, \text{pl}}, \; \bm{y}_{\text{rod}} \right\rangle_{\mathbb{R}^m} &= \left\langle y_{\partial, \text{pl}}, \, \mathcal{W}^* \bm{y}_{\text{rod}}\right\rangle_{L^2(\Gamma_{\text{int}})}, \\
-\mathcal{W}^* {y}_{\text{rod}} &= v_G + \omega_{G} \left( y - L_y/2 \right).
+\left\langle \mathcal{W} y_{\partial, \text{pl}}, \; \mathbf{y}_{\text{rod}} \right\rangle_{\mathbb{R}^m} &= \left\langle y_{\partial, \text{pl}}, \, \mathcal{W}^* \mathbf{y}_{\text{rod}}\right\rangle_{L^2(\Gamma_{\text{int}})}, \\
+\mathcal{W}^* \mathbf{y}_{\text{rod}} &= v_G + \omega_{G} \left( y - L_y/2 \right).
 \end{align*}
 \end{frame}
 
@@ -874,21 +843,26 @@ mediacommand=vidRod:playPause
 
 \begin{frame}{Conclusion}
 Summarizing:
+\begin{multicols}{2}
 	\begin{itemize}
-		\item Port-Hamiltonian formulation of floating bodies;
+		\item PH formulation of floating bodies;
 		\item Finite element discretization;
 		\item Interconnection of subcomponents;
 		\item Linearized case.
 	\end{itemize}
+\end{multicols}
+	
 Some open questions:
-\begin{itemize}
-	\item Stability and convergence of finite element;
-	\item Time discretization;
-	\item Non-linear model reduction of pHDAE;
-	\item Control strategies.
-\end{itemize}
-\centering
-\Large Additional information\footfullcite{brugnoli2020msd} 
+\begin{multicols}{2}
+	\begin{itemize}
+		\item Stability and convergence of FE\footfullcite{cohen2005};
+		\item Time discretization;
+		\item Non-linear model reduction of pHDAE;
+		\item Control strategies.
+	\end{itemize}
+\end{multicols}
+
+\fullcite{brugnoli2020msd} 
 \end{frame}
 
 

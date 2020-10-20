@@ -16,6 +16,7 @@
 \RequirePackage[T1]{fontenc}
 \RequirePackage[english]{babel}
 
+
 %% Backgrounds
 \RequirePackage{tikz}
 \definecolor{BlueCLS}{HTML}{00AAFF}
@@ -1041,7 +1042,7 @@
 \end{tikzpicture}
 
 \begin{tikzpicture}[remember picture, overlay]
-\node [anchor=north, shift={(0.5\paperwidth,-0.6\paperheight)}] at (current page.north west) {
+\node [anchor=north, shift={(0.5\paperwidth,-0.45\paperheight)}] at (current page.north west) {
 \parbox[t]{\paperwidth}{
     \centering
     \usebeamerfont{author} \textbf{\insertauthor}\par
@@ -1068,6 +1069,15 @@
 }
 };
 \end{tikzpicture}
+
+
+%% Additional image
+
+\begin{tikzpicture}[remember picture, overlay]
+\node[anchor=south west, shift={(0\paperwidth,0.03\paperheight)}] at (current page.south west) {\includegraphics[width=3.5cm]{Figures/infidhem.png}
+};	
+\end{tikzpicture}
+
 }
 
 %% Frame
