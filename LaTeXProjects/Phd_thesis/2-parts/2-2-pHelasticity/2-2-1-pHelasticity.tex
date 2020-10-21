@@ -158,13 +158,13 @@ The tensor-valued co-energy $\bm{E}_\varepsilon$ is obtained by taking the varia
 		H_{\mathrm{def}}(\bar{\bm{A}}_{\varepsilon} + \eta \bm{\Delta}\bm{A}_{\varepsilon}) = \frac{1}{2} \int_{\Omega} (\bm{\mathcal{D}} \bar{\bm{A}}_{\varepsilon}) \cddot \bar{\bm{A}}_{\varepsilon} \; \d\Omega + \eta \int_{\Omega} (\bm{\mathcal{D}} \bar{\bm{A}}_{\varepsilon}) \cddot \bm{\Delta}\bm{A}_{\varepsilon}\; \d\Omega  + O(\eta^2). 
 		\end{equation*}
 		By definition of  variational derivative it can be written:
-		\begin{equation*}H_{\mathrm{def}}(\bar{\bm{A}}_{\varepsilon} + \eta \bm{\Delta}\bm{A}_{\varepsilon}) = H_{\mathrm{def}}(\bar{\bm{A}}_{\varepsilon}) + \eta \inner[L^2(\Omega, \mathbb{S})]{\diffd{H}{\bm{A}_{\varepsilon}}}{\bm{\Delta}\bm{A}_{\varepsilon}} + O(\eta^2), \end{equation*}
+		\begin{equation*}H_{\mathrm{def}}(\bar{\bm{A}}_{\varepsilon} + \eta \bm{\Delta}\bm{A}_{\varepsilon}) = H_{\mathrm{def}}(\bar{\bm{A}}_{\varepsilon}) + \eta \inner[L^2(\Omega, \mathbb{S})]{\diffd{H_{\mathrm{def}}}{\bm{A}_{\varepsilon}}}{\bm{\Delta}\bm{A}_{\varepsilon}} + O(\eta^2), \end{equation*}
 		
 		Then, by identification 
 		\begin{equation*}
 		\diffd{H_{\mathrm{def}}}{\bm{A}_{\varepsilon}} = \bm{\mathcal{D}} \bar{\bm{A}}_{\varepsilon} = \bm{\Sigma}.
 		\end{equation*}
-		Since the Hamiltonian is separable then $\delta_{\bm{A}_{\varepsilon}}{H_{\mathrm{def}}} =\delta_{\bm{A}_{\varepsilon}} H$, leading to the final result.
+		Since the Hamiltonian is separable $\delta_{\bm{A}_{\varepsilon}}{H_{\mathrm{def}}} =\delta_{\bm{A}_{\varepsilon}} H$, leading to the final result.
 	\end{proof}
 \end{proposition}
 
@@ -256,7 +256,7 @@ The boundary values are then found by evaluating the energy rate
 \dot{H} &= \int_{\Omega} \left\{ \bm{e}_v \cdot \partial_t \bm\alpha_v + \bm{E}_\varepsilon \cddot \partial_t \bm{A}_\varepsilon \right\} \d\Omega, \\
 &= \int_{\Omega} \left\{\bm{e}_v \cdot \Div \bm{E}_\varepsilon + \bm{E}_\varepsilon \cddot \Grad \bm{e}_v \right\}\d\Omega,\\
 &= \int_{\Omega} \div(\bm{E}_\varepsilon \, \bm{e}_v) \d\Omega, \qquad &\text{Stokes theorem (see  Appendix \ref{app:math} Eq. \eqref{eq:intbypartsSymTens}}), \\
-&= \int_{\partial \Omega} \bm{e}_v \cdot (\bm{E}_\varepsilon\bm{n}) \d{S} = \inner[L^2(\partial\Omega, \bbR^d)]{\bm{e}_v}{\bm{E}_\varepsilon \, \bm{n}}.
+&= \int_{\partial \Omega} \bm{e}_v \cdot (\bm{E}_\varepsilon\bm{n}) \d{S}.
 \end{aligned}
 \end{equation}
 
@@ -305,16 +305,26 @@ The imposition of the velocity field along the boundary $\bm{e}_v = \partial_t \
 \end{equation}
 where $\bm\gamma_{0}^{\Gamma_*}$ denotes the trace over the set $\Gamma_*$, namely $\bm\gamma_{0}^{\Gamma_*}\bm{e}_v = \bm{e}_v\vert_{\Gamma_*}$. Furthermore, $\bm\gamma_{n}^{\Gamma_*}$ denotes the normal trace over the set $\Gamma_*$, namely $\bm\gamma_{n}^{\Gamma_*}\bm{E}_\varepsilon = \bm{E}_\varepsilon \bm{n}\vert_{\Gamma_*}$.
 
+
 \begin{remark}\label{rmk:unboundednessBC}
-	The boundary operators $\mathcal{B}_\partial, \mathcal{C}_\partial$ in Eq.\eqref{eq:pHsysElas} are unbounded if the co-energy belong to $H^{\Grad}, \; H^{\Div}$ (see conjecture \ref{conj:stdirElas}).
+	The boundary operators $\mathcal{B}_\partial, \mathcal{C}_\partial$ in Eq.\eqref{eq:pHsysElas} are unbounded if the co-energy belong to $H^{\Grad}, \; H^{\Div}$.
 \end{remark}
 
-\begin{conjecture}[Stokes-Dirac structure for elastodynamics] \label{conj:stdirElas}
+\begin{remark}[Trace operators and duality pairing for the elastodynamics problem]\label{rmk:duality_elas}
+	For linear elastodynamics the integrations by parts formula leads to the following duality pairings \cite[Chapter 1]{boffi2013mixed}
+	\begin{equation}\label{eq:duality_elas}
+	\inner[L^2(\Omega, \bbS)]{\Grad \bm{e}_v}{\bm{E}_\varepsilon} + \inner[L^2(\Omega, \mathbb{V})]{\bm{e}_v}{\Div \bm{E}_\varepsilon} = \inner[H^{\frac{1}{2}} \times H^{-\frac{1}{2}}(\partial\Omega, \mathbb{V})]{\bm\gamma_{0} \bm{e}_v}{\bm\gamma_{n}\bm{E}_\varepsilon},
+	\end{equation}
+	where $H^{\frac{1}{2}}(\partial\Omega, \mathbb{V})$ is the space of traces of functions belonging to $H^{\Grad}(\Omega, \mathbb{V})$ and $H^{-\frac{1}{2}}(\partial\Omega, \mathbb{V})$ is its topological dual.
+\end{remark}
+
+\begin{theorem}[Stokes-Dirac structure for elastodynamics] \label{thm:stdirElas}
 Let $H^{\Grad}(\Omega, \mathbb{V})$ denote the space of vectors with symmetric gradient in $L^2(\Omega, \mathbb{S})$ and $H^{\Div}  (\Omega, \mathbb{S})$ be the space of symmetric tensors with divergence in $L^2(\Omega, \mathbb{V})$. Consider the following definitions
 \begin{align*}
 H &:= H^{\Grad}(\Omega, \mathbb{V}) \times H^{\Div}(\Omega, \mathbb{S}), \\
 F &:= L^2(\Omega, \mathbb{V}) \times L^2(\Omega, \mathbb{S}), \\
-F_\partial &:= L^2(\Gamma_D, \mathbb{V}) \times L^2(\Gamma_N, \mathbb{V}).
+V_\partial &:= H^{\frac{1}{2}}(\partial\Omega, \mathbb{V}), \\
+V_\partial' &:= H^{-\frac{1}{2}}(\partial\Omega, \mathbb{V}), \\
 \end{align*}
 
 The set 
@@ -324,84 +334,53 @@ The set
 \bm{f} \\ \bm{f}_\partial \\ \bm{e} \\ \bm{e}_\partial \\
 \end{pmatrix}
 \vert \;
- \bm{e} \in H, \; \bm{f} = \mathcal{J} \bm{e}, \;\bm{f}_\partial = \mathcal{B}_\partial \bm{e}, \; \bm{e}_\partial = -\mathcal{C}_\partial \bm{e}   \right\},
+ \bm{e} \in H, \quad \bm{f} = \mathcal{J} \bm{e} \in F, \quad \bm{f}_\partial  = \bm{\gamma}_0 \bm{e}_v \in V_\partial, \quad \bm{e}_\partial = -\bm{\gamma}_n \bm{E}_\varepsilon \in V_\partial'  \right\},
 \end{equation}
-where $\bm{e} = (\bm{e}_v,\, \bm{E}_\varepsilon)$ and $\mathcal{J, \, B_\partial, \,  C_\partial}$ are defined in \eqref{eq:pHsysElas}, is a Stokes–Dirac structure with respect to the pairing
+where $\bm{e} = (\bm{e}_v,\, \bm{E}_\varepsilon)$ and $\mathcal{J}$ are defined in \eqref{eq:pHsysElas}, is a Stokes–Dirac structure with respect to the pairing
 \begin{equation}\label{eq:bilinearElas}
-\bilprod{(\bm{f}^1, \bm{f}_{\partial}^1, \bm{e}^1, \bm{e}_{\partial}^1)}{(\bm{f}^2, \bm{f}_{\partial}^2, \bm{e}^2, \bm{e}_{\partial}^2)}  := \inner[F]{\bm{e}^1}{\bm{f}^2} + \inner[F]{\bm{e}^2}{\bm{f}^1} + \inner[F_\partial]{\bm{e}_{\partial}^1}{\bm{f}_{\partial}^2} + \inner[F_\partial]{\bm{e}_{\partial}^2}{\bm{f}_{\partial}^1},
+\begin{aligned}
+\bilprod{(\bm{f}^1, \bm{f}_{\partial}^1, \bm{e}^1, \bm{e}_{\partial}^1)}{(\bm{f}^2, \bm{f}_{\partial}^2, \bm{e}^2, \bm{e}_{\partial}^2)}  := &\inner[F]{\bm{f}^1}{\bm{e}^2} + \inner[F]{\bm{f}^2}{\bm{e}^1} \\
+ + &\inner[V_\partial \times V_\partial']{\bm{f}_{\partial}^1}{\bm{e}_{\partial}^2} + \inner[V_\partial \times V_\partial']{\bm{f}_{\partial}^2}{\bm{e}_{\partial}^1},
+\end{aligned}
 \end{equation}
-where 
-\begin{equation*}
-\inner[F_\partial]{(\bm{a}, \, \bm{b})}{(\bm{c}, \, \bm{d})} = \int_{\Gamma_D} \bm{a} \cdot \bm{c} \d{S} + \int_{\Gamma_N} \bm{b} \cdot \bm{d} \d{S}, \quad \bm{a},\ \bm{b},\ \bm{c},\ \bm{d} \in \mathbb{V}. 
-\end{equation*}
-\end{conjecture}
+\end{theorem}
 
-\begin{remark}[Trace operators and duality pairing for the elastodynamics problem]\label{rmk:duality_elas}
-	For linear elastodynamics the integrations by parts formula leads to the following duality pairings \cite[Chapter 1]{boffi2013mixed}
-	\begin{equation}\label{eq:duality_elas}
-	\inner[L^2(\Omega, \bbS)]{\bm{E}_\varepsilon}{\Grad \bm{e}_v} + \inner[L^2(\Omega, \mathbb{V})]{\Div \bm{E}_\varepsilon}{\bm{e}_v} = \inner[H^{-\frac{1}{2}} \times H^{\frac{1}{2}}(\partial\Omega, \mathbb{V})]{\bm\gamma_{n}\bm{E}_\varepsilon}{\bm\gamma_{0} \bm{e}_v},
-	\end{equation}
-	where $H^{\frac{1}{2}}(\partial\Omega, \mathbb{V})$ is the space of traces of functions belonging to $H^{\Grad}(\Omega, \mathbb{V})$ and $H^{-\frac{1}{2}}(\partial\Omega, \mathbb{V})$ is its topological dual.
-\end{remark}
-
-\begin{paragraph}{Crucial points to obtain a rigorous proof}
-	The crucial point that needs to be elucidated is where the boundary variables live. From Eq. \eqref{eq:duality_elas}, it is clear that when only only one kind of boundary condition is imposed (either Neumann or Dirichlet), these variables belong to the fractional Sobolev spaces $H^{\frac{1}{2}}(\partial\Omega, \mathbb{V}), \, H^{-\frac{1}{2}}(\partial\Omega, \mathbb{V})$ linked by duality with respect to the pivot space $L^2(\partial\Omega, \mathbb{V})$ (cf. Remark \ref{rmk:duality_elas}). This is why an $L^2$ inner product has been assumed as boundary inner product. The partition of the boundary due to the non uniform boundary control complicates the proof, since one has to properly connect the two partitions at their interconnection.
-\end{paragraph}
-
-\begin{paragraph}{Elements to support the conjecture}
+\begin{proof}
 	A Stokes-Dirac is characterized by the fact that ${D}_{\mathcal{J}} = {D}_{\mathcal{J}}^\perp$. Then one has to show that ${D}_{\mathcal{J}} \subset {D}_{\mathcal{J}}^\perp$ and ${D}_{\mathcal{J}}^\perp \subset {D}_{\mathcal{J}}$. The main steps of Theorem 3.6 in \cite{legorrec2005} (and Proposition \ref{prop:stdir}) are followed here to support the substantiation of the conjecture. The integration by parts formula is applied as in \eqref{eq:enrateElas}. \\
 	
 	\textit{Step 1}. To show that ${D}_{\mathcal{J}} \subset {D}_{\mathcal{J}}^\perp$, take $(\bm{f}, \, \bm{f}_\partial, \, \bm{e}, \, \bm{e}_\partial) \in {D}_{\mathcal{J}}$. Then
 	\begin{align*}
-	\bilprod{(\bm{f}, \bm{f}_{\partial}, \bm{e}, \bm{e}_{\partial})}{(\bm{f}, \bm{f}_{\partial}, \bm{e}, \bm{e}_{\partial})} =& 2 \inner[F]{\bm{e}}{\bm{f}} + 2 \inner[F_\partial]{\bm{e}_{\partial}}{\bm{f}_{\partial}}, \\
-	=& 2 \inner[F]{\bm{e}}{\mathcal{J}\bm{e}} + 2 \inner[F_\partial]{\bm{e}_{\partial}}{\bm{f}_{\partial}}, \\
-	=& + 2 \int_{\Omega} \left\{\bm{e}_v \cdot \Div \bm{E}_\varepsilon + \bm{E}_\varepsilon \cddot \Grad \bm{e}_v \right\}\d\Omega\\
-	&- 2 \int_{\Gamma_D} \bm{e}_v \cdot (\bm{E}_\varepsilon \, \bm{n}) \d{S} - 2 \int_{\Gamma_N} \bm{e}_v \cdot (\bm{E}_\varepsilon \, \bm{n}) \d{S}, \\
+	\bilprod{(\bm{f}, \bm{f}_{\partial}, \bm{e}, \bm{e}_{\partial})}{(\bm{f}, \bm{f}_{\partial}, \bm{e}, \bm{e}_{\partial})} =& 2 \inner[F]{\bm{f}}{\bm{e}} + 2 \inner[V_\partial \times V_\partial']{\bm{f}_{\partial}}{\bm{e}_{\partial}}, \\
+	=& 2 \inner[F]{\mathcal{J}\bm{e}}{\bm{e}} + 2 \inner[V_\partial \times V_\partial']{\bm{f}_{\partial}}{\bm{e}_{\partial}}, \\
 	=& + 2 \int_{\Omega} \left\{\bm{e}_v \cdot \Div \bm{E}_\varepsilon + \bm{E}_\varepsilon \cddot \Grad \bm{e}_v \right\}\d\Omega\\
 	& - 2 \int_{\partial\Omega} \bm{e}_v \cdot (\bm{E}_\varepsilon \, \bm{n}) \d{S},
-	= 0, \quad \text{from \eqref{eq:enrateElas}}.
+	= 0, \quad \text{from \eqref{eq:duality_elas}}.
 	\end{align*}
 	This implies ${D}_{\mathcal{J}} \subset {D}_{\mathcal{J}}^\perp$.
 	
-	\textit{Step 2}. Take $(\bm{\phi}, \, \bm{\phi}_\partial, \, \bm{\epsilon}, \, \bm{\epsilon}_\partial) \in {D}_{\mathcal{J}}^\perp$ and $\bm{e}_0 \in H$ with compact support on $\Omega$. This implies $\mathcal{B}_\partial \bm{e}_0 = (\bm{0},\, \bm{0})$ and $\mathcal{C}_\partial \bm{e}_0 = (\bm{0},\, \bm{0})$. Taking $(\mathcal{J}\bm{e}_0, \bm{0}, \bm{e}_0, \bm{0}) \in {D}_{\mathcal{J}}$ then 
+	\textit{Step 2}. Take $(\bm{\phi}, \, \bm{\phi}_\partial, \, \bm{\epsilon}, \, \bm{\epsilon}_\partial) \in {D}_{\mathcal{J}}^\perp$ and $\bm{e}_0 = (\bm{e}_{v, 0}, \; \bm{E}_{\varepsilon, 0}) \in H$ with compact support on $\Omega$. This implies $\bm{\gamma_{0}} \bm{e}_{v, 0} = \bm{0}$ and $\bm{\gamma}_n \bm{E}_{\varepsilon, 0} = \bm{0}$. Taking $(\mathcal{J}\bm{e}_0, \bm{0}, \bm{e}_0, \bm{0}) \in {D}_{\mathcal{J}}$ then 
 	\begin{equation*}
-	\bilprod{(\bm{\phi}, \bm{\phi}_\partial,  \bm{\epsilon}, \bm{\epsilon}_\partial)}{(\mathcal{J}\bm{e}_0, \bm{0}, \bm{e}_0, \bm{0})} = \inner[F]{\bm{\epsilon}}{\mathcal{J}\bm{e}_0} + \inner[F]{\bm{e}_0}{\bm{\phi}} = 0, \quad \forall \bm{e}_0 \in H.
+	\bilprod{(\bm{\phi}, \bm{\phi}_\partial,  \bm{\epsilon}, \bm{\epsilon}_\partial)}{(\mathcal{J}\bm{e}_0, \bm{0}, \bm{e}_0, \bm{0})} = \inner[F]{\mathcal{J}\bm{e}_0}{\bm{\epsilon}} + \inner[F]{\bm{\phi}}{\bm{e}_0} = 0, \quad \forall \bm{e}_0 \in H.
 	\end{equation*}
 	It follows that $\bm{\epsilon} \in H$ and $\bm{\phi}=\mathcal{J}\bm{\epsilon}$. \\
 	
 	\textit{Step 3}. Take $(\bm{\phi}, \, \bm{\phi}_\partial, \, \bm{\epsilon}, \, \bm{\epsilon}_\partial) \in {D}_{\mathcal{J}}^\perp$ and $(\bm{f}, \, \bm{f}_\partial, \, \bm{e}, \, \bm{e}_\partial) \in {D}_{\mathcal{J}}$. Variables $\bm{e}, \bm{\epsilon}$ are indeed tuples containing a vector and a tensor, namely $\bm{e} = (\bm{e}_v, \, \bm{E}_\varepsilon), \;\bm{\epsilon} = (\bm{\epsilon}_v, \, \bm{\mathcal{E}}_\varepsilon)$. From step 2 and \eqref{eq:bilinearElas}
 	
 	\begin{align*}
-	0 &=\inner[F]{\bm{e}}{\mathcal{J}\bm{\epsilon}} + \inner[F]{\mathcal{J}\bm{e}}{\bm{\epsilon}}+ \inner[F_\partial]{\bm{e}_{\partial}}{\bm{\phi}_{\partial}} +  \inner[F_\partial]{\bm{\epsilon}_{\partial}}{\bm{f}_{\partial}}, \\
-	&=\int_{\partial\Omega} \left\{\bm{e}_v \cdot (\bm{\mathcal{E}}_\varepsilon \, \bm{n}) + \bm{\epsilon}_v \cdot (\bm{{E}}_\varepsilon \, \bm{n})\right\}  \d{S} + \inner[F_\partial]{-\mathcal{C}_{\partial}\bm{e}}{\bm{\phi}_{\partial}} +  \inner[F_\partial]{\bm{\epsilon}_{\partial}}{\mathcal{B}_{\partial}\bm{e}}
+	0 &=\inner[F]{\mathcal{J}\bm{\epsilon}}{\bm{e}} + \inner[F]{\mathcal{J}\bm{e}}{\bm{\epsilon}}+ \inner[V_\partial \times V_\partial']{\bm{\phi}_{\partial}}{\bm{e}_{\partial}} +  \inner[V_\partial \times V_\partial']{\bm{f}_{\partial}}{\bm{\epsilon}_{\partial}}, \\
+	&=\int_{\partial\Omega} \left\{\bm{e}_v \cdot (\bm{\mathcal{E}}_\varepsilon \, \bm{n}) + \bm{\epsilon}_v \cdot (\bm{{E}}_\varepsilon \, \bm{n})\right\}  \d{S} + \inner[V_\partial \times V_\partial']{\bm{\phi}_{\partial}}{-\bm{\gamma}_{n}\bm{E}_\varepsilon} +  \inner[V_\partial \times V_\partial']{\bm{\gamma}_0\bm{e}_v}{\bm{\epsilon}_{\partial}}
 	\end{align*}
-	Consider the splitting of the boundary $\partial\Omega = \overline{\Gamma}_N \cup \overline{\Gamma}_D$
-	\begin{align*}
-	\int_{\partial\Omega} \left\{\bm{e}_v \cdot (\bm{\mathcal{E}}_\varepsilon \cdot \bm{n}) + \bm{\epsilon}_v \cdot (\bm{{E}}_\varepsilon \cdot \bm{n})\right\}  \d{S} 
-	=& +\int_{\Gamma_N} \left\{\bm{e}_{\partial, 2} \cdot (\bm{\mathcal{E}}_\varepsilon \cdot \bm{n}) + \bm{\epsilon}_v \cdot \bm{f}_{\partial, 2}\right\}  \d{S}, \\
-	&+ \int_{\Gamma_D} \left\{\bm{f}_{\partial, 1} \cdot (\bm{\mathcal{E}}_\varepsilon \cdot \bm{n}) + \bm{\epsilon}_v \cdot \bm{e}_{\partial, 1}\right\}  \d{S},
-	\end{align*}
-	where the elements of the vectors $\bm{f}_{\partial} = (\bm{f}_{\partial, 1}, \bm{f}_{\partial, 2}), \; \bm{e}_{\partial} = (\bm{e}_{\partial, 1}, \bm{e}_{\partial, 2})$ have been considered. By expanding of the terms $\inner[F_\partial]{\bm{e}_{\partial}}{\bm{\phi}_{\partial}} +  \inner[F_\partial]{\bm{\epsilon}_{\partial}}{\bm{f}_{\partial}}$ and given the fact that $\bm{e}$ is arbitrary then
+	Given the fact that $\bm{e} = (\bm{e}_v, \; \bm{E}_\varepsilon)$ is arbitrary then
 	\begin{equation*}
-	\bm{\phi}_{\partial} = \begin{bmatrix}
-	\bm\gamma_{0}^{\Gamma_D} & \bm{0} \\
-	\bm{0} & \bm\gamma_n^{\Gamma_N} \\
-	\end{bmatrix} \begin{pmatrix}
-	\bm{\epsilon}_v \\
-	\bm{\mathcal{E}}_\varepsilon
-	\end{pmatrix}, \qquad 
-	\bm{\epsilon}_{\partial} = -
-	\begin{bmatrix}
-	\bm{0} & \bm\gamma_{n}^{\Gamma_D} \\
-	\bm\gamma_0^{\Gamma_N} & \bm{0} \\
-	\end{bmatrix}
-	\begin{pmatrix}
-	\bm{\epsilon}_v \\
-	\bm{\mathcal{E}}_\varepsilon
-	\end{pmatrix},
+	\bm{\phi}_{\partial} = \bm\gamma_{0} \bm{\epsilon}_v, \qquad 
+	\bm{\epsilon}_{\partial} = -\bm\gamma_n	\bm{\mathcal{E}}_\varepsilon,
 	\end{equation*}
 	meaning that ${D}_{\mathcal{J}}^\perp \subset {D}_{\mathcal{J}}$. 
-\end{paragraph}
+\end{proof}
+
+\begin{remark}[General mixed causality and existence and uniqueness of solutions]\label{rmk:mix_ExUn}
+The proof consider uniform boundary condition based on the integration by parts formula given in Remark \ref{rmk:duality_elas}. This is sufficient for characterizing the Stokes-Dirac structure. Indeed, for the existence and uniqueness of solution of system \eqref{eq:pHsysElas}, the control inputs and output have to satisfy additional compatibility condition \cite{grisvard2011}. In particular when both Neumann and Dirichlet conditions are imposed and their boundary partitions touch (just like in Fig. \ref{fig:bc_elas2D}), then the appropriate space for the Dirichlet control is $H^{1/2}_{00}$ (see e.g. \cite{ramaswamy2019}). The conjugated output will then belong to the topological dual of this space, that does not possess a characterization. This issues are out of the scope of this work.
+\end{remark}
 
 Linear elasticity falls within the assumptions of the theoretical work of \cite{skrepek2019wellposedness}. Therefore, it is a well posed boundary control pH system. A question that naturally arises is how to reformulate this system using the language of differential geometry. This is possible through the usage of vector-valued differential forms. The interested reader may consult \cite{brezzi2008mixed}.
 

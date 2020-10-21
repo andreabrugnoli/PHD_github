@@ -292,6 +292,7 @@ Vectors $\bm{n}$ and $\bm{s}$ designate the normal and tangential unit vectors t
 	\caption{Boundary conditions for the Mindlin plate.}
 	\label{fig:bcs_min}
 \end{figure}
+
 Consider a partition of the boundary $\partial \Omega  = \overline{\Gamma}_{C} \cup \overline{\Gamma}_{S} \cup \overline{\Gamma}_{F}, \; {\Gamma}_{C} \cap {\Gamma}_{S} \cap {\Gamma}_{F} = \{\emptyset\}$. The open subset $\Gamma_{C}, \, \Gamma_{S}, \, \Gamma_{F}$ could be empty. Given definitions \eqref{eq:QnMnnMns}, \eqref{eq:wtwnws}, the boundary conditions for the Mindlin plate \cite{duran1999approximation} (see Fig. \ref{fig:bcs_min}) that are considered are:
 \begin{itemize}
 \item Clamped (C) on $\Gamma_{C}\subseteq \partial \Omega$ : $w_t, \ \omega_{n}, \ \omega_{s}$ known;
@@ -365,49 +366,64 @@ where $\gamma_{0}^{\Gamma_*}a = a\vert_{\Gamma_*}$ denotes the trace over the se
 	It can be observed that the interconnection structure given by $\mathcal{J}$ in \eqref{eq:pHsysMin} mimics that of the Timoshenko beam \cite[Chapter 7]{zwart2012}.
 \end{remark}
 
-\begin{conjecture}[Stokes-Dirac structure for the Mindlin plate]\label{conj:stdirMin}
-Consider $\mathbb{V} = \mathbb{R}^2, \, \mathbb{S} = \mathbb{R}^{2\times 2}_{\text{sym}}$ and
-let $H^{1}(\Omega)$ be the space of functions with gradient in $L^2(\Omega, \mathbb{V})$ and $H^{\div}  (\Omega, \mathbb{V})$ the space of vector-valued functions with divergence in $L^2(\Omega)$. Furthermore, $H^{1}(\Omega, \mathbb{V})$ is the space of vectors with symmetric gradient in $L^2(\Omega, \mathbb{S})$ and $H^{\Div}  (\Omega, \mathbb{S})$ denotes the space of symmetric tensors with divergence in $L^2(\Omega, \mathbb{V})$. Consider the definitions 
-\begin{align*}
-H &:= H^{1}(\Omega) \times H^{\Grad}(\Omega, \mathbb{V}) \times H^{\Div}(\Omega, \mathbb{S}) \times H^{\div}(\Omega, \mathbb{V}), \\
-F &:= L^2(\Omega) \times L^2(\Omega, \mathbb{V}) \times L^2(\Omega, \mathbb{S}) \times L^2(\Omega, \mathbb{V}), \\
-F_\partial &:= L^2(\Gamma_C, \mathbb{R}^3) \times L^2(\Gamma_S, \mathbb{R}^3) \times L^2(\Gamma_F, \mathbb{R}^3). 
-\end{align*}
-
-The set 
-\begin{equation}
-{D}_{\mathcal{J}} = \left\{
-\begin{pmatrix}
-\bm{f} \\ \bm{f}_\partial \\ \bm{e} \\ \bm{e}_\partial \\
-\end{pmatrix}
-\vert \;
-\bm{e} \in H, \; \bm{f} = \mathcal{J} \bm{e}, \;\bm{f}_\partial = \mathcal{B}_\partial \bm{e}, \; \bm{e}_\partial = -\mathcal{C}_\partial \bm{e}   \right\},
-\end{equation}
-where $\bm{e} = ({e}_w, \,\bm{e}_\theta, \, \bm{E}_\kappa, \, \bm{e}_\gamma)$ and $\mathcal{J, B_\partial, C_\partial}$ are defined in \eqref{eq:pHsysMin}, is a Stokes–Dirac structure with respect to the pairing
-\begin{equation}\label{eq:bilinearMin}
-\bilprod{(\bm{f}^1, \bm{f}_{\partial}^1, \bm{e}^1, \bm{e}_{\partial}^1)}{(\bm{f}^2, \bm{f}_{\partial}^2, \bm{e}^2, \bm{e}_{\partial}^2)}  := \inner[F]{\bm{e}^1}{\bm{f}^2} + \inner[F]{\bm{e}^2}{\bm{f}^1} + \inner[F_\partial]{\bm{e}_{\partial}^1}{\bm{f}_{\partial}^2} + \inner[F_\partial]{\bm{e}_{\partial}^2}{\bm{f}_{\partial}^1},
-\end{equation}
-where $\bm{e}_{\partial}^i = (\bm{e}_{\partial, 1}^i, \ \bm{e}_{\partial, 2}^i, \ \bm{e}_{\partial, 3}^i), \, \bm{f}_{\partial}^i = (\bm{f}_{\partial, 1}^i, \ \bm{f}_{\partial, 2}^i, \ \bm{f}_{\partial, 3}^i)$ and
-\begin{equation*}
-\inner[F_\partial]{(\bm{a}, \, \bm{b}, \, \bm{c})}{(\bm{d}, \, \bm{e}, \, \bm{f})} = \int_{\Gamma_C} \bm{a} \cdot \bm{d} \d{S} + \int_{\Gamma_S} \bm{b} \cdot \bm{e} \d{S}  + \int_{\Gamma_F} \bm{c} \cdot \bm{f} \d{S}, \quad \bm{a},\ \bm{b},\ \bm{c},\ \bm{d},\ \bm{e},\ \bm{f} \in \mathbb{R}^3. 
-\end{equation*}
-\end{conjecture}
-
 \begin{remark}[Trace operators and duality pairings for the Mindlin plate]\label{rmk:duality_min}
 	For the Mindlin plate the integrations by parts formula leads to the following duality pairings 
 	\begin{equation}\label{eq:duality_min}
 	\begin{aligned}
-	\inner{\bm{e}_\gamma}{\grad {e}_w} + \inner{\div \bm{e}_\gamma}{e_w} +  \inner{\bm{E}_\kappa}{\Grad \bm{e}_\theta} + \inner{\Div \bm{E}_\kappa}{\bm{e}_\theta} = &+\inner[H^{-\frac{1}{2}} \times H^{\frac{1}{2}}(\partial\Omega)]{\gamma_{n}\bm{e}_\gamma}{\gamma_{0} {e}_w} \\
-	&+\inner[H^{-\frac{1}{2}} \times H^{\frac{1}{2}}(\partial\Omega, \mathbb{V})]{\bm\gamma_{n}\bm{E}_\kappa}{\bm\gamma_{0} \bm{e}_\theta}, \\
+	\inner{\grad {e}_w}{\bm{e}_\gamma} + \inner{e_w}{\div \bm{e}_\gamma} +  \inner{\Grad \bm{e}_\theta}{\bm{E}_\kappa} + \inner{\bm{e}_\theta}{\Div \bm{E}_\kappa} = &+\inner[H^{\frac{1}{2}} \times H^{-\frac{1}{2}}(\partial\Omega)]{\gamma_{0} {e}_w}{\gamma_{n}\bm{e}_\gamma} \\
+	&+\inner[H^{\frac{1}{2}} \times H^{-\frac{1}{2}}(\partial\Omega, \mathbb{V})]{\bm\gamma_{0} \bm{e}_\theta}{\bm\gamma_{n}\bm{E}_\kappa}, \\
 	\end{aligned}
 	\end{equation}
 	where $H^{\frac{1}{2}}(\partial\Omega), \; H^{\frac{1}{2}}(\partial\Omega, \mathbb{V})$ is the space of traces of functions belonging to $H^{1}(\Omega), \; H^{\Grad}(\Omega, \mathbb{V})$ respectively and $H^{-\frac{1}{2}}(\partial\Omega), \; H^{-\frac{1}{2}}(\partial\Omega, \mathbb{V})$ are their topological dual.
 \end{remark}
 
+\begin{theorem}[Stokes-Dirac structure for the Mindlin plate]\label{thm:stdirMin}
+Consider $\mathbb{V} = \mathbb{R}^2, \, \mathbb{S} = \mathbb{R}^{2\times 2}_{\text{sym}}$ and
+let $H^{1}(\Omega)$ be the space of functions with gradient in $L^2(\Omega, \mathbb{V})$ and $H^{\div}  (\Omega, \mathbb{V})$ the space of vector-valued functions with divergence in $L^2(\Omega)$. Furthermore, $H^{1}(\Omega, \mathbb{V})$ is the space of vectors with symmetric gradient in $L^2(\Omega, \mathbb{S})$ and $H^{\Div}  (\Omega, \mathbb{S})$ denotes the space of symmetric tensors with divergence in $L^2(\Omega, \mathbb{V})$. Consider the definitions 
+\begin{align*}
+H &:= H^{1}(\Omega) \times H^{\Grad}(\Omega, \mathbb{V}) \times H^{\Div}(\Omega, \mathbb{S}) \times H^{\div}(\Omega, \mathbb{V}), \\
+F &:= L^2(\Omega) \times L^2(\Omega, \mathbb{V}) \times L^2(\Omega, \mathbb{S}) \times L^2(\Omega, \mathbb{V}), \\
+V_\partial &:= H^{\frac{1}{2}}(\partial\Omega) \times H^{\frac{1}{2}}(\partial\Omega, \mathbb{V}), \\
+V_\partial' &:= H^{-\frac{1}{2}}(\partial\Omega) \times H^{-\frac{1}{2}}(\partial\Omega, \mathbb{V}) 
+\end{align*}
 
-\begin{paragraph}{Crucial points and elements in favor of the conjecture}
-	Analogously to what was stated in Conjecture \ref{conj:stdirElas}, the boundary spaces have to properly defined from the integration by parts formula \eqref{eq:duality_min} and the partition of the boundary.
-\end{paragraph}
+The set 
+\begin{equation}
+\begin{aligned}
+{D}_{\mathcal{J}} = \Biggl\{
+\begin{pmatrix}
+\bm{f} \\ \bm{f}_\partial \\ \bm{e} \\ \bm{e}_\partial \\
+\end{pmatrix}
+\vert \;
+\bm{e} \in H, \quad \bm{f} = \mathcal{J} \bm{e} \in F,  \quad \bm{f}_\partial &= \begin{bmatrix}
+\gamma_0 & 0 \\
+\bm{0} & \bm{\gamma}_0 \\ 
+\end{bmatrix}
+\begin{pmatrix}
+e_w \\ \bm{e}_\theta \\ 
+\end{pmatrix} \in V_\partial, \\ 
+\bm{e}_\partial &= -\begin{bmatrix}
+\bm{\gamma}_n & 0 \\
+\bm{0} & \gamma_n \\ 
+\end{bmatrix}
+\begin{pmatrix}
+\bm{E}_\kappa \\ \bm{e}_\gamma \\  
+\end{pmatrix} \in V_\partial' \Biggr\},
+\end{aligned}
+\end{equation}
+where $\bm{e} = ({e}_w, \,\bm{e}_\theta, \, \bm{E}_\kappa, \, \bm{e}_\gamma)$ and $\mathcal{J}$ is defined in \eqref{eq:pHsysMin}, is a Stokes–Dirac structure with respect to the pairing
+\begin{equation}\label{eq:bilinearMin}
+\begin{aligned}
+\bilprod{(\bm{f}^1, \bm{f}_{\partial}^1, \bm{e}^1, \bm{e}_{\partial}^1)}{(\bm{f}^2, \bm{f}_{\partial}^2, \bm{e}^2, \bm{e}_{\partial}^2)}  := &\inner[F]{\bm{f}^1}{\bm{e}^2} + \inner[F]{\bm{f}^2}{\bm{e}^1}\\
++ &\inner[V_\partial \times V_\partial']{\bm{f}_{\partial}^1}{\bm{e}_{\partial}^2} + \inner[V_\partial \times V_\partial']{\bm{f}_{\partial}^2}{\bm{e}_{\partial}^1}.
+\end{aligned}
+\end{equation}
+
+\end{theorem}
+
+\begin{proof}
+	The proof is analogous to the proof of to Theorem \ref{thm:stdirElas}. Here, the integration by parts formula \eqref{eq:duality_min} is used.
+\end{proof}
 
 The Mindlin plate falls within the assumption of \cite{skrepek2019wellposedness}, hence it is a well-posed boundary control pH systems.
 	
@@ -510,6 +526,7 @@ The final energy balance reads
 \begin{equation}\label{eq:enrateKir}
 \dot{H} = \int_{\partial \Omega} \left\{ w_t \, \widetilde{q}_n + \partial_{\bm{n}}{w_t} \, M_{nn}\right\} \, \d{s}, 
 \end{equation} 
+
 where the boundary variables are 
 \begin{subequations}
 \label{eq:QnTilMnn}
@@ -591,13 +608,22 @@ where $\gamma_{0}^{\Gamma_*}a = a\vert_{\Gamma_*}$ and  $\gamma_{1}^{\Gamma_*}a 
 	The interconnection structure $\mathcal{J}$ in \eqref{eq:pHsysKir} mimics that of the Bernoulli beam \cite{cardoso2017}. The double divergence and the Hessian coincide, in dimension one, with the second derivative.
 \end{remark}
 
-\begin{conjecture}[Stokes-Dirac structure for the Kirchhoff plate]\label{conj:stdirKir}
+\begin{remark}[Trace operators and duality pairings for the Kirchhoff plate]\label{rmk:duality_kir}
+	For the Kirchoff plate the integrations by parts formula leads to the following duality pairings \cite[Theorem 2.2]{amara2002kir}
+	\begin{equation}\label{eq:duality_kir}
+	\inner{\Hess e_w}{\bm{E}_\kappa} -\inner{e_w}{\div\Div\bm{E}_\kappa} = \inner[H^{\frac{1}{2}} \times H^{-\frac{1}{2}}(\partial\Omega)]{\gamma_{1} e_w}{\gamma_{nn}\bm{E}_\kappa} + \inner[H^{\frac{3}{2}} \times H^{-\frac{3}{2}}(\partial\Omega)]{\gamma_{0} e_w}{\gamma_{nn, 1}\bm{E}_\kappa},
+	\end{equation}
+	where $H^{\frac{1}{2}}(\partial\Omega), \; H^{\frac{3}{2}}(\partial\Omega)$ are the spaces of traces of functions belonging to $H^1(\Omega)$ and $H^2(\Omega)$ respectively and $H^{-\frac{1}{2}}(\partial\Omega), \; H^{-\frac{3}{2}}(\partial\Omega)$ are their topological duals.
+\end{remark}
+
+\begin{theorem}[Stokes-Dirac structure for the Kirchhoff plate]\label{thm:stdirKir}
 	Consider $\mathbb{S} = \mathbb{R}^{2\times 2}_{\text{sym}}$ and
 	let $H^{2}(\Omega)$ be the space of functions with Hessian in $L^2(\Omega, \mathbb{S})$ and $H^{\div\Div}  (\Omega, \mathbb{S})$ the space of vector-valued functions with double divergence in $L^2(\Omega)$. Consider the definitions
 	\begin{align*}
 	H &:=H^{2}(\Omega) \times H^{\div\Div}(\Omega, \mathbb{S}), \\
 	F &:= L^2(\Omega) \times L^2(\Omega, \mathbb{S}), \\
-	F_\partial &:= L^2(\Gamma_C, \mathbb{R}^2) \times L^2(\Gamma_S, \mathbb{R}^2) \times L^2(\Gamma_F, \mathbb{R}^2). 
+	V_\partial &:= H^{\frac{1}{2}}(\partial\Omega) \times H^{\frac{3}{2}}(\partial\Omega), \\
+	V_\partial' &:= H^{-\frac{1}{2}}(\partial\Omega) \times H^{-\frac{3}{2}}(\partial\Omega), \\
 	\end{align*}
 	
 	The set 
@@ -607,26 +633,26 @@ where $\gamma_{0}^{\Gamma_*}a = a\vert_{\Gamma_*}$ and  $\gamma_{1}^{\Gamma_*}a 
 	\bm{f} \\ \bm{f}_\partial \\ \bm{e} \\ \bm{e}_\partial \\
 	\end{pmatrix}
 	\vert \;
-	\bm{e} \in H, \; \bm{f} = \mathcal{J} \bm{e}, \;\bm{f}_\partial = \mathcal{B}_\partial \bm{e}, \; \bm{e}_\partial = -\mathcal{C}_\partial \bm{e}   \right\},
+	\bm{e} \in H, \quad \bm{f} = \mathcal{J} \bm{e} \in F, \quad \bm{f}_\partial = 
+	\begin{pmatrix}
+	\gamma_1 \\ \gamma_0 \end{pmatrix} e_w \in V_\partial, \quad \bm{e}_\partial = -\begin{pmatrix}
+	\gamma_{nn} \\ \gamma_{nn, 1} \end{pmatrix} \bm{E}_\kappa \in V_\partial'  \right\},
 	\end{equation}
-	where $\bm{e} = ({e}_w, \, \bm{E}_\kappa)$ and $\mathcal{J, B_\partial, C_\partial}$ are defined in \eqref{eq:pHsysKir}, is a Stokes–Dirac structure with respect to the pairing
+	where $\bm{e} = ({e}_w, \, \bm{E}_\kappa)$ and $\mathcal{J}$ is defined in \eqref{eq:pHsysKir}, is a Stokes–Dirac structure with respect to the pairing
 	\begin{equation}\label{eq:bilinearKir}
-	\bilprod{(\bm{f}^1, \bm{f}_{\partial}^1, \bm{e}^1, \bm{e}_{\partial}^1)}{(\bm{f}^2, \bm{f}_{\partial}^2, \bm{e}^2, \bm{e}_{\partial}^2)}  := \inner[F]{\bm{e}^1}{\bm{f}^2} + \inner[F]{\bm{e}^2}{\bm{f}^1} + \inner[F_\partial]{\bm{e}_{\partial}^1}{\bm{f}_{\partial}^2} + \inner[F_\partial]{\bm{e}_{\partial}^2}{\bm{f}_{\partial}^1},
+	\begin{aligned}
+	\bilprod{(\bm{f}^1, \bm{f}_{\partial}^1, \bm{e}^1, \bm{e}_{\partial}^1)}{(\bm{f}^2, \bm{f}_{\partial}^2, \bm{e}^2, \bm{e}_{\partial}^2)}  := &\inner[F]{\bm{f}^1}{\bm{e}^2} + \inner[F]{\bm{f}^2}{\bm{e}^1} \\
+	+ &\inner[V_\partial \times V_\partial']{\bm{f}_{\partial}^1}{\bm{e}_{\partial}^2} + \inner[V_\partial \times V_\partial']{\bm{f}_{\partial}^2}{\bm{e}_{\partial}^1},
+	\end{aligned}
 	\end{equation}
-	where $\bm{e}_{\partial}^i = (\bm{e}_{\partial, 1}^i, \ \bm{e}_{\partial, 2}^i), \, \bm{f}_{\partial}^i = (\bm{f}_{\partial, 1}^i, \ \bm{f}_{\partial, 2}^i)$ and
-	\begin{equation*}
-	\inner[F_\partial]{(\bm{a}, \, \bm{b}, \, \bm{c})}{(\bm{d}, \, \bm{e}, \, \bm{f})} = \int_{\Gamma_C} \bm{a} \cdot \bm{d} \d{S} + \int_{\Gamma_S} \bm{b} \cdot \bm{e} \d{S}  + \int_{\Gamma_F} \bm{c} \cdot \bm{f} \d{S}, \quad \bm{a},\ \bm{b},\ \bm{c},\ \bm{d},\ \bm{e},\ \bm{f} \in \mathbb{R}^2. 
-	\end{equation*}
 	
-\end{conjecture}
+	\begin{proof}
+		The proof is analogous to Theorem \ref{thm:stdirElas}. The integration by parts formula \eqref{eq:duality_kir} is here used.
+	\end{proof}
+	
+\end{theorem}
 
-\begin{remark}[Trace operators and duality pairings for the Kirchhoff plate]\label{rmk:duality_kir}
-	For the Kirchoff plate the integrations by parts formula leads to the following duality pairings \cite[Theorem 2.2]{amara2002kir}
-	\begin{equation}\label{eq:duality_kir}
-	\inner{\bm{E}_\kappa}{\Hess e_w} -\inner{\div\Div\bm{E}_\kappa}{e_w} = \inner[H^{-\frac{1}{2}} \times H^{\frac{1}{2}}(\partial\Omega)]{\gamma_{nn}\bm{E}_\kappa}{\gamma_{1} e_w} + \inner[H^{-\frac{3}{2}} \times H^{\frac{3}{2}}(\partial\Omega)]{\gamma_{nn, 1}\bm{E}_\kappa}{\gamma_{0} e_w},
-	\end{equation}
-	where $H^{\frac{1}{2}}(\partial\Omega), \; H^{\frac{3}{2}}(\partial\Omega)$ are the spaces of traces of functions belonging to $H^1(\Omega)$ and $H^2(\Omega)$ respectively and $H^{-\frac{1}{2}}(\partial\Omega), \; H^{-\frac{3}{2}}(\partial\Omega)$ are their topological duals.
-\end{remark}
+
 
 
 \section{Laminated anisotropic plates}\label{sec:lamAnis}
