@@ -148,7 +148,6 @@ PH systems are:
 \end{frame}
 
 \begin{frame}{Twenty years of distributed port-Hamiltonian systems}
-\begin{overlayarea}{\textwidth}{\textheight}
 	
 They have been used for simulating and controlling a variety of applications\footfullcite{rashad2020}:
 \begin{multicols}{2}
@@ -186,7 +185,7 @@ They have been used for simulating and controlling a variety of applications\foo
 \end{equation*}
 \end{block}
 
-\end{overlayarea}
+
 \end{frame}
 
 
@@ -236,12 +235,12 @@ Discretization of port-Hamiltonian systems:
 Modular modelling of flexible multibody systems:
 \begin{itemize}
 \item Model for a flexible link under large deformations using Lie algebra and differential forms\footfullcite{macchelli2007link};
-\item Construction of complex multibody (under large deformation) using the oriented graphs\footfullcite{macchelli2009multi};
+\item Construction of complex multibody (under large deformation) using oriented graphs\footfullcite{macchelli2009multi};
 \item Linear modelling of structural dynamics in pH form\footfullcite{warsewa2020port}.
 \end{itemize}
 
 \begin{exampleblock}{This contribution}
-A pH model of floating flexible structure under small deformations (floating frame of reference approach). The paradigm includes all linear model detailed in the thesis.
+A pH model of floating flexible structure under small deformations (floating frame of reference approach). The paradigm includes all linear models detailed in the thesis.
 \end{exampleblock}
 
 \end{frame}
@@ -1231,8 +1230,11 @@ A simple proportional control stabilizes the system around the desired point $h^
 \end{frame}
 
 \begin{frame}{Discretization strategy}
+\begin{itemize}
+\item The $\div$ operator is integrated by parts to highlight the appropriate the Neumann boundary control.
+\item \fenics is used to generate the matrices.
+\end{itemize}
 
-Given the Neumann control, the $\div$ operator is integrated by parts to highlight the appropriate control. \fenics is used to generate the matrices.
 \begin{table}[th]
 	\centering
 	\begin{tabular}{|c|c|}
@@ -1257,8 +1259,8 @@ Given the Neumann control, the $\div$ operator is integrated by parts to highlig
 	\end{tabular} 
 \end{table}
 \vspace{.5cm}
-Control parameter
 \begin{equation*}
+\text{Control parameter} \qquad 
 k = 
 \begin{cases}
 0, \quad &\forall t < 0.5 \, [\mathrm{s}], \\
@@ -1442,7 +1444,7 @@ mimics the continuous one.
 
 \begin{frame}{Mixed boundary conditions (linear system)}
 
-Consider now the following boundary-control linear pH system in co-energy form 
+Consider now the following boundary-controlled linear pH system in co-energy form 
 \begin{columns}
 \begin{column}{0.6\textwidth}
 \begin{align*}
@@ -1487,7 +1489,7 @@ Consider now the following boundary-control linear pH system in co-energy form
 \end{columns}
 
 \vspace{1cm}
-The operator $\mathcal{N}_{\partial, *}^{\Gamma_\circ}$ with $*, \circ \in \{1, 2\}$ represents now the restriction of operator $\mathcal{N}_{\partial, *}$ over the subset $\Gamma_\circ$.
+The operator $\mathcal{N}_{\partial, *}^{\Gamma_\circ}$ with $*, \circ \in \{1, 2\}$ represents the restriction of operator $\mathcal{N}_{\partial, *}$ over the subset $\Gamma_\circ$.
 \end{frame}
 
 \begin{frame}{Lagrange multiplier method}
@@ -1634,7 +1636,7 @@ mimics the continuous counterpart.
 \begin{equation*}
 \begin{bmatrix}
 \rho h & 0 \\ 
-\bm{0} & \bm{\mathcal{D}_b}^{-1} \\
+\bm{0} & \bm{\mathcal{D}}_b^{-1} \\
 \end{bmatrix}
 \diffp{}{t}
 \begin{pmatrix}
@@ -1692,8 +1694,11 @@ u_{\partial, m} &= M_{nn}|_{\Gamma_N}.\\
 
 
 \begin{frame}{Discretization strategy}
-
-The $\div\Div$ operator is integrated by parts twice to enforce weekly the Neumann conditions. The \firedrake library is used to generate the matrices. The Dirichlet condition is imposed weakly through a Lagrange multiplier (strong imposition of boundary conditions for $H^2$ conforming elements is not trivial \footfullcite{kirby2019}). 
+\begin{itemize}
+\item The $\div\Div$ operator is integrated by parts twice to enforce weekly the Neumann bc.
+\item The \firedrake library is used to generate the matrices.
+\item The Dirichlet condition is imposed weakly through a Lagrange multiplier (strong imposition of boundary conditions for $H^2$ conforming elements is not trivial \footfullcite{kirby2019}).
+\end{itemize} 
 
 \begin{table}[t]
 	\centering
@@ -1721,8 +1726,8 @@ The $\div\Div$ operator is integrated by parts twice to enforce weekly the Neuma
 	\end{tabular} 
 \end{table}
 
-	Control parameter 
 	\begin{equation*}
+	\text{Control parameter} \qquad 
 	k_* = 
 	\begin{cases}
 	0, \quad &\forall t < 1 \, [\mathrm{s}], \\
@@ -2377,7 +2382,7 @@ The Hamiltonian  satisfies
 \end{equation*}
 \end{frame}
 
-\begin{frame}{Energy balance}
+\begin{frame}{Power balance}
 
 \begin{exampleblock}{Power balance}
 	The power balance equals the power due to the surface traction
@@ -2872,7 +2877,7 @@ One possible strategy consists in integrating by parts the whole first line and 
 {\mathbf{e}}_Q\\
 \end{pmatrix}.
 \end{equation*}
-The coupling matrix $\mathbf{A}_{\beta}$ arises from the discretization of the coupling operator $\mathcal{A}_\beta^*$ where $\mathbf{R}_Q$ represent a dissipation matrix. \\
+The coupling matrix $\mathbf{A}_{\beta}$ arises from the discretization of the coupling operator $\mathcal{A}_\beta^*$, whereas $\mathbf{R}_Q$ represent a dissipation matrix. \\
 For this discretization the boundary condition 
 \begin{equation*}
 e_T(0, t) = \frac{T_1 - T_0}{T_0} H(t), 
