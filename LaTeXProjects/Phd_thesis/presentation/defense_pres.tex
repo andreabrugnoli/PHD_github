@@ -2002,75 +2002,16 @@ Conforming elements for a similar problem are detailed in Cohen 2007\footfullcit
 \end{conjecture}
 \end{frame}
 
-\begin{comment}
-
-\begin{frame}{An analytical solution for the clamped Mindlin plate}
-\setlength{\abovedisplayskip}{4pt}
-\setlength{\belowdisplayskip}{4pt}
-\onslide<1->{
-
-A static solution is already known for this problem defined on the unit square domain\footfullcite{veiga2013}:
-\begin{equation*}
-\begin{aligned}
-0 &= \mathrm{div} \ \bm{q}_s + f_s , \\
-0 &= \mathrm{Div} \bm{M}_s + \bm{q}_s, \\
-\end{aligned} \qquad
-\begin{aligned}
-\bm{\mathcal{C}}_b\bm{M}_s &= \mathrm{Grad} \ \bm{\theta}_s, \\
-C_s \bm{q}_s &= \mathrm{grad} \ w_s - \bm{\theta}_s, \\
-\end{aligned}
-\qquad
-\begin{aligned}
-w_s\vert_{\partial\Omega} = 0, \\
-\bm{\theta}_s\vert_{\partial\Omega} = 0. \\
-\end{aligned}
-\end{equation*}
-}
-
-\onslide<2->{
-A solution for the dynamic problem is obtained considering
-\[
-w_d(x,y,t) = w_s(x,y) \sin(t), \quad \bm{\theta}_d(x,y,t) = \bm\theta_s(x,y) \sin(t).
-\]
-}
-\onslide<3->{
-Appropriate forcing terms have to be introduced to compensate the inertial accelerations
-\begin{equation*}
-f_d = f_s \sin(t) + \rho b \partial_{tt} w_d, \qquad \bm{\tau}_d = \frac{\rho b^3}{12} \partial_{tt} \bm{\theta}_d.
-\end{equation*}
-}
-\onslide<4>{
-The exact solution and boundary conditions for the pH system are thus given by
-\begin{equation*}
-\begin{aligned}
-e_w^\text{ex} &= w_s(x,y) \cos(t), \\
-\bm{e}_\theta^\text{ex} &= \bm\theta_s(x,y) \cos(t), \\
-\end{aligned} \qquad
-\begin{aligned}
-\bm{E}_\kappa^\text{ex} &=  \bm{\mathcal{D}}_b \ \mathrm{Grad} \ \bm{\theta}_d, \\
-\bm{e}_\gamma^\text{ex} &= D_s(\mathrm{grad} \ w_d - \bm{\theta}_d), \\
-\end{aligned}
-\qquad
-\begin{aligned}
-e_w^\text{ex}\vert_{\partial\Omega} &= 0, \\
-\bm{e}_\theta^\text{ex}\vert_{\partial\Omega} &= 0. \\
-\end{aligned}
-\end{equation*}
-}
-
-\end{frame}
-\end{comment}
 
 \begin{frame}{Simulation Settings}
 \begin{itemize}
 	\item The {\sc{Firedrake}} library is used to generate the matrices. 
 	\item Time integration: a Crank-Nicholson scheme has been used with time step $\Delta t = h/10$ where $h$ is the mesh size.
-	\item Linear solver: Conjugate gradient with LU preconditioner.
+	\item Linear solver: Conjugate gradient with LU preconditioner (ILU).
 	\item To compute the $L^\infty ({X})$ space-time dependent norm  the discrete norm $L^\infty_{\Delta t} ({X})$ is used
 	\[
-	||\cdot ||_{L^\infty ({X})} \approx || \cdot ||_{L^\infty_{\Delta t} ({X})} = \max_{t \in t_i} ||\cdot||_{{X}},
+	||\cdot ||_{L^\infty ({X})} \approx || \cdot ||_{L^\infty_{\Delta t} ({X})} = \max_{t \in t_i} ||\cdot||_{{X}}, \qquad \text{$t_i$ are the discrete simulation instants.}
 	\]
-	where $t_i$ are the discrete simulation instants.
 \end{itemize}
 
  \begin{table}[htbp]
@@ -2557,7 +2498,7 @@ Main contributions:
 \begin{frame}{Outlook}
 Open problems and possible developments:
 \begin{itemize}
-	\item \onslide<2->{Modelling: shell problems and non linear elasticity (ex. von Karman plate);}
+	\item \onslide<2->{Modelling: shell problems and non linear elasticity (ex. von K\'arm\'an plate);}
 	\item \onslide<3->{Discretization: efficient finite element for the Kirchhoff plate based on div-div conforming elements \footfullcite{chen2020divDiv};}
 	\item \onslide<4->{Model reduction: application of POD methods, $H_2$-optimal strategies or Krilov subspace methods to the considered models;}
 	\item \onslide<5->{Multibody dynamics: computational aspect of the general quasi-linear problem (symplectic time-integration);}
@@ -3834,6 +3775,66 @@ The adjoint operator provides a rigid movement as the plate input at $\Gamma_{\t
 \mathcal{W}^* {y}_{\text{rod}} &= v_G + \omega_{G} \left( y - L_y/2 \right).
 \end{align*}
 \end{frame}
+
+
+\begin{comment}
+
+\begin{frame}{An analytical solution for the clamped Mindlin plate}
+\setlength{\abovedisplayskip}{4pt}
+\setlength{\belowdisplayskip}{4pt}
+\onslide<1->{
+
+A static solution is already known for this problem defined on the unit square domain\footfullcite{veiga2013}:
+\begin{equation*}
+\begin{aligned}
+0 &= \mathrm{div} \ \bm{q}_s + f_s , \\
+0 &= \mathrm{Div} \bm{M}_s + \bm{q}_s, \\
+\end{aligned} \qquad
+\begin{aligned}
+\bm{\mathcal{C}}_b\bm{M}_s &= \mathrm{Grad} \ \bm{\theta}_s, \\
+C_s \bm{q}_s &= \mathrm{grad} \ w_s - \bm{\theta}_s, \\
+\end{aligned}
+\qquad
+\begin{aligned}
+w_s\vert_{\partial\Omega} = 0, \\
+\bm{\theta}_s\vert_{\partial\Omega} = 0. \\
+\end{aligned}
+\end{equation*}
+}
+
+\onslide<2->{
+A solution for the dynamic problem is obtained considering
+\[
+w_d(x,y,t) = w_s(x,y) \sin(t), \quad \bm{\theta}_d(x,y,t) = \bm\theta_s(x,y) \sin(t).
+\]
+}
+\onslide<3->{
+Appropriate forcing terms have to be introduced to compensate the inertial accelerations
+\begin{equation*}
+f_d = f_s \sin(t) + \rho b \partial_{tt} w_d, \qquad \bm{\tau}_d = \frac{\rho b^3}{12} \partial_{tt} \bm{\theta}_d.
+\end{equation*}
+}
+\onslide<4>{
+The exact solution and boundary conditions for the pH system are thus given by
+\begin{equation*}
+\begin{aligned}
+e_w^\text{ex} &= w_s(x,y) \cos(t), \\
+\bm{e}_\theta^\text{ex} &= \bm\theta_s(x,y) \cos(t), \\
+\end{aligned} \qquad
+\begin{aligned}
+\bm{E}_\kappa^\text{ex} &=  \bm{\mathcal{D}}_b \ \mathrm{Grad} \ \bm{\theta}_d, \\
+\bm{e}_\gamma^\text{ex} &= D_s(\mathrm{grad} \ w_d - \bm{\theta}_d), \\
+\end{aligned}
+\qquad
+\begin{aligned}
+e_w^\text{ex}\vert_{\partial\Omega} &= 0, \\
+\bm{e}_\theta^\text{ex}\vert_{\partial\Omega} &= 0. \\
+\end{aligned}
+\end{equation*}
+}
+
+\end{frame}
+\end{comment}
 
 
 \end{document}
