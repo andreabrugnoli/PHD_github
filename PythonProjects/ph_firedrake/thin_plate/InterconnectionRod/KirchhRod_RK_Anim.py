@@ -33,7 +33,7 @@ L = 1
 l_x = L
 l_y = L
 
-n = 6 #int(input("N element on each side: "))
+n = 4 #int(input("N element on each side: "))
 
 m_rod = 50
 Jxx_rod = 1. / 12 * m_rod * L ** 2
@@ -134,8 +134,8 @@ m_p = dot(v_p, al_p) * dx
 m_q = inner(v_q, al_q) * dx
 m = m_p + m_q
 
-j_divDiv = -v_p * tensor_divDiv_vec(e_q) * dx
-j_divDivIP = tensor_divDiv_vec(v_q) * e_p * dx
+# j_divDiv = -v_p * tensor_divDiv_vec(e_q) * dx
+# j_divDivIP = tensor_divDiv_vec(v_q) * e_p * dx
 
 j_gradgrad = inner(v_q, Gradgrad_vec(e_p)) * dx
 j_gradgradIP = -inner(Gradgrad_vec(v_p), e_q) * dx
@@ -366,7 +366,7 @@ plt.legend(loc='best')
 path_out = "/home/a.brugnoli/Plots/Python/Plots/Kirchhoff_plots/Simulations/Article_CDC/InterconnectionRod/"
 # path_video = "/home/a.brugnoli/Videos/"
 
-plt.savefig(path_out + "HamiltonianRod.eps", format="eps")
+# plt.savefig(path_out + "HamiltonianRod.eps", format="eps")
 
 anim = animateInt2D(minZ, 13, wmm_pl_CGvec, x_rod, y_rod, w_rod_mm, \
              t_ev, xlabel='$x \; \mathrm{[m]}$', ylabel = '$y \; \mathrm{[m]}$', \
@@ -377,9 +377,9 @@ fps = 20
 Writer = animation.writers['ffmpeg']
 writer = Writer(fps= fps, metadata=dict(artist='Me'), bitrate=1800)
 
-anim.save(path_out + 'Kirchh_Rod.mp4', writer=writer)
+# anim.save(path_out + 'Kirchh_Rod.mp4', writer=writer)
 
-save_solutions = True
+save_solutions = False
 if save_solutions:
 
     matplotlib.rcParams['text.usetex'] = True

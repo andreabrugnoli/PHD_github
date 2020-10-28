@@ -32,7 +32,7 @@ from scipy import integrate
 from scipy import linalg as la
 from math import ceil, floor
 
-n = 20
+n = 10
 deg_p = 0
 deg_q = 1
 
@@ -340,7 +340,7 @@ plt.xlabel(r'{Time} $\mathrm{[s]}$')
 plt.ylabel('Hamiltonian $\mathrm{[J]}$')
 plt.title(r"Hamiltonian")
 
-plt.savefig(path_out + "Hamiltonian.eps", format="eps")
+#plt.savefig(path_out + "Hamiltonian.eps", format="eps")
 
 plt.figure()
 plt.plot(t_ev, V_vec, 'g-')
@@ -348,7 +348,7 @@ plt.xlabel(r'{Time} $\mathrm{[s]}$')
 plt.ylabel('Lyapunov Function $\mathrm{[J]}$')
 plt.title(r"Lyapunov function")
 
-plt.savefig(path_out + "Lyapunov.eps", format="eps")
+#plt.savefig(path_out + "Lyapunov.eps", format="eps")
 
 
 # make an animation
@@ -399,4 +399,4 @@ anim = animate2D(x_plot, y_plot, alq_sol, t_ev, xlabel = '$x \;  \mathrm{[m]}$',
 rallenty = 0.2
 Writer = animation.writers['ffmpeg']
 writer = Writer(fps=n_ev/t_fin*rallenty, metadata=dict(artist='Me'), bitrate=1800)
-anim.save(path_out + 'wave.mp4', writer=writer)
+# anim.save(path_out + 'wave.mp4', writer=writer)

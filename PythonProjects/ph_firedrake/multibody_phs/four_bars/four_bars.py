@@ -325,7 +325,7 @@ def omegatheta_plot(n_elem, theta_vec, n_om):
 
 crank = FloatFlexBeam(2, L_crank, rho, A_crank, E, I_crank)
 
-n_el = 2
+n_el = 3
 th_vec = np.linspace(0, 2*pi, 50)
 n_omega = 6
 
@@ -341,8 +341,8 @@ perm = np.argsort(omega)
 eigvec_omega = eigvec_omega[:, perm]
 omega.sort()
 
-# print(omega)
-# compute_eigs(n_omega, n_el, 0, draw=True)
-# compute_eigs(n_omega, n_el, pi, draw=True)
-omegatheta_plot(n_el, th_vec, n_omega)
+print(omega)
+compute_eigs(n_omega, n_el, 0, draw=True)
+compute_eigs(n_omega, n_el, pi, draw=True)
+# omegatheta_plot(n_el, th_vec, n_omega)
 

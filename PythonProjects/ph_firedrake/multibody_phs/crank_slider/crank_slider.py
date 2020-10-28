@@ -48,8 +48,8 @@ I_coupler = pi * d**4 / 64
 # rho_coupler = 7.87 * 10 ** 3
 # E_coupler = 0.2 * 10**12
 
-# omega_cr = 150
-omega_cr = 124.8
+omega_cr = 150
+# omega_cr = 124.8
 
 
 # L_crank = 150

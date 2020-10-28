@@ -28,7 +28,7 @@ h = 0.05 # 0.01
 rho = 2700  # kg/m^3
 D = E * h ** 3 / (1 - nu ** 2) / 12.
 
-n = 6
+n = 4
 
 
 D_b = as_tensor([
@@ -284,7 +284,7 @@ plt.title(r"Plate only")
 
 path_out = "/home/a.brugnoli/Plots/Python/Plots/Kirchhoff_plots/Simulations/Article_CDC/InterconnectionRod/"
 path_video = "/home/a.brugnoli/Videos/"
-plt.savefig(path_out + "HamiltonianNoRod.eps", format="eps")
+# plt.savefig(path_out + "HamiltonianNoRod.eps", format="eps")
 
 anim = animate2D(minZ, maxZ, wmm_CGvec, t_ev, xlabel = '$x \; \mathrm{[m]}$', ylabel = '$y \; \mathrm{[m]}$', \
                          zlabel = '$w \; \mathrm{[mm]}$', title = 'Vertical Displacement')
@@ -295,9 +295,9 @@ Writer = animation.writers['ffmpeg']
 writer = Writer(fps= fps, metadata=dict(artist='Me'), bitrate=1800)
 
 
-anim.save(path_out + 'Kirchh_NoRod.mp4', writer=writer)
+# anim.save(path_out + 'Kirchh_NoRod.mp4', writer=writer)
 
-save_solutions = True
+save_solutions = False
 if save_solutions:
 
 
