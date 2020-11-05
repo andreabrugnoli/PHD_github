@@ -1,0 +1,2372 @@
+\documentclass[aspectratio=169,handout]{ISAE-Beamer}
+\usefonttheme[onlymath]{serif}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{arydshln,mathtools}
+\usepackage{bm}
+\usepackage{color}
+\definecolor{theme}{RGB}{0,73,114}
+\usepackage{multicol}
+\usepackage[caption=false]{subfig}
+
+\usepackage{graphicx}
+\usepackage{diffcoeff}
+\usepackage{dsfont}
+\usepackage{mathrsfs}
+\usepackage[most]{tcolorbox}
+
+\usepackage{xspace}
+\usepackage{appendixnumberbeamer}
+
+%\usepackage{multimedia}
+\usepackage{media9}
+\usepackage[backend=bibtex,doi=false,isbn=false,url=false,eprint=false]{biblatex}
+
+\graphicspath{{../images/}}
+
+\bibliography{../mybibliography}
+
+% Math macros
+\DeclareMathOperator*{\grad}{grad}
+\DeclareMathOperator*{\Grad}{Grad}
+\DeclareMathOperator*{\Div}{Div}
+\renewcommand{\div}{\operatorname{div}}
+\DeclareMathOperator*{\Hess}{Hess}
+\DeclareMathOperator*{\curl}{curl}
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator{\Dom}{Dom}
+\DeclareMathOperator*{\esssup}{ess\,sup}
+
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\bbF}{\mathbb{F}}
+\newcommand{\bbA}{\mathbb{A}}
+\newcommand{\bbB}{\mathbb{B}}
+\newcommand{\bbS}{\mathbb{S}}
+
+\newcommand*{\norm}[1]{\ensuremath{\left\|#1\right\|}}
+\newcommand{\where}{\qquad \text{where} \qquad}
+\newcommand{\inner}[3][]{\ensuremath{\left\langle #2, \, #3 \right\rangle_{#1}}}
+\newcommand{\bilprod}[2]{\left\langle \left\langle \, #1, #2 \, \right\rangle \right\rangle}
+\newcommand{\pder}[2]{\ensuremath{\partial_{#2} #1}}
+\newcommand{\dder}[2]{\ensuremath{\delta_{#2} #1}}
+\newcommand{\secref}[1]{\S\ref{#1}}
+\newcommand{\energy}[1]{\frac{1}{2} \int_{\Omega} \left\{ #1 \right\} \d\Omega}
+\newcommand{\crmat}[1]{\ensuremath{\left[#1\right]_\times}}
+\newcommand{\fenics}{\textsc{FEniCS}\xspace}
+\newcommand{\firedrake}{\textsc{Firedrake}\xspace}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+\newtheorem{hypothesis}{Hypothesis}
+\newtheorem{assumption}{Assumption}
+\newtheorem{conjecture}{Conjecture}
+
+
+\def\onedot{$\mathsurround0pt\ldotp$}
+\def\cddot{% two dots stacked vertically
+	\mathbin{\vcenter{\baselineskip.67ex
+			\hbox{\onedot}\hbox{\onedot}}%
+}}
+
+\renewcommand\bibfont{\scriptsize}
+
+
+\makeatletter \renewcommand\d[1]{\ensuremath{%
+		\;\mathrm{d}#1\@ifnextchar\d{\!}{}}}
+\makeatother
+
+\title[PHD Defense]{A port-Hamiltonian formulation of flexible structures \\
+Modelling and structure preserving finite element discretization}
+
+%\institute[ISAE]
+%{\inst{1}ISAE-SUPAERO, Toulouse}
+
+\author[Andrea Brugnoli]{Andrea Brugnoli\\
+	{\and} \\
+	{\textit{Supervisors}} \\
+	Thesis director: {Daniel Alazard} \\
+	Co-director: {Val\'erie Pommier-Budinger} \\
+	\vspace{10pt}
+	Co-supervisor: Denis Matignon}
+
+\date[Toulouse, 9/11/20]{November, the 9th, 2020}
+
+%\thanks{}
+
+
+
+\begin{document}
+
+
+\maketitle
+
+
+\begin{frame}{Outline}
+
+\tableofcontents
+
+\end{frame}
+
+\section{Introduction}
+
+\begin{frame}{Why port-Hamiltonian systems?}
+\begin{columns}
+\begin{column}{.45\textwidth}
+\begin{figure}
+	\centering
+	\includegraphics[width=.95\textwidth]{presentation/sketch_PH.eps}
+\end{figure}
+\end{column}
+\hspace{1cm}
+\begin{column}{.5\textwidth}
+PH systems are:
+\begin{itemize}
+\item Physically motivated;
+\item Lumped (ODEs) or distributed (PDEs);
+\item Passive (passivity based control);
+\item \textcolor{red}{Closed under interconnection (modular multiphysics modelling)};
+\end{itemize}
+\end{column}
+\end{columns}
+
+\end{frame}
+
+\begin{frame}{Why port-Hamiltonian systems?}	
+
+\begin{figure}
+	\centering
+	\includegraphics[width=.95\textwidth]{presentation/sketch_PH_gyrator.eps}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Why port-Hamiltonian systems?}
+	
+\begin{figure}
+	\centering
+	\includegraphics[width=.95\textwidth]{presentation/sketch_PH_transformer.eps}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Twenty years of distributed port-Hamiltonian systems}
+	
+They have been used for simulating and controlling a variety of applications\footfullcite{rashad2020}:
+\begin{multicols}{2}
+	\begin{itemize}
+		\item {flexible thin beams;}
+		\item {acoustic waves;}
+		\item {stirred tank reactors;}
+		\item {plasma in tokamak;}
+		\item {shallow water equations;}
+		\item {fluid-structure interactions.}
+	\end{itemize}
+\end{multicols}
+
+
+\begin{block}{Distributed port-Hamiltonian systems}
+\begin{equation*}
+\begin{aligned}
+\partial_t {\bm{\alpha}} &= \mathcal{J} \, \bm{e}, \\
+\bm{e} &:= {\delta_{\bm{\alpha}}{H}}, \\
+\bm{u}_\partial &= \mathcal{B}_\partial  \, \bm{e}, \\
+\bm{y}_\partial &= \mathcal{C}_\partial \, \bm{e}, 
+\end{aligned} \qquad
+\begin{aligned}
+\bm{\alpha} &\quad\text{Energy variables},\\
+\bm{e} &\quad\text{Co-energy variables},\\
+\bm{u}_\partial &\quad\text{Control input}, \\
+\bm{y}_\partial &\quad\text{Control output}. 
+\end{aligned} \qquad
+\begin{aligned}
+\mathcal{J} &\quad\text{Skew-symmetric operator},\\
+\\
+\mathcal{B}_\partial &\quad\text{Input operator}, \\
+\mathcal{C}_\partial &\quad\text{Output operator}. \\
+\end{aligned}
+\end{equation*}
+\end{block}
+
+
+\end{frame}
+
+
+\begin{frame}{Motivation \& Research Objectives}
+
+\begin{alertblock}{A missing piece in the port-Hamiltonian literature}
+Despite all the preexisting literature, models arising from structural mechanics on multidimensional geometrical domains have rarely been considered\footfullcite{macchelli2005mindlin}. 
+\end{alertblock}
+
+\begin{block}{Purpose of this work}
+This thesis aims to establish a consistent pH formulation of flexible structures, together with a symplectic discretization method.
+\end{block}
+
+\begin{exampleblock}{Methodologies}
+The numerical implementation relies on efficient and well-established libraries, to avoid constructing everything from scratch.
+\end{exampleblock}
+
+\end{frame}
+
+\begin{frame}{State of the art and this contribution: modelling}
+
+Flexible systems pH modelling:
+\begin{itemize}
+\item Mindlin plate: Stokes-Dirac formulation\footfullcite{macchelli2005mindlin}, jet bundle formalism\footfullcite{schoberl2017mindlin};
+\item Kirchhoff plate: jet bundle formalism\footfullcite{schoberl2018kir}.
+\end{itemize}
+\begin{exampleblock}{This contribution}
+Stokes-Dirac formulation of linear elastodynamics and plate models.
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}{State of the art and this contribution: discretization}
+Discretization of port-Hamiltonian systems:
+\begin{itemize}
+\item Mixed finite elements for differential forms\footfullcite{golo2004hamiltonian,kotyczka2018weak};
+\item Spectral methods\footfullcite{moulla2012pseudo};
+\item Finite differences\footfullcite{trenchant2018}.
+\end{itemize}
+
+\begin{exampleblock}{This contribution}
+	Mixed finite element for PDEs, applicable to generic hyperbolic and parabolic systems under uniform or mixed boundary conditions. Conjectured error estimates for linear flexible structures.
+\end{exampleblock}
+
+\end{frame}
+
+\begin{frame}{State of the art and this contribution: multibody systems}
+Modular modelling of flexible multibody systems:
+\begin{itemize}
+\item Model for a flexible link under large deformations using Lie algebra and differential forms\footfullcite{macchelli2007link};
+\item Construction of complex multibody (under large deformation) using oriented graphs\footfullcite{macchelli2009multi};
+\item Linear modelling of structural dynamics in pH form\footfullcite{warsewa2020port}.
+\end{itemize}
+
+\begin{exampleblock}{This contribution}
+A pH model of floating flexible structure under small deformations (floating frame of reference approach). The paradigm includes all linear models detailed in the thesis.
+\end{exampleblock}
+
+\end{frame}
+
+
+\section{Port-Hamiltonian formulation of elasticity models}
+
+\subsection{Linear elasticity}
+
+\begin{frame}{Main steps for the derivation}
+The derivation of the Hamiltonian system relies on few simple steps to define:
+\begin{enumerate}
+	\item the total energy, the energy and co-energy variables;
+	\item the resulting dynamics  $\mathcal{J}$;
+	\item the boundary variables (energy rate and the Stokes theorem).
+\end{enumerate}
+\vspace{10pt}
+The construction is exactly the same for plate models, as they represent particular instances of this problem.
+\end{frame}
+
+\begin{frame}{The Linear Elastodynamics problem}
+\begin{overlayarea}{\textwidth}{\textheight}
+	\setlength{\abovedisplayskip}{7pt}
+	\setlength{\belowdisplayskip}{7pt}
+For small deformations, the displacement $\bm{u}$ within a continuum  satisfies the PDE
+\begin{equation*}
+\rho \diffp[2]{\bm{u}}{t} - \Div(\bm{\mathcal{D}} \Grad \bm{u}) =0, \qquad \bm{x} \in \Omega \subset \bbR^d, \; d \in \{2,3\}.
+\end{equation*}
+\only<1>{
+Parameters:	
+\begin{itemize}
+\item $\rho$ mass density;
+\item $\bm{\mathcal{D}}(\cdot) := \frac{E}{1 + \nu} \left[(\cdot) + \frac{\nu}{1-2\nu}\Tr(\cdot) \bm{I} \right]$ the stiffness tensor (symmetric and positive).
+\end{itemize}
+\vspace{5pt}
+Stress and strain tensors:	
+\begin{itemize}
+	\item $\bm{\varepsilon} := \Grad \bm{u}$ the strain tensor (symmetric);
+	\item $\bm{\Sigma} := \bm{\mathcal{D}} \bm{\varepsilon}$ the stress tensor (symmetric).
+\end{itemize}
+\vspace{5pt}
+Operators:
+\begin{itemize}
+	\item $\Grad \bm{u} := \frac{1}{2}\left[\nabla\bm{u} + \nabla^\top\bm{u} \right]$ the symmetric gradient;
+	\item $\Div \bm{\Sigma} := \left(\sum_{i=1}^d \diffp{\Sigma_{ij}}{x_i}\right)_{1\le j\le d }$ the tensor divergence.
+\end{itemize}
+}
+\only<2>{
+\begin{figure}
+	\centering
+	\includegraphics[height=0.5\textheight]{presentation/bc_elas2D.eps}
+
+\end{figure}
+}
+\end{overlayarea}
+\end{frame}
+
+\begin{frame}{Energy and co-energy variables}
+\begin{overlayarea}{\textwidth}{\textheight}
+	\begin{block}{Total energy}
+	\begin{equation*}
+	H = \energy{\rho \norm{\partial_t \bm{u}}^2 + \bm{\Sigma} \cddot \bm{\varepsilon}}, \qquad \bm{A} \cddot \bm{B} = \Tr(\bm{A}^\top \bm{B}) \quad \text{Tensor contraction}.
+	\end{equation*}
+	\end{block}
+	
+	\onslide<2->{
+	\begin{block}{Energy variables}
+	\begin{equation*}
+	\bm{\alpha}_v = \rho \partial_t \bm{u}, \quad \text{Linear momentum}, \qquad \bm{A}_{\varepsilon} = \bm{\varepsilon}, \quad \text{Strain tensor}. 
+	\end{equation*}
+	\end{block}
+
+	}
+	\only<3>{
+	\begin{block}{Co-energy variables}
+	\begin{equation*}
+	\bm{e}_v = \diffd{H}{\bm{\alpha}_v} = \partial_t \bm{u}, \quad \text{Linear velocity}, \qquad \bm{E}_{\varepsilon} = \diffd{H}{\bm{A}_{\varepsilon}} = \bm{\mathcal{D}} \bm{A}_{\varepsilon} = \bm{\Sigma}, \quad \text{Stress tensor}.
+	\end{equation*}
+	\end{block}	
+	}
+\end{overlayarea}
+\end{frame}
+
+\begin{frame}{Interconnection operator and boundary variables}
+\vskip-1.5em
+\begin{columns}[t]
+\begin{column}{.5\textwidth}
+\begin{block}{Dynamics}
+\begin{equation*}
+\displaystyle
+\diffp{}{t}
+\begin{pmatrix}
+\bm{\alpha}_v \\
+\bm{A}_\varepsilon
+\end{pmatrix} = \underbrace{
+	\begin{bmatrix}
+	\bm{0} & \Div \\
+	\Grad & \bm{0} \\
+	\end{bmatrix}}_{\mathcal{J}}
+\begin{pmatrix}
+\bm{e}_v \\
+\bm{E}_\varepsilon
+\end{pmatrix}.
+\end{equation*}
+\end{block}
+
+\end{column}
+\begin{column}{.5\textwidth}
+\begin{exampleblock}{Theorem}
+	The formal adjoint of the $-\Div$ operator is the symmetric gradient $\Grad$.
+\end{exampleblock}
+Hence $\mathcal{J}$ is skew-symmetric.
+\end{column}
+\end{columns}
+
+
+\begin{block}{Boundary variables}
+	\setlength{\abovedisplayskip}{0pt}
+	\setlength{\belowdisplayskip}{0pt}
+	\begin{equation*}
+	\begin{aligned}
+	\dot{H} &= \int_{\Omega} \left\{\bm{e}_v \cdot \Div \bm{E}_\varepsilon + \bm{E}_\varepsilon \cddot \Grad \bm{e}_v \right\}\d\Omega, \qquad &\text{Stokes theorem},\\
+	&= \int_{\partial \Omega} \bm{e}_v \cdot (\bm{E}_\varepsilon\bm{n}) \d{S} = \inner[\partial\Omega]{\bm\gamma_{0}\bm{e}_v}{\bm\gamma_{n}\bm{E}_\varepsilon}.
+	\end{aligned}
+	\end{equation*}
+	\begin{itemize}
+		\item $\bm\gamma_{0}\bm{e}_v = \bm{e}_v\vert_{\partial\Omega}$ the Dirichlet trace of the velocity;
+		\item $\bm\gamma_{n}\bm{E}_\varepsilon = \bm{E}_\varepsilon\bm{n}\vert_{\partial\Omega}$ the normal trace of the stress tensor.
+	\end{itemize} 
+\end{block}
+
+
+\end{frame}
+
+
+\begin{frame}{The port-Hamiltonian formulation}
+	Given the fact that mixed boundary conditions are considered, the trace operators are restricted to the boundary partitions:
+	\begin{itemize} 
+		\item $\bm\gamma_{0}^{\Gamma_*}$ denotes the Dirichlet trace over the set $\Gamma_*$, $\bm\gamma_{0}^{\Gamma_*} \bm{e}_v = \bm{e}_v\vert_{\Gamma_*}$;
+		\item $\bm\gamma_{n}^{\Gamma_*}$ denotes the normal trace over the set $\Gamma_*$, $\bm{\gamma_{n}}^{\Gamma_*}\bm{E}_\varepsilon = \bm{E}_\varepsilon \bm{n}\vert_{\Gamma_*}$.
+	\end{itemize}
+
+	\begin{block}{PH linear elasticity}
+	\begin{equation*}
+	\begin{aligned}
+	\displaystyle
+	\diffp{}{t}
+	\begin{pmatrix}
+	\bm{\alpha}_v \\
+	\bm{A}_\varepsilon
+	\end{pmatrix} &= \underbrace{
+		\begin{bmatrix}
+		\bm{0} & \Div \\
+		\Grad & \bm{0} \\
+		\end{bmatrix}}_{\mathcal{J}}
+	\begin{pmatrix}
+	\bm{e}_v \\
+	\bm{E}_\varepsilon
+	\end{pmatrix}, \\
+	\bm{u}_\partial &= \underbrace{
+		\begin{bmatrix}
+		\textcolor{blue}{\bm\gamma_{0}^{\Gamma_D}} & \bm{0} \\
+		\bm{0} & \textcolor{red}{\bm\gamma_n^{\Gamma_N}} \\
+		\end{bmatrix}}_{\mathcal{B}_\partial} \begin{pmatrix}
+	\bm{e}_v \\
+	\bm{E}_\varepsilon
+	\end{pmatrix}, \vspace{3pt}\qquad
+	\end{aligned}
+	\begin{aligned}
+	\begin{pmatrix}
+	\bm{e}_v \\
+	\bm{E}_\varepsilon
+	\end{pmatrix} &= 
+	\underbrace{
+		\begin{bmatrix}
+		\frac{1}{\rho} & \bm{0} \\
+		\bm{0} & \bm{\mathcal{D}} \\
+		\end{bmatrix}}_{\mathcal{Q}}
+	\begin{pmatrix}
+	\bm{\alpha}_v \\
+	\bm{A}_\varepsilon
+	\end{pmatrix}, \\
+	\bm{y}_\partial &= \underbrace{
+		\begin{bmatrix}
+		\bm{0} & \textcolor{blue}{\bm\gamma_{n}^{\Gamma_D}} \\
+		\textcolor{red}{\bm\gamma_0^{\Gamma_N}} & \bm{0} \\
+		\end{bmatrix}}_{\mathcal{C}_\partial}
+	\begin{pmatrix}
+	\bm{e}_v \\
+	\bm{E}_\varepsilon
+	\end{pmatrix}.
+	\end{aligned}
+	\end{equation*}
+	\end{block}
+\end{frame}
+
+
+
+\subsection{Plate models: Kirchhoff and Mindlin plates}
+
+\begin{frame}{The Mindlin plate classical model}
+Model describing the bending deflection of \textbf{thick} plates of thickness $h$
+\begin{equation*}
+\begin{aligned}
+\rho h \diffp[2]{w}{t} &= \div \bm{q}, \qquad (x,y) \in \Omega \subset \bbR^2, \\
+\frac{\rho h^3}{12} \diffp[2]{\bm{\theta}}{t} &=\Div \bm{M} + \bm{q},
+\end{aligned}
+\end{equation*}
+Strains:
+\begin{itemize}
+	\item  $\bm{\kappa} = \Grad{\bm{\theta}}$ the curvature tensor;
+	\item $\bm{\gamma} = \grad w - \bm{\theta}$ the shear strain.
+\end{itemize}
+Stresses:
+\begin{itemize}
+	\item $\bm{M}= \bm{\mathcal{D}}_b\,\bm{\kappa}$ the momenta tensor;
+	\item $\bm{\mathcal{D}}_{b} = \frac{E h^3}{12(1-\nu^2)} \left[ (1-\nu) (\cdot) + \nu \Tr(\cdot) \bm{I}_{2\times 2} \right]$ the bending stiffness tensor;
+	\item $\bm{q}= K_{\text{sh}} Gh\,\bm{\gamma}$ the shear stress ($G$ is the shear modulus and $K_{\text{sh}}$ the shear correction factor);
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Mindlin plate boundary conditions}
+\begin{overlayarea}{\textwidth}{\textheight}
+\begin{table}
+	\centering
+	\begin{tabular}{cc|cc}
+		\hline 
+		\multicolumn{2}{c}{\textcolor{blue}{Dirichlet} conditions (\textcolor{blue}{clamped})}&  \multicolumn{2}{c}{\textcolor{orange}{Neumann} conditions (\textcolor{orange}{free})} \\ 
+		\hline 
+		Vertical velocity  & $w_t = \partial_t {w}$ & Shear force  & $q_n = \bm{q} \cdot \bm{n}$ \\ 
+		Flexural rotation  & $\omega_n = \partial_t {\bm{\theta}} \cdot \bm{n}$ & Flexural momentum & $M_{nn} = \bm{n}^\top\bm{M}\bm{n}$ \\  
+		Torsional rotation & $\omega_s = \partial_t {\bm{\theta}} \cdot \bm{s}$ & Torsional momentum  & $ M_{ns} = \bm{s}^\top\bm{M}\bm{n}$  \\ 
+		\hline 
+	\end{tabular}
+\end{table}
+\textcolor{red}{Mixed condition}: $w_t,\;  \omega_s, \; M_{nn}$ given (\textcolor{red}{simply supported})
+\only<1>{
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.6\textwidth]{part_2/cauchy_law.eps}
+\end{figure}
+}
+\only<2>{
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.6\textwidth]{part_2/min_plate_bcs.eps}
+\end{figure}
+}
+\end{overlayarea}	
+
+\end{frame}
+
+\begin{frame}{Energies and co-energies for the Mindlin plate}
+\begin{overlayarea}{\textwidth}{\textheight}
+\begin{block}{Total energy}
+	\begin{equation*}
+	H = \frac{1}{2} \int_{\Omega}  \left\{ \rho h \left(\diffp{w}{t} \right)^2 + \frac{\rho h^3}{12} \norm{\diffp{\bm{\theta}}{t}}^2 +   \bm{M} \cddot \bm{\kappa} + \bm{q} \cdot \bm{\gamma}  \right\}  \d\Omega, 
+	\end{equation*}
+\end{block}
+
+\only<1>{
+\begin{block}{Energy variables}
+	\begin{equation*}
+	\begin{aligned}
+	\alpha_w &= \rho h \diffp{w}{t}, \quad &\text{Linear momentum,} \\
+	\bm{A}_{\kappa} &= \bm{\kappa}, \quad &\text{Curvature tensor,} \\
+	\end{aligned} \qquad
+	\begin{aligned}
+	\bm\alpha_{\theta} &=  \frac{\rho h^3}{12} \diffp{\bm{\theta}}{t}, \quad &\text{Angular momentum,}\\
+	\bm\alpha_{\gamma} &= \bm{\gamma}. \quad &\text{Shear deformation.}\\
+	\end{aligned}
+	\end{equation*}
+\end{block}	
+}
+
+\only<2>{
+\begin{block}{Co-energy variables}
+	\begin{equation*}
+	\begin{aligned}
+	e_w &:= \diffd{H}{\alpha_w} = \diffp{w}{t},  \quad &\text{Linear velocity,} \\
+	\bm{E}_{\kappa} &:= \diffd{H}{\bm{A}_{\kappa}} = \bm{M}, \quad &\text{Momenta tensor,}\\
+	\end{aligned} \qquad
+	\begin{aligned}
+	\bm{e}_{\theta} &:= \diffd{H}{\bm\alpha_{\theta}} = \diffp{\bm{\theta}}{t}, \quad &\text{Angular velocity,}  \\
+	\bm{e}_{\gamma} &:= \diffd{H}{\bm\alpha_{\gamma}} = \bm{q} \quad &\text{Shear stress.} \\
+	\end{aligned}
+	\end{equation*}
+\end{block}	
+}
+
+\end{overlayarea}	
+\end{frame}
+
+\begin{frame}{Interconnection operator and boundary variables}
+\vskip-0.5em
+\begin{block}{Dynamics}
+\begin{equation*}
+\diffp{}{t}
+\begin{pmatrix}
+\alpha_w \\
+\bm\alpha_\theta \\
+\bm{A}_\kappa \\
+\bm\alpha_{\gamma} \\
+\end{pmatrix} = 
+\underbrace{\begin{bmatrix}
+	0  & 0  & 0  & \div \\
+	\bm{0} & \bm{0} &  \Div & \bm{I}_{2 \times 2}\\
+	\bm{0}  & \Grad  & \bm{0}  & \bm{0}\\
+	\grad & -\bm{I}_{2 \times 2} &  \bm{0} & \bm{0} \\
+	\end{bmatrix}}_{\mathcal{J}}
+\begin{pmatrix}
+e_w \\
+\bm{e}_{\theta} \\
+\bm{E}_{\kappa} \\
+\bm{e}_{\gamma} \\
+\end{pmatrix}.
+\end{equation*}
+\end{block}
+
+\begin{block}{Boundary variables}
+	\vskip-0.5em
+\begin{equation*}
+\begin{aligned}
+\dot{H}&= \int_{\Omega} \left\{ \div(\bm{e}_{\gamma}) e_w  + \Div(\bm{E}_{\kappa}) \cdot \bm{e}_\theta + \; \Grad(\bm{e}_{\theta}) \cddot \bm{E}_{\kappa}  + \grad (e_w) \cdot \bm{e}_{\gamma} \right\} \d\Omega, \\
+&= \inner[\partial\Omega]{\gamma_{0} e_w}{\gamma_{n} \bm{e}_\gamma} + \inner[\partial\Omega]{\gamma_{n}\bm{e}_\theta}{\gamma_{nn}\bm{E}_\kappa} + \inner[\partial\Omega]{\gamma_{s}\bm{e}_\theta}{\gamma_{ns}\bm{E}_\kappa},  \\
+\end{aligned}
+\end{equation*}
+	\vskip-0.5em
+\begin{itemize}
+	\item $\gamma_{nn}\bm{E}_\kappa = \bm{n}^\top \bm{E}_\kappa \bm{n}\vert_{\partial\Omega}$ denotes the normal-normal trace  of tensor-valued functions;
+	\item $\gamma_{ns}\bm{E}_\kappa = \bm{s}^\top \bm{E}_\kappa \bm{n}\vert_{\partial\Omega}$ denotes the normal-tangential trace of tensor-valued functions.
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Mindlin plate as a port-Hamiltonian system}
+	\begin{block}{PH Mindlin plate}
+		\small
+		\setlength{\abovedisplayskip}{1pt}
+		\setlength{\belowdisplayskip}{1pt}
+		\begin{equation*}
+		\begin{aligned}
+		\displaystyle
+		\diffp{}{t}
+		\begin{pmatrix}
+		\alpha_w \\
+		\bm\alpha_\theta \\
+		\bm{A}_\kappa \\
+		\bm\alpha_{\gamma} \\
+		\end{pmatrix} &= 
+		\underbrace{\begin{bmatrix}
+			0  & 0  & 0  & \div \\
+			\bm{0} & \bm{0} &  \Div & \bm{I}_{2 \times 2}\\
+			\bm{0}  & \Grad  & \bm{0}  & \bm{0}\\
+			\grad & -\bm{I}_{2 \times 2} &  \bm{0} & \bm{0} \\
+			\end{bmatrix}}_{\mathcal{J}}
+		\begin{pmatrix}
+		e_w \\
+		\bm{e}_{\theta} \\
+		\bm{E}_{\kappa} \\
+		\bm{e}_{\gamma} \\
+		\end{pmatrix}, \vspace{3pt}\\
+		\bm{u}_\partial &= \underbrace{
+			\begin{bmatrix}
+			\textcolor{blue}{\gamma_{0}^{\Gamma_C}} & {0} & {0} & {0} \\
+			{0} & \textcolor{blue}{\gamma_n^{\Gamma_C}} &  {0} & {0} \\
+			{0} & \textcolor{blue}{\gamma_s^{\Gamma_C}} &  {0} & {0} \\
+			\textcolor{red}{\gamma_{0}^{\Gamma_S}} & {0} & {0} & {0} \\
+			{0} & \textcolor{red}{\gamma_s^{\Gamma_S}} & {0} & {0} \\
+			{0} &  {0} & \textcolor{red}{\gamma_{nn}^{\Gamma_S}} & {0} \\
+			{0} &  {0} & \textcolor{orange}{\gamma_{nn}^{\Gamma_F}} & {0} \\
+			{0} &  {0} & \textcolor{orange}{\gamma_{ns}^{\Gamma_F}} & {0} \\
+			{0} &  {0} & {0} & \textcolor{orange}{\gamma_{n}^{\Gamma_F}} \\
+			\end{bmatrix}}_{\mathcal{B}_\partial} \begin{pmatrix}
+		e_w \\
+		\bm{e}_{\theta} \\
+		\bm{E}_{\kappa} \\
+		\bm{e}_{\gamma} \\
+		\end{pmatrix}, 
+		\end{aligned} \quad
+		\begin{aligned}
+		\begin{pmatrix}
+		e_w \\
+		\bm{e}_{\theta} \\
+		\bm{E}_{\kappa} \\
+		\bm{e}_{\gamma} \\
+		\end{pmatrix} &= 
+		\underbrace{\begin{bmatrix}
+			\frac{1}{\rho h}  & 0 & 0  & 0 \\
+			\bm{0} & \frac{12}{\rho h^3} &  \bm{0} & \bm{0}\\
+			\bm{0} & \bm{0} & \bm{\mathcal{D}}_b  & \bm{0}\\
+			\bm{0} & \bm{0} &  \bm{0} & K_{\text{sh}} G h \\
+			\end{bmatrix}}_{\mathcal{Q}}
+		\begin{pmatrix}
+		\alpha_w \\
+		\bm\alpha_\theta \\
+		\bm{A}_\kappa \\
+		\bm\alpha_{\gamma} \\
+		\end{pmatrix}, \\
+		\bm{y}_\partial &= \underbrace{
+			\begin{bmatrix}
+			{0} & {0} & {0} & \textcolor{blue}{\gamma_{n}^{\Gamma_C}} \\
+			{0} & {0} & \textcolor{blue}{\gamma_{nn}^{\Gamma_C}} & {0} \\
+			{0} & {0} & \textcolor{blue}{\gamma_{ns}^{\Gamma_C}} & {0} \\
+			{0} & {0} & {0} & \textcolor{red}{\gamma_{n}^{\Gamma_S}} \\
+			{0} & {0} & \textcolor{red}{\gamma_{ns}^{\Gamma_S}} & {0} \\
+			{0} & \textcolor{red}{\gamma_{n}^{\Gamma_S}} & {0} & {0} \\
+			{0} & \textcolor{orange}{\gamma_{n}^{\Gamma_F}} & {0} & {0} \\
+			{0} & \textcolor{orange}{\gamma_{s}^{\Gamma_F}} & {0} & {0} \\
+			\textcolor{orange}{\gamma_{0}^{\Gamma_F}} & {0} & {0} & {0} \\
+			\end{bmatrix}}_{\mathcal{C}_\partial}
+		\begin{pmatrix}
+		e_w \\
+		\bm{e}_{\theta} \\
+		\bm{E}_{\kappa} \\
+		\bm{e}_{\gamma} \\
+		\end{pmatrix}.
+		\end{aligned}
+		\end{equation*}
+	\end{block}
+\end{frame}
+
+\begin{frame}{Kirchhoff plate classical model}
+	This model describes the bending deflection of \textbf{thin} plates
+	\begin{equation*}
+	\rho h \diffp[2]{w}{t} = - \div\Div \bm{M}, \qquad (x,y) \in \Omega \subset \bbR^2.
+	\end{equation*}
+
+	As for the Mindlin plate the stress tensor is defined as 
+	$$\bm{M} = \bm{\mathcal{D}}_b \bm{\kappa}.$$
+	However, the curvature tensor is now given by the Hessian of the displacement field
+	$$\bm{\kappa} = \Grad\grad w = \Hess w.$$
+	Notice that $\Grad \circ \grad = \Hess$.
+\end{frame}
+
+\begin{frame}{Kirchhoff plate boundary conditions}
+
+\begin{table}
+	\centering
+	\begin{tabular}{cc|cc}
+		\hline 
+		\multicolumn{2}{c}{\textcolor{blue}{Dirichlet} conditions (\textcolor{blue}{clamped})}&  \multicolumn{2}{c}{\textcolor{orange}{Neumann} conditions (\textcolor{orange}{free})} \\ 
+		\hline 
+		Vertical velocity  & $w_t$ & Effective shear force  & $\widetilde{q}_n = -\Div \bm{M} \cdot \bm{n} - \partial_{\bm{s}} (\bm{s}^\top \bm{M} \bm{n})$ \\ 
+		Flexural rotation  & $\partial_{\bm{n}} w_t $  & Flexural momentum & $M_{nn} = \bm{n}^\top\bm{M}\bm{n}$ \\  
+		\hline 
+	\end{tabular}
+\end{table}
+\textcolor{red}{Mixed} conditions: $w_t, M_{nn}$ given (\textcolor{red}{simply supported})
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.6\textwidth]{part_2/kirchh_plate_bcs.eps}
+\end{figure}
+		
+\end{frame}
+
+\begin{frame}{Energies and co-energies for the Kirchhoff plate}
+\begin{overlayarea}{\textwidth}{\textheight}
+\begin{block}{Total energy}
+	\setlength{\abovedisplayskip}{1pt}
+	\setlength{\belowdisplayskip}{1pt}
+	\begin{equation*}
+	H = \frac{1}{2} \int_{\Omega}  \left\{ \rho h \left(\partial_t {w} \right)^2 + \bm{M} \cddot \bm{\kappa}\right\}  \d\Omega, 
+	\end{equation*}
+\end{block}
+	
+\begin{block}{Energy variables}
+	\begin{equation*}
+	\alpha_w = \rho h \partial_t {w}, \quad \text{Linear momentum,} \qquad
+	\bm{A}_{\kappa} = \bm{\kappa}, \quad \text{Curvature tensor.} 
+	\end{equation*}
+\end{block}	
+
+\begin{block}{Co-energy variables}
+	\begin{equation*}
+	e_w := \diffd{H}{\alpha_w} = \partial_t {w},  \quad \text{Linear velocity,} \qquad
+	\bm{E}_{\kappa} := \diffd{H}{\bm{A}_{\kappa}} = \bm{M}, \quad \text{Momenta tensor.}
+	\end{equation*}
+\end{block}	
+	
+\end{overlayarea}	
+\end{frame}
+
+\begin{frame}{Interconnection operator and boundary variables}
+\vskip-1.5em
+\begin{columns}[t]
+	\begin{column}{.55\textwidth}
+		\begin{block}{Dynamics}
+			\begin{equation*}
+			\diffp{}{t}
+			\begin{pmatrix}
+			\alpha_w \\
+			\bm{A}_{\kappa} \\
+			\end{pmatrix} = 
+			\underbrace{\begin{bmatrix}
+				0  &  - \div \circ \Div \\
+				\Grad \circ \grad & \bm{0} \\
+				\end{bmatrix}}_{\mathcal{J}}
+			\begin{pmatrix}
+			e_w \\
+			\bm{E}_{\kappa} \\
+			\end{pmatrix}.
+			\end{equation*}
+		\end{block}
+		
+	\end{column}
+	\begin{column}{.45\textwidth}
+		\begin{exampleblock}{Theorem}
+		The formal adjoint of the $\div\Div$ operator is $\Grad\grad$, the Hessian operator.
+		\end{exampleblock}
+		Hence $\mathcal{J}$ is skew-symmetric.
+	\end{column}
+\end{columns}
+
+\begin{block}{Boundary variables}
+\setlength{\abovedisplayskip}{1pt}
+\setlength{\belowdisplayskip}{1pt}
+Assuming a regular boundary $\partial\Omega \in C^1$
+\begin{equation*}
+\begin{aligned}
+\dot{H}&= \int_{\Omega} \left\{ - \div\Div \bm{E}_{\kappa} \, e_w + \Grad\grad e_w \cddot \bm{E}_{\kappa} \right\} \d\Omega, \\
+&=\inner[\partial\Omega]{\gamma_{0} e_w}{\gamma_{nn, 1}\bm{E}_\kappa} + \inner[\partial\Omega]{\gamma_{1} e_w}{\gamma_{nn}\bm{E}_\kappa}.  
+\end{aligned}
+\end{equation*}
+\begin{itemize}
+	\item $\gamma_{1} e_w = \partial_{\bm{n}} e_w \vert_{\partial\Omega}$ denote the normal derivative trace;
+	\item $\gamma_{nn, 1}$ denotes the map $\gamma_{nn, 1}\bm{E}_\kappa = -\bm{n} \cdot \Div \bm{E}_\kappa - \partial_{\bm{s}} (\bm{s}^\top\bm{E}_\kappa\bm{n})\vert_{\partial\Omega}$.
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+\begin{frame}{The Kirchhoff plate as a pH system}
+	\begin{block}{PH Kirchhoff plate}
+		\begin{equation*}
+		\begin{aligned}
+		\displaystyle
+		\diffp{}{t}
+		\begin{pmatrix}
+		\alpha_w \\
+		\bm{A}_{\kappa} \\
+		\end{pmatrix} &= 
+		\underbrace{\begin{bmatrix}
+			0  &  - \div \circ \Div \\
+			\Grad \circ \grad & \bm{0} \\
+			\end{bmatrix}}_{\mathcal{J}: \text{2nd order}}
+		\begin{pmatrix}
+		e_w \\
+		\bm{E}_{\kappa} \\
+		\end{pmatrix}, \vspace{3pt}\\
+		\bm{u}_\partial &= \underbrace{
+			\begin{bmatrix}
+			\textcolor{blue}{\gamma_{0}^{\Gamma_C}} & {0}  \\
+			\textcolor{blue}{\gamma_1^{\Gamma_C}} &  {0} \\
+			\textcolor{red}{\gamma_{0}^{\Gamma_S}} &  {0}  \\
+			{0} & \textcolor{red}{\gamma_{nn}^{\Gamma_S}} \\
+			{0} & \textcolor{orange}{\gamma_{nn, 1}^{\Gamma_F}}  \\
+			{0} & \textcolor{orange}{\gamma_{nn}^{\Gamma_F}}\\
+			\end{bmatrix}}_{\mathcal{B}_\partial} \begin{pmatrix}
+		e_w \\
+		\bm{E}_{\kappa} \\
+		\end{pmatrix}, 
+		\end{aligned} \qquad
+		\begin{aligned}
+		\begin{pmatrix}
+		e_w \\
+		\bm{E}_{\kappa} \\
+		\end{pmatrix} &= 
+		\underbrace{\begin{bmatrix}
+		\frac{1}{\rho h}  &  0 \\
+		\bm{0} & \bm{\mathcal{D}}_b \\
+		\end{bmatrix}}_{\mathcal{Q}}
+		\begin{pmatrix}
+		\alpha_w \\
+		\bm{A}_{\kappa} \\
+		\end{pmatrix}, \\
+		\bm{y}_\partial &= \underbrace{
+			\begin{bmatrix}
+			{0} & \textcolor{blue}{\gamma_{nn, 1}^{\Gamma_C}} \\
+			{0} & \textcolor{blue}{\gamma_{nn}^{\Gamma_C}} \\
+			{0} & \textcolor{red}{\gamma_{nn, 1}^{\Gamma_S}} \\
+			\textcolor{red}{\gamma_{1}^{\Gamma_S}} & {0} \\
+			\textcolor{orange}{\gamma_{0}^{\Gamma_F}} & {0} \\
+			\textcolor{orange}{\gamma_{1}^{\Gamma_F}} & {0} \\
+			\end{bmatrix}}_{\mathcal{C}_\partial}
+		\begin{pmatrix}
+		e_w \\
+		\bm{E}_{\kappa} \\
+		\end{pmatrix}.
+		\end{aligned}
+		\end{equation*}
+	\end{block}
+\end{frame}
+
+
+
+
+
+\section{A structure preserving discretization method}
+
+
+\begin{frame}{Structure preserving discretization}
+\begin{tcbraster}[raster columns=2, raster equal height]
+	\begin{tcolorbox}[width=0.4\textwidth, nobeforeafter, colframe=theme,title=Infinite-dimensional pH system]%%
+		PDE with distributed inputs:
+		\begin{align*}
+		\diffp{\bm{\alpha}}{t}(\bm{x}, t) &= \mathcal{J} \delta_{\bm{\alpha}} H + \mathcal{B} \textcolor{red}{\bm{u}_\Omega(\bm{x}, t)}, \\
+		\textcolor{red}{\bm{y}_\Omega(\bm{x}, t)} &= \mathcal{B}^* \delta_{\bm{\alpha}} H.
+		\end{align*}
+		Boundary conditions: 
+		\[\textcolor{blue}{\bm{u}_\partial} = \mathcal{B}_\partial \delta_{\bm{\alpha}} H, \quad \textcolor{blue}{\bm{y}_\partial} = \mathcal{C}_\partial \delta_{\bm{\alpha}} H. \]
+		Power balance (Stokes Theorem): 
+		\[ \dot{H} = \displaystyle \int_{\partial \Omega} \textcolor{blue}{\bm{u}_\partial} \cdot \textcolor{blue}{\bm{y}_\partial} \d{S} +  \int_{\Omega} \textcolor{red}{\bm{u}_\Omega} \cdot \textcolor{red}{\bm{y}_\Omega} \d{\Omega}.
+		\]
+	\end{tcolorbox} 
+	\begin{tcolorbox}[width=0.4\textwidth, nobeforeafter,  colframe=theme,title=Structure-preserving discretization]%%
+		Resulting ODE:
+		\begin{align*}
+		\dot{\bm{\alpha}}_d &= \mathbf{J} \, {\nabla {H}_d} + \mathbf{B}_\Omega \textcolor{red}{\mathbf{u}_\Omega} + \mathbf{B}_\partial \textcolor{blue}{\mathbf{u}_\partial}, \\
+		\textcolor{red}{\mathbf{y}_\Omega} &= \mathbf{B}_\Omega^\top \, {\nabla {H}_d}, \\
+		\textcolor{blue}{\mathbf{y}_\partial} &= \mathbf{B}_\partial^\top \,{\nabla {H}_d}.
+		\end{align*}
+		Discretized Hamiltonian:
+		\[
+		H_d := H(\bm{\alpha} \equiv \bm{\alpha}_d).
+		\]
+		Power balance: 
+		\[ \dot{H} = \textcolor{blue}{\mathbf{u}_\partial^\top \mathbf{y}_\partial} +  \textcolor{red}{\mathbf{u}_\Omega^\top \mathbf{y}_\Omega}.
+		\]
+	\end{tcolorbox}
+\end{tcbraster}
+\end{frame}
+
+
+\begin{frame}{Discretization of port-Hamiltonian system}
+\begin{exampleblock}{Available methods}
+	\begin{itemize}
+		\item Spectral methods (Moulla 2012):
+		\begin{itemize}
+			\item[\textcolor{green}{\checkmark}] Rapid spectral convergence;
+			\item[\textcolor{red}{$\times$}] Only for 1D problem;
+		\end{itemize}
+		\item Finite differences (Trenchant 2018):
+		\begin{itemize}
+			\item[\textcolor{green}{\checkmark}] Valid up to 2D geometries;
+			\item[\textcolor{red}{$\times$}] Requires \textit{ad hoc} implementation (staggered grids);
+		\end{itemize}
+		\item Finite elements based
+		\begin{itemize}
+			\item Golo 2004, Kotyczka 2018: 
+			\begin{itemize}
+				\item[\textcolor{red}{$\times$}] they require tuning of some parameters to ensure the power flows preservation;
+			\end{itemize}		
+			\item \textcolor{blue}{Cardoso-Ribeiro 2018}:
+			\begin{itemize}
+				\item[\textcolor{green}{\checkmark}] Natural extension of the mixed finite element method to pH systems;
+				\item[\textcolor{green}{\checkmark}] Implementable using well-established libraries (\fenics{}, \firedrake{});
+			\end{itemize}
+		\end{itemize}
+	\end{itemize}
+\end{exampleblock}
+\end{frame}
+
+
+\subsection{Uniform boundary condition}
+
+\begin{frame}{Underlying hypotheses of the method}
+\only<1>{
+\begin{assumption}[Partitioned structure of the pH system]
+The pH system has the partitioned form
+\begin{align*}
+\begin{aligned}
+\partial_t \begin{pmatrix}
+{\bm{\alpha}}_1 \\ {\bm{\alpha}}_2
+\end{pmatrix} &= \begin{bmatrix}
+0 & - \mathcal{L}^* \\
+\mathcal{L} & 0 \\
+\end{bmatrix}\begin{pmatrix}
+\bm{e}_1 \\ \bm{e}_2
+\end{pmatrix} , \vspace{3pt}\\
+\begin{pmatrix}
+\bm{e}_1 \\ \bm{e}_2
+\end{pmatrix} &:= \begin{pmatrix}
+\delta_{\bm{\alpha}_1}H \\ \delta_{\bm{\alpha}_2}H
+\end{pmatrix},
+\end{aligned} \qquad
+\begin{aligned}
+\bm{\alpha}_1 &\in L^2(\Omega, \mathbb{A}), 	\\
+\bm{\alpha}_2 &\in L^2(\Omega, \mathbb{B}),  \\
+\bm{e}_1 &\in H^\mathcal{L}:= \left\{\bm{u}_1 \in L^2(\Omega, \mathbb{A}) \vert \; \mathcal{L}\bm{u}_1 \in L^2(\Omega, \mathbb{B}) \right\}, 	\\
+\bm{e}_2 &\in H^{-\mathcal{L}^*}:= \left\{\bm{u}_2 \in L^2(\Omega, \mathbb{B}) \vert \; -\mathcal{L}^*\bm{u}_2 \in L^2(\Omega, \mathbb{A}) \right\}.
+\end{aligned}
+\end{align*}
+The  sets $\mathbb{A}, \mathbb{B}$ are Cartesian product of either scalar, vectorial or tensorial quantities.
+\end{assumption}
+Wave-like equations (e.g. linear elastic models) possess this structure  \footfullcite{joly2003variational}.
+}
+
+\only<2>{
+\begin{assumption}[Abstract integration by parts formula]
+Assume that there exists  two boundary operators $\mathcal{N}_{\partial, 1}, \; \mathcal{N}_{\partial, 2}$ such that  a general integration by parts formula holds $\forall \bm{e}_1 \in H^\mathcal{L}$ and $\forall \bm{e}_2 \in H^{-\mathcal{L}^*}$
+\begin{equation*}
+\inner[L^2(\Omega, \mathbb{B})]{\bm{e}_2}{\mathcal{L}\,\bm{e}_1} - \inner[L^2(\Omega, \mathbb{A})]{\mathcal{L}^* \, \bm{e}_2}{\bm{e}_1} = \inner[\partial \Omega]{\mathcal{N}_{\partial, 1} \bm{e}_1}{\mathcal{N}_{\partial, 2} \bm{e}_2}. 
+\end{equation*}
+where $\inner[\partial \Omega]{\cdot}{\cdot}$ denotes an appropriate duality pairing.
+\end{assumption}
+
+\begin{assumption}[Uniform boundary condition]
+The boundary operators $\mathcal{B}_\partial, \, \mathcal{C}_\partial$ are then assumed to verify, in an exclusive manner, either
+\begin{equation*}
+\mathcal{B}_\partial = \begin{bmatrix}
+0 & \mathcal{N}_{\partial, 2} \\
+\end{bmatrix}, \qquad 
+\mathcal{C}_\partial = \begin{bmatrix}
+\mathcal{N}_{\partial, 1} & 0 \\
+\end{bmatrix},
+\end{equation*}
+or 
+\begin{equation*}
+\mathcal{B}_\partial = \begin{bmatrix}
+\mathcal{N}_{\partial, 1} & 0 \\
+\end{bmatrix}, \qquad \mathcal{C}_\partial = \begin{bmatrix}
+0 & \mathcal{N}_{\partial, 2} \\
+\end{bmatrix}.
+\end{equation*}
+\end{assumption}
+}
+
+\end{frame}
+
+\begin{frame}{The partitioned finite element method}
+\begin{overlayarea}{\textwidth}{.4\textheight}
+This discretization procedure boils down to three simple steps:
+\setbeamercovered{transparent}
+\begin{enumerate}
+	\item \only<2->{The system is written in weak form;} 
+	\item \only<3>{\textcolor{red}{An integration by parts is applied to highlight the appropriate boundary control;}}
+	\item \only<4->{A Galerkin method is employed to obtain a finite-dimensional system. For the approximation basis the Finite Element Method FEM (large sparse matrices) is here employed but Spectral Methods SM (small full matrices) can be used as well.}
+\end{enumerate}
+\end{overlayarea}
+\end{frame}
+
+\begin{frame}{The discretized system}
+
+Consider the causality 
+\begin{equation*}
+\bm{u}_\partial = \mathcal{N}_{\partial, 1} \displaystyle \bm{e}_1, \qquad  \bm{y}_\partial = \mathcal{N}_{\partial, 2} \displaystyle \bm{e}_2.
+\end{equation*}
+By integrating by parts  $\mathcal{L}$ the appropriate causality is obtained for the discretized system.
+\begin{exampleblock}{Finite dimensional system for $\bm{u}_\partial = \mathcal{N}_{\partial, 1} \displaystyle \bm{e}_1$}
+	\begin{equation*}
+	\begin{aligned}
+	\begin{bmatrix}
+	\mathbf{M}_1 & \mathbf{0} \\
+	\mathbf{0} & \mathbf{M}_2 \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	\dot{\bm{\alpha}}_{d, 1} \\
+	\dot{\bm{\alpha}}_{d, 2} \\
+	\end{pmatrix}
+	&= \begin{bmatrix}
+	\mathbf{0} & \mathbf{D}_{-\mathcal{L}^*} \\
+	- \mathbf{D}_{-\mathcal{L}^*}^\top & \mathbf{0} \\
+	\end{bmatrix} 
+	\begin{pmatrix}
+	\mathbf{e}_{1} \\
+	\mathbf{e}_{2} \\
+	\end{pmatrix} + 
+	\begin{bmatrix}
+	\mathbf{0}\\
+	\mathbf{B}_2\\
+	\end{bmatrix}
+	\mathbf{u}_\partial, \\
+	\begin{bmatrix}
+	\mathbf{M}_1 & \mathbf{0} \\
+	\mathbf{0} & \mathbf{M}_2 \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	\mathbf{e}_{1} \\
+	\mathbf{e}_{2} \\
+	\end{pmatrix}
+	&= \begin{pmatrix}
+	\partial_{\bm{\alpha}_{d, 1}} H_d(\bm{\alpha}_d)\\
+	\partial_{\bm{\alpha}_{d, 2}} H_d(\bm{\alpha}_d)\\
+	\end{pmatrix}, \\
+	\mathbf{M}_\partial {\mathbf{y}_\partial} &= 
+	\begin{bmatrix}
+	\mathbf{0} & \mathbf{B}_2^\top 
+	\end{bmatrix}\begin{pmatrix}
+	\mathbf{e}_{1} \\
+	\mathbf{e}_{2} \\
+	\end{pmatrix}.
+	\end{aligned}
+	\end{equation*}
+\end{exampleblock}
+
+\end{frame}
+
+\begin{frame}{The discretized system}
+	Consider the causality
+	\begin{equation*}
+	\bm{u}_\partial = \mathcal{N}_{\partial, 2} \displaystyle \bm{e}_2, \qquad  \bm{y}_\partial = \mathcal{N}_{\partial, 1} \displaystyle \bm{e}_1.
+	\end{equation*}
+	By integrating by parts  $-\mathcal{L}^*$ the appropriate causality is obtained for the discretized system.
+	\begin{exampleblock}{Finite dimensional system for $\bm{u}_\partial = \mathcal{N}_{\partial, 2} \displaystyle \bm{e}_2$}
+		\begin{equation*}
+		\begin{aligned}
+		\begin{bmatrix}
+		\mathbf{M}_1 & \mathbf{0} \\
+		\mathbf{0} & \mathbf{M}_2 \\
+		\end{bmatrix}
+		\begin{pmatrix}
+		\dot{\bm{\alpha}}_{d, 1} \\
+		\dot{\bm{\alpha}}_{d, 2} \\
+		\end{pmatrix}
+		&= \begin{bmatrix}
+		\mathbf{0} & - \mathbf{D}_{\mathcal{L}}^\top \\
+		\mathbf{D}_{\mathcal{L}} & \mathbf{0} \\
+		\end{bmatrix} 
+		\begin{pmatrix}
+		\mathbf{e}_{1} \\
+		\mathbf{e}_{2} \\
+		\end{pmatrix} + 
+		\begin{bmatrix}
+		\mathbf{B}_1\\
+		\mathbf{0}\\
+		\end{bmatrix}
+		\mathbf{u}_\partial, \\
+		\begin{bmatrix}
+		\mathbf{M}_1 & \mathbf{0} \\
+		\mathbf{0} & \mathbf{M}_2 \\
+		\end{bmatrix}
+		\begin{pmatrix}
+		\mathbf{e}_{1} \\
+		\mathbf{e}_{2} \\
+		\end{pmatrix}
+		&= \begin{bmatrix}
+		\partial_{\bm{\alpha}_{d, 1}} H_d(\bm{\alpha}_d)\\
+		\partial_{\bm{\alpha}_{d, 2}} H_d(\bm{\alpha}_d)\\
+		\end{bmatrix}, \\
+		\mathbf{M}_\partial {\mathbf{y}_\partial} &= \begin{bmatrix}
+		\mathbf{B}_1^\top & \mathbf{0}
+		\end{bmatrix}\begin{pmatrix}
+		\mathbf{e}_{1} \\
+		\mathbf{e}_{2} \\
+		\end{pmatrix}.
+		\end{aligned}
+		\end{equation*}
+	\end{exampleblock}
+
+
+\end{frame}
+
+\begin{frame}{Discrete power balance}
+The power balance
+\begin{equation*}
+\dot{H}_d = \partial_{\bm{\alpha}_{d, 1}}^\top H_d(\bm{\alpha}_d) \dot{\bm{\alpha}}_{d, 1} + \partial_{\bm{\alpha}_{d, 2}}^\top H_d(\bm{\alpha}_d) \dot{\bm{\alpha}}_{d, 2}
+\end{equation*}
+mimics the continuous one.
+
+\begin{exampleblock}{Causality $\bm{u}_\partial = \mathcal{N}_{\partial, 1} \displaystyle \bm{e}_1$}
+	
+	\begin{equation*}
+	\begin{aligned}
+	\dot{H}_d &= \mathbf{e}_{1}^\top \mathbf{D}_{-\mathcal{L}^*} \mathbf{e}_{2} - \mathbf{e}_{2}^\top \mathbf{D}_{-\mathcal{L}^*}^\top \mathbf{e}_{1} + \mathbf{e}_{2}^\top \mathbf{B}_2 \mathbf{u}_\partial, \\
+	& = \mathbf{y}_\partial^\top \mathbf{M}_\partial \mathbf{u}_\partial
+	\end{aligned}
+	\end{equation*}
+	
+\end{exampleblock}
+
+\begin{exampleblock}{Causality $\bm{u}_\partial = \mathcal{N}_{\partial, 2} \displaystyle \bm{e}_2$}
+	
+\begin{equation*}
+\begin{aligned}
+\dot{H}_d &= - \mathbf{e}_{1}^\top \mathbf{D}_{\mathcal{L}}^\top \mathbf{e}_{2} + \mathbf{e}_{2}^\top \mathbf{D}_{\mathcal{L}} \mathbf{e}_{1} + \mathbf{e}_{1}^\top \mathbf{B}_1 \mathbf{u}_\partial, \\
+& = \mathbf{y}_\partial^\top \mathbf{M}_\partial \mathbf{u}_\partial.
+\end{aligned}
+\end{equation*}
+
+\end{exampleblock}
+
+\end{frame}
+
+\begin{frame}{The final canonical system}
+
+\begin{exampleblock}{Canonical representation}
+The constitutive relations have been discretized separately from the dynamics. A canonical pH system is obtained by matrix inversions. 
+\begin{equation*}
+\begin{pmatrix}
+\dot{\bm{\alpha}}_{d, 1} \\
+\dot{\bm{\alpha}}_{d, 2} \\
+\end{pmatrix}
+= 
+\underbrace{
+	\begin{bmatrix}
+	\mathbf{0} & \mathbf{M}_1^{-1}\mathbf{D}\mathbf{M}_2^{-1} \\
+	- \mathbf{M}_2^{-1} \mathbf{D}^\top \mathbf{M}_1^{-1} & \mathbf{0} \\
+	\end{bmatrix}}_{\mathbf{J}}
+\begin{pmatrix}
+\partial_{\bm{\alpha}_{d, 1}} H_d(\bm{\alpha}_d)\\
+\partial_{\bm{\alpha}_{d, 2}} H_d(\bm{\alpha}_d)\\
+\end{pmatrix}  + 
+\text{Boundary control}.
+\end{equation*}
+\end{exampleblock}
+	
+	
+\begin{alertblock}{Numerical issues related to the canonical representation}
+ Matrix inversions are unfeasible for large problems and generally speaking not recommended. However, for small-size problems ($N_{\text{dof}} \approx 10^4$) it is possible to obtain a canonical system ready for simulation.
+\end{alertblock}
+
+\end{frame}
+
+\begin{frame}{Example: irrotational shallow water equations}
+
+$\alpha_h$ the fluid height, $\bm{\alpha}_v$ the linear momentum.
+
+
+\begin{equation*} 
+\begin{aligned}
+\diffp{}{t}
+\begin{pmatrix}
+\alpha_h \\
+\bm{\alpha}_v \\
+\end{pmatrix} &= 
+\begin{bmatrix}
+0 & -\div \\
+-\grad & \bm{0}
+\end{bmatrix}
+\begin{pmatrix}
+e_h\\
+\bm{e}_v\\
+\end{pmatrix}, \qquad (x,y) \in \Omega = \{x^2 + y^2 \le R \}, \\
+\begin{pmatrix}
+e_h\\
+\bm{e}_v\\
+\end{pmatrix} &= \begin{pmatrix}
+\delta_{\alpha_h} H\\
+\delta_{\bm{\alpha}_v} H\\
+\end{pmatrix} = 
+\begin{pmatrix}
+\frac{1}{2 \rho} \norm{\bm{\alpha}_v}^2 + \rho g \alpha_h \\
+\frac{1}{\rho} \alpha_h \bm{\alpha}_v
+\end{pmatrix}, 
+\end{aligned}
+\end{equation*}
+
+The Hamiltonian is a non-quadratic and non-separable functional
+\begin{equation*}
+H(\alpha_h, \bm{\alpha}_v) = \energy{\frac{1}{\rho} \alpha_h \norm{\bm{\alpha}_v}^2 + \rho g \alpha_h^2}.
+\end{equation*}
+\onslide<2>{
+Consider a uniform Neumann boundary control 
+\begin{equation*}
+{u}_\partial = - \bm{e}_v \cdot \bm{n}\vert_{\partial\Omega} = - \frac{1}{\rho}\alpha_h \bm{\alpha}_v \cdot\bm{n}\vert_{\partial\Omega}, \qquad \text{Volumetric inflow rate}.
+\end{equation*}
+The corresponding output reads
+\begin{equation*}
+{y}_\partial = {e}_h\vert_{\partial\Omega} = (\rho g \alpha_h + \frac{1}{2\rho} \norm{\bm{\alpha}_v}^2)\vert_{\partial\Omega}.
+\end{equation*}
+}
+
+\end{frame}
+
+\begin{frame}{Example: irrotational shallow water equations}
+
+A simple proportional control stabilizes the system around the desired point $h^{\text{des}}$
+	\begin{equation*}
+	u_\partial = -k (y_\partial - y_\partial^{\text{des}}), \qquad y_\partial^{\text{des}}= \rho g h^{\text{des}}, \quad k>0.
+	\end{equation*}
+	This control law ensures that the Lyapunov functional
+	\begin{equation*}
+	V = \frac{1}{2} \int_{\Omega}\left\{\frac{1}{2} \rho g (\alpha_h - \alpha_h^{\text{des}})^2 + \frac{1}{2\rho} \alpha_h \norm{\bm{\alpha}_v}^2 \right\} d\Omega \ge 0,
+	\end{equation*}
+	where $\alpha_h^{\text{des}}=h^{\text{des}}$, has negative semi definite time derivative
+	\begin{equation*}
+	\dot{V} = -k \int_{\partial \Omega}\left({y}_\partial - {y}_\partial^{\text{des}} \right)^2 \d{\Gamma} \le 0.
+	\end{equation*}
+\end{frame}
+
+\begin{frame}{Discretization strategy}
+\begin{itemize}
+\item The $\div$ operator is integrated by parts to highlight the appropriate the Neumann boundary control.
+\item \fenics is used to generate the matrices.
+\end{itemize}
+
+\begin{table}[th]
+	\centering
+	\begin{tabular}{|c|c|}
+		\hline 
+		\multicolumn{2}{|c|}{Parameters} \\ 
+		\hline 
+		$\rho$ & $1000\; \mathrm{[kg \cdot m^3]}$ \\ 
+		$g$& $10\; \mathrm{[m/s^2]}$ \\ 
+		$R$& $1\; \mathrm{[m]}$\\ 
+		$h^{\text{des}}$& $1\; \mathrm{[m]}$ \\ 
+		\hline 
+	\end{tabular} \hspace{.3cm}
+	\begin{tabular}{|c|c|}
+		\hline 
+		\multicolumn{2}{|c|}{Simulation Settings} \\
+		\hline 
+		Integrator & Runge-Kutta 45 \\
+		N$_{\text{dof}}^\circ$ & $3973$ \\
+		FE spaces & ($\alpha_h\approx$ CG$_1$) $\times$ ($\bm{\alpha}_v\approx$ DG$_0$) $\times$ ($u_\partial\approx$ DG$_0$)\\
+		$t_{\text{end}}$ & $3\; \mathrm{[s]}$\\ 
+		\hline 
+	\end{tabular} 
+\end{table}
+\vspace{.5cm}
+\begin{equation*}
+\text{Control parameter} \qquad 
+k = 
+\begin{cases}
+0, \quad & \forall t < 0.5 \, [\mathrm{s}], \\
+10^{-3}, \quad & \textcolor{red}{\forall t \ge 0.5} \, [\mathrm{s}].
+\end{cases}
+\end{equation*}
+		
+\end{frame}
+
+
+\begin{frame}{Results irrotational SWE}
+\begin{center}
+\includegraphics[width=0.48\textwidth]{part_3/applications/bs_SWE/Hamiltonian.eps}
+\includegraphics[width=0.48\textwidth]{part_3/applications/bs_SWE/Lyapunov.eps}
+\end{center}
+
+\end{frame}
+
+\subsection{The linear case}
+
+\begin{frame}
+\begin{assumption}[Quadratic separable Hamiltonian]
+	The Hamiltonian is assumed to be a positive quadratic separable functional in $\bm{\alpha}_1, \, \bm{\alpha}_2$ 
+	\begin{equation*}
+	H = \frac{1}{2} \inner[L^2(\Omega, \mathbb{A})]{\bm{\alpha}_{1}}{\mathcal{Q}_1\bm{\alpha}_{1}} + \frac{1}{2} \inner[L^2(\Omega, \mathbb{B})]{\bm{\alpha}_{2}}{\mathcal{Q}_2\bm{\alpha}_{2}},
+	\end{equation*}
+	where $\mathcal{Q}_1, \, \mathcal{Q}_2$ are positive symmetric operators, bounded from below and above
+	\begin{equation*}
+	m_1 \bm{I}_\mathbb{A} \le\mathcal{Q}_1 \le M_1 \bm{I}_\mathbb{A}, \qquad  m_2 \bm{I}_\mathbb{B} \le \mathcal{Q}_2 \le M_2 \bm{I}_\mathbb{B}, \qquad m_1>0, \ m_2>0, \ M_1>0, \ M_2>0.
+	\end{equation*} 
+\end{assumption}
+
+
+\begin{exampleblock}{PH linear system}
+\begin{equation*}
+\begin{bmatrix}
+\mathcal{M}_1 & 0 \\
+0 & \mathcal{M}_2 \\
+\end{bmatrix}
+\partial_t \begin{pmatrix}
+\bm{e}_1 \\ \bm{e}_2
+\end{pmatrix} = \begin{bmatrix}
+0 &  - \mathcal{L}^* \\
+\mathcal{L} & 0 \\
+\end{bmatrix}\begin{pmatrix}
+\bm{e}_1 \\ \bm{e}_2
+\end{pmatrix} , \qquad \begin{aligned}
+\bm{e}_1 &\in H^{\mathcal{L}}, 	\\
+\bm{e}_2 &\in H^{-\mathcal{L}^*},
+\end{aligned}
+\end{equation*}
+where $\mathcal{M}_1:=\mathcal{Q}_1^{-1},\; \mathcal{M}_2:=\mathcal{Q}_2^{-1}$. \textbf{Constitutive laws} have been included in the dynamics.
+\end{exampleblock}
+
+\end{frame}
+
+\begin{frame}{The linear discretized system}
+\begin{exampleblock}{Finite dimensional system for $\bm{u}_\partial = \mathcal{N}_{\partial, 1} \displaystyle \bm{e}_1, \;  \bm{y}_\partial = \mathcal{N}_{\partial, 2} \displaystyle \bm{e}_2$}
+	\begin{equation*}
+	\begin{aligned}
+	\begin{bmatrix}
+	\mathbf{M}_{\mathcal{M}_1} & \mathbf{0} \\
+	\mathbf{0} & \mathbf{M}_{\mathcal{M}_2} \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	\dot{\mathbf{e}}_{1} \\
+	\dot{\mathbf{e}}_{2} \\
+	\end{pmatrix}
+	&= \begin{bmatrix}
+	\mathbf{0} & \mathbf{D}_{-\mathcal{L}^*} \\
+	- \mathbf{D}_{-\mathcal{L}^*}^\top & \mathbf{0} \\
+	\end{bmatrix} 
+	\begin{pmatrix}
+	\mathbf{e}_{1} \\
+	\mathbf{e}_{2} \\
+	\end{pmatrix} + 
+	\begin{bmatrix}
+	\mathbf{0}\\
+	\mathbf{B}_2\\
+	\end{bmatrix}
+	\mathbf{u}_\partial, \\
+	\mathbf{M}_\partial {\mathbf{y}_\partial} &= 
+	\begin{bmatrix}
+	\mathbf{0} & \mathbf{B}_2^\top 
+	\end{bmatrix}\begin{pmatrix}
+	\mathbf{e}_{1} \\
+	\mathbf{e}_{2} \\
+	\end{pmatrix}.
+	\end{aligned}
+	\end{equation*}
+\end{exampleblock}
+
+\begin{exampleblock}{Finite dimensional system for $\bm{u}_\partial = \mathcal{N}_{\partial, 2} \displaystyle \bm{e}_2, \; \bm{y}_\partial = \mathcal{N}_{\partial, 1} \displaystyle \bm{e}_1$}
+	\begin{equation*}
+	\begin{aligned}
+	\begin{bmatrix}
+	\mathbf{M}_{\mathcal{M}_1} & \mathbf{0} \\
+	\mathbf{0} & \mathbf{M}_{\mathcal{M}_2} \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	\dot{\mathbf{e}}_{1} \\
+	\dot{\mathbf{e}}_{2} \\
+	\end{pmatrix}
+	&= \begin{bmatrix}
+	\mathbf{0} & - \mathbf{D}_{\mathcal{L}}^\top \\
+	\mathbf{D}_{\mathcal{L}} & \mathbf{0} \\
+	\end{bmatrix} 
+	\begin{pmatrix}
+	\mathbf{e}_{1} \\
+	\mathbf{e}_{2} \\
+	\end{pmatrix} + 
+	\begin{bmatrix}
+	\mathbf{B}_1\\
+	\mathbf{0}\\
+	\end{bmatrix}
+	\mathbf{u}_\partial, \\
+	\mathbf{M}_\partial {\mathbf{y}_\partial} &= \begin{bmatrix}
+	\mathbf{B}_1^\top & \mathbf{0}
+	\end{bmatrix}\begin{pmatrix}
+	\mathbf{e}_{1} \\
+	\mathbf{e}_{2} \\
+	\end{pmatrix}.
+	\end{aligned}
+	\end{equation*}
+\end{exampleblock}
+	
+\end{frame}
+
+\begin{frame}{Power balance}
+The power balance 
+\begin{equation*}
+\dot{H}_d = \mathbf{e}_1^\top \mathbf{M}_{\mathcal{M}_1} \dot{\mathbf{e}}_{1} + \mathbf{e}_2^\top \mathbf{M}_{\mathcal{M}_2} \dot{\mathbf{e}}_{2} 
+\end{equation*}
+mimics the continuous one.
+
+\begin{exampleblock}{Causality $\bm{u}_\partial = \mathcal{N}_{\partial, 1} \displaystyle \bm{e}_1$}
+	
+	\begin{equation*}
+	\begin{aligned}
+	\dot{H}_d &= \mathbf{e}_{1}^\top \mathbf{D}_{-\mathcal{L}^*} \mathbf{e}_{2} - \mathbf{e}_{2}^\top \mathbf{D}_{-\mathcal{L}^*}^\top \mathbf{e}_{1} + \mathbf{e}_{2}^\top \mathbf{B}_2 \mathbf{u}_\partial, \\
+	& = \mathbf{y}_\partial^\top \mathbf{M}_\partial \mathbf{u}_\partial
+	\end{aligned}
+	\end{equation*}
+	
+\end{exampleblock}
+
+\begin{exampleblock}{Causality $\bm{u}_\partial = \mathcal{N}_{\partial, 2} \displaystyle \bm{e}_2$}
+	
+	\begin{equation*}
+	\begin{aligned}
+	\dot{H}_d 	&= - \mathbf{e}_{1}^\top \mathbf{D}_{\mathcal{L}}^\top \mathbf{e}_{2} + \mathbf{e}_{2}^\top \mathbf{D}_{\mathcal{L}} \mathbf{e}_{1} + \mathbf{e}_{1}^\top \mathbf{B}_1 \mathbf{u}_\partial, \\
+	& = \mathbf{y}_\partial^\top \mathbf{M}_\partial \mathbf{u}_\partial.
+	\end{aligned}
+	\end{equation*}
+	
+\end{exampleblock}
+\end{frame}
+
+
+\subsection{Mixed boundary conditions}
+
+\begin{frame}{Mixed boundary conditions (linear system)}
+
+Consider now the following boundary-controlled linear pH system in co-energy form 
+\begin{columns}
+\begin{column}{0.6\textwidth}
+\begin{align*}
+\begin{bmatrix}
+\mathcal{M}_1 & 0 \\
+0 & \mathcal{M}_2 \\
+\end{bmatrix}
+\partial_t \begin{pmatrix}
+\bm{e}_1 \\ \bm{e}_2
+\end{pmatrix} &= \begin{bmatrix}
+0 &- \mathcal{L}^* \\
+\mathcal{L} & 0 \\
+\end{bmatrix}\begin{pmatrix}
+\bm{e}_1 \\ \bm{e}_2
+\end{pmatrix}, \\
+\begin{pmatrix}
+\bm{u}_{\partial, 1}\\
+\bm{u}_{\partial, 2}\\
+\end{pmatrix} &= \begin{bmatrix}
+\mathcal{N}_{\partial, 1}^{\Gamma_1} & 0\\
+0 & \mathcal{N}_{\partial, 2}^{\Gamma_2} \\
+\end{bmatrix} \begin{pmatrix}
+\bm{e}_1 \\ \bm{e}_2
+\end{pmatrix}, \\
+\begin{pmatrix}
+\bm{y}_{\partial, 1}\\
+\bm{y}_{\partial, 2}\\
+\end{pmatrix} &= \begin{bmatrix}
+0 & \mathcal{N}_{\partial, 2}^{\Gamma_1} \\
+\mathcal{N}_{\partial, 1}^{\Gamma_2} & 0\\
+\end{bmatrix} \begin{pmatrix}
+\bm{e}_1 \\ \bm{e}_2
+\end{pmatrix}.
+\end{align*}
+\end{column}
+\begin{column}{0.4\textwidth}
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.9\columnwidth]{part_3/pfem/bound_part.eps}
+\end{figure}
+\end{column}
+\end{columns}
+
+\vspace{1cm}
+The operator $\mathcal{N}_{\partial, *}^{\Gamma_\circ}$ with $*, \circ \in \{1, 2\}$ represents the restriction of operator $\mathcal{N}_{\partial, *}$ over the subset $\Gamma_\circ \subset \partial\Omega$.
+\end{frame}
+
+
+\begin{frame}{Mixed boundary conditions: two strategies}
+
+\begin{tcbraster}[raster columns=2, raster equal height]
+	\begin{tcolorbox}[width=0.4\textwidth, nobeforeafter, colframe=theme,title=Lagrange multiplier]%%
+		\begin{itemize}
+			\item[\textcolor{green}{\checkmark}] Easier implementation (only one mesh);
+			\item[\textcolor{red}{$\times$}] Must fulfill the \textit{inf-sup} condition;	
+			\item[\textcolor{red}{$\times$}] Requires solving a DAE, or specific reduction methods.
+		\end{itemize}
+	\end{tcolorbox} 
+	\begin{tcolorbox}[width=0.4\textwidth, nobeforeafter,  colframe=theme,title=Virtual domain decomposition]%%
+		\begin{itemize}
+			\item[\textcolor{green}{\checkmark}] Provides an ODE;
+			\item[\textcolor{red}{$\times$}] Requires the construction of multiple meshes;
+			\item[\textcolor{red}{$\times$}] Different formulation (and therefore finite elements) on each subdomain;
+		\end{itemize}
+	\end{tcolorbox}
+\end{tcbraster}
+\end{frame}
+
+\begin{frame}{Lagrange multiplier method}
+A Lagrange multiplier can be introduced to include the input that does not explicitly appear in the weak formulation, i.e. to enforce the essential boundary condition. 
+
+\begin{exampleblock}{Integration by parts of $-\mathcal{L}^*$ ($\textcolor{blue}{\bm{\lambda}_{\partial, 1}}=\textcolor{blue}{\bm{y}_{\partial, 1}}$) }
+\begin{equation*}
+\begin{aligned}
+\mathrm{Diag}
+\begin{bmatrix}
+\mathbf{M}_{\mathcal{M}_1}\\
+\mathbf{M}_{\mathcal{M}_2}\\
+\mathbf{0}\\
+\end{bmatrix}
+\begin{pmatrix}
+\dot{\mathbf{e}}_{1} \\
+\dot{\mathbf{e}}_{2} \\
+\textcolor{blue}{\dot{\bm{\lambda}}_{\partial, 1}} \\
+\end{pmatrix}
+&= \begin{bmatrix}
+\mathbf{0} & - \mathbf{D}_{\mathcal{L}}^\top & \mathbf{B}_{1, \textcolor{blue}{\Gamma_1}}\\
+\mathbf{D}_{\mathcal{L}} & \mathbf{0} & \mathbf{0} \\
+-\mathbf{B}_{1, \textcolor{blue}{\Gamma_1}}^\top & \mathbf{0} & \mathbf{0} \\
+\end{bmatrix} 
+\begin{pmatrix}
+\mathbf{e}_{1} \\
+\mathbf{e}_{2} \\
+\textcolor{blue}{\bm{\lambda}_{\partial, 1}} \\
+\end{pmatrix} + 
+\begin{bmatrix}
+\mathbf{0} & \mathbf{B}_{1, \textcolor{red}{\Gamma_2}} \\
+\mathbf{0} & \mathbf{0} \\
+\mathbf{M}_{\partial, 1} & \mathbf{0} \\
+\end{bmatrix}
+\begin{bmatrix}
+\textcolor{blue}{\mathbf{u}_{\partial, 1}} \\
+\textcolor{red}{\mathbf{u}_{\partial, 2}} \\
+\end{bmatrix}, \\
+\begin{bmatrix}
+\mathbf{M}_{\partial, 1} & \mathbf{0} \\
+\mathbf{0} & \mathbf{M}_{\partial, 2} \\
+\end{bmatrix}
+\begin{pmatrix}
+\textcolor{blue}{\mathbf{y}_{\partial, 1}} \\
+\textcolor{red}{\mathbf{y}_{\partial, 2}} \\
+\end{pmatrix}
+&= \begin{bmatrix}
+\mathbf{0} & \mathbf{0} & \mathbf{M}_{\partial, 1} \\
+\mathbf{B}_{1, \textcolor{red}{\Gamma_2}}^\top & \mathbf{0} & \mathbf{0} \\
+\end{bmatrix}\begin{pmatrix}
+\mathbf{e}_{1} \\
+\mathbf{e}_{2} \\
+\textcolor{blue}{\bm{\lambda}_{\partial, 1}} \\
+\end{pmatrix}.
+\end{aligned}
+\end{equation*}
+\end{exampleblock}
+
+\end{frame}
+
+\begin{frame}{Lagrange multiplier method}
+A Lagrange multiplier can be introduced to include the input that does not explicitly appear in the weak formulation, i.e. to enforce the essential boundary condition. 
+
+\begin{exampleblock}{Integration by parts of $\mathcal{L}$ ($\textcolor{red}{\bm{\lambda}_{\partial, 2}} = \textcolor{red}{\bm{y}_{\partial, 2}}$)}
+	\begin{equation*}
+	\begin{aligned}
+	\mathrm{Diag}
+	\begin{bmatrix}
+	\mathbf{M}_{\mathcal{M}_1}\\
+	\mathbf{M}_{\mathcal{M}_2}\\
+	\mathbf{0}\\
+	\end{bmatrix}
+	\begin{pmatrix}
+	\dot{\mathbf{e}}_{1} \\
+	\dot{\mathbf{e}}_{2} \\
+	\textcolor{red}{\dot{\bm{\lambda}}_{\partial, 2}} \\
+	\end{pmatrix}
+	&= \begin{bmatrix}
+	\mathbf{0} & \mathbf{D}_ {-\mathcal{L}^*} & \mathbf{0}\\
+	- \mathbf{D}_ {-\mathcal{L}^*}^\top & \mathbf{0} & \mathbf{B}_{2, \textcolor{red}{\Gamma_2}} \\
+	\mathbf{0} & -\mathbf{B}_{2, \textcolor{red}{\Gamma_2}}^\top & \mathbf{0}  \\
+	\end{bmatrix} 
+	\begin{pmatrix}
+	\mathbf{e}_{1} \\
+	\mathbf{e}_{2} \\
+	\textcolor{red}{\bm{\lambda}_{\partial, 2}} \\
+	\end{pmatrix} + 
+	\begin{bmatrix}
+	\mathbf{0} & \mathbf{0} \\
+	\mathbf{B}_{2, \textcolor{blue}{\Gamma_1}} & \mathbf{0} \\
+	\mathbf{0} & \mathbf{M}_{\partial, 2} \\
+	\end{bmatrix}
+	\begin{bmatrix}
+	\textcolor{blue}{\mathbf{u}_{\partial, 1}} \\
+	\textcolor{red}{\mathbf{u}_{\partial, 2}} \\
+	\end{bmatrix}, \\
+	\begin{bmatrix}
+	\mathbf{M}_{\partial, 1} & \mathbf{0} \\
+	\mathbf{0} & \mathbf{M}_{\partial, 2} \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	\textcolor{blue}{\mathbf{y}_{\partial, 1}} \\
+	\textcolor{red}{\mathbf{y}_{\partial, 2}} \\
+	\end{pmatrix}
+	&= \begin{bmatrix}
+	\mathbf{0} & \mathbf{B}_{2, \textcolor{blue}{\Gamma_1}}^\top & \mathbf{0} \\
+	\mathbf{0} & \mathbf{0} & \mathbf{M}_{\partial, 2} \\
+	\end{bmatrix}\begin{pmatrix}
+	\mathbf{e}_{1} \\
+	\mathbf{e}_{2} \\
+	\textcolor{red}{\bm{\lambda}_{\partial, 2}} \\
+	\end{pmatrix}.
+	\end{aligned}
+	\end{equation*}
+\end{exampleblock}
+
+A pH differential-algebraic system is obtained in this case (pHDAE).
+\end{frame}
+
+\begin{frame}{Power balance}
+The energy balance
+\begin{equation*}
+\dot{H}_d = \mathbf{e}_1^\top \mathbf{M}_{\mathcal{M}_1} \dot{\mathbf{e}}_1 + \mathbf{e}_2^\top \mathbf{M}_{\mathcal{M}_2} \dot{\mathbf{e}}_2
+\end{equation*}
+mimics the continuous counterpart.
+\begin{exampleblock}{Integration by parts of $-\mathcal{L}^*$ ($\bm{\lambda}_{\partial, 1} = \bm{u}_{\partial, 1}$)}
+\begin{equation*}
+\begin{aligned}
+\dot{H}_d &= -\mathbf{e}_1^\top \mathbf{D}_\mathcal{L}^\top {\mathbf{e}}_2 + \mathbf{e}_2^\top\mathbf{D}_\mathcal{L} {\mathbf{e}}_1 + \mathbf{e}_1^\top (\mathbf{B}_{1, \Gamma_1} \bm{\lambda}_{\partial, 1} + \mathbf{B}_{1, \Gamma_2} \mathbf{u}_{\partial, 2} ), \\
+&= \mathbf{y}_{\partial, 1}^\top \mathbf{M}_{\partial, 1} \mathbf{u}_{\partial, 1} + \mathbf{y}_{\partial, 2}^\top \mathbf{M}_{\partial, 2} \mathbf{u}_{\partial, 2}. 
+\end{aligned}
+\end{equation*}
+\end{exampleblock}
+\begin{exampleblock}{Integration by parts of $\mathcal{L}$ ($\bm{\lambda}_{\partial, 2} = \bm{u}_{\partial, 2}$)}
+	\begin{equation*}
+	\begin{aligned}
+	\dot{H}_d &= \mathbf{e}_1^\top \mathbf{D}_{-\mathcal{L}^*}^\top {\mathbf{e}}_2 - \mathbf{e}_2^\top\mathbf{D}_{-\mathcal{L}^*} {\mathbf{e}}_1 + \mathbf{e}_2^\top (\mathbf{B}_{2, \Gamma_2} \bm{\lambda}_{\partial, 2} + \mathbf{B}_{2, \Gamma_1} \mathbf{u}_{\partial, 1} ), \\
+	&= \mathbf{y}_{\partial, 1}^\top \mathbf{M}_{\partial, 1} \mathbf{u}_{\partial, 1} + \mathbf{y}_{\partial, 2}^\top \mathbf{M}_{\partial, 2} \mathbf{u}_{\partial, 2}. 
+	\end{aligned}
+	\end{equation*}
+\end{exampleblock}
+\end{frame}
+
+\begin{frame}{Example: cantilever Kirchhoff plate}
+
+\begin{equation*}
+\begin{bmatrix}
+\rho h & 0 \\ 
+\bm{0} & \bm{\mathcal{D}}_b^{-1} \\
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+e_w \\ \bm{E}_\kappa \\
+\end{pmatrix} = 
+\begin{bmatrix}
+0 & -\div\Div \\ 
+\Grad\grad & \bm{0} \\
+\end{bmatrix}
+\begin{pmatrix}
+e_w \\ \bm{E}_\kappa \\
+\end{pmatrix} \qquad (x, y) \in \Omega = [0, 1]\times[0,1],
+\end{equation*}
+subject to Dirichlet homogeneous conditions and Neumann boundary control
+\begin{align*}
+\begin{aligned}
+\partial_t e_w|_{\Gamma_D} &= 0, \\
+\partial_x e_w|_{\Gamma_D} &= 0, \\
+\end{aligned} \qquad {\Gamma_D} = \left\{x = 0 \right\}, \qquad
+\begin{aligned}
+u_{\partial, q} & = \widetilde{q}_n|_{\Gamma_N},\\
+u_{\partial, m} &= M_{nn}|_{\Gamma_N}.\\
+\end{aligned} \qquad {\Gamma_N} = \left\{y = 0 \cup x=1 \cup y=1 \right\}.
+\end{align*}
+
+\begin{columns}
+	\begin{column}{.5\textwidth}
+		The corresponding boundary outputs read
+		\begin{equation*}
+		\begin{aligned}
+		y_{\partial, q} &= e_w|_{\Gamma_N}, \\
+		y_{\partial, m} &=\partial_{\bm{n}} e_w|_{\Gamma_N}.
+		\end{aligned}
+		\end{equation*}
+		
+		The following control law stabilizes the system
+		\begin{equation*}
+		\begin{aligned}
+		u_{\partial, q} & = - k y_{\partial, q}, \\
+		u_{\partial, m} & = - k y_{\partial, m}, \\
+		\end{aligned} \qquad k>0.
+		\end{equation*}
+		
+	\end{column}
+
+	\begin{column}{.5\textwidth}
+		\begin{figure}[b]
+			\centering
+			\includegraphics[width=0.9\columnwidth]{part_3/applications/bs_Kirchh/plate_controlled.eps}
+		\end{figure}
+	\end{column}
+\end{columns}
+
+\end{frame}
+
+
+\begin{frame}{Discretization strategy}
+\begin{itemize}
+\item The $\div\Div$ operator is integrated by parts twice to enforce weekly the Neumann bc.
+\item The \firedrake library is used to generate the matrices.
+\item The Dirichlet condition is imposed weakly through a Lagrange multiplier (strong imposition of boundary conditions for $H^2$ conforming elements is not trivial \footfullcite{kirby2019}).
+\end{itemize} 
+
+\begin{table}[t]
+	\centering
+	\begin{tabular}{|c|c|}
+		\hline 
+		\multicolumn{2}{|c|}{Plate Parameters} \\ 
+		\hline 
+		$E$ & $70\; \mathrm{[GPa]}$ \\ 
+		$\rho$ & $2700\; \mathrm{[kg \cdot m^3]}$ \\ 
+		$\nu$& $0.35$ \\ 
+		$h/L$& $0.05$ \\ 
+		$L_x = L_y$& $1\; \mathrm{[m]}$\\ 
+		\hline 
+	\end{tabular} \hspace{.1cm}
+	\begin{tabular}{|c|c|}
+		\hline 
+		\multicolumn{2}{|c|}{Simulation Settings} \\
+		\hline 
+		Integrator & St\"ormer-Verlet \\
+		$\Delta t $ & $1 \; \mathrm{[\mu s]}$ \\  
+		N$_{\text{dof}}^\circ$ & $2574$ \\
+		FE spaces & ($e_w \approx $ Argyris) $\times$ ($\bm{E}_\kappa \approx$ DG$_3$) $\times$ ($\bm{\lambda} \approx$ CG$_2$)\\
+		$t_{\text{end}}$ & $5\; \mathrm{[s]}$\\ 
+		\hline 
+	\end{tabular} 
+\end{table}
+
+\begin{equation*}
+	\text{Control parameter} \qquad 
+	k = 
+	\begin{cases}
+	0, \quad &\forall t < 1 \, [\mathrm{s}], \\
+	10, \quad & \textcolor{red}{\forall t \ge 1} \, [\mathrm{s}].
+	\end{cases}
+\end{equation*}
+
+	
+\end{frame}
+
+\begin{frame}{Results cantilever Kirchoff plate}
+
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=0.7\textwidth]{part_3/applications/bs_Kirchh/Hamiltonian.eps}
+\end{figure}
+
+\end{frame}
+
+
+
+\subsection{Convergence study: the Mindlin plate example}
+
+
+\begin{frame}{The Mindlin plate under clamped boundary conditions}
+
+\begin{equation*}
+	\begin{bmatrix}
+	\rho b  & 0  & 0  & 0 \\
+	\bm{0} & I_\theta &  \bm{0} & \bm{0}\\
+	\bm{0}  & \bm{0}  & \bm{\mathcal{C}}_b  & \bm{0}\\
+	\bm{0} & \bm{0} &  \bm{0} & C_s \\
+	\end{bmatrix}
+	\diffp{}{t}
+	\begin{pmatrix}
+	e_w \\
+	\bm{e}_\theta \\
+	\bm{E}_\kappa \\
+	\bm{e}_{\gamma} \\
+	\end{pmatrix} = 
+	\begin{bmatrix}
+	0  & 0  & 0  & \div \\
+	\bm{0} & \bm{0} &  \Div & \bm{I}_{2 \times 2}\\
+	\bm{0}  & \Grad  & \bm{0}  & \bm{0}\\
+	\grad & -\bm{I}_{2 \times 2} &  \bm{0} & \bm{0} \\
+	\end{bmatrix}
+	\begin{pmatrix}
+	e_w \\
+	\bm{e}_{\theta} \\
+	\bm{E}_{\kappa} \\
+	\bm{e}_{\gamma} \\
+	\end{pmatrix} + 
+	\begin{pmatrix}
+	f \\
+	\bm{\tau} \\
+	\bm{0} \\
+	\bm{0} \\
+	\end{pmatrix}, \qquad
+	\begin{aligned}
+	{e}_w\vert_{\partial\Omega} &= 0, \\
+	\bm{e}_\theta\vert_{\partial\Omega} &= \bm{0}.
+	\end{aligned}	
+\end{equation*}
+where $b$ is the thickness, $I_\theta$ is the rotary inertia, $\bm{C}_b, \; C_s$ are the bending and shear compliance  respectively, $f, \; \bm{\tau}$ are distributed forces and torques.
+\vspace{.5cm}
+
+For this example, the $\mathcal{L}, \; -\mathcal{L}^*, \; \mathcal{N}_{\partial, 1}, \; \mathcal{N}_{\partial, 2}$ operators are given by
+\begin{equation*}
+\mathcal{L} = \begin{bmatrix}
+\bm{0} & \Grad\\
+\grad & -\bm{I}_{2 \times 2}\\
+\end{bmatrix}, \quad
+-\mathcal{L}^* = \begin{bmatrix}
+\bm{0} & \div\\
+\Div & \bm{I}_{2 \times 2}\\
+\end{bmatrix}, \qquad
+\mathcal{N}_{\partial, 1} = \begin{bmatrix}
+\gamma_0 & 0 \\ 
+0 &  \bm\gamma_0\\
+\end{bmatrix}, \quad 
+\mathcal{N}_{\partial, 2} = \begin{bmatrix}
+0 & \gamma_{n}  \\
+\bm\gamma_n & 0 \\
+\end{bmatrix}.
+\end{equation*}
+
+\end{frame}
+
+\begin{frame}{Mixed discretization}
+\setlength{\abovedisplayskip}{3pt}
+\setlength{\belowdisplayskip}{3pt}
+After integrating by parts $\mathcal{L}$, the weak form looks for solutions in the space
+$$\{e_w, \bm{e}_{\bm{\theta}}, \bm{E}_{\kappa}, \bm{e}_{\gamma}\} \in L^2(\Omega) \times L^2(\Omega, \bbR^2) \times H^{\Div}(\Omega, \bbR^{2\times 2}_{\text{sym}}) \times H^{\div}(\Omega, \bbR^2).$$
+The clamped condition is a natural one in this setting.
+\begin{block}{BJT elements}
+These elements were proposed in Bécache 2001 for elastodynamics problems\footfullcite{becache2001elas}.
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{presentation/fe_BJT.eps}
+\end{figure}
+		
+\end{block}
+
+\end{frame}
+
+
+
+\begin{frame}{Dual mixed formulation}
+\setlength{\abovedisplayskip}{3pt}
+\setlength{\belowdisplayskip}{3pt}
+If instead $-\mathcal{L}^*$ the weak form looks for solutions in the space
+$$\{e_w, \bm{e}_{\bm{\theta}}, \bm{E}_{\kappa}, \bm{e}_{\gamma}\} \in H^{1}(\Omega) \times H^{\Grad}(\Omega, \bbR^2) \times L^2(\Omega, \bbR^{2\times 2}_{\text{sym}}) \times L^2(\Omega, \bbR^2).$$
+The clamped condition is an essential one in this setting.
+\begin{block}{CG elements}
+Conforming elements for a similar problem are detailed in Cohen 2007\footfullcite{cohen2007mindlin}.
+\begin{figure}
+	\centering
+	\includegraphics[width=0.8\textwidth]{presentation/fe_CG.eps}
+\end{figure}
+		
+\end{block}
+
+\end{frame}
+
+
+\begin{frame}{Conjectured convergence estimates}
+
+\begin{conjecture}[Convergence rate for the BJT elements]
+	\setlength{\abovedisplayskip}{0pt}
+	\setlength{\belowdisplayskip}{0pt}
+	Combining previous results \footfullcite{becache2000wave,becache2001elas} and assuming a smooth solution, the following error estimates hold ($k$ polynomial degree for FE)
+	\begin{equation*}
+	\label{eq:errBEC}
+	\begin{aligned}
+	||e_w - e_w^h||_{L^{\infty}(L^2(\Omega))} &\lesssim h^{k}, \\
+	||\bm{e}_\theta - \bm{e}_\theta^h||_{L^{\infty}(L^2(\Omega, \bbR^2))} &\lesssim h^{k}, \\
+	\end{aligned} \qquad
+	\begin{aligned}
+	||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty}(L^2(\Omega, \bbR^{2\times 2}_{\text{sym}}))} &\lesssim  h^{k}, \\
+	||\bm{e}_\gamma - \bm{e}_\gamma^ h||_{L^{\infty}(L^2(\Omega, \bbR^2))} &\lesssim  h^{k}. \\
+	\end{aligned} 
+	\end{equation*}
+\end{conjecture}
+
+\begin{conjecture}[Convergence of the CG elements]
+\setlength{\abovedisplayskip}{0pt}
+\setlength{\belowdisplayskip}{0pt}
+	Assuming a smooth solution, the following error estimates hold ($k$ polynomial degree for FE)
+	\begin{equation*}
+	\label{eq:errCGDG}
+	\begin{aligned}
+	||e_w - e_w^h||_{L^{\infty}(H^1(\Omega))} &\lesssim h^{k}, \\
+	||\bm{e}_\theta - \bm{e}_\theta^h||_{L^{\infty}(H^{\Grad}(\Omega, \bbR^2))} &\lesssim h^{k}, \\
+	\end{aligned} \qquad
+	\begin{aligned}
+	||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^{\infty}(L^2(\Omega, \bbR^{2\times 2}_{\text{sym}}))} &\lesssim  h^{k}, \\
+	||\bm{e}_\gamma - \bm{e}_\gamma^ h||_{L^{\infty}(L^2(\Omega, \bbR^2))} &\lesssim  h^{k}. \\
+	\end{aligned} 
+	\end{equation*}
+	
+\end{conjecture}
+\end{frame}
+
+
+\begin{frame}{Simulation Settings}
+\begin{itemize}
+	\item The {\sc{Firedrake}} library is used to generate the matrices. 
+	\item Time integration: a Crank-Nicholson scheme has been used with time step $\Delta t = h/10$ where $h$ is the mesh size.
+	\item Linear solver: Conjugate gradient with LU preconditioner (ILU).
+	\item To compute the $L^\infty ({X})$ space-time dependent norm  the discrete norm $L^\infty_{\Delta t} ({X})$ is used
+	\[
+	||\cdot ||_{L^\infty ({X})} \approx || \cdot ||_{L^\infty_{\Delta t} ({X})} = \max_{t \in t_i} ||\cdot||_{{X}}, \qquad \text{$t_i$ are the discrete simulation instants.}
+	\]
+\end{itemize}
+
+ \begin{table}[htbp]
+ 	\centering
+ 	\begin{tabular}{ccccc}
+ 		\hline 
+ 		\multicolumn{5}{c}{Plate parameters} \\ 
+ 		\hline 
+ 		$E$ & $\rho$ & $\nu$ & $K_{\text{sh}}$ & $b$ \\
+ 		$74 \;  [\textrm{GPa}]$ & $2700\; [\textrm{kg}/\textrm{m}^3]$ & $0.3$ & $5/6$ &  $0.1 \;  [\textrm{m}]$\\ 
+ 		\hline 
+ 	\end{tabular} 
+ 	\caption{Physical parameters for the Numerical test (Aluminum).}
+ \end{table}
+\end{frame}
+
+\begin{frame}{Results}
+
+	\begin{figure}[b]
+		\begin{minipage}[b]{0.45\linewidth}
+			\centering
+			\includegraphics[width=1\textwidth]{presentation/CCCC_BEC_Phys_vel.eps}
+			\caption{BTJ $e_w$ error ($L^\infty(L^2(\Omega))$).}
+		\end{minipage}
+		\begin{minipage}[b]{0.45\linewidth}
+			\centering
+			\includegraphics[width=1\textwidth]{presentation/CCCC_CF_Phys_vel.eps}
+			\caption{CG $e_w$ error ($L^\infty(H^1(\Omega))$).}
+		\end{minipage}
+	\end{figure}
+
+\end{frame}
+
+\begin{frame}{Results}
+
+	\begin{figure}[b]
+		\begin{minipage}[b]{0.45\linewidth}
+			\centering
+			\includegraphics[width=1\textwidth]{presentation/CCCC_BEC_Phys_om.eps}
+			\caption{BTJ $\bm{e}_\theta$ error ($L^\infty(L^2(\Omega, \bbR^2))$).}
+		\end{minipage}
+		\begin{minipage}[b]{0.45\linewidth}
+			\centering
+			\includegraphics[width=1\textwidth]{presentation/CCCC_CF_Phys_om.eps}
+			\caption{CG $\bm{e}_\theta$ error ($L^\infty(H^{\Grad}(\Omega, \bbR^2))$).}
+		\end{minipage}
+	\end{figure}
+
+\end{frame}
+
+\section{PH flexible multibody dynamics}
+
+\begin{frame}{Previous work}
+
+Using Lie Algebra and differential forms a pH model of a flexible link has already been proposed \footfullcite{macchelli2007link}. This model can be embedded in a complex multibody system\footfullcite{macchelli2009multi}. \\
+
+\begin{overlayarea}{\textwidth}{0.55\textheight}
+	\setlength{\abovedisplayskip}{1pt}
+	\setlength{\belowdisplayskip}{1pt}
+	Advantages:
+	\begin{itemize}
+		\item {Modular construction of flexible systems;}
+		\item {Large deformations naturally considered.}
+	\end{itemize}
+	Drawbacks:
+	\begin{itemize}
+		\item {Quite cumbersome implementation;}
+		\item {Limited to one-dimensional beam;}
+		\item {Numerical analysis not feasible;}
+		\item {Model reduction techniques not easily applicable.} 
+	\end{itemize}
+\end{overlayarea}
+\end{frame}
+
+\begin{frame}{Floating frame of reference approach}
+\begin{columns}
+\begin{column}{.5\textwidth}
+The elastic motion is described in a reference frame that follows the large rigid motion. \\
+
+Advantages 
+\begin{itemize}
+	\item {Most used paradigm in multibody dynamics;}
+	\item {For control other approaches are too complex;}
+	\item {Linear model reduction techniques are applicable.} 
+\end{itemize}
+Drawbacks:
+\begin{itemize}
+	\item {Not suitable for large deformations.}
+\end{itemize}	
+\end{column}
+\begin{column}{.5\textwidth}
+\begin{tcolorbox}
+	\begin{figure}[t]
+		\centering
+		\includegraphics[width=1\textwidth]{presentation/floating_body_small.eps} 
+	\end{figure}
+\end{tcolorbox}
+\end{column}
+\end{columns}
+
+\end{frame}
+
+\begin{frame}{Floating body kinematics}
+\onslide*<1->{
+	The velocity of a generic point is expressed by considering a small flexible displacement superimposed to the rigid motion
+	\[
+	\bm{v} = \bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}+\bm{u}_f) + \bm{v}_f.
+	\]
+	where the cross map $\crmat{\bm{a}}$ denotes the skew-symmetric matrix associated to vector $\bm{a}$. \\
+	
+	This equation is expressed in the body reference frame $\widehat{\bm{x}}, \widehat{\bm{y}}, \widehat{\bm{z}}$. 
+	
+}
+\onslide<2->{
+\vspace{5pt}
+Kinematic variables:  
+\begin{itemize}
+	\item $\bm{x}$ is the position vector of the current point;
+	\item $\bm{v}_P,\, \bm{\omega}_P$ are the linear and angular velocities of point $P$;
+	\item $\bm{v}_f := \dot{\bm{u}}_f$ the deformation velocity.
+\end{itemize}
+}
+\onslide<3>{
+Inertia terms:
+\begin{itemize}
+	\item $m:= \int_{\Omega} \rho \d{\Omega}$ the total mass;
+	\item $\bm{s}_u:= \int_{\Omega} \rho (\bm{x}+\bm{u}_f) \d{\Omega}$ the static moment;
+	\item $\bm{J}_u:= \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f}^\top\crmat{\bm{x}+\bm{u}_f} \d{\Omega}$ the inertia matrix.
+\end{itemize}
+	
+}
+\end{frame}
+
+\subsection{PH formulation of a floating body}
+
+\begin{frame}{Canonical momenta}
+\begin{overlayarea}{\textwidth}{0.95\textheight}
+	Consider the total energy (Hamiltonian), given by the sum of kinetic and deformation energy:
+	\begin{equation*}
+	H = H_{\text{kin}} + H_{\text{def}}= \frac{1}{2} \int_{\Omega} \left\{\rho ||\bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}+\bm{u}_f) + {\bm{v}}_f||^2 + \bm\Sigma \cddot \bm\varepsilon \right\}  \d{\Omega}.
+	\end{equation*}
+	
+	\begin{exampleblock}{Canonical momenta}
+		\begin{equation*}
+		\begin{aligned}
+		\bm{p}_t &:= \diffp{H}{\bm{v}_P} = m \bm{v}_P + \crmat{\bm{s}_u}^\top \, \bm\omega_P + \int_{\Omega} \rho \bm{v}_f \d{\Omega}, \\
+		\bm{p}_r &:= \diffp{H}{\bm\omega_P} = \crmat{\bm{s}_u} \bm{v}_P + \bm{J}_u \bm\omega_P + \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f} \bm{v}_f \d{\Omega}, \\
+		\bm{p}_f &:= \diffd{H}{\bm{v}_f} = \rho \bm{v}_P + \rho \crmat{\bm{x}+\bm{u}_f}^\top \, \bm\omega_P + \rho \bm{v}_f, \\
+		\bm\varepsilon &:= \diffd{H}{\bm\Sigma} = \bm{\mathcal{D}}^{-1} \bm\Sigma,
+		\end{aligned}
+		\end{equation*}
+	\end{exampleblock} 
+		
+	
+\end{overlayarea}
+\end{frame}
+
+
+
+\begin{frame}{Canonical momenta}
+\begin{overlayarea}{\textwidth}{0.95\textheight}
+	Consider the total energy (Hamiltonian), given by the sum of kinetic and deformation energy:
+	\begin{equation*}
+	H = H_{\text{kin}} + H_{\text{def}}= \frac{1}{2} \int_{\Omega} \left\{\rho ||\bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}+\bm{u}_f) + {\bm{v}}_f||^2 + \bm\Sigma \cddot \bm\varepsilon \right\}  \d{\Omega}.
+	\end{equation*}
+	
+		\begin{exampleblock}{Canonical momenta}
+			\setlength{\abovedisplayskip}{1pt}
+			\setlength{\belowdisplayskip}{1pt}
+			\begin{equation*}
+			\begin{bmatrix}
+			\bm{p}_t \\ \bm{p}_r \\ \bm{p}_f \\ \bm\varepsilon \\
+			\end{bmatrix} = 
+			\underbrace{\begin{bmatrix}
+				m \bm{I}_{3\times 3} & \crmat{\bm{s}_u}^\top & \mathcal{I}_\rho^{\Omega} & 0 \\
+				\crmat{\bm{s}_u} & \bm{J}_u & \bm{\mathcal{I}}_{\rho x}^{\Omega} & 0  \\
+				(\mathcal{I}_\rho^{\Omega})^* & (\bm{\mathcal{I}}_{\rho x}^{\Omega})^* & \rho & 0  \\
+				0 & 0 & 0 & \bm{\mathcal{D}}^{-1} \\
+				\end{bmatrix}}_{\mathcal{M}: \; \text{Mass operator}}
+			\begin{bmatrix}
+			\bm{v}_P \\ \bm{\omega}_P  \\ \bm{v}_f  \\ \bm\Sigma \\
+			\end{bmatrix}, \qquad 
+			\begin{aligned}
+			\mathcal{I}_\rho^\Omega &:=\int_{\Omega} \rho (\cdot) \d{\Omega}, \\
+			\bm{\mathcal{I}}_{\rho x}^{\Omega} &:= \int_\Omega \rho \crmat{\bm{x}+\bm{u}_f} (\cdot). \\
+			\end{aligned}
+			\end{equation*}	
+			The mass operator $\mathcal{M}$ is a self-adjoint, positive operator. It holds
+			\begin{equation*}
+			H_{\text{kin}} + H_{\text{def}} = \frac{1}{2} \langle \bm{e}_{\text{kd}}, \ \mathcal{M} \bm{e}_{\text{kd}} \rangle, \qquad \bm{e}_{\text{kd}} = [\bm{v}_P; \, \bm{\omega}_P; \, \bm{v}_f; \bm{\Sigma}]
+			\end{equation*}
+		\end{exampleblock} 
+	
+\end{overlayarea}
+\end{frame}
+
+
+\begin{frame}{Canonical momenta}
+\begin{overlayarea}{\textwidth}{0.95\textheight}
+	Consider the total energy (Hamiltonian), given by the sum of kinetic and deformation energy:
+	\begin{equation*}
+	H = H_{\text{kin}} + H_{\text{def}}= \frac{1}{2} \int_{\Omega} \left\{\rho ||\bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}+\bm{u}_f) + {\bm{v}}_f||^2 + \bm\Sigma \cddot \bm\varepsilon \right\}  \d{\Omega}.
+	\end{equation*}
+	
+		\begin{exampleblock}{Modified canonical momenta}
+			\setlength{\abovedisplayskip}{1pt}
+			\setlength{\belowdisplayskip}{1pt}
+			\begin{equation*}
+			\begin{aligned}
+			\widehat{\bm{p}}_t &:=  m \bm{v}_P + \crmat{\bm{s}_u}^\top \, \bm\omega_P + 2\int_{\Omega} \rho \bm{v}_f \d{\Omega}, \\
+			\widehat{\bm{p}}_r &:=  \crmat{\bm{s}_u} \bm{v}_P + \bm{J}_u \bm\omega_P + 2 \int_{\Omega} \rho \crmat{\bm{x}+\bm{u}_f} \bm{v}_f \d{\Omega}, \\
+			\end{aligned} \qquad 
+			\begin{aligned}
+			\widehat{\bm{p}}_f &:= \rho \bm{v}_P + \rho \crmat{\bm{x}+\bm{u}_f}^\top \, \bm\omega_P + 2\rho \bm{v}_f, \\
+			\bm{\mathcal{I}}_{p_f}^\Omega &:= \int_\Omega \left\{ \crmat{\bm{p}_f} + \crmat{\widehat{\bm{p}}_f} \right\}(\cdot) \d{\Omega},
+			\end{aligned} 
+			\end{equation*}
+		\end{exampleblock} 
+		Notice that the kinetic energy also depends on the flexible displacement
+		\[
+		\diffd{H_{\text{kin}}}{\bm{u}_f} = \crmat{\bm{p}_f} \bm{\omega}_{P}.
+		\]
+	
+\end{overlayarea}
+\end{frame}
+
+\begin{frame}{Generalized coordinates}
+Generalized coordinates are required for a complete formulation:
+\begin{itemize}
+	\item $^i \bm{r}_P$ the position of point $P$ in the inertial frame of reference;
+	\item $\bm{R}$ the direction cosine matrix (other attitude parametrizations are possible);
+	\item $\bm{u}_f$ the flexible displacement;
+\end{itemize}
+The direction cosine matrix is converted into a vector by concatenating its rows
+\begin{equation*}
+\bm{R}_{\text{v}} = \text{vec}(\bm{R}^\top) = [\bm{R}_1 \; \bm{R}_2 \; \bm{R}_3]^\top,
+\end{equation*}
+where $\bm{R}_{1}, \bm{R}_{2}, \bm{R}_{3}$ are the rows of matrix $\bm{R}$. Furthermore the corresponding cross map will be given by
+\begin{equation*}
+\crmat{\bm{R}_{\text{v}}} = 
+\begin{bmatrix}
+\crmat{\bm{R}_1} \\
+\crmat{\bm{R}_2} \\
+\crmat{\bm{R}_3} \\
+\end{bmatrix}, \qquad 
+\crmat{\bm{R}_{\text{v}}} : \mathbb{R}^9 \rightarrow \mathbb{R}^{9 \times 3}.
+\end{equation*}
+\end{frame}
+
+\begin{frame}{PH formulation}
+The overall port-Hamiltonian formulation (without including the boundary traction $\bm{\tau}$)
+\begin{equation*}
+\setlength{\dashlinegap}{2pt}
+\underbrace{
+{\left[ \begin{array}{c:c}
+	\bm{I} & 0 \\
+	\hdashline
+	0 & \mathcal{M} \\
+	\end{array} \right]}
+}_{\mathcal{E}}
+\diffp{}{t}
+\underbrace{\begin{bmatrix}
+^i \bm{r}_P \\ \bm{R}_{\text{v}} \\ \bm{u}_f \\\hdashline  \bm{v}_P \\ \bm\omega_P  \\ \bm{v}_f  \\ \bm\Sigma \\
+\end{bmatrix}}_{\bm{e}} = 
+\underbrace{
+{\left[ \begin{array}{ccc:cccc}
+	0 & 0 & 0 &  \bm{R} & 0 & 0 & 0 \\
+	0 & 0 & 0 & 0 & \crmat{\bm{R}_{\text{v}}} & 0 & 0 \\
+	0 & 0 & 0 & 0 & 0 & \bm{I}_{3\times 3} & 0  \\ 
+	\hdashline
+	-\bm{R}^\top & 0 & 0 & 0 & \crmat{\widehat{\bm{p}}_t} & 0 & 0 \\
+	0 & -\crmat{\bm{R}_{\text{v}}}^\top & 0 & \crmat{\widehat{\bm{p}}_t} & \crmat{\widehat{\bm{p}}_r} & \bm{\mathcal{I}}_{p_f}^\Omega & 0 \\
+	0 & 0 & -\bm{I}_{3\times 3} & 0 & -(\bm{\mathcal{I}}_{p_f}^\Omega)^* & 0 & \Div \\
+	0 & 0 & 0 & 0 & 0 & \Grad & 0 \\
+	\end{array} \right]}
+}_{\mathcal{J}}
+\underbrace{\begin{bmatrix}
+\partial_{\bm{r}_P}H \\ \partial_{\bm{R}_\text{v}}H \\ \delta_{\bm{u}_f} H \\\hdashline  \bm{v}_P \\ \bm\omega_P  \\ \bm{v}_f  \\ \bm\Sigma \\
+\end{bmatrix}}_{\bm{z}}.
+\end{equation*} 
+
+\end{frame}
+
+\begin{frame}{Floating body as a pHDAE system}
+\begin{exampleblock}{Final pHDAE system}
+	This system fits into the framework detailed in Morandin 2019 \footfullcite{mehrmann2019structurepreserving} and extends it.
+	\begin{equation*}
+	\begin{aligned}
+	\mathcal{E}(\bm{e}) \partial_t \bm{e} &= \mathcal{J}(\bm{e}) \bm{z}(\bm{e}) + {\mathcal{B}}_r(\bm{e}) \bm{u}_\partial, \\
+	\bm{y}_r &= {\mathcal{B}}_r^*(\bm{e}) \bm{z}(\bm{e}), \\
+	\bm{u}_\partial &= {\mathcal{B}}_{\partial} \bm{z}(\bm{e}) =  \bm\Sigma \cdot \bm{n}|_{\partial \Omega} = \bm\tau|_{\partial \Omega}, \\
+	\bm{y}_\partial &= {\mathcal{C}}_{\partial} \bm{z}(\bm{e}) = \bm{v}_f|_{\partial \Omega},
+	\end{aligned}
+	\end{equation*}
+	with $\bm{y}_r = (\bm{v}_P + \crmat{\bm{x}+\bm{u}_f}^\top \bm{\omega}_P)\vert_{\partial\Omega}$.
+\end{exampleblock}
+Operator ${\mathcal{E}}$ is positive self-adjoint, ${\mathcal{J}}$ is formally skew-symmetric.
+The Hamiltonian  satisfies 
+\begin{equation*}
+\partial_{\bm{e}} H = {\mathcal{E}}^* \bm{z}.
+\end{equation*}
+\end{frame}
+
+\begin{frame}{Power balance}
+
+\begin{exampleblock}{Power balance}
+	The power balance equals the power due to the surface traction
+	\begin{equation*}
+	\setlength{\abovedisplayskip}{5pt}
+	\setlength{\belowdisplayskip}{5pt}
+	\begin{aligned}
+	\dot{H}(\bm{e}) &= \langle \partial_{\bm{e}} H, \partial_t {\bm{e}} \rangle_{X},\\
+	&= \langle \bm{z}, {\mathcal{E}} \partial_t {\bm{e}} \rangle_{{X}}, \quad \text{Adjoint definition},  \\
+	&= \langle \bm{y}_\partial,  \bm{u}_\partial \rangle_{\partial\Omega} + \langle {\mathcal{B}}_r^* \bm{z}, \bm{u}_\partial \rangle_{\partial\Omega}, \quad \text{I.B.P. on } {\mathcal{J}}, \\
+	&=  \int_{\partial \Omega} \bm{u}_\partial \cdot (\bm{y}_\partial + \bm{y}_r)  \d{\Omega}, \\
+	&= \int_{\partial \Omega} \bm\tau \cdot \bm{v} \d\Gamma,  \\
+	\end{aligned}
+	\end{equation*}
+	where $\bm{y}_\partial + \bm{y}_r := (\bm{v}_P + \crmat{\bm{\omega}_P} (\bm{x}+\bm{u}_f) + {\bm{v}}_f)\vert_{\partial\Omega} = \bm{v}\vert_{\partial\Omega}$ is the velocity field at the boundary.
+\end{exampleblock}
+
+\end{frame}
+
+\begin{frame}{Some remarks}
+
+\begin{itemize}
+	\item Generic linear elastic model can be included (beams, plates etc.).
+	\item Conservative forces are easily accounted for by introducing an appropriate potential energy. For example, the gravitational potential reads
+	\begin{equation*}
+	H_{\text{pot}} = \int_{\Omega} \rho g \, ^i r_z \d{\Omega} = \int_{\Omega} \rho g \left[ ^i r_{P, z} +\bm{R}_z (\bm{x} + \bm{u}_f) \right] \d{\Omega}.
+	\end{equation*}
+	\item If case of vanishing deformations $\bm{u}_f \equiv 0$, the Newton-Euler equations on the Euclidean group $SE(3)$ are retrieved
+	\begin{equation*}
+	\diff{}{t}
+	\begin{pmatrix}
+	^i{\bm{r}}_P \\
+	\bm{R}_{\mathrm{v}} \\
+	{\bm{p}}_t \\ 
+	{\bm{p}}_r \\
+	\end{pmatrix} = 
+	\begin{bmatrix}
+	0 & 0 & \bm{R} & 0 \\
+	0 & 0 & 0 & \crmat{\bm{R}_{\text{v}}} \\
+	- \bm{R}^\top & 0 & 0 & \crmat{\bm{p}_t}\\
+	0 & -\crmat{\bm{R}_{\text{v}}}^\top & \crmat{\bm{p}_t} & \crmat{\bm{p}_r} \\
+	\end{bmatrix}
+	\begin{bmatrix}
+	\partial_{\bm{r}_P} H \\ 
+	\partial_{\bm{R}_{\text{v}}} H \\ 
+	\partial_{\bm{p}_t} H \\ 
+	\partial_{\bm{p}_r} H \\ 
+	\end{bmatrix}.
+	\end{equation*}
+\end{itemize}
+\end{frame}
+
+\subsection{Discretization}
+
+\begin{frame}{Discretized system}
+Same procedure but the integration by parts has to be applied to the $\Div$ operator to highlight the Neumann condition.
+\begin{exampleblock}{Finite-dimensional pHDAE system}
+	\setlength{\abovedisplayskip}{3pt}
+	\setlength{\belowdisplayskip}{3pt}
+	After integration by parts of the $\Div$ operator
+	\begin{equation*}
+	\begin{aligned}
+	\mathbf{E}(\mathbf{e}) \dot{\mathbf{e}} &= \mathbf{J}(\mathbf{e}) \mathbf{z}(\mathbf{e}) + \mathbf{B}_\partial(\mathbf{e}) \mathbf{u}_\partial, \\
+	\mathbf{M}_\partial \mathbf{y}_\partial &= \mathbf{B}_\partial^\top \mathbf{z}(\mathbf{e}).
+	\end{aligned}
+	\end{equation*}
+\end{exampleblock}
+
+\begin{block}{Dirichlet conditions}
+	The set $\Gamma_D$ for the Dirichlet condition has to be non empty, otherwise the deformation field is allowed for rigid movement, leading to a singular mass matrix: test and state shape functions must verify a homogeneous Dirichlet condition\footfullcite{agrawal1986application}. 
+\end{block}
+\end{frame}
+
+\subsection{Example: boundary interconnection of the Kirchhoff plate}
+
+\begin{frame}{Rigid rod welded to a cantilever plate }
+\begin{columns}
+\begin{column}{.57\textwidth}
+\begin{tcolorbox}
+	\centering
+	\includegraphics[height=0.355\textheight]{presentation/plate_rod_separated.eps}
+\end{tcolorbox}
+\end{column}
+
+\begin{column}{.43\textwidth}
+\begin{tcolorbox}
+	\centering
+	\includegraphics[height=0.355\textheight]{presentation/plate_rod_welded.eps}
+\end{tcolorbox}	
+\end{column}
+\end{columns}
+
+
+\end{frame}
+
+
+\begin{frame}{Boundary Interconnection}
+\centering 
+\includegraphics[width=0.48\textwidth]{part_4/validation/KP/pp_interconnection.eps}
+\hspace{5pt}
+\includegraphics[width=0.48\textwidth]{presentation/pp_interconnection_platerod.eps}
+\end{frame}
+
+
+\begin{frame}{Results}
+
+\includegraphics[width=0.48\textwidth]{part_4/validation/KP/HamiltonianNoRod.eps}
+\includegraphics[width=0.48\textwidth]{part_4/validation/KP/HamiltonianRod.eps}
+
+\end{frame}
+
+
+
+\begin{frame}{Conclusion}
+Main contributions:
+\begin{itemize}
+\item \onslide<2->{A port-Hamiltonian formulation of elasticity, thermoelasticity and plate problems;}
+\item \onslide<3->{Development and validation of a finite element based symplectic discretization characterized by an easy re-implementability;}
+\item \onslide<4->{Floating frame based multibody dynamics: this multibody framework allows including the linear elastic models discussed in this thesis.}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Outlook}
+Open problems and possible developments:
+\begin{itemize}
+	\item \onslide<2->{Modelling: shell problems and non linear elasticity (ex. von K\'arm\'an plate);}
+	\item \onslide<3->{Discretization: efficient finite element for the Kirchhoff plate based on div-div conforming elements \footfullcite{chen2020divDiv};}
+	\item \onslide<4->{Model reduction: application of POD methods, $H_2$-optimal strategies or Krilov subspace methods to the considered models;}
+	\item \onslide<5->{Multibody dynamics: computational aspect of the general quasi-linear problem (symplectic time-integration);}
+	\item \onslide<6>{Control: observer based strategies for boundary control\footfullcite{toledo2020} and reduced LQG design for distributed control\footfullcite{wu2020reduced}.}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Journal articles}
+\begin{enumerate}
+\item \fullcite{brugnoli2019ammmin} 
+\vspace{.3cm}
+\item \fullcite{brugnoli2019ammkir} 
+\vspace{.3cm}
+\item \fullcite{brugnoli2020msd} 
+\vspace{.3cm}
+\item \fullcite{brugnoli2020numerical}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{International conferences with proceedings}
+\begin{enumerate}
+\item \fullcite{brugnoli2019cpde} 
+\vspace{.1cm}
+\item \fullcite{brugnoli2019cdc} 
+\vspace{.1cm}
+\item \fullcite{cardoso2019cdc} 
+\vspace{.1cm}
+\item \fullcite{brugnoli2020wc} 
+\vspace{.1cm}
+\item \fullcite{brugnoli2020mtns}
+\end{enumerate}
+\end{frame}
+
+
+\end{document}

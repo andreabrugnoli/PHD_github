@@ -200,7 +200,7 @@ This thesis aims to establish a consistent pH formulation of flexible structures
 \end{block}
 
 \begin{exampleblock}{Methodologies}
-The numerical implementation relies on efficient and well-established libraries, so to avoid constructing everything from scratch.
+The numerical implementation relies on efficient and well-established libraries, to avoid constructing everything from scratch.
 \end{exampleblock}
 
 \end{frame}
@@ -350,7 +350,7 @@ Operators:
 \end{column}
 \begin{column}{.5\textwidth}
 \begin{exampleblock}{Theorem}
-	The formal anti-adjoint of the $\Div$ operator is the symmetric gradient $\Grad$.
+	The formal adjoint of the $-\Div$ operator is the symmetric gradient $\Grad$.
 \end{exampleblock}
 Hence $\mathcal{J}$ is skew-symmetric.
 \end{column}
@@ -675,6 +675,7 @@ e_w \\
 	$$\bm{M} = \bm{\mathcal{D}}_b \bm{\kappa}.$$
 	However, the curvature tensor is now given by the Hessian of the displacement field
 	$$\bm{\kappa} = \Grad\grad w = \Hess w.$$
+	Notice that $\Grad \circ \grad = \Hess$.
 \end{frame}
 
 \begin{frame}{Kirchhoff plate boundary conditions}
@@ -750,7 +751,7 @@ e_w \\
 	\end{column}
 	\begin{column}{.45\textwidth}
 		\begin{exampleblock}{Theorem}
-		The formal anti-adjoint of the $-\div\Div$ operator is $\Grad\grad$, the Hessian operator.
+		The formal adjoint of the $\div\Div$ operator is $\Grad\grad$, the Hessian operator.
 		\end{exampleblock}
 		Hence $\mathcal{J}$ is skew-symmetric.
 	\end{column}
@@ -1135,17 +1136,10 @@ The constitutive relations have been discretized separately from the dynamics. A
 \dot{\bm{\alpha}}_{d, 2} \\
 \end{pmatrix}
 = 
-\underbrace{\begin{bmatrix}
-	\mathbf{M}_1^{-1} & \mathbf{0} \\
-	\mathbf{0} & \mathbf{M}_2^{-1} \\
-	\end{bmatrix}
+\underbrace{
 	\begin{bmatrix}
-	\mathbf{0} & \mathbf{D} \\
-	- \mathbf{D}^\top & \mathbf{0} \\
-	\end{bmatrix} 
-	\begin{bmatrix}
-	\mathbf{M}_1^{-1} & \mathbf{0} \\
-	\mathbf{0} & \mathbf{M}_2^{-1} \\
+	\mathbf{0} & \mathbf{M}_1^{-1}\mathbf{D}\mathbf{M}_2^{-1} \\
+	- \mathbf{M}_2^{-1} \mathbf{D}^\top \mathbf{M}_1^{-1} & \mathbf{0} \\
 	\end{bmatrix}}_{\mathbf{J}}
 \begin{pmatrix}
 \partial_{\bm{\alpha}_{d, 1}} H_d(\bm{\alpha}_d)\\
@@ -1203,7 +1197,7 @@ H(\alpha_h, \bm{\alpha}_v) = \energy{\frac{1}{\rho} \alpha_h \norm{\bm{\alpha}_v
 \onslide<2>{
 Consider a uniform Neumann boundary control 
 \begin{equation*}
-{u}_\partial = - \bm{e}_v \cdot \bm{n}\vert_{\partial\Omega} = - \frac{1}{\rho}\alpha_h \bm{\alpha}_v \cdot\bm{n}\vert_{\partial\Omega}, \qquad \text{Volumetric flow rate}.
+{u}_\partial = - \bm{e}_v \cdot \bm{n}\vert_{\partial\Omega} = - \frac{1}{\rho}\alpha_h \bm{\alpha}_v \cdot\bm{n}\vert_{\partial\Omega}, \qquad \text{Volumetric inflow rate}.
 \end{equation*}
 The corresponding output reads
 \begin{equation*}
@@ -1263,8 +1257,8 @@ A simple proportional control stabilizes the system around the desired point $h^
 \text{Control parameter} \qquad 
 k = 
 \begin{cases}
-0, \quad &\forall t < 0.5 \, [\mathrm{s}], \\
-10^{-3}, \quad &\forall t \ge 0.5 \, [\mathrm{s}].
+0, \quad & \forall t < 0.5 \, [\mathrm{s}], \\
+10^{-3}, \quad & \textcolor{red}{\forall t \ge 0.5} \, [\mathrm{s}].
 \end{cases}
 \end{equation*}
 		
@@ -1288,6 +1282,15 @@ k =
 	\mediabutton[
 	mediacommand=vidDam:playPause,
 	]{\fbox{Play/Pause}}
+	
+	\begin{equation*}
+	\text{Control parameter} \qquad 
+	k = 
+	\begin{cases}
+	0, \quad & \forall t < 0.5 \, [\mathrm{s}], \\
+	10^{-3}, \quad & \textcolor{red}{\forall t \ge 0.5} \, [\mathrm{s}].
+	\end{cases}
+	\end{equation*}
 \end{center}
 }
 	
@@ -1489,13 +1492,34 @@ Consider now the following boundary-controlled linear pH system in co-energy for
 \end{columns}
 
 \vspace{1cm}
-The operator $\mathcal{N}_{\partial, *}^{\Gamma_\circ}$ with $*, \circ \in \{1, 2\}$ represents the restriction of operator $\mathcal{N}_{\partial, *}$ over the subset $\Gamma_\circ$.
+The operator $\mathcal{N}_{\partial, *}^{\Gamma_\circ}$ with $*, \circ \in \{1, 2\}$ represents the restriction of operator $\mathcal{N}_{\partial, *}$ over the subset $\Gamma_\circ \subset \partial\Omega$.
+\end{frame}
+
+
+\begin{frame}{Mixed boundary conditions: two strategies}
+
+\begin{tcbraster}[raster columns=2, raster equal height]
+	\begin{tcolorbox}[width=0.4\textwidth, nobeforeafter, colframe=theme,title=Lagrange multiplier]%%
+		\begin{itemize}
+			\item[\textcolor{green}{\checkmark}] Easier implementation (only one mesh);
+			\item[\textcolor{red}{$\times$}] Must fulfill the \textit{inf-sup} condition;	
+			\item[\textcolor{red}{$\times$}] Requires solving a DAE, or specific reduction methods.
+		\end{itemize}
+	\end{tcolorbox} 
+	\begin{tcolorbox}[width=0.4\textwidth, nobeforeafter,  colframe=theme,title=Virtual domain decomposition]%%
+		\begin{itemize}
+			\item[\textcolor{green}{\checkmark}] Provides an ODE;
+			\item[\textcolor{red}{$\times$}] Requires the construction of multiple meshes;
+			\item[\textcolor{red}{$\times$}] Different formulation (and therefore finite elements) on each subdomain;
+		\end{itemize}
+	\end{tcolorbox}
+\end{tcbraster}
 \end{frame}
 
 \begin{frame}{Lagrange multiplier method}
 A Lagrange multiplier can be introduced to include the input that does not explicitly appear in the weak formulation, i.e. to enforce the essential boundary condition. 
 \only<1>{
-\begin{block}{Integration by parts of $-\mathcal{L}^*$ ($\bm\lambda_{\partial, 1}=\bm{u}_{\partial, 1}$) }
+\begin{exampleblock}{Integration by parts of $-\mathcal{L}^*$ ($\textcolor{blue}{\bm{\lambda}_{\partial, 1}}=\textcolor{blue}{\bm{y}_{\partial, 1}}$) }
 \begin{equation*}
 \begin{aligned}
 \mathrm{Diag}
@@ -1507,51 +1531,51 @@ A Lagrange multiplier can be introduced to include the input that does not expli
 \begin{pmatrix}
 \dot{\mathbf{e}}_{1} \\
 \dot{\mathbf{e}}_{2} \\
-\dot{\bm{\lambda}}_{\partial, 1} \\
+\textcolor{blue}{\dot{\bm{\lambda}}_{\partial, 1}} \\
 \end{pmatrix}
 &= \begin{bmatrix}
-\mathbf{0} & - \mathbf{D}_{\mathcal{L}}^\top & \mathbf{B}_{1, \Gamma_1}\\
+\mathbf{0} & - \mathbf{D}_{\mathcal{L}}^\top & \mathbf{B}_{1, \textcolor{blue}{\Gamma_1}}\\
 \mathbf{D}_{\mathcal{L}} & \mathbf{0} & \mathbf{0} \\
--\mathbf{B}_{1, \Gamma_1}^\top & \mathbf{0} & \mathbf{0} \\
+-\mathbf{B}_{1, \textcolor{blue}{\Gamma_1}}^\top & \mathbf{0} & \mathbf{0} \\
 \end{bmatrix} 
 \begin{pmatrix}
 \mathbf{e}_{1} \\
 \mathbf{e}_{2} \\
-{\bm{\lambda}}_{\partial, 1} \\
+\textcolor{blue}{\bm{\lambda}_{\partial, 1}} \\
 \end{pmatrix} + 
 \begin{bmatrix}
-\mathbf{0} & \mathbf{B}_{1, \Gamma_2} \\
+\mathbf{0} & \mathbf{B}_{1, \textcolor{red}{\Gamma_2}} \\
 \mathbf{0} & \mathbf{0} \\
 \mathbf{M}_{\partial, 1} & \mathbf{0} \\
 \end{bmatrix}
 \begin{bmatrix}
-\mathbf{u}_{\partial, 1} \\
-\mathbf{u}_{\partial, 2} \\
+\textcolor{blue}{\mathbf{u}_{\partial, 1}} \\
+\textcolor{red}{\mathbf{u}_{\partial, 2}} \\
 \end{bmatrix}, \\
 \begin{bmatrix}
 \mathbf{M}_{\partial, 1} & \mathbf{0} \\
 \mathbf{0} & \mathbf{M}_{\partial, 2} \\
 \end{bmatrix}
 \begin{pmatrix}
-\mathbf{y}_{\partial, 1} \\
-\mathbf{y}_{\partial, 2} \\
+\textcolor{blue}{\mathbf{y}_{\partial, 1}} \\
+\textcolor{red}{\mathbf{y}_{\partial, 2}} \\
 \end{pmatrix}
 &= \begin{bmatrix}
 \mathbf{0} & \mathbf{0} & \mathbf{M}_{\partial, 1} \\
-\mathbf{B}_{1, \Gamma_2}^\top & \mathbf{0} & \mathbf{0} \\
+\mathbf{B}_{1, \textcolor{red}{\Gamma_2}}^\top & \mathbf{0} & \mathbf{0} \\
 \end{bmatrix}\begin{pmatrix}
 \mathbf{e}_{1} \\
 \mathbf{e}_{2} \\
-{\bm{\lambda}}_{\partial, 1} \\
+\textcolor{blue}{\bm{\lambda}_{\partial, 1}} \\
 \end{pmatrix}.
 \end{aligned}
 \end{equation*}
-\end{block}
+\end{exampleblock}
 }
 
 
 \only<2>{
-\begin{block}{Integration by parts of $\mathcal{L}$ ($\bm{\lambda}_{\partial, 2} = \bm{u}_{\partial, 2}$)}
+\begin{exampleblock}{Integration by parts of $\mathcal{L}$ ($\textcolor{red}{\bm{\lambda}_{\partial, 2}} = \textcolor{red}{\bm{y}_{\partial, 2}}$)}
 	\begin{equation*}
 	\begin{aligned}
 	\mathrm{Diag}
@@ -1563,48 +1587,48 @@ A Lagrange multiplier can be introduced to include the input that does not expli
 	\begin{pmatrix}
 	\dot{\mathbf{e}}_{1} \\
 	\dot{\mathbf{e}}_{2} \\
-	\dot{\bm{\lambda}}_{\partial, 2} \\
+	\textcolor{red}{\dot{\bm{\lambda}}_{\partial, 2}} \\
 	\end{pmatrix}
 	&= \begin{bmatrix}
 	\mathbf{0} & \mathbf{D}_ {-\mathcal{L}^*} & \mathbf{0}\\
-	- \mathbf{D}_ {-\mathcal{L}^*}^\top & \mathbf{0} & \mathbf{B}_{2, \Gamma_2} \\
-	\mathbf{0} & -\mathbf{B}_{2, \Gamma_2}^\top & \mathbf{0}  \\
+	- \mathbf{D}_ {-\mathcal{L}^*}^\top & \mathbf{0} & \mathbf{B}_{2, \textcolor{red}{\Gamma_2}} \\
+	\mathbf{0} & -\mathbf{B}_{2, \textcolor{red}{\Gamma_2}}^\top & \mathbf{0}  \\
 	\end{bmatrix} 
 	\begin{pmatrix}
 	\mathbf{e}_{1} \\
 	\mathbf{e}_{2} \\
-	{\bm{\lambda}}_{\partial, 2} \\
+	\textcolor{red}{\bm{\lambda}_{\partial, 2}} \\
 	\end{pmatrix} + 
 	\begin{bmatrix}
 	\mathbf{0} & \mathbf{0} \\
-	\mathbf{B}_{2, \Gamma_1} & \mathbf{0} \\
+	\mathbf{B}_{2, \textcolor{blue}{\Gamma_1}} & \mathbf{0} \\
 	\mathbf{0} & \mathbf{M}_{\partial, 2} \\
 	\end{bmatrix}
 	\begin{bmatrix}
-	\mathbf{u}_{\partial, 1} \\
-	\mathbf{u}_{\partial, 2} \\
+	\textcolor{blue}{\mathbf{u}_{\partial, 1}} \\
+	\textcolor{red}{\mathbf{u}_{\partial, 2}} \\
 	\end{bmatrix}, \\
 	\begin{bmatrix}
 	\mathbf{M}_{\partial, 1} & \mathbf{0} \\
 	\mathbf{0} & \mathbf{M}_{\partial, 2} \\
 	\end{bmatrix}
 	\begin{pmatrix}
-	\mathbf{y}_{\partial, 1} \\
-	\mathbf{y}_{\partial, 2} \\
+	\textcolor{blue}{\mathbf{y}_{\partial, 1}} \\
+	\textcolor{red}{\mathbf{y}_{\partial, 2}} \\
 	\end{pmatrix}
 	&= \begin{bmatrix}
-	\mathbf{0} & \mathbf{B}_{2, \Gamma_1}^\top & \mathbf{0} \\
+	\mathbf{0} & \mathbf{B}_{2, \textcolor{blue}{\Gamma_1}}^\top & \mathbf{0} \\
 	\mathbf{0} & \mathbf{0} & \mathbf{M}_{\partial, 2} \\
 	\end{bmatrix}\begin{pmatrix}
 	\mathbf{e}_{1} \\
 	\mathbf{e}_{2} \\
-	{\bm{\lambda}}_{\partial, 2} \\
+	\textcolor{red}{\bm{\lambda}_{\partial, 2}} \\
 	\end{pmatrix}.
 	\end{aligned}
 	\end{equation*}
-\end{block}
+\end{exampleblock}
 }
-
+A pH differential-algebraic system is obtained in this case (pHDAE).
 \end{frame}
 
 \begin{frame}{Power balance}
@@ -1726,14 +1750,14 @@ u_{\partial, m} &= M_{nn}|_{\Gamma_N}.\\
 	\end{tabular} 
 \end{table}
 
-	\begin{equation*}
+\begin{equation*}
 	\text{Control parameter} \qquad 
-	k_* = 
+	k = 
 	\begin{cases}
 	0, \quad &\forall t < 1 \, [\mathrm{s}], \\
-	10, \quad &\forall t \ge 1 \, [\mathrm{s}].
+	10, \quad & \textcolor{red}{\forall t \ge 1} \, [\mathrm{s}].
 	\end{cases}
-	\end{equation*}
+\end{equation*}
 
 	
 \end{frame}
@@ -1743,11 +1767,11 @@ u_{\partial, m} &= M_{nn}|_{\Gamma_N}.\\
 \begin{center}
 \includemedia[
 label=vidDam,
-addresource=/home/a.brugnoli/Videos_defense/Kirchh_Damped_3s.mp4,
+addresource=/home/a.brugnoli/Videos_defense/Kirchh_Damped.mp4,
 activate=pageopen,
 width=10cm, height=5cm,
 flashvars={
-	source=/home/a.brugnoli/Videos_defense/Kirchh_Damped_3s.mp4
+	source=/home/a.brugnoli/Videos_defense/Kirchh_Damped.mp4
 	&loop=true
 }
 ]{}{VPlayer.swf}
@@ -1755,6 +1779,15 @@ flashvars={
 \mediabutton[
 mediacommand=vidDam:playPause,
 ]{\fbox{Play/Pause}}
+
+\begin{equation*}
+\text{Control parameter} \qquad 
+k = 
+\begin{cases}
+0, \quad &\forall t < 1 \, [\mathrm{s}], \\
+10, \quad & \textcolor{red}{\forall t \ge 1} \, [\mathrm{s}].
+\end{cases}
+\end{equation*}
 \end{center}
 }
 \only<2>{
@@ -1767,98 +1800,6 @@ mediacommand=vidDam:playPause,
 \end{frame}
 
 
-\begin{frame}{Virtual domain decomposition}
-The idea is based on the fact that a mixed boundary conditions problem can be split into two problems with uniform causality. The two systems are then appropriately interconnected.
-
-\begin{figure}[b]
-	\begin{minipage}[b]{0.4\linewidth}
-		\centering
-		\includegraphics[width=0.95\textwidth]{part_3/pfem/dom_part.eps}
-		\caption{Splitting of the domain.}
-	\end{minipage}
-	\hspace{0.5cm}
-	\begin{minipage}[b]{0.55\linewidth}
-		\centering
-		\includegraphics[width=0.95\textwidth]{part_3/pfem/dom_part_int.eps}
-		\caption{Interconnection at the interface $\Gamma_{12}$.}
-	\end{minipage}
-\end{figure}
-
-\end{frame}
-
-\begin{comment}
-\begin{frame}{Core idea}
-For $\Omega_1$ subdomain, we set
-
-\begin{equation*} 
-\begin{pmatrix}
-\bm{u}_{\partial, 1}\\
-\textcolor{blue}{\bm{u}_{\partial, 1}^{\Gamma_{12}}}\\
-\end{pmatrix} = \begin{bmatrix}
-\mathcal{N}_{\partial, 1}^{\Gamma_1} & 0\\
-\mathcal{N}_{\partial, 1}^{\Gamma_{12}} & 0 \\
-\end{bmatrix} \begin{pmatrix}
-\bm{e}_1 \\ \bm{e}_2
-\end{pmatrix}, \qquad
-\begin{pmatrix}
-\bm{y}_{\partial, 1}\\
-\textcolor{red}{\bm{y}_{\partial, 1}^{\Gamma_{12}}} \\
-\end{pmatrix} = \begin{bmatrix}
-0 & \mathcal{N}_{\partial, 2}^{\Gamma_1} \\
-0 & \mathcal{N}_{\partial, 2}^{\Gamma_{12}} \\
-\end{bmatrix} \begin{pmatrix}
-\bm{e}_1 \\ \bm{e}_2
-\end{pmatrix},
-\end{equation*}
-whereas for the $\Omega_2$ subdomain
-\begin{equation*}
-\begin{pmatrix}
-\bm{u}_{\partial, 2}\\
-\textcolor{red}{\bm{u}_{\partial, 2}^{\Gamma_{12}}}\\
-\end{pmatrix} = \begin{bmatrix}
-0 & \mathcal{N}_{\partial, 2}^{\Gamma_2}\\
-0 & \mathcal{N}_{\partial, 2}^{\Gamma_{12}} \\
-\end{bmatrix} \begin{pmatrix}
-\bm{e}_1 \\ \bm{e}_2
-\end{pmatrix}, \qquad
-\begin{pmatrix}
-\bm{y}_{\partial, 2}\\
-\textcolor{blue}{\bm{y}_{\partial, 2}^{\Gamma_{12}}}\\
-\end{pmatrix} = \begin{bmatrix}
-\mathcal{N}_{\partial, 1}^{\Gamma_1} & 0 \\
-\mathcal{N}_{\partial, 1}^{\Gamma_{12}}  & 0 \\
-\end{bmatrix} \begin{pmatrix}
-\bm{e}_1 \\ \bm{e}_2
-\end{pmatrix}.
-\end{equation*}
-The following relations then hold
-\begin{equation*}
-\textcolor{blue}{\bm{u}_{\partial, 1}^{\Gamma_{12}}} =\pm \textcolor{blue}{\bm{y}_{\partial, 2}^{\Gamma_{12}}}, \qquad \textcolor{red}{\bm{u}_{\partial, 2}^{\Gamma_{12}}} = \mp \textcolor{red}{\bm{y}_{\partial, 1}^{\Gamma_{12}}}.
-\end{equation*}
-The plus or minus sign is due to the fact that either $\mathcal{N}_{\partial, 1}^{\Gamma_{12}}$ or $\mathcal{N}_{\partial, 2}^{\Gamma_{12}}$ contains a scalar product with the outgoing normal (or the tangent unit vector) at ${\Gamma_{12}}$ (that has opposite direction depending on which subdomain is considered).
-\end{frame}
-\end{comment}
-
-
-\begin{frame}{Summary: mixed boundary conditions}
-
-\begin{tcbraster}[raster columns=2, raster equal height]
-	\begin{tcolorbox}[width=0.4\textwidth, nobeforeafter, colframe=theme,title=Lagrange multiplier]%%
-		\begin{itemize}
-			\item[\textcolor{green}{\checkmark}] Easier implementation (only one mesh);
-			\item[\textcolor{red}{$\times$}] Must fulfill the \textit{inf-sup} condition;	
-			\item[\textcolor{red}{$\times$}] Requires solving a DAE, or specific reduction methods.
-		\end{itemize}
-	\end{tcolorbox} 
-	\begin{tcolorbox}[width=0.4\textwidth, nobeforeafter,  colframe=theme,title=Virtual domain decomposition]%%
-		\begin{itemize}
-			\item[\textcolor{green}{\checkmark}] Provides an ODE;
-			\item[\textcolor{red}{$\times$}] Requires the construction of multiple meshes;
-			\item[\textcolor{red}{$\times$}] Different formulation (and therefore finite elements) on each subdomain;
-		\end{itemize}
-	\end{tcolorbox}
-\end{tcbraster}
-\end{frame}
 
 \subsection{Convergence study: the Mindlin plate example}
 
@@ -1969,7 +1910,7 @@ Conforming elements for a similar problem are detailed in Cohen 2007\footfullcit
 \begin{conjecture}[Convergence rate for the BJT elements]
 	\setlength{\abovedisplayskip}{0pt}
 	\setlength{\belowdisplayskip}{0pt}
-	Combining previous results \footfullcite{becache2000wave,becache2001elas}, the following error estimates can be conjectured. Assuming a smooth solution, the following error estimates hold 
+	Combining previous results \footfullcite{becache2000wave,becache2001elas} and assuming a smooth solution, the following error estimates hold ($k$ polynomial degree for FE)
 	\begin{equation*}
 	\label{eq:errBEC}
 	\begin{aligned}
@@ -1986,7 +1927,7 @@ Conforming elements for a similar problem are detailed in Cohen 2007\footfullcit
 \begin{conjecture}[Convergence of the CG elements]
 \setlength{\abovedisplayskip}{0pt}
 \setlength{\belowdisplayskip}{0pt}
-	Assuming a smooth solution, the following error estimates hold 
+	Assuming a smooth solution, the following error estimates hold ($k$ polynomial degree for FE)
 	\begin{equation*}
 	\label{eq:errCGDG}
 	\begin{aligned}
@@ -2057,34 +1998,7 @@ Conforming elements for a similar problem are detailed in Cohen 2007\footfullcit
 		\end{minipage}
 	\end{figure}
 }
-\only<3>{
-	\begin{figure}[b]
-		\begin{minipage}[b]{0.45\linewidth}
-			\centering
-			\includegraphics[width=1\textwidth]{presentation/CCCC_BEC_Phys_sig.eps}
-			\caption{BTJ $\bm{E}_\kappa$ error ($L^\infty(L^2(\Omega, \bbR^{2\times 2}_{\text{sym}}))$).}
-		\end{minipage}
-		\begin{minipage}[b]{0.45\linewidth}
-			\centering
-			\includegraphics[width=1\textwidth]{presentation/CCCC_CF_Phys_sig.eps}
-			\caption{CG $\bm{E}_\kappa$ error ($L^\infty(L^2(\Omega, \bbR^{2\times 2}_{\text{sym}}))$).}
-		\end{minipage}
-	\end{figure}
-}
-\only<4>{
-	\begin{figure}[b]
-		\begin{minipage}[b]{0.45\linewidth}
-			\centering
-			\includegraphics[width=1\textwidth]{presentation/CCCC_BEC_Phys_q.eps}
-			\caption{BTJ $\bm{e}_\gamma$ error ($L^\infty(L^2(\Omega, \bbR^{2}))$).}
-		\end{minipage}
-		\begin{minipage}[b]{0.45\linewidth}
-			\centering
-			\includegraphics[width=1\textwidth]{presentation/CCCC_CF_Phys_q.eps}
-			\caption{CG $\bm{e}_\gamma$ error ($L^\infty(L^2(\Omega, \bbR^{2}))$).}
-		\end{minipage}
-	\end{figure}
-}
+
 \end{frame}
 
 \section{PH flexible multibody dynamics}
@@ -2541,6 +2455,39 @@ Open problems and possible developments:
 \begin{frame}
 \end{frame}
 
+\section{Results convergence study}
+
+\begin{frame}{Results for the Mindlin test}
+	\only<1>{
+		\begin{figure}[b]
+			\begin{minipage}[b]{0.45\linewidth}
+				\centering
+				\includegraphics[width=1\textwidth]{presentation/CCCC_BEC_Phys_sig.eps}
+				\caption{BTJ $\bm{E}_\kappa$ error ($L^\infty(L^2(\Omega, \bbR^{2\times 2}_{\text{sym}}))$).}
+			\end{minipage}
+			\begin{minipage}[b]{0.45\linewidth}
+				\centering
+				\includegraphics[width=1\textwidth]{presentation/CCCC_CF_Phys_sig.eps}
+				\caption{CG $\bm{E}_\kappa$ error ($L^\infty(L^2(\Omega, \bbR^{2\times 2}_{\text{sym}}))$).}
+			\end{minipage}
+		\end{figure}
+	}
+	\only<2>{
+		\begin{figure}[b]
+			\begin{minipage}[b]{0.45\linewidth}
+				\centering
+				\includegraphics[width=1\textwidth]{presentation/CCCC_BEC_Phys_q.eps}
+				\caption{BTJ $\bm{e}_\gamma$ error ($L^\infty(L^2(\Omega, \bbR^{2}))$).}
+			\end{minipage}
+			\begin{minipage}[b]{0.45\linewidth}
+				\centering
+				\includegraphics[width=1\textwidth]{presentation/CCCC_CF_Phys_q.eps}
+				\caption{CG $\bm{e}_\gamma$ error ($L^\infty(L^2(\Omega, \bbR^{2}))$).}
+			\end{minipage}
+		\end{figure}
+	}
+\end{frame}
+
 \section{Thermoelasticity}
 
 \subsection{General 3D thermoelasticity as coupled pH systems}
@@ -2931,6 +2878,79 @@ C_1/2(s) = \left[\frac{s}{2} [(1+\delta+s)\pm[(1+\delta+s)^2-4s]^{\frac{1}{2}} ]
 \end{frame}
 
 \section{Vibroacoustic under mixed boundary conditions}
+
+\subsection{Virtual domain decomposition}
+
+\begin{frame}{Virtual domain decomposition}
+The idea is based on the fact that a mixed boundary conditions problem can be split into two problems with uniform causality. The two systems are then appropriately interconnected.
+
+\begin{figure}[b]
+	\begin{minipage}[b]{0.4\linewidth}
+		\centering
+		\includegraphics[width=0.95\textwidth]{part_3/pfem/dom_part.eps}
+		\caption{Splitting of the domain.}
+	\end{minipage}
+	\hspace{0.5cm}
+	\begin{minipage}[b]{0.55\linewidth}
+		\centering
+		\includegraphics[width=0.95\textwidth]{part_3/pfem/dom_part_int.eps}
+		\caption{Interconnection at the interface $\Gamma_{12}$.}
+	\end{minipage}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Core idea}
+For $\Omega_1$ subdomain, we set
+
+\begin{equation*} 
+\begin{pmatrix}
+\bm{u}_{\partial, 1}\\
+\textcolor{blue}{\bm{u}_{\partial, 1}^{\Gamma_{12}}}\\
+\end{pmatrix} = \begin{bmatrix}
+\mathcal{N}_{\partial, 1}^{\Gamma_1} & 0\\
+\mathcal{N}_{\partial, 1}^{\Gamma_{12}} & 0 \\
+\end{bmatrix} \begin{pmatrix}
+\bm{e}_1 \\ \bm{e}_2
+\end{pmatrix}, \qquad
+\begin{pmatrix}
+\bm{y}_{\partial, 1}\\
+\textcolor{red}{\bm{y}_{\partial, 1}^{\Gamma_{12}}} \\
+\end{pmatrix} = \begin{bmatrix}
+0 & \mathcal{N}_{\partial, 2}^{\Gamma_1} \\
+0 & \mathcal{N}_{\partial, 2}^{\Gamma_{12}} \\
+\end{bmatrix} \begin{pmatrix}
+\bm{e}_1 \\ \bm{e}_2
+\end{pmatrix},
+\end{equation*}
+whereas for the $\Omega_2$ subdomain
+\begin{equation*}
+\begin{pmatrix}
+\bm{u}_{\partial, 2}\\
+\textcolor{red}{\bm{u}_{\partial, 2}^{\Gamma_{12}}}\\
+\end{pmatrix} = \begin{bmatrix}
+0 & \mathcal{N}_{\partial, 2}^{\Gamma_2}\\
+0 & \mathcal{N}_{\partial, 2}^{\Gamma_{12}} \\
+\end{bmatrix} \begin{pmatrix}
+\bm{e}_1 \\ \bm{e}_2
+\end{pmatrix}, \qquad
+\begin{pmatrix}
+\bm{y}_{\partial, 2}\\
+\textcolor{blue}{\bm{y}_{\partial, 2}^{\Gamma_{12}}}\\
+\end{pmatrix} = \begin{bmatrix}
+\mathcal{N}_{\partial, 1}^{\Gamma_1} & 0 \\
+\mathcal{N}_{\partial, 1}^{\Gamma_{12}}  & 0 \\
+\end{bmatrix} \begin{pmatrix}
+\bm{e}_1 \\ \bm{e}_2
+\end{pmatrix}.
+\end{equation*}
+The following relations then hold
+\begin{equation*}
+\textcolor{blue}{\bm{u}_{\partial, 1}^{\Gamma_{12}}} =\pm \textcolor{blue}{\bm{y}_{\partial, 2}^{\Gamma_{12}}}, \qquad \textcolor{red}{\bm{u}_{\partial, 2}^{\Gamma_{12}}} = \mp \textcolor{red}{\bm{y}_{\partial, 1}^{\Gamma_{12}}}.
+\end{equation*}
+The plus or minus sign is due to the fact that either $\mathcal{N}_{\partial, 1}^{\Gamma_{12}}$ or $\mathcal{N}_{\partial, 2}^{\Gamma_{12}}$ contains a scalar product with the outgoing normal (or the tangent unit vector) at ${\Gamma_{12}}$ (that has opposite direction depending on which subdomain is considered).
+\end{frame}
+
 
 \subsection{Model description}
 
