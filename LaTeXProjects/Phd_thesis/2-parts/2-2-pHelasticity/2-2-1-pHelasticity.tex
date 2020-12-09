@@ -11,7 +11,7 @@ In this section, the main concepts behind a deformable continuum are briefly rec
 \subsection{Non-linear formulation of elasticity}
 
 The bounded region of $\mathbb{R}^d, \; d\in \{2, 3\}$ occupied by a solid is called configuration. The reference configuration $\Omega$ is the domain that a body occupies at the initial state. To describe how the body deforms in time the deformation map $\bm\Phi: \Omega \times [0, T_f] \rightarrow \Omega' \subset \mathbb{R}^d$ is introduced. This map is differentiable and orientation preserving, and the image of $\Omega$ under $\bm\Phi(\cdot, t) \; \forall t \in [0, T_f]$ is called the deformed configuration $\Omega_t$. Given a specific point in the reference frame its image is denoted by $\bm{y} = \bm{\Phi}(\bm{x}, t)$. The gradient of the deformation map is called the deformation gradient $\bm{F}:=\nabla_x\bm{\Phi} = \diffp{\bm{y}}{\bm{x}}$. A rigid deformation maps a point $\bm{x} \in \Omega \rightarrow \bm{A}(t) \bm{x} + \bm{b}(t)$, where $\bm{A}(t)$ is an orthogonal matrix and $\bm{b}(t) \in \mathbb{R}^d$ a vector. A differentiable deformation map $\bm\Phi$ is a rigid deformation iff $\bm{F}^\top \bm{F} - \bm{I} = 0$,  where $\bm{I}$ is the identity in $\mathbb{R}^{d\times d}$ (for the proof see \cite{ciarlet1988mathematical}, page 44). For this reason, a suitable measure of the deformation is the Green-St.Venant strain tensor $\frac{1}{2} (\bm{F}^\top \bm{F} - \bm{I})$.  \\
-A quantity of interest is the displacement $\bm{u}: \Omega \times [0, T_f] \rightarrow \mathbb{R}^d$ with respect to the reference configuration. It is defined as $\bm{u}(\bm{x}, t) = \bm{\Phi}(\bm{x}, t) - \bm{x}$. The gradient of the displacement verifies $\nabla_x \bm{u} = \bm{F} - \bm{I}$. The strain tensor can now be written in terms of the displacement
+A quantity of interest is the displacement $\bm{u}: \Omega \times [0, T_f] \rightarrow \mathbb{R}^d$ with respect to the reference configuration. It is defined as $\bm{u}(\bm{x}, t) = \bm{\Phi}(\bm{x}, t) - \bm{x}$ (cf. Fig. \ref{fig:non_lin}). The gradient of the displacement verifies $\nabla_x \bm{u} = \bm{F} - \bm{I}$. The strain tensor can now be written in terms of the displacement
 \begin{equation*}
 \begin{aligned}
 \frac{1}{2} (\bm{F}^\top \bm{F} - \bm{I}) &= \frac{1}{2}\left[(\nabla_x \bm{u} + \bm{I})^\top (\nabla_x \bm{u} + \bm{I}) - \bm{I}\right] \\
@@ -22,6 +22,13 @@ or in components
 \begin{equation*}
 \frac{1}{2} ({F}_{ik}^\top {F}_{kj} - {I}_{ij}) = \frac{1}{2} \left(\diffp{u_i}{x_j} + \diffp{u_j}{x_i} + \diffp{u_i}{x_j}\diffp{u_j}{x_i}\right).
 \end{equation*}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.4\textwidth]{part_2/non_linear.eps}
+	\caption{A 2D continuum in his reference configuration $\Omega$ and in the current configuration $\Omega_t$. Given a generic point $\bm{x}$ in the reference configuration, the map $\bm{\Phi}(\bm{x}, t)$ provides its current position $\bm{y}$ at a given time instant $t$.}
+	\label{fig:non_lin}
+\end{figure}
 
 To state the balance laws the actual deformed configuration is considered. The linear and angular momenta in a subdomain $\omega_t \subset \Omega_t$ are computed as 
 \begin{equation*}
