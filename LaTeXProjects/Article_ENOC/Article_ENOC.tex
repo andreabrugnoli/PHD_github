@@ -8,7 +8,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \documentclass{enoc2020}
 \usepackage{natbib}
-\usepackage{diffcoeff}
+%\usepackage{diffcoeff} % désolé chez moi ça n'a jamais fonctionné correctement
 \usepackage{comment}
 
 \bibliographystyle{unsrtnat}
@@ -70,18 +70,18 @@
 
 \title{A port-Hamiltonian formulation for the full von-K\'arm\'an plate model}
 
-\author{{Andrea Brugnoli}$^\ast$, Denis Matignon$^{\ast}$}
+\author{{\underline{Andrea Brugnoli}}$^\ast$, Denis Matignon$^{\ast}$}
 
-\address{$^\ast$ISAE-SUPAERO, Université de Toulouse, France 
+\address{$^\ast$ISAE-SUPAERO, Universit\'e de Toulouse, France 
 }
 
-\abstract{In this contribution, a port-Hamiltonian reformulation of the full von-Karman dynamical model for geometrically non-linear plates is detailed. Starting from the canonical equations, a set of variables is chosen so that that make the total energy quadratic. The model, reformulated in these variables, highlights a port-Hamiltonian structure ruled by a state-modulated interconnection operator. }
+\abstract{In this contribution, a port-Hamiltonian reformulation of the full von-K\'arm\'an  dynamical model for geometrically non-linear plates is detailed, including the collocated boundary control and observation. Starting from the canonical equations, a set of variables is chosen so as to  make the total energy quadratic. The model, reformulated in these variables, highlights a port-Hamiltonian structure ruled by a state-modulated interconnection operator. }
 
 \begin{document}
 
 \section{Classical model}
 
-The classical full von-Karman dynamical model is detailed in \cite{bilbao2015conservative}. The problem, defined on an open connected set $\Omega \subset \bbR^2$, takes the dimensionless form
+The classical full  von-K\'arm\'an dynamical model is presented in \cite{bilbao2015conservative}. The problem, defined on an open connected set $\Omega \subset \bbR^2$, takes the dimensionless form
 
 \begin{equation}\label{eq:class}
 \begin{aligned}
@@ -97,11 +97,11 @@ The classical full von-Karman dynamical model is detailed in \cite{bilbao2015con
 \bm{\kappa} &= \Grad \grad w,
 \end{aligned}
 \end{equation}
-where $\bm{u} \in \bbR^2$ is the in-plane displacement, $w$ is the vertical displacement, $\bm{\varepsilon}$ is the in-plane strain tensor, $\bm{\kappa}$ is the curvature tensor, $\bm{N}$ is the in-plane stress resultant and $\bm{M}$ is the bending stress resultant. The notation $\bm{a} \otimes \bm{b} = \bm{a} \bm{b}^\top$ denotes the dyadic product of two vectors.  The operator $\div$ is the divergence of a vector field and $\grad$ the gradient of a scalar field. The  operator $\mathrm{Grad} = \frac{1}{2} \left(\nabla + \nabla^\top \right)$ designates the symmetric part of the gradient (i. e. the deformation gradient in continuum mechanics). For a tensor field $\bm{U}: \Omega \rightarrow \bbR^{2\times 2}$, with components $U_{ij}$, the divergence $\Div$ is a vector, defined column-wise as
+where $\bm{u} \in \bbR^2$ is the in-plane displacement, $w$ is the vertical displacement, $\bm{\varepsilon}$ is the in-plane strain tensor, $\bm{\kappa}$ is the curvature tensor, $\bm{N}$ is the in-plane stress resultant and $\bm{M}$ is the bending stress resultant. The notation $\bm{a} \otimes \bm{b} = \bm{a} \bm{b}^\top$ denotes the dyadic product of two vectors.  The $\div$ operator  is the divergence of a vector field, and $\grad$ the gradient of a scalar field. The  operator $\mathrm{Grad} = \frac{1}{2} \left(\nabla + \nabla^\top \right)$ designates the symmetric part of the gradient (i. e. the deformation gradient in continuum mechanics). For a tensor field $\bm{U}: \Omega \rightarrow \bbR^{2\times 2}$, with components $U_{ij}$, the divergence $\Div(\bm{U})$ is a vector, defined column-wise as
 \begin{equation*}
 \Div(\bm U) := \sum_{i = 1}^2 \partial_{x_i} U_{ij}, \qquad \forall j = \{1, 2\}.
 \end{equation*}
-The tensor mapping $\bm{\Phi}$ is positive and preserves the symmetry
+The linear tensor mapping $\bm{\Phi}$ is positive and preserves symmetry:
 \begin{equation*}
 	\bm\Phi (\bm{A}) = \nu \Tr(\bm{A})\bm{1} + (1 - \nu) \bm{A}, \qquad \bm{A} = \bm{A}^\top \implies \bm{\Phi}(\bm{A}) = \bm{\Phi}(\bm{A})^\top, \where \bm{1} = \mathrm{Diag}(1,1).
 \end{equation*}
@@ -117,12 +117,12 @@ The total energy of the model (Hamiltonian functional)
 \begin{equation}
 	H = \frac{1}{2} \int_{\Omega}\left\{ \norm{\dot{\bm{u}}}^2 + \dot{w}^2 + \bm{N} \cddot \bm{\varepsilon} + \bm{M} \cddot \bm{\kappa} \right\} \d\Omega, \qquad \where \bm{A} \cddot \bm{B} = \Tr(\bm{A}^\top\bm{B})
 \end{equation}
-consists of the kinetic energy and membrane and bending deformation energies.
-This model is conservative \cite{bilbao2015conservative}. Indeed, this implies that a port-Hamiltonian realization of the system exists. We shall demonstrate how to construct a port-Hamiltonian realization, equivalent to \eqref{eq:class}.
+consists of the kinetic energy and both membrane and bending deformation energies.
+This model proves conservative, see \cite{bilbao2015conservative}. Indeed, this implies that a port-Hamiltonian realization of the system exists. We shall demonstrate how to construct a port-Hamiltonian realization, equivalent to \eqref{eq:class}.
 
 
-\section{The equivalent port-Hamiltonian system}
-To find a suitable port-Hamiltonian (pH) system, we first select a set of new variables to make the Hamiltonian functional quadratic. The selection is the same as for a linear plate problem \cite{brugnoli2019mindlin,brugnoli2019kirchhoff}
+\section{The equivalent port-Hamiltonian system (pHs)}
+To find a suitable port-Hamiltonian system, we first select a set of new energy variables to make the Hamiltonian functional quadratic. The selection is the same as for both the linear plate problems in \cite{brugnoli2019mindlin,brugnoli2019kirchhoff}:
 \begin{equation}
 \bm{\alpha}_u = \dot{\bm{u}}, \qquad \alpha_w = \dot{w}, \qquad \bm{A}_\varepsilon = \bm{\varepsilon}, \qquad \bm{A}_\kappa = \bm{\kappa}.
 \end{equation}
@@ -130,22 +130,22 @@ The energy is quadratic in these variables
 \begin{equation}
  H = \frac{1}{2} \int_{\Omega} \left\{\norm{\bm{\alpha}_u}^2 + \alpha_w^2 + \bm{\Phi}(\bm{A}_\varepsilon) \cddot \bm{A}_\varepsilon + \bm{\Phi}(\bm{A}_\kappa) \cddot \bm{A}_\kappa \right\}.
 \end{equation}
-By computing the variational derivative of the Hamiltonian, one obtains the co-energy variables
+By computing the variational derivative of the Hamiltonian, one obtains the so-called co-energy variables:
 \begin{equation}
 	\bm{e}_u := \delta_{\bm\alpha_u} H = \dot{\bm{u}}, \qquad \bm{e}_w := \delta_{\alpha_w} H = \dot{w}, \qquad \bm{E}_\varepsilon := \delta_{\bm{A}_\varepsilon} H = \bm{\Phi}(\bm{A}_\varepsilon), \qquad \bm{E}_\kappa := \delta_{\bm{A}_\kappa} H = \bm{\Phi}(\bm{A}_\kappa).
 \end{equation}
 Before stating the final formulation, consider the operator $\mathcal{C}(w)(\cdot): L^2(\Omega, \bbR^{2\times 2}_{\text{sym}}) \rightarrow L^2(\Omega)$ acting on symmetric tensors 
 \begin{equation}
-	\mathcal{C}(w)(\cdot) = \div(\cdot \grad w).
+	\mathcal{C}(w)(\bm{T}) = \div(\bm{T} \grad w).
 \end{equation}
 \begin{proposition}\label{prop:adjC}
-The formal anti-adjoint of the $\mathcal{C}(w)(\cdot)$ is given by
+The formal adjoint of the $\mathcal{C}(w)(\cdot)$ is given by
 \begin{equation}
--\mathcal{C}(w)^*(\cdot) = \frac{1}{2} \left[\grad (\cdot) \otimes \grad(w) + \grad(w) \otimes \grad(\cdot) \right] .
+\mathcal{C}(w)^*(\cdot) = -\frac{1}{2} \left[\grad (\cdot) \otimes \grad(w) + \grad(w) \otimes \grad(\cdot) \right] .
 \end{equation}
 \end{proposition}
 \begin{proof}
-Consider a smooth scalar $v \in C^\infty_0(\Omega)$ and a smooth symmetric tensor field $\bm{U} \in C^\infty_0(\Omega, \bbR^{2\times 2}_{\text{sym}})$ with compact support. The formal adjoint of $\mathcal{C}(w)(\cdot)$ satisfies the relation
+Consider a smooth scalar field  $v \in C^\infty_0(\Omega)$ and a smooth symmetric tensor field $\bm{U} \in C^\infty_0(\Omega, \bbR^{2\times 2}_{\text{sym}})$ with compact support. The formal adjoint of $\mathcal{C}(w)(\cdot)$ satisfies the relation
 \begin{equation}
 \inner[L^2(\Omega)]{v}{\mathcal{C}(w)(\bm{U})} = \inner[L^2(\Omega, \bbR^{2\times 2}_{\text{sym}})]{\mathcal{C}(w)(v)^*}{\bm{U}}.
 \end{equation}
@@ -167,7 +167,8 @@ leading to the final result.
 
 The pH realization is then given by the following system
 \begin{equation}\label{eq:pHsys}
-\diffp{}{t}
+  %\diffp{}{t}
+   \frac{\partial}{\partial t}
 \begin{pmatrix}
 \bm{\alpha}_u \\
 \bm{A}_\varepsilon \\
@@ -189,8 +190,9 @@ The pH realization is then given by the following system
 \end{equation}
 The second line of system \eqref{eq:pHsys} represents the time derivative of the membrane strain tensor. To close the system, variable $w$ has to be accessible. For this reason, its dynamics has to be included. The augmented system reads
 \begin{equation}\label{eq:pHsys_aug}
-\diffp{}{t}
-\begin{pmatrix}
+%\diffp{}{t}
+  \frac{\partial}{\partial t}
+  \begin{pmatrix}
 \bm{\alpha}_u \\
 \bm{A}_\varepsilon \\
 w \\
@@ -216,12 +218,14 @@ Given the results in \cite{brugnoli2019mindlin,brugnoli2019kirchhoff} and Propos
 \begin{equation}
 \dot{H} = \inner[\partial\Omega]{\gamma_0\bm{e}_u}{\gamma_\perp \bm{E}_\varepsilon} + \inner[\partial\Omega]{\gamma_0\bm{e}_w}{\gamma_{\perp\perp, 1} \bm{E}_\kappa + \gamma_0(\bm{E}_\varepsilon \bm{n} \cdot \grad w)} + \inner[\partial\Omega]{\gamma_1\bm{e}_w}{\gamma_{\perp\perp} \bm{E}_\kappa},
 \end{equation}
-where $\gamma_0\bm{e}_u= \bm{e}_u\vert_{\partial\Omega}$ is the Dirichlet trace, $\gamma_\perp \bm{E}_\varepsilon = \bm{E}_\varepsilon \bm{n}\vert_{\partial\Omega}$ is the normal trace ($\bm{n}$ is the outward normal versor), $\gamma_{\perp\perp, 1} \bm{E}_\kappa = - \bm{n} \cdot \Div \bm{E}_\kappa - \partial_{\bm{s}}(\bm{n}^\top \bm{E}_\kappa \bm{s})\vert_{\partial\Omega}$ is the effective shear force at the boundary ($\bm{s}$ is the tangent versor at the boundary), $\gamma_1 \bm{e}_w = \partial_{\bm{n}} \bm{e}_w\vert_{\partial\Omega}$ is the normal derivative trace and $\gamma_{\perp\perp} \bm{E}_\kappa = \bm{n}^\top \bm{E}_\kappa \bm{n}$ is the normal to normal trace. The boundary conditions are consistent with the ones assumed in \cite{puel1996} for deriving a global existence result for this model.
+where $\gamma_0\bm{e}_u= \bm{e}_u\vert_{\partial\Omega}$ is the Dirichlet trace, $\gamma_\perp \bm{E}_\varepsilon = \bm{E}_\varepsilon \bm{n}\vert_{\partial\Omega}$ is the normal trace ($\bm{n}$ is the outward normal vector), $\gamma_{\perp\perp, 1} \bm{E}_\kappa = - \bm{n} \cdot \Div \bm{E}_\kappa - \partial_{\bm{s}}(\bm{n}^\top \bm{E}_\kappa \bm{s})\vert_{\partial\Omega}$ is the effective shear force at the boundary ($\bm{s}$ is the tangent versor at the boundary), $\gamma_1 \bm{e}_w = \partial_{\bm{n}} \bm{e}_w\vert_{\partial\Omega}$ is the normal derivative trace and $\gamma_{\perp\perp} \bm{E}_\kappa = \bm{n}^\top \bm{E}_\kappa \bm{n}$ is the normal to normal trace. The boundary conditions are consistent with the ones assumed in \cite{puel1996} for deriving a global existence result for this model.
 
 
 
 \section{Conclusions}
-We have presented a pH formulation of the full von-K\'arm\'an model. The dynamics of the system exhibits a state modulated interconnection operator, while the energy remains quadratic in the chosen variables. Of particular interest is the discretization of such model for simulation and control purposes. Mixed finite elements seems to be particularly suited to achieve a structure-preserving discretization of this model.
+We have presented a pHs formulation of the full von-K\'arm\'an model. The dynamics of the system exhibits a state modulated interconnection operator, while the energy remains quadratic in the chosen variables. Of particular interest is the discretization of such a model for simulation and control purposes. %
+The Partitioned Finite Element Method (PFEM), an extension of mixed finite elements to pHs,  seems to be particularly suitable to achieve a structure-preserving discretization of this model, as in \cite{cardoso2020pfem} for the 2D  Shallow Water Equation, which exhibits the same kind of polynomial nonlinearity.
  
-\bibliography{biblio_ENOC} 
+\footnotesize{\bibliography{biblio_ENOC}}
+
  \end{document}
