@@ -22,6 +22,23 @@ mpmath.mp.dps = 15; mpmath.mp.pretty = True
 
 path_fig = "/home/andrea/"
 
+lamda = 0.8529 * 10 ** 9  # kg cm^-1 s^-2
+mu = 0.5686 * 10 ** 9  # kg cm^-1 s^-2
+rho = 7.82 * 10 ** (-3)  # kg cm^-3
+c_E = 4.61 * 10 ** 6  # cm^2 K^-1 s^-3
+K = 1.7 * 10 ** 3  # kg cm K^-1 s^-3
+
+c_1 = np.sqrt((lamda + 2 * mu) / rho)
+
+alpha_T = 9.0375 * 10 ** (-6)  # K^-1  alpha = K/(rho*c_E)
+T_0 = 300  # K
+
+beta = K / (rho * c_E * c_1)
+gamma = alpha_T * (3 * lamda + 2 * mu)
+
+C = alpha_T ** 2 * (3 * lamda + 2 * mu) ** 2 * T_0 / (rho * c_E * (2 * mu + lamda))
+fac = 1 / C
+
 def compute_analytical(delta, xi, tfin_hat):
 
     gam1 = lambda s: (s/2*((1 + delta + s) + ((1+delta+s)**2-4*s)**(1/2)))**(1/2)
@@ -49,22 +66,6 @@ def compute_analytical(delta, xi, tfin_hat):
 
 def compute_sol(n, r, delta, tfin_hat):
 
-    lamda = 0.8529 * 10 ** 9  # kg cm^-1 s^-2
-    mu = 0.5686 * 10 ** 9  # kg cm^-1 s^-2
-    rho = 7.82 * 10 ** (-3)  # kg cm^-3
-    c_E = 4.61 * 10 ** 6  # cm^2 K^-1 s^-3
-    K = 1.7 * 10 ** 3  # kg cm K^-1 s^-3
-
-    c_1 = np.sqrt((lamda + 2 * mu) / rho)
-
-    alpha_T = 9.0375 * 10 ** (-6)  # K^-1  alpha = K/(rho*c_E)
-    T_0 = 300  # K
-
-    beta = K / (rho * c_E * c_1)
-    gamma = alpha_T * (3 * lamda + 2 * mu)
-
-    C = alpha_T ** 2 * (3 * lamda + 2 * mu) ** 2 * T_0 / (rho * c_E * (2 * mu + lamda))
-    fac = 1 / C
 
     def rigidity_tensor(epsilon):
         sigma = (2*mu + lamda)*epsilon
@@ -152,7 +153,7 @@ def compute_sol(n, r, delta, tfin_hat):
 
     # J, M = PETScMatrix(), PETScMatrix()
 
-    dt = t_fin/100
+    dt = t_fin/1000
     theta = 0.5
 
     e_form = e_operator(v_pel, al_pel, v_qel, al_qel, v_pt, al_pt)
@@ -276,8 +277,8 @@ def compute_sol(n, r, delta, tfin_hat):
     return t_vec_hat, theta_atP, u_atP_hat, sol_u, sol_v, sol_T, t_ev
 
 
-n = 5
-r = 1
+n = 50
+r = 2
 t_fin_hat = 4
 
 
@@ -341,57 +342,58 @@ for i in range(1, nt_ev0):
 xx_plot0, tt_plot0 = np.meshgrid(x_plot0, t_plot0)
 
 
+xx_plot0_dimless = xx_plot0/beta
+tt_plot0_dimless = tt_plot0*c_1/beta
+U_plot0_dimless = U_plot0 * (lamda + 2 * mu) / (beta * gamma * T_0)
+
 fig = plt.figure()
 ax = fig.gca(projection='3d')
-ax.set_xlabel('$x \; \mathrm{[cm]}$')
-ax.set_ylabel('$t \; \mathrm{[s]}$')
-ax.set_zlabel('$u \; \mathrm{[cm]}$')
+ax.set_xlabel('$\hat{x}$')
+ax.set_ylabel('$\hat{t}$')
+# ax.set_zlabel('$\hat{u}$')
 
-ax.set_title(r'Displacement $\delta=0$', loc='center')
+ax.set_title(r'Dimensionless displacement $\delta=0$', loc='center')
 
 
-surf_u0 = ax.plot_surface(xx_plot0, tt_plot0, U_plot0, cmap=cm.jet, linewidth=0, antialiased=False)
+surf_u0 = ax.plot_surface(xx_plot0_dimless, tt_plot0_dimless, U_plot0_dimless,\
+                          cmap=cm.jet, linewidth=0, antialiased=False)
 ax.view_init(azim=az_angle)
-#surf_u0._facecolors2d = surf_u0._facecolors3d
-#surf_u0._edgecolors2d = surf_u0._edgecolors3d
 fig.colorbar(surf_u0, shrink=0.5, aspect=5)
 
-plt.savefig(path_fig + "plot_u0.eps", format="eps")
+plt.savefig(path_fig + "plot_u0.eps", format="eps", bbox_inches='tight')
 
 fig = plt.figure()
 ax = fig.gca(projection='3d')
-ax.set_xlabel('$x \; \mathrm{[cm]}$')
-ax.set_ylabel('$t \; \mathrm{[s]}$')
+ax.set_xlabel('$\hat{x}$')
+ax.set_ylabel('$\hat{t}$')
 ax.set_zlabel('$v \; \mathrm{[cm/s]}$')
 
 ax.set_title(r'Velocity $\delta=0$', loc='center')
 
 
-surf_v0 = ax.plot_surface(xx_plot0, tt_plot0, V_plot0, cmap=cm.jet, linewidth=0, antialiased=False)
+surf_v0 = ax.plot_surface(xx_plot0_dimless, tt_plot0_dimless, V_plot0, \
+                          cmap=cm.jet, linewidth=0, antialiased=False)
 ax.view_init(azim=az_angle)
-#surf_v0._facecolors2d = surf_v0._facecolors3d
-#surf_v0._edgecolors2d = surf_v0._edgecolors3d
 fig.colorbar(surf_v0, shrink=0.5, aspect=5)
 
-plt.savefig(path_fig + "plot_v0.eps", format="eps")
+plt.savefig(path_fig + "plot_v0.eps", format="eps", bbox_inches='tight')
 
 fig = plt.figure()
 ax = fig.gca(projection='3d')
-ax.set_xlabel('$x \; \mathrm{[cm]}$')
-ax.set_ylabel('$t \; \mathrm{[s]}$')
+ax.set_xlabel('$\hat{x}$')
+ax.set_ylabel('$\hat{t}$')
 # ax.set_zlabel(r'$\theta$')
 
 ax.set_title(r'Dimensionless Temperature $\delta=0$', loc='center')
 
 
-surf_T0 = ax.plot_surface(xx_plot0, tt_plot0, T_plot0, cmap=cm.jet, linewidth=0, antialiased=False)
+surf_T0 = ax.plot_surface(xx_plot0_dimless, tt_plot0_dimless, T_plot0,\
+                          cmap=cm.jet, linewidth=0, antialiased=False)
 ax.set_zlim3d(0, 1)
 
-#surf_T0._facecolors2d = surf_T0._facecolors3d
-#surf_T0._edgecolors2d = surf_T0._edgecolors3d
 fig.colorbar(surf_T0, shrink=0.5, aspect=5)
 
-plt.savefig(path_fig + "plot_T0.eps", format="eps")
+plt.savefig(path_fig + "plot_T0.eps", format="eps", bbox_inches='tight')
 
 
 x_plot1, T0_plot1 = calculate_one_dim_points(sol_T1[0], nplot_el)
@@ -418,58 +420,60 @@ for i in range(1, nt_ev1):
 
 xx_plot1, tt_plot1 = np.meshgrid(x_plot1, t_plot1)
 
+xx_plot1_dimless = xx_plot1/beta
+tt_plot1_dimless = tt_plot1*c_1/beta
+U_plot1_dimless = U_plot1 * (lamda + 2 * mu) / (beta * gamma * T_0)
+
 
 fig = plt.figure()
 ax = fig.gca(projection='3d')
-ax.set_xlabel('$x \; \mathrm{[cm]}$')
-ax.set_ylabel('$t \; \mathrm{[s]}$')
-ax.set_zlabel('$u \; \mathrm{[cm]}$')
+ax.set_xlabel('$\hat{x}$')
+ax.set_ylabel('$\hat{t}$')
+# ax.set_zlabel('$\hat{u}$')
 
-ax.set_title(r'Displacement $\delta=1$', loc='center')
+ax.set_title(r'Dimensionless displacement $\delta=1$', loc='center')
 
 
-surf_u1 = ax.plot_surface(xx_plot1, tt_plot1, U_plot1, cmap=cm.jet, linewidth=0, antialiased=False)
+surf_u1 = ax.plot_surface(xx_plot1_dimless, tt_plot1_dimless, U_plot1_dimless, \
+                          cmap=cm.jet, linewidth=0, antialiased=False)
 ax.view_init(azim=az_angle)
-#surf_u1._facecolors2d = surf_u1._facecolors3d
-#surf_u1._edgecolors2d = surf_u1._edgecolors3d
 fig.colorbar(surf_u1, shrink=0.5, aspect=5)
 
-plt.savefig(path_fig + "plot_u1.eps", format="eps")
+plt.savefig(path_fig + "plot_u1.eps", format="eps", bbox_inches='tight')
 
 fig = plt.figure()
 ax = fig.gca(projection='3d')
-ax.set_xlabel('$x \; \mathrm{[cm]}$')
-ax.set_ylabel('$t \; \mathrm{[s]}$')
+ax.set_xlabel('$\hat{x}$')
+ax.set_ylabel('$\hat{t}$')
 ax.set_zlabel('$v \; \mathrm{[cm/s]}$')
 
 ax.set_title(r'Velocity $\delta=1$', loc='center')
 
 
-surf_v1 = ax.plot_surface(xx_plot1, tt_plot1, V_plot1, cmap=cm.jet, linewidth=0, antialiased=False)
+surf_v1 = ax.plot_surface(xx_plot1_dimless, tt_plot1_dimless, V_plot1, \
+                          cmap=cm.jet, linewidth=0, antialiased=False)
 ax.view_init(azim=az_angle)
-#surf_v1._facecolors2d = surf_v1._facecolors3d
-#surf_v1._edgecolors2d = surf_v1._edgecolors3d
+
 fig.colorbar(surf_v1, shrink=0.5, aspect=5)
 
 
-plt.savefig(path_fig + "plot_v1.eps", format="eps")
+plt.savefig(path_fig + "plot_v1.eps", format="eps",bbox_inches='tight')
 
 fig = plt.figure()
 ax = fig.gca(projection='3d')
-ax.set_xlabel('$x \; \mathrm{[cm]}$')
-ax.set_ylabel('$t \; \mathrm{[s]}$')
+ax.set_xlabel('$\hat{x}$')
+ax.set_ylabel('$\hat{t}$')
 # ax.set_zlabel(r'$\theta$')
 
 ax.set_title(r'Dimensionless Temperature $\delta=1$', loc='center')
 
 
-surf_T1 = ax.plot_surface(xx_plot1, tt_plot1, T_plot1, cmap=cm.jet, linewidth=0, antialiased=False)
+surf_T1 = ax.plot_surface(xx_plot1_dimless, tt_plot1_dimless, T_plot1, \
+                          cmap=cm.jet, linewidth=0, antialiased=False)
 ax.set_zlim3d(0, 1)
 
-#surf_T1._facecolors2d = surf_T1._facecolors3d
-#surf_T1._edgecolors2d = surf_T1._edgecolors3d
 fig.colorbar(surf_T1, shrink=0.5, aspect=5)
 
-plt.savefig(path_fig + "plot_T1.eps", format="eps")
+plt.savefig(path_fig + "plot_T1.eps", format="eps",bbox_inches='tight')
 
 plt.show()
