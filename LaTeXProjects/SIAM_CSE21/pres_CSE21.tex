@@ -112,42 +112,6 @@
 
 \section{Introduction}
 
-\begin{frame}{Why port-Hamiltonian systems?}
-\only<1>{
-\begin{columns}
-\begin{column}{.45\textwidth}
-\begin{figure}
-	\centering
-	\includegraphics[width=.95\textwidth]{sketch_PH.eps}
-\end{figure}
-\end{column}
-\hspace{1cm}
-\begin{column}{.5\textwidth}
-PH systems are:
-\begin{itemize}
-\item Physically motivated;
-\item Lumped (ODEs) or distributed (PDEs);
-\item Passive (passivity based control);
-\item \textcolor{red}{Closed under interconnection (modular multiphysics modelling)};
-\end{itemize}
-\end{column}
-\end{columns}	
-}
-\only<2>{
-\begin{figure}
-	\centering
-	\includegraphics[width=.95\textwidth]{sketch_PH_gyrator.eps}
-\end{figure}
-}
-\only<3>{
-	\begin{figure}
-		\centering
-		\includegraphics[width=.95\textwidth]{sketch_PH_transformer.eps}
-	\end{figure}
-}
-
-\end{frame}
-
 \begin{frame}{Twenty years of distributed port-Hamiltonian systems}
 	
 They have been used for simulating and controlling a variety of applications\footfullcite{rashad2020}:
@@ -205,7 +169,7 @@ Discretization of port-Hamiltonian systems:
 \end{frame}
 
 
-\section{A structure preserving discretization method}
+\section{Structure preserving discretization through mixed finite elements}
 
 
 \begin{frame}{Structure preserving discretization}
@@ -469,7 +433,7 @@ Discretization of port-Hamiltonian systems:
 		\begin{equation*}
 			H = \frac{1}{2} \inner[L^2(\Omega, \mathbb{A})]{\bm{\alpha}_{1}}{\mathcal{Q}_1\bm{\alpha}_{1}} + \frac{1}{2} \inner[L^2(\Omega, \mathbb{B})]{\bm{\alpha}_{2}}{\mathcal{Q}_2\bm{\alpha}_{2}},
 		\end{equation*}
-		where $\mathcal{Q}_1, \, \mathcal{Q}_2$ are positive symmetric operators, bounded from below and above
+		where $\mathcal{Q}_1, \, \mathcal{Q}_2$ are positive symmetric bounded operators
 		\begin{equation*}
 			m_1 \bm{I}_\mathbb{A} \le\mathcal{Q}_1 \le M_1 \bm{I}_\mathbb{A}, \qquad  m_2 \bm{I}_\mathbb{B} \le \mathcal{Q}_2 \le M_2 \bm{I}_\mathbb{B}, \qquad m_1>0, \ m_2>0, \ M_1>0, \ M_2>0.
 		\end{equation*} 
@@ -1268,18 +1232,19 @@ mediacommand=vidRod:playPause
 
 
 
-\begin{frame}{Contribution and Outlook}
-Contribution:
+\begin{frame}{Open problems and Outlook}
+Open problem
 \begin{itemize}
-		\item \onslide<2->{Development of a finite element based symplectic discretization easily re-implementable;}
+\item \onslide<2->{Finite element space for the Lagrange multiplier, satisfying the inf-sup condition;}
 \end{itemize}
-Open problems and possible developments:
+	
+Possible developments:
 \begin{itemize}
-	\item \onslide<3->{Finite element space for the multiplier satisfying the inf-sup condition;}
-	\item \onslide<4->{Discretization: efficient finite element for the Kirchhoff plate based on div-div conforming elements \footfullcite{chen2020divDiv};}
-	\item \onslide<5->{Model reduction: POD methods, $H_2$-optimal strategies or Krilov subspace methods\footfullcite{egger2018};}
-	\item \onslide<6>{Observer based boundary control\footfullcite{toledo2020} and reduced LQG design for distributed control\footfullcite{wu2020reduced}.}
+	\item \onslide<3->{Discretization: efficient finite element for the Kirchhoff plate based on div-div conforming elements \footfullcite{chen2020divDiv};}
+	\item \onslide<4->{Model reduction: POD methods, $H_2$-optimal strategies or Krilov subspace methods\footfullcite{egger2018};}
+	\item \onslide<5>{Observer based boundary control\footfullcite{toledo2020} and reduced LQG design for distributed control\footfullcite{wu2020reduced}.}
 \end{itemize}
+
 \end{frame}
 
 \begin{frame}{Additional informations}
@@ -1288,6 +1253,13 @@ Open problems and possible developments:
 Jupiter Notebooks for the wave and heat equation and the Mindlin plate model are available: \\
 \vspace{.3cm}
 \fullcite{brugnoli2020zenodo}.
+
+\vspace{1cm}
+
+Flexible multibody dynamics for pHs based on the proposed discretization:\\
+\vspace{.3cm}
+\fullcite{brugnoli2020msd}.
+
 \end{frame}
 
 \appendix
@@ -1347,7 +1319,7 @@ Jupiter Notebooks for the wave and heat equation and the Mindlin plate model are
 \begin{aligned}
 \text{Plate} \; (\Omega &= [0, L_x] \times [0, L_y]) \\
 \begin{bmatrix}
-\rho h & 0 \\ 0 & \mathcal{\bm{C}}_b \\
+\rho h & 0 \\ 0 & \bm{\mathcal{D}}_b^{-1} \\
 \end{bmatrix}
 \diffp{}{t}
 \begin{bmatrix}
