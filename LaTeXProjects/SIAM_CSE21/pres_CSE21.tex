@@ -127,11 +127,11 @@ They have been used for simulating and controlling a variety of applications\foo
 \end{multicols}
 
 
-\begin{block}{Distributed port-Hamiltonian systems \only<2>{(Linear case)}}
+\begin{block}{Distributed port-Hamiltonian systems}
 \begin{equation*}
 \begin{aligned}
 \partial_t {\bm{\alpha}} &= \mathcal{J} \, \bm{e}, \\
-\bm{e} &:= \only<1>{\delta_{\bm{\alpha}}{H}} \only<2>{\mathcal{Q}\bm{\alpha}}, \\
+\bm{e} &:= \delta_{\bm{\alpha}}{H}, \\
 \bm{u}_\partial &= \mathcal{B}_\partial  \, \bm{e}, \\
 \bm{y}_\partial &= \mathcal{C}_\partial \, \bm{e}, 
 \end{aligned} \qquad
@@ -143,7 +143,7 @@ They have been used for simulating and controlling a variety of applications\foo
 \end{aligned} \qquad
 \begin{aligned}
 \mathcal{J} &\quad\text{Skew-symmetric operator},\\
-\only<2>{\mathcal{Q} &\quad\text{Positive bounded operator},}\\
+ & \\
 \mathcal{B}_\partial &\quad\text{Input operator}, \\
 \mathcal{C}_\partial &\quad\text{Output operator}. \\
 \end{aligned}
@@ -175,22 +175,20 @@ Discretization of port-Hamiltonian systems:
 \begin{frame}{Structure preserving discretization}
 	\begin{tcbraster}[raster columns=2, raster equal height]
 		\begin{tcolorbox}[width=0.4\textwidth, nobeforeafter, colframe=theme,title=Infinite-dimensional pH system]%%
-			PDE with distributed inputs:
-			\begin{align*}
-				\diffp{\bm{\alpha}}{t}(\bm{x}, t) &= \mathcal{J} \delta_{\bm{\alpha}} H + \mathcal{B} \textcolor{red}{\bm{u}_\Omega(\bm{x}, t)}, \\
-				\textcolor{red}{\bm{y}_\Omega(\bm{x}, t)} &= \mathcal{B}^* \delta_{\bm{\alpha}} H.
-			\end{align*}
+			PDE with boundary control:
+			\begin{equation*}
+				\diffp{\bm{\alpha}}{t}(\bm{x}, t) = \mathcal{J} \delta_{\bm{\alpha}} H.
+			\end{equation*}
 			Boundary conditions: 
 			\[\textcolor{blue}{\bm{u}_\partial} = \mathcal{B}_\partial \delta_{\bm{\alpha}} H, \quad \textcolor{blue}{\bm{y}_\partial} = \mathcal{C}_\partial \delta_{\bm{\alpha}} H. \]
 			Power balance (Stokes Theorem): 
-			\[ \dot{H} = \displaystyle \int_{\partial \Omega} \textcolor{blue}{\bm{u}_\partial} \cdot \textcolor{blue}{\bm{y}_\partial} \d{S} +  \int_{\Omega} \textcolor{red}{\bm{u}_\Omega} \cdot \textcolor{red}{\bm{y}_\Omega} \d{\Omega}.
+			\[ \dot{H} = \displaystyle \int_{\partial \Omega} \textcolor{blue}{\bm{u}_\partial} \cdot \textcolor{blue}{\bm{y}_\partial} \d{S}.
 			\]
 		\end{tcolorbox} 
 		\begin{tcolorbox}[width=0.4\textwidth, nobeforeafter,  colframe=theme,title=Structure-preserving discretization]%%
 			Resulting ODE:
 			\begin{align*}
-				\dot{\bm{\alpha}}_d &= \mathbf{J} \, {\nabla {H}_d} + \mathbf{B}_\Omega \textcolor{red}{\mathbf{u}_\Omega} + \mathbf{B}_\partial \textcolor{blue}{\mathbf{u}_\partial}, \\
-				\textcolor{red}{\mathbf{y}_\Omega} &= \mathbf{B}_\Omega^\top \, {\nabla {H}_d}, \\
+				\dot{\bm{\alpha}}_d &= \mathbf{J} \, {\nabla {H}_d} + \mathbf{B}_\partial \textcolor{blue}{\mathbf{u}_\partial}, \\
 				\textcolor{blue}{\mathbf{y}_\partial} &= \mathbf{B}_\partial^\top \,{\nabla {H}_d}.
 			\end{align*}
 			Discretized Hamiltonian:
@@ -198,7 +196,7 @@ Discretization of port-Hamiltonian systems:
 			H_d := H(\bm{\alpha} \equiv \bm{\alpha}_d).
 			\]
 			Power balance: 
-			\[ \dot{H} = \textcolor{blue}{\mathbf{u}_\partial^\top \mathbf{y}_\partial} +  \textcolor{red}{\mathbf{u}_\Omega^\top \mathbf{y}_\Omega}.
+			\[ \dot{H} = \textcolor{blue}{\mathbf{u}_\partial^\top \mathbf{y}_\partial}.
 			\]
 		\end{tcolorbox}
 	\end{tcbraster}
@@ -619,30 +617,11 @@ Discretization of port-Hamiltonian systems:
 \end{frame}
 
 
-\begin{frame}{Mixed boundary conditions: two strategies}
-	
-	\begin{tcbraster}[raster columns=2, raster equal height]
-		\begin{tcolorbox}[width=0.4\textwidth, nobeforeafter, colframe=theme,title=Lagrange multiplier]%%
-			\begin{itemize}
-				\item[\textcolor{green}{\checkmark}] Easier implementation (only one mesh);
-				\item[\textcolor{red}{$\times$}] Must fulfill the \textit{inf-sup} condition;	
-				\item[\textcolor{red}{$\times$}] Requires solving a DAE, or specific reduction methods.
-			\end{itemize}
-		\end{tcolorbox} 
-		\begin{tcolorbox}[width=0.4\textwidth, nobeforeafter,  colframe=theme,title=Virtual domain decomposition]%%
-			\begin{itemize}
-				\item[\textcolor{green}{\checkmark}] Provides an ODE;
-				\item[\textcolor{red}{$\times$}] Requires the construction of multiple meshes;
-				\item[\textcolor{red}{$\times$}] Different formulation (and therefore finite elements) on each subdomain;
-			\end{itemize}
-		\end{tcolorbox}
-	\end{tcbraster}
-\end{frame}
-
 \begin{frame}{Lagrange multiplier method}
 	A Lagrange multiplier can be introduced to include the input that does not explicitly appear in the weak formulation, i.e. to enforce the essential boundary condition. 
 	\only<1>{
-		\begin{exampleblock}{Integration by parts of $-\mathcal{L}^*$ ($\textcolor{blue}{\bm{\lambda}_{\partial, 1}}=\textcolor{blue}{\bm{y}_{\partial, 1}}$) }
+		\setbeamercolor{block title}{bg=yellow, fg=black}
+		\begin{block}{Integration by parts of $-\mathcal{L}^*$ ($\textcolor{blue}{\bm{\lambda}_{\partial, 1}}=\textcolor{blue}{\bm{y}_{\partial, 1}}$) }
 			\begin{equation*}
 				\begin{aligned}
 					\mathrm{Diag}
@@ -693,12 +672,13 @@ Discretization of port-Hamiltonian systems:
 					\end{pmatrix}.
 				\end{aligned}
 			\end{equation*}
-		\end{exampleblock}
+		\end{block}	
 	}
 	
 	
 	\only<2>{
-		\begin{exampleblock}{Integration by parts of $\mathcal{L}$ ($\textcolor{red}{\bm{\lambda}_{\partial, 2}} = \textcolor{red}{\bm{y}_{\partial, 2}}$)}
+		\setbeamercolor{block title}{bg=yellow, fg=black}
+		\begin{block}{Integration by parts of $\mathcal{L}$ ($\textcolor{red}{\bm{\lambda}_{\partial, 2}} = \textcolor{red}{\bm{y}_{\partial, 2}}$)}
 			\begin{equation*}
 				\begin{aligned}
 					\mathrm{Diag}
@@ -749,7 +729,7 @@ Discretization of port-Hamiltonian systems:
 					\end{pmatrix}.
 				\end{aligned}
 			\end{equation*}
-		\end{exampleblock}
+		\end{block}
 	}
 	A pH differential-algebraic system is obtained in this case (pHDAE).
 \end{frame}
@@ -782,7 +762,7 @@ Discretization of port-Hamiltonian systems:
 
 \section{Applications}
 
-\subsection{Boundary control of irrotational shallow water equations}
+\subsection{Boundary control of the irrotational shallow water equations}
 
 \begin{frame}{Irrotational shallow water equations}
 	
@@ -1142,95 +1122,7 @@ where $M_{nn}$ is the flexural moment and $\widetilde{q}_n$ is the effective she
 	%\movie[width=0.42\textwidth, height = 0.7 \textheight]{Damped Kirchhoff Plate}{../Videos/Kirchh_Damped_4faster.mp4}
 \end{frame}
 
-
-
-\subsection{Boundary interconnection of the Kirchhoff plate}
-
-\begin{frame}{Rigid rod welded to a cantilever plate }
-\begin{columns}
-\begin{column}{.57\textwidth}
-\begin{tcolorbox}
-	\centering
-	\includegraphics[height=0.355\textheight]{plate_rod_separated.eps}
-\end{tcolorbox}
-\end{column}
-
-\begin{column}{.43\textwidth}
-\begin{tcolorbox}
-	\centering
-	\includegraphics[height=0.355\textheight]{plate_rod_welded.eps}
-\end{tcolorbox}	
-\end{column}
-\end{columns}
-
-
-\end{frame}
-
-
-\begin{frame}{Boundary Interconnection}
-\centering 
-\includegraphics[width=0.48\textwidth]{KP/pp_interconnection.eps}
-\hspace{5pt}
-\includegraphics[width=0.48\textwidth]{pp_interconnection_platerod.eps}
-\end{frame}
-
-
-\begin{frame}{Results}
-\begin{center}
-\onslide*<1>{
-\setlength{\abovedisplayskip}{0pt}
-\setlength{\belowdisplayskip}{0pt}
-%\begin{equation*}
-%\text{Load} \qquad f = \begin{cases}
-%10^5 \left[ y + 10 \left( y - L_y/2 \right)^2 \right] [\mathrm{Pa}], \quad &\forall \, t < 2 \, [\mathrm{ms}], \\
-%0, \quad &\forall \, t \ge 2 \, [\mathrm{ms}],
-%\end{cases}
-%\quad t_{\text{end}} = 10 \, [\mathrm{ms}].
-%\end{equation*}
-\begin{columns}
-\begin{column}{.45\textwidth}
-	\includemedia[
-	label=vidNoRod,
-	addresource=/home/andrea/Videos/Videos_defense/Kirchh_NoRod.mp4,
-	activate=pageopen,
-	width=6cm, height=5cm,
-	flashvars={
-		source=/home/andrea/Videos/Videos_defense/Kirchh_NoRod.mp4
-		&loop=true
-	}
-	]{}{VPlayer.swf}
-\end{column}
-\begin{column}{.45\textwidth}
-	\includemedia[
-	label=vidRod,
-	addresource=/home/andrea/Videos/Videos_defense/Kirchh_Rod.mp4,
-	activate=pageopen,
-	width=6cm, height=5cm,
-	flashvars={
-		source=/home/andrea/Videos/Videos_defense/Kirchh_Rod.mp4
-		&loop=true
-	}
-	]{}{VPlayer.swf}
-\end{column}
-\end{columns}
-
-\mediabutton[
-mediacommand=vidNoRod:playPause,
-mediacommand=vidRod:playPause
-]{\fbox{Play/Pause}}
-
-%\movie[width=0.8\textwidth, height=0.6\textheight]{Plate and rod}{../Videos/Comparison_RodNoRod.mp4}	
-}
-
-\onslide*<2>{
-\includegraphics[width=0.48\textwidth]{KP/HamiltonianNoRod.eps}
-\includegraphics[width=0.48\textwidth]{KP/HamiltonianRod.eps}
-}
-
-\end{center}
-\end{frame}
-
-
+\section{Conclusion}
 
 \begin{frame}{Open problems and Outlook}
 Open problem
@@ -1261,114 +1153,6 @@ Flexible multibody dynamics for pHs based on the proposed discretization:\\
 \fullcite{brugnoli2020msd}.
 
 \end{frame}
-
-\appendix
-
-\begin{frame}
-\end{frame}
-
-\begin{frame}
-\end{frame}
-
-
-\section{Details on the Kirchhoff plate interconnection}
-
-\begin{frame}{Boundary interconnection}
-\only<1>{
-	The system is composed by a cantilever plate (distributed pH) connected to a rigid rod:
-	\begin{minipage}{.45\linewidth}
-		\begin{equation*}
-		\text{dpH}\qquad
-		\begin{aligned}
-		\partial_t \bm{x}_1 &= \mathcal{J} \, \delta_{\bm{x}_1} {H_1}, \\
-		\bm{u}_{\partial, 1}  &= \mathcal{B}_\partial \, \delta_{\bm{x}_1} {H_1}, \\
-		\bm{y}_{\partial, 1} &= \mathcal{C}_\partial \, \delta_{\bm{x}_1} {H_1}, \\
-		\end{aligned}
-		\end{equation*}
-	\end{minipage}
-	\begin{minipage}{.5\linewidth}
-		\begin{equation*}
-		\text{pH} \qquad
-		\begin{aligned}
-		\dot{\mathbf{x}}_2 &= \mathbf{J} \nabla_{\mathbf{x}_2} {H_2} + \mathbf{B} \mathbf{u}_2, \\
-		\mathbf{y}_{2} &= \mathbf{B}^\top \nabla_{\mathbf{x}_2} {H_2}, \\
-		\end{aligned}
-		\end{equation*}
-	\end{minipage} %
-	
-	\vspace{.3cm}
-	
-	where $\mathbf{x} \in \mathbb{R}^n, \mathbf{u}_2, \mathbf{y}_2 \in \mathbb{R}^m$ and $\bm{x}_1 \in {X}$,  $\bm{u}_{\partial, 1}  \in {U}, \, \bm{y}_{\partial, 1} \in  {Y} = {U}^\prime$ belong to and Hilbert spaces  and  $\mathcal{B}_\partial: {X} \rightarrow {U}, \; \mathcal{C}_\partial: {X} \rightarrow {Y}$ are boundary operators. \\ The duality pairings for the boundary ports are denoted by
-	\[
-	\inner[{U} \times {Y}]{\bm{u}_{\partial, 1}}{\bm{y}_{\partial, 1}},  \qquad
-	\inner[\mathbb{R}^m]{\mathbf{u}_{2}}{\mathbf{y}_{2}}.
-	\]
-	For the interconnection, consider the compact operator $\mathcal{W}: Y \rightarrow \mathbb{R}^m$ and the following power-preserving interconnection
-	\begin{equation*}
-	\label{eq:int_inf}
-	\mathbf{u}_2 = -\mathcal{W} \, \bm{y}_{\partial, 1},  \qquad \bm{u}_{\partial, 1} = \mathcal{W}^* \, \mathbf{y}_2.
-	\end{equation*}
-}
-
-\only<2>{\vspace{.5cm}\centering \includegraphics[width=0.6\textwidth]{KP/pp_interconnection.eps}}
-
-\end{frame}
-
-\begin{frame}{Kirchhoff plate welded to a rigid rod}
-\begin{equation*}\small
-\begin{aligned}
-\text{Plate} \; (\Omega &= [0, L_x] \times [0, L_y]) \\
-\begin{bmatrix}
-\rho h & 0 \\ 0 & \bm{\mathcal{D}}_b^{-1} \\
-\end{bmatrix}
-\diffp{}{t}
-\begin{bmatrix}
-{e}_w \\ \bm{E}_\kappa \\
-\end{bmatrix} &= 
-\begin{bmatrix}
-0 & -\div\Div \\ \Hess & 0 \\
-\end{bmatrix}
-\begin{bmatrix}
-{e}_w \\ \bm{E}_\kappa \\
-\end{bmatrix} \\
-u_{\partial, \text{pl}} &= {e}_w (x = L_x, y), \\
-y_{\partial, \text{pl}} &= \widetilde{q}_n(x = L_x, y).
-\end{aligned} \qquad \quad
-\begin{aligned}
-\text{Rigid rod} \\
-\begin{bmatrix}
-M & 0 \\
-0   & J_G \\
-\end{bmatrix} 
-\displaystyle \diff{}{t}
-\begin{pmatrix}
-v_G \\ \omega_G \\
-\end{pmatrix} & = \begin{pmatrix}
-F_z \\ T_x \\
-\end{pmatrix} = \bm{u}_{\text{rod}}\vspace{1mm}, \\
-\bm{y}_{\text{rod}} &= \begin{pmatrix}
-v_G \\ \omega_{G} \\
-\end{pmatrix},
-\end{aligned}
-\end{equation*}
-Space $Y$ is the space of square-integrable functions with support on $\Gamma_{\text{int}} = \left\{x=L_x\right\}$. \\
-The interconnection operator  provides the total force and torque acting on the rigid rod
-\begin{equation*}
-\mathcal{W} y_{\partial, \text{pl}} =  - \begin{pmatrix}
-F_z \\
-T_x \\
-\end{pmatrix} = \begin{pmatrix}
-\int_{\Gamma_{\text{int}}} y_{\partial, \text{pl}} \d{s} \\
-\int_{\Gamma_{\text{int}}} \left( y - L_y/2 \right) y_{\partial, \text{pl}} \d{s} \\
-\end{pmatrix}.
-\end{equation*}
-The adjoint operator provides a rigid movement as the plate input at $\Gamma_{\text{int}}$
-\begin{align*}
-\left\langle \mathcal{W} y_{\partial, \text{pl}}, \; \bm{y}_{\text{rod}} \right\rangle_{\mathbb{R}^m} &= \left\langle y_{\partial, \text{pl}}, \, \mathcal{W}^* \bm{y}_{\text{rod}}\right\rangle_{L^2(\Gamma_{\text{int}})}, \\
-\mathcal{W}^* {y}_{\text{rod}} &= v_G + \omega_{G} \left( y - L_y/2 \right).
-\end{align*}
-\end{frame}
-
 
 \end{document}
 
