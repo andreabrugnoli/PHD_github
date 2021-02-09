@@ -90,7 +90,7 @@ def compute_sol(n, r, delta, tfin_hat):
         jel_gradIP = - v_pel.dx(0) * e_qel * dx
 
         if delta != 0:
-            jcoup_div = - fac*gamma * T_0 * v_pt * e_pel.dx(0) * dx
+            jcoup_div = - delta*fac*gamma * T_0 * v_pt * e_pel.dx(0) * dx
 
         jcoup_divIP = gamma * T_0 * v_pel.dx(0) * e_pt * dx
 

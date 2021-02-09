@@ -90,22 +90,28 @@ def compute_sol(n, r, delta, tfin_hat):
         return e_form
 
     def j_operator(v_pel, e_pel, v_qel, e_qel, v_pt, e_pt, v_qt, e_qt):
-
-        jel_grad = v_qel * e_pel.dx(0) * dx
-        jel_gradIP = - v_pel.dx(0) * e_qel * dx
+   
+        jel_div = v_pel * e_qel.dx(0) * dx
+        jel_divIP = - v_qel.dx(0) * e_pel * dx
 
         if delta != 0:
+            # jcoup_grad = delta*fac*gamma * T_0 * v_pt.dx(0) * e_pel * dx
             jcoup_div = - delta*fac*gamma * T_0 * v_pt * e_pel.dx(0) * dx
-
+  
+        #jcoup_gradIP = -gamma * T_0 * v_pel * e_pt.dx(0) * dx
+        
         jcoup_divIP = gamma * T_0 * v_pel.dx(0) * e_pt * dx
 
-        jt_grad = - v_qt*e_pt.dx(0) * dx
-        jt_gradIP = + v_pt.dx(0) * e_qt * dx
+        jt_div = - v_pt*e_qt.dx(0) * dx
+        jt_divIP = + v_qt.dx(0) * e_pt * dx
+        
 
         if delta != 0:
-            j_form = jel_grad + jel_gradIP + jcoup_div + jcoup_divIP + jt_grad + jt_gradIP
+            j_form = jel_div + jel_divIP + jcoup_div + jcoup_divIP + jt_div\
+                + jt_divIP
+        
         else:
-            j_form = jel_grad + jel_gradIP + jcoup_divIP + jt_grad + jt_gradIP
+            j_form = jel_div + jel_divIP + jcoup_divIP + jt_div + jt_divIP
 
         return j_form
 
@@ -128,9 +134,9 @@ def compute_sol(n, r, delta, tfin_hat):
 
     # Finite element defition
     V_pel = FunctionSpace(mesh, "CG", r)
-    V_qel = FunctionSpace(mesh, "DG", r-1)
-    V_pt = FunctionSpace(mesh, "CG", r)
-    V_qt = FunctionSpace(mesh, "DG", r-1)
+    V_qel = FunctionSpace(mesh, "CG", r)
+    V_pt = FunctionSpace(mesh, "DG", r-1)
+    V_qt = FunctionSpace(mesh, "CG", r)
 
     V = MixedFunctionSpace([V_pel, V_qel, V_pt, V_qt])
 
@@ -166,8 +172,16 @@ def compute_sol(n, r, delta, tfin_hat):
 
     bcs = []
 
-    bc_t = DirichletBC(V.sub(2), Constant(1), 1)
-    bcs.append(bc_t)
+    bc_sig_1 = DirichletBC(V.sub(1), Constant(gamma*T_0), 1)
+    bc_sig_2 = DirichletBC(V.sub(1), Constant(0), 2)
+    
+    bcs.append(bc_sig_1)
+    bcs.append(bc_sig_2)
+    
+    bc_jQ = DirichletBC(V.sub(3), Constant(0), 2)
+    bcs.append(bc_jQ)
+    
+    
     lhs = e_form - dt*theta*(j_form -r_form)
     A = assemble(lhs, bcs = bcs, mat_type='aij')
 
@@ -233,7 +247,8 @@ def compute_sol(n, r, delta, tfin_hat):
 
         rhs = e_operator(v_pel, alpel_n, v_qel, alqel_n, v_pt, alpt_n) \
               + dt * (1 - theta) * (j_operator(v_pel, epel_n, v_qel, eqel_n, v_pt, ept_n, v_qt, eqt_n)\
-                                    -r_operator(v_qt, eqt_n))
+                                    -r_operator(v_qt, eqt_n))  \
+                  + dt*(v_qt*ds(1) + gamma*T_0*v_pel*ds(1))
 
         b = assemble(rhs, bcs = bcs)
 
@@ -285,7 +300,7 @@ def compute_sol(n, r, delta, tfin_hat):
 
 
 n = 200
-r = 1
+r = 2
 t_fin_hat = 4
 
 
