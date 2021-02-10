@@ -90,28 +90,22 @@ def compute_sol(n, r, delta, tfin_hat):
         return e_form
 
     def j_operator(v_pel, e_pel, v_qel, e_qel, v_pt, e_pt, v_qt, e_qt):
-   
-        jel_div = v_pel * e_qel.dx(0) * dx
-        jel_divIP = - v_qel.dx(0) * e_pel * dx
+
+        jel_grad = v_qel * e_pel.dx(0) * dx
+        jel_gradIP = - v_pel.dx(0) * e_qel * dx
 
         if delta != 0:
-            jcoup_grad = delta*fac*gamma * T_0 * v_pt.dx(0) * e_pel * dx
-            # jcoup_div = - delta*fac*gamma * T_0 * v_pt * e_pel.dx(0) * dx
-  
-        jcoup_gradIP = -gamma * T_0 * v_pel * e_pt.dx(0) * dx
-        
-        # jcoup_divIP = gamma * T_0 * v_pel.dx(0) * e_pt * dx
+            jcoup_div = - delta*fac*gamma * T_0 * v_pt * e_pel.dx(0) * dx
 
-        jt_div = - v_pt*e_qt.dx(0) * dx
-        jt_divIP = + v_qt.dx(0) * e_pt * dx
-        
+        jcoup_divIP = gamma * T_0 * v_pel.dx(0) * e_pt * dx
+
+        jt_grad = - v_qt*e_pt.dx(0) * dx
+        jt_gradIP = + v_pt.dx(0) * e_qt * dx
 
         if delta != 0:
-            j_form = jel_div + jel_divIP + jcoup_grad + jcoup_gradIP + jt_div\
-                + jt_divIP
-        
+            j_form = jel_grad + jel_gradIP + jcoup_div + jcoup_divIP + jt_grad + jt_gradIP
         else:
-            j_form = jel_div + jel_divIP + jcoup_gradIP + jt_div + jt_divIP
+            j_form = jel_grad + jel_gradIP + jcoup_divIP + jt_grad + jt_gradIP
 
         return j_form
 
@@ -133,11 +127,15 @@ def compute_sol(n, r, delta, tfin_hat):
 
 
     # Finite element defition
-    V_pel = FunctionSpace(mesh, "DG", 1)
+    # V_pel = FunctionSpace(mesh, "CG", r)
+    # V_qel = FunctionSpace(mesh, "DG", r-1)
+    # V_pt = FunctionSpace(mesh, "CG", r)
+    # V_qt = FunctionSpace(mesh, "DG", r-1)
+    
+    V_pel = FunctionSpace(mesh, "Hermite", 3)
     V_qel = FunctionSpace(mesh, "CG", 2)
     V_pt = FunctionSpace(mesh, "CG", 2)
-    V_qt = FunctionSpace(mesh, "Hermite", 3)
-    
+    V_qt = FunctionSpace(mesh, "DG", 1)
 
     V = MixedFunctionSpace([V_pel, V_qel, V_pt, V_qt])
 
@@ -174,16 +172,8 @@ def compute_sol(n, r, delta, tfin_hat):
 
     bcs = []
 
-    bc_sig_1 = DirichletBC(V.sub(1), Constant(gamma*T_0), 1)
-    bc_sig_2 = DirichletBC(V.sub(1), Constant(0), 2)
-    
-    bcs.append(bc_sig_1)
-    bcs.append(bc_sig_2)
-    
-    bc_jQ = DirichletBC(V.sub(3), Constant(0), 2)
-    bcs.append(bc_jQ)
-    
-    
+    bc_t = DirichletBC(V.sub(2), Constant(1), 1)
+    bcs.append(bc_t)
     lhs = e_form - dt*theta*(j_form -r_form)
     A = assemble(lhs, bcs = bcs, mat_type='aij')
 
@@ -239,9 +229,9 @@ def compute_sol(n, r, delta, tfin_hat):
 
     sol_T = []
 
-    # sol_u.append(f_solu)
-    # sol_v.append(f_solv)
-    # sol_T.append(f_solT)
+    sol_u.append(f_solu)
+    sol_v.append(f_solv)
+    sol_T.append(f_solT)
 
     for i in range(1, n_t):
         epel_n, eqel_n, ept_n, eqt_n = e_n.split()
@@ -253,7 +243,7 @@ def compute_sol(n, r, delta, tfin_hat):
 
         rhs = e_operator(v_pel, alpel_n, v_qel, alqel_n, v_pt, alpt_n) \
               + dt * (1 - theta) * (j_operator(v_pel, epel_n, v_qel, eqel_n, v_pt, ept_n, v_qt, eqt_n)\
-                                    -r_operator(v_qt, eqt_n))  + dt*v_qt*ds(1)
+                                    -r_operator(v_qt, eqt_n))
 
         b = assemble(rhs, bcs = bcs)
 
@@ -282,11 +272,12 @@ def compute_sol(n, r, delta, tfin_hat):
         u_n.assign(u_n1)
         e_n.assign(e_n1)
 
-        u_atP[i] = u_atP[i-1] + dt/2*(v_n.at(Ppoint) + v_n1.at(Ppoint))
+        # u_atP[i] = u_atP[i-1] + dt/2*(v_n.at(Ppoint) + v_n1.at(Ppoint))
 
         v_n.assign(v_n1)
         theta_atP[i] = ept_n1.at(Ppoint)
-        v_atP[i] = v_n1.at(Ppoint)
+        
+        # v_atP[i] = v_n1.at(Ppoint)
         
         print(i)
 
@@ -329,25 +320,25 @@ plt.legend()
 # plt.savefig(path_fig + "temp_at1_1D.eps", format="eps")
 plt.figure()
 
-plt.plot(t1, u1, '-.', label=r'Approx $\widehat{u}$ ($\delta=0$)')
-plt.plot(t2, u2, '-.', label=r'Approx $\widehat{u}$ ($\delta=1$)')
-plt.plot(t_an1, disp_an1, ':', label=r'Exact $\widehat{u}$ ($\delta=0$)')
-plt.plot(t_an2, disp_an2, ':', label=r'Exact $\widehat{u}$ ($\delta=1$)')
-plt.xlabel(r'Dimensionless Time')
-plt.title(r'Dimensionless Displacement at ' + str(1))
-plt.legend()
+# plt.plot(t1, u1, '-.', label=r'Approx $\widehat{u}$ ($\delta=0$)')
+# plt.plot(t2, u2, '-.', label=r'Approx $\widehat{u}$ ($\delta=1$)')
+# plt.plot(t_an1, disp_an1, ':', label=r'Exact $\widehat{u}$ ($\delta=0$)')
+# plt.plot(t_an2, disp_an2, ':', label=r'Exact $\widehat{u}$ ($\delta=1$)')
+# plt.xlabel(r'Dimensionless Time')
+# plt.title(r'Dimensionless Displacement at ' + str(1))
+# plt.legend()
 
-# plt.savefig(path_fig + "disp_at1_1D.eps", format="eps")
+# # plt.savefig(path_fig + "disp_at1_1D.eps", format="eps")
 
-plt.figure()
+# plt.figure()
 
-plt.plot(t1, v1, '-.', label=r'Approx $\widehat{v}$ ($\delta=0$)')
-plt.plot(t2, v2, '-.', label=r'Approx $\widehat{v}$ ($\delta=1$)')
-plt.plot(t_an1, vel_an1, ':', label=r'Exact $\widehat{v}$ ($\delta=0$)')
-plt.plot(t_an2, vel_an2, ':', label=r'Exact $\widehat{v}$ ($\delta=1$)')
-plt.xlabel(r'Dimensionless Time')
-plt.title(r'Dimensionless Velocity at ' + str(1))
-plt.legend()
+# plt.plot(t1, v1, '-.', label=r'Approx $\widehat{v}$ ($\delta=0$)')
+# plt.plot(t2, v2, '-.', label=r'Approx $\widehat{v}$ ($\delta=1$)')
+# plt.plot(t_an1, vel_an1, ':', label=r'Exact $\widehat{v}$ ($\delta=0$)')
+# plt.plot(t_an2, vel_an2, ':', label=r'Exact $\widehat{v}$ ($\delta=1$)')
+# plt.xlabel(r'Dimensionless Time')
+# plt.title(r'Dimensionless Velocity at ' + str(1))
+# plt.legend()
 
 # plt.savefig(path_fig + "vel_at1_1D.eps", format="eps")
 
@@ -380,141 +371,141 @@ for i in range(1, nt_ev0):
     V_plot0[i] = calculate_one_dim_points(sol_v0[i], nplot_el)[1]
 
 
-xx_plot0, tt_plot0 = np.meshgrid(x_plot0, t_plot0)
+# xx_plot0, tt_plot0 = np.meshgrid(x_plot0, t_plot0)
 
 
-xx_plot0_dimless = xx_plot0/beta
-tt_plot0_dimless = tt_plot0*c_1/beta
-U_plot0_dimless = U_plot0 * (lamda + 2 * mu) / (beta * gamma * T_0)
+# xx_plot0_dimless = xx_plot0/beta
+# tt_plot0_dimless = tt_plot0*c_1/beta
+# U_plot0_dimless = U_plot0 * (lamda + 2 * mu) / (beta * gamma * T_0)
 
-fig = plt.figure()
-ax = fig.gca(projection='3d')
-ax.set_xlabel('$\hat{x}$')
-ax.set_ylabel('$\hat{t}$')
-# ax.set_zlabel('$\hat{u}$')
+# fig = plt.figure()
+# ax = fig.gca(projection='3d')
+# ax.set_xlabel('$\hat{x}$')
+# ax.set_ylabel('$\hat{t}$')
+# # ax.set_zlabel('$\hat{u}$')
 
-ax.set_title(r'Dimensionless displacement $\delta=0$', loc='center')
-
-
-surf_u0 = ax.plot_surface(xx_plot0_dimless, tt_plot0_dimless, U_plot0_dimless,\
-                          cmap=cm.jet, linewidth=0, antialiased=False)
-ax.view_init(azim=az_angle)
-fig.colorbar(surf_u0, shrink=0.5, aspect=5)
-
-plt.savefig(path_fig + "plot_u0.eps", format="eps", bbox_inches='tight')
-
-fig = plt.figure()
-ax = fig.gca(projection='3d')
-ax.set_xlabel('$\hat{x}$')
-ax.set_ylabel('$\hat{t}$')
-ax.set_zlabel('$v \; \mathrm{[cm/s]}$')
-
-ax.set_title(r'Velocity $\delta=0$', loc='center')
+# ax.set_title(r'Dimensionless displacement $\delta=0$', loc='center')
 
 
-surf_v0 = ax.plot_surface(xx_plot0_dimless, tt_plot0_dimless, V_plot0, \
-                          cmap=cm.jet, linewidth=0, antialiased=False)
-ax.view_init(azim=az_angle)
-fig.colorbar(surf_v0, shrink=0.5, aspect=5)
+# surf_u0 = ax.plot_surface(xx_plot0_dimless, tt_plot0_dimless, U_plot0_dimless,\
+#                           cmap=cm.jet, linewidth=0, antialiased=False)
+# ax.view_init(azim=az_angle)
+# fig.colorbar(surf_u0, shrink=0.5, aspect=5)
 
-plt.savefig(path_fig + "plot_v0.eps", format="eps", bbox_inches='tight')
+# plt.savefig(path_fig + "plot_u0.eps", format="eps", bbox_inches='tight')
 
-fig = plt.figure()
-ax = fig.gca(projection='3d')
-ax.set_xlabel('$\hat{x}$')
-ax.set_ylabel('$\hat{t}$')
-# ax.set_zlabel(r'$\theta$')
+# fig = plt.figure()
+# ax = fig.gca(projection='3d')
+# ax.set_xlabel('$\hat{x}$')
+# ax.set_ylabel('$\hat{t}$')
+# ax.set_zlabel('$v \; \mathrm{[cm/s]}$')
 
-ax.set_title(r'Dimensionless Temperature $\delta=0$', loc='center')
-
-
-surf_T0 = ax.plot_surface(xx_plot0_dimless, tt_plot0_dimless, T_plot0,\
-                          cmap=cm.jet, linewidth=0, antialiased=False)
-ax.set_zlim3d(0, 1)
-
-fig.colorbar(surf_T0, shrink=0.5, aspect=5)
-
-plt.savefig(path_fig + "plot_T0.eps", format="eps", bbox_inches='tight')
+# ax.set_title(r'Velocity $\delta=0$', loc='center')
 
 
-x_plot1, T0_plot1 = calculate_one_dim_points(sol_T1[0], nplot_el)
-x_plot1, u0_plot1 = calculate_one_dim_points(sol_u1[0], nplot_el)
-x_plot1, v0_plot1 = calculate_one_dim_points(sol_v1[0], nplot_el)
+# surf_v0 = ax.plot_surface(xx_plot0_dimless, tt_plot0_dimless, V_plot0, \
+#                           cmap=cm.jet, linewidth=0, antialiased=False)
+# ax.view_init(azim=az_angle)
+# fig.colorbar(surf_v0, shrink=0.5, aspect=5)
 
-nt_ev1 = len(t_plot1)
-nx_ev1 = len(x_plot1)
+# plt.savefig(path_fig + "plot_v0.eps", format="eps", bbox_inches='tight')
 
-T_plot1 = np.zeros((nt_ev1, nx_ev1))
-T_plot1[0] = T0_plot1
+# fig = plt.figure()
+# ax = fig.gca(projection='3d')
+# ax.set_xlabel('$\hat{x}$')
+# ax.set_ylabel('$\hat{t}$')
+# # ax.set_zlabel(r'$\theta$')
 
-U_plot1 = np.zeros((nt_ev1, nx_ev1))
-U_plot1[0] = u0_plot1
-
-V_plot1 = np.zeros((nt_ev1, nx_ev1))
-V_plot1[0] = v0_plot1
-
-for i in range(1, nt_ev1):
-    T_plot1[i] = calculate_one_dim_points(sol_T1[i], nplot_el)[1]
-    U_plot1[i] = calculate_one_dim_points(sol_u1[i], nplot_el)[1]
-    V_plot1[i] = calculate_one_dim_points(sol_v1[i], nplot_el)[1]
+# ax.set_title(r'Dimensionless Temperature $\delta=0$', loc='center')
 
 
-xx_plot1, tt_plot1 = np.meshgrid(x_plot1, t_plot1)
+# surf_T0 = ax.plot_surface(xx_plot0_dimless, tt_plot0_dimless, T_plot0,\
+#                           cmap=cm.jet, linewidth=0, antialiased=False)
+# ax.set_zlim3d(0, 1)
 
-xx_plot1_dimless = xx_plot1/beta
-tt_plot1_dimless = tt_plot1*c_1/beta
-U_plot1_dimless = U_plot1 * (lamda + 2 * mu) / (beta * gamma * T_0)
+# fig.colorbar(surf_T0, shrink=0.5, aspect=5)
 
-
-fig = plt.figure()
-ax = fig.gca(projection='3d')
-ax.set_xlabel('$\hat{x}$')
-ax.set_ylabel('$\hat{t}$')
-# ax.set_zlabel('$\hat{u}$')
-
-ax.set_title(r'Dimensionless displacement $\delta=1$', loc='center')
+# plt.savefig(path_fig + "plot_T0.eps", format="eps", bbox_inches='tight')
 
 
-surf_u1 = ax.plot_surface(xx_plot1_dimless, tt_plot1_dimless, U_plot1_dimless, \
-                          cmap=cm.jet, linewidth=0, antialiased=False)
-ax.view_init(azim=az_angle)
-fig.colorbar(surf_u1, shrink=0.5, aspect=5)
+# x_plot1, T0_plot1 = calculate_one_dim_points(sol_T1[0], nplot_el)
+# x_plot1, u0_plot1 = calculate_one_dim_points(sol_u1[0], nplot_el)
+# x_plot1, v0_plot1 = calculate_one_dim_points(sol_v1[0], nplot_el)
 
-plt.savefig(path_fig + "plot_u1.eps", format="eps", bbox_inches='tight')
+# nt_ev1 = len(t_plot1)
+# nx_ev1 = len(x_plot1)
 
-fig = plt.figure()
-ax = fig.gca(projection='3d')
-ax.set_xlabel('$\hat{x}$')
-ax.set_ylabel('$\hat{t}$')
-ax.set_zlabel('$v \; \mathrm{[cm/s]}$')
+# T_plot1 = np.zeros((nt_ev1, nx_ev1))
+# T_plot1[0] = T0_plot1
 
-ax.set_title(r'Velocity $\delta=1$', loc='center')
+# U_plot1 = np.zeros((nt_ev1, nx_ev1))
+# U_plot1[0] = u0_plot1
 
+# V_plot1 = np.zeros((nt_ev1, nx_ev1))
+# V_plot1[0] = v0_plot1
 
-surf_v1 = ax.plot_surface(xx_plot1_dimless, tt_plot1_dimless, V_plot1, \
-                          cmap=cm.jet, linewidth=0, antialiased=False)
-ax.view_init(azim=az_angle)
-
-fig.colorbar(surf_v1, shrink=0.5, aspect=5)
-
-
-plt.savefig(path_fig + "plot_v1.eps", format="eps",bbox_inches='tight')
-
-fig = plt.figure()
-ax = fig.gca(projection='3d')
-ax.set_xlabel('$\hat{x}$')
-ax.set_ylabel('$\hat{t}$')
-# ax.set_zlabel(r'$\theta$')
-
-ax.set_title(r'Dimensionless Temperature $\delta=1$', loc='center')
+# for i in range(1, nt_ev1):
+#     T_plot1[i] = calculate_one_dim_points(sol_T1[i], nplot_el)[1]
+#     U_plot1[i] = calculate_one_dim_points(sol_u1[i], nplot_el)[1]
+#     V_plot1[i] = calculate_one_dim_points(sol_v1[i], nplot_el)[1]
 
 
-surf_T1 = ax.plot_surface(xx_plot1_dimless, tt_plot1_dimless, T_plot1, \
-                          cmap=cm.jet, linewidth=0, antialiased=False)
-ax.set_zlim3d(0, 1)
+# xx_plot1, tt_plot1 = np.meshgrid(x_plot1, t_plot1)
 
-fig.colorbar(surf_T1, shrink=0.5, aspect=5)
+# xx_plot1_dimless = xx_plot1/beta
+# tt_plot1_dimless = tt_plot1*c_1/beta
+# U_plot1_dimless = U_plot1 * (lamda + 2 * mu) / (beta * gamma * T_0)
 
-plt.savefig(path_fig + "plot_T1.eps", format="eps",bbox_inches='tight')
 
-plt.show()
+# fig = plt.figure()
+# ax = fig.gca(projection='3d')
+# ax.set_xlabel('$\hat{x}$')
+# ax.set_ylabel('$\hat{t}$')
+# # ax.set_zlabel('$\hat{u}$')
+
+# ax.set_title(r'Dimensionless displacement $\delta=1$', loc='center')
+
+
+# surf_u1 = ax.plot_surface(xx_plot1_dimless, tt_plot1_dimless, U_plot1_dimless, \
+#                           cmap=cm.jet, linewidth=0, antialiased=False)
+# ax.view_init(azim=az_angle)
+# fig.colorbar(surf_u1, shrink=0.5, aspect=5)
+
+# plt.savefig(path_fig + "plot_u1.eps", format="eps", bbox_inches='tight')
+
+# fig = plt.figure()
+# ax = fig.gca(projection='3d')
+# ax.set_xlabel('$\hat{x}$')
+# ax.set_ylabel('$\hat{t}$')
+# ax.set_zlabel('$v \; \mathrm{[cm/s]}$')
+
+# ax.set_title(r'Velocity $\delta=1$', loc='center')
+
+
+# surf_v1 = ax.plot_surface(xx_plot1_dimless, tt_plot1_dimless, V_plot1, \
+#                           cmap=cm.jet, linewidth=0, antialiased=False)
+# ax.view_init(azim=az_angle)
+
+# fig.colorbar(surf_v1, shrink=0.5, aspect=5)
+
+
+# plt.savefig(path_fig + "plot_v1.eps", format="eps",bbox_inches='tight')
+
+# fig = plt.figure()
+# ax = fig.gca(projection='3d')
+# ax.set_xlabel('$\hat{x}$')
+# ax.set_ylabel('$\hat{t}$')
+# # ax.set_zlabel(r'$\theta$')
+
+# ax.set_title(r'Dimensionless Temperature $\delta=1$', loc='center')
+
+
+# surf_T1 = ax.plot_surface(xx_plot1_dimless, tt_plot1_dimless, T_plot1, \
+#                           cmap=cm.jet, linewidth=0, antialiased=False)
+# ax.set_zlim3d(0, 1)
+
+# fig.colorbar(surf_T1, shrink=0.5, aspect=5)
+
+# plt.savefig(path_fig + "plot_T1.eps", format="eps",bbox_inches='tight')
+
+# plt.show()

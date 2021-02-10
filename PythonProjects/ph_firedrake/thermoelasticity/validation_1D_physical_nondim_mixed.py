@@ -133,14 +133,20 @@ def compute_sol(n, r, delta, tfin_hat):
 
 
     # Finite element defition
-    V_pel = FunctionSpace(mesh, "CG", r)
-    V_qel = FunctionSpace(mesh, "CG", r)
-    V_pt = FunctionSpace(mesh, "DG", r-1)
-    V_qt = FunctionSpace(mesh, "CG", r)
+    # V_pel = FunctionSpace(mesh, "CG", r)
+    # V_qel = FunctionSpace(mesh, "CG", r)
+    # V_pt = FunctionSpace(mesh, "DG", r-1)
+    # V_qt = FunctionSpace(mesh, "CG", r)
+    
+    V_pel = FunctionSpace(mesh, "CG", 2)
+    V_qel = FunctionSpace(mesh, "Hermite", 3)
+    V_pt = FunctionSpace(mesh, "DG", 1)
+    V_qt = FunctionSpace(mesh, "CG", 2)
 
     V = MixedFunctionSpace([V_pel, V_qel, V_pt, V_qt])
 
     n_V = V.dim()
+    n_Vpt = V_pt.dim()
     print(n_V)
 
     v = TestFunction(V)
@@ -200,6 +206,10 @@ def compute_sol(n, r, delta, tfin_hat):
     u_n.assign(Constant(0.0))
     v_n.assign(Constant(0.0))
     theta_n.assign(Constant(0.0))
+    
+    theta_0 = np.zeros((n_Vpt, ))
+    theta_0[0] = 1
+    theta_n.vector().set_local(theta_0)
 
     n_t = int(floor(t_fin/dt) + 1)
 
@@ -300,7 +310,7 @@ def compute_sol(n, r, delta, tfin_hat):
 
 
 n = 200
-r = 2
+r = 1
 t_fin_hat = 4
 
 
