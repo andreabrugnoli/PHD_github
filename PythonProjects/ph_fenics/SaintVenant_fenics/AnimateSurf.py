@@ -19,8 +19,8 @@ def animate2D(x, y, sol2D, t, xlabel = None, ylabel = None,  zlabel = None, titl
         lab = 'Time =' + '{0:.2e}'.format(t[frame_number])
         plot = ax.plot_trisurf(x, y, sol2D[:, frame_number], \
                                   label=lab, **surf_opts)
-        plot._facecolors2d = plot._facecolors3d
-        plot._edgecolors2d = plot._edgecolors3d
+        plot._facecolors2d = plot._facecolors
+        plot._edgecolors2d = plot._edgecolors
 
         ax.legend()
 

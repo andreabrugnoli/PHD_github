@@ -32,7 +32,7 @@ from scipy import integrate
 from scipy import linalg as la
 from math import ceil, floor
 
-n = 10
+n = 5
 deg_p = 0
 deg_q = 1
 
@@ -332,7 +332,7 @@ for i in range(n_ev):
     # H_vec_lin[i] = HamFuncMat(alp_sol[:,i], alq_sol[:,i])
     V_vec[i] = LyaFunc(alp_sol[:,i], alq_sol[:,i])
 
-path_out = "/home/a.brugnoli/Plots/Python/Plots/SaintVenant_plots/Simulations/TwoDimension2/"
+path_out = "/home/andrea/Videos/"
 
 plt.figure()
 plt.plot(t_ev, H_vec, 'r-')
@@ -364,6 +364,18 @@ minZ = alq_sol.min()
 maxZ = alq_sol.max()
 
 
+anim = animate2D(x_plot, y_plot, alq_sol, t_ev, xlabel = '$x \;  \mathrm{[m]}$',\
+                        ylabel = '$y \;  \mathrm{[m]}$', \
+                         zlabel = '$h \;  \mathrm{[m]}$', title = 'Fluid Height')
+
+
+rallenty = 0.2
+Writer = animation.writers['ffmpeg']
+writer = Writer(fps=n_ev/t_fin*rallenty, metadata=dict(artist='Me'), bitrate=1800)
+# anim.save(path_out + 'wave.mp4', writer=writer)
+
+plt.show()
+
 save_figs = False
 if save_figs:
     n_fig = 7
@@ -390,13 +402,3 @@ if save_figs:
         plt.savefig(path_out + "Snap_n" + str(index + 1) + ".eps", format="eps")
         # plt.show()
 
-
-anim = animate2D(x_plot, y_plot, alq_sol, t_ev, xlabel = '$x \;  \mathrm{[m]}$',\
-                        ylabel = '$y \;  \mathrm{[m]}$', \
-                         zlabel = '$h \;  \mathrm{[m]}$', title = 'Fluid Height')
-
-
-rallenty = 0.2
-Writer = animation.writers['ffmpeg']
-writer = Writer(fps=n_ev/t_fin*rallenty, metadata=dict(artist='Me'), bitrate=1800)
-# anim.save(path_out + 'wave.mp4', writer=writer)
