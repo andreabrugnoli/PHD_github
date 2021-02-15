@@ -17,7 +17,7 @@ matplotlib.rcParams['text.usetex'] = True
 from EnergyShapingPDE.matrices_timoshenko import matrices_constraints, \
 matrices_timoshenko
 
-init = ('sin(2*pi*x[0])', '0', '0', '0')
+init = ('exp(-x[0])-1', '0', '0', '0')
 M_all, J_all, B_all, G, e0, dofs_dict, x_dict = matrices_timoshenko(n_el=20, deg=1,\
                                                                     e0_string=init)
 
@@ -34,7 +34,7 @@ B_sys = np.linalg.solve(M_red, B_red)
 
 def fun(t,y):
 
-    dydt = A_sys @ y #  + B_sys @ u_in * np.sin(pi*t) * (t<=1 or t>=5) 
+    dydt = A_sys @ y + B_sys @ u_in * np.sin(pi*t) * (t<=1 or t>=5) 
 
     return dydt
 
@@ -55,7 +55,7 @@ sol = solve_ivp(fun, t_span, y0, method='BDF', vectorized=False, t_eval = t_ev, 
 
 
 e_red = sol.y
-t_ev = sol.t
+
 n_ev = len(t_ev)
 
 n_all = len(T)
@@ -63,7 +63,6 @@ n_all = len(T)
 e_all = np.zeros((n_all, n_ev))
 
 v_all= np.zeros((len(dofs_Vpw), n_ev))
-
 
 for i in range(n_ev):
     
@@ -84,8 +83,6 @@ plt.plot(t_ev, H_vec, 'g-', label = 'Total Energy (J)')
 plt.xlabel(r'{Time} (s)',fontsize=16)
 plt.legend(loc='upper left')
 
-plt.show()
-
 perm = np.argsort(x_Vpw)
 
 x_Vpw_perm = x_Vpw[perm]
@@ -96,7 +93,6 @@ fig = plt.figure(1)
 ax = plt.axes(xlim=(0, 1), ylim=(np.min(np.min(v_all)), np.max(np.max(v_all))))
 line, = ax.plot(x_Vpw_perm, v_all_perm[:, 0], lw=2, label = 'Time =' + '{0:.2f}'.format(t_ev[0]) + '[s]')
 
-plt.show()
 
 # First set up the figure, the axis, and the plot element we want to animate
 fig = plt.figure(2)
