@@ -7,6 +7,8 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import animation
+from math import pi
+from tools_plotting import setup
 
 
 matplotlib.rcParams['text.usetex'] = True
@@ -15,7 +17,13 @@ matplotlib.rcParams['text.usetex'] = True
 from EnergyShapingPDE.matrices_timoshenko import matrices_constraints, \
 matrices_timoshenko
 
-M_all, J_all, B_all, G, dofs_Vpw, x_dofVpw = matrices_timoshenko(n_el=100)
+init = ('sin(2*pi*x[0])', '0', '0', '0')
+M_all, J_all, B_all, G, e0, dofs_dict, x_dict = matrices_timoshenko(n_el=20, deg=1,\
+                                                                    e0_string=init)
+
+dofs_Vpw = dofs_dict['Vpw']
+x_Vpw = x_dict['Vpw']
+
 
 M_red, J_red, B_red, T = matrices_constraints(M_all, J_all, B_all, G)
 
@@ -26,23 +34,23 @@ B_sys = np.linalg.solve(M_red, B_red)
 
 def fun(t,y):
 
-    dydt = A_sys @ y + B_sys @ u_in * np.sin(t) * (t<3) # or t>7)
+    dydt = A_sys @ y #  + B_sys @ u_in * np.sin(pi*t) * (t<=1 or t>=5) 
 
     return dydt
 
 
 n_red = len(M_red)
 
-y0 = np.zeros((n_red, ))
+y0 = T.T @ e0
 
 t0 = 0.0
 t_fin = 10
-n_t = 1000
+n_t = 500
 t_span = [t0, t_fin]
 
 t_ev = np.linspace(t0,t_fin, num = n_t)
 
-sol = solve_ivp(fun, t_span, y0, method='RK45', vectorized=False, t_eval = t_ev, \
+sol = solve_ivp(fun, t_span, y0, method='BDF', vectorized=False, t_eval = t_ev, \
                        atol = 1e-5, rtol = 1e-5)
 
 
@@ -78,35 +86,45 @@ plt.legend(loc='upper left')
 
 plt.show()
 
-perm = np.argsort(x_dofVpw)
-x_dofVpw.sort()
+perm = np.argsort(x_Vpw)
 
+x_Vpw_perm = x_Vpw[perm]
 v_all_perm = v_all[perm, :]
 
-# First set up the figure, the axis, and the plot element we want to animate
+
 fig = plt.figure(1)
 ax = plt.axes(xlim=(0, 1), ylim=(np.min(np.min(v_all)), np.max(np.max(v_all))))
-line, = ax.plot([], [], lw=2)
+line, = ax.plot(x_Vpw_perm, v_all_perm[:, 0], lw=2, label = 'Time =' + '{0:.2f}'.format(t_ev[0]) + '[s]')
 
- # initialization function: plot the background of each frame
+plt.show()
+
+# First set up the figure, the axis, and the plot element we want to animate
+fig = plt.figure(2)
+ax = plt.axes(xlim=(0, 1), ylim=(np.min(np.min(v_all)), np.max(np.max(v_all))))
+line, = ax.plot([], [], lw=2, label = 'Time =' + '{0:.2f}'.format(t_ev[0]) + '[s]')
+
+
+# initialization function: plot the background of each frame
 def init():
-    line.set_data(x_dofVpw, v_all_perm[:, 0])
+    line.set_data(x_Vpw_perm, v_all_perm[:, 0])
+    
+#    line.set_label('Time =' + '{0:.2f}'.format(t_ev[0]) + '[s]')
+#    plt.legend(bbox_to_anchor=(1.1, 1.1))
     return line,
 
- # animation function.  This is called sequentially
+# animation function.  This is called sequentially
 def animate(i):
-    line.set_data(x_dofVpw, v_all_perm[:,i])
+    line.set_data(x_Vpw_perm, v_all_perm[:,i])
+    
+#    line.set_label('Time =' + '{0:.2f}'.format(t_ev[i]) + '[s]')
+#    plt.legend(bbox_to_anchor=(1.1, 1.1))
     return line,
 
  # call the animator.  blit=True means only re-draw the parts that have changed.
 anim = animation.FuncAnimation(fig, animate, init_func=init,
                                 frames=len(t_ev), interval=20, blit=False)
 
-# save the animation as an mp4.  This requires ffmpeg or mencoder to be
-# installed.  The extra_args ensure that the x264 codec is used, so that
-# the video can be embedded in html5.  You may need to adjust this for
-# your system: for more information, see
-# http://matplotlib.sourceforge.net/api/animation_api.html
-# anim.save('basic_animation.mp4', fps=30, extra_args=['-vcodec', 'libx264'])
+plt.xlabel('x')
+plt.ylabel('Vertical velocity')
 
 plt.show()

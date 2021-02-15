@@ -1,14 +1,10 @@
 from fenics import *
 import numpy as np
-from math import pi
-
-import matplotlib.pyplot as plt
-
-from scipy import integrate
 from scipy import linalg as la
 
     
-def matrices_timoshenko(n_el=10, deg=1, rho=1, I_rho=1, C_b=1, C_s=1, L=1):
+def matrices_timoshenko(n_el=10, deg=1, e0_string=('0', '0', '0', '0'),\
+                        rho=1, I_rho=1, C_b=1, C_s=1, L=1):
     """
     Computes matrices M, J, B for the Timoshenko beam.
     Parameters:
@@ -20,7 +16,6 @@ def matrices_timoshenko(n_el=10, deg=1, rho=1, I_rho=1, C_b=1, C_s=1, L=1):
     C_s: shear compliance
     L: beam length
     """
-    
 
     # Mesh
     mesh = IntervalMesh(n_el, 0, L)
@@ -84,7 +79,15 @@ def matrices_timoshenko(n_el=10, deg=1, rho=1, I_rho=1, C_b=1, C_s=1, L=1):
     dofs_Vqth = V.sub(2).dofmap().dofs()
     dofs_Vqw = V.sub(3).dofmap().dofs()
     
-    dofVpw_x = dofV_x[dofs_Vpw]
+    dofs_dict = {'Vpw': dofs_Vpw, 'Vpth': dofs_Vpth,\
+                 'Vqth': dofs_Vqth, 'Vqw': dofs_Vqw}
+        
+    x_Vpw = dofV_x[dofs_Vpw, 0]
+    x_Vpth = dofV_x[dofs_Vpth, 0]
+    x_Vqth = dofV_x[dofs_Vqth, 0]
+    x_Vqw = dofV_x[dofs_Vqw, 0]
+    
+    x_dict = {'Vpw': x_Vpw, 'Vpth': x_Vpth, 'Vqth': x_Vqth, 'Vqw': x_Vqw}
 
     v = TestFunction(V)
     v_pw, v_pth, v_qth, v_qw = split(v)
@@ -99,6 +102,10 @@ def matrices_timoshenko(n_el=10, deg=1, rho=1, I_rho=1, C_b=1, C_s=1, L=1):
     al_qth = C_b * e_qth
     al_qw = C_s * e_qw
     
+    exp_e0 = Expression(e0_string, degree=2)
+    
+    e0_array = interpolate(exp_e0, V).vector().get_local()
+
     
     def get_m_form(v_pw, v_pth, v_qth, v_qw, al_pw, al_pth, al_qth, al_qw):
         """
@@ -172,18 +179,18 @@ def matrices_timoshenko(n_el=10, deg=1, rho=1, I_rho=1, C_b=1, C_s=1, L=1):
         G_mat[i,j] = 1
     
     
-    return M_mat, J_mat, B_mat, G_mat, dofs_Vpw, dofVpw_x[:, 0]
+    return M_mat, J_mat, B_mat, G_mat, e0_array, dofs_dict, x_dict
 
 
 def matrices_constraints(M_mat, J_mat, B_mat, G_mat):
     
-    P = la.null_space(G_mat).T
+    P = la.null_space(G_mat)
 
-    M_red = P @ M_mat @ P.T
-    J_red = P @ J_mat @ P.T
-    B_red = P @ B_mat
+    M_red = P.T @ M_mat @ P
+    J_red = P.T @ J_mat @ P
+    B_red = P.T @ B_mat
     
-    return M_red, J_red, B_red, P.T
+    return M_red, J_red, B_red, P
     
     
     
