@@ -14,7 +14,7 @@ from tools_plotting import setup
 matplotlib.rcParams['text.usetex'] = True
 
 
-from EnergyShapingPDE.matrices_timoshenko import matrices_constraints, \
+from EnergyShapingPDE.func_timoshenko import matrices_constraints, \
 matrices_timoshenko
 
 init = ('exp(-x[0])-1', '0', '0', '0')
