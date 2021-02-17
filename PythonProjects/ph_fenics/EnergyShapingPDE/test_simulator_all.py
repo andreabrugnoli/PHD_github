@@ -21,11 +21,12 @@ plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 rcParams.update({'figure.autolayout': True})
 rcParams['text.usetex'] = True
 
-from EnergyShapingPDE.func_timoshenko import matrices_timoshenko
+from EnergyShapingPDE.func_timoshenko_all import matrices_timoshenko
 
 init = ('exp(-x[0])-1', '0', '0', '0')
 
-M, J, B, e0, dofs_dict, x_dict = matrices_timoshenko(n_el=10, deg=1, e0_string=init)
+M_red, J_red, B_red, e0_red, dofs_dict, x_dict, T_r2t = matrices_timoshenko(n_el=10, deg=1,\
+                                                                    e0_string=init)
 
 dofs_vt = dofs_dict['v_t']
 x_vt = x_dict['v_t']
@@ -41,8 +42,8 @@ x_sigt = x_dict['sig_t']
 
 u_in = np.array([1, 0])
 
-A_sys = np.linalg.solve(M, J)
-B_sys = np.linalg.solve(M, B)
+A_sys = np.linalg.solve(M_red, J_red)
+B_sys = np.linalg.solve(M_red, B_red)
 
 def fun(t,y):
 
@@ -57,30 +58,35 @@ t_span = [t0, t_fin]
 n_ev = 500
 t_ev = np.linspace(t0, t_fin, num=n_ev)
 
-sol = solve_ivp(fun, t_span, e0, method='RK45', t_eval = t_ev, \
+sol_red = solve_ivp(fun, t_span, e0_red, method='RK45', t_eval = t_ev, \
                        atol = 1e-5, rtol = 1e-5)
 
-e_sol = sol.y
+e_red = sol_red.y
 
-vt_sol= np.zeros((len(dofs_vt), n_ev))
-vr_sol= np.zeros((len(dofs_vr), n_ev))
+n_all = len(T_r2t)
+e_all = np.zeros((n_all, n_ev))
 
-sigr_sol= np.zeros((len(dofs_sigr), n_ev))
-sigt_sol= np.zeros((len(dofs_sigt), n_ev))
+vt_all= np.zeros((len(dofs_vt), n_ev))
+vr_all= np.zeros((len(dofs_vr), n_ev))
+
+sigr_all= np.zeros((len(dofs_sigr), n_ev))
+sigt_all= np.zeros((len(dofs_sigt), n_ev))
 
 for i in range(n_ev):
     
-    vt_sol[:, i] = e_sol[dofs_vt, i]
-    vr_sol[:, i] = e_sol[dofs_vr, i]
+    e_all[:, i] = T_r2t @ e_red[:,i]
     
-    sigr_sol[:, i] = e_sol[dofs_sigr, i]
-    sigt_sol[:, i] = e_sol[dofs_sigt, i]
+    vt_all[:, i] = e_all[dofs_vt, i]
+    vr_all[:, i] = e_all[dofs_vr, i]
+    
+    sigr_all[:, i] = e_all[dofs_sigr, i]
+    sigt_all[:, i] = e_all[dofs_sigt, i]
 
 
 H_vec = np.zeros((n_ev))
 
 for i in range(n_ev):
-    H_vec[i] = 0.5 *(e_sol[:, i] @ M @ e_sol[:, i])
+    H_vec[i] = 0.5 *(e_red[:, i] @ M_red @ e_red[:, i])
 
 fig = plt.figure()
 plt.plot(t_ev, H_vec, 'g-', label = 'Total Energy [J]')
@@ -93,30 +99,30 @@ plt.legend(loc='upper left')
 
 perm_vt = np.argsort(x_vt)
 x_vt_perm = x_vt[perm_vt]
-vt_sol_perm = vt_sol[perm_vt, :]
+vt_all_perm = vt_all[perm_vt, :]
 
 perm_vr = np.argsort(x_vr)
 x_vr_perm = x_vr[perm_vr]
-vr_sol_perm = vr_sol[perm_vr, :]
+vr_all_perm = vr_all[perm_vr, :]
 
 perm_sigr = np.argsort(x_sigr)
 x_sigr_perm = x_sigr[perm_sigr]
-sigr_sol_perm = sigr_sol[perm_sigr, :]
+sigr_all_perm = sigr_all[perm_sigr, :]
 
 perm_sigt = np.argsort(x_sigt)
 x_sigt_perm = x_sigt[perm_sigt]
-sigt_sol_perm = sigt_sol[perm_sigt, :]
+sigt_all_perm = sigt_all[perm_sigt, :]
 
 ## Initial condition plot
 #fig = plt.figure(1)
-#ax = plt.axes(xlim=(0, 1), ylim=(np.min(np.min(vt_sol)), np.max(np.max(vt_sol))))
-#line, = ax.plot(x_vt_perm, vt_sol_perm[:, 0], lw=2, label = 'Time =' + '{0:.2f}'.format(t_ev[0]) + '[s]')
+#ax = plt.axes(xlim=(0, 1), ylim=(np.min(np.min(v_all)), np.max(np.max(v_all))))
+#line, = ax.plot(x_Vpw_perm, v_all_perm[:, 0], lw=2, label = 'Time =' + '{0:.2f}'.format(t_ev[0]) + '[s]')
 
 
 
 # Vertical velocity
 fig_vt = plt.figure()
-ax_vt = plt.axes(xlim=(0, 1), ylim=(np.min(np.min(vt_sol)), np.max(np.max(vt_sol))))
+ax_vt = plt.axes(xlim=(0, 1), ylim=(np.min(np.min(vt_all)), np.max(np.max(vt_all))))
 ax_vt.set_xlabel('Space [m]')
 ax_vt.set_ylabel('Vertical velocity')
 
@@ -124,7 +130,7 @@ line_vt, = ax_vt.plot([], [], lw=2, label = 'Time =' + '{0:.2f}'.format(t_ev[0])
 
 # Functions for plot
 def animate_vt(i):
-    line_vt.set_data(x_vt_perm, vt_sol_perm[:,i])
+    line_vt.set_data(x_vt_perm, vt_all_perm[:,i])
     
     line_vt.set_label('Time =' + '{0:.2f}'.format(t_ev[i]) + '[s]')
     ax_vt.legend(bbox_to_anchor=(1.2, 1.2))
@@ -132,21 +138,21 @@ def animate_vt(i):
 
 anim_vt = animation.FuncAnimation(fig_vt, animate_vt, frames=len(t_ev), interval=20, blit=False)
 
-#path_out = "/home/andrea/Videos/"
-#Writer = animation.writers['ffmpeg']
-#writer = Writer(fps=25, metadata=dict(artist='Me'), bitrate=1800)
-#anim_vt.save(path_out + 'timo_bc.mp4', writer=writer)
+path_out = "/home/andrea/Videos/"
+Writer = animation.writers['ffmpeg']
+writer = Writer(fps=25, metadata=dict(artist='Me'), bitrate=1800)
+anim_vt.save(path_out + 'timo_all.mp4', writer=writer)
 
 ## Angular velocity
 #fig_vr = plt.figure()
-#ax_vr = plt.axes(xlim=(0, 1), ylim=(np.min(np.min(vr_sol)), np.max(np.max(vr_sol))))
+#ax_vr = plt.axes(xlim=(0, 1), ylim=(np.min(np.min(vr_all)), np.max(np.max(vr_all))))
 #ax_vr.set_xlabel('Space [m]')
 #ax_vr.set_ylabel('Angular velocity')
 #
 #line_vr, = ax_vr.plot([], [], lw=2, label = 'Time =' + '{0:.2f}'.format(t_ev[0]) + '[s]')
 #
 #def animate_vr(i):
-#    line_vr.set_data(x_vr_perm, vr_sol_perm[:,i])
+#    line_vr.set_data(x_vr_perm, vr_all_perm[:,i])
 #    
 #    line_vr.set_label('Time =' + '{0:.2f}'.format(t_ev[i]) + '[s]')
 #    ax_vr.legend(bbox_to_anchor=(1.2, 1.2))
@@ -159,14 +165,14 @@ anim_vt = animation.FuncAnimation(fig_vt, animate_vt, frames=len(t_ev), interval
 #
 ## Bending stress
 #fig_sigr = plt.figure()
-#ax_sigr = plt.axes(xlim=(0, 1), ylim=(np.min(np.min(sigr_sol)), np.max(np.max(sigr_sol))))
+#ax_sigr = plt.axes(xlim=(0, 1), ylim=(np.min(np.min(sigr_all)), np.max(np.max(sigr_all))))
 #ax_sigr.set_xlabel('Space [m]')
 #ax_sigr.set_ylabel('Bending stress')
 #
 #line_sigr, = ax_sigr.plot([], [], lw=2, label = 'Time =' + '{0:.2f}'.format(t_ev[0]) + '[s]')
 #
 #def animate_sigr(i):
-#    line_sigr.set_data(x_sigr_perm, sigr_sol_perm[:,i])
+#    line_sigr.set_data(x_sigr_perm, sigr_all_perm[:,i])
 #    
 #    line_sigr.set_label('Time =' + '{0:.2f}'.format(t_ev[i]) + '[s]')
 #    ax_sigr.legend(bbox_to_anchor=(1.2, 1.2))
@@ -178,7 +184,7 @@ anim_vt = animation.FuncAnimation(fig_vt, animate_vt, frames=len(t_ev), interval
 #
 ## Shear stress
 #fig_sigt = plt.figure()
-#ax_sigt = plt.axes(xlim=(0, 1), ylim=(np.min(np.min(sigt_sol)), np.max(np.max(sigt_sol))))
+#ax_sigt = plt.axes(xlim=(0, 1), ylim=(np.min(np.min(sigt_all)), np.max(np.max(sigt_all))))
 #ax_sigt.set_xlabel('Space [m]')
 #ax_sigt.set_ylabel('Shear stress')
 #
@@ -186,7 +192,7 @@ anim_vt = animation.FuncAnimation(fig_vt, animate_vt, frames=len(t_ev), interval
 #
 #
 #def animate_sigt(i):
-#    line_sigt.set_data(x_sigt_perm, sigt_sol_perm[:,i])
+#    line_sigt.set_data(x_sigt_perm, sigt_all_perm[:,i])
 #    
 #    line_sigt.set_label('Time =' + '{0:.2f}'.format(t_ev[i]) + '[s]')
 #    ax_sigt.legend(bbox_to_anchor=(1.2, 1.2))

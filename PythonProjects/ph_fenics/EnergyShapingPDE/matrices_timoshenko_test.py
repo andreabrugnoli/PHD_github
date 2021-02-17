@@ -72,18 +72,6 @@ element = MixedElement([P_pw, P_pth, P_qth, P_qw])
 
 V = FunctionSpace(mesh, element)
 
-dofV_x = V.tabulate_dof_coordinates().reshape((-1, d))
-
-dofs_Vpw = V.sub(0).dofmap().dofs()
-dofs_Vpth = V.sub(1).dofmap().dofs()
-dofs_Vqth = V.sub(2).dofmap().dofs()
-dofs_Vqw = V.sub(3).dofmap().dofs()
-
-dofVpw_x = dofV_x[dofs_Vpw]
-dofVpth_x = dofV_x[dofs_Vpth]
-dofVqth_x = dofV_x[dofs_Vqth]
-dofVqw_x = dofV_x[dofs_Vqw]
-
 v = TestFunction(V)
 v_pw, v_pth, v_qth, v_qw = split(v)
 
@@ -171,11 +159,69 @@ for (i, j) in enumerate(bc_dofs):
 
 # Reduced dynamics 
     
-P = la.null_space(G_mat).T
+P = la.null_space(G_mat)
 
-M_red = P @ M_mat @ P.T
-J_red = P @ J_mat @ P.T
-B_red = P @ B_mat
+M_red = P.T @ M_mat @ P
+J_red = P.T @ J_mat @ P
+B_red = P.T @ B_mat
+
+dofs2x = V.tabulate_dof_coordinates().reshape((-1, ))
+
+dofsVpw = V.sub(0).dofmap().dofs()
+dofsVpth = V.sub(1).dofmap().dofs()
+dofsVqth = V.sub(2).dofmap().dofs()
+dofsVqw = V.sub(3).dofmap().dofs()
+
+xVpw = dofs2x[dofsVpw]
+xVpth = dofs2x[dofsVpth]
+xVqth = dofs2x[dofsVqth]
+xVqw = dofs2x[dofsVqw]
+
+dofs2x_bc = np.delete(dofs2x, bc_dofs)
+
+dofsVpw_bc = dofsVpw.copy()
+dofsVpth_bc = dofsVpth.copy()
+dofsVqth_bc = dofsVqth.copy()
+dofsVqw_bc = dofsVqw.copy()
+
+for bc_dof in bc_dofs:
+    
+    if bc_dof in dofsVpw_bc:
+        dofsVpw_bc.remove(bc_dof)
+    else:
+        dofsVpth_bc.remove(bc_dof)
+        
+        
+for (bc_i, bc_dof) in enumerate(bc_dofs):
+
+    for (ind, dof) in enumerate(dofsVpw_bc):
+        if dof > bc_dof-bc_i:
+            dofsVpw_bc[ind] +=-1 
+
+    for (ind, dof) in enumerate(dofsVpth_bc):
+        if dof > bc_dof-bc_i:
+            dofsVpth_bc[ind] +=-1 
+            
+    for (ind, dof) in enumerate(dofsVqth_bc):
+        if dof > bc_dof-bc_i:
+            dofsVqth_bc[ind] +=-1 
+
+    for (ind, dof) in enumerate(dofsVqw_bc):
+        if dof > bc_dof-bc_i:
+            dofsVqw_bc[ind] +=-1 
+    
+    
+xVpw_bc = dofs2x_bc[dofsVpw_bc]
+xVpth_bc = dofs2x_bc[dofsVpth_bc]
+xVqth_bc = dofs2x_bc[dofsVqth_bc]
+xVqw_bc = dofs2x_bc[dofsVqw_bc]
+    
+    
+    
+    
+    
+    
+    
 
 
 

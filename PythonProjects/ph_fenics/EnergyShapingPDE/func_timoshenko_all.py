@@ -117,7 +117,12 @@ def matrices_timoshenko(n_el=10, deg=1, e0_string=('0', '0', '0', '0'),\
                 
         return j
     
+    
     # Boundary conditions
+    
+    m_form = get_m_form(v_pw, v_pth, v_qth, v_qw, al_pw, al_pth, al_qth, al_qw)
+    j_form = get_j_form(v_pw, v_pth, v_qth, v_qw, e_pw, e_pth, e_qth, e_qw)
+    
     bcs=[]
     
     bc_w = DirichletBC(V.sub(0), Constant(0.0), left)
@@ -125,15 +130,6 @@ def matrices_timoshenko(n_el=10, deg=1, e0_string=('0', '0', '0', '0'),\
     
     bcs.append(bc_w)
     bcs.append(bc_th)
-    
-    dofs_bc = []
-    for bc in bcs:
-        for key in bc.get_boundary_values().keys():
-            dofs_bc.append(key)
-    
-    # Matrices assembly
-    m_form = get_m_form(v_pw, v_pth, v_qth, v_qw, al_pw, al_pth, al_qth, al_qw)
-    j_form = get_j_form(v_pw, v_pth, v_qth, v_qw, e_pw, e_pth, e_qth, e_qw)
     
     J_petsc = assemble(j_form)
     M_petsc = assemble(m_form)
@@ -145,8 +141,13 @@ def matrices_timoshenko(n_el=10, deg=1, e0_string=('0', '0', '0', '0'),\
     BT_vec = assemble(v_pth*ds(2)).get_local().reshape((-1, 1))
     
     B_mat = np.concatenate((BT_vec, BF_vec), axis=1)
+    
+    dofs_bc = []
+    for bc in bcs:
+        for key in bc.get_boundary_values().keys():
+            dofs_bc.append(key)
      
-    # Dofs and coordinates for subspaces
+    
     dofs2x = V.tabulate_dof_coordinates().reshape((-1, d))
 
     dofsVpw = V.sub(0).dofmap().dofs()
@@ -158,66 +159,34 @@ def matrices_timoshenko(n_el=10, deg=1, e0_string=('0', '0', '0', '0'),\
     xVpth = dofs2x[dofsVpth, 0]
     xVqth = dofs2x[dofsVqth, 0]
     xVqw = dofs2x[dofsVqw, 0]
+   
+    M_red, J_red, B_red, e0_red, P = eliminate_bc(M_mat, J_mat, B_mat, e0_array, dofs_bc)
+
+    dofs_dict = {'v_t': dofsVpw, 'v_r': dofsVpth,\
+                 'sig_r': dofsVqth, 'sig_t': dofsVqw}
+    x_dict = {'v_t': xVpw, 'v_r': xVpth, 'sig_r': xVqth, 'sig_t': xVqw}
     
-    dofs2x_bc = np.delete(dofs2x, dofs_bc)
-        
-    dofsVpw_bc = dofsVpw.copy()
-    dofsVpth_bc = dofsVpth.copy()
-    dofsVqth_bc = dofsVqth.copy()
-    dofsVqw_bc = dofsVqw.copy()
-    
-    # Eliminate bc dofs form subspaces
-    for bc_dof in dofs_bc:
-        
-        if bc_dof in dofsVpw_bc:
-            dofsVpw_bc.remove(bc_dof)
-        else:
-            dofsVpth_bc.remove(bc_dof)
-            
-    
-    # Recompute the dofs after bc elimination        
-    for (i_bc, dof_bc) in enumerate(dofs_bc):
-    
-        for (ind, dof) in enumerate(dofsVpw_bc):
-            if dof > dof_bc-i_bc:
-                dofsVpw_bc[ind] +=-1 
-    
-        for (ind, dof) in enumerate(dofsVpth_bc):
-            if dof > dof_bc-i_bc:
-                dofsVpth_bc[ind] +=-1 
-                
-        for (ind, dof) in enumerate(dofsVqth_bc):
-            if dof > dof_bc-i_bc:
-                dofsVqth_bc[ind] +=-1 
-    
-        for (ind, dof) in enumerate(dofsVqw_bc):
-            if dof > dof_bc-i_bc:
-                dofsVqw_bc[ind] +=-1 
-        
-        
-    xVpw_bc = dofs2x_bc[dofsVpw_bc]
-    xVpth_bc = dofs2x_bc[dofsVpth_bc]
-    xVqth_bc = dofs2x_bc[dofsVqth_bc]
-    xVqw_bc = dofs2x_bc[dofsVqw_bc]
-    
-    # Dictonary containing the dofs
-    dofs_dict = {'v_t': dofsVpw_bc, 'v_r': dofsVpth_bc,\
-                 'sig_r': dofsVqth_bc, 'sig_t': dofsVqw_bc}
-    
-    # Dictonary containing the coordinates
-    x_dict = {'v_t': xVpw_bc, 'v_r': xVpth_bc,\
-              'sig_r': xVqth_bc, 'sig_t': xVqw_bc}
-    
-    # Eliminate bc dofs from matrices and vectors
-    M_red = np.delete(np.delete(M_mat, dofs_bc, axis=0), dofs_bc, axis=1)
-    J_red = np.delete(np.delete(J_mat, dofs_bc, axis=0), dofs_bc, axis=1)
-    B_red = np.delete(B_mat, dofs_bc, axis=0)
-    e0_red = np.delete(e0_array, dofs_bc, axis=0)
-    
-    
-    return M_red, J_red, B_red, e0_red, dofs_dict, x_dict
+    return M_red, J_red, B_red, e0_red, dofs_dict, x_dict, P
 
  
+def eliminate_bc(M_mat, J_mat, B_mat, e0, dofs_bc):
+    
+    G_mat = np.zeros((len(dofs_bc), len(M_mat)))
+    
+    for (i, j) in enumerate(dofs_bc):
+        G_mat[i,j] = 1
+    
+    P = la.null_space(G_mat)
+
+    M_red = P.T @ M_mat @ P
+    J_red = P.T @ J_mat @ P
+    B_red = P.T @ B_mat
+    
+    e0_red = P.T @ e0
+    
+    return M_red, J_red, B_red, e0_red, P
+
+    
     
     
     
