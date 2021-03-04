@@ -112,45 +112,30 @@
 
 \section{Introduction}
 
-\begin{frame}{Twenty years of distributed port-Hamiltonian systems}
-	
-They have been used for simulating and controlling a variety of applications\footfullcite{rashad2020}:
-\begin{multicols}{2}
-	\begin{itemize}
-		\item {flexible thin beams;}
-		\item {acoustic waves;}
-		\item {stirred tank reactors;}
-		\item {plasma in tokamak;}
-		\item {shallow water equations;}
-		\item {fluid-structure interactions.}
-	\end{itemize}
-\end{multicols}
+\begin{frame}{Why port-Hamiltonian systems?}
 
-
-\begin{block}{Distributed port-Hamiltonian systems}
-\begin{equation*}
-\begin{aligned}
-\partial_t {\bm{\alpha}} &= \mathcal{J} \, \bm{e}, \\
-\bm{e} &:= \delta_{\bm{\alpha}}{H}, \\
-\bm{u}_\partial &= \mathcal{B}_\partial  \, \bm{e}, \\
-\bm{y}_\partial &= \mathcal{C}_\partial \, \bm{e}, 
-\end{aligned} \qquad
-\begin{aligned}
-\bm{\alpha} &\quad\text{Energy variables},\\
-\bm{e} &\quad\text{Co-energy variables},\\
-\bm{u}_\partial &\quad\text{Control input}, \\
-\bm{y}_\partial &\quad\text{Control output}. 
-\end{aligned} \qquad
-\begin{aligned}
-\mathcal{J} &\quad\text{Skew-symmetric operator},\\
- & \\
-\mathcal{B}_\partial &\quad\text{Input operator}, \\
-\mathcal{C}_\partial &\quad\text{Output operator}. \\
-\end{aligned}
-\end{equation*}
-\end{block}
-
-
+		\begin{columns}
+			\begin{column}{.45\textwidth}
+				\begin{figure}
+					\centering
+					\includegraphics[width=.95\textwidth]{sketch_PH.eps}
+				\end{figure}
+			\end{column}
+			\hspace{1cm}
+			\begin{column}{.5\textwidth}
+				PH systems are:
+				\begin{itemize}
+					\item Physically motivated;
+					\item Lumped (ODEs) or distributed (PDEs);
+					\item Passive (passivity based control);
+					\item \textcolor{red}{Closed under interconnection (modular multiphysics modelling)};
+				\end{itemize}
+			\begin{block}{Necessity of numerical methods}
+				To tackle complex models and for control implementation, numerical methods are needed.
+			\end{block}
+			
+			\end{column}
+		\end{columns}	
 \end{frame}
 
 
@@ -453,7 +438,7 @@ Discretization of port-Hamiltonian systems:
 				\bm{e}_1 \\ \bm{e}_2
 			\end{pmatrix} , \qquad \begin{aligned}
 				\bm{e}_1 &\in H^{\mathcal{L}}, 	\\
-				\bm{e}_2 &\in H^{-\mathcal{L}^*},
+				\bm{e}_2 &\in H^{\mathcal{L}^*},
 			\end{aligned}
 		\end{equation*}
 		where $\mathcal{M}_1:=\mathcal{Q}_1^{-1},\; \mathcal{M}_2:=\mathcal{Q}_2^{-1}$. \textbf{Constitutive laws} have been included in the dynamics.
@@ -997,7 +982,7 @@ The Hamiltonian is a  quadratic functional (linear case), hence a co-energy form
 Consider mixed Dirichlet homogeneous conditions and Neumann boundary control
 \begin{align*}
 	\begin{aligned}
-		\partial_t e_w|_{\Gamma_D} &= 0, \\
+		e_w|_{\Gamma_D} &= 0, \\
 		\partial_x e_w|_{\Gamma_D} &= 0, \\
 	\end{aligned} \qquad {\Gamma_D} = \left\{x = 0 \right\}, \qquad
 	\begin{aligned}
@@ -1090,11 +1075,11 @@ where $M_{nn}$ is the flexural moment and $\widetilde{q}_n$ is the effective she
 		\begin{center}
 			\includemedia[
 			label=vidDam,
-			addresource=/home/andrea/Videos/Videos_defense/Kirchh_Damped.mp4,
+			addresource=/home/andrea/Videos/Videos_defense/Kirchh_Damped_rendered.mp4,
 			activate=pageopen,
 			width=10cm, height=5cm,
 			flashvars={
-				source=/home/andrea/Videos/Videos_defense/Kirchh_Damped.mp4
+				source=/home/andrea/Videos/Videos_defense/Kirchh_Damped_rendered.mp4
 				&loop=true
 			}
 			]{}{VPlayer.swf}
@@ -1125,12 +1110,12 @@ where $M_{nn}$ is the flexural moment and $\widetilde{q}_n$ is the effective she
 \section{Conclusion}
 
 \begin{frame}{Open problems and Outlook}
-Open problem
+Open problem:
 \begin{itemize}
 \item \onslide<2->{Finite element space for the Lagrange multiplier, satisfying the inf-sup condition;}
 \end{itemize}
 	
-Possible developments:
+Developments:
 \begin{itemize}
 	\item \onslide<3->{Discretization: efficient finite element for the Kirchhoff plate based on div-div conforming elements \footfullcite{chen2020divDiv};}
 	\item \onslide<4->{Model reduction: POD methods, $H_2$-optimal strategies or Krilov subspace methods\footfullcite{egger2018};}
