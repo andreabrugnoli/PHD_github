@@ -83,7 +83,7 @@
 \begin{document}
 \begin{frontmatter}
 
-\title{Mixed finite elements for port-Hamiltonian von Ka\'rm\'an beams} 
+\title{Mixed finite elements for port-Hamiltonian von K\'arm\'an beams} 
 % Title, preferably not more than 10 words.
 
 
@@ -93,11 +93,11 @@
 	a.brugnoli@utwente.nl, s.stramigioli@utwente.nl }
 
 \begin{abstract}
-The port-Hamiltonian framework allows for a structured representation and interconnection of distributed parameter systems described by Partial Differential Equations (PDE) from different realms. Here, the Mindlin-Reissner model of a thick plate is presented in a tensorial formulation. Taking into account collocated boundary control and observation gives rise to an infinite-dimensional port-Hamiltonian system (pHs). The Partitioned Finite Element Method (PFEM), already presented in our previous work, allows obtaining a structure-preserving finite-dimensional port-Hamiltonian system, and accounting for boundary control in a straightforward manner. In order to illustrate the flexibility of PFEM, both types of boundary controls can be dealt with: either through forces and momenta, or through kinematic variables. The discrete model is easily implementable by using the FEniCS platform. Computation of eigenfrequencies and vibration modes, together with time-domain simulation results demonstrate the consistency of the proposed approach.
+
 \end{abstract}
 
 \begin{keyword}
-Port-Hamiltonian systems (pHs), Geometric Discretization, Mindlin-Reissner Plate, Partitioned Finite Element Method (PFEM), Symplectic Integration
+Port-Hamiltonian systems (pHs), von K\'arm\'an beams, Mixed Finite Elements
 \end{keyword}
 
 \end{frontmatter}
@@ -108,144 +108,137 @@ Port-Hamiltonian systems (pHs), Geometric Discretization, Mindlin-Reissner Plate
 \section{Von K\'arm\'an beams}
 
 
-The classical full  von-K\'arm\'an dynamical model is presented in \cite{bilbao2015conservative}. The problem, defined on an open connected set $\Omega \subset \bbR^2$, takes the dimensionless form
+The classical von-K\'arm\'an beam model is presented in \cite[Chapter 4]{reddy2010introduction}. Under the hypothesis of isotropic material, the extensional-bending stiffness is zero when the x-axis is taken along the geometric centroidal axis. With this assumption, the problem, defined on an open interval $\Omega = (0, L)$, takes the following form
 
 \begin{equation}\label{eq:class}
 	\begin{aligned}
-		\ddot{\bm{u}} &= \Div{\bm{N}}, \\
-		\ddot{w} &= -\div\Div{\bm{M}} + \div{(\bm{N}\grad w)}, \\
-	\end{aligned} \qquad \qquad 
-	\begin{aligned}
-		\bm{N} &= \bm{\Phi} (\bm{\varepsilon}), \\
-		\bm{M} &= \bm{\Phi} (\bm{\kappa}), \\
-	\end{aligned} \qquad \qquad
-	\begin{aligned}
-		\bm{\varepsilon} &= \Grad \bm{u} + 1/2 \grad w \otimes \grad w, \\
-		\bm{\kappa} &= \Grad \grad w,
-	\end{aligned}
+		\rho A \ddot{u} &= \partial_x n_{xx}, \\
+		\rho A \ddot{w} &= -\partial^2_{xx} m_{xx} + \partial_x(n_{xx} \partial_x w),
+	\end{aligned} 
 \end{equation}
-where $\bm{u} \in \bbR^2$ is the in-plane displacement, $w$ is the vertical displacement, $\bm{\varepsilon}$ is the in-plane strain tensor, $\bm{\kappa}$ is the curvature tensor, $\bm{N}$ is the in-plane stress resultant and $\bm{M}$ is the bending stress resultant. The notation $\bm{a} \otimes \bm{b} = \bm{a} \bm{b}^\top$ denotes the dyadic product of two vectors.  The $\div$ operator  is the divergence of a vector field, and $\grad$ the gradient of a scalar field. The  operator $\mathrm{Grad} = \frac{1}{2} \left(\nabla + \nabla^\top \right)$ designates the symmetric part of the gradient (i. e. the deformation gradient in continuum mechanics). For a tensor field $\bm{U}: \Omega \rightarrow \bbR^{2\times 2}$, with components $U_{ij}$, the divergence $\Div(\bm{U})$ is a vector, defined column-wise as
-\begin{equation*}
-	\Div(\bm U) := \sum_{i = 1}^2 \partial_{x_i} U_{ij}, \qquad \forall j = \{1, 2\}.
-\end{equation*}
-The linear tensor mapping $\bm{\Phi}$ is positive and preserves symmetry:
-\begin{equation*}
-	\bm\Phi (\bm{A}) = \nu \Tr(\bm{A})\bm{1} + (1 - \nu) \bm{A}, \qquad \bm{A} = \bm{A}^\top \implies \bm{\Phi}(\bm{A}) = \bm{\Phi}(\bm{A})^\top, \where \bm{1} = \mathrm{Diag}(1,1).
-\end{equation*}
-
-\begin{comment}
-Its inverse is given by 
+together with the stresses and strains expressions
 \begin{equation}
-\bm{\Phi}^{-1}(\bm{A}) = \frac{1}{1 - \nu} \bm{A} - \frac{\nu}{1 - \nu^2} \Tr(\bm{A}) \bm{1}.
+	\begin{aligned}
+		n_{xx} &= EA \varepsilon_{xx}, \\
+		m_{xx} &= EI \kappa_{xx}, \\
+	\end{aligned} \quad
+	\begin{aligned}
+		\varepsilon_{xx} &= \partial_x u + 1/2 (\partial_x w)^2, \\
+		\kappa_{xx} &=\partial^2_{xx} w. \\
+	\end{aligned} 
 \end{equation}
-\end{comment}
+Variable $u$ is the horizontal displacement, $w$ is the vertical displacement, $n_{xx}$ is the axial stress resultant and $m_{xx}$ is the bending stress resultant. The coefficients $\rho, A, E, I$ are the mass density, the cross section, the Young module and the second moment of area.
 
 The total energy of the model (Hamiltonian functional)
 \begin{equation}
-	H = \frac{1}{2} \int_{\Omega}\left\{ \norm{\dot{\bm{u}}}^2 + \dot{w}^2 + \bm{N} \cddot \bm{\varepsilon} + \bm{M} \cddot \bm{\kappa} \right\} \d\Omega, \qquad \where \bm{A} \cddot \bm{B} = \Tr(\bm{A}^\top\bm{B})
+	H = \frac{1}{2} \int_{\Omega}\left\{\rho A \dot{u}^2 + \rho A \dot{w}^2 + n_{xx} \varepsilon_{xx} + m_{xx} \kappa_{xx} \right\} \d\Omega,
 \end{equation}
 consists of the kinetic energy and both membrane and bending deformation energies.
 This model proves conservative, see \cite{bilbao2015conservative}. Indeed, this implies that a port-Hamiltonian realization of the system exists. We shall demonstrate how to construct a port-Hamiltonian realization, equivalent to \eqref{eq:class}.
 
 
 \section{The equivalent port-Hamiltonian realization}
-To find a suitable port-Hamiltonian system, we first select a set of new energy variables to make the Hamiltonian functional quadratic. The selection is the same as for both the linear plate problems in \cite{brugnoli2019mindlin,brugnoli2019kirchhoff}:
+To find a suitable port-Hamiltonian system, we first select a set of new energy variables to make the Hamiltonian functional quadratic
 \begin{equation}
-	\bm{\alpha}_u = \dot{\bm{u}}, \qquad \alpha_w = \dot{w}, \qquad \bm{A}_\varepsilon = \bm{\varepsilon}, \qquad \bm{A}_\kappa = \bm{\kappa}.
+	\alpha_u = \rho A \dot{u}, \quad \alpha_\varepsilon = \varepsilon_{xx}, \quad \alpha_w = \rho A \dot{w}, \quad \alpha_\kappa = \kappa_{xx}.
 \end{equation}
 The energy is quadratic in these variables
 \begin{equation}
-	H = \frac{1}{2} \int_{\Omega} \left\{\norm{\bm{\alpha}_u}^2 + \alpha_w^2 + \bm{\Phi}(\bm{A}_\varepsilon) \cddot \bm{A}_\varepsilon + \bm{\Phi}(\bm{A}_\kappa) \cddot \bm{A}_\kappa \right\}.
+	H = \frac{1}{2} \int_{\Omega} \left\{\frac{\alpha_u^2}{\rho A} + \frac{\alpha_w^2}{\rho A} + EA \varepsilon_{xx}^2 + EI \kappa_{xx}^2 \right\} \d{\Omega}.
 \end{equation}
 By computing the variational derivative of the Hamiltonian, one obtains the so-called co-energy variables:
 \begin{equation}
-	\bm{e}_u := \delta_{\bm\alpha_u} H = \dot{\bm{u}}, \qquad \bm{e}_w := \delta_{\alpha_w} H = \dot{w}, \qquad \bm{E}_\varepsilon := \delta_{\bm{A}_\varepsilon} H = \bm{\Phi}(\bm{A}_\varepsilon), \qquad \bm{E}_\kappa := \delta_{\bm{A}_\kappa} H = \bm{\Phi}(\bm{A}_\kappa).
+	\begin{aligned}
+	e_u &:= \delta_{\alpha_u} H = \dot{u}, \\
+	e_w &:= \delta_{\alpha_w} H = \dot{w}, \\
+	\end{aligned} \qquad 
+\begin{aligned}
+	e_\varepsilon &:= \delta_{\alpha_\varepsilon} H = n_{xx}, \\ e_\kappa &:= \delta_{\alpha_\kappa} H = m_{xx}.
+\end{aligned}
 \end{equation}
-Before stating the final formulation, consider the operator $\mathcal{C}(w)(\cdot): L^2(\Omega, \bbR^{2\times 2}_{\text{sym}}) \rightarrow L^2(\Omega)$ acting on symmetric tensors 
+Before stating the final formulation, consider the unbounded operator operator $\mathcal{C}(w)(\cdot): L^2(\Omega) \rightarrow L^2(\Omega)$, that acts as follows
 \begin{equation}
-	\mathcal{C}(w)(\bm{T}) = \div(\bm{T} \grad w).
+	\mathcal{C}(w)(n_{xx}) = \partial_x(n_{xx} \partial_x w).
 \end{equation}
 \begin{proposition}\label{prop:adjC}
 	The formal adjoint of the $\mathcal{C}(w)(\cdot)$ is given by
 	\begin{equation}
-		\mathcal{C}(w)^*(\cdot) = -\frac{1}{2} \left[\grad (\cdot) \otimes \grad(w) + \grad(w) \otimes \grad(\cdot) \right] .
+		\mathcal{C}(w)^*(\cdot) = -\partial_x (\cdot) \partial_x(w).
 	\end{equation}
 \end{proposition}
 \begin{proof}
-	Consider a smooth scalar field  $v \in C^\infty_0(\Omega)$ and a smooth symmetric tensor field $\bm{U} \in C^\infty_0(\Omega, \bbR^{2\times 2}_{\text{sym}})$ with compact support. The formal adjoint of $\mathcal{C}(w)(\cdot)$ satisfies the relation
+	Consider a smooth scalar field  $\psi \in C^\infty_0(\Omega)$ and a smooth scalar field $\xi \in C^\infty_0(\Omega)$ with compact support. The formal adjoint of $\mathcal{C}(w)(\cdot)$ satisfies the relation
 	\begin{equation}
-		\inner[L^2(\Omega)]{v}{\mathcal{C}(w)(\bm{U})} = \inner[L^2(\Omega, \bbR^{2\times 2}_{\text{sym}})]{\mathcal{C}(w)(v)^*}{\bm{U}}.
+		\inner[L^2(\Omega)]{\psi}{\mathcal{C}(w)(\xi)} = \inner[L^2(\Omega)]{\mathcal{C}(w)(\psi)^*}{\xi}.
 	\end{equation}
 	The proof follows from the computation
 	\begin{equation}
 		\begin{aligned}
-			\inner[L^2(\Omega)]{v}{\mathcal{C}(w)(\bm{U})} &= \inner[L^2(\Omega)]{v}{\div(\bm{U} \grad w)}, \qquad \text{Integration by parts,}\\
-			&= \inner[L^2(\Omega, \bbR^2)]{-\grad v}{\bm{U} \grad w}, \qquad \text{Dyadic product properties,}\\
-			&= \inner[L^2(\Omega, \bbR^{2\times 2}_{\text{sym}})]{-\grad v \otimes \grad w}{\bm{U}}, \qquad \text{Symmetry of $\bm{U}$,}\\
-			&= \inner[L^2(\Omega, \bbR^{2\times 2}_{\text{sym}})]{-1/2(\grad v \otimes \grad w + \grad w \otimes \grad v)}{\bm{U}}.
+			\inner[L^2(\Omega)]{\psi}{\mathcal{C}(w)(\xi)} &= \inner[L^2(\Omega)]{\psi}{\partial_x(\xi \, \partial_x w)}, \\
+			&= \inner[L^2(\Omega, \bbR^2)]{-\partial_x \psi}{\xi \partial_x w}, \\
+			&= \inner[L^2(\Omega)]{-\partial_x \psi \, \partial_x w}{\xi}.
 		\end{aligned} 
 	\end{equation}
-	This means
+	This means that
 	\begin{equation}
-		\mathcal{C}(w)^*(\cdot) = -\frac{1}{2} \left[\grad (\cdot) \otimes \grad(w) + \grad(w) \otimes \grad(\cdot) \right],
+		\mathcal{C}(w)^*(\cdot) = -\partial_x (\cdot) \partial_x w,
 	\end{equation}
 	leading to the final result.
 \end{proof}
 
 The pH realization is then given by the following system
 \begin{equation}\label{eq:pHsys}
-	%\diffp{}{t}
 	\frac{\partial}{\partial t}
 	\begin{pmatrix}
-		\bm{\alpha}_u \\
-		\bm{A}_\varepsilon \\
+		\alpha_u \\
+		\alpha_\varepsilon \\
 		\alpha_w \\
-		\bm{A}_\kappa
+		\alpha_\kappa
 	\end{pmatrix} = 
 	\begin{bmatrix}
-		\bm{0} & \Div & \bm{0} & \bm{0} \\
-		\Grad & \bm{0} & -\mathcal{C}(w)^* & \bm{0} \\
-		0 & \mathcal{C}(w) & 0 & -\div\Div \\
-		\bm{0} & \bm{0} & \Grad\grad & \bm{0} \\ 
+		0 & \partial_x & 0 & 0 \\
+		\partial_x & 0 & \partial_x w \, \partial_x & 0 \\
+		0 & \partial_x(\cdot \, \partial_x w) & 0 & -\partial_{xx}^2 \\
+		0 & 0 & \partial_{xx}^2 & 0 \\ 
 	\end{bmatrix}
 	\begin{pmatrix}
-		\delta_{\bm\alpha_u} H \\
-		\delta_{\bm{A}_\varepsilon} H \\
-		\delta_{\bm\alpha_w} H \\
-		\delta_{\bm{A}_\kappa} H
+		\delta_{\alpha_u} H \\
+		\delta_{\alpha_\varepsilon} H \\
+		\delta_{\alpha_w} H \\
+		\delta_{\alpha_\kappa} H
 	\end{pmatrix},
 \end{equation}
 The second line of system \eqref{eq:pHsys} represents the time derivative of the membrane strain tensor. To close the system, variable $w$ has to be accessible. For this reason, its dynamics has to be included. The augmented system reads
 \begin{equation}\label{eq:pHsys_aug}
-	%\diffp{}{t}
 	\frac{\partial}{\partial t}
 	\begin{pmatrix}
-		\bm{\alpha}_u \\
-		\bm{A}_\varepsilon \\
+		\alpha_u \\
+		\alpha_\varepsilon \\
 		w \\
 		\alpha_w \\
-		\bm{A}_\kappa
+		\alpha_\kappa
 	\end{pmatrix} = 
 	\underbrace{\begin{bmatrix}
-			\bm{0} & \Div & \bm{0} & \bm{0} & \bm{0}\\
-			\Grad & \bm{0} & \bm{0} & -\mathcal{C}(w)^* & \bm{0} \\
+			0 & \partial_x & 0 & 0 & 0\\
+			\partial_x & 0 & 0 &  \partial_x w \, \partial_x & 0 \\
 			0 & 0 & 0 & 1 & 0 \\
-			0 & \mathcal{C}(w) & -1 & 0 & -\div\Div \\
-			\bm{0} & \bm{0} & \bm{0} & \Grad\grad & \bm{0} \\ 
+			0 & \partial_x(\cdot \, \partial_x w) & -1 & 0 & -\partial_{xx}^2 \\
+			0 & 0 & 0 & \partial_{xx}^2 & 0 \\ 
 	\end{bmatrix}}_{\mathcal{J}}
 	\begin{pmatrix}
-		\delta_{\bm\alpha_u} H \\
-		\delta_{\bm{A}_\varepsilon} H \\
+		\delta_{\alpha_u} H \\
+		\delta_{\alpha_\varepsilon} H \\
 		\delta_{w} H \\
 		\delta_{\alpha_w} H \\
-		\delta_{\bm{A}_\kappa} H
+		\delta_{\alpha_\kappa} H
 	\end{pmatrix}.
 \end{equation}
-Given the results in \cite{brugnoli2019mindlin,brugnoli2019kirchhoff} and Proposition \ref{prop:adjC}, the operator $\mathcal{J}$ is formally skew-adjoint. If only the kinetic and deformation energies are considered, it holds $\delta_{w} H=0$. In general this terms allows accommodating other potentials, for example the gravitational one. Suitable boundary variables are then obtained considering the power balance
+The operator $\mathcal{J}$ is formally skew-adjoint. If only the kinetic and deformation energies are considered, it holds $\delta_{w} H=0$. In general this terms allows accommodating other potentials, for example the gravitational one. Suitable boundary variables are then obtained considering the power balance
 \begin{equation}
-	\dot{H} = \inner[\partial\Omega]{\gamma_0\bm{e}_u}{\gamma_\perp \bm{E}_\varepsilon} + \inner[\partial\Omega]{\gamma_0\bm{e}_w}{\gamma_{\perp\perp, 1} \bm{E}_\kappa + \gamma_0(\bm{E}_\varepsilon \bm{n} \cdot \grad w)} + \inner[\partial\Omega]{\gamma_1\bm{e}_w}{\gamma_{\perp\perp} \bm{E}_\kappa},
+	\dot{H} = \inner[\partial\Omega]{e_u}{e_\varepsilon} + \inner[\partial\Omega]{e_w}{-\partial_x e_\kappa + e_\varepsilon \partial_x w} + \inner[\partial\Omega]{\partial_x e_w}{e_\kappa},
 \end{equation}
-where $\gamma_0\bm{e}_u= \bm{e}_u\vert_{\partial\Omega}$ is the Dirichlet trace, $\gamma_\perp \bm{E}_\varepsilon = \bm{E}_\varepsilon \bm{n}\vert_{\partial\Omega}$ is the normal trace ($\bm{n}$ is the outward normal vector), $\gamma_{\perp\perp, 1} \bm{E}_\kappa = - \bm{n} \cdot \Div \bm{E}_\kappa - \partial_{\bm{s}}(\bm{n}^\top \bm{E}_\kappa \bm{s})\vert_{\partial\Omega}$ is the effective shear force at the boundary ($\bm{s}$ is the tangent versor at the boundary), $\gamma_1 \bm{e}_w = \partial_{\bm{n}} \bm{e}_w\vert_{\partial\Omega}$ is the normal derivative trace and $\gamma_{\perp\perp} \bm{E}_\kappa = \bm{n}^\top \bm{E}_\kappa \bm{n}$ is the normal to normal trace. The boundary conditions are consistent with the ones assumed in \cite{puel1996} for deriving a global existence result for this model.
+
+The boundary conditions are consistent with the ones assumed in \cite{puel1996} for deriving a global existence result for this model.
 
 
 
