@@ -89,8 +89,13 @@
 
 \author[UT]{Andrea Brugnoli}
 \author[UT]{Stefano Stramigioli}
+\author[ISAE]{Denis Matignon}
 \address[UT]{University of Twente, Enschede (NL) \\
 	a.brugnoli@utwente.nl, s.stramigioli@utwente.nl }
+
+\address[ISAE]{ISAE-SUPAERO, Universit\'e de Toulouse, France.\\
+	10 Avenue Edouard Belin, BP-54032, 31055 Toulouse Cedex 4. \\
+	denis.matignon@isae.fr}
 
 \begin{abstract}
 
@@ -131,7 +136,7 @@ Variable $u$ is the horizontal displacement, $w$ is the vertical displacement, $
 
 The total energy of the model (Hamiltonian functional)
 \begin{equation}
-	H = \frac{1}{2} \int_{\Omega}\left\{\rho A \dot{u}^2 + \rho A \dot{w}^2 + n_{xx} \varepsilon_{xx} + m_{xx} \kappa_{xx} \right\} \d\Omega,
+	H = \frac{1}{2} \int_{\Omega}\left\{\rho A (\dot{u}^2 + \dot{w}^2) + n_{xx} \varepsilon_{xx} + m_{xx} \kappa_{xx} \right\} \d\Omega,
 \end{equation}
 consists of the kinetic energy and both membrane and bending deformation energies.
 This model proves conservative, see \cite{bilbao2015conservative}. Indeed, this implies that a port-Hamiltonian realization of the system exists. We shall demonstrate how to construct a port-Hamiltonian realization, equivalent to \eqref{eq:class}.
@@ -139,15 +144,15 @@ This model proves conservative, see \cite{bilbao2015conservative}. Indeed, this 
 
 \section{The equivalent port-Hamiltonian realization}
 To find a suitable port-Hamiltonian system, we first select a set of new energy variables to make the Hamiltonian functional quadratic
-\begin{equation}
+\begin{equation}\label{eq:energies}
 	\alpha_u = \rho A \dot{u}, \quad \alpha_\varepsilon = \varepsilon_{xx}, \quad \alpha_w = \rho A \dot{w}, \quad \alpha_\kappa = \kappa_{xx}.
 \end{equation}
 The energy is quadratic in these variables
 \begin{equation}
-	H = \frac{1}{2} \int_{\Omega} \left\{\frac{\alpha_u^2}{\rho A} + \frac{\alpha_w^2}{\rho A} + EA \varepsilon_{xx}^2 + EI \kappa_{xx}^2 \right\} \d{\Omega}.
+	H = \frac{1}{2} \int_{\Omega} \left\{\frac{\alpha_u^2 + \alpha_w^2}{\rho A} + EA \varepsilon_{xx}^2 + EI \kappa_{xx}^2 \right\} \d{\Omega}.
 \end{equation}
 By computing the variational derivative of the Hamiltonian, one obtains the so-called co-energy variables:
-\begin{equation}
+\begin{equation}\label{eq:coenergies}
 	\begin{aligned}
 	e_u &:= \delta_{\alpha_u} H = \dot{u}, \\
 	e_w &:= \delta_{\alpha_w} H = \dot{w}, \\
@@ -158,7 +163,7 @@ By computing the variational derivative of the Hamiltonian, one obtains the so-c
 \end{equation}
 Before stating the final formulation, consider the unbounded operator operator $\mathcal{C}(w)(\cdot): L^2(\Omega) \rightarrow L^2(\Omega)$, that acts as follows
 \begin{equation}
-	\mathcal{C}(w)(n_{xx}) = \partial_x(n_{xx} \partial_x w).
+	\mathcal{C}(w)(\cdot ) = \partial_x(\cdot \; \partial_x w).
 \end{equation}
 \begin{proposition}\label{prop:adjC}
 	The formal adjoint of the $\mathcal{C}(w)(\cdot)$ is given by
@@ -167,9 +172,9 @@ Before stating the final formulation, consider the unbounded operator operator $
 	\end{equation}
 \end{proposition}
 \begin{proof}
-	Consider a smooth scalar field  $\psi \in C^\infty_0(\Omega)$ and a smooth scalar field $\xi \in C^\infty_0(\Omega)$ with compact support. The formal adjoint of $\mathcal{C}(w)(\cdot)$ satisfies the relation
+	Consider a smooth scalar fields with compact support  $\psi \in C^\infty_0(\Omega)$ and $\xi \in C^\infty_0(\Omega)$. The formal adjoint of $\mathcal{C}(w)(\cdot)$ satisfies the relation
 	\begin{equation}
-		\inner[L^2(\Omega)]{\psi}{\mathcal{C}(w)(\xi)} = \inner[L^2(\Omega)]{\mathcal{C}(w)(\psi)^*}{\xi}.
+		\inner[L^2(\Omega)]{\psi}{\mathcal{C}(w)(\xi)} = \inner[L^2(\Omega)]{\mathcal{C}(w)^*(\psi)}{\xi}.
 	\end{equation}
 	The proof follows from the computation
 	\begin{equation}
@@ -202,10 +207,10 @@ The pH realization is then given by the following system
 		0 & 0 & \partial_{xx}^2 & 0 \\ 
 	\end{bmatrix}
 	\begin{pmatrix}
-		\delta_{\alpha_u} H \\
-		\delta_{\alpha_\varepsilon} H \\
-		\delta_{\alpha_w} H \\
-		\delta_{\alpha_\kappa} H
+		e_u \\
+		e_\varepsilon \\
+		e_w \\
+		e_\kappa 
 	\end{pmatrix},
 \end{equation}
 The second line of system \eqref{eq:pHsys} represents the time derivative of the membrane strain tensor. To close the system, variable $w$ has to be accessible. For this reason, its dynamics has to be included. The augmented system reads
@@ -214,39 +219,195 @@ The second line of system \eqref{eq:pHsys} represents the time derivative of the
 	\begin{pmatrix}
 		\alpha_u \\
 		\alpha_\varepsilon \\
-		w \\
 		\alpha_w \\
-		\alpha_\kappa
+		\alpha_\kappa \\
+		w \\
 	\end{pmatrix} = 
 	\underbrace{\begin{bmatrix}
 			0 & \partial_x & 0 & 0 & 0\\
-			\partial_x & 0 & 0 &  \partial_x w \, \partial_x & 0 \\
-			0 & 0 & 0 & 1 & 0 \\
-			0 & \partial_x(\cdot \, \partial_x w) & -1 & 0 & -\partial_{xx}^2 \\
-			0 & 0 & 0 & \partial_{xx}^2 & 0 \\ 
+			\partial_x & 0 & \partial_x w \, \partial_x & 0 & 0 \\
+			0 & \partial_x(\cdot \, \partial_x w) & 0 & -\partial_{xx}^2 & -1 \\
+			0 & 0 & \partial_{xx}^2 & 0 & 0 \\ 
+			0 & 0 & 1 &  & 0 \\
 	\end{bmatrix}}_{\mathcal{J}}
 	\begin{pmatrix}
-		\delta_{\alpha_u} H \\
-		\delta_{\alpha_\varepsilon} H \\
-		\delta_{w} H \\
-		\delta_{\alpha_w} H \\
-		\delta_{\alpha_\kappa} H
+		e_u \\
+		e_\varepsilon \\
+		e_w \\
+		e_\kappa \\
+		\delta_w H  \\
 	\end{pmatrix}.
 \end{equation}
-The operator $\mathcal{J}$ is formally skew-adjoint. If only the kinetic and deformation energies are considered, it holds $\delta_{w} H=0$. In general this terms allows accommodating other potentials, for example the gravitational one. Suitable boundary variables are then obtained considering the power balance
+The operator $\mathcal{J}$ is formally skew-adjoint. If only the kinetic and deformation energies are considered, it holds $\delta_{w} H~=~0$. In general this terms allows accommodating other potentials, for example the gravitational one. Suitable boundary variables are then obtained considering the power balance
 \begin{equation}
-	\dot{H} = \inner[\partial\Omega]{e_u}{e_\varepsilon} + \inner[\partial\Omega]{e_w}{-\partial_x e_\kappa + e_\varepsilon \partial_x w} + \inner[\partial\Omega]{\partial_x e_w}{e_\kappa},
+	\dot{H} = \inner[\partial\Omega]{e_u}{e_\varepsilon} + \inner[\partial\Omega]{e_w}{e_\varepsilon \partial_x w -\partial_x e_\kappa} + \inner[\partial\Omega]{\partial_x e_w}{e_\kappa},
 \end{equation}
 
 The boundary conditions are consistent with the ones assumed in \cite{puel1996} for deriving a global existence result for this model.
 
 
+\section{Mixed finite element discretization}
+To perform the numerical discretization, the constitutive relations are first incorporated in the dynamics. The link between the energy variables \eqref{eq:energies} and the conergy variables \eqref{eq:coenergies} is given by the linear transformation
 
+\begin{equation}\label{eq:e2alpha}
+	\begin{pmatrix}
+		\alpha_u \\ \alpha_\varepsilon \\ \alpha_w \\ \alpha_\kappa
+	\end{pmatrix} =
+	\begin{bmatrix}
+	\rho A & 0 & 0 & 0 \\
+	0 & C_a & 0 & 0 \\
+	0 & 0 & \rho A & 0 \\
+	0 & 0 & 0 & C_b
+	\end{bmatrix}
+	\begin{pmatrix}
+		e_u \\ e_\varepsilon \\ e_w \\ e_{\kappa}
+	\end{pmatrix},
+\end{equation}
+where $C_a = (EA)^{-1}$ and $C_b = (EI)^{-1}$ are the axial and bending compliance respectively. A pure coenergy formulation can then be employed once \eqref{eq:e2alpha} is plugged into \eqref{eq:pHsys_aug}
+
+\begin{equation}\label{eq:pHaug_e}
+	\begin{pmatrix}
+		\rho A \dot{e}_u \\
+		C_a \dot{e}_\varepsilon \\
+		\rho A \dot{e}_w \\
+		C_b \dot{e}_\kappa \\
+		\dot{w} \\
+	\end{pmatrix} = 
+	\begin{bmatrix}
+		0 & \partial_x & 0 & 0 & 0\\
+		\partial_x & 0 & \partial_x w \, \partial_x & 0 & 0 \\
+		0 & \partial_x(\cdot \, \partial_x w) & 0 & -\partial_{xx}^2 & -1 \\
+		0 & 0 & \partial_{xx}^2 & 0 & 0 \\ 
+		0 & 0 & 1 &  & 0 \\
+	\end{bmatrix}
+	\begin{pmatrix}
+		e_u \\
+		e_\varepsilon \\
+		e_w \\
+		e_\kappa \\
+		\delta_w H \\
+	\end{pmatrix}.
+\end{equation}
+
+To derive the discrete system, first \eqref{eq:pHaug_e} is put into weak form. To this aim the test functions $(\psi_u,\, \psi_\varepsilon,\, \psi_w,\, \psi_\kappa,\, \psi)$ are introduced. For sake of simplicity, no dependency between the displacements and the energy is considered, i.e. $\delta_w H=0$:
+\begin{equation}
+	\begin{aligned}
+	\inner[\Omega]{\psi_u}{\rho A \, \dot{e}_u} &= \inner[\Omega]{\psi_u}{\partial_x e_\varepsilon}. \\
+	\inner[\Omega]{\psi_\varepsilon}{C_a \, \dot{e}_\varepsilon} &= \inner[\Omega]{\psi_\varepsilon}{\partial_x e_u} + \inner[\Omega]{\psi_\varepsilon}{\partial_x w \, \partial_x e_w}, \\
+	\inner[\Omega]{\psi_w}{\rho A\dot{e}_w} &= \inner[\Omega]{\psi_w}{\partial_x(e_\varepsilon \partial_x w)} - \inner[\Omega]{\psi_w}{\partial^2_{xx} e_\kappa}, \\
+	\inner[\Omega]{\psi_\kappa}{C_b \, \dot{e}_\kappa} &= \inner[\Omega]{\psi_\kappa}{\partial^2_{xx} e_w}, \\
+	\inner[\Omega]{\psi}{\dot{w}} &= \inner[\Omega]{\psi}{e_w}. \\
+	\end{aligned}
+\end{equation}
+
+Then the integration by parts is performed on the first line, the third and fourth line. This choice is such to retain the skew-symmetric structure at the discrete level and to lower the regularity requirement for the finite elements \cite[Chap. 8]{brugnoli2020thesis}. The weak formulation then looks for $(e_u, e_w, e_\kappa, w) \in H^1(\Omega), \, e_\varepsilon \in L^2(\Omega)$
+such that the following system
+\begin{equation}\label{eq:weak_form}
+	\begin{aligned}
+		\inner[\Omega]{\psi_u}{\rho A \, \dot{e}_u} &= -\inner[\Omega]{\partial_x \psi_u}{ e_\varepsilon} +  \inner[\partial\Omega]{\psi_u}{e_\varepsilon}. \\
+		\inner[\Omega]{\psi_\varepsilon}{C_a \, \dot{e}_\varepsilon} &= \inner[\Omega]{\psi_\varepsilon}{\partial_x e_u} + \inner[\Omega]{\psi_\varepsilon}{\partial_x w \, \partial_x e_w}, \\
+		\inner[\Omega]{\psi_w}{\rho A\dot{e}_w} &= -\inner[\Omega]{\partial_x \psi_w \partial_x w}{e_\varepsilon} + \inner[\Omega]{\partial_{x} \psi_w}{\partial_{x} e_\kappa} \\
+		&\quad +\inner[\partial\Omega]{\psi_w}{e_\varepsilon \partial_x w - \partial_x e_\kappa}, \\
+		\inner[\Omega]{\psi_\kappa}{C_b \, \dot{e}_\kappa} &= - \inner[\Omega]{\partial_{x} \psi_\kappa}{\partial_{x} e_w} + \inner[\partial\Omega]{\psi_\kappa}{\partial_x e_w}, \\
+		\inner[\Omega]{\psi}{\dot{w}} &= \inner[\Omega]{\psi}{e_w}. \\
+	\end{aligned}
+\end{equation}
+holds $\forall (\psi_u, \psi_w, \psi_\kappa, \psi) \in H^1(\Omega), \, \forall \psi_\varepsilon \in L^2(\Omega)$
+In this formulation, the boundary axial forces $e_\varepsilon\vert_{0}^L$, vertical forces $e_\varepsilon\partial_x w - \partial_x e_\kappa\vert_{0}^L$ and  rotations $\partial_x e_w\vert_{0}^L$ are enforced weakly. To obtain the associated finite-dimensional system, the following Galerkin approximation is considered 
+\begin{equation}\label{eq:Gal_appr}
+\begin{aligned}
+	e_u &= \sum_{i=1}^{n_u} \xi_u^i(x) e_u^i(t), \\
+	e_\varepsilon &= \sum_{i=1}^{n_\varepsilon} \xi_\varepsilon^i(x) e_\varepsilon^i(t), \\
+	e_w &= \sum_{i=1}^{n_w} \xi_w^i(x) e_w^i(t), \\
+	e_\kappa &= \sum_{i=1}^{n_\kappa} \xi_\kappa^i(x) e_\kappa^i(t), \\
+	w &= \sum_{i=1}^{n_w} \xi_w^i(x) w^i(t), \\
+\end{aligned} \qquad 
+\begin{aligned}
+	\psi_u &= \sum_{i=1}^{n_u} \xi_u^i(x) \psi_u^i, \\
+	\psi_\varepsilon &= \sum_{i=1}^{n_\varepsilon} \xi_\varepsilon^i(x) \psi_\varepsilon^i, \\
+	\psi_w &= \sum_{i=1}^{n_w} \xi_w^i(x) \psi_w^i, \\
+    \psi_\kappa &= \sum_{i=1}^{n_\kappa} \xi_\kappa^i(x) \psi_\kappa^i, \\
+	\psi &= \sum_{i=1}^{n_w} \xi_w^i(x) \psi^i, \\
+\end{aligned}
+\end{equation}
+Notice that $w, \, e_w$ have been discretized using the same test functions. Plugging \eqref{eq:Gal_appr} into \eqref{eq:weak_form}, the following finite dimensional system is obtained
+
+\begin{equation}\label{eq:findimSys}
+\begin{pmatrix}
+	\mathbf{M}_u \dot{\mathbf{e}}_u \\
+	\mathbf{M}_\varepsilon \dot{\mathbf{e}}_\varepsilon \\
+	\mathbf{M}_w \dot{\mathbf{e}}_w \\
+	\mathbf{M}_\kappa \dot{\mathbf{e}}_\kappa \\
+	 \dot{\mathbf{w}}
+\end{pmatrix} = 
+\begin{bmatrix}
+	\mathbf{0} & -\mathbf{D}_{\varepsilon u}^\top & \mathbf{0} & \mathbf{0}  \\
+	\mathbf{D}_{\varepsilon u} & \mathbf{0} & \mathbf{D}_{\varepsilon w}(\mathbf{w}) & \mathbf{0}  \\
+	\mathbf{0} & -\mathbf{D}_{\varepsilon w}^\top(\mathbf{w}) & \mathbf{0} & \mathbf{D}_{w \kappa} \\
+	\mathbf{0} & \mathbf{0} & -\mathbf{D}_{w \kappa}^\top & \mathbf{0}  \\
+	\mathbf{0} & \mathbf{0} & \mathbf{I} & \mathbf{0} \\ 
+\end{bmatrix}
+\begin{pmatrix}
+	\mathbf{e}_u \\
+	\mathbf{e}_\varepsilon \\
+	\mathbf{e}_w \\
+	\mathbf{e}_\kappa \\
+\end{pmatrix},
+\end{equation}
+where the boundary terms have been omitted for simplicity. The mass matrices are defined as follows
+\begin{equation}
+	\begin{aligned}
+	M_u^{ij} &= \inner[\Omega]{\xi_u^i}{\rho A \xi_u^j}, \\
+	M_\varepsilon^{ij} &= \inner[\Omega]{\xi_\varepsilon^i}{C_a \xi_\varepsilon^j}, 
+	\end{aligned} \qquad 
+	\begin{aligned}
+	M_w^{ij} &= \inner[\Omega]{\xi_w^i}{\rho A \xi_w^j}, \\
+	M_\kappa^{ij} &= \inner[\Omega]{\xi_\kappa^i}{C_b \xi_\kappa^j}.
+	\end{aligned}
+\end{equation}
+
+The interconnection matrices are given by 
+\begin{equation}
+	\begin{aligned}
+	D_{\varepsilon u}^{ij} &= \inner[\Omega]{\xi_\varepsilon^i}{\partial_x \xi_u^j}, \\
+	D_{\varepsilon w}^{ij}(\mathbf{w}) &= \inner[\Omega]{\xi_\varepsilon^i}{ \sum_{k=1}^{n_w} \partial_x \xi_w^k(x) w^k(t) \partial_x \xi_w^j}, \\
+	D_{w \kappa}^{ij} &= \inner[\Omega]{\partial_x \xi_w^i}{\partial_x \xi_\kappa^j}.
+	\end{aligned}
+\end{equation}
+
+\section{Numerical tests}
+
+Consider the following analytical solution for the axial and vertical displacement
+
+\begin{equation}\label{eq:analytical}
+	\begin{aligned}
+		u &= x(1-x/L) \sin(t), \\
+		w &= \sin(\pi x/L)\sin(t), \\
+	\end{aligned}
+\end{equation}
+toghether with the boundary conditions
+\begin{equation}
+u\vert_0^L = 0, \quad w\vert_0^L =0, \quad m_{xx}\vert_{0}^L=0.
+\end{equation}
+Then the associated axial and bending stress resultants are given by  
+\begin{equation}
+	\begin{aligned}
+		n_{xx} &= EA \sin(t) \left[1-2x/L + \pi^2/(2 L^2)\sin(t)\cos^2(\pi x /L) \right], \\
+		m_{xx} &= - EI \pi^2/L^2 \sin(\pi x/L)\sin(t). \\
+	\end{aligned}
+\end{equation}
+For Eq. \eqref{eq:analytical} to be the solution of \eqref{eq:class} appropriate forcing term have to be introduced. These are given by 
+\begin{equation}\label{eq:forcing}
+	\begin{aligned}
+		f_u &= \rho A \partial_{tt}^2 u - \partial_x n_{xx}, \\
+		f_w &= \rho A \partial_{tt}^2 w + \partial_{xx}^2 m_{xx} - \partial_x(n_{xx} \partial_x w), \\
+	\end{aligned}
+\end{equation}
 
 \section{Conclusion}
 
-\begin{ack}
-The authors would like to thank Denis Matignon from ISAE-SUPAERO for the fruitful and insightful discussions.
+\begin{ack} 
+	
 \end{ack}
 
 \bibliography{biblio_LHMNC}             % bib file to 

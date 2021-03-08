@@ -20,13 +20,13 @@ plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 rcParams.update({'figure.autolayout': True})
 rcParams['text.usetex'] = True
-#rcParams['text.latex.preamble']=r"\usepackage{bm}"
 
-from EnergyShapingPDE.func_timoshenko import matrices_timoshenko
+from EnergyShapingPDE.func_timoshenko_all import matrices_timoshenko
 
-init = ('sin(pi*x[0])', 'sin(3*pi*x[0])', '0', '0')
+init = ('exp(-x[0])-1', '0', '0', '0')
 
-M, J, B, e0, dofs_dict, x_dict = matrices_timoshenko(n_el=10, deg=1, e0_string=init)
+M_red, J_red, B_red, e0_red, dofs_dict, x_dict, T_r2t = matrices_timoshenko(n_el=10, deg=1,\
+                                                                    e0_string=init)
 
 dofs_vt = dofs_dict['v_t']
 x_vt = x_dict['v_t']
@@ -40,10 +40,10 @@ x_sigr = x_dict['sig_r']
 dofs_sigt = dofs_dict['sig_t']
 x_sigt = x_dict['sig_t']
 
-u_in = np.array([0, 1])
+u_in = np.array([1, 0])
 
-A_sys = np.linalg.solve(M, J)
-B_sys = np.linalg.solve(M, B)
+A_sys = np.linalg.solve(M_red, J_red)
+B_sys = np.linalg.solve(M_red, B_red)
 
 def fun(t,y):
 
@@ -58,82 +58,93 @@ t_span = [t0, t_fin]
 n_ev = 500
 t_ev = np.linspace(t0, t_fin, num=n_ev)
 
-sol = solve_ivp(fun, t_span, e0, method='RK45', t_eval = t_ev, \
+sol_red = solve_ivp(fun, t_span, e0_red, method='RK45', t_eval = t_ev, \
                        atol = 1e-5, rtol = 1e-5)
 
-e_sol = sol.y
+e_red = sol_red.y
 
-vt_sol= np.zeros((len(dofs_vt), n_ev))
-vr_sol= np.zeros((len(dofs_vr), n_ev))
+n_all = len(T_r2t)
+e_all = np.zeros((n_all, n_ev))
 
-sigr_sol= np.zeros((len(dofs_sigr), n_ev))
-sigt_sol= np.zeros((len(dofs_sigt), n_ev))
+vt_all= np.zeros((len(dofs_vt), n_ev))
+vr_all= np.zeros((len(dofs_vr), n_ev))
+
+sigr_all= np.zeros((len(dofs_sigr), n_ev))
+sigt_all= np.zeros((len(dofs_sigt), n_ev))
 
 for i in range(n_ev):
     
-    vt_sol[:, i] = e_sol[dofs_vt, i]
-    vr_sol[:, i] = e_sol[dofs_vr, i]
+    e_all[:, i] = T_r2t @ e_red[:,i]
     
-    sigr_sol[:, i] = e_sol[dofs_sigr, i]
-    sigt_sol[:, i] = e_sol[dofs_sigt, i]
+    vt_all[:, i] = e_all[dofs_vt, i]
+    vr_all[:, i] = e_all[dofs_vr, i]
+    
+    sigr_all[:, i] = e_all[dofs_sigr, i]
+    sigt_all[:, i] = e_all[dofs_sigt, i]
 
 
 H_vec = np.zeros((n_ev))
 
 for i in range(n_ev):
-    H_vec[i] = 0.5 *(e_sol[:, i] @ M @ e_sol[:, i])
+    H_vec[i] = 0.5 *(e_red[:, i] @ M_red @ e_red[:, i])
 
 fig = plt.figure()
 plt.plot(t_ev, H_vec, 'g-')
 plt.xlabel(r'{Time} [t]')
 plt.ylabel(r'Total Energy [J]')
 
+
 # Plot of the different variables
 # Due to fenics ordering, a permutation is first needed
 
 perm_vt = np.argsort(x_vt)
 x_vt_perm = x_vt[perm_vt]
-vt_sol_perm = vt_sol[perm_vt, :]
+vt_all_perm = vt_all[perm_vt, :]
 
 perm_vr = np.argsort(x_vr)
 x_vr_perm = x_vr[perm_vr]
-vr_sol_perm = vr_sol[perm_vr, :]
+vr_all_perm = vr_all[perm_vr, :]
 
 perm_sigr = np.argsort(x_sigr)
 x_sigr_perm = x_sigr[perm_sigr]
-sigr_sol_perm = sigr_sol[perm_sigr, :]
+sigr_all_perm = sigr_all[perm_sigr, :]
 
 perm_sigt = np.argsort(x_sigt)
 x_sigt_perm = x_sigt[perm_sigt]
-sigt_sol_perm = sigt_sol[perm_sigt, :]
+sigt_all_perm = sigt_all[perm_sigt, :]
+
+## Initial condition plot
+#fig = plt.figure(1)
+#ax = plt.axes(xlim=(0, 1), ylim=(np.min(np.min(v_all)), np.max(np.max(v_all))))
+#line, = ax.plot(x_Vpw_perm, v_all_perm[:, 0], lw=2, label = 'Time =' + '{0:.2f}'.format(t_ev[0]) + '[s]')
 
 # Plot variables
 fig, ax = plt.subplots()
 ax.set_xlabel('Space [m]')
 ax.set_ylabel('Coenergy variables')
 ax.set_xlim(0, 1)
-ax.set_ylim(np.min(np.min(e_sol)), np.max(np.max(e_sol)))
+ax.set_ylim(np.min(np.min(e_all)), np.max(np.max(e_all)))
 
-line_vt, = ax.plot([], [], lw=2, label = '${v}_t$ at $t$ =' \
+line_vt, = ax.plot([], [], lw=2, label = '$\mathbf{v}_t$ at $t$ =' \
                    + '{0:.2f}'.format(t_ev[0]) + '[s]')
-line_vr, = ax.plot([], [], lw=2, label = '${v}_r$ at $t$ =' \
+line_vr, = ax.plot([], [], lw=2, label = '$\mathbf{v}_r$ at $t$ =' \
                    + '{0:.2f}'.format(t_ev[0]) + '[s]')
-line_sigr, = ax.plot([], [], 'o', lw=2, label = '${\sigma}_r$ at $t$ ='  \
+line_sigr, = ax.plot([], [], lw=2, label = '$\mathbf{s}_r$ at $t$ ='  \
                    + '{0:.2f}'.format(t_ev[0]) + '[s]')
-line_sigt, = ax.plot([], [], '*', lw=2, label = '${\sigma}_t$ at $t$ ='  \
+line_sigt, = ax.plot([], [], lw=2, label = '$\mathbf{s}_t$ at $t$ ='  \
                    + '{0:.2f}'.format(t_ev[0]) + '[s]')
 
 # Functions for plot
 def animate(i):
-    line_vt.set_data(np.pad(x_vt_perm, (1, 0)), np.pad(vt_sol_perm[:,i], (1, 0)))
-    line_vr.set_data(np.pad(x_vr_perm, (1, 0)), np.pad(vr_sol_perm[:,i], (1, 0)))
-    line_sigr.set_data(x_sigr_perm, sigr_sol_perm[:,i])
-    line_sigt.set_data(x_sigt_perm, sigt_sol_perm[:,i])
+    line_vt.set_data(np.pad(x_vt_perm, (1, 0)), np.pad(vt_all_perm[:,i], (1, 0)))
+    line_vr.set_data(np.pad(x_vr_perm, (1, 0)), np.pad(vr_all_perm[:,i], (1, 0)))
+    line_sigr.set_data(x_sigr_perm, sigr_all_perm[:,i])
+    line_sigt.set_data(x_sigt_perm, sigt_all_perm[:,i])
     
-    line_vt.set_label('${v}_t$')
-    line_vr.set_label('${v}_r$')
-    line_sigr.set_label('${\sigma}_r$')
-    line_sigt.set_label('${\sigma}_t$')
+    line_vt.set_label('$\mathbf{v}_t$')
+    line_vr.set_label('$\mathbf{v}_r$')
+    line_sigr.set_label('$\mathbf{s}_r$')
+    line_sigt.set_label('$\mathbf{s}_t$')
     
 #    line_vt.set_label('$\mathbf{v}_t$ at $t$ =' + '{0:.2f}'.format(t_ev[i]) + '[s]')
 #    line_vr.set_label('$\mathbf{v}_r$ at $t$ =' + '{0:.2f}'.format(t_ev[i]) + '[s]')
@@ -147,9 +158,7 @@ def animate(i):
 
 anim = animation.FuncAnimation(fig, animate, frames=len(t_ev), interval=20, blit=False)
 
-##path_out = "/home/andrea/Videos/"
-##Writer = animation.writers['ffmpeg']
-##writer = Writer(fps=25, metadata=dict(artist='Me'), bitrate=1800)
-##anim.save(path_out + 'timo_bc.mp4', writer=writer)
-
-plt.show()
+#path_out = "/home/andrea/Videos/"
+#Writer = animation.writers['ffmpeg']
+#writer = Writer(fps=25, metadata=dict(artist='Me'), bitrate=1800)
+#anim_vt.save(path_out + 'timo_all.mp4', writer=writer)

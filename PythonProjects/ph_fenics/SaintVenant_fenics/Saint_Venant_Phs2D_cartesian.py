@@ -32,7 +32,7 @@ from scipy import integrate
 from scipy import linalg as la
 from math import ceil, floor
 
-n = 5
+n = 20
 deg_p = 0
 deg_q = 1
 

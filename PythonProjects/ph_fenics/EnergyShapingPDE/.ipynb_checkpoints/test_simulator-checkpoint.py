@@ -152,4 +152,3 @@ anim = animation.FuncAnimation(fig, animate, frames=len(t_ev), interval=20, blit
 ##writer = Writer(fps=25, metadata=dict(artist='Me'), bitrate=1800)
 ##anim.save(path_out + 'timo_bc.mp4', writer=writer)
 
-plt.show()
