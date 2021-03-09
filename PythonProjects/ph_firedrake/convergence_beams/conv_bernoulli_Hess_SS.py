@@ -5,10 +5,9 @@ import numpy as np
 np.set_printoptions(threshold=np.inf)
 from math import pi, floor
 
-import matplotlib
-import matplotlib.pyplot as plt
 import petsc4py
 
+import matplotlib
 import matplotlib.pyplot as plt
 SMALL_SIZE = 14
 MEDIUM_SIZE = 16
