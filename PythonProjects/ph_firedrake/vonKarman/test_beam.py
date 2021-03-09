@@ -247,12 +247,150 @@ def compute_err(n_elem, deg):
     x_an, e_eps_an = calculate_one_dim_points(interpolate(e_eps_ex, V_plot), 10) 
          
     plt.figure()
-    plt.scatter(x_num, e_eps_num, 'r', label="Numerical")
+    plt.scatter(x_num, e_eps_num, c='r', label="Numerical")
     plt.plot(x_an, e_eps_an, 'b', label="Analytical")
+
+    e_u_err_max = max(e_u_err_H1)
+    e_eps_err_max = max(e_eps_err_L2)
     
-    return 1
+    e_w_err_max = max(e_w_err_H1)
+    e_kap_err_max = max(e_w_err_H1)
     
-compute_err(100, 1)
+    w_err_max = max(w_err_H1)
+    
+    return e_u_err_max, e_eps_err_max, e_w_err_max, e_kap_err_max, w_err_max
+    
+
+e_u_err_max, e_eps_err_max, e_w_err_max, e_kap_err_max, w_err_max = compute_err(40, 1)
+
+# n_h = 5
+# n_vec = np.array([2**(i+2) for i in range(n_h)])
+# h_vec = 1./n_vec
+
+
+# v_err_r1 = np.zeros((n_h,))
+# v_errInf_r1 = np.zeros((n_h,))
+# v_errQuad_r1 = np.zeros((n_h,))
+# #
+# # v_err_r2 = np.zeros((n_h,))
+# # v_errInf_r2 = np.zeros((n_h,))
+# # v_errQuad_r2 = np.zeros((n_h,))
+# #
+# # v_err_r3 = np.zeros((n_h,))
+# # v_errInf_r3 = np.zeros((n_h,))
+# # v_errQuad_r3 = np.zeros((n_h,))
+
+# v_r1_atF = np.zeros((n_h-1,))
+# v_r1_max = np.zeros((n_h-1,))
+# v_r1_L2 = np.zeros((n_h-1,))
+# #
+# # v_r2_atF = np.zeros((n_h-1,))
+# # v_r2_max = np.zeros((n_h-1,))
+# # v_r2_L2 = np.zeros((n_h-1,))
+# #
+# # v_r3_atF = np.zeros((n_h-1,))
+# # v_r3_max = np.zeros((n_h-1,))
+# # v_r3_L2 = np.zeros((n_h-1,))
+
+# w_err_r1 = np.zeros((n_h,))
+# w_errInf_r1 = np.zeros((n_h,))
+# w_errQuad_r1 = np.zeros((n_h,))
+# #
+# w_r1_atF = np.zeros((n_h-1,))
+# w_r1_max = np.zeros((n_h-1,))
+# w_r1_L2 = np.zeros((n_h-1,))
+
+# sig_err_r1 = np.zeros((n_h,))
+# sig_errInf_r1 = np.zeros((n_h,))
+# sig_errQuad_r1 = np.zeros((n_h,))
+
+# # sig_err_r2 = np.zeros((n_h,))
+# # sig_errInf_r2 = np.zeros((n_h,))
+# # sig_errQuad_r2 = np.zeros((n_h,))
+# #
+# # sig_err_r3 = np.zeros((n_h,))
+# # sig_errInf_r3 = np.zeros((n_h,))
+# # sig_errQuad_r3 = np.zeros((n_h,))
+
+# sig_r1_atF = np.zeros((n_h-1,))
+# sig_r1_max = np.zeros((n_h-1,))
+# sig_r1_L2 = np.zeros((n_h-1,))
+
+# # sig_r2_atF = np.zeros((n_h-1,))
+# # sig_r2_max = np.zeros((n_h-1,))
+# # sig_r2_L2 = np.zeros((n_h-1,))
+# #
+# # sig_r3_atF = np.zeros((n_h-1,))
+# # sig_r3_max = np.zeros((n_h-1,))
+# # sig_r3_L2 = np.zeros((n_h-1,))
+
+
+# for i in range(n_h):
+#     w_err_r1[i], w_errInf_r1[i], w_errQuad_r1[i], v_err_r1[i], v_errInf_r1[i], v_errQuad_r1[i],\
+#     sig_err_r1[i], sig_errInf_r1[i], sig_errQuad_r1[i] = compute_err(n1_vec[i], 1)
+#     # v_err_r2[i], v_errInf_r2[i], v_errQuad_r2[i], sig_err_r2[i],\
+#     # sig_errInf_r2[i], sig_errQuad_r2[i] = compute_err(n1_vec[i], 2)
+#     # v_err_r3[i], v_errInf_r3[i], v_errQuad_r3[i], sig_err_r3[i],\
+#     # sig_errInf_r3[i], sig_errQuad_r3[i] = compute_err(n2_vec[i], 3)
+
+#     if i>0:
+#         v_r1_atF[i-1] = np.log(v_err_r1[i]/v_err_r1[i-1])/np.log(h1_vec[i]/h1_vec[i-1])
+#         v_r1_max[i-1] = np.log(v_errInf_r1[i]/v_errInf_r1[i-1])/np.log(h1_vec[i]/h1_vec[i-1])
+#         v_r1_L2[i-1] = np.log(v_errQuad_r1[i]/v_errQuad_r1[i-1])/np.log(h1_vec[i]/h1_vec[i-1])
+
+#         w_r1_atF[i - 1] = np.log(w_err_r1[i] / w_err_r1[i - 1]) / np.log(h1_vec[i] / h1_vec[i - 1])
+#         w_r1_max[i - 1] = np.log(w_errInf_r1[i] / w_errInf_r1[i - 1]) / np.log(h1_vec[i] / h1_vec[i - 1])
+#         w_r1_L2[i - 1] = np.log(w_errQuad_r1[i] / w_errQuad_r1[i - 1]) / np.log(h1_vec[i] / h1_vec[i - 1])
+
+#         # v_r2_atF[i-1] = np.log(v_err_r2[i]/v_err_r2[i-1])/np.log(h1_vec[i]/h1_vec[i-1])
+#         # v_r2_max[i-1] = np.log(v_errInf_r2[i]/v_errInf_r2[i-1])/np.log(h1_vec[i]/h1_vec[i-1])
+#         # v_r2_L2[i-1] = np.log(v_errQuad_r2[i]/v_errQuad_r2[i-1])/np.log(h1_vec[i]/h1_vec[i-1])
+#         #
+#         # v_r3_atF[i-1] = np.log(v_err_r3[i]/v_err_r3[i-1])/np.log(h2_vec[i]/h2_vec[i-1])
+#         # v_r3_max[i-1] = np.log(v_errInf_r3[i]/v_errInf_r3[i-1])/np.log(h2_vec[i]/h2_vec[i-1])
+#         # v_r3_L2[i-1] = np.log(v_errQuad_r3[i]/v_errQuad_r3[i-1])/np.log(h2_vec[i]/h2_vec[i-1])
+
+#         sig_r1_atF[i - 1] = np.log(sig_err_r1[i] / sig_err_r1[i - 1]) / np.log(h1_vec[i] / h1_vec[i - 1])
+#         sig_r1_max[i - 1] = np.log(sig_errInf_r1[i] / sig_errInf_r1[i - 1]) / np.log(h1_vec[i] / h1_vec[i - 1])
+#         sig_r1_L2[i - 1] = np.log(sig_errQuad_r1[i] / sig_errQuad_r1[i - 1]) / np.log(h1_vec[i] / h1_vec[i - 1])
+
+#         # sig_r2_atF[i - 1] = np.log(sig_err_r2[i] / sig_err_r2[i - 1]) / np.log(h1_vec[i] / h1_vec[i - 1])
+#         # sig_r2_max[i - 1] = np.log(sig_errInf_r2[i] / sig_errInf_r2[i - 1]) / np.log(h1_vec[i] / h1_vec[i - 1])
+#         # sig_r2_L2[i - 1] = np.log(sig_errQuad_r2[i] / sig_errQuad_r2[i - 1]) / np.log(h1_vec[i] / h1_vec[i - 1])
+#         #
+#         # sig_r3_atF[i - 1] = np.log(sig_err_r3[i] / sig_err_r3[i - 1]) / np.log(h2_vec[i] / h2_vec[i - 1])
+#         # sig_r3_max[i - 1] = np.log(sig_errInf_r3[i] / sig_errInf_r3[i - 1]) / np.log(h2_vec[i] / h2_vec[i - 1])
+#         # sig_r3_L2[i - 1] = np.log(sig_errQuad_r3[i] / sig_errQuad_r3[i - 1]) / np.log(h2_vec[i] / h2_vec[i - 1])
+
+# path_res = "./convergence_results_bernoulli/"
+# if save_res:
+#     np.save(path_res + bc_input + "_h1", h1_vec)
+#     # np.save(path_res + bc_input + "_h2", h1_vec)
+#     # np.save(path_res + bc_input + "_h3", h2_vec)
+
+#     np.save(path_res + bc_input + "_v_errF_r1", v_err_r1)
+#     np.save(path_res + bc_input + "_v_errInf_r1", v_errInf_r1)
+#     np.save(path_res + bc_input + "_v_errQuad_r1", v_errQuad_r1)
+
+#     # np.save(path_res + bc_input + "_v_errF_r2", v_err_r2)
+#     # np.save(path_res + bc_input + "_v_errInf_r2", v_errInf_r2)
+#     # np.save(path_res + bc_input + "_v_errQuad_r2", v_errQuad_r2)
+#     #
+#     # np.save(path_res + bc_input + "_v_errF_r3", v_err_r3)
+#     # np.save(path_res + bc_input + "_v_errInf_r3", v_errInf_r3)
+#     # np.save(path_res + bc_input + "_v_errQuad_r3", v_errQuad_r3)
+
+#     np.save(path_res + bc_input + "_sig_errF_r1", sig_err_r1)
+#     np.save(path_res + bc_input + "_sig_errInf_r1", sig_errInf_r1)
+#     np.save(path_res + bc_input + "_sig_errQuad_r1", sig_errQuad_r1)
+
+#     # np.save(path_res + bc_input + "_sig_errF_r2", sig_err_r2)
+#     # np.save(path_res + bc_input + "_sig_errInf_r2", sig_errInf_r2)
+#     # np.save(path_res + bc_input + "_sig_errQuad_r2", sig_errQuad_r2)
+#     #
+#     # np.save(path_res + bc_input + "_sig_errF_r3", sig_err_r3)
+#     # np.save(path_res + bc_input + "_sig_errInf_r3", sig_errInf_r3)
+#     # np.save(path_res + bc_input + "_sig_errQuad_r3", sig_errQuad_r3)
 
 
 
