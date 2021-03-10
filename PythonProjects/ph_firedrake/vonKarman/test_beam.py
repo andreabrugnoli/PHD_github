@@ -6,7 +6,8 @@ import numpy as np
 np.set_printoptions(threshold=np.inf)
 from math import pi, floor
 
-
+# Matplotlib settings
+import matplotlib
 import matplotlib.pyplot as plt
 SMALL_SIZE = 14
 MEDIUM_SIZE = 16
@@ -20,16 +21,24 @@ plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
 plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
 plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
+matplotlib.rcParams['text.usetex'] = True
+
+
+save_res = True
 # Physical coefficients
 
-rho = 1 
-E = 1
+rho = 2700
+E = 70 * 10**9
 
 # Geometrical coefficients 
 
 L = 1
-A = 1
-I = 1
+height = 0.1
+wid = 0.1
+
+A = height*wid
+I = wid*height**3/12
+
 
 def m_operator(v_u, v_eps, v_w, v_kap, v_disp, \
                    e_u, e_eps, e_w, e_kap, e_disp):
@@ -97,17 +106,28 @@ def compute_err(n_elem, deg):
     t = 0.
     t_fin = 1        # total simulation time
 
+    dt = 1/(2*pi*n_elem)
     t_ = Constant(t)
-    t_1 = Constant(t)
+    t_1 = Constant(t+dt)
+    theta = 0.5
+    
     x = mesh.coordinates
     
-    u_ex = x[0]*(1-x[0]/L)*sin(t_)    
-    e_u_ex = x[0]*(1-x[0]/L)*cos(t_)
-    dtt_u_ex = - x[0]*(1-x[0]/L)*sin(t_)
-
-    w_ex = sin(pi*x[0]/L)*sin(t_)
-    e_w_ex = sin(pi*x[0]/L) * cos(t_)
-    dtt_w_ex = - sin(pi*x[0]/L)*sin(t_)
+    T_u = t_fin
+    omega_u = 2*pi/T_u*t_fin
+    T_w = t_fin
+    omega_w = 2*pi/T_w*t_fin
+    
+    # omega_u = 1
+    # omega_w = 1
+    
+    u_ex = x[0]*(1-x[0]/L)*sin(omega_u*t_)    
+    e_u_ex = omega_u*x[0]*(1-x[0]/L)*cos(omega_u*t_)
+    dtt_u_ex = - omega_u**2 * x[0]*(1-x[0]/L)*sin(omega_u*t_)
+    
+    w_ex = sin(pi*x[0]/L)*sin(omega_w*t_)
+    e_w_ex = omega_w*sin(pi*x[0]/L) * cos(omega_w*t_)
+    dtt_w_ex = - omega_w**2*sin(pi*x[0]/L)*sin(omega_w*t_)
 
     e_eps_ex = E*A*(u_ex.dx(0) + 0.5*(w_ex.dx(0))**2)
     e_kap_ex = E*I*w_ex.dx(0).dx(0)
@@ -117,13 +137,13 @@ def compute_err(n_elem, deg):
     
     f_form = v_u*f_u*dx + v_w*f_w*dx
     
-    u_ex1 = x[0]*(1-x[0]/L)*sin(t_1)    
-    e_u_ex1 = x[0]*(1-x[0]/L)*cos(t_1)
-    dtt_u_ex1 = - x[0]*(1-x[0]/L)*sin(t_1)
+    u_ex1 = x[0]*(1-x[0]/L)*sin(omega_u*t_1)    
+    e_u_ex1 = omega_u*x[0]*(1-x[0]/L)*cos(omega_u*t_1)
+    dtt_u_ex1 = - omega_u**2*x[0]*(1-x[0]/L)*sin(omega_u*t_1)
 
-    w_ex1 = sin(pi*x[0]/L)*sin(t_1)
-    e_w_ex1 = sin(pi*x[0]/L) * cos(t_1)
-    dtt_w_ex1 = - sin(pi*x[0]/L)*sin(t_1)
+    w_ex1 = sin(pi*x[0]/L)*sin(omega_w*t_1)
+    e_w_ex1 = omega_w*sin(pi*x[0]/L) * cos(omega_w*t_1)
+    dtt_w_ex1 = - omega_w**2*sin(pi*x[0]/L)*sin(omega_w*t_1)
 
     e_eps_ex1 = E*A*(u_ex1.dx(0) + 0.5*(w_ex1.dx(0))**2)
     e_kap_ex1 = E*I*w_ex1.dx(0).dx(0)
@@ -133,8 +153,6 @@ def compute_err(n_elem, deg):
    
     f_form1 = v_u*f_u1*dx + v_w*f_w1*dx
 
-    dt = 0.1/n_elem
-    theta = 0.5
 
     e_n = Function(V,  name="e old")
     e_n1 = Function(V,  name="e new")
@@ -159,7 +177,6 @@ def compute_err(n_elem, deg):
     e_u_atP = np.zeros((n_t,))
     
     
-    
     Ppoint = 3*L/4
 
     
@@ -177,14 +194,12 @@ def compute_err(n_elem, deg):
     w_err_H1[0] = np.sqrt(assemble(inner(e_disp_n-w_ex, e_disp_n-w_ex) * dx
                 + inner(e_disp_n.dx(0) - w_ex.dx(0), e_disp_n.dx(0) - w_ex.dx(0)) * dx))
     
-    
+    param = {"ksp_type": "preonly", "pc_type": "lu"}
+        
     for i in range(1, n_t):
 
-        t_.assign(t)
-        t_1.assign(t+dt)
 
         e_u_n, e_eps_n, e_w_n, e_kap_n, e_disp_n = e_n.split()
-        
         e_u_n1, e_eps_n1, e_w_n1, e_kap_n1, e_disp_n1 = split(e_n1)
        
         left_hs = m_operator(v_u, v_eps, v_w, v_kap, v_disp, \
@@ -203,13 +218,15 @@ def compute_err(n_elem, deg):
         F = left_hs - right_hs
 
         e_n1.assign(e_n) #  For initialisation
-        solve(F==0, e_n1, bcs=bcs)
+        solve(F==0, e_n1, bcs=bcs, \
+              solver_parameters=param)
         
         e_n.assign(e_n1)
         
         t += dt
         t_.assign(t)
-        
+        t_1.assign(t+dt)
+  
         e_u_n, e_eps_n, e_w_n, e_kap_n, e_disp_n = e_n.split()
         
 
@@ -233,22 +250,20 @@ def compute_err(n_elem, deg):
 
     # plt.figure()
     # plt.plot(t_vec, w_atP, 'r-', label=r'approx $w$')
-    # plt.plot(t_vec, np.sin(pi*Ppoint/L)*np.sin(t_vec), 'b-', label=r'exact $w$')
-    # # plt.plot(t_vec, v_atP, 'r-', label=r'approx $v$')
-    # # plt.plot(t_vec, beta * np.sin(pi*Ppoint[0]/Lx)*np.sin(pi*Ppoint[1]/Ly) * np.cos(beta * t_vec), 'b-', label=r'exact $v$')
+    # plt.plot(t_vec, np.sin(pi*Ppoint/L)*np.sin(omega_w*t_vec), 'b-', label=r'exact $w$')
     # plt.xlabel(r'Time [s]')
     # plt.title(r'Displacement at: ' + str(Ppoint))
     # plt.legend()
-    # # plt.show()
      
-    x_num, e_eps_num = calculate_one_dim_points(e_eps_n, 1) 
+    # x_num, e_eps_num = calculate_one_dim_points(e_eps_n, 1) 
 
-    V_plot = FunctionSpace(mesh, "CG", 5)
-    x_an, e_eps_an = calculate_one_dim_points(interpolate(e_eps_ex, V_plot), 10) 
+    # V_plot = FunctionSpace(mesh, "CG", 5)
+    # x_an, e_eps_an = calculate_one_dim_points(interpolate(e_eps_ex, V_plot), 10) 
          
-    plt.figure()
-    plt.scatter(x_num, e_eps_num, c='r', label="Numerical")
-    plt.plot(x_an, e_eps_an, 'b', label="Analytical")
+    # fig, ax = plt.subplots()
+    # ax.scatter(x_num, e_eps_num, c='r', label='Numerical')
+    # ax.plot(x_an, e_eps_an, 'b', label="Analytical")
+    # ax.legend()
 
     e_u_err_max = max(e_u_err_H1)
     e_eps_err_max = max(e_eps_err_L2)
@@ -261,137 +276,67 @@ def compute_err(n_elem, deg):
     return e_u_err_max, e_eps_err_max, e_w_err_max, e_kap_err_max, w_err_max
     
 
-e_u_err_max, e_eps_err_max, e_w_err_max, e_kap_err_max, w_err_max = compute_err(40, 1)
+# e_u_err_max, e_eps_err_max, e_w_err_max, e_kap_err_max, w_err_max = compute_err(10, 1)
 
-# n_h = 5
-# n_vec = np.array([2**(i+2) for i in range(n_h)])
-# h_vec = 1./n_vec
-
-
-# v_err_r1 = np.zeros((n_h,))
-# v_errInf_r1 = np.zeros((n_h,))
-# v_errQuad_r1 = np.zeros((n_h,))
-# #
-# # v_err_r2 = np.zeros((n_h,))
-# # v_errInf_r2 = np.zeros((n_h,))
-# # v_errQuad_r2 = np.zeros((n_h,))
-# #
-# # v_err_r3 = np.zeros((n_h,))
-# # v_errInf_r3 = np.zeros((n_h,))
-# # v_errQuad_r3 = np.zeros((n_h,))
-
-# v_r1_atF = np.zeros((n_h-1,))
-# v_r1_max = np.zeros((n_h-1,))
-# v_r1_L2 = np.zeros((n_h-1,))
-# #
-# # v_r2_atF = np.zeros((n_h-1,))
-# # v_r2_max = np.zeros((n_h-1,))
-# # v_r2_L2 = np.zeros((n_h-1,))
-# #
-# # v_r3_atF = np.zeros((n_h-1,))
-# # v_r3_max = np.zeros((n_h-1,))
-# # v_r3_L2 = np.zeros((n_h-1,))
-
-# w_err_r1 = np.zeros((n_h,))
-# w_errInf_r1 = np.zeros((n_h,))
-# w_errQuad_r1 = np.zeros((n_h,))
-# #
-# w_r1_atF = np.zeros((n_h-1,))
-# w_r1_max = np.zeros((n_h-1,))
-# w_r1_L2 = np.zeros((n_h-1,))
-
-# sig_err_r1 = np.zeros((n_h,))
-# sig_errInf_r1 = np.zeros((n_h,))
-# sig_errQuad_r1 = np.zeros((n_h,))
-
-# # sig_err_r2 = np.zeros((n_h,))
-# # sig_errInf_r2 = np.zeros((n_h,))
-# # sig_errQuad_r2 = np.zeros((n_h,))
-# #
-# # sig_err_r3 = np.zeros((n_h,))
-# # sig_errInf_r3 = np.zeros((n_h,))
-# # sig_errQuad_r3 = np.zeros((n_h,))
-
-# sig_r1_atF = np.zeros((n_h-1,))
-# sig_r1_max = np.zeros((n_h-1,))
-# sig_r1_L2 = np.zeros((n_h-1,))
-
-# # sig_r2_atF = np.zeros((n_h-1,))
-# # sig_r2_max = np.zeros((n_h-1,))
-# # sig_r2_L2 = np.zeros((n_h-1,))
-# #
-# # sig_r3_atF = np.zeros((n_h-1,))
-# # sig_r3_max = np.zeros((n_h-1,))
-# # sig_r3_L2 = np.zeros((n_h-1,))
+n_h = 5
+n_vec = np.array([2**(i+3) for i in range(n_h)])
+h_vec = 1./n_vec
 
 
-# for i in range(n_h):
-#     w_err_r1[i], w_errInf_r1[i], w_errQuad_r1[i], v_err_r1[i], v_errInf_r1[i], v_errQuad_r1[i],\
-#     sig_err_r1[i], sig_errInf_r1[i], sig_errQuad_r1[i] = compute_err(n1_vec[i], 1)
-#     # v_err_r2[i], v_errInf_r2[i], v_errQuad_r2[i], sig_err_r2[i],\
-#     # sig_errInf_r2[i], sig_errQuad_r2[i] = compute_err(n1_vec[i], 2)
-#     # v_err_r3[i], v_errInf_r3[i], v_errQuad_r3[i], sig_err_r3[i],\
-#     # sig_errInf_r3[i], sig_errQuad_r3[i] = compute_err(n2_vec[i], 3)
+e_u_err_deg1 = np.zeros((n_h,))
+e_u_err_deg2 = np.zeros((n_h,))
+e_u_err_deg3 = np.zeros((n_h,))
 
-#     if i>0:
-#         v_r1_atF[i-1] = np.log(v_err_r1[i]/v_err_r1[i-1])/np.log(h1_vec[i]/h1_vec[i-1])
-#         v_r1_max[i-1] = np.log(v_errInf_r1[i]/v_errInf_r1[i-1])/np.log(h1_vec[i]/h1_vec[i-1])
-#         v_r1_L2[i-1] = np.log(v_errQuad_r1[i]/v_errQuad_r1[i-1])/np.log(h1_vec[i]/h1_vec[i-1])
+e_eps_err_deg1 = np.zeros((n_h,))
+e_eps_err_deg2 = np.zeros((n_h,))
+e_eps_err_deg3 = np.zeros((n_h,))
 
-#         w_r1_atF[i - 1] = np.log(w_err_r1[i] / w_err_r1[i - 1]) / np.log(h1_vec[i] / h1_vec[i - 1])
-#         w_r1_max[i - 1] = np.log(w_errInf_r1[i] / w_errInf_r1[i - 1]) / np.log(h1_vec[i] / h1_vec[i - 1])
-#         w_r1_L2[i - 1] = np.log(w_errQuad_r1[i] / w_errQuad_r1[i - 1]) / np.log(h1_vec[i] / h1_vec[i - 1])
+e_w_err_deg1 = np.zeros((n_h,))
+e_w_err_deg2 = np.zeros((n_h,))
+e_w_err_deg3 = np.zeros((n_h,))
 
-#         # v_r2_atF[i-1] = np.log(v_err_r2[i]/v_err_r2[i-1])/np.log(h1_vec[i]/h1_vec[i-1])
-#         # v_r2_max[i-1] = np.log(v_errInf_r2[i]/v_errInf_r2[i-1])/np.log(h1_vec[i]/h1_vec[i-1])
-#         # v_r2_L2[i-1] = np.log(v_errQuad_r2[i]/v_errQuad_r2[i-1])/np.log(h1_vec[i]/h1_vec[i-1])
-#         #
-#         # v_r3_atF[i-1] = np.log(v_err_r3[i]/v_err_r3[i-1])/np.log(h2_vec[i]/h2_vec[i-1])
-#         # v_r3_max[i-1] = np.log(v_errInf_r3[i]/v_errInf_r3[i-1])/np.log(h2_vec[i]/h2_vec[i-1])
-#         # v_r3_L2[i-1] = np.log(v_errQuad_r3[i]/v_errQuad_r3[i-1])/np.log(h2_vec[i]/h2_vec[i-1])
+e_kap_err_deg1 = np.zeros((n_h,))
+e_kap_err_deg2 = np.zeros((n_h,))
+e_kap_err_deg3 = np.zeros((n_h,))
 
-#         sig_r1_atF[i - 1] = np.log(sig_err_r1[i] / sig_err_r1[i - 1]) / np.log(h1_vec[i] / h1_vec[i - 1])
-#         sig_r1_max[i - 1] = np.log(sig_errInf_r1[i] / sig_errInf_r1[i - 1]) / np.log(h1_vec[i] / h1_vec[i - 1])
-#         sig_r1_L2[i - 1] = np.log(sig_errQuad_r1[i] / sig_errQuad_r1[i - 1]) / np.log(h1_vec[i] / h1_vec[i - 1])
+e_disp_err_deg1 = np.zeros((n_h,))
+e_disp_err_deg2 = np.zeros((n_h,))
+e_disp_err_deg3 = np.zeros((n_h,))
 
-#         # sig_r2_atF[i - 1] = np.log(sig_err_r2[i] / sig_err_r2[i - 1]) / np.log(h1_vec[i] / h1_vec[i - 1])
-#         # sig_r2_max[i - 1] = np.log(sig_errInf_r2[i] / sig_errInf_r2[i - 1]) / np.log(h1_vec[i] / h1_vec[i - 1])
-#         # sig_r2_L2[i - 1] = np.log(sig_errQuad_r2[i] / sig_errQuad_r2[i - 1]) / np.log(h1_vec[i] / h1_vec[i - 1])
-#         #
-#         # sig_r3_atF[i - 1] = np.log(sig_err_r3[i] / sig_err_r3[i - 1]) / np.log(h2_vec[i] / h2_vec[i - 1])
-#         # sig_r3_max[i - 1] = np.log(sig_errInf_r3[i] / sig_errInf_r3[i - 1]) / np.log(h2_vec[i] / h2_vec[i - 1])
-#         # sig_r3_L2[i - 1] = np.log(sig_errQuad_r3[i] / sig_errQuad_r3[i - 1]) / np.log(h2_vec[i] / h2_vec[i - 1])
 
-# path_res = "./convergence_results_bernoulli/"
-# if save_res:
-#     np.save(path_res + bc_input + "_h1", h1_vec)
-#     # np.save(path_res + bc_input + "_h2", h1_vec)
-#     # np.save(path_res + bc_input + "_h3", h2_vec)
+for i in range(n_h):
+    e_u_err_deg1[i], e_eps_err_deg1[i], e_w_err_deg1[i], e_kap_err_deg1[i], \
+        e_disp_err_deg1[i] = compute_err(n_vec[i], 1)
+    e_u_err_deg2[i], e_eps_err_deg2[i], e_w_err_deg2[i], e_kap_err_deg2[i], \
+        e_disp_err_deg2[i] = compute_err(n_vec[i], 2)
+    # e_u_err_deg3[i], e_eps_err_deg3[i], e_w_err_deg3[i], e_kap_err_deg3[i], \
+    #     e_disp_err_deg3[i] = compute_err(n_vec[i], 3)
 
-#     np.save(path_res + bc_input + "_v_errF_r1", v_err_r1)
-#     np.save(path_res + bc_input + "_v_errInf_r1", v_errInf_r1)
-#     np.save(path_res + bc_input + "_v_errQuad_r1", v_errQuad_r1)
+        
+       
+path_res = "./errors_data/"
+if save_res:
+    np.save(path_res + "h_vec", h_vec)
+   
+    np.save(path_res + "e_u_err_deg1", e_u_err_deg1)
+    np.save(path_res + "e_u_err_deg2", e_u_err_deg2)
+    np.save(path_res + "e_u_err_deg3", e_u_err_deg3)
 
-#     # np.save(path_res + bc_input + "_v_errF_r2", v_err_r2)
-#     # np.save(path_res + bc_input + "_v_errInf_r2", v_errInf_r2)
-#     # np.save(path_res + bc_input + "_v_errQuad_r2", v_errQuad_r2)
-#     #
-#     # np.save(path_res + bc_input + "_v_errF_r3", v_err_r3)
-#     # np.save(path_res + bc_input + "_v_errInf_r3", v_errInf_r3)
-#     # np.save(path_res + bc_input + "_v_errQuad_r3", v_errQuad_r3)
-
-#     np.save(path_res + bc_input + "_sig_errF_r1", sig_err_r1)
-#     np.save(path_res + bc_input + "_sig_errInf_r1", sig_errInf_r1)
-#     np.save(path_res + bc_input + "_sig_errQuad_r1", sig_errQuad_r1)
-
-#     # np.save(path_res + bc_input + "_sig_errF_r2", sig_err_r2)
-#     # np.save(path_res + bc_input + "_sig_errInf_r2", sig_errInf_r2)
-#     # np.save(path_res + bc_input + "_sig_errQuad_r2", sig_errQuad_r2)
-#     #
-#     # np.save(path_res + bc_input + "_sig_errF_r3", sig_err_r3)
-#     # np.save(path_res + bc_input + "_sig_errInf_r3", sig_errInf_r3)
-#     # np.save(path_res + bc_input + "_sig_errQuad_r3", sig_errQuad_r3)
-
+    np.save(path_res + "e_eps_err_deg1", e_eps_err_deg1)
+    np.save(path_res + "e_eps_err_deg2", e_eps_err_deg2)
+    np.save(path_res + "e_eps_err_deg3", e_eps_err_deg3)
+    
+    np.save(path_res + "e_w_err_deg1", e_w_err_deg1)
+    np.save(path_res + "e_w_err_deg2", e_w_err_deg2)
+    np.save(path_res + "e_w_err_deg3", e_w_err_deg3)
+    
+    np.save(path_res + "e_kap_err_deg1", e_kap_err_deg1)
+    np.save(path_res + "e_kap_err_deg2", e_kap_err_deg2)
+    np.save(path_res + "e_kap_err_deg3", e_kap_err_deg3)
+    
+    np.save(path_res + "e_disp_err_deg1", e_disp_err_deg1)
+    np.save(path_res + "e_disp_err_deg2", e_disp_err_deg2)
+    np.save(path_res + "e_disp_err_deg3", e_disp_err_deg3)
 
 
 
