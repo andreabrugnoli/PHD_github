@@ -98,7 +98,7 @@
 	denis.matignon@isae.fr}
 
 \begin{abstract}
-
+A port-Hamiltonian formulation of von K\'arm\'an beams is presented. The variables selection lead to a non linear interconnection operator, while the constitutive laws are linear. The model can be readily discretized by exploiting a coenergy formulation and a mixed finite element method. The mixed formulation does not demand the $H^2$ regularity requirement typical of standard Galerkin discretization of thin structures. A numerical test is performed to assess the convergence rate of the solution. The error behavior exhibit the same convergence rate of the associated linear problem.
 \end{abstract}
 
 \begin{keyword}
@@ -109,6 +109,13 @@ Port-Hamiltonian systems (pHs), von K\'arm\'an beams, Mixed Finite Elements
 %===============================================================================
 
 \section{Introduction}
+
+Linear elastic structures have been largely investigated into the port-Hamiltonian (pH) framework as well as the heat equation (consult for instance \cite{macchelli2004timo} for the Timoshenko beam, \cite{aoues2017modeling} for the Euler-Bernoulli beam, \cite{brugnoli2019ammmin,brugnoli2019ammkir} for thick and thin plates). Recently, more complicated models arising from fluid dynamics have also been considered \cite{cardoso2020swe,rashad2020port1,rashad2020port2,altmann2017}. 
+
+
+The Hamiltonian foundation of non-linear elasticity dates back to the late 80' \cite{simo1988}. However, the field of non-linear elasticity remains an unexplored topic in the pH framework 
+
+The development of new models within the pH framework has been accompanied with an increased interest in numerical discretization methods, capable of retaining the main features of the distributed system in its finite-dimensional counterpart. Recently, it has become evident that there is a strict link between  discretization of port-Hamiltonian  systems and mixed finite elements \cite{cardoso2020pfem}. An example of this connection is given in \cite{kirby2015}, where a velocity-stress formulation for the wave dynamics is shown to be Hamiltonian and its mixed discretization preserves such a structure.
 
 \section{Von K\'arm\'an beams}
 
@@ -312,25 +319,25 @@ such that the following system
 		\inner[\Omega]{\psi}{\dot{w}} &= \inner[\Omega]{\psi}{e_w}. \\
 	\end{aligned}
 \end{equation}
-holds $\forall (\psi_u, \psi_w, \psi_\kappa, \psi) \in H^1(\Omega), \, \forall \psi_\varepsilon \in L^2(\Omega)$
+holds $\forall (\psi_u, \psi_w, \psi_\kappa, \psi) \in H^1(\Omega), \, \forall \psi_\varepsilon \in L^2(\Omega)$.
 In this formulation, the boundary axial forces $e_\varepsilon\vert_{0}^L$, vertical forces $e_\varepsilon\partial_x w - \partial_x e_\kappa\vert_{0}^L$ and  rotations $\partial_x e_w\vert_{0}^L$ are enforced weakly. To obtain the associated finite-dimensional system, the following Galerkin approximation is considered 
 \begin{equation}\label{eq:Gal_appr}
 \begin{aligned}
-	e_u &= \sum_{i=1}^{n_u} \xi_u^i(x) e_u^i(t), \\
-	e_\varepsilon &= \sum_{i=1}^{n_\varepsilon} \xi_\varepsilon^i(x) e_\varepsilon^i(t), \\
-	e_w &= \sum_{i=1}^{n_w} \xi_w^i(x) e_w^i(t), \\
-	e_\kappa &= \sum_{i=1}^{n_\kappa} \xi_\kappa^i(x) e_\kappa^i(t), \\
-	w &= \sum_{i=1}^{n_w} \xi_w^i(x) w^i(t), \\
+	e_u^h &= \sum_{i=1}^{n_u} \xi_u^i(x) e_u^i(t), \\
+	e_\varepsilon^h &= \sum_{i=1}^{n_\varepsilon} \xi_\varepsilon^i(x) e_\varepsilon^i(t), \\
+	e_w^h &= \sum_{i=1}^{n_w} \xi_w^i(x) e_w^i(t), \\
+	e_\kappa^h &= \sum_{i=1}^{n_\kappa} \xi_\kappa^i(x) e_\kappa^i(t), \\
+	w^h &= \sum_{i=1}^{n_w} \xi_w^i(x) w^i(t), \\
 \end{aligned} \qquad 
 \begin{aligned}
-	\psi_u &= \sum_{i=1}^{n_u} \xi_u^i(x) \psi_u^i, \\
-	\psi_\varepsilon &= \sum_{i=1}^{n_\varepsilon} \xi_\varepsilon^i(x) \psi_\varepsilon^i, \\
-	\psi_w &= \sum_{i=1}^{n_w} \xi_w^i(x) \psi_w^i, \\
-    \psi_\kappa &= \sum_{i=1}^{n_\kappa} \xi_\kappa^i(x) \psi_\kappa^i, \\
-	\psi &= \sum_{i=1}^{n_w} \xi_w^i(x) \psi^i, \\
+	\psi_u^h &= \sum_{i=1}^{n_u} \xi_u^i(x) \psi_u^i, \\
+	\psi_\varepsilon^h &= \sum_{i=1}^{n_\varepsilon} \xi_\varepsilon^i(x) \psi_\varepsilon^i, \\
+	\psi_w^h &= \sum_{i=1}^{n_w} \xi_w^i(x) \psi_w^i, \\
+    \psi_\kappa^h &= \sum_{i=1}^{n_\kappa} \xi_\kappa^i(x) \psi_\kappa^i, \\
+	\psi^h &= \sum_{i=1}^{n_w} \xi_w^i(x) \psi^i. \\
 \end{aligned}
 \end{equation}
-Notice that $w, \, e_w$ have been discretized using the same test functions. Plugging \eqref{eq:Gal_appr} into \eqref{eq:weak_form}, the following finite dimensional system is obtained
+Notice that $w, \, e_w$ are discretized using the same test functions. Plugging \eqref{eq:Gal_appr} into \eqref{eq:weak_form}, the following finite dimensional system is obtained
 
 \begin{equation}\label{eq:findimSys}
 \begin{pmatrix}
@@ -375,34 +382,94 @@ The interconnection matrices are given by
 	\end{aligned}
 \end{equation}
 
+
+For what concerns the choice of the underlying finite elements, a simple selection conforming to the weak form \eqref{eq:weak_form} is given by continuous Galerkin to discretize the space $H^1(\Omega)$ and discontinuous Galerkin for the space $L^2(\Omega)$. Consider an interval mesh $\mathcal{I}_h$ with elements $E$. The space of polynomials of order $k$ on a mesh cell is denoted by $P_k$. The following conforming family of finite elements is selected for this problem:
+
+\begin{equation}
+	\begin{aligned}
+		H^1_h(\Omega) &= \left\{v_h \in H^1(\Omega)\vert \forall E \in \mathcal{I}_h, \; v_h\vert_E \in P_k \right\}, \\
+		L^2_h(\Omega) &= \left\{u_h \in L^2(\Omega)\vert \forall E \in \mathcal{I}_h, \; u_h\vert_E \in P_{k-1} \right\}.
+	\end{aligned}
+\end{equation}
+
+The space $H^1_h$ corresponds to the space of continous Galerkin elements of order $k$, whereas $L^2_h$ corresponds to the space of discontinuous Galerkin elements of order $k-1$. This choice guarantees that $\partial_x H^1_h(\Omega) \subset L^2_h(\Omega)$. So the discrete weak formulation becomes: find $(e_u^h, e_w^h, e_\kappa^h, w^h) \in H^1_h(\Omega), \, e_\varepsilon^h \in L_h^2(\Omega)$
+such that system \eqref{eq:weak_form} holds $\forall (\psi_u^h, \psi_w^h, \psi_\kappa^h, \psi^h) \in H^1_h(\Omega), \, \forall \psi_\varepsilon^h \in L^2_h(\Omega)$.
+
 \section{Numerical tests}
 
 Consider the following analytical solution for the axial and vertical displacement
 
 \begin{equation}\label{eq:analytical}
 	\begin{aligned}
-		u &= x(1-x/L) \sin(t), \\
-		w &= \sin(\pi x/L)\sin(t), \\
+		u^{\text{ex}} &= x(1-x/L) \sin(2 \pi t), \\
+		w^{\text{ex}} &= \sin(\pi x/L)\sin(2 \pi t), \\
 	\end{aligned}
 \end{equation}
-toghether with the boundary conditions
+together with the boundary conditions
 \begin{equation}
 u\vert_0^L = 0, \quad w\vert_0^L =0, \quad m_{xx}\vert_{0}^L=0.
 \end{equation}
-Then the associated axial and bending stress resultants are given by  
-\begin{equation}
-	\begin{aligned}
-		n_{xx} &= EA \sin(t) \left[1-2x/L + \pi^2/(2 L^2)\sin(t)\cos^2(\pi x /L) \right], \\
-		m_{xx} &= - EI \pi^2/L^2 \sin(\pi x/L)\sin(t). \\
-	\end{aligned}
-\end{equation}
-For Eq. \eqref{eq:analytical} to be the solution of \eqref{eq:class} appropriate forcing term have to be introduced. These are given by 
+For $u$ and $w$ given in \eqref{eq:analytical} to be the solution of \eqref{eq:class}, appropriate forcing term have to be introduced. These are given by 
 \begin{equation}\label{eq:forcing}
 	\begin{aligned}
 		f_u &= \rho A \partial_{tt}^2 u - \partial_x n_{xx}, \\
 		f_w &= \rho A \partial_{tt}^2 w + \partial_{xx}^2 m_{xx} - \partial_x(n_{xx} \partial_x w), \\
 	\end{aligned}
 \end{equation}
+
+The numerical values of the parameters for the simulation are reported in Table \ref{tab:par}. The Firedrake library (\cite{rathgeber2017firedrake}) is used to generate the matrices. To integrate the equations in time a Crank-Nicholson scheme has been used, for all simulations. The time step is set to $\Delta t = h/(2 \pi)$ to have the same impact of the time discretization error with respect to the spatial error. The final time is set to one $t_f = 1 [\textrm{s}]$. The non-linear system is solved using Newton-Krylov iterations with a line search and direct factorisation of the linear system.  \\
+
+To measure the convergence suitable norms have to be introduced. 
+Let $\mathcal{X}$ be a Hilbert space, and $t_f$ a positive real number. We denote by $L^\infty([0, t_f]; \mathcal{X})$ or $L^\infty(\mathcal{X})$ the space of functions $f: [0, t_f] \rightarrow X$ for which the time-space norm $||\cdot||_{L^\infty([0, t_f]; \mathcal{X})}$ satisfies
+\[
+||f||_{L^\infty([0, t_f]; \mathcal{X})} = \esssup_{t \in [0,t_f]} ||f||_{\mathcal{X}} < \infty.
+\]
+
+To compute the $L^\infty (\mathcal{X})$ space-time dependent norm from the numerical results, the discrete norm $L^\infty_{\Delta t} (\mathcal{X})$ is used
+\[
+||\cdot ||_{L^\infty (\mathcal{X})} \approx || \cdot ||_{L^\infty_{\Delta t} (\mathcal{X})} = \max_{t \in t_i} ||\cdot||_{\mathcal{X}},
+\]
+where $t_i$ are the discrete simulation instants. The Hilbert space $\mathcal{X}$ depends on the regularity of the considered variable. For variables $(e_u,\, e_w,\, e_\kappa,\, w)$ the error is measured in the $L^\infty_{\Delta t}(H^1)$, whereas for $e_\varepsilon$ is measured in the $L^\infty_{\Delta t}(L^2)$. The simulation results are reported in Fig. \ref{fig:error}. It can be noticed that all variable converge at rate given by the polynomial degree $k$. This is in accordance with the order of convergence of the the linear problem (cf. \cite{brugnoli2020thesis} for the Euler-Bernoulli beam).
+
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{ccccc}
+		\hline 
+		\multicolumn{5}{c}{Beam parameters} \\ 
+		\hline 
+		$E$ & $\rho$ & $L$  & $A$ & $I$ \\
+		70 $[\textrm{GPa}]$ & $2700\; [\textrm{kg}/\textrm{m}^3]$ & 1 $[\textrm{m}]$ &  0.01 $[\textrm{m}^2]$ & $8.3 \; 10^{-6} \, [\textrm{m}^4]$\\ 
+		\hline 
+	\end{tabular} 
+	\captionsetup{width=0.95\linewidth}
+	\vspace{1mm}
+	\captionof{table}{Physical parameters for the beam.}
+	\label{tab:par}
+\end{table}
+
+\begin{figure}[ht]%
+	\centering
+	\subfloat[][$L^\infty_{\Delta t} (H^1)$ error for $e_u$]{%
+		\label{fig:err_e_u}%
+		\includegraphics[width=0.48\columnwidth]{u_dot.eps}}%
+	\hspace{8pt}%
+	\subfloat[][$L^\infty_{\Delta t} (L^2)$ error for $e_\varepsilon$]{%
+		\label{fig:err_e_eps}%
+		\includegraphics[width=0.48\columnwidth]{n_xx.eps}} \\
+	\subfloat[][$L^\infty_{\Delta t} (H^1)$ error for $e_w$]{%
+		\label{fig:err_e_w}%
+		\includegraphics[width=0.48\columnwidth]{w_dot.eps}}%
+	\hspace{8pt}%
+	\subfloat[][$L^\infty_{\Delta t} (H^1)$ error for $e_\kappa$]{%
+		\label{fig:err_e_kap}%
+		\includegraphics[width=0.48\columnwidth]{m_xx.eps}} \\
+	\subfloat[][$L^\infty_{\Delta t} (H^1)$ error for $w$]{%
+		\label{fig:err_e_disp}%
+		\includegraphics[width=0.48\columnwidth]{w.eps}}%
+	\caption{Error trend for the different variables}%
+	\label{fig:error}%
+\end{figure}
 
 \section{Conclusion}
 
