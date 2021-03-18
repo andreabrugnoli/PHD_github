@@ -28,7 +28,7 @@ save_res = True
 # Physical coefficients
 
 rho = 2700
-E = 70 * 10**9
+E = 70*10**3
 
 # Geometrical coefficients 
 
@@ -121,36 +121,38 @@ def compute_err(n_elem, deg):
     # omega_u = 1
     # omega_w = 1
     
-    u_ex = x[0]*(1-x[0]/L)*sin(omega_u*t_)    
-    e_u_ex = omega_u*x[0]*(1-x[0]/L)*cos(omega_u*t_)
-    dtt_u_ex = - omega_u**2 * x[0]*(1-x[0]/L)*sin(omega_u*t_)
+    u_st = x[0]**3*(1-(x[0]/L)**3)
+
+    u_ex = u_st*sin(omega_u*t_)    
+    e_u_ex = omega_u*u_st*cos(omega_u*t_)
+    dtt_u_ex = - omega_u**2 * u_st*sin(omega_u*t_)
     
     w_ex = sin(pi*x[0]/L)*sin(omega_w*t_)
     e_w_ex = omega_w*sin(pi*x[0]/L) * cos(omega_w*t_)
     dtt_w_ex = - omega_w**2*sin(pi*x[0]/L)*sin(omega_w*t_)
-
+    
     e_eps_ex = E*A*(u_ex.dx(0) + 0.5*(w_ex.dx(0))**2)
     e_kap_ex = E*I*w_ex.dx(0).dx(0)
-
+    
     f_u = rho*A*dtt_u_ex - e_eps_ex.dx(0)
     f_w = rho*A*dtt_w_ex + e_kap_ex.dx(0).dx(0) - (e_eps_ex*w_ex.dx(0)).dx(0)
     
     f_form = v_u*f_u*dx + v_w*f_w*dx
     
-    u_ex1 = x[0]*(1-x[0]/L)*sin(omega_u*t_1)    
-    e_u_ex1 = omega_u*x[0]*(1-x[0]/L)*cos(omega_u*t_1)
-    dtt_u_ex1 = - omega_u**2*x[0]*(1-x[0]/L)*sin(omega_u*t_1)
-
+    u_ex1 = u_st*sin(omega_u*t_1)    
+    e_u_ex1 = omega_u*u_st*cos(omega_u*t_1)
+    dtt_u_ex1 = - omega_u**2*u_st*sin(omega_u*t_1)
+    
     w_ex1 = sin(pi*x[0]/L)*sin(omega_w*t_1)
     e_w_ex1 = omega_w*sin(pi*x[0]/L) * cos(omega_w*t_1)
     dtt_w_ex1 = - omega_w**2*sin(pi*x[0]/L)*sin(omega_w*t_1)
-
+    
     e_eps_ex1 = E*A*(u_ex1.dx(0) + 0.5*(w_ex1.dx(0))**2)
     e_kap_ex1 = E*I*w_ex1.dx(0).dx(0)
-
+    
     f_u1 = rho*A*dtt_u_ex1 - e_eps_ex1.dx(0)
     f_w1 = rho*A*dtt_w_ex1 + e_kap_ex1.dx(0).dx(0) - (e_eps_ex1*w_ex1.dx(0)).dx(0)
-   
+       
     f_form1 = v_u*f_u1*dx + v_w*f_w1*dx
 
 
@@ -194,7 +196,10 @@ def compute_err(n_elem, deg):
     w_err_H1[0] = np.sqrt(assemble(inner(e_disp_n-w_ex, e_disp_n-w_ex) * dx
                 + inner(e_disp_n.dx(0) - w_ex.dx(0), e_disp_n.dx(0) - w_ex.dx(0)) * dx))
     
-    param = {"ksp_type": "preonly", "pc_type": "lu"}
+    param = {'snes_type': 'newtonls', 'ksp_type': 'preonly', 'pc_type': 'lu'} 
+             # 'snes_rtol': '1e+1', 'snes_atol': '1e-10','snes_stol': '1e+1', 
+             # 'snes_max_it': '50', 'ksp_rtol': '1e+1', 'ksp_atol': '1e-10', 
+             # 'ksp_rtol': '1e+1', 'ksp_atol': '1e-10', 'ksp_divtol': '1e15'}
         
     for i in range(1, n_t):
 
@@ -276,7 +281,6 @@ def compute_err(n_elem, deg):
     return e_u_err_max, e_eps_err_max, e_w_err_max, e_kap_err_max, w_err_max
     
 
-# e_u_err_max, e_eps_err_max, e_w_err_max, e_kap_err_max, w_err_max = compute_err(10, 1)
 
 n_h = 5
 n_vec = np.array([2**(i+3) for i in range(n_h)])
