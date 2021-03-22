@@ -17,7 +17,7 @@ matplotlib.rcParams["legend.loc"] = 'best'
 matplotlib.rcParams['text.usetex'] = True
 matplotlib.rcParams['text.latex.preamble']=r"\usepackage{amsmath} \usepackage{bm}"
 
-path_res = "./errors_data_beam/"
+path_res = "./errors_data_plate/"
 
 save_fig = False
 

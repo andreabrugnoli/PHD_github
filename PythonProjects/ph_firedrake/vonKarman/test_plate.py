@@ -28,7 +28,7 @@ save_res = True
 # Geometrical coefficients 
 
 nu = Constant(0.3)
-h = Constant(0.01)
+h = Constant(0.1)
 
 L= 1
 
@@ -167,8 +167,8 @@ def compute_err(n_elem, deg):
     # omega_u = 1
     # omega_w = 1
     
-    u_st = as_vector([x[0]**3*(1-(x[0]/L)**3)*x[1]**3*(1-(x[1]/L)**3),
-                      x[0]**2*(1-(x[0]/L)**2)*x[1]**2*(1-(x[1]/L)**2)])
+    u_st = as_vector([x[0]*(1-(x[0]/L))*x[1]*(1-(x[1]/L)),
+                      x[0]*(1-(x[0]/L))*x[1]*(1-(x[1]/L))])
     
     u_ex = u_st*sin(omega_u*t_)    
     e_u_ex = omega_u*u_st*cos(omega_u*t_)
@@ -236,17 +236,17 @@ def compute_err(n_elem, deg):
 
     
     e_u_err_H1[0] = np.sqrt(assemble(inner(e_u_n - e_u_ex, e_u_n - e_u_ex) * dx
-                  + inner(gradSym(e_u_n - e_u_ex), gradSym(e_u_n - e_u_ex)) * dx))
+                  + inner(gradSym(e_u_n) - gradSym(e_u_ex), gradSym(e_u_n) - gradSym(e_u_ex)) * dx))
     
     e_eps_err_L2[0] = np.sqrt(assemble(inner(e_eps_n - e_eps_ex, e_eps_n - e_eps_ex) * dx))
     
     e_w_err_H1[0] = np.sqrt(assemble(inner(e_w_n - e_w_ex, e_w_n - e_w_ex) * dx
-                  + inner(grad(e_w_n - e_w_ex), grad(e_w_n - e_w_ex)) * dx))
+                  + inner(grad(e_w_n) - grad(e_w_ex), grad(e_w_n) - grad(e_w_ex)) * dx))
     
     e_kap_err_L2[0] = np.sqrt(assemble(inner(e_kap_n - e_kap_ex, e_kap_n - e_kap_ex) * dx))
     
     w_err_H1[0] = np.sqrt(assemble(inner(e_disp_n-w_ex, e_disp_n-w_ex) * dx
-                + inner(grad(e_disp_n - w_ex), grad(e_disp_n - w_ex)) * dx))
+                + inner(grad(e_disp_n) - grad(w_ex), grad(e_disp_n) - grad(w_ex)) * dx))
     
     param = {'snes_type': 'newtonls', 'ksp_type': 'preonly', 'pc_type': 'lu'} 
              # 'snes_rtol': '1e+1', 'snes_atol': '1e-10','snes_stol': '1e+1', 
@@ -301,17 +301,17 @@ def compute_err(n_elem, deg):
         
 
         e_u_err_H1[i] = np.sqrt(assemble(inner(e_u_n - e_u_ex, e_u_n - e_u_ex) * dx
-                  + inner(gradSym(e_u_n - e_u_ex), gradSym(e_u_n - e_u_ex)) * dx))
+                  + inner(gradSym(e_u_n) - gradSym(e_u_ex), gradSym(e_u_n) - gradSym(e_u_ex)) * dx))
     
         e_eps_err_L2[i] = np.sqrt(assemble(inner(e_eps_n - e_eps_ex, e_eps_n - e_eps_ex) * dx))
         
         e_w_err_H1[i] = np.sqrt(assemble(inner(e_w_n - e_w_ex, e_w_n - e_w_ex) * dx
-                      + inner(grad(e_w_n - e_w_ex), grad(e_w_n - e_w_ex)) * dx))
+                      + inner(grad(e_w_n) - grad(e_w_ex), grad(e_w_n) - grad(e_w_ex)) * dx))
         
         e_kap_err_L2[i] = np.sqrt(assemble(inner(e_kap_n - e_kap_ex, e_kap_n - e_kap_ex) * dx))
         
         w_err_H1[i] = np.sqrt(assemble(inner(e_disp_n-w_ex, e_disp_n-w_ex) * dx
-                + inner(grad(e_disp_n - w_ex), grad(e_disp_n - w_ex)) * dx))
+                + inner(grad(e_disp_n) - grad(w_ex), grad(e_disp_n) - grad(w_ex)) * dx))
     
 
         # w_atP[i] = e_disp_n.at(Ppoint)
@@ -346,7 +346,7 @@ def compute_err(n_elem, deg):
     
 
 
-n_h = 2
+n_h = 3
 n_vec = np.array([2**(i+2) for i in range(n_h)])
 h_vec = 1./n_vec
 
