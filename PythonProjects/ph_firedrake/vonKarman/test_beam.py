@@ -274,7 +274,7 @@ def compute_err(n_elem, deg):
     e_eps_err_max = max(e_eps_err_L2)
     
     e_w_err_max = max(e_w_err_H1)
-    e_kap_err_max = max(e_w_err_H1)
+    e_kap_err_max = max(e_kap_err_H1)
     
     w_err_max = max(w_err_H1)
     
@@ -318,7 +318,7 @@ for i in range(n_h):
 
         
        
-path_res = "./errors_data/"
+path_res = "./errors_data_beam/"
 if save_res:
     np.save(path_res + "h_vec", h_vec)
    

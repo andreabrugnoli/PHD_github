@@ -90,6 +90,7 @@
 \author[UT]{Andrea Brugnoli}
 \author[UT]{Stefano Stramigioli}
 \author[UT]{Federico Califano}
+\author[UT]{Ramy Rashad}
 \author[ISAE]{Denis Matignon}
 \address[UT]{University of Twente, Enschede (NL) \\
 	a.brugnoli@utwente.nl, s.stramigioli@utwente.nl }
@@ -226,9 +227,9 @@ The pH realization is then given by the following system
 		e_\varepsilon \\
 		e_w \\
 		e_\kappa 
-	\end{pmatrix},
+	\end{pmatrix}.
 \end{equation}
-The second line of system \eqref{eq:pHsys} represents the time derivative of the membrane strain tensor. To close the system, variable $w$ has to be accessible. For this reason, its dynamics has to be included. The augmented system reads
+The second line of system \eqref{eq:pHsys} represents the time derivative of the membrane strain. To close the system, variable $w$ has to be accessible. For this reason, its dynamics has to be included. The augmented system reads
 \begin{equation}\label{eq:pHsys_aug}
 	\frac{\partial}{\partial t}
 	\begin{pmatrix}
@@ -395,7 +396,7 @@ The interconnection matrices are given by
 \end{equation}
 
 
-For what concerns the choice of the underlying finite elements, a simple selection conforming to the weak form \eqref{eq:weak_form} is given by continuous Galerkin to discretize the space $H^1(\Omega)$ and discontinuous Galerkin for the space $L^2(\Omega)$. Consider an interval mesh $\mathcal{I}_h$ with elements $E$. The space of polynomials of order $k$ on a mesh cell is denoted by $P_k$. The following conforming family of finite elements is selected for this problem:
+For what concerns the choice of the underlying finite elements, a simple selection conforming to the weak form \eqref{eq:weak_form} is given by continuous Galerkin to discretize the space $H^1(\Omega)$ and discontinuous Galerkin for the space $L^2(\Omega)$. Consider an interval mesh $\mathcal{I}_h$ with elements $E$. The space of polynomials of order $k$ on a mesh cell is denoted by $P_k$. The following conforming families of finite elements are selected for this problem:
 
 \begin{equation}
 	\begin{aligned}
@@ -429,10 +430,10 @@ For $u$ and $w$ given in \eqref{eq:analytical} to be the solution of \eqref{eq:c
 	\end{aligned}
 \end{equation}
 
-The numerical values of the parameters for the simulation are reported in Table \ref{tab:par}. The Firedrake library (\cite{rathgeber2017firedrake}) is used to generate the matrices. To integrate the equations in time a Crank-Nicholson scheme has been used, for all simulations. The time step is set to $\Delta t = h/(2 \pi)$ to have the same impact of the time discretization error with respect to the spatial error. The final time is set to one $t_f = 1 [\textrm{s}]$. The non-linear system is solved using Newton-Krylov iterations with a line search and direct factorisation of the linear system.  \\
+The numerical values of the parameters for the simulation are reported in Table \ref{tab:par}. The Firedrake library (\cite{rathgeber2017firedrake}) is used to generate the matrices. To integrate the equations in time a Crank-Nicholson scheme is employed. The time step is set to $\Delta t = h/(2 \pi)$ to have the same impact of the time discretization error with respect to the spatial error. The final time is set to one $t_f = 1 [\textrm{s}]$. The non-linear system is solved using Newton-Krylov iterations with a line search and direct factorisation of the linear system.  \\
 
-To measure the convergence suitable norms have to be introduced. 
-Let $\mathcal{X}$ be a Hilbert space, and $t_f$ a positive real number. We denote by $L^\infty([0, t_f]; \mathcal{X})$ or $L^\infty(\mathcal{X})$ the space of functions $f: [0, t_f] \rightarrow X$ for which the time-space norm $||\cdot||_{L^\infty([0, t_f]; \mathcal{X})}$ satisfies
+To measure the convergence rate,  suitable norms have to be introduced. 
+Let $\mathcal{X}$ be a Hilbert space, and $t_f$ a positive real number. We denote by $L^\infty([0, t_f]; \mathcal{X})$ or $L^\infty(\mathcal{X})$ the space of functions $f: [0, t_f] \rightarrow \mathcal{X}$ for which the time-space norm $||\cdot||_{L^\infty([0, t_f]; \mathcal{X})}$ satisfies
 \[
 ||f||_{L^\infty([0, t_f]; \mathcal{X})} = \esssup_{t \in [0,t_f]} ||f||_{\mathcal{X}} < \infty.
 \]
@@ -441,7 +442,7 @@ To compute the $L^\infty (\mathcal{X})$ space-time dependent norm from the numer
 \[
 ||\cdot ||_{L^\infty (\mathcal{X})} \approx || \cdot ||_{L^\infty_{\Delta t} (\mathcal{X})} = \max_{t \in t_i} ||\cdot||_{\mathcal{X}},
 \]
-where $t_i$ are the discrete simulation instants. The Hilbert space $\mathcal{X}$ depends on the regularity of the considered variable. For variables $(e_u,\, e_w,\, e_\kappa,\, w)$ the error is measured in the $L^\infty_{\Delta t}(H^1)$, whereas for $e_\varepsilon$ is measured in the $L^\infty_{\Delta t}(L^2)$. The simulation results are reported in Fig. \ref{fig:error}. It can be noticed that all variable converge at rate given by the polynomial degree $k$. This is in accordance with the order of convergence of the the linear problem (cf. \cite{brugnoli2020thesis} for the Euler-Bernoulli beam). The numerical solutions for the different variables is plot in Fig. \ref{fig:plot}.
+where $t_i$ are the discrete simulation instants. The Hilbert space $\mathcal{X}$ depends on the regularity of the considered variable. For variables $(e_u,\, e_w,\, e_\kappa,\, w)$ the error is measured in the $L^\infty_{\Delta t}(H^1)$ norm, whereas for $e_\varepsilon$ is measured using the $L^\infty_{\Delta t}(L^2)$ norm. The simulation results are reported in Fig. \ref{fig:error}. It can be noticed that all variable converge at rate given by the polynomial degree $k$. For variable $e_\kappa$ a superconvergent trend can be observed for case $k=1$ (cf. Fig \ref{fig:err_e_kap}). The numerical solutions for the different variables is plot in Fig. \ref{fig:plot}.
 
 
 \begin{table}[h]

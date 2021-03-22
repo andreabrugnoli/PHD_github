@@ -3,7 +3,7 @@ import numpy as np
 # from scipy import linalg as la
     
 def matrices_timoshenko(n_el=10, deg=1, e0_string=('0', '0', '0', '0'),\
-                        rho=1, I_rho=1, C_b=1, C_s=1, L=1):
+                        rho=1, I_rho=1, C_b=1, C_s=1, L=1, r_w=1, r_th=1):
     """
     Computes matrices M, J, B for the Timoshenko beam.
     Parameters:
@@ -93,7 +93,7 @@ def matrices_timoshenko(n_el=10, deg=1, e0_string=('0', '0', '0', '0'),\
         m = v_pw * al_pw * dx \
             + v_pth * al_pth * dx \
             + v_qth * al_qth * dx \
-            + v_qw* al_qw * dx 
+            + v_qw * al_qw * dx
         
         return m
 
@@ -104,18 +104,31 @@ def matrices_timoshenko(n_el=10, deg=1, e0_string=('0', '0', '0', '0'),\
         Once assembled the interconnection matrix is obtained
         """
         
-        j_grad = v_qw* e_pw.dx(0) * dx
+        j_grad = v_qw * e_pw.dx(0) * dx
         j_gradIP = -v_pw.dx(0) * e_qw * dx
         
         j_Grad = v_qth * e_pth.dx(0) * dx
         j_GradIP = -v_pth.dx(0) * e_qth * dx
         
-        j_Id = v_pth* e_qw * dx
-        j_IdIP = - v_qw* e_pth * dx
+        j_Id = v_pth * e_qw * dx
+        j_IdIP = - v_qw * e_pth * dx
         
         j = j_grad + j_gradIP + j_Grad + j_GradIP + j_Id + j_IdIP
                 
         return j
+
+    def get_r_form(v_pw, v_pth, e_pw, e_pth):
+        """
+        Defines the damping form.
+        Once assembled the damping matrix is obtained
+        """
+
+        r_w_form = r_w * v_pw * e_pw * dx
+        r_th_form = r_th * v_pth * e_pth * dx
+
+        r = r_w_form + r_th_form
+
+        return r
     
     # Boundary conditions
     bcs=[]
@@ -134,13 +147,16 @@ def matrices_timoshenko(n_el=10, deg=1, e0_string=('0', '0', '0', '0'),\
     # Matrices assembly
     m_form = get_m_form(v_pw, v_pth, v_qth, v_qw, al_pw, al_pth, al_qth, al_qw)
     j_form = get_j_form(v_pw, v_pth, v_qth, v_qw, e_pw, e_pth, e_qth, e_qw)
-    
+    r_form = get_r_form(v_pw, v_pth, e_pw, e_pth)
+
     J_petsc = assemble(j_form)
     M_petsc = assemble(m_form)
+    R_petsc = assemble(r_form)
     
     J_mat = J_petsc.array()
     M_mat = M_petsc.array()
-    
+    R_mat = R_petsc.array()
+
     BF_vec = assemble(v_pw*ds(2)).get_local().reshape((-1, 1))
     BT_vec = assemble(v_pth*ds(2)).get_local().reshape((-1, 1))
     
@@ -211,11 +227,13 @@ def matrices_timoshenko(n_el=10, deg=1, e0_string=('0', '0', '0', '0'),\
     # Eliminate bc dofs from matrices and vectors
     M_red = np.delete(np.delete(M_mat, dofs_bc, axis=0), dofs_bc, axis=1)
     J_red = np.delete(np.delete(J_mat, dofs_bc, axis=0), dofs_bc, axis=1)
+    R_red = np.delete(np.delete(R_mat, dofs_bc, axis=0), dofs_bc, axis=1)
+
     B_red = np.delete(B_mat, dofs_bc, axis=0)
     e0_red = np.delete(e0_array, dofs_bc, axis=0)
     
     
-    return M_red, J_red, B_red, e0_red, dofs_dict, x_dict
+    return M_red, J_red, R_red, B_red, e0_red, dofs_dict, x_dict
 
  
     

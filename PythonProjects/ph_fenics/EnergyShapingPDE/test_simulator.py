@@ -28,7 +28,7 @@ from EnergyShapingPDE.func_timoshenko import matrices_timoshenko
 
 init = ('sin(pi*x[0])', 'sin(3*pi*x[0])', '0', '0')
 
-M, J, B, e0, dofs_dict, x_dict = matrices_timoshenko(n_el=20, deg=1, e0_string=init)
+M, J, R, B, e0, dofs_dict, x_dict = matrices_timoshenko(n_el=10, deg=1, e0_string=init)
 
 dofs_vt = dofs_dict['v_t']
 x_vt = x_dict['v_t']
@@ -44,10 +44,13 @@ x_sigt = x_dict['sig_t']
 
 u_in = np.array([0, 1])
 
-A_sys = np.linalg.solve(M, J)
+A_sys = np.linalg.solve(M, J-R)
 B_sys = np.linalg.solve(M, B)
 C_sys= B.T
 
+omega, eigvectors= np.linalg.eig(A_sys)
+
+print(omega)
 
 scipy.io.savemat('Data.mat', {"A": A_sys, "B": B_sys, "C": C_sys, "x0": e0})
 
