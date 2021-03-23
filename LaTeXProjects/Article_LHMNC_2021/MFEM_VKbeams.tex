@@ -112,10 +112,10 @@ Port-Hamiltonian systems, von K\'arm\'an beams, Mixed Finite Elements
 
 \section{Introduction}
 
-Linear elastic structures have been largely investigated into the port-Hamiltonian (pH) framework as well as the heat equation (consult for instance \cite{macchelli2004timo} for the Timoshenko beam, \cite{aoues2017modeling} for the Euler-Bernoulli beam, \cite{brugnoli2019mindlin,brugnoli2019kirchhoff} for thick and thin plates). Recently, more complicated models arising from fluid dynamics have also been considered \cite{cardoso2020swe,rashad2020port1,rashad2020port2,altmann2017}. \\
+Linear elastic structures have been largely investigated into the port-Hamiltonian (pH) framework as well as the heat equation (consult for instance \cite{macchelli2004timo} for the Timoshenko beam, \cite{aoues2017modeling} for the Euler-Bernoulli beam, \cite{brugnoli2019mindlin,brugnoli2019kirchhoff} for thick and thin plates). Recently, more complicated models arising from fluid dynamics have also been considered \cite{cardoso2019port,cardoso2020swe,rashad2021port1,rashad2021port2,califano2021geometric,altmann2017}. \\
 
 
-The Hamiltonian foundation of non-linear elasticity dates back to the late 80' \cite{simo1988}. However, the field of non-linear elasticity remains a largely unexplored topic in the pH framework. One fundamental non linear theory is the Von K\'arm\'an one, that applies for moderately large deformation of beams, plates and shells. This theory has puzzled mathematicians and physicists as the derivation of the model rely on some not well justified assumptions \cite{ciarlet1980}. Conditions under which this theory actually applicable and will give reasonable results when solved are discussed in \cite{ciarlet1980,ciarlet1990}. Existence and uniqueness of solutions for the full dynamical problem were established in \cite{lagnese1991uniform} for one-dimensional beams and in \cite{puel1996} for plates. Since the full dynamical von K\'arman problem is conservative \cite{bilbao2015conservative}, a pH realization of this system exists. \\
+The Hamiltonian foundation of non-linear elasticity dates back to the late 80' \cite{simo1988}. However, the field of non-linear elasticity remains a largely unexplored topic in the pH framework. One fundamental non linear theory is the Von K\'arm\'an one, that applies for moderately large deformation of beams, plates and shells. This theory has puzzled mathematicians and physicists as the derivation of the model rely on some not well justified assumptions. Conditions under which this theory is actually applicable and will give reasonable results when solved are discussed in \cite{ciarlet1980,ciarlet1990}. Existence and uniqueness of solutions for the full dynamical problem were established in \cite{lagnese1991uniform} for one-dimensional beams and in \cite{puel1996} for plates. Since the full dynamical von K\'arman problem is conservative (see e.g. \cite{bilbao2015conservative}), a pH realization of this system exists. \\
 
 The development of new models within the pH framework has been accompanied with an increased interest in numerical discretization methods, capable of retaining the main features of the distributed system in its finite-dimensional counterpart. Recently, it has become evident that there is a strict link between  discretization of port-Hamiltonian  systems and mixed finite elements \cite{cardoso2020pfem}. An example of this connection is given in \cite{kirby2015}, where a velocity-stress formulation for the wave dynamics is shown to be Hamiltonian and its mixed discretization preserves such a structure. \\
 
@@ -128,7 +128,7 @@ The paper is organized as follows. In Section \ref{sec:vK_beams} the classical m
 \section{Von K\'arm\'an beams}\label{sec:vK_beams}
 
 
-The classical von-K\'arm\'an beam model is presented in \cite[Chapter 4]{reddy2010introduction}. Under the hypothesis of isotropic material, the extensional-bending stiffness is zero when the x-axis is taken along the geometric centroidal axis. With this assumption, the problem, defined on an open interval $\Omega = (0, L)$, takes the following form
+The classical von-K\'arm\'an beam model is presented in \cite[Chapter 4]{reddy2010introduction}. Under the hypothesis of isotropic material, the extensional-bending stiffness is zero when the $x$-axis is taken along the geometric centroidal axis. With this assumption, the problem, defined on an interval $\Omega = [0, L]$, takes the following form
 
 \begin{equation}\label{eq:class}
 	\begin{aligned}
@@ -147,7 +147,7 @@ together with the stresses and strains expressions
 		\kappa_{xx} &=\partial^2_{xx} w. \\
 	\end{aligned} 
 \end{equation}
-Variable $u$ is the horizontal displacement, $w$ is the vertical displacement, $n_{xx}$ is the axial stress resultant and $m_{xx}$ is the bending stress resultant. The coefficients $\rho, A, E, I$ are the mass density, the cross section, the Young module and the second moment of area.
+Variable $u$ is the horizontal displacement, $w$ is the vertical displacement, $n_{xx}$ is the axial stress resultant and $m_{xx}$ is the bending stress resultant. The coefficients $\rho, A, E, I$ are the mass density, the cross section, the Young modulus and the second moment of area.
 
 The total energy of the model (Hamiltonian functional)
 \begin{equation}
@@ -218,7 +218,7 @@ The pH realization is then given by the following system
 	\end{pmatrix} = 
 	\begin{bmatrix}
 		0 & \partial_x & 0 & 0 \\
-		\partial_x & 0 & \partial_x w \, \partial_x & 0 \\
+		\partial_x & 0 & (\partial_x w) \, \partial_x & 0 \\
 		0 & \partial_x(\cdot \, \partial_x w) & 0 & -\partial_{xx}^2 \\
 		0 & 0 & \partial_{xx}^2 & 0 \\ 
 	\end{bmatrix}
@@ -241,7 +241,7 @@ The second line of system \eqref{eq:pHsys} represents the time derivative of the
 	\end{pmatrix} = 
 	\underbrace{\begin{bmatrix}
 			0 & \partial_x & 0 & 0 & 0\\
-			\partial_x & 0 & \partial_x w \, \partial_x & 0 & 0 \\
+			\partial_x & 0 & (\partial_x w) \, \partial_x & 0 & 0 \\
 			0 & \partial_x(\cdot \, \partial_x w) & 0 & -\partial_{xx}^2 & -1 \\
 			0 & 0 & \partial_{xx}^2 & 0 & 0 \\ 
 			0 & 0 & 1 &  & 0 \\
@@ -254,7 +254,7 @@ The second line of system \eqref{eq:pHsys} represents the time derivative of the
 		\delta_w H  \\
 	\end{pmatrix}.
 \end{equation}
-The operator $\mathcal{J}$ is formally skew-adjoint. If only the kinetic and deformation energies are considered, it holds $\delta_{w} H~=~0$. In general this terms allows accommodating other potentials, for example the gravitational one. Suitable boundary variables are then obtained considering the power balance
+The operator $\mathcal{J}$ is formally skew-adjoint. If only the kinetic and deformation energies are considered, it holds $\delta_{w} H~=~0$. In general this terms allows accommodating for other potentials, for example the gravitational one. Suitable boundary variables are then obtained considering the power balance
 \begin{equation}
 	\dot{H} = \inner[\partial\Omega]{e_u}{e_\varepsilon} + \inner[\partial\Omega]{e_w}{e_\varepsilon \partial_x w -\partial_x e_\kappa} + \inner[\partial\Omega]{\partial_x e_w}{e_\kappa}.
 \end{equation}
@@ -279,7 +279,7 @@ To perform the numerical discretization, the constitutive relations are first in
 		e_u \\ e_\varepsilon \\ e_w \\ e_{\kappa}
 	\end{pmatrix},
 \end{equation}
-where $C_a = (EA)^{-1}$ and $C_b = (EI)^{-1}$ are the axial and bending compliance respectively. A pure coenergy formulation can then be employed once \eqref{eq:e2alpha} is plugged into \eqref{eq:pHsys_aug}
+where $C_a = (EA)^{-1}$ and $C_b = (EI)^{-1}$ are the axial and bending compliances respectively. A pure coenergy formulation can then be employed once \eqref{eq:e2alpha} is plugged into \eqref{eq:pHsys_aug}
 
 \begin{equation}\label{eq:pHaug_e}
 	\begin{pmatrix}
@@ -309,14 +309,14 @@ To derive the discrete system, first \eqref{eq:pHaug_e} is put into weak form. T
 \begin{equation}
 	\begin{aligned}
 	\inner[\Omega]{\psi_u}{\rho A \, \dot{e}_u} &= \inner[\Omega]{\psi_u}{\partial_x e_\varepsilon}. \\
-	\inner[\Omega]{\psi_\varepsilon}{C_a \, \dot{e}_\varepsilon} &= \inner[\Omega]{\psi_\varepsilon}{\partial_x e_u} + \inner[\Omega]{\psi_\varepsilon}{\partial_x w \, \partial_x e_w}, \\
+	\inner[\Omega]{\psi_\varepsilon}{C_a \, \dot{e}_\varepsilon} &= \inner[\Omega]{\psi_\varepsilon}{\partial_x e_u} + \inner[\Omega]{\psi_\varepsilon}{(\partial_x w) \, \partial_x e_w}, \\
 	\inner[\Omega]{\psi_w}{\rho A\dot{e}_w} &= \inner[\Omega]{\psi_w}{\partial_x(e_\varepsilon \partial_x w)} - \inner[\Omega]{\psi_w}{\partial^2_{xx} e_\kappa}, \\
 	\inner[\Omega]{\psi_\kappa}{C_b \, \dot{e}_\kappa} &= \inner[\Omega]{\psi_\kappa}{\partial^2_{xx} e_w}, \\
 	\inner[\Omega]{\psi}{\dot{w}} &= \inner[\Omega]{\psi}{e_w}. \\
 	\end{aligned}
 \end{equation}
 
-Then the integration by parts is performed on the first line, the third and fourth line. This choice is such to retain the skew-symmetric structure at the discrete level and to lower the regularity requirement for the finite elements \cite[Chap. 8]{brugnoli2020thesis}. The weak formulation then looks for $(e_u, e_w, e_\kappa, w) \in H^1(\Omega), \, e_\varepsilon \in L^2(\Omega)$
+Then the integration by parts is performed on the first, third and fourth line. This choice is such to retain the skew-symmetric structure at the discrete level and to lower the regularity requirement for the finite elements \cite[Chap. 8]{brugnoli2020thesis}. The weak formulation then looks for $(e_u, e_w, e_\kappa, w) \in H^1(\Omega), \, e_\varepsilon \in L^2(\Omega)$
 such that the following system
 \begin{equation}\label{eq:weak_form}
 	\begin{aligned}
@@ -350,7 +350,7 @@ In this formulation, the boundary axial forces $e_\varepsilon\vert_{0}^L$, verti
 \end{aligned}
 \end{equation}
 Notice that $w, \, e_w$ are discretized using the same test functions 
-$\xi_w^i(x)$. Plugging \eqref{eq:Gal_appr} into \eqref{eq:weak_form}, the following finite dimensional system is obtained
+$\xi_w^i(x)$. Plugging \eqref{eq:Gal_appr} into \eqref{eq:weak_form}, the following-finite dimensional system is obtained
 
 \begin{equation}\label{eq:findimSys}
 \begin{pmatrix}
@@ -372,9 +372,9 @@ $\xi_w^i(x)$. Plugging \eqref{eq:Gal_appr} into \eqref{eq:weak_form}, the follow
 	\mathbf{e}_\varepsilon \\
 	\mathbf{e}_w \\
 	\mathbf{e}_\kappa \\
-\end{pmatrix},
+\end{pmatrix}.
 \end{equation}
-where the boundary terms have been omitted for simplicity. The mass matrices are defined as follows
+The boundary terms have been omitted for simplicity. The fifth column disappear because $\delta_w H=0$. The mass matrices are defined as follows
 \begin{equation}
 	\begin{aligned}
 	M_u^{ij} &= \inner[\Omega]{\xi_u^i}{\rho A \xi_u^j}, \\
@@ -425,12 +425,12 @@ u\vert_0^L = 0, \quad w\vert_0^L =0, \quad m_{xx}\vert_{0}^L=0.
 For $u$ and $w$ given in \eqref{eq:analytical} to be the solution of \eqref{eq:class}, appropriate forcing term have to be introduced. These are given by 
 \begin{equation}\label{eq:forcing}
 	\begin{aligned}
-		f_u &= \rho A \partial_{tt}^2 u - \partial_x n_{xx}, \\
-		f_w &= \rho A \partial_{tt}^2 w + \partial_{xx}^2 m_{xx} - \partial_x(n_{xx} \partial_x w), \\
+		f_u &= \rho A \partial_{tt}^2 u^{\text{ex}} - \partial_x n_{xx}^{\text{ex}}, \\
+		f_w &= \rho A \partial_{tt}^2 w^{\text{ex}} + \partial_{xx}^2 m_{xx}^{\text{ex}} - \partial_x(n_{xx}^{\text{ex}} \partial_x w^{\text{ex}}), \\
 	\end{aligned}
 \end{equation}
 
-The numerical values of the parameters for the simulation are reported in Table \ref{tab:par}. The Firedrake library (\cite{rathgeber2017firedrake}) is used to generate the matrices. To integrate the equations in time a Crank-Nicholson scheme is employed. The time step is set to $\Delta t = h/(2 \pi)$ to have the same impact of the time discretization error with respect to the spatial error. The final time is set to one $t_f = 1 [\textrm{s}]$. The non-linear system is solved using Newton-Krylov iterations with a line search and direct factorisation of the linear system.  \\
+The numerical values of the parameters for the simulation are reported in Table \ref{tab:par}. The Firedrake library (\cite{rathgeber2017firedrake}) is used to generate the matrices. To integrate the equations in time a Crank-Nicholson scheme is employed. The time step is set to $\Delta t = h/(2 \pi)$ to have the same impact of the time discretization error with respect to the spatial error. The final time is set to one $t_f = 1 [\textrm{s}]$. The non-linear system is solved using Newton-Krylov iterations with a line search and direct factorization of the linear system.  \\
 
 To measure the convergence rate,  suitable norms have to be introduced. 
 Let $\mathcal{X}$ be a Hilbert space, and $t_f$ a positive real number. We denote by $L^\infty([0, t_f]; \mathcal{X})$ or $L^\infty(\mathcal{X})$ the space of functions $f: [0, t_f] \rightarrow \mathcal{X}$ for which the time-space norm $||\cdot||_{L^\infty([0, t_f]; \mathcal{X})}$ satisfies
@@ -442,7 +442,7 @@ To compute the $L^\infty (\mathcal{X})$ space-time dependent norm from the numer
 \[
 ||\cdot ||_{L^\infty (\mathcal{X})} \approx || \cdot ||_{L^\infty_{\Delta t} (\mathcal{X})} = \max_{t \in t_i} ||\cdot||_{\mathcal{X}},
 \]
-where $t_i$ are the discrete simulation instants. The Hilbert space $\mathcal{X}$ depends on the regularity of the considered variable. For variables $(e_u,\, e_w,\, e_\kappa,\, w)$ the error is measured in the $L^\infty_{\Delta t}(H^1)$ norm, whereas for $e_\varepsilon$ is measured using the $L^\infty_{\Delta t}(L^2)$ norm. The simulation results are reported in Fig. \ref{fig:error}. It can be noticed that all variable converge at rate given by the polynomial degree $k$. For variable $e_\kappa$ a superconvergent trend can be observed for case $k=1$ (cf. Fig \ref{fig:err_e_kap}). The numerical solutions for the different variables is plot in Fig. \ref{fig:plot}.
+where $t_i$ are the discrete simulation instants. The Hilbert space $\mathcal{X}$ depends on the regularity of the considered variable. For variables $(e_u,\, e_w,\, e_\kappa,\, w)$ the error is measured in the $L^\infty_{\Delta t}(H^1)$ norm, whereas for $e_\varepsilon$ is measured using the $L^\infty_{\Delta t}(L^2)$ norm. The simulation results are reported in Fig. \ref{fig:error}. It can be noticed that all variables converge at rate given by the polynomial degree $k$. For variable $e_\kappa$ a superconvergent trend can be observed for case $k=1$ (cf. Fig \ref{fig:err_e_kap}). The numerical solutions for the different variables is plotted in Fig. \ref{fig:plot}.
 
 
 \begin{table}[h]
@@ -509,7 +509,7 @@ where $t_i$ are the discrete simulation instants. The Hilbert space $\mathcal{X}
 
 \section{Conclusion}
 
-In this contribution, a pH model for von K\'arm\'an beams is detailed. The resulting system of equations is then discretized using mixed finite elements. The validity of discretized model is assessed by comparison with an analytical solution. This demonstrates how pH formulations can be used in relevant non linear models arising from engineering. A natural outlook is the extension of this formulation to the two-dimensional case. \\
+In this contribution, a pH model for von K\'arm\'an beams is detailed. The resulting system of equations is then discretized using mixed finite elements. The validity of discretized model is assessed by comparison with an analytical solution. This demonstrates how pH formulations can be used in relevant non linear models arising from engineering. A natural outlook is the extension of this formulation to the two-dimensional case \cite{brugnoli2021enoc}. \\
 
 The analysis of this model under a control theoretic perspective represents another interesting development. The numerical discrete model can be used to construct model based controllers.
 
