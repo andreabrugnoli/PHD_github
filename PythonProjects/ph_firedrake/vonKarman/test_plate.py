@@ -115,10 +115,17 @@ def j_operator(v_u, v_eps, v_w, v_kap, v_disp, \
 def compute_err(n_elem, deg):
 
     mesh = RectangleMesh(n_elem, n_elem, L, L, quadrilateral=False)
+    
+    deg_eps = 2*(deg-1)
+
+    # V_u = VectorFunctionSpace(mesh, "CG", deg_eps+1)
+    # V_epsD = VectorFunctionSpace(mesh, "DG", deg_eps)
+    # V_eps12 = FunctionSpace(mesh, "DG", deg_eps)
 
     V_u = VectorFunctionSpace(mesh, "CG", deg)
     V_epsD = VectorFunctionSpace(mesh, "DG", deg-1)
     V_eps12 = FunctionSpace(mesh, "DG", deg-1)
+    
     V_w = FunctionSpace(mesh, "CG", deg)
     V_kap = FunctionSpace(mesh, "HHJ", deg-1)
     V_disp = FunctionSpace(mesh, "CG", deg)
@@ -167,8 +174,8 @@ def compute_err(n_elem, deg):
     # omega_u = 1
     # omega_w = 1
     
-    u_st = as_vector([x[0]*(1-(x[0]/L))*x[1]*(1-(x[1]/L)),
-                      x[0]*(1-(x[0]/L))*x[1]*(1-(x[1]/L))])
+    u_st = as_vector([x[0]**3*(1-(x[0]/L)**3)*sin(pi*x[1]/L)**2,
+                      sin(pi*x[0]/L)**2*x[1]**3*(1-(x[1]/L)**3)])
     
     u_ex = u_st*sin(omega_u*t_)    
     e_u_ex = omega_u*u_st*cos(omega_u*t_)
@@ -346,7 +353,7 @@ def compute_err(n_elem, deg):
     
 
 
-n_h = 5
+n_h = 3
 n_vec = np.array([2**(i+2) for i in range(n_h)])
 h_vec = 1./n_vec
 
@@ -382,7 +389,7 @@ for i in range(n_h):
 
         
        
-path_res = "./errors_data_plate/"
+path_res = "./errors_data_plate3/"
 if save_res:
     np.save(path_res + "h_vec", h_vec)
    

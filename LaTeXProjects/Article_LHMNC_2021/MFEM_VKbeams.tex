@@ -92,11 +92,10 @@
 \author[UT]{Federico Califano}
 \author[UT]{Ramy Rashad}
 \author[ISAE]{Denis Matignon}
-\address[UT]{University of Twente, Enschede (NL) \\
+\address[UT]{University of Twente, Enschede, The Netherlands. \\
 	a.brugnoli@utwente.nl, s.stramigioli@utwente.nl }
 
-\address[ISAE]{ISAE-SUPAERO, Universit\'e de Toulouse, France.\\
-	10 Avenue Edouard Belin, BP-54032, 31055 Toulouse Cedex 4. \\
+\address[ISAE]{ISAE-SUPAERO, Universit\'e de Toulouse, France. \\
 	denis.matignon@isae.fr}
 
 \begin{abstract}
@@ -115,11 +114,11 @@ Port-Hamiltonian systems, von K\'arm\'an beams, Mixed Finite Elements
 Linear elastic structures have been largely investigated into the port-Hamiltonian (pH) framework as well as the heat equation (consult for instance \cite{macchelli2004timo} for the Timoshenko beam, \cite{aoues2017modeling} for the Euler-Bernoulli beam, \cite{brugnoli2019mindlin,brugnoli2019kirchhoff} for thick and thin plates). Recently, more complicated models arising from fluid dynamics have also been considered \cite{cardoso2019port,cardoso2020swe,rashad2021port1,rashad2021port2,califano2021geometric,altmann2017}. \\
 
 
-The Hamiltonian foundation of non-linear elasticity dates back to the late 80' \cite{simo1988}. However, the field of non-linear elasticity remains a largely unexplored topic in the pH framework. One fundamental non linear theory is the Von K\'arm\'an one, that applies for moderately large deformation of beams, plates and shells. This theory has puzzled mathematicians and physicists as the derivation of the model rely on some not well justified assumptions. Conditions under which this theory is actually applicable and will give reasonable results when solved are discussed in \cite{ciarlet1980,ciarlet1990}. Existence and uniqueness of solutions for the full dynamical problem were established in \cite{lagnese1991uniform} for one-dimensional beams and in \cite{puel1996} for plates. Since the full dynamical von K\'arman problem is conservative (see e.g. \cite{bilbao2015conservative}), a pH realization of this system exists. \\
+The Hamiltonian foundation of non-linear elasticity dates back to the late 80' \cite{simo1988}. A pH formulation of flexible beams undergoing large deformations can be found in \cite{macchelli2007fl,macchelli2009flrig}. One fundamental non linear theory is the Von K\'arm\'an one, that applies for moderately large deformation of beams, plates and shells. This theory has puzzled mathematicians and physicists as the derivation of the model rely on some not well justified assumptions. Conditions under which this theory is actually applicable and will give reasonable results when solved are discussed in \cite{ciarlet1980,ciarlet1990}. Existence and uniqueness of solutions for the full dynamical problem were established in \cite{lagnese1991uniform} for one-dimensional beams and in \cite{puel1996} for plates. Since the full dynamical von K\'arman problem is conservative (see e.g. \cite{bilbao2015conservative}), a pH realization of this system exists. \\
 
 The development of new models within the pH framework has been accompanied with an increased interest in numerical discretization methods, capable of retaining the main features of the distributed system in its finite-dimensional counterpart. Recently, it has become evident that there is a strict link between  discretization of port-Hamiltonian  systems and mixed finite elements \cite{cardoso2020pfem}. An example of this connection is given in \cite{kirby2015}, where a velocity-stress formulation for the wave dynamics is shown to be Hamiltonian and its mixed discretization preserves such a structure. \\
 
-In this contribution, the von K\'arm\'an beam model is formulated as a pH system. The selection of energy variables will be such to make the Hamiltonian quadratic in these variables. As a consequence of this choice, the non linearities of the model are included in the interconnection operator, whereas the constitutive relations remain linear. The obtained model can be discretized using mixed finite element. To this aim, a weak formulation that does not demand for $H^2$ regularity for the vertical displacement (as in classical Galerkin discretizaiton of beams and plates, cf. \cite{gustafsson2018}) is obtained. A numerical test is carried out to evaluate the convergence rate of the discrete solution with respect to an analytical one. \\
+In this contribution, the von K\'arm\'an beam model is formulated as a pH system. The selection of energy variables will be such to make the Hamiltonian quadratic in these variables. As a consequence of this choice, the non linearities of the model are included in the interconnection operator, whereas the constitutive relations remain linear. The obtained model can be discretized using mixed finite element. To this aim, a weak formulation that does not demand for $H^2$ regularity for the vertical displacement (as in classical Galerkin discretization of beams and plates, cf. \cite{gustafsson2018}) is obtained. This means that the vertical displacement can be discretized using $H^1$ conforming elements (i.e. Continuous Galerkin elements), rather then using the more computationally demanding $H^2$ conforming elements, like the Hermite polynomials. A numerical test is carried out to evaluate the convergence rate of the discrete solution with respect to an analytical one. \\
 
 The paper is organized as follows. In Section \ref{sec:vK_beams} the classical model for von K\'arm\'an beams is recalled. Then, a pH realization of the classical model is detailed in \secref{sec:pHmodel}. The mixed finite elements discretization strategy is discussed in \secref{sec:mfem}. In Sec. \ref{sec:num_test} a numerical convergence test is performed to assess the rate of convergence of the solution.
 
@@ -147,7 +146,14 @@ together with the stresses and strains expressions
 		\kappa_{xx} &=\partial^2_{xx} w. \\
 	\end{aligned} 
 \end{equation}
-Variable $u$ is the horizontal displacement, $w$ is the vertical displacement, $n_{xx}$ is the axial stress resultant and $m_{xx}$ is the bending stress resultant. The coefficients $\rho, A, E, I$ are the mass density, the cross section, the Young modulus and the second moment of area.
+Variable $u$ is the horizontal displacement, $w$ is the vertical displacement (cf. Fig. \ref{fig:vKbeam}), $n_{xx}$ is the axial stress resultant and $m_{xx}$ is the bending stress resultant. The coefficients $\rho, A, E, I$ are the mass density, the cross section, the Young modulus and the second moment of area.
+
+\begin{figure}[ht]%
+	\centering
+		\includegraphics[width=0.95\columnwidth]{vKbeam.eps}%
+	\caption{Schematic representation of a von K\'arm\'an beam}%
+	\label{fig:vKbeam}%
+\end{figure}
 
 The total energy of the model (Hamiltonian functional)
 \begin{equation}
@@ -180,6 +186,12 @@ Before stating the final formulation, consider the unbounded operator operator $
 \begin{equation}
 	\mathcal{C}(w)(\cdot ) = \partial_x(\cdot \; \partial_x w).
 \end{equation}
+
+The domain of the operator is given by
+\begin{equation}
+D(\mathcal{C}) = \{v \, \vert \; v \, \partial_x w \in H^1(\Omega) \}.
+\end{equation}
+
 \begin{proposition}\label{prop:adjC}
 	The formal adjoint of the $\mathcal{C}(w)(\cdot)$ is given by
 	\begin{equation}
@@ -374,7 +386,7 @@ $\xi_w^i(x)$. Plugging \eqref{eq:Gal_appr} into \eqref{eq:weak_form}, the follow
 	\mathbf{e}_\kappa \\
 \end{pmatrix}.
 \end{equation}
-The boundary terms have been omitted for simplicity. The fifth column disappear because $\delta_w H=0$. The mass matrices are defined as follows
+Since homogeneous boundary conditions will be considered in \secref{sec:num_test}, the boundary terms have been omitted. The fifth column disappear because $\delta_w H=0$. The mass matrices are defined as follows
 \begin{equation}
 	\begin{aligned}
 	M_u^{ij} &= \inner[\Omega]{\xi_u^i}{\rho A \xi_u^j}, \\
@@ -513,6 +525,10 @@ In this contribution, a pH model for von K\'arm\'an beams is detailed. The resul
 
 The analysis of this model under a control theoretic perspective represents another interesting development. The numerical discrete model can be used to construct model based controllers.
 
+\begin{ack}
+	This work was supported by the PortWings project funded
+	by the European Research Council [Grant Agreement No. 787675]
+\end{ack}
 
 \bibliography{biblio_LHMNC}             % bib file to 
 \appendix

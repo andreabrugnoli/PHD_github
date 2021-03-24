@@ -81,8 +81,10 @@ def compute_err(n_elem, deg):
 
     mesh = IntervalMesh(n_elem, L)
     
-    V_u = FunctionSpace(mesh, "CG", deg)
-    V_eps = FunctionSpace(mesh, "DG", deg-1)
+    deg_eps = 2*(deg-1)
+    
+    V_u = FunctionSpace(mesh, "CG", deg_eps+1)
+    V_eps = FunctionSpace(mesh, "DG", deg_eps)
     V_w = FunctionSpace(mesh, "CG", deg)
     V_kap = FunctionSpace(mesh, "CG", deg)
     V_disp = FunctionSpace(mesh, "CG", deg)
@@ -318,7 +320,7 @@ for i in range(n_h):
 
         
        
-path_res = "./errors_data_beam/"
+path_res = "./errors_data_beam2/"
 if save_res:
     np.save(path_res + "h_vec", h_vec)
    

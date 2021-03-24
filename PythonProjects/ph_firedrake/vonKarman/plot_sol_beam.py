@@ -90,8 +90,10 @@ def j_operator(v_u, v_eps, v_w, v_kap, v_disp, \
 
 mesh = IntervalMesh(n_elem, L)
 
-V_u = FunctionSpace(mesh, "CG", deg)
-V_eps = FunctionSpace(mesh, "DG", deg-1)
+deg_eps = 2*(deg-1)
+    
+V_u = FunctionSpace(mesh, "CG", deg_eps+1)
+V_eps = FunctionSpace(mesh, "DG", deg_eps)
 V_w = FunctionSpace(mesh, "CG", deg)
 V_kap = FunctionSpace(mesh, "CG", deg)
 V_disp = FunctionSpace(mesh, "CG", deg)
@@ -257,7 +259,7 @@ xx_plot_w, tt_plot = np.meshgrid(x_w, t_vec)
 
 
 path_fig = "/home/andrea/Plots/Python/VonKarman/"
-save_fig = True
+save_fig = False
 
 fig = plt.figure()
 ax = fig.gca(projection='3d')
