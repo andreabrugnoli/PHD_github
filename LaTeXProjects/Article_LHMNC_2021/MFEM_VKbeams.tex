@@ -318,6 +318,7 @@ where $C_a = (EA)^{-1}$ and $C_b = (EI)^{-1}$ are the axial and bending complian
 \end{equation}
 
 To derive the discrete system, first \eqref{eq:pHaug_e} is put into weak form. To this aim the test functions $(\psi_u,\, \psi_\varepsilon,\, \psi_w,\, \psi_\kappa,\, \psi)$ are introduced. For sake of simplicity, no dependency between the displacements and the energy is considered, i.e. $\delta_w H=0$:
+
 \begin{equation}
 	\begin{aligned}
 	\inner[\Omega]{\psi_u}{\rho A \, \dot{e}_u} &= \inner[\Omega]{\psi_u}{\partial_x e_\varepsilon}. \\
@@ -328,8 +329,8 @@ To derive the discrete system, first \eqref{eq:pHaug_e} is put into weak form. T
 	\end{aligned}
 \end{equation}
 
-Then the integration by parts is performed on the first, third and fourth line. This choice is such to retain the skew-symmetric structure at the discrete level and to lower the regularity requirement for the finite elements \cite[Chap. 8]{brugnoli2020thesis}. The weak formulation then looks for $(e_u, e_w, e_\kappa, w) \in H^1(\Omega), \, e_\varepsilon \in L^2(\Omega)$
-such that the following system
+Then the integration by parts is performed on the first, third and fourth line. This choice is such to retain the skew-symmetric structure at the discrete level and to lower the regularity requirement for the finite elements \cite[Chap. 8]{brugnoli2020thesis}. The weak formulation then looks for $(e_u, e_w, e_\kappa, w) \in H^1(\Omega), \, e_\varepsilon \in L^2(\Omega)$ such that the following system
+
 \begin{equation}\label{eq:weak_form}
 	\begin{aligned}
 		\inner[\Omega]{\psi_u}{\rho A \, \dot{e}_u} &= -\inner[\Omega]{\partial_x \psi_u}{ e_\varepsilon} +  \inner[\partial\Omega]{\psi_u}{e_\varepsilon}. \\
@@ -412,13 +413,27 @@ For what concerns the choice of the underlying finite elements, a simple selecti
 
 \begin{equation}
 	\begin{aligned}
-		H^1_h(\Omega) &= \left\{v_h \in H^1(\Omega)\vert \forall E \in \mathcal{I}_h, \; v_h\vert_E \in P_k \right\}, \\
-		L^2_h(\Omega) &= \left\{u_h \in L^2(\Omega)\vert \forall E \in \mathcal{I}_h, \; u_h\vert_E \in P_{k-1} \right\}.
+		\mathcal{E}^h_u &= \left\{e_u^h \in H^1(\Omega)\vert \forall E \in \mathcal{I}_h, \; e_u^h\vert_E \in P_{2k-1} \right\}, \\
+		\mathcal{E}^h_\varepsilon &= \left\{e_\varepsilon^h \in L^2(\Omega)\vert \forall E \in \mathcal{I}_h, \; e_\varepsilon^h\vert_E \in P_{2k-2} \right\}, \\
+		\mathcal{E}^h_w &= \left\{e_w^h \in H^1(\Omega)\vert \forall E \in \mathcal{I}_h, \; e_w^h\vert_E \in P_{k} \right\}, \\
+		\mathcal{E}^h_\kappa &= \left\{e_\kappa^h \in H^1(\Omega)\vert \forall E \in \mathcal{I}_h, \; e_\kappa^h\vert_E \in P_{k} \right\}, \\
+		\mathcal{W}^h &= \left\{w^h \in H^1(\Omega)\vert \forall E \in \mathcal{I}_h, \; w^h\vert_E \in P_{k} \right\}, \\
 	\end{aligned}
 \end{equation}
 
-The space $H^1_h$ corresponds to the space of continous Galerkin elements of order $k$, whereas $L^2_h$ corresponds to the space of discontinuous Galerkin elements of order $k-1$. This choice guarantees that $\partial_x H^1_h(\Omega) \subset L^2_h(\Omega)$. So the discrete weak formulation becomes: find $(e_u^h, e_w^h, e_\kappa^h, w^h) \in H^1_h(\Omega), \, e_\varepsilon^h \in L_h^2(\Omega)$
-such that system \eqref{eq:weak_form} holds $\forall (\psi_u^h, \psi_w^h, \psi_\kappa^h, \psi^h) \in H^1_h(\Omega), \, \forall \psi_\varepsilon^h \in L^2_h(\Omega)$.
+where $k \ge 1$. The space $\mathcal{E}^h_u$ corresponds to the space of continous Galerkin elements of order $2k-1$ whereas $\mathcal{E}^h_w, \, \mathcal{E}^h_\kappa, \mathcal{W}^h$ corresponds to the space of continous Galerkin elements of order $k$. The space $\mathcal{E}^h_\varepsilon$ corresponds to the space of discontinuous Galerkin elements of order $2k-2$. This choice guarantees that $\partial_x H^1_h(\Omega) \subset L^2_h(\Omega)$. 
+
+\begin{equation}
+\begin{aligned}
+	\partial_x \mathcal{E}^h_u \subset \mathcal{E}^h_\varepsilon, \\
+	\partial_x \mathcal{W}^h \cdot  \partial_x \mathcal{E}^h_w \subset \mathcal{E}^h_\varepsilon.
+\end{aligned}
+\end{equation}
+
+So the discrete weak formulation becomes: find 
+$$(e_u^h, \; e_\varepsilon^h, \; e_w^h, \; e_\kappa^h, \; w^h) \in   \mathcal{E}^h_u \times \mathcal{E}^h_\varepsilon \times \mathcal{E}^h_w \times \mathcal{E}^h_\kappa \times \mathcal{W}^h$$
+such that system \eqref{eq:weak_form} holds 
+$$\forall (\psi_u^h, \; \psi_\varepsilon^h, \;  \psi_w^h, \; \psi_\kappa^h, \; \psi^h) \in \mathcal{E}^h_u \times \mathcal{E}^h_\varepsilon \times \mathcal{E}^h_w \times \mathcal{E}^h_\kappa \times \mathcal{W}^h.$$.
 
 \section{Numerical test}\label{sec:num_test}
 

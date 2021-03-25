@@ -85,6 +85,10 @@ def compute_err(n_elem, deg):
     
     V_u = FunctionSpace(mesh, "CG", deg_eps+1)
     V_eps = FunctionSpace(mesh, "DG", deg_eps)
+    
+    # V_u = FunctionSpace(mesh, "CG", deg+1)
+    # V_eps = FunctionSpace(mesh, "DG", deg)
+    
     V_w = FunctionSpace(mesh, "CG", deg)
     V_kap = FunctionSpace(mesh, "CG", deg)
     V_disp = FunctionSpace(mesh, "CG", deg)
@@ -124,6 +128,7 @@ def compute_err(n_elem, deg):
     # omega_w = 1
     
     u_st = x[0]**3*(1-(x[0]/L)**3)
+    
 
     u_ex = u_st*sin(omega_u*t_)    
     e_u_ex = omega_u*u_st*cos(omega_u*t_)

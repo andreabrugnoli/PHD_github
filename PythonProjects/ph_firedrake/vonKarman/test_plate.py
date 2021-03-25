@@ -118,13 +118,13 @@ def compute_err(n_elem, deg):
     
     deg_eps = 2*(deg-1)
 
-    # V_u = VectorFunctionSpace(mesh, "CG", deg_eps+1)
-    # V_epsD = VectorFunctionSpace(mesh, "DG", deg_eps)
-    # V_eps12 = FunctionSpace(mesh, "DG", deg_eps)
+    V_u = VectorFunctionSpace(mesh, "CG", deg_eps+1)
+    V_epsD = VectorFunctionSpace(mesh, "DG", deg_eps)
+    V_eps12 = FunctionSpace(mesh, "DG", deg_eps)
 
-    V_u = VectorFunctionSpace(mesh, "CG", deg)
-    V_epsD = VectorFunctionSpace(mesh, "DG", deg-1)
-    V_eps12 = FunctionSpace(mesh, "DG", deg-1)
+    # V_u = VectorFunctionSpace(mesh, "CG", deg)
+    # V_epsD = VectorFunctionSpace(mesh, "DG", deg-1)
+    # V_eps12 = FunctionSpace(mesh, "DG", deg-1)
     
     V_w = FunctionSpace(mesh, "CG", deg)
     V_kap = FunctionSpace(mesh, "HHJ", deg-1)
@@ -164,7 +164,7 @@ def compute_err(n_elem, deg):
     t_1 = Constant(t+dt)
     theta = 0.5
     
-    x = mesh.coordinates
+    x, y = mesh.coordinates
     
     T_u = t_fin
     omega_u = 2*pi/T_u*t_fin
@@ -174,24 +174,43 @@ def compute_err(n_elem, deg):
     # omega_u = 1
     # omega_w = 1
     
-    u_st = as_vector([x[0]**3*(1-(x[0]/L)**3)*sin(pi*x[1]/L)**2,
-                      sin(pi*x[0]/L)**2*x[1]**3*(1-(x[1]/L)**3)])
+    u_st = as_vector([x**4*(1-(x/L)**4)*sin(pi*y/L)**2,
+                      sin(pi*x/L)**2*y**4*(1-(y/L)**4)])
+    
+    grad_u_st = as_tensor([[4*x**3*(1-2*(x/L)**4)*sin(pi*y/L)**2, pi/L*x**4*(1-(x/L)**4)*sin(2*pi*y/L)],
+                           [pi/L*sin(2*pi*x/L)*y**4*(1-(y/L)**4), sin(pi*x/L)**2*4*y**3*(1-2*(y/L)**4)]
+                           ])
     
     u_ex = u_st*sin(omega_u*t_)    
     e_u_ex = omega_u*u_st*cos(omega_u*t_)
     dtt_u_ex = - omega_u**2 * u_st*sin(omega_u*t_)
     
-    w_st = sin(pi*x[0]/L)*sin(pi*x[1]/L)
+    w_st = sin(pi*x/L)*sin(pi*y/L)
+    
+    grad_w_st = as_vector([pi/L*cos(pi*x/L)*sin(pi*y/L),
+                           pi/L*sin(pi*x/L)*cos(pi*y/L)])
+    
+    Hess_w_st = as_tensor([[-(pi/L)**2*sin(pi*x/L)*sin(pi*y/L), (pi/L)**2*cos(pi*x/L)*cos(pi*y/L)],
+                           [(pi/L)**2*cos(pi*x/L)*cos(pi*y/L), -(pi/L)**2*sin(pi*x/L)*sin(pi*y/L)]
+                           ])
     
     w_ex = w_st * sin(omega_w*t_)
     e_w_ex = omega_w * w_st * cos(omega_w*t_)
     dtt_w_ex = - omega_w**2*w_st*sin(omega_w*t_)
     
-    e_eps_ex = traction_stiff(gradSym(u_ex) + 0.5 * outer(grad(w_ex), grad(w_ex)))
-    e_kap_ex = bending_stiff(grad(grad(w_ex)))
+    e_eps_ex = traction_stiff(sym(grad_u_st)*sin(omega_u*t_) \
+                              + 0.5 * sin(omega_w*t_)**2* outer(grad_w_st, grad_w_st))
+        
+    e_kap_ex = bending_stiff(Hess_w_st * sin(omega_w*t_))
     
     f_u = rho*h*dtt_u_ex - div(e_eps_ex)
-    f_w = rho*h*dtt_w_ex + div(div(e_kap_ex)) - div(dot(e_eps_ex, grad(w_ex)))
+    f_w = rho*h*dtt_w_ex + div(div(e_kap_ex)) - div(dot(e_eps_ex, grad_w_st*sin(omega_w*t_)))
+        
+    # e_eps_ex = traction_stiff(gradSym(u_ex) + 0.5 * outer(grad(w_ex), grad(w_ex)))
+    # e_kap_ex = bending_stiff(grad(grad(w_ex)))
+    
+    # f_u = rho*h*dtt_u_ex - div(e_eps_ex)
+    # f_w = rho*h*dtt_w_ex + div(div(e_kap_ex)) - div(dot(e_eps_ex, grad(w_ex)))
     
     f_form = inner(v_u, f_u)*dx + inner(v_w, f_w)*dx
     
@@ -203,11 +222,19 @@ def compute_err(n_elem, deg):
     e_w_ex1 = omega_w* w_st * cos(omega_w*t_1)
     dtt_w_ex1 = - omega_w**2* w_st *sin(omega_w*t_1)
     
-    e_eps_ex1 = traction_stiff(gradSym(u_ex1) + 0.5 * outer(grad(w_ex1), grad(w_ex1)))
-    e_kap_ex1 = bending_stiff(grad(grad(w_ex1)))
+    e_eps_ex1 = traction_stiff(sym(grad_u_st)*sin(omega_u*t_1) \
+                              + 0.5 * sin(omega_w*t_1)**2* outer(grad_w_st, grad_w_st))
+        
+    e_kap_ex1 = bending_stiff(Hess_w_st * sin(omega_w*t_1))
     
     f_u1 = rho*h*dtt_u_ex1 - div(e_eps_ex1)
-    f_w1 = rho*h*dtt_w_ex1 + div(div(e_kap_ex1)) - div(dot(e_eps_ex1, grad(w_ex1)))
+    f_w1 = rho*h*dtt_w_ex1 + div(div(e_kap_ex1)) - div(dot(e_eps_ex1, grad_w_st*sin(omega_w*t_1)))
+    
+    # e_eps_ex1 = traction_stiff(gradSym(u_ex1) + 0.5 * outer(grad(w_ex1), grad(w_ex1)))
+    # e_kap_ex1 = bending_stiff(grad(grad(w_ex1)))
+    
+    # f_u1 = rho*h*dtt_u_ex1 - div(e_eps_ex1)
+    # f_w1 = rho*h*dtt_w_ex1 + div(div(e_kap_ex1)) - div(dot(e_eps_ex1, grad(w_ex1)))
        
     f_form1 = inner(v_u, f_u1)*dx + inner(v_w, f_w1)*dx
     

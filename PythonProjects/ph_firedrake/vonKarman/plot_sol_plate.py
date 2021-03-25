@@ -117,9 +117,16 @@ def j_operator(v_u, v_eps, v_w, v_kap, v_disp, \
 
 mesh = RectangleMesh(n_elem, n_elem, L, L, quadrilateral=False)
 
-V_u = VectorFunctionSpace(mesh, "CG", deg)
-V_epsD = VectorFunctionSpace(mesh, "DG", deg-1)
-V_eps12 = FunctionSpace(mesh, "DG", deg-1)
+deg_eps = 2*(deg-1)
+
+V_u = VectorFunctionSpace(mesh, "CG", deg_eps+1)
+V_epsD = VectorFunctionSpace(mesh, "DG", deg_eps)
+V_eps12 = FunctionSpace(mesh, "DG", deg_eps)
+
+# V_u = VectorFunctionSpace(mesh, "CG", deg)
+# V_epsD = VectorFunctionSpace(mesh, "DG", deg-1)
+# V_eps12 = FunctionSpace(mesh, "DG", deg-1)
+
 V_w = FunctionSpace(mesh, "CG", deg)
 V_kap = FunctionSpace(mesh, "HHJ", deg-1)
 V_disp = FunctionSpace(mesh, "CG", deg)
