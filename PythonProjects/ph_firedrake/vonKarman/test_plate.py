@@ -380,7 +380,7 @@ def compute_err(n_elem, deg):
     
 
 
-n_h = 3
+n_h = 5
 n_vec = np.array([2**(i+2) for i in range(n_h)])
 h_vec = 1./n_vec
 
@@ -416,7 +416,7 @@ for i in range(n_h):
 
         
        
-path_res = "./errors_data_plate3/"
+path_res = "./errors_data_plate10/"
 if save_res:
     np.save(path_res + "h_vec", h_vec)
    

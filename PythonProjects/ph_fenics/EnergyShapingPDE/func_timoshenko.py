@@ -3,17 +3,19 @@ import numpy as np
 # from scipy import linalg as la
     
 def matrices_timoshenko(n_el=10, deg=1, e0_string=('0', '0', '0', '0'),\
-                        rho=1, I_rho=1, C_b=1, C_s=1, L=1, r_w=1, r_th=1):
+                        rho=1, I_rho=1, C_b=1, C_s=1, L=1, r_w=0, r_th=0):
     """
     Computes matrices M, J, B for the Timoshenko beam.
     Parameters:
     n_el: number of finite elements
-    deg: degree of  palynomial basis functions
-    rho: density per unit length [kg/m]
-    I_rho: rotational inertia
-    C_b: bending compliance
-    C_s: shear compliance
+    deg: degree of  polynomial basis functions
+    rho: density per unit length [kg/m^3]
+    I_rho: Rotational Inertia
+    C_b: Bending compliance
+    C_s: Shear compliance
     L: beam length
+    r_w: linear damping
+    r_th: rotational damping
     """
 
     # Mesh
@@ -80,16 +82,17 @@ def matrices_timoshenko(n_el=10, deg=1, e0_string=('0', '0', '0', '0'),\
     exp_e0 = Expression(e0_string, degree=2)
     e0_array = interpolate(exp_e0, V).vector().get_local()
 
-    # Energy variables
-    al_pw = rho * e_pw
-    al_pth = I_rho * e_pth
-    al_qth = C_b * e_qth
-    al_qw = C_s * e_qw
     
-    def get_m_form(v_pw, v_pth, v_qth, v_qw, al_pw, al_pth, al_qth, al_qw):
+    def get_m_form(v_pw, v_pth, v_qth, v_qw, e_pw, e_pth, e_qth, e_qw):
         """
         Defines the mass form. Once assembled the mass matrix is obtained
         """
+        # Energy variables
+        al_pw = rho * e_pw
+        al_pth = I_rho * e_pth
+        al_qth = C_b * e_qth
+        al_qw = C_s * e_qw
+
         m = v_pw * al_pw * dx \
             + v_pth * al_pth * dx \
             + v_qth * al_qth * dx \
@@ -145,7 +148,7 @@ def matrices_timoshenko(n_el=10, deg=1, e0_string=('0', '0', '0', '0'),\
             dofs_bc.append(key)
     
     # Matrices assembly
-    m_form = get_m_form(v_pw, v_pth, v_qth, v_qw, al_pw, al_pth, al_qth, al_qw)
+    m_form = get_m_form(v_pw, v_pth, v_qth, v_qw, e_pw, e_pth, e_qth, e_qw)
     j_form = get_j_form(v_pw, v_pth, v_qth, v_qw, e_pw, e_pth, e_qth, e_qw)
     r_form = get_r_form(v_pw, v_pth, e_pw, e_pth)
 

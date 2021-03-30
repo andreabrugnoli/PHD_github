@@ -88,9 +88,9 @@
 
 
 \author[UT]{Andrea Brugnoli}
-\author[UT]{Stefano Stramigioli}
-\author[UT]{Federico Califano}
 \author[UT]{Ramy Rashad}
+\author[UT]{Federico Califano}
+\author[UT]{Stefano Stramigioli}
 \author[ISAE]{Denis Matignon}
 \address[UT]{University of Twente, Enschede, The Netherlands. \\
 	a.brugnoli@utwente.nl, s.stramigioli@utwente.nl }
@@ -111,14 +111,14 @@ Port-Hamiltonian systems, von K\'arm\'an beams, Mixed Finite Elements
 
 \section{Introduction}
 
-Linear elastic structures have been largely investigated into the port-Hamiltonian (pH) framework as well as the heat equation (consult for instance \cite{macchelli2004timo} for the Timoshenko beam, \cite{aoues2017modeling} for the Euler-Bernoulli beam, \cite{brugnoli2019mindlin,brugnoli2019kirchhoff} for thick and thin plates). Recently, more complicated models arising from fluid dynamics have also been considered \cite{cardoso2019port,cardoso2020swe,rashad2021port1,rashad2021port2,califano2021geometric,altmann2017}. \\
+Linear elastic structures have been largely investigated into the port-Hamiltonian (pH) framework as well as the heat equation (consult for instance \cite{macchelli2004timo} for the Timoshenko beam, \cite{aoues2017modeling} for the Euler-Bernoulli beam, \cite{brugnoli2019mindlin,brugnoli2019kirchhoff} for thick and thin plates). Recently, more complicated models arising from fluid dynamics have also been considered \citep{cardoso2019port,cardoso2020swe,rashad2021port1,rashad2021port2,califano2021geometric,altmann2017}. \\
 
 
-The Hamiltonian foundation of non-linear elasticity dates back to the late 80' \cite{simo1988}. A pH formulation of flexible beams undergoing large deformations can be found in \cite{macchelli2007fl,macchelli2009flrig}. One fundamental non linear theory is the Von K\'arm\'an one, that applies for moderately large deformation of beams, plates and shells. This theory has puzzled mathematicians and physicists as the derivation of the model rely on some not well justified assumptions. Conditions under which this theory is actually applicable and will give reasonable results when solved are discussed in \cite{ciarlet1980,ciarlet1990}. Existence and uniqueness of solutions for the full dynamical problem were established in \cite{lagnese1991uniform} for one-dimensional beams and in \cite{puel1996} for plates. Since the full dynamical von K\'arman problem is conservative (see e.g. \cite{bilbao2015conservative}), a pH realization of this system exists. \\
+The Hamiltonian foundation of non-linear elasticity dates back to the late 80' \citep{simo1988}. A pH formulation of flexible beams undergoing large deformations can be found in \cite{macchelli2007fl,macchelli2009flrig}. One fundamental non linear theory is the Von K\'arm\'an one, that applies for moderately large deformation of beams, plates and shells. This theory has puzzled mathematicians and physicists as the derivation of the model rely on some not well justified assumptions. Conditions under which this theory is actually applicable and will give reasonable results when solved are discussed in \cite{ciarlet1980,ciarlet1990}. Existence and uniqueness of solutions for the full dynamical problem were established in \cite{lagnese1991uniform} for one-dimensional beams and in \cite{puel1996} for plates. Since the full dynamical von K\'arman problem is conservative (see e.g. \cite{bilbao2015conservative}), a pH realization of this system exists. \\
 
-The development of new models within the pH framework has been accompanied with an increased interest in numerical discretization methods, capable of retaining the main features of the distributed system in its finite-dimensional counterpart. Recently, it has become evident that there is a strict link between  discretization of port-Hamiltonian  systems and mixed finite elements \cite{cardoso2020pfem}. An example of this connection is given in \cite{kirby2015}, where a velocity-stress formulation for the wave dynamics is shown to be Hamiltonian and its mixed discretization preserves such a structure. \\
+The development of new models within the pH framework has been accompanied with an increased interest in numerical discretization methods, capable of retaining the main features of the distributed system in its finite-dimensional counterpart (see \cite{rashad2020review} for a comprehensive review on this topic). Recently, it has become evident that there is a strict link between  discretization of port-Hamiltonian  systems and mixed finite elements \citep{cardoso2020pfem}. An example of this connection is given in \cite{kirby2015}, where a velocity-stress formulation for the wave dynamics is shown to be Hamiltonian and its mixed discretization preserves such a structure. \\
 
-In this contribution, the von K\'arm\'an beam model is formulated as a pH system. The selection of energy variables will be such to make the Hamiltonian quadratic in these variables. As a consequence of this choice, the non linearities of the model are included in the interconnection operator, whereas the constitutive relations remain linear. The obtained model can be discretized using mixed finite element. To this aim, a weak formulation that does not demand for $H^2$ regularity for the vertical displacement (as in classical Galerkin discretization of beams and plates, cf. \cite{gustafsson2018}) is obtained. This means that the vertical displacement can be discretized using $H^1$ conforming elements (i.e. Continuous Galerkin elements), rather then using the more computationally demanding $H^2$ conforming elements, like the Hermite polynomials. A numerical test is carried out to evaluate the convergence rate of the discrete solution with respect to an analytical one. \\
+In this contribution, the von K\'arm\'an beam model is formulated as a pH system. The selection of energy variables will be such to make the Hamiltonian quadratic in these variables. As a consequence of this choice, the non linearities of the model are included in the interconnection operator, whereas the constitutive relations remain linear. The obtained model can be discretized using mixed finite elements. To this aim, a weak formulation that does not demand for $H^2$ regularity for the vertical displacement (as in classical Galerkin discretization of beams and plates, cf. \cite{gustafsson2018}) is obtained. This means that the vertical displacement can be discretized using $H^1$ conforming elements (i.e. Continuous Galerkin elements), rather then using the more computationally demanding $H^2$ conforming elements, like the Hermite polynomials. A numerical test is carried out to evaluate the convergence rate of the discrete solution with respect to an analytical one. \\
 
 The paper is organized as follows. In Section \ref{sec:vK_beams} the classical model for von K\'arm\'an beams is recalled. Then, a pH realization of the classical model is detailed in \secref{sec:pHmodel}. The mixed finite elements discretization strategy is discussed in \secref{sec:mfem}. In Sec. \ref{sec:num_test} a numerical convergence test is performed to assess the rate of convergence of the solution.
 
@@ -146,7 +146,7 @@ together with the stresses and strains expressions
 		\kappa_{xx} &=\partial^2_{xx} w. \\
 	\end{aligned} 
 \end{equation}
-Variable $u$ is the horizontal displacement, $w$ is the vertical displacement (cf. Fig. \ref{fig:vKbeam}), $n_{xx}$ is the axial stress resultant and $m_{xx}$ is the bending stress resultant. The coefficients $\rho, A, E, I$ are the mass density, the cross section, the Young modulus and the second moment of area.
+Variable $u$ is the horizontal displacement, $w$ is the vertical displacement (cf. Fig. \ref{fig:vKbeam}), $n_{xx}$ is the axial stress resultant and $m_{xx}$ is the bending stress resultant. The coefficients $\rho, A, E, I$ are the beam's mass density, the cross section, the Young modulus and the second moment of area.
 
 \begin{figure}[ht]%
 	\centering
@@ -166,13 +166,18 @@ This model proves conservative, see \cite{bilbao2015conservative}. Indeed, this 
 \section{The equivalent port-Hamiltonian realization}\label{sec:pHmodel}
 To find a suitable port-Hamiltonian system, we first select a set of new energy variables to make the Hamiltonian functional quadratic
 \begin{equation}\label{eq:energies}
-	\alpha_u = \rho A \dot{u}, \quad \alpha_\varepsilon = \varepsilon_{xx}, \quad \alpha_w = \rho A \dot{w}, \quad \alpha_\kappa = \kappa_{xx}.
+	\begin{aligned}
+	\alpha_u &= \rho A \dot{u}, \quad &\text{Horizontal momentum},\\
+	\alpha_\varepsilon &= \varepsilon_{xx}, \quad &\text{Axial strain}, \\
+	\alpha_w &= \rho A \dot{w}, \quad &\text{Vertical momentum}, \\
+	\alpha_\kappa &= \kappa_{xx}, \quad &\text{Curvature}.
+	\end{aligned}
 \end{equation}
 The energy is quadratic in these variables
 \begin{equation}
-	H = \frac{1}{2} \int_{\Omega} \left\{\frac{\alpha_u^2 + \alpha_w^2}{\rho A} + EA \varepsilon_{xx}^2 + EI \kappa_{xx}^2 \right\} \d{\Omega}.
+	H = \frac{1}{2} \int_{\Omega} \left\{\frac{\alpha_u^2 + \alpha_w^2}{\rho A} + EA \alpha_\varepsilon^2 + EI \alpha_\kappa^2 \right\} \d{\Omega}.
 \end{equation}
-By computing the variational derivative of the Hamiltonian, one obtains the so-called co-energy variables:
+By computing the variational derivative of the Hamiltonian, one obtains the so-called coenergy variables:
 \begin{equation}\label{eq:coenergies}
 	\begin{aligned}
 	e_u &:= \delta_{\alpha_u} H = \dot{u}, \\
@@ -270,12 +275,31 @@ The operator $\mathcal{J}$ is formally skew-adjoint. If only the kinetic and def
 \begin{equation}
 	\dot{H} = \inner[\partial\Omega]{e_u}{e_\varepsilon} + \inner[\partial\Omega]{e_w}{e_\varepsilon \partial_x w -\partial_x e_\kappa} + \inner[\partial\Omega]{\partial_x e_w}{e_\kappa}.
 \end{equation}
+For the boundary terms, the following notation has been used
+\begin{equation*}
+	\inner[\partial\Omega]{f}{g} = f g \vert_{0}^L = f(L)g(L) - f(0)g(0).
+\end{equation*} 
+The boundary conditions, resumed in Table \ref{tab:bcs}, are consistent with the ones assumed in \cite{puel1996} for deriving a global existence result for this model.
 
-The boundary conditions are consistent with the ones assumed in \cite{puel1996} for deriving a global existence result for this model.
 
+\begin{table}[h]
+	\centering
+	\begin{tabular}{c|c|cc}
+		\hline 
+		BCs & Traction & \multicolumn{2}{c}{Bending} \\ 
+		\hline 
+		Dirichlet BCs. & $e_u\vert_0^L$ & $e_w\vert_0^L$  & $\partial_x e_w\vert_0^L$  \\
+		Neumann BCs. & $e_\varepsilon\vert_0^L$ & $e_\varepsilon \partial_x w -\partial_x e_\kappa\vert_0^L$ & $e_\kappa\vert_0^L$ \\ 
+		\hline 
+	\end{tabular} 
+	\captionsetup{width=0.95\linewidth}
+	\vspace{1mm}
+	\captionof{table}{Boundary conditions for von Karman beams.}
+	\label{tab:bcs}
+\end{table}
 
 \section{Mixed finite element discretization}\label{sec:mfem}
-To perform the numerical discretization, the constitutive relations are first incorporated in the dynamics. The link between the energy variables \eqref{eq:energies} and the conergy variables \eqref{eq:coenergies} is given by the linear transformation
+To perform the numerical discretization, the constitutive relations are first incorporated in the dynamics. The link between the energy variables \eqref{eq:energies} and the coenergy variables \eqref{eq:coenergies} is given by the linear transformation
 
 \begin{equation}\label{eq:e2alpha}
 	\begin{pmatrix}
@@ -291,7 +315,7 @@ To perform the numerical discretization, the constitutive relations are first in
 		e_u \\ e_\varepsilon \\ e_w \\ e_{\kappa}
 	\end{pmatrix},
 \end{equation}
-where $C_a = (EA)^{-1}$ and $C_b = (EI)^{-1}$ are the axial and bending compliances respectively. A pure coenergy formulation can then be employed once \eqref{eq:e2alpha} is plugged into \eqref{eq:pHsys_aug}
+where $C_a = (EA)^{-1}$ and $C_b = (EI)^{-1}$ are the axial and bending compliances respectively. The physical parameters are assumed to be constant for simplicity. A pure coenergy formulation can then be employed once \eqref{eq:e2alpha} is plugged into \eqref{eq:pHsys_aug}
 
 \begin{equation}\label{eq:pHaug_e}
 	\begin{pmatrix}
@@ -341,11 +365,7 @@ Then the integration by parts is performed on the first, third and fourth line. 
 		\inner[\Omega]{\psi}{\dot{w}} &= \inner[\Omega]{\psi}{e_w}. \\
 	\end{aligned}
 \end{equation}
-holds $\forall (\psi_u, \psi_w, \psi_\kappa, \psi) \in H^1(\Omega), \, \forall \psi_\varepsilon \in L^2(\Omega)$. For the boundary terms, the following notation has been used
-\begin{equation*}
-	\inner[\partial\Omega]{f}{g} = f g \vert_{0}^L = f(L)g(L) - f(0)g(0).
-\end{equation*} 
-In this formulation, the boundary axial forces $e_\varepsilon\vert_{0}^L$, vertical forces $e_\varepsilon\partial_x w - \partial_x e_\kappa\vert_{0}^L$ and  rotations $\partial_x e_w\vert_{0}^L$ are enforced weakly. To obtain the associated finite-dimensional system, the following Galerkin approximation is considered 
+holds $\forall (\psi_u, \psi_w, \psi_\kappa, \psi) \in H^1(\Omega), \, \forall \psi_\varepsilon \in L^2(\Omega)$. In this formulation, the boundary axial forces $e_\varepsilon\vert_{0}^L$, vertical forces $e_\varepsilon\partial_x w - \partial_x e_\kappa\vert_{0}^L$ and  rotations $\partial_x e_w\vert_{0}^L$ are enforced weakly. To obtain the associated finite-dimensional system, the following Galerkin approximation is considered 
 \begin{equation}\label{eq:Gal_appr}
 \begin{aligned}
 	e_u^h &= \sum_{i=1}^{n_u} \xi_u^i(x) e_u^i(t), \\
@@ -421,23 +441,22 @@ For what concerns the choice of the underlying finite elements, a simple selecti
 	\end{aligned}
 \end{equation}
 
-where $k \ge 1$. The space $\mathcal{E}^h_u$ corresponds to the space of continous Galerkin elements of order $2k-1$ whereas $\mathcal{E}^h_w, \, \mathcal{E}^h_\kappa, \mathcal{W}^h$ corresponds to the space of continous Galerkin elements of order $k$. The space $\mathcal{E}^h_\varepsilon$ corresponds to the space of discontinuous Galerkin elements of order $2k-2$. This choice guarantees that $\partial_x H^1_h(\Omega) \subset L^2_h(\Omega)$. 
-
+where $k \ge 1$. The space $\mathcal{E}^h_u$ corresponds to the space of continous Galerkin elements of order $2k-1$ whereas $\mathcal{E}^h_w, \, \mathcal{E}^h_\kappa, \mathcal{W}^h$ corresponds to the space of continous Galerkin elements of order $k$. The space $\mathcal{E}^h_\varepsilon$ corresponds to the space of discontinuous Galerkin elements of order $2k-2$. This choice guarantees that 
 \begin{equation}
 \begin{aligned}
 	\partial_x \mathcal{E}^h_u \subset \mathcal{E}^h_\varepsilon, \\
 	\partial_x \mathcal{W}^h \cdot  \partial_x \mathcal{E}^h_w \subset \mathcal{E}^h_\varepsilon.
 \end{aligned}
 \end{equation}
-
 So the discrete weak formulation becomes: find 
 $$(e_u^h, \; e_\varepsilon^h, \; e_w^h, \; e_\kappa^h, \; w^h) \in   \mathcal{E}^h_u \times \mathcal{E}^h_\varepsilon \times \mathcal{E}^h_w \times \mathcal{E}^h_\kappa \times \mathcal{W}^h$$
 such that system \eqref{eq:weak_form} holds 
 $$\forall (\psi_u^h, \; \psi_\varepsilon^h, \;  \psi_w^h, \; \psi_\kappa^h, \; \psi^h) \in \mathcal{E}^h_u \times \mathcal{E}^h_\varepsilon \times \mathcal{E}^h_w \times \mathcal{E}^h_\kappa \times \mathcal{W}^h.$$.
 
 \section{Numerical test}\label{sec:num_test}
+In this section the convervenge rate of the underlying finite elements is assessed by means of a numerical test. A manufactured solution is consider in order to compare the numerical with an analytical manufactured one. \\
 
-Consider the following analytical solution for the axial and vertical displacement
+Consider the following manufactured solution for the axial and vertical displacement
 
 \begin{equation}\label{eq:analytical}
 	\begin{aligned}
