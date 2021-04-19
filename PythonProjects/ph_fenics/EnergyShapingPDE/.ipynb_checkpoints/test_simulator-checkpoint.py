@@ -22,7 +22,7 @@ rcParams.update({'figure.autolayout': True})
 rcParams['text.usetex'] = True
 #rcParams['text.latex.preamble']=r"\usepackage{bm}"
 
-from EnergyShapingPDE.func_timoshenko import matrices_timoshenko
+from EnergyShapingPDE.TimoshenkoBeam.func_timoshenko import matrices_timoshenko
 
 init = ('sin(pi*x[0])', 'sin(3*pi*x[0])', '0', '0')
 

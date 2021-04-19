@@ -9,26 +9,26 @@ beta = 1.25
 lambda_ = beta
 g = gamma
 # Create mesh and define function space
-mesh = BoxMesh(Point(0, 0, 0), Point(L, W, W), 10, 3, 3)
+mesh = RectangleMesh(Point(0, 0), Point(2, 2), 30, 30)
 V = VectorFunctionSpace(mesh, 'P', 1)
 # Define boundary condition
 tol = 1E-14
 def clamped_boundary(x, on_boundary):
     return on_boundary and x[0] < tol
 
-bc = DirichletBC(V, Constant((0, 0, 0)), clamped_boundary)
+bc = DirichletBC(V, Constant((0, 0)), clamped_boundary)
 # Define strain and stress
 def epsilon(u):
     return 0.5*(nabla_grad(u) + nabla_grad(u).T)
 #return sym(nabla_grad(u))
 def sigma(u):
-    return lambda_*nabla_div(u)*Identity(d) + 2*mu*epsilon(u)
+    return lambda_*div(u)*Identity(d) + 2*mu*epsilon(u)
 # Define variational problem
 u = TrialFunction(V)
 d = u.geometric_dimension() # space dimension
 v = TestFunction(V)
-f = Constant((0, 0, -rho*g))
-T = Constant((0, 0, 0))
+f = Constant((0, -rho*g))
+T = Constant((0, 0))
 a = inner(sigma(u), epsilon(v))*dx
 L = dot(f, v)*dx + dot(T, v)*ds
 # Compute solution

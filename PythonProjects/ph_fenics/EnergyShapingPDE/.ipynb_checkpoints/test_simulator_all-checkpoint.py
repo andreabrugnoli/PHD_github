@@ -21,7 +21,7 @@ plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 rcParams.update({'figure.autolayout': True})
 rcParams['text.usetex'] = True
 
-from EnergyShapingPDE.func_timoshenko_all import matrices_timoshenko
+from EnergyShapingPDE.TimoshenkoBeam.func_timoshenko_all import matrices_timoshenko
 
 init = ('exp(-x[0])-1', '0', '0', '0')
 

@@ -4,7 +4,7 @@ import numpy as np
 
 # from scipy import linalg as la
 
-def matrices_wave(n_el=10, deg=1, e0_string=('0', '0'), \
+def matrices_wave(n_el=10, deg=1, e0_string=('0', '0'), eT_string=('0', '0'), \
                         rho=1, E=1, A=1, L=1, r_damp=1):
     """
     Computes matrices M, J, B for the Timoshenko beam.
@@ -80,6 +80,8 @@ def matrices_wave(n_el=10, deg=1, e0_string=('0', '0'), \
     exp_e0 = Expression(e0_string, degree=2)
     e0_array = interpolate(exp_e0, V).vector().get_local()
 
+    exp_eT = Expression(eT_string, degree=2)
+    eT_array = interpolate(exp_eT, V).vector().get_local()
 
     def get_m_form(v_p, v_q, e_p, e_q):
         """
@@ -149,9 +151,12 @@ def matrices_wave(n_el=10, deg=1, e0_string=('0', '0'), \
     dofsVp = V.sub(0).dofmap().dofs()
     dofsVq = V.sub(1).dofmap().dofs()
 
-
     xVp = dofs2x[dofsVp, 0]
     xVq = dofs2x[dofsVq, 0]
+
+    i_max_Vq = np.argmax(xVq)
+
+    dof_last_Vq = dofsVq[i_max_Vq]
 
     dofs2x_bc = np.delete(dofs2x, dofs_bc)
 
@@ -165,11 +170,15 @@ def matrices_wave(n_el=10, deg=1, e0_string=('0', '0'), \
 
     # Recompute the dofs after bc elimination
     for (i_bc, dof_bc) in enumerate(dofs_bc):
+        # Correction for last Vq
+        if dof_last_Vq > dof_bc - i_bc:
+            dof_last_Vq += -1
 
+        # Correction of dofs for Vp
         for (ind, dof) in enumerate(dofsVp_bc):
             if dof > dof_bc - i_bc:
                 dofsVp_bc[ind] += -1
-
+        # Correction of dofs for Vq
         for (ind, dof) in enumerate(dofsVq_bc):
             if dof > dof_bc - i_bc:
                 dofsVq_bc[ind] += -1
@@ -190,8 +199,10 @@ def matrices_wave(n_el=10, deg=1, e0_string=('0', '0'), \
 
     B_red = np.delete(B_vec, dofs_bc, axis=0)
     e0_red = np.delete(e0_array, dofs_bc, axis=0)
+    eT_red = np.delete(eT_array, dofs_bc, axis=0)
 
-    return M_red, J_red, R_red, B_red, e0_red, dofs_dict, x_dict
+    return M_red, J_red, R_red, B_red, e0_red, eT_red,\
+           dofs_dict, x_dict, dof_last_Vq
 
 
 

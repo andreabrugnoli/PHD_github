@@ -52,6 +52,8 @@ class FloatingPlanarEB(SysPhdaeRig):
 
         petcs_j = assemble(j_form, mat_type='aij').M.handle
         J_FEM = np.array(petcs_j.convert("dense").getDenseArray())
+        
+        
 
         if bc=='CF':
             dofs2dump = list([0, 1])
@@ -115,7 +117,7 @@ class FloatingPlanarEB(SysPhdaeRig):
 
 class FloatFlexBeam(SysPhdaeRig):
 
-    def __init__(self, n_el, L, rho, A, E, I, m_joint=0.0, J_joint=0.0, bc='CF'):
+    def __init__(self, n_el, L, rho, A, E, I, m_joint=0.0, J_joint=0.0, r_x=1, r_y=1, bc='CF'):
         self.bc = bc
 
         mesh = IntervalMesh(n_el, L)
@@ -225,6 +227,18 @@ class FloatFlexBeam(SysPhdaeRig):
 
         J = np.zeros((n_tot, n_tot))
         J[n_rig:, n_rig:] = J_f
+        
+        r_form = r_x * vp_x * ep_x * dx + r_y * vp_y * ep_y * dx
+        
+        petcs_r = assemble(r_form, mat_type='aij').M.handle
+        R_FEM = np.array(petcs_r.convert("dense").getDenseArray())
+
+        R_f = R_FEM
+        R_f = R_f[:, dofs2keep]
+        R_f = R_f[dofs2keep, :]
+
+        R = np.zeros((n_tot, n_tot))
+        R[n_rig:, n_rig:] = R_f
 
         tau_CP = np.array([[1, 0, 0], [0, 1, L], [0, 0, 1]])
 
@@ -241,7 +255,7 @@ class FloatFlexBeam(SysPhdaeRig):
         B[:n_rig, n_rig:] = tau_CP.T
         B[n_rig:, n_rig:] = np.hstack((B_Fx, B_Fy, B_Mz))
 
-        SysPhdaeRig.__init__(self, n_tot, 0, n_rig, n_p, n_q, E=M, J=J, B=B)
+        SysPhdaeRig.__init__(self, n_tot, 0, n_rig, n_p, n_q, E=M, J=J, R=R, B=B)
 
 
 class FloatCentBeam(SysPhdaeRig):

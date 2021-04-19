@@ -3,7 +3,7 @@ import numpy as np
 # from scipy import linalg as la
     
 def matrices_timoshenko(n_el=10, deg=1, e0_string=('0', '0', '0', '0'),\
-                        rho=1, I_rho=1, C_b=1, C_s=1, L=1, r_w=0, r_th=0):
+                        rho=1, I_rho=1, C_b=1, C_s=1, L=1, r_w=1, r_th=1):
     """
     Computes matrices M, J, B for the Timoshenko beam.
     Parameters:

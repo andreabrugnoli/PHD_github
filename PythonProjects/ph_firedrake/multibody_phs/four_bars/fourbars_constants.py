@@ -29,3 +29,8 @@ EI_follower = E *I_follower
 # I_follower = EI_follower/E
 
 m_link = 0.041942966  # kg
+
+
+r_crank = 0.1
+r_follower = 0.05
+r_coupler = 0.15

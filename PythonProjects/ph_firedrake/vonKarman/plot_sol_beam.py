@@ -259,7 +259,7 @@ xx_plot_w, tt_plot = np.meshgrid(x_w, t_vec)
 
 
 path_fig = "/home/andrea/Plots/Python/VonKarman/"
-save_fig = False
+save_fig = True
 
 fig = plt.figure()
 ax = fig.gca(projection='3d')
