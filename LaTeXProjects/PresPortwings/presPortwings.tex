@@ -1,0 +1,227 @@
+% WORKAROUND (an update of the geometry package broke beamer...)
+\makeatletter\let\ifGm@compatii\relax\makeatother
+% end of WORKAROUND
+
+
+\documentclass{beamer}
+% \usetheme[uttitlepage=false]{ut}
+\usetheme[euler=false,titlepage=B]{ut}
+%\usetheme[titlepage=C,debug]{ut}
+\usetheme{ut}
+
+\usepackage{tikz-cd}
+\usepackage[most]{tcolorbox}
+
+\usepackage[backend=bibtex, style=authoryear, doi=false,isbn=false,url=false]{biblatex}
+
+\usepackage{bm}
+\usepackage{color}
+\definecolor{theme}{RGB}{0,73,114}
+
+
+\usepackage{graphicx}
+\usepackage{diffcoeff}
+\usepackage[most]{tcolorbox}
+\usepackage{mathtools}
+
+% Math macros
+\DeclareMathOperator*{\grad}{grad}
+\DeclareMathOperator*{\Grad}{Grad}
+\DeclareMathOperator*{\Div}{Div}
+\renewcommand{\div}{\operatorname{div}}
+\DeclareMathOperator*{\Hess}{Hess}
+\DeclareMathOperator*{\curl}{curl}
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator{\Dom}{Dom}
+\DeclareMathOperator*{\esssup}{ess\,sup}
+
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\bbF}{\mathbb{F}}
+\newcommand{\bbA}{\mathbb{A}}
+\newcommand{\bbB}{\mathbb{B}}
+\newcommand{\bbS}{\mathbb{S}}
+
+\newcommand*{\norm}[1]{\ensuremath{\left\|#1\right\|}}
+\newcommand{\where}{\qquad \text{where} \qquad}
+\newcommand{\inner}[3][]{\ensuremath{\left\langle #2, \, #3 \right\rangle_{#1}}}
+\newcommand{\bilprod}[2]{\left\langle \left\langle \, #1, #2 \, \right\rangle \right\rangle}
+\newcommand{\pder}[2]{\ensuremath{\partial_{#2} #1}}
+\newcommand{\dder}[2]{\ensuremath{\delta_{#2} #1}}
+\newcommand{\secref}[1]{\S\ref{#1}}
+\newcommand{\energy}[1]{\frac{1}{2} \int_{\Omega} \left\{ #1 \right\} \d\Omega}
+\newcommand{\crmat}[1]{\ensuremath{\left[#1\right]_\times}}
+\newcommand{\fenics}{\textsc{FEniCS}\xspace}
+\newcommand{\firedrake}{\textsc{Firedrake}\xspace}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+\newtheorem{hypothesis}{Hypothesis}
+\newtheorem{assumption}{Assumption}
+\newtheorem{conjecture}{Conjecture}
+
+
+\def\onedot{$\mathsurround0pt\ldotp$}
+\def\cddot{% two dots stacked vertically
+	\mathbin{\vcenter{\baselineskip.67ex
+			\hbox{\onedot}\hbox{\onedot}}%
+}}
+
+\renewcommand\bibfont{\scriptsize}
+
+
+\makeatletter \renewcommand\d[1]{\ensuremath{%
+		\;\mathrm{d}#1\@ifnextchar\d{\!}{}}}
+\makeatother
+
+
+\graphicspath{{./images/}}
+
+\bibliography{biblioPortwings}
+
+
+\title{Portwings Internal Meeting\\
+Challenges and outlook for the numerics}
+% \subtitle[Short subtitle]{I am not using any subtitles}
+\author[A.~Brugnoli]{Andrea Brugnoli} %  
+\institute[UT]{Department of Robotics and Mechatronics,\\ University of Twente}
+\date[29-04-2021]{April 29, 2021}
+\footlinetext{[A.~Brugnoli]}
+% \titlegraphic{\includegraphics[height=1cm]{titlegraphic}}
+
+% \utbeamerset{tpboxbx=10}
+
+\begin{document}
+
+\maketitle
+
+
+\begin{frame}\frametitle{What numerics for the portwings project?}
+Methods should preserve the continuous structure at the discrete level. Which structure? 
+\begin{enumerate}
+	\item Cohomology: $V^0(\bbR) \xrightarrow{\nabla} V^1(\bbR^3) \xrightarrow{\nabla \times} V^2(\bbR^3) \xrightarrow{\nabla \cdot} V^3(\bbR)$;
+	\item Variational structure $\delta \int l = 0$, ($l$ Lagrangian density);
+	\item Hamiltonian structure $\dot{\mathcal{F}} = \{F, H\}$, $\{\cdot, \cdot\}$ Poisson brackets.
+	\item \dots
+\end{enumerate}
+\vspace{.1cm}
+Recent developments:
+\begin{itemize}
+\item splitting of topological and metric operators (\cite{bauer2018split});
+\item Lie group structure and underlying variational formulation (\cite{gawlik2020variational});
+\item connection with algebraic topology, i.e. de Rham complex and more general Hilbert complexes, e.g. elasticity (\cite{bochev2006mimetic,arnold2006acta,palha2014compatible}); 
+\end{itemize}
+
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Principle behind split discretization}
+\begin{itemize}
+	\item Fluid equation written in covariant form (exterior calculus);
+	\item Split Hamiltonian form $\dot{\mathcal{F}}= \{\mathcal{F}, \mathcal{H}\}$.	
+	\begin{itemize}
+		\item Topological braket depending on $d$ (exterior derivative) or $\iota_v$ (interior product).
+		\item Metric dependent $\mathcal{H}$, since it depends on $*$
+	\end{itemize}
+\end{itemize}	
+\begin{block}{Linear shallow water waves in Hamiltonian form}
+	\begin{itemize}
+		\item $\mathcal{H} = \energy{\bar{h} \norm{\mathbf{u}}^2 + g h^2}$, with $\diffd{\mathcal{H}}{\mathbf{u}} = \bar{h}\mathbf{u}, \; \diffd{\mathcal{H}}{h}=g h$, where $g$ gravity acc. and $\bar{h}$ equilibrium fluid height.
+		\item $\{\mathcal{F}, \mathcal{G}\} = -(\diffd{\mathcal{F}}{\mathbf{u}}, \nabla \diffd{\mathcal{G}}{h}) - (\diffd{\mathcal{F}}{h}, \nabla \cdot \diffd{\mathcal{G}}{\mathbf{u}})$.
+		\begin{equation*}
+			\begin{aligned}
+				\mathcal{F} &= \int \mathbf{u} \d{\Omega}: \; \dot{\mathcal{F}} = - (\diffd{\mathcal{F}}{\mathbf{u}}, \nabla \diffd{\mathcal{H}}{h}) \rightarrow \partial_t \mathbf{u} = -g \nabla h. \\
+				\mathcal{F} &= \int h \d{\Omega}: \;\dot{\mathcal{F}} = - (\diffd{\mathcal{F}}{h}, \nabla \cdot \diffd{\mathcal{H}}{\mathbf{u}}) \rightarrow \partial_t h = -\bar{h} \nabla \cdot \mathbf{u}.
+			\end{aligned}
+		\end{equation*}
+		
+	\end{itemize}
+\end{block}
+
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Split and weak (or mixed) form}
+	De Rham complex: $V^0(\bbR) \xrightarrow{\nabla} V^1(\bbR^3) \xrightarrow{\nabla \times} V^2(\bbR^3) \xrightarrow{\nabla \cdot} V^3(\bbR).$
+	\addtolength{\textfloatsep}{-0.8in}
+	
+	\begin{tcbraster}[raster columns=2, raster equal height]
+		\begin{tcolorbox}[width=0.5\textwidth, nobeforeafter, colframe=theme,title=Split form]%%
+				\begin{tikzcd}
+					h \in V^0 \arrow{r}{\nabla}\arrow{d}[swap]{\tilde{h} = \tilde{*} h} & V^1 \ni \mathbf{u} \arrow{d}{\mathbf{u} = \tilde{*} \mathbf{u}} \\
+					\tilde{h} \in V^3  & \arrow{l}[swap]{\nabla \cdot} V^2 \ni \tilde{\mathbf{u}} \\
+				\end{tikzcd}
+		\begin{itemize}
+			\item Assume full $\tilde{*}$ in metric eqs.
+			\item Both $\nabla, \nabla \cdot$ are imposed strongly.
+			\item Both diff. eqs exact 
+		\end{itemize}
+		\end{tcolorbox} 
+		\begin{tcolorbox}[width=0.5\textwidth, nobeforeafter,  colframe=theme,title=Weak form (Mixed FE)]%%
+			\begin{tikzcd}
+				h \in V^3 \arrow{r}{\hat{\nabla}}\arrow{d}[swap]{\tilde{h} = h} & V^2 \ni \mathbf{u} \arrow{d}{\tilde{\mathbf{u}} = \mathbf{u}} \\
+				\tilde{h} \in V^3  & \arrow{l}[swap]{\nabla \cdot} V^2 \ni \tilde{\mathbf{u}} \\
+			\end{tikzcd}
+		\begin{itemize}
+			\item Assume $\tilde{*}=\text{Id}$, i.e. $\tilde{\mathbf{u}}=\mathbf{u}, \, \tilde{h}=h$.
+			\item Weak gradient $\hat{\nabla}$.
+			\item Moment Eq. weak
+		\end{itemize}
+		\end{tcolorbox}
+	\end{tcbraster}
+	
+	
+\end{frame}
+
+
+\begin{frame}{Application of mixed finite elements}
+		\begin{tcolorbox}[width=0.9\textwidth, nobeforeafter, colframe=theme,title=Infinite-dimensional pH system]%%
+			PDE with boundary control:
+			\begin{equation*}
+				\diffp{\bm{\alpha}}{t}(\bm{x}, t) = \mathcal{J} \delta_{\bm{\alpha}} H.
+			\end{equation*}
+			Boundary conditions: 
+			\[\textcolor{blue}{\bm{u}_\partial} = \mathcal{B}_\partial \delta_{\bm{\alpha}} H, \quad \textcolor{blue}{\bm{y}_\partial} = \mathcal{C}_\partial \delta_{\bm{\alpha}} H. \]
+			Power balance (Stokes Theorem): 
+			\[ \dot{H} = \displaystyle \int_{\partial \Omega} \textcolor{blue}{\bm{u}_\partial} \cdot \textcolor{blue}{\bm{y}_\partial} \d{S}.
+			\]
+		\end{tcolorbox} 
+		\begin{tcolorbox}[width=0.9\textwidth, nobeforeafter,  colframe=theme,title=Structure-preserving discretization]%%
+			Resulting ODE:
+			\begin{align*}
+				\dot{\bm{\alpha}}_d &= \mathbf{J} \, {\nabla {H}_d} + \mathbf{B}_\partial \textcolor{blue}{\mathbf{u}_\partial}, \\
+				\textcolor{blue}{\mathbf{y}_\partial} &= \mathbf{B}_\partial^\top \,{\nabla {H}_d}.
+			\end{align*}
+			Discretized Hamiltonian:
+			\[
+			H_d := H(\bm{\alpha} \equiv \bm{\alpha}_d).
+			\]
+			Power balance: 
+			\[ \dot{H} = \textcolor{blue}{\mathbf{u}_\partial^\top \mathbf{y}_\partial}.
+			\]
+		\end{tcolorbox}
+\end{frame}
+
+
+\begin{frame}\frametitle{Tools available}
+FEniCS: \url{https://fenicsproject.org/}. \\
+\vspace{.1cm}
+
+Fluid Structure Interaction in Fenics: \cite{bergersen2020fenics}. \\
+\vspace{.1cm}
+Mesh morphing in FEniCS: \url{https://bitbucket.org/Epoxid/femorph/src/c7317791c8f00d70fe16d593344cb164a53cad9b/?at=dokken\%2Frestructuring} \\
+\vspace{.1cm}	
+
+PyDec: \url{https://github.com/hirani/pydec} \\
+\vspace{.1cm}
+
+Learning Python for scientific computing \url{https://faculty.math.illinois.edu/~hirani/cbmg/index.html}
+\end{frame}
+
+
+
+
+\end{document}
+
