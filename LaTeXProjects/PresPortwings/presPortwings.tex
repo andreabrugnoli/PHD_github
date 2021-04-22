@@ -97,6 +97,7 @@ Challenges and outlook for the numerics}
 
 \maketitle
 
+\section{What numerics for portwings?}
 
 \begin{frame}\frametitle{What numerics for the portwings project?}
 Methods should preserve the continuous structure at the discrete level. Which structure? 
@@ -129,12 +130,12 @@ Recent developments:
 \end{itemize}	
 \begin{block}{Linear shallow water waves in Hamiltonian form}
 	\begin{itemize}
-		\item $\mathcal{H} = \energy{\bar{h} \norm{\mathbf{u}}^2 + g h^2}$, with $\diffd{\mathcal{H}}{\mathbf{u}} = \bar{h}\mathbf{u}, \; \diffd{\mathcal{H}}{h}=g h$, where $g$ gravity acc. and $\bar{h}$ equilibrium fluid height.
-		\item $\{\mathcal{F}, \mathcal{G}\} = -(\diffd{\mathcal{F}}{\mathbf{u}}, \nabla \diffd{\mathcal{G}}{h}) - (\diffd{\mathcal{F}}{h}, \nabla \cdot \diffd{\mathcal{G}}{\mathbf{u}})$.
+		\item $\mathcal{H} = \energy{\bar{h} \norm{\bm{u}}^2 + g h^2}$, with $\diffd{\mathcal{H}}{\bm{u}} = \bar{h}\bm{u}, \; \diffd{\mathcal{H}}{h}=g h$, where $g$ gravity acc. and $\bar{h}$ equilibrium fluid height.
+		\item $\{\mathcal{F}, \mathcal{G}\} = -(\diffd{\mathcal{F}}{\bm{u}}, \nabla \diffd{\mathcal{G}}{h}) - (\diffd{\mathcal{F}}{h}, \nabla \cdot \diffd{\mathcal{G}}{\bm{u}})$.
 		\begin{equation*}
 			\begin{aligned}
-				\mathcal{F} &= \int \mathbf{u} \d{\Omega}: \; \dot{\mathcal{F}} = - (\diffd{\mathcal{F}}{\mathbf{u}}, \nabla \diffd{\mathcal{H}}{h}) \rightarrow \partial_t \mathbf{u} = -g \nabla h. \\
-				\mathcal{F} &= \int h \d{\Omega}: \;\dot{\mathcal{F}} = - (\diffd{\mathcal{F}}{h}, \nabla \cdot \diffd{\mathcal{H}}{\mathbf{u}}) \rightarrow \partial_t h = -\bar{h} \nabla \cdot \mathbf{u}.
+				\mathcal{F} &= \int \bm{u} \d{\Omega}: \; \dot{\mathcal{F}} = - \left(\diffd{\mathcal{F}}{\bm{u}}, \nabla \diffd{\mathcal{H}}{h}\right) \rightarrow \partial_t \bm{u} = -g \nabla h. \\
+				\mathcal{F} &= \int h \d{\Omega}: \;\dot{\mathcal{F}} = - \left(\diffd{\mathcal{F}}{h}, \nabla \cdot \diffd{\mathcal{H}}{\bm{u}}\right) \rightarrow \partial_t h = -\bar{h} \nabla \cdot \bm{u}.
 			\end{aligned}
 		\end{equation*}
 		
@@ -150,8 +151,8 @@ Recent developments:
 	\begin{tcbraster}[raster columns=2, raster equal height]
 		\begin{tcolorbox}[width=0.5\textwidth, nobeforeafter, colframe=theme,title=Split form]%%
 				\begin{tikzcd}
-					h \in V^0 \arrow{r}{\nabla}\arrow{d}[swap]{\tilde{h} = \tilde{*} h} & V^1 \ni \mathbf{u} \arrow{d}{\mathbf{u} = \tilde{*} \mathbf{u}} \\
-					\tilde{h} \in V^3  & \arrow{l}[swap]{\nabla \cdot} V^2 \ni \tilde{\mathbf{u}} \\
+					h \in V^0 \arrow{r}{\nabla}\arrow{d}[swap]{\tilde{h} = \tilde{*} h} & V^1 \ni \bm{u} \arrow{d}{\bm{u} = \tilde{*} \bm{u}} \\
+					\tilde{h} \in V^3  & \arrow{l}[swap]{\nabla \cdot} V^2 \ni \tilde{\bm{u}} \\
 				\end{tikzcd}
 		\begin{itemize}
 			\item Assume full $\tilde{*}$ in metric eqs.
@@ -161,64 +162,119 @@ Recent developments:
 		\end{tcolorbox} 
 		\begin{tcolorbox}[width=0.5\textwidth, nobeforeafter,  colframe=theme,title=Weak form (Mixed FE)]%%
 			\begin{tikzcd}
-				h \in V^3 \arrow{r}{\hat{\nabla}}\arrow{d}[swap]{\tilde{h} = h} & V^2 \ni \mathbf{u} \arrow{d}{\tilde{\mathbf{u}} = \mathbf{u}} \\
-				\tilde{h} \in V^3  & \arrow{l}[swap]{\nabla \cdot} V^2 \ni \tilde{\mathbf{u}} \\
+				h \in V^3 \arrow{r}{\widehat{\nabla}}\arrow{d}[swap]{\tilde{h} = h} & V^2 \ni \bm{u} \arrow{d}{\tilde{\bm{u}} = \bm{u}} \\
+				\tilde{h} \in V^3  & \arrow{l}[swap]{\nabla \cdot} V^2 \ni \tilde{\bm{u}} \\
 			\end{tikzcd}
 		\begin{itemize}
-			\item Assume $\tilde{*}=\text{Id}$, i.e. $\tilde{\mathbf{u}}=\mathbf{u}, \, \tilde{h}=h$.
-			\item Weak gradient $\hat{\nabla}$.
+			\item Assume $\tilde{*}=\text{Id}$, i.e. $\tilde{\bm{u}}=\bm{u}, \, \tilde{h}=h$.
+			\item Weak gradient $\widehat{\nabla}$.
 			\item Moment Eq. weak
 		\end{itemize}
 		\end{tcolorbox}
 	\end{tcbraster}
 	
-	
+\end{frame}
+
+\begin{frame}\frametitle{Split decomposition in practice}
+\begin{enumerate}
+\item First projection of the strong form.  For the 1D case:
+\begin{equation*}
+	\begin{aligned}
+		\partial_t \mathbf{u}_e^{(1)} + g \mathbf{D}^{en} \mathbf{h}_n^{(0)} = \mathbf{0}, \qquad \mathbf{u}_e^{(1)}: \text{1 form}, \quad \mathbf{h}_n^{(0)}: \text{0 form}, \\
+		\partial_t \widetilde{\mathbf{h}}_e^{(1)} + \bar{h} \mathbf{D}^{en} \widetilde{\mathbf{u}}_n^{(0)} = \mathbf{0}, \qquad \widetilde{\mathbf{h}}_e^{(1)}: \text{1 form}, \quad \widetilde{\mathbf{u}}_n^{(0)}: \text{0 form}.
+	\end{aligned}
+\end{equation*}
+$\mathbf{D}^{en}$ metric free approximation of exterior derivative. \vspace{.3cm}
+\item Project the metric closure relations:
+\begin{itemize}
+	\item High accuracy $CG_1^u-CG_1^h$ spaces: 
+	$$\mathbf{M}^{nn} \widetilde{\mathbf{u}}_n^{(0)}=\mathbf{P}^{ne}\mathbf{u}_e^{(1)}, \qquad \mathbf{M}^{nn} \mathbf{h}_n^{(0)}=\mathbf{P}^{ne}\widetilde{\mathbf{h}}_e^{(1)};$$
+	\item Low accuracy $CG_0^u-CG_0^h$ spaces: 
+	$$\mathbf{M}^{en} \widetilde{\mathbf{u}}_n^{(0)}=\mathbf{I}^{ee}\mathbf{u}_e^{(1)}, \qquad \mathbf{M}^{en} \mathbf{h}_n^{(0)}=\mathbf{I}^{ee}\widetilde{\mathbf{h}}_e^{(1)};$$
+	\item Medium accuracy $CG_1^u-CG_0^h$ spaces: 
+	$$\mathbf{M}^{nn} \widetilde{\mathbf{u}}_n^{(0)}=\mathbf{P}^{ne}\mathbf{u}_e^{(1)}, \qquad \mathbf{M}^{en} \mathbf{h}_n^{(0)}=\mathbf{I}^{ee}\widetilde{\mathbf{h}}_e^{(1)};$$
+\end{itemize}
+$\mathbf{M}^{nn}, \; \mathbf{M}^{en}$ metric dependent, $\mathbf{P}^{ne}$ metric free averaging op.	
+\end{enumerate}
+
 \end{frame}
 
 
-\begin{frame}{Application of mixed finite elements}
-		\begin{tcolorbox}[width=0.9\textwidth, nobeforeafter, colframe=theme,title=Infinite-dimensional pH system]%%
-			PDE with boundary control:
-			\begin{equation*}
-				\diffp{\bm{\alpha}}{t}(\bm{x}, t) = \mathcal{J} \delta_{\bm{\alpha}} H.
-			\end{equation*}
-			Boundary conditions: 
-			\[\textcolor{blue}{\bm{u}_\partial} = \mathcal{B}_\partial \delta_{\bm{\alpha}} H, \quad \textcolor{blue}{\bm{y}_\partial} = \mathcal{C}_\partial \delta_{\bm{\alpha}} H. \]
-			Power balance (Stokes Theorem): 
-			\[ \dot{H} = \displaystyle \int_{\partial \Omega} \textcolor{blue}{\bm{u}_\partial} \cdot \textcolor{blue}{\bm{y}_\partial} \d{S}.
-			\]
-		\end{tcolorbox} 
-		\begin{tcolorbox}[width=0.9\textwidth, nobeforeafter,  colframe=theme,title=Structure-preserving discretization]%%
-			Resulting ODE:
-			\begin{align*}
-				\dot{\bm{\alpha}}_d &= \mathbf{J} \, {\nabla {H}_d} + \mathbf{B}_\partial \textcolor{blue}{\mathbf{u}_\partial}, \\
-				\textcolor{blue}{\mathbf{y}_\partial} &= \mathbf{B}_\partial^\top \,{\nabla {H}_d}.
-			\end{align*}
-			Discretized Hamiltonian:
-			\[
-			H_d := H(\bm{\alpha} \equiv \bm{\alpha}_d).
-			\]
-			Power balance: 
-			\[ \dot{H} = \textcolor{blue}{\mathbf{u}_\partial^\top \mathbf{y}_\partial}.
-			\]
-		\end{tcolorbox}
+\begin{frame}{Weak (mixed) form}
+Weak formulation: find $\bm{u} \in V^2(\bbR^3), \; h \in V^3(\bbR)$
+\begin{equation*}
+	\begin{aligned}
+(\bm{v}_u, \partial_t \bm{u})_{L^2} &= -(\bm{v}_u, g \widehat{\nabla} h)_{L^2} = (\nabla \cdot \bm{v}_u, g h)_{L^2}, \\
+(v_h, \partial_t h)_{L^2} &= -(v_h, \bar{h} \nabla \cdot \bm{u})_{L^2},
+\end{aligned} \qquad 
+\begin{aligned}
+	&\forall\bm{v}_u \in V^2, \\ &\forall v_h \in V^3.
+\end{aligned}
+\end{equation*}
+
+After projection
+\begin{equation*}
+\begin{bmatrix}
+	\mathbf{M}^{nn} & \mathbf{0} \\
+	\mathbf{0} & \mathbf{M}^{ee}
+\end{bmatrix}
+\diffp{}{t}
+\begin{pmatrix}
+	\mathbf{u}_n \\ \mathbf{h}_e
+\end{pmatrix} = 
+\begin{bmatrix}
+	\mathbf{0} & g \mathbf{D}^{ne} \\
+	 -\bar{h}\mathbf{D}^{en} & \mathbf{0}
+\end{bmatrix}
+\begin{pmatrix}
+	\mathbf{u}_n \\ \mathbf{h}_e
+\end{pmatrix}, \qquad \mathbf{D}^{ne} = \mathbf{D}^{en\, \top}.
+\end{equation*}
+\vspace{.3cm}\\
+Another formulation with weak divergence: find $\bm{u} \in V^1(\bbR^3), \; h \in V^0(\bbR)$
+\begin{equation*}
+	\begin{aligned}
+		(\bm{v}_u, \partial_t \bm{u})_{L^2} &= -(\bm{v}_u, g \nabla h)_{L^2} , \\
+		(v_h, \partial_t h)_{L^2} &= -(v_h, \bar{h}\widehat{\nabla \cdot} \bm{u})_{L^2} = (\nabla v_h,  \bar{h}\bm{u})_{L^2},
+	\end{aligned} \qquad 
+	\begin{aligned}
+		&\forall\bm{v}_u \in V^1, \\ &\forall v_h \in V^0.
+	\end{aligned}
+\end{equation*} 
 \end{frame}
 
+\begin{frame}[fragile]\frametitle{Connection with algebraic topology}
+		\begin{tikzcd}[row sep=scriptsize, column sep=scriptsize]
+			& \Lambda^0(\Omega) \arrow{dl}\arrow{rr}\arrow{dd} & & E_V \arrow{dl}\arrow{dd} \\
+			f^* E \arrow[crossing over]{rr}\arrow{dd} & & E \\
+			& U \arrow{dl}\arrow{rr} &  & V \arrow{dl} \\
+			M \arrow{rr} & & N\arrow[crossing over, leftarrow]{uu} \\
+		\end{tikzcd}
+\end{frame}
 
 \begin{frame}\frametitle{Tools available}
-FEniCS: \url{https://fenicsproject.org/}. \\
-\vspace{.1cm}
-
-Fluid Structure Interaction in Fenics: \cite{bergersen2020fenics}. \\
-\vspace{.1cm}
-Mesh morphing in FEniCS: \url{https://bitbucket.org/Epoxid/femorph/src/c7317791c8f00d70fe16d593344cb164a53cad9b/?at=dokken\%2Frestructuring} \\
-\vspace{.1cm}	
-
-PyDec: \url{https://github.com/hirani/pydec} \\
-\vspace{.1cm}
-
-Learning Python for scientific computing \url{https://faculty.math.illinois.edu/~hirani/cbmg/index.html}
+	Firedrake: \url{https://www.firedrakeproject.org/}. \\
+	\vspace{.1cm}
+	
+	FEniCS: \url{https://fenicsproject.org/}. \\
+	\vspace{.1cm}
+	
+	Fluid Structure Interaction in Fenics: \cite{bergersen2020fenics}. \\
+	\vspace{.1cm}
+	Mesh morphing in FEniCS: \url{https://bitbucket.org/Epoxid/femorph/src/c7317791c8f00d70fe16d593344cb164a53cad9b/?at=dokken\%2Frestructuring} \\
+	\vspace{.1cm}	
+	
+	PyDec: \url{https://github.com/hirani/pydec} \\
+	\vspace{.1cm}
+	
+	Learning Python for scientific computing \url{https://faculty.math.illinois.edu/~hirani/cbmg/index.html}
 \end{frame}
+
+
+\section{Outlook for elasticity models}
+
+
+
 
 
 
