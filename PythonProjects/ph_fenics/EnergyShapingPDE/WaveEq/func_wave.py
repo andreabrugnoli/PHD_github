@@ -202,7 +202,7 @@ def matrices_wave(n_el=10, deg=1, e0_string=('0', '0'), eT_string=('0', '0'), \
     eT_red = np.delete(eT_array, dofs_bc, axis=0)
 
     return M_red, J_red, R_red, B_red, e0_red, eT_red,\
-           dofs_dict, x_dict, dof_last_Vq
+           dofs_dict, x_dict
 
 
 

@@ -26,13 +26,13 @@ from EnergyShapingPDE.WaveEq.func_wave import matrices_wave
 
 init = ('0', '0')
 
-fin = ('0', '0')
+fin = ('0', '1')
 
 n_el = 10
 
 
 
-M, J, R, B, e0, eT, dofs_dict, x_dict, dof_last_Vq = matrices_wave(n_el=n_el, deg=1, e0_string=init, eT_string=fin)
+M, J, R, B, e0, eT, dofs_dict, x_dict = matrices_wave(n_el=n_el, deg=1, e0_string=init, eT_string=fin)
 
 dofs_v = dofs_dict['v']
 x_v = x_dict['v']
@@ -40,22 +40,20 @@ x_v = x_dict['v']
 dofs_sig = dofs_dict['sig']
 x_sig = x_dict['sig']
 
-# C_sig = np.zeros((1, len(e0)))
-# C_sig[0, dof_last_Vq] = 1
-#
-# omega, eigvectors = linalg.eig(J, M)
-#
-# val_omega = np.imag(omega)
-#
-# index = val_omega>=0
-# pos_omega = val_omega[index]
-#
-# pos_eigvectors = eigvectors[:, index]
-#
-# realpos_eigvectors = np.real(pos_eigvectors) + np.imag(pos_eigvectors)
-# realneg_eigvectors = np.real(pos_eigvectors) - np.imag(pos_eigvectors)
-#
-# real_eigvectors = np.concatenate((realpos_eigvectors, realpos_eigvectors), axis=1)
+omega, eigvectors = linalg.eig(J, M)
+
+val_omega = np.imag(omega)
+
+index = val_omega>=0
+pos_omega = val_omega[index]
+
+pos_eigvectors = eigvectors[:, index]
+
+realpos_eigvectors = np.real(pos_eigvectors) + np.imag(pos_eigvectors)
+realneg_eigvectors = np.real(pos_eigvectors) - np.imag(pos_eigvectors)
+
+real_eigvectors = np.concatenate((realpos_eigvectors, realneg_eigvectors), axis=1)
+
 # print(real_eigvectors.shape)
 
 # eigvector_v = pos_eigvectors[dofs_v]
@@ -65,66 +63,66 @@ x_sig = x_dict['sig']
 # for i in range(len(sort_omega)):
 #     print(i+1, sort_omega[i])
 #
-# path_data = "./Data_Wave/"
-# np.save(path_data + 'M', M)
-# np.save(path_data + 'J', J)
-# np.save(path_data + 'B', B)
-# np.save(path_data + 'C_sig', C_sig)
-# np.save(path_data + 'eigvectors', real_eigvectors)
-# np.save(path_data + 'e0', e0)
-# np.save(path_data + 'eT', eT)
-# np.save(path_data + 'dofs_dict', dofs_dict)
-# np.save(path_data + 'x_dict', x_dict)
+path_data = "/home/andrea/PHD_github/PythonProjects/ph_fenics/EnergyShapingPDE/WaveEq/Data_Wave/"
+np.save(path_data + 'M', M)
+np.save(path_data + 'J', J)
+np.save(path_data + 'B', B)
+np.save(path_data + 'eigvectors', real_eigvectors)
+np.save(path_data + 'e0', e0)
+np.save(path_data + 'eT', eT)
+np.save(path_data + 'dofs_dict', dofs_dict)
+np.save(path_data + 'x_dict', x_dict)
 
-
-A_sys = np.linalg.solve(M, J)
-B_sys = np.linalg.solve(M, B) # .reshape((-1, 1))
-C_sys = B.T.reshape((1, -1))
-# scipy.io.savemat(path_data + 'Data_Wave.mat', {"A": A_sys, "B": B_sys, "C": C_sys, "x0": e0})
-
-Theta = 200
-alpha = 30
-
-phi_ref = np.array([1])
-def fun(t,y):
-    e = y[:-1]
-    phi = y[-1]
-
-    u_DI = - alpha * C_sys @ e
-    u_ES =  Theta * alpha * (phi_ref - phi)
-
-    # sig = e[dofs_sig]
-    # u_ES = + Theta * (phi_ref - 1/n_el * np.sum(sig))
-
-    u = u_DI + u_ES
-
-    dedt = A_sys @ e + B_sys * u  #  + B_sys * 1
-
-    dphidt = C_sys @ e
-
-    dydt = np.concatenate((dedt, dphidt))
-
-    return dydt
-
-t0 = 0.0
-t_fin = .12
-t_span = [t0, t_fin]
-
-n_ev = 500
-t_ev = np.linspace(t0, t_fin, num=n_ev)
-
-
-y0 = np.concatenate((e0, [0]), axis=0)
-sol = solve_ivp(fun, t_span, y0, method='RK45', t_eval = t_ev, \
-                      atol = 1e-5, rtol = 1e-5)
-
-e_sol = sol.y[:-1]
-phi_sol = sol.y[-1]
-
-fig = plt.figure()
-plt.plot(t_ev, phi_sol.T, 'g-', t_ev, np.ones((len(t_ev), )), 'b--')
-
-plt.show()
+#
+# A_sys = np.linalg.solve(M, J)
+# B_sys = np.linalg.solve(M, B) # .reshape((-1, 1))
+# C_sys = B.T.reshape((1, -1))
+# # scipy.io.savemat(path_data + 'Data_Wave.mat', {"A": A_sys, "B": B_sys, "C": C_sys, "x0": e0})
+#
+# Theta = 200
+# alpha = 10
+#
+# phi_ref = np.array([10])
+# def fun(t,y):
+#     e = y[:-1]
+#     phi = y[-1]
+#
+#     u_DI = - alpha * C_sys @ e
+#     u_ES =  Theta *  (phi_ref - phi)
+#
+#     # u_ES = Theta * alpha * (- phi)
+#     # sig = e[dofs_sig]
+#     # u_ES = + Theta * (phi_ref - 1/n_el * np.sum(sig))
+#
+#     u = u_DI  + u_ES
+#
+#     dedt = A_sys @ e + B_sys * u # + B_sys * 1
+#
+#     dphidt = C_sys @ e
+#
+#     dydt = np.concatenate((dedt, dphidt))
+#
+#     return dydt
+#
+# t0 = 0.0
+# t_fin = .12
+# t_span = [t0, t_fin]
+#
+# n_ev = 1000
+# t_ev = np.linspace(t0, t_fin, num=n_ev)
+#
+#
+# y0 = np.concatenate((e0, [0]), axis=0)
+# sol = solve_ivp(fun, t_span, y0, method='RK45', t_eval = t_ev, \
+#                       atol = 1e-5, rtol = 1e-5)
+#
+# e_sol = sol.y[:-1]
+# phi_sol = sol.y[-1]
+#
+# fig = plt.figure()
+# plt.plot(t_ev, phi_sol.T, 'g-', t_ev, np.ones((len(t_ev), )), 'b--')
+#
+# plt.show()
 
 
 
