@@ -97,7 +97,13 @@ Challenges and outlook for the numerics}
 
 \maketitle
 
+\begin{frame}{Overview}
+	\tableofcontents[currentsubsection, sectionstyle=show/show, subsectionstyle=show/shaded/show]
+\end{frame}
+
 \section{What numerics for portwings?}
+
+
 
 \begin{frame}\frametitle{What numerics for the portwings project?}
 Methods should preserve the continuous structure at the discrete level. Which structure? 
@@ -117,7 +123,7 @@ Recent developments:
 
 \end{frame}
 
-
+\subsection{Split discretization}
 
 \begin{frame}[fragile]{Principle behind split discretization}
 \begin{itemize}
@@ -130,8 +136,8 @@ Recent developments:
 \end{itemize}	
 \begin{block}{Linear shallow water waves in Hamiltonian form}
 	\begin{itemize}
-		\item $\mathcal{H} = \energy{\bar{h} \norm{\bm{u}}^2 + g h^2}$, with $\diffd{\mathcal{H}}{\bm{u}} = \bar{h}\bm{u}, \; \diffd{\mathcal{H}}{h}=g h$, where $g$ gravity acc. and $\bar{h}$ equilibrium fluid height.
-		\item $\{\mathcal{F}, \mathcal{G}\} = -(\diffd{\mathcal{F}}{\bm{u}}, \nabla \diffd{\mathcal{G}}{h}) - (\diffd{\mathcal{F}}{h}, \nabla \cdot \diffd{\mathcal{G}}{\bm{u}})$.
+		\item $\mathcal{H} = \frac{1}{2} \int_M\{\bar{h} \norm{\bm{u}}^2 + g h^2\}\d{x}$, with $\diffd{\mathcal{H}}{\bm{u}} = \bar{h}\bm{u}, \; \diffd{\mathcal{H}}{h}=g h$, where $g$ gravity acc. and $\bar{h}$ equilibrium fluid height.
+		\item $\{\mathcal{F}, \mathcal{G}\} = -(\diffd{\mathcal{F}}{\bm{u}}, \nabla \diffd{\mathcal{G}}{h})_{L^2} - (\diffd{\mathcal{F}}{h}, \nabla \cdot \diffd{\mathcal{G}}{\bm{u}})_{L^2}$.
 		\begin{equation*}
 			\begin{aligned}
 				\mathcal{F} &= \int \bm{u} \d{\Omega}: \; \dot{\mathcal{F}} = - \left(\diffd{\mathcal{F}}{\bm{u}}, \nabla \diffd{\mathcal{H}}{h}\right) \rightarrow \partial_t \bm{u} = -g \nabla h. \\
@@ -189,9 +195,9 @@ $\mathbf{D}^{en}$ metric free approximation of exterior derivative. \vspace{.3cm
 \begin{itemize}
 	\item High accuracy $CG_1^u-CG_1^h$ spaces: 
 	$$\mathbf{M}^{nn} \widetilde{\mathbf{u}}_n^{(0)}=\mathbf{P}^{ne}\mathbf{u}_e^{(1)}, \qquad \mathbf{M}^{nn} \mathbf{h}_n^{(0)}=\mathbf{P}^{ne}\widetilde{\mathbf{h}}_e^{(1)};$$
-	\item Low accuracy $CG_0^u-CG_0^h$ spaces: 
+	\item Low accuracy $DG_0^u-DG_0^h$ spaces: 
 	$$\mathbf{M}^{en} \widetilde{\mathbf{u}}_n^{(0)}=\mathbf{I}^{ee}\mathbf{u}_e^{(1)}, \qquad \mathbf{M}^{en} \mathbf{h}_n^{(0)}=\mathbf{I}^{ee}\widetilde{\mathbf{h}}_e^{(1)};$$
-	\item Medium accuracy $CG_1^u-CG_0^h$ spaces: 
+	\item Medium accuracy $CG_1^u-DG_0^h$ spaces: 
 	$$\mathbf{M}^{nn} \widetilde{\mathbf{u}}_n^{(0)}=\mathbf{P}^{ne}\mathbf{u}_e^{(1)}, \qquad \mathbf{M}^{en} \mathbf{h}_n^{(0)}=\mathbf{I}^{ee}\widetilde{\mathbf{h}}_e^{(1)};$$
 \end{itemize}
 $\mathbf{M}^{nn}, \; \mathbf{M}^{en}$ metric dependent, $\mathbf{P}^{ne}$ metric free averaging op.	
@@ -243,14 +249,49 @@ Another formulation with weak divergence: find $\bm{u} \in V^1(\bbR^3), \; h \in
 \end{equation*} 
 \end{frame}
 
-\begin{frame}[fragile]\frametitle{Connection with algebraic topology}
-		\begin{tikzcd}[row sep=scriptsize, column sep=scriptsize]
-			& \Lambda^0(\Omega) \arrow{dl}\arrow{rr}\arrow{dd} & & E_V \arrow{dl}\arrow{dd} \\
-			f^* E \arrow[crossing over]{rr}\arrow{dd} & & E \\
-			& U \arrow{dl}\arrow{rr} &  & V \arrow{dl} \\
-			M \arrow{rr} & & N\arrow[crossing over, leftarrow]{uu} \\
+\subsection{Algebraic topology: from continuous to discrete}
+
+\begin{frame}[fragile]\frametitle{Connection with algebraic topology (n=2)}
+		\begin{tikzcd}[row sep=small, column sep=small]
+			& C^0(D) \arrow[bend right=25]{dl}[', near end, xshift=5pt, yshift=-2pt]{\mathcal{I}^0}\arrow{rr}{\delta}\arrow[leftrightarrow]{dd}[yshift=-10pt]{*_h} & & C^1(D)\arrow{rr}{\delta} \arrow[bend right=15]{dl}[', near end,xshift=5pt, yshift=-2pt]{\mathcal{I}^1}\arrow[leftrightarrow]{dd}[yshift=-10pt]{*_h} & & C^2(D)\arrow[leftrightarrow]{dd}[yshift=-10pt]{*_h} \arrow[bend right=25]{dl}[', near end, xshift=5pt, yshift=-2pt]{\mathcal{I}^2} \\
+			\Lambda^0(M) \arrow[bend right=15]{ur}[xshift=5pt]{\mathcal{R}^0} \arrow[crossing over]{rr}[xshift=10pt]{d}\arrow[leftrightarrow]{dd}[yshift=3pt]{*} & & \Lambda^1(M)\arrow[bend right=25]{ru}[xshift=5pt]{\mathcal{R}^1}\arrow{rr}[xshift=10pt]{d} & & \Lambda^2(M)\arrow[bend right=15]{ur}[xshift=5pt]{\mathcal{R}^2} \\
+			& \widetilde{C}^2(D) \arrow[bend right=25]{dl}[', near end, xshift=5pt, yshift=-3pt]{\widetilde{\mathcal{I}}^2} &  & \widetilde{C}^1(D) \arrow{ll}[xshift=-15pt]{\delta} \arrow[bend right=25]{dl}[', near end, xshift=5pt, yshift=-3pt]{\widetilde{\mathcal{I}}^1} & & \widetilde{C}^0(D) \arrow{ll}[xshift=-15pt]{\delta} \arrow[bend right=25]{dl}[', near end, xshift=5pt, yshift=-3pt]{\widetilde{\mathcal{I}}^0} \\
+			\widetilde{\Lambda}^2(M)\arrow[bend right=15]{ur}[xshift=5pt]{\widetilde{\mathcal{R}}^2}   & & \widetilde{\Lambda}^1(M)\arrow{ll}{d}\arrow[crossing over, leftrightarrow]{uu}[yshift=3pt]{*}\arrow[bend right=15]{ur}[xshift=5pt]{\widetilde{\mathcal{R}}^1} & & \widetilde{\Lambda}^0(M) \arrow{ll}{d}\arrow[crossing over, leftrightarrow]{uu}[yshift=3pt]{*}\arrow[bend right=15]{ur}[xshift=5pt]{\widetilde{\mathcal{R}}^0}\\
 		\end{tikzcd}
+	Diagram taken from \cite{palha2014compatible}.
+	\begin{itemize}
+		\item $C^k(D)$ space of cochains on the primal grid $D$;
+		\item $\widetilde{C}^k$ space of cochains on the dual grid $\widetilde{D}$;
+		\item $\delta$ coboundary operator (dual of $\partial$ on chains);
+		\item $\mathcal{I}^k, \widetilde{\mathcal{I}}^k$ interpolation operators;
+		\item $\mathcal{R}^k, \widetilde{\mathcal{R}}^k$ reduction operators;
+	\end{itemize}
 \end{frame}
+
+\begin{frame}{Connection with Finite Elements and Finite Volumes}
+	How to discretize the Hodge Laplacian in  in physics-compatible fashion?
+	The exterior derivative can be discretize exactly on one grid, but not the codifferential $d^* = (-1)^{n(k+1)+1}* d *$. \\
+	
+	
+	Two different solutions:
+	\begin{itemize}
+		\item Dual grid discretization: the Hodge star is treated numerically by considering a dual grid and leads to the explicit construction of the Hodge matrix (analogously to finite volumes);
+		\item Single grid discretization: the Hodge operator is incorporated implicitly by using an inner product. The codifferential is converted into an exterior derivative by using the integration by parts (equivalent to mixed finite element method).
+	\end{itemize}
+\end{frame}
+
+\section{What about mechanics?}
+
+\begin{frame}\frametitle{Continuum mechanics and differential geometry}
+	In \cite{arnold2006acta} the authors present linear elasticity using vector-valued forms and its associated complex. \\
+	\vspace{.5cm}
+	
+	 The wing can be modeled as a thin shell structure.  For thin structures (Euler-Bernoulli beam and Kirchhoff plate) the metric enters the interconnection operator.\\
+	\vspace{.5cm}
+	Open question for Kirchhoff plate: $\Hess \cong  \nabla \circ d$, where $\nabla$ covariant derivative? 
+
+\end{frame}
+
 
 \begin{frame}\frametitle{Tools available}
 	Firedrake: \url{https://www.firedrakeproject.org/}. \\
