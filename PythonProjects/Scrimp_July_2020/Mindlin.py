@@ -25,12 +25,29 @@ from assimulo.solvers.sundials import IDA, CVode
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import rcParams
+
+SMALL_SIZE = 14
+MEDIUM_SIZE = 16
+BIGGER_SIZE = 18
+
+plt.rc('font', size=SMALL_SIZE)  # controls default text sizes
+plt.rc('axes', titlesize=BIGGER_SIZE)  # fontsize of the axes title
+plt.rc('axes', labelsize=MEDIUM_SIZE)  # fontsize of the x and y labels
+plt.rc('xtick', labelsize=SMALL_SIZE)  # fontsize of the tick labels
+plt.rc('ytick', labelsize=SMALL_SIZE)  # fontsize of the tick labels
+plt.rc('legend', fontsize=SMALL_SIZE)  # legend fontsize
+plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+rcParams.update({'figure.autolayout': True})
+rcParams['text.usetex'] = True
+
 import matplotlib.animation as manimation
 
 import sys
 import time
 
-
+n_dpi = 1000
         
 class Mindlin:
     #%% CLASS INSTANTATION
@@ -2020,7 +2037,7 @@ class Mindlin:
         plt.grid(True)
         if not(self.notebook):
             plt.show()
-        plt.savefig("Hamiltonian.png")    
+        plt.savefig("Hamiltonian.jpg", format='jpg', dpi=n_dpi)
         
     def Plot_Hamiltonian_Relative_Error(self, tspan, Ham, figsize=(8,6.5), **kwargs):
         """
@@ -2035,7 +2052,7 @@ class Mindlin:
         plt.grid(True)
         if not(self.notebook):
             plt.show()
-        plt.savefig("Hamiltonian_RE.png")
+        plt.savefig("Hamiltonian_RE.jpg", format='jpg', dpi=n_dpi)
 
 
     ## Method.
@@ -2053,7 +2070,7 @@ class Mindlin:
         plt.ylabel('y')
         plt.show()
         plt.title("Mesh with " + "Nv=" + str( self.Msh.num_vertices()) + ", hmax="+str(round(self.Msh.hmax(),3)) )
-        plt.savefig("Mesh.png")
+        plt.savefig("Mesh.jpg", format='jpg', dpi=n_dpi)
 
     def Plot_Mesh_with_DOFs(self, figure=True, figsize=(8,6.5), **kwargs):
         """
@@ -2074,7 +2091,7 @@ class Mindlin:
         plt.legend()
         if not(self.notebook):
             plt.show()
-        plt.savefig("Mesh_with_DOFs.png")
+        plt.savefig("Mesh_with_DOFs.jpg", format='jpg', dpi=n_dpi)
 
     def Plot_3D(self, time_space_Vector, t, title):
     	"""
@@ -2093,7 +2110,7 @@ class Mindlin:
     	ax.set_title(title)
     	if not(self.notebook):
     	 plt.show()
-    	plt.savefig("Space_Time_plot.png")
+    	plt.savefig("Space_Time_plot.jpg", format='jpg', dpi=n_dpi)
               
     # Set writer for video saving
     def Set_Video_Writer(self, fps=128, dpi=256):
@@ -2134,7 +2151,7 @@ class Mindlin:
         plt.ylabel('imaginary part')
         plt.title('eigs($J-R$, $M$) with '+str(k)+' first eigenvalues')
         plt.xlim(xl)
-        plt.savefig('spectrum.png')
+        plt.savefig('spectrum.jpg', format='jpg', dpi=n_dpi)
         return self.eigen_values_Real, self.eigen_values_Imag
 
     def Trisurf(self, SpaceTimeVector_Lag, instance=0, title='', save=False, figsize=(8,6.5), **kwargs):
@@ -2152,7 +2169,7 @@ class Mindlin:
         ax.set_zlim(np.min(SpaceTimeVector_Lag), np.max(SpaceTimeVector_Lag))
         ax.plot_trisurf(self.xp, self.yp, SpaceTimeVector_Lag[:,instance], linewidth=0.2, \
                                          antialiased=True, cmap=plt.cm.CMRmap)#, **kwargs)
-        if save: fig.save(title+'png')
+        if save: fig.save(title+'jpg', format='jpg', dpi=n_dpi)
             
     #%% UTILITY
     

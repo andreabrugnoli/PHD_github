@@ -82,6 +82,26 @@
 \bibliography{biblioPortwings}
 
 
+%% At begin of each section: show current section and all subsections in the section if any
+%% At begin of each subsection except first: show only the current section/subsection
+\newif\iftocsub
+\tocsubtrue
+\AtBeginSection[] {
+	\begin{frame}[noframenumbering]{Outline}
+		\tableofcontents[sectionstyle=show/shaded, subsectionstyle=show/show/hide]
+	\end{frame}
+	\tocsubfalse
+}
+\AtBeginSubsection[] {
+	\iftocsub
+	\begin{frame}[noframenumbering]{Outline}
+		\tableofcontents[currentsubsection, sectionstyle=show/shaded, subsectionstyle=show/shaded/hide]
+	\end{frame}
+	\fi
+	\tocsubtrue
+}
+
+
 \title{Portwings Internal Meeting\\
 Challenges and outlook for the numerics}
 % \subtitle[Short subtitle]{I am not using any subtitles}
@@ -98,10 +118,10 @@ Challenges and outlook for the numerics}
 \maketitle
 
 \begin{frame}{Overview}
-	\tableofcontents[currentsubsection, sectionstyle=show/show, subsectionstyle=show/shaded/show]
+	\tableofcontents
 \end{frame}
 
-\section{What numerics for portwings?}
+\section{What numerics for portwings? (2 years)}
 
 
 
@@ -251,7 +271,7 @@ Another formulation with weak divergence: find $\bm{u} \in V^1(\bbR^3), \; h \in
 
 \subsection{Algebraic topology: from continuous to discrete}
 
-\begin{frame}[fragile]\frametitle{Connection with algebraic topology (n=2)}
+\begin{frame}[fragile]\frametitle{Connection with algebraic topology (dim $M$=2)}
 		\begin{tikzcd}[row sep=small, column sep=small]
 			& C^0(D) \arrow[bend right=25]{dl}[', near end, xshift=5pt, yshift=-2pt]{\mathcal{I}^0}\arrow{rr}{\delta}\arrow[leftrightarrow]{dd}[yshift=-10pt]{*_h} & & C^1(D)\arrow{rr}{\delta} \arrow[bend right=15]{dl}[', near end,xshift=5pt, yshift=-2pt]{\mathcal{I}^1}\arrow[leftrightarrow]{dd}[yshift=-10pt]{*_h} & & C^2(D)\arrow[leftrightarrow]{dd}[yshift=-10pt]{*_h} \arrow[bend right=25]{dl}[', near end, xshift=5pt, yshift=-2pt]{\mathcal{I}^2} \\
 			\Lambda^0(M) \arrow[bend right=15]{ur}[xshift=5pt]{\mathcal{R}^0} \arrow[crossing over]{rr}[xshift=10pt]{d}\arrow[leftrightarrow]{dd}[yshift=3pt]{*} & & \Lambda^1(M)\arrow[bend right=25]{ru}[xshift=5pt]{\mathcal{R}^1}\arrow{rr}[xshift=10pt]{d} & & \Lambda^2(M)\arrow[bend right=15]{ur}[xshift=5pt]{\mathcal{R}^2} \\
@@ -264,14 +284,14 @@ Another formulation with weak divergence: find $\bm{u} \in V^1(\bbR^3), \; h \in
 		\item $\widetilde{C}^k$ space of cochains on the dual grid $\widetilde{D}$;
 		\item $\delta$ coboundary operator (dual of $\partial$ on chains);
 		\item $\mathcal{I}^k, \widetilde{\mathcal{I}}^k$ interpolation operators;
-		\item $\mathcal{R}^k, \widetilde{\mathcal{R}}^k$ reduction operators;
+		\item $\mathcal{R}^k, \widetilde{\mathcal{R}}^k$ reduction operators (dof.);
 	\end{itemize}
 \end{frame}
 
 \begin{frame}{Connection with Finite Elements and Finite Volumes}
-	How to discretize the Hodge Laplacian in  in physics-compatible fashion?
+	How to discretize the Hodge Laplacian $\Delta= dd^* + d^*d$? \\
 	The exterior derivative can be discretize exactly on one grid, but not the codifferential $d^* = (-1)^{n(k+1)+1}* d *$. \\
-	
+	\vspace{.5cm}
 	
 	Two different solutions:
 	\begin{itemize}
@@ -280,18 +300,93 @@ Another formulation with weak divergence: find $\bm{u} \in V^1(\bbR^3), \; h \in
 	\end{itemize}
 \end{frame}
 
-\section{What about mechanics?}
+\subsection{Application to portwings}
+
+\begin{frame}\frametitle{How to dicretize Navier Stokes?}
+	Combine both approaches:
+	\begin{itemize}
+		\item Use the split discretization for the topological part (ideal fluid).
+		\item Use a weak formulation to discretize the Hodge Laplancian (due to the stress tensor).
+	\end{itemize}
+
+\vspace{.5cm}
+Timeline: 1 year to look into discretization of ideal fluid. \\
+ + 0.5y for Navier-Stokes, 0.5y for the fluid structure interaction.
+
+\end{frame}
+
+\section{What about mechanics? (6 months)}
+
 
 \begin{frame}\frametitle{Continuum mechanics and differential geometry}
 	In \cite{arnold2006acta} the authors present linear elasticity using vector-valued forms and its associated complex. \\
 	\vspace{.5cm}
+	Thanks to the Navier-Stokes equation we already have the answer
 	
-	 The wing can be modeled as a thin shell structure.  For thin structures (Euler-Bernoulli beam and Kirchhoff plate) the metric enters the interconnection operator.\\
-	\vspace{.5cm}
-	Open question for Kirchhoff plate: $\Hess \cong  \nabla \circ d$, where $\nabla$ covariant derivative? 
+	\begin{equation*}
+	\diffp{}{t}
+	\begin{pmatrix}
+		\bm{\alpha}_v \\ \bm{A}_\varepsilon
+	\end{pmatrix}=
+	\begin{bmatrix}
+		\bm{0} & *^2 \circ \d{}_{\nabla} \\
+		\nabla \circ \sharp \circ * & \bm{0}
+	\end{bmatrix}
+	\begin{pmatrix}
+		\delta_{\bm{\alpha}_v}H \\ \delta_{\bm{A}_\varepsilon} H
+	\end{pmatrix}
+\end{equation*}
 
+	\begin{itemize}
+		\item $\nabla, \d{}_{\nabla}$ covariant derivative and exterior covariant derivative;
+		\item $\bm{\alpha}_v \in \Lambda^1(M)$ momentum one form;
+		\item $\delta_{\bm{\alpha}_v}H \in \Lambda^{n-1}(M)$ velocity $n-1$ form;
+		\item $\bm{A}_\varepsilon \in \mathfrak{X}(M) \otimes \Lambda^1(M)$ strain tensor;
+		\item $\delta_{\bm{A}_\varepsilon} H \in \Lambda^{1}(M) \otimes \Lambda^{n-1}(M)$ stress tensor;
+	\end{itemize}
+	
 \end{frame}
 
+\begin{frame}\frametitle{Continuum mechanics and differential geometry}
+	
+	The wing can be modeled as a thin shell structure dim($M$)=2. Higher order differential operator:
+	\begin{equation*}
+	\diffp{}{t}
+	\begin{pmatrix}
+		{\alpha}_w \\ \bm{A}_\varepsilon
+	\end{pmatrix}=
+	\begin{bmatrix}
+		\bm{0} & -d \circ *^2 \circ \d{}_{\nabla} \\
+		\nabla \circ \sharp \circ d & \bm{0}
+	\end{bmatrix}
+	\begin{pmatrix}
+		\delta_{\alpha_w} H \\ \delta_{\bm{A}_\varepsilon} H
+	\end{pmatrix}
+\end{equation*}
+
+\begin{itemize}
+	\item ${\alpha}_w \in \Lambda^2(M)$ momentum top form;
+	\item $\delta_{{\alpha}_w} H \in \Lambda^{0}(M)$ velocity $0$ form;
+	\item $\bm{A}_\varepsilon \in \mathfrak{X}(M) \otimes \Lambda^1(M)$ bending strain tensor;
+	\item $\delta_{\bm{A}_\varepsilon} H \in \Lambda^{1}(M) \otimes \Lambda^{n-1}(M)$ bending stress tensor;
+\end{itemize} 
+\vspace{.5cm}
+Timeline: 6 months for elaborate the theoretical models. \\
++ 6 months for the numerics.
+\end{frame}
+
+\section{Combining numerics and control theory (4 months)}
+
+\begin{frame}\frametitle{Energy shaping via neural network approximators}
+Main idea: combine passivity based control (energy shaping + damping injection) with optimization thanks to neural networks (NNs).
+
+\begin{itemize}
+	\item The damping coefficient and added energy are parametrized by a NN.
+	\item A numerical model of the system is fed to an otpimization procedure whose solution gives the NN's parameters
+\end{itemize}
+\vspace{.5cm}
+Timeline: first validated results by September on simpler PDEs.
+\end{frame}
 
 \begin{frame}\frametitle{Tools available}
 	Firedrake: \url{https://www.firedrakeproject.org/}. \\
@@ -312,8 +407,10 @@ Another formulation with weak divergence: find $\bm{u} \in V^1(\bbR^3), \; h \in
 \end{frame}
 
 
-\section{Outlook for elasticity models}
-
+\begin{frame}[allowframebreaks]{References}
+	\printbibliography
+	\nocite{*}
+\end{frame}
 
 
 
