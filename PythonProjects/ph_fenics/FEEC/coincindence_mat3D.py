@@ -12,11 +12,16 @@ from vedo.dolfin import plot
 tol = 1e-10
 
 L = 1
-n_el = 4
+n_el = 1
+deg = 1
+
+mesh = UnitCubeMesh.create(n_el, n_el, n_el, \
+                           CellType.Type.hexahedron)
+
+# mesh = BoxMesh(Point(0,0,0), Point(L, L, L), n_el, n_el, n_el)
 
 # domain = mshr.Box(Point(0,0,0), Point(L,L,L))
 # mesh = mshr.generate_mesh(domain, n_el)
-mesh = BoxMesh(Point(0,0,0), Point(L, L, L), n_el, n_el, n_el)
 
 # mesh_plot = plot(mesh) # mode="mesh", interactive=0
 
@@ -24,11 +29,15 @@ mesh = BoxMesh(Point(0,0,0), Point(L, L, L), n_el, n_el, n_el)
 # vmesh.cutWithPlane(origin=(0,0,0), normal=(1,-1,0))
 # plot(vmesh, interactive=1)
 
-deg = 1
-V_0 = FunctionSpace(mesh, "CG", deg)
-V_1 = FunctionSpace(mesh, "N1curl", deg)
-V_2 = FunctionSpace(mesh, "RT", deg)
-V_3 = FunctionSpace(mesh, "DG", deg-1)
+# V_0 = FunctionSpace(mesh, "CG", deg)
+# V_1 = FunctionSpace(mesh, "N1curl", deg)
+# V_2 = FunctionSpace(mesh, "N1div", deg)
+# V_3 = FunctionSpace(mesh, "DG", deg-1)
+
+V_0 = FunctionSpace(mesh, "P- Lambda", deg, 0)
+V_1 = FunctionSpace(mesh, "P- Lambda", deg, 1)
+V_2 = FunctionSpace(mesh, "P- Lambda", deg, 2)
+V_3 = FunctionSpace(mesh, "P- Lambda", deg, 3)
 
 u_0 = TrialFunction(V_0)
 
@@ -61,6 +70,7 @@ D_0 = spsolve(M1_mat, D10_mat)
 D_0.tolil()
 
 # D_0[abs(D_0) < tol] = 0.0
+# print(D_0)
 print(D_0[abs(D_0)>tol])
 
 # Construction of the D_1 co-incidence matrix
@@ -83,6 +93,7 @@ D_1 = spsolve(M2_mat, D21_mat)
 D_1.tolil()
 
 # D_1[abs(D_1) < tol] = 0.0
+# print(D_1)
 print(D_1[abs(D_1)>tol])
 
 # Construction of the D_3 co-incidence matrix
@@ -105,4 +116,6 @@ D_2 = spsolve(M3_mat, D32_mat)
 D_2.tolil()
 
 # D_2[abs(D_2) < tol] = 0.0
+# print(D_2)
+
 print(D_2[abs(D_2)>tol])
