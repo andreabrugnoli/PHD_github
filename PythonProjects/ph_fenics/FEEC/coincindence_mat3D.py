@@ -15,10 +15,7 @@ L = 1
 n_el = 1
 deg = 1
 
-mesh = UnitCubeMesh.create(n_el, n_el, n_el, \
-                           CellType.Type.hexahedron)
-
-# mesh = BoxMesh(Point(0,0,0), Point(L, L, L), n_el, n_el, n_el)
+mesh = BoxMesh(Point(0,0,0), Point(L, L, L), n_el, n_el, n_el)
 
 # domain = mshr.Box(Point(0,0,0), Point(L,L,L))
 # mesh = mshr.generate_mesh(domain, n_el)
@@ -34,10 +31,22 @@ mesh = UnitCubeMesh.create(n_el, n_el, n_el, \
 # V_2 = FunctionSpace(mesh, "N1div", deg)
 # V_3 = FunctionSpace(mesh, "DG", deg-1)
 
-V_0 = FunctionSpace(mesh, "P- Lambda", deg, 0)
-V_1 = FunctionSpace(mesh, "P- Lambda", deg, 1)
-V_2 = FunctionSpace(mesh, "P- Lambda", deg, 2)
-V_3 = FunctionSpace(mesh, "P- Lambda", deg, 3)
+
+# V_0 = FunctionSpace(mesh, "P- Lambda", deg, 0)
+# V_1 = FunctionSpace(mesh, "P- Lambda", deg, 1)
+# V_2 = FunctionSpace(mesh, "P- Lambda", deg, 2)
+# V_3 = FunctionSpace(mesh, "P- Lambda", deg, 3)
+
+P_0 = FiniteElement("CG", tetrahedron, deg, variant='point')
+P_1 = FiniteElement("N1curl", tetrahedron, deg, variant='integral')
+P_2 = FiniteElement("N1div", tetrahedron, deg, variant='point')
+P_3 = FiniteElement("DG", tetrahedron, deg-1, variant='point')
+
+V_0 = FunctionSpace(mesh, P_0)
+V_1 = FunctionSpace(mesh, P_1)
+V_2 = FunctionSpace(mesh, P_2)
+V_3 = FunctionSpace(mesh, P_3)
+
 
 u_0 = TrialFunction(V_0)
 

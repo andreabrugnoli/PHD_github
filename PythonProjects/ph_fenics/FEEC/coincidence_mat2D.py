@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 tol = 1e-10
 
 L = 1
-n_el = 2
+n_el = 1
 deg = 1
 
 mesh = RectangleMesh(Point(0, 0), Point(L, L), n_el, n_el, "right/left")
@@ -32,14 +32,21 @@ def rot2D(u_vec):
 # V_0 = FunctionSpace(mesh, "P- Lambda", deg, 0)
 # V_1 = FunctionSpace(mesh, "P- Lambda", deg, 1)  # Equivalent to Hcurl
 # V_2 = FunctionSpace(mesh, "P- Lambda", deg, 2)
+#
+# P_0 = FiniteElement("CG", triangle, deg, variant='point')
+# # P_1 = FiniteElement("N1curl", triangle, deg, variant='integral')
+# P_1 = FiniteElement("RT", triangle, deg, variant='integral')
+# P_2 = FiniteElement("DG", triangle, deg-1, variant='point')
 
-V_0 = FunctionSpace(mesh, "CG", deg)
 
-V_1 = FunctionSpace(mesh, "RT", deg)
-# V_1 = FunctionSpace(mesh, "N1curl", deg)
+P_0 = FiniteElement("CG", triangle, deg, variant='feec')
+# P_1 = FiniteElement("N1curl", triangle, deg, variant='feec')
+P_1 = FiniteElement("RT", triangle, deg, variant='feec')
+P_2 = FiniteElement("DG", triangle, deg-1, variant='feec')
 
-V_2 = FunctionSpace(mesh, "DG", deg-1)
-
+V_0 = FunctionSpace(mesh, P_0)
+V_1 = FunctionSpace(mesh, P_1)
+V_2 = FunctionSpace(mesh, P_2)
 
 u_0 = TrialFunction(V_0)
 

@@ -13,7 +13,7 @@ L = 1
 n_el = 2
 deg = 1
 
-mesh = RectangleMesh(n_el, n_el, L, L)
+mesh = UnitSquareMesh(n_el, n_el, quadrilateral=True)
 
 
 def curl2D(u):
@@ -22,11 +22,10 @@ def curl2D(u):
 def rot2D(u_vec):
     return u_vec[1].dx(0) - u_vec[0].dx(1)
 
-
-P_0 = FiniteElement("CG", triangle, deg)
-# P_1 = FiniteElement("N1curl", triangle, deg, variant='point')
-P_1 = FiniteElement("RT", triangle, deg, variant='point')
-P_2 = FiniteElement("DG", triangle, deg-1)
+P_0 = FiniteElement("CG", quadrilateral, deg)
+# P_1 = FiniteElement("RTCE", quadrilateral, deg)
+P_1 = FiniteElement("RTCF", quadrilateral, deg)
+P_2 = FiniteElement("DG", quadrilateral, deg-1)
 
 V_0 = FunctionSpace(mesh, P_0)
 V_1 = FunctionSpace(mesh, P_1)
@@ -61,9 +60,8 @@ D_0.tolil()
 
 D_0[abs(D_0) < tol] = 0.0
 print("D_0")
-print(D_0)
-print(D_0.shape)
-# print(D_0[abs(D_0)>tol])
+# print(D_0)
+print(D_0[abs(D_0)>tol])
 
 # Construction of the D_1 co-incidence matrix
 m_2 = dot(v_2, u_2) * dx
@@ -86,4 +84,3 @@ D_1[abs(D_1) < tol] = 0.0
 print("D_1")
 # print(D_1)
 print(D_1[abs(D_1)>tol])
-print(D_1.shape)
