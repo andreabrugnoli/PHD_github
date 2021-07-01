@@ -19,8 +19,8 @@ plt.rc('legend', fontsize=SMALL_SIZE)  # legend fontsize
 plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 rcParams.update({'figure.autolayout': True})
-rcParams['text.usetex'] = True
-#rcParams['text.latex.preamble']=r"\usepackage{bm}"
+# rcParams['text.usetex'] = True
+# rcParams['text.latex.preamble']=r"\usepackage{bm}"
 
 from EnergyShapingPDE.WaveEq.func_wave import matrices_wave
 
@@ -63,66 +63,66 @@ real_eigvectors = np.concatenate((realpos_eigvectors, realneg_eigvectors), axis=
 # for i in range(len(sort_omega)):
 #     print(i+1, sort_omega[i])
 #
-path_data = "/home/andrea/PHD_github/PythonProjects/ph_fenics/EnergyShapingPDE/WaveEq/Data_Wave/"
-np.save(path_data + 'M', M)
-np.save(path_data + 'J', J)
-np.save(path_data + 'B', B)
-np.save(path_data + 'eigvectors', real_eigvectors)
-np.save(path_data + 'e0', e0)
-np.save(path_data + 'eT', eT)
-np.save(path_data + 'dofs_dict', dofs_dict)
-np.save(path_data + 'x_dict', x_dict)
+# path_data = "/home/andrea/PHD_github/PythonProjects/ph_fenics/EnergyShapingPDE/WaveEq/Data_Wave/"
+# np.save(path_data + 'M', M)
+# np.save(path_data + 'J', J)
+# np.save(path_data + 'B', B)
+# np.save(path_data + 'eigvectors', real_eigvectors)
+# np.save(path_data + 'e0', e0)
+# np.save(path_data + 'eT', eT)
+# np.save(path_data + 'dofs_dict', dofs_dict)
+# np.save(path_data + 'x_dict', x_dict)
 
-#
-# A_sys = np.linalg.solve(M, J)
-# B_sys = np.linalg.solve(M, B) # .reshape((-1, 1))
-# C_sys = B.T.reshape((1, -1))
-# # scipy.io.savemat(path_data + 'Data_Wave.mat', {"A": A_sys, "B": B_sys, "C": C_sys, "x0": e0})
-#
-# Theta = 200
-# alpha = 10
-#
-# phi_ref = np.array([10])
-# def fun(t,y):
-#     e = y[:-1]
-#     phi = y[-1]
-#
-#     u_DI = - alpha * C_sys @ e
-#     u_ES =  Theta *  (phi_ref - phi)
-#
-#     # u_ES = Theta * alpha * (- phi)
-#     # sig = e[dofs_sig]
-#     # u_ES = + Theta * (phi_ref - 1/n_el * np.sum(sig))
-#
-#     u = u_DI  + u_ES
-#
-#     dedt = A_sys @ e + B_sys * u # + B_sys * 1
-#
-#     dphidt = C_sys @ e
-#
-#     dydt = np.concatenate((dedt, dphidt))
-#
-#     return dydt
-#
-# t0 = 0.0
-# t_fin = .12
-# t_span = [t0, t_fin]
-#
-# n_ev = 1000
-# t_ev = np.linspace(t0, t_fin, num=n_ev)
-#
-#
-# y0 = np.concatenate((e0, [0]), axis=0)
-# sol = solve_ivp(fun, t_span, y0, method='RK45', t_eval = t_ev, \
-#                       atol = 1e-5, rtol = 1e-5)
-#
-# e_sol = sol.y[:-1]
-# phi_sol = sol.y[-1]
-#
-# fig = plt.figure()
-# plt.plot(t_ev, phi_sol.T, 'g-', t_ev, np.ones((len(t_ev), )), 'b--')
-#
-# plt.show()
+
+A_sys = np.linalg.solve(M, J)
+B_sys = np.linalg.solve(M, B) # .reshape((-1, 1))
+C_sys = B.T.reshape((1, -1))
+# scipy.io.savemat(path_data + 'Data_Wave.mat', {"A": A_sys, "B": B_sys, "C": C_sys, "x0": e0})
+
+Theta = 200
+alpha = 0.5
+
+phi_ref = np.array([10])
+def fun(t,y):
+    e = y[:-1]
+    phi = y[-1]
+
+    u_DI = - alpha * C_sys @ e
+    u_ES =  Theta *  (phi_ref - phi)
+
+    # u_ES = Theta * alpha * (- phi)
+    # sig = e[dofs_sig]
+    # u_ES = + Theta * (phi_ref - 1/n_el * np.sum(sig))
+
+    u = u_DI  # + u_ES
+
+    dedt = A_sys @ e + B_sys * u + B_sys * 1
+
+    dphidt = C_sys @ e
+
+    dydt = np.concatenate((dedt, dphidt))
+
+    return dydt
+
+t0 = 0.0
+t_fin = 15
+t_span = [t0, t_fin]
+
+n_ev = 1000
+t_ev = np.linspace(t0, t_fin, num=n_ev)
+
+
+y0 = np.concatenate((e0, [0]), axis=0)
+sol = solve_ivp(fun, t_span, y0, method='RK45', t_eval = t_ev, \
+                      atol = 1e-5, rtol = 1e-5)
+
+e_sol = sol.y[:-1]
+phi_sol = sol.y[-1]
+
+fig = plt.figure()
+plt.plot(t_ev, phi_sol.T, 'g-', t_ev, np.ones((len(t_ev), )), 'b--')
+
+plt.show()
 
 
 
