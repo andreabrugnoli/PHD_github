@@ -1,31 +1,47 @@
 ## This is a first test to solve the wave equation in 2D domains using the dual filed method
+## using partitioned methods that expoit the str
 from warnings import simplefilter
 simplefilter(action='ignore', category=DeprecationWarning)
 
 # import numpy as np
 from firedrake import *
-from irksome import GaussLegendre, Dt, AdaptiveTimeStepper, TimeStepper, LobattoIIIA
+from irksome import GaussLegendre, Dt, AdaptiveTimeStepper, TimeStepper
 import matplotlib.pyplot as plt
 from tools_plotting import setup
 from tqdm import tqdm
 # from time import sleep
 
 
-
-
 def compute_sol(n_el, n_t, deg=1, t_fin=1):
     """Compute the numerical solution of the wave equation with the dual field method
+        and using partitioned Runge-Kutta methods
 
         Parameters:
         n_el: number of elements for the discretization
-        n_t: number of time instants
-        deg: polynomial degree for finite
+
         Returns:
         some plots
 
        """
     def cross_2D(a, b):
         return a[0] * b[1] - a[1] * b[0]
+
+    def mp_oper(vp, p, vq, q):
+        mp_form = inner(vp, p) * dx + inner(vq, q) * dx
+        return mp_form
+
+    def md_oper(vp, p, vq, q):
+        md_form = inner(vp_d, p_d) * dx + inner(vq_d, q_d) * dx
+        # + vp_d * dot(q0_d, n_ver) * ds + dot(vq_d, n_ver) * p0_d * ds
+        return md_form
+
+    def jp_oper(vp, p_d, vq, q_d):
+        jp_form = dot(vp, div(q_d)) * dx + dot(vq, grad(p_d)) * dx
+        return jp_form
+
+    def jd_oper(vp_d, p, vq_d, q):
+        jd_form = - dot(grad(vp_d), q) * dx - dot(div(vq_d), p) * dx
+        return jd_form
 
     L = 1
     mesh = RectangleMesh(n_el, n_el, L, L, quadrilateral=False)
@@ -37,42 +53,33 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     Vp_d = FunctionSpace(mesh, 'CG', deg)
     Vq_d = FunctionSpace(mesh, 'RT', deg)
 
-    V = Vp * Vq * Vp_d * Vq_d
-
+    V = Vp * Vq
     v = TestFunction(V)
-    vp, vq, vp_d, vq_d = split(v)
-
+    vp, vq, = split(v)
     e = TrialFunction(V)
-    p, q, p_d, q_d = split(e)
+    p, q = split(e)
+
+    V_d = Vp_d * Vq_d
+    v_d = TestFunction(V_d)
+    vp_d, vq_d = split(v_d)
+    e_d = TrialFunction(V_d)
+    p_d, q_d = split(e_d)
 
     dx = Measure('dx')
     ds = Measure('ds')
+
+    dt = Constant(t_fin / n_t)
+
+
+
+    bc = DirichletBC(V.sub(2), 0, "on_boundary")
+    # bc = []
 
     x, y = SpatialCoordinate(mesh)
 
     om_x = pi
     om_y = pi
-    om_t = np.sqrt(om_x**2 + om_y**2)
-
-    v0 = om_t*sin(om_x*x)*sin(om_y*y)
-    in_cond = project(as_vector([v0, 0, 0, v0, 0, 0]), V)
-
-    p0, q0, p0_d, q0_d = split(in_cond)
-
-    Ep = 0.5 * (inner(p0, p0) * dx + inner(q0, q0) * dx)
-    Ed = 0.5 * (inner(p0_d, p0_d) * dx + inner(q0_d, q0_d) * dx)
-    Es = 0.5 * (p0 * p0_d * dx + dot(q0, q0_d) * dx)
-
-    m_form = inner(vp, Dt(p0)) * dx + inner(vq, Dt(q0)) * dx + inner(vp_d, Dt(p0_d)) * dx + inner(vq_d, Dt(q0_d)) * dx
-
-    # Check for sign in adjoint system
-    j_form = dot(vp, div(q0_d)) * dx + dot(vq, grad(p0_d)) * dx - dot(grad(vp_d), q0) * dx - dot(div(vq_d), p0) * dx \
-               + vp_d * dot(q0_d, n_ver) * ds + dot(vq_d, n_ver) * p0_d * ds
-    # Form defininig the problem
-    f_form = m_form - j_form
-
-    bc = DirichletBC(V.sub(2), 0, "on_boundary")
-    # bc = []
+    om_t = np.sqrt(om_x ** 2 + om_y ** 2)
 
     t = Constant(0.0)
     w_ex = sin(om_x * x) * sin(om_y * y) * sin(om_t * t)
@@ -84,10 +91,24 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     # Method of manifactured solution: check demo on Firedrake irksome
     # rhs = expand_derivatives(diff(uexact, t)) - div(grad(uexact))
 
-    dt = Constant(t_fin / n_t)
-    # butcher_tableau = GaussLegendre(2)
-    butcher_tableau = LobattoIIIA(2)
+    v0 = om_t * sin(om_x * x) * sin(om_y * y)
+    in_cond = project(as_vector([v0, 0, 0, v0, 0, 0]), V)
 
+    p0, q0, p0_d, q0_d = split(in_cond)
+
+    Ep = 0.5 * (inner(p0, p0) * dx + inner(q0, q0) * dx)
+    Ed = 0.5 * (inner(p0_d, p0_d) * dx + inner(q0_d, q0_d) * dx)
+    Es = 0.5 * (p0 * p0_d * dx + dot(q0, q0_d) * dx)
+
+    e_n1 = Function(V)
+    e_n = Function(V)
+    w_n1 = Function(V_pw)
+    w_n = Function(V_pw)
+    th_n1 = Function(V_pth)
+    th_n = Function(V_pth)
+
+
+    butcher_tableau = GaussLegendre(2)
     params = {"mat_type": "aij",
               "snes_type": "ksponly",
               "ksp_type": "preonly",
@@ -210,7 +231,7 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     return t_vec, Ep_vec, Ed_vec, Es_vec
 
 
-t_vec, Ep_vec, Ed_vec, Es_vec = compute_sol(10, 100, 1, 1)
+t_vec, Ep_vec, Ed_vec, Es_vec = compute_sol(30, 30, 1, 1)
 
 plt.figure()
 plt.plot(t_vec, 0.5 * (Ep_vec + Ed_vec), 'g', label=r'Both energies')
