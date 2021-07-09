@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 
 tol = 1e-10
 
-L = 2
-n_el = 3
+L = 1
+n_el = 1
 deg = 1
 
 mesh = UnitCubeMesh(n_el, n_el, n_el)

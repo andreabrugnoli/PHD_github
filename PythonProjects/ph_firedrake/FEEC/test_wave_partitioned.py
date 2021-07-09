@@ -72,7 +72,7 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
 
 
 
-    bc = DirichletBC(V.sub(2), 0, "on_boundary")
+    bc = DirichletBC(V_d.sub(0), 0, "on_boundary")
     # bc = []
 
     x, y = SpatialCoordinate(mesh)
@@ -102,13 +102,13 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
 
     e_n1 = Function(V)
     e_n = Function(V)
-    w_n1 = Function(V_pw)
-    w_n = Function(V_pw)
-    th_n1 = Function(V_pth)
-    th_n = Function(V_pth)
+
+    ed_n1 = Function(V)
+    ed_n = Function(V)
 
 
-    butcher_tableau = GaussLegendre(2)
+
+
     params = {"mat_type": "aij",
               "snes_type": "ksponly",
               "ksp_type": "preonly",
