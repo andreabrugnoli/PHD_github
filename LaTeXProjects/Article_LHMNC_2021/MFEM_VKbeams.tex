@@ -83,7 +83,7 @@
 \begin{document}
 \begin{frontmatter}
 
-\title{Mixed finite elements for port-Hamiltonian von K\'arm\'an beams} 
+\title{Mixed finite elements for port-Hamiltonian models of von K\'arm\'an beams} 
 % Title, preferably not more than 10 words.
 
 
@@ -114,20 +114,20 @@ Port-Hamiltonian systems, von K\'arm\'an beams, Mixed Finite Elements
 Linear elastic structures have been largely investigated into the port-Hamiltonian (pH) framework as well as the heat equation (consult for instance \cite{macchelli2004timo} for the Timoshenko beam, \cite{aoues2017modeling} for the Euler-Bernoulli beam, \cite{brugnoli2019mindlin,brugnoli2019kirchhoff} for thick and thin plates). Recently, more complicated models arising from fluid dynamics have also been considered \citep{cardoso2019port,cardoso2020swe,rashad2021port1,rashad2021port2,califano2021geometric,altmann2017}. \\
 
 
-The Hamiltonian foundation of non-linear elasticity dates back to the late 80' \citep{simo1988}. A pH formulation of flexible beams undergoing large deformations can be found in \cite{macchelli2007fl,macchelli2009flrig}. One fundamental non linear theory is the Von K\'arm\'an one, that applies for moderately large deformation of beams, plates and shells. This theory has puzzled mathematicians and physicists as the derivation of the model rely on some not well justified assumptions. Conditions under which this theory is actually applicable and will give reasonable results when solved are discussed in \cite{ciarlet1980,ciarlet1990}. Existence and uniqueness of solutions for the full dynamical problem were established in \cite{lagnese1991uniform} for one-dimensional beams and in \cite{puel1996} for plates. Since the full dynamical von K\'arman problem is conservative (see e.g. \cite{bilbao2015conservative}), a pH realization of this system exists. \\
+The Hamiltonian foundation of non-linear elasticity dates back to the late 80s \citep{simo1988}. A pH formulation of flexible beams undergoing large deformations can be found in \cite{macchelli2007fl,macchelli2009flrig}. One fundamental non linear theory is the von K\'arm\'an one, that applies for moderately large deformation of beams, plates and shells. This theory has puzzled mathematicians and physicists as the derivation of the model rely on some not well justified assumptions. Mathematical conditions under which this theory is actually applicable and will give reasonable results when solved are discussed in \cite{ciarlet1980,ciarlet1990}. In particular, for this model the stresses-strains constitutive relation has to be linear and the Kirchhoff-Love displacement field assumption (i.e. the normals to the middle surface remain normal to the deformed middle surface) hold. Existence and uniqueness of solutions for the full dynamical problem were established in \cite{lagnese1991uniform} for one-dimensional beams and in \cite{puel1996} for plates. Since the full dynamical von K\'arman problem is conservative (see e.g. \cite{bilbao2015conservative}), a pH realization of this system exists. \\
 
 The development of new models within the pH framework has been accompanied with an increased interest in numerical discretization methods, capable of retaining the main features of the distributed system in its finite-dimensional counterpart (see \cite{rashad2020review} for a comprehensive review on this topic). Recently, it has become evident that there is a strict link between  discretization of port-Hamiltonian  systems and mixed finite elements \citep{cardoso2020pfem}. An example of this connection is given in \cite{kirby2015}, where a velocity-stress formulation for the wave dynamics is shown to be Hamiltonian and its mixed discretization preserves such a structure. \\
 
 In this contribution, the von K\'arm\'an beam model is formulated as a pH system. The selection of energy variables will be such to make the Hamiltonian quadratic in these variables. As a consequence of this choice, the non linearities of the model are included in the interconnection operator, whereas the constitutive relations remain linear. The obtained model can be discretized using mixed finite elements. To this aim, a weak formulation that does not demand for $H^2$ regularity for the vertical displacement (as in classical Galerkin discretization of beams and plates, cf. \cite{gustafsson2018}) is obtained. This means that the vertical displacement can be discretized using $H^1$ conforming elements (i.e. Continuous Galerkin elements), rather then using the more computationally demanding $H^2$ conforming elements, like the Hermite polynomials. A numerical test is carried out to evaluate the convergence rate of the discrete solution with respect to an analytical one. \\
 
-The paper is organized as follows. In Section \ref{sec:vK_beams} the classical model for von K\'arm\'an beams is recalled. Then, a pH realization of the classical model is detailed in \secref{sec:pHmodel}. The mixed finite elements discretization strategy is discussed in \secref{sec:mfem}. In Sec. \ref{sec:num_test} a numerical convergence test is performed to assess the rate of convergence of the solution.
+The paper is organized as follows. In Section \ref{sec:vK_beams} the classical model for von K\'arm\'an beams is recalled. Then, a pH realization of the classical model is detailed in Sec. \ref{sec:pHmodel}. The mixed finite element discretization strategy is discussed in Sec. \ref{sec:mfem}. In Sec. \ref{sec:num_test} a numerical convergence test is performed to assess the rate of convergence of the solution.
 
 
 
 \section{Von K\'arm\'an beams}\label{sec:vK_beams}
 
 
-The classical von-K\'arm\'an beam model is presented in \cite[Chapter 4]{reddy2010introduction}. Under the hypothesis of isotropic material, the extensional-bending stiffness is zero when the $x$-axis is taken along the geometric centroidal axis. With this assumption, the problem, defined on an interval $\Omega = [0, L]$, takes the following form
+The classical von K\'arm\'an beam model is presented in \cite[Chapter 4]{reddy2010introduction}. Under the hypothesis of isotropic material, the extensional-bending stiffness is zero when the $x$-axis is taken along the geometric centroidal axis. This means that a pure traction (bending) deformation produces no bending (traction) stress. With this assumption, the problem, defined on an interval $\Omega = [0, L]$, takes the following form
 
 \begin{equation}\label{eq:class}
 	\begin{aligned}
@@ -246,7 +246,7 @@ The pH realization is then given by the following system
 		e_\kappa 
 	\end{pmatrix}.
 \end{equation}
-The second line of system \eqref{eq:pHsys} represents the time derivative of the membrane strain. To close the system, variable $w$ has to be accessible. For this reason, its dynamics has to be included. The augmented system reads
+The second line of system \eqref{eq:pHsys} represents the time derivative of the axial strain $\varepsilon_{xx}$. To close the system, variable $w$ has to be accessible. For this reason, its dynamics has to be included. The augmented system reads
 \begin{equation}\label{eq:pHsys_aug}
 	\frac{\partial}{\partial t}
 	\begin{pmatrix}
@@ -271,15 +271,16 @@ The second line of system \eqref{eq:pHsys} represents the time derivative of the
 		\delta_w H  \\
 	\end{pmatrix}.
 \end{equation}
-The operator $\mathcal{J}$ is formally skew-adjoint. If only the kinetic and deformation energies are considered, it holds $\delta_{w} H~=~0$. In general this terms allows accommodating for other potentials, for example the gravitational one. Suitable boundary variables are then obtained considering the power balance
-\begin{equation}
+The operator $\mathcal{J}$ is formally skew-adjoint. If only the kinetic and deformation energies are considered, it holds $\delta_{w} H~=~0$. In general this term allows
+accommodation of other potentials, such as gravitational. Suitable boundary variables are then obtained considering the power balance
+\begin{equation}\label{eq:pow_bal}
 	\dot{H} = \inner[\partial\Omega]{e_u}{e_\varepsilon} + \inner[\partial\Omega]{e_w}{e_\varepsilon \partial_x w -\partial_x e_\kappa} + \inner[\partial\Omega]{\partial_x e_w}{e_\kappa}.
 \end{equation}
 For the boundary terms, the following notation has been used
 \begin{equation*}
 	\inner[\partial\Omega]{f}{g} = f g \vert_{0}^L = f(L)g(L) - f(0)g(0).
 \end{equation*} 
-The boundary conditions, resumed in Table \ref{tab:bcs}, are consistent with the ones assumed in \cite{puel1996} for deriving a global existence result for this model.
+The boundary conditions, summarized in Table \ref{tab:bcs}, are consistent with the ones assumed in \cite{puel1996} for deriving a global existence result for this model.
 
 
 \begin{table}[h]
@@ -330,7 +331,7 @@ where $C_a = (EA)^{-1}$ and $C_b = (EI)^{-1}$ are the axial and bending complian
 		\partial_x & 0 & \partial_x w \, \partial_x & 0 & 0 \\
 		0 & \partial_x(\cdot \, \partial_x w) & 0 & -\partial_{xx}^2 & -1 \\
 		0 & 0 & \partial_{xx}^2 & 0 & 0 \\ 
-		0 & 0 & 1 &  & 0 \\
+		0 & 0 & 1 & 0 & 0 \\
 	\end{bmatrix}
 	\begin{pmatrix}
 		e_u \\
@@ -386,28 +387,56 @@ Notice that $w, \, e_w$ are discretized using the same test functions
 $\xi_w^i(x)$. Plugging \eqref{eq:Gal_appr} into \eqref{eq:weak_form}, the following-finite dimensional system is obtained
 
 \begin{equation}\label{eq:findimSys}
-\begin{pmatrix}
-	\mathbf{M}_u \dot{\mathbf{e}}_u \\
-	\mathbf{M}_\varepsilon \dot{\mathbf{e}}_\varepsilon \\
-	\mathbf{M}_w \dot{\mathbf{e}}_w \\
-	\mathbf{M}_\kappa \dot{\mathbf{e}}_\kappa \\
-	 \dot{\mathbf{w}}
-\end{pmatrix} = 
-\begin{bmatrix}
-	\mathbf{0} & -\mathbf{D}_{\varepsilon u}^\top & \mathbf{0} & \mathbf{0}  \\
-	\mathbf{D}_{\varepsilon u} & \mathbf{0} & \mathbf{D}_{\varepsilon w}(\mathbf{w}) & \mathbf{0}  \\
-	\mathbf{0} & -\mathbf{D}_{\varepsilon w}^\top(\mathbf{w}) & \mathbf{0} & \mathbf{D}_{w \kappa} \\
-	\mathbf{0} & \mathbf{0} & -\mathbf{D}_{w \kappa}^\top & \mathbf{0}  \\
-	\mathbf{0} & \mathbf{0} & \mathbf{I} & \mathbf{0} \\ 
-\end{bmatrix}
-\begin{pmatrix}
+	\begin{aligned}
+		\begin{pmatrix}
+			\mathbf{M}_u \dot{\mathbf{e}}_u \\
+			\mathbf{M}_\varepsilon \dot{\mathbf{e}}_\varepsilon \\
+			\mathbf{M}_w \dot{\mathbf{e}}_w \\
+			\mathbf{M}_\kappa \dot{\mathbf{e}}_\kappa \\
+			\dot{\mathbf{w}}
+		\end{pmatrix} &= 
+		\begin{bmatrix}
+			\mathbf{0} & -\mathbf{D}_{\varepsilon u}^\top & \mathbf{0} & \mathbf{0}  \\
+			\mathbf{D}_{\varepsilon u} & \mathbf{0} & \mathbf{D}_{\varepsilon w}(\mathbf{w}) & \mathbf{0}  \\
+			\mathbf{0} & -\mathbf{D}_{\varepsilon w}^\top(\mathbf{w}) & \mathbf{0} & \mathbf{D}_{w \kappa} \\
+			\mathbf{0} & \mathbf{0} & -\mathbf{D}_{w \kappa}^\top & \mathbf{0}  \\
+			\mathbf{0} & \mathbf{0} & \mathbf{I} & \mathbf{0} \\ 
+		\end{bmatrix}
+		\begin{pmatrix}
+			\mathbf{e}_u \\
+			\mathbf{e}_\varepsilon \\
+			\mathbf{e}_w \\
+			\mathbf{e}_\kappa \\
+		\end{pmatrix} \\
+	&+ \begin{bmatrix}
+		\mathbf{B}_u & \mathbf{0} & \mathbf{0} \\
+		\mathbf{0} & \mathbf{0} & \mathbf{0}\\
+		\mathbf{0} & \mathbf{B}_w & \mathbf{0} \\
+		\mathbf{0} & \mathbf{0} & \mathbf{B}_{\kappa}\\
+		\mathbf{0} & \mathbf{0} & \mathbf{0}\\
+	\end{bmatrix}
+		\begin{pmatrix}
+		\mathbf{u}_{1} \\
+		\mathbf{u}_2 \\
+		\mathbf{u}_3 \\
+		\end{pmatrix}, \\
+	\begin{pmatrix}
+		\mathbf{y}_{1} \\
+		\mathbf{y}_2 \\
+		\mathbf{y}_3 \\
+	\end{pmatrix} &= \begin{bmatrix}
+	\mathbf{B}_u^\top & \mathbf{0} & \mathbf{0} & \mathbf{0}\\
+	\mathbf{0} & \mathbf{0} & \mathbf{B}_w^\top & \mathbf{0}\\
+	\mathbf{0} & \mathbf{0} & \mathbf{0} & \mathbf{B}_{\kappa}^\top \\
+	\end{bmatrix} \begin{pmatrix}
 	\mathbf{e}_u \\
 	\mathbf{e}_\varepsilon \\
 	\mathbf{e}_w \\
 	\mathbf{e}_\kappa \\
 \end{pmatrix}.
+	\end{aligned}
 \end{equation}
-Since homogeneous boundary conditions will be considered in \secref{sec:num_test}, the boundary terms have been omitted. The fifth column disappear because $\delta_w H=0$. The mass matrices are defined as follows
+ The fifth entry in the coenergy variables column disappear because $\delta_w H=0$. The mass matrices are defined as follows
 \begin{equation}
 	\begin{aligned}
 	M_u^{ij} &= \inner[\Omega]{\xi_u^i}{\rho A \xi_u^j}, \\
@@ -427,11 +456,31 @@ The interconnection matrices are given by
 	D_{w \kappa}^{ij} &= \inner[\Omega]{\partial_x \xi_w^i}{\partial_x \xi_\kappa^j}.
 	\end{aligned}
 \end{equation}
+The boundary matrices and control inputs are given by
+\begin{equation}
+	\begin{aligned}
+		B_u^{i} &= [\psi_u^i(L) \quad \psi_u^i(0)], \\
+		B_w^{i} &= [\psi_w^i(L) \quad \psi_w^i(0)], \\
+		B_{\kappa}^{i} &= [\psi_{\kappa}^i(L) \quad \psi_{\kappa}^i(0)], \\
+		\mathbf{u}_1 &= [e_\varepsilon(L) \quad -e_\varepsilon(0)]^\top, \\
+		\mathbf{u}_2 &= [e_\varepsilon\partial_x w - \partial_x e_\kappa(L) \quad -e_\varepsilon\partial_x w - \partial_x e_\kappa(0)]^\top, \\
+		\mathbf{u}_3 &= [\partial_x e_w(L) \quad -\partial_x e_w(L)]^\top. \\	
+		\end{aligned}
+\end{equation}
+The outputs $\mathbf{y}_i$ are easily identified thanks to power balance \eqref{eq:pow_bal}, as they corresponds to the power collocated variables w.r.t. the inputs. The discrete energy definition is given by the mass matrices weighted inner product of the coenergy variable
+\begin{equation}\label{eq:Hd}
+	H_d = \frac{1}{2}(\mathbf{e}_u \mathbf{M}_u \mathbf{e}_u + \mathbf{e}_\varepsilon \mathbf{M}_\varepsilon \mathbf{e}_\varepsilon + \mathbf{e}_w \mathbf{M}_w \mathbf{e}_w + \mathbf{e}_\kappa \mathbf{M}_\kappa \mathbf{e}_\kappa).
+\end{equation}
+ The energy rate is computed taking into account the lossless dynamics of System \eqref{eq:findimSys} and the discrete energy definition \eqref{eq:Hd}:
+\begin{equation}
+	\dot{H}_d = \sum_{i=1}^3\mathbf{y}_i^\top \mathbf{u}_i.
+\end{equation}
 
+ For the numerical study in Sec. \ref{sec:num_test}, homogeneous boundary conditions will be considered for simplicity. \\
 
 For what concerns the choice of the underlying finite elements, a simple selection conforming to the weak form \eqref{eq:weak_form} is given by continuous Galerkin to discretize the space $H^1(\Omega)$ and discontinuous Galerkin for the space $L^2(\Omega)$. Consider an interval mesh $\mathcal{I}_h$ with elements $E$. The space of polynomials of order $k$ on a mesh cell is denoted by $P_k$. The following conforming families of finite elements are selected for this problem:
 
-\begin{equation}
+\begin{equation}\label{eq:FE}
 	\begin{aligned}
 		\mathcal{E}^h_u &= \left\{e_u^h \in H^1(\Omega)\vert \forall E \in \mathcal{I}_h, \; e_u^h\vert_E \in P_{2k-1} \right\}, \\
 		\mathcal{E}^h_\varepsilon &= \left\{e_\varepsilon^h \in L^2(\Omega)\vert \forall E \in \mathcal{I}_h, \; e_\varepsilon^h\vert_E \in P_{2k-2} \right\}, \\
@@ -454,7 +503,7 @@ such that system \eqref{eq:weak_form} holds
 $$\forall (\psi_u^h, \; \psi_\varepsilon^h, \;  \psi_w^h, \; \psi_\kappa^h, \; \psi^h) \in \mathcal{E}^h_u \times \mathcal{E}^h_\varepsilon \times \mathcal{E}^h_w \times \mathcal{E}^h_\kappa \times \mathcal{W}^h.$$.
 
 \section{Numerical test}\label{sec:num_test}
-In this section the convervenge rate of the underlying finite elements is assessed by means of a numerical test. A manufactured solution is consider in order to compare the numerical with an analytical manufactured one. \\
+In this section the convergence rate of the underlying finite elements is assessed by means of a numerical test. A manufactured solution is considered in order to compare the numerical with an analytical manufactured one. \\
 
 Consider the following manufactured solution for the axial and vertical displacement
 
@@ -468,15 +517,17 @@ together with the boundary conditions
 \begin{equation}
 u\vert_0^L = 0, \quad w\vert_0^L =0, \quad m_{xx}\vert_{0}^L=0.
 \end{equation}
-For $u$ and $w$ given in \eqref{eq:analytical} to be the solution of \eqref{eq:class}, appropriate forcing term have to be introduced. These are given by 
+For $u$ and $w$ given in \eqref{eq:analytical} to be the solution of \eqref{eq:class}, appropriate forcing terms have to be introduced in the right hand side of \eqref{eq:class}. These are given by 
 \begin{equation}\label{eq:forcing}
 	\begin{aligned}
 		f_u &= \rho A \partial_{tt}^2 u^{\text{ex}} - \partial_x n_{xx}^{\text{ex}}, \\
 		f_w &= \rho A \partial_{tt}^2 w^{\text{ex}} + \partial_{xx}^2 m_{xx}^{\text{ex}} - \partial_x(n_{xx}^{\text{ex}} \partial_x w^{\text{ex}}), \\
 	\end{aligned}
 \end{equation}
+The forcing term are computed considering the projection of the analytical forcing terms on the corresponding test functions $\psi_u, \; \psi_w$. Given the finite element selection \eqref{eq:FE}, this test function corresponds to the Lagrange elements of order $2k-1$ and $k$ for $\psi_u$ and $\psi_w$ respectively. \\
 
-The numerical values of the parameters for the simulation are reported in Table \ref{tab:par}. The Firedrake library (\cite{rathgeber2017firedrake}) is used to generate the matrices. To integrate the equations in time a Crank-Nicholson scheme is employed. The time step is set to $\Delta t = h/(2 \pi)$ to have the same impact of the time discretization error with respect to the spatial error. The final time is set to one $t_f = 1 [\textrm{s}]$. The non-linear system is solved using Newton-Krylov iterations with a line search and direct factorization of the linear system.  \\
+The numerical values of the parameters for the simulation are reported in Table \ref{tab:par}. The Firedrake library (\cite{rathgeber2017firedrake}) is used to generate the matrices. To integrate the equations in time a Crank-Nicholson scheme is employed. The time step is set to $\Delta t = h/(2 \pi)$ to balance the time
+discretization error with respect to the spatial error. The final time is set to $t_f = 1 [\textrm{s}]$. The non-linear system is solved using Newton-Krylov iterations with a line search and direct factorization of the linear system.  \\
 
 To measure the convergence rate,  suitable norms have to be introduced. 
 Let $\mathcal{X}$ be a Hilbert space, and $t_f$ a positive real number. We denote by $L^\infty([0, t_f]; \mathcal{X})$ or $L^\infty(\mathcal{X})$ the space of functions $f: [0, t_f] \rightarrow \mathcal{X}$ for which the time-space norm $||\cdot||_{L^\infty([0, t_f]; \mathcal{X})}$ satisfies

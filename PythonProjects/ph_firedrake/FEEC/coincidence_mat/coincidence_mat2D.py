@@ -24,8 +24,8 @@ def rot2D(u_vec):
 
 
 P_0 = FiniteElement("CG", triangle, deg)
-P_1 = FiniteElement("N1curl", triangle, deg)
-# P_1 = FiniteElement("RT", triangle, deg)
+# P_1 = FiniteElement("N1curl", triangle, deg)
+P_1 = FiniteElement("RT", triangle, deg)
 P_2 = FiniteElement("DG", triangle, deg-1)
 
 V_0 = FunctionSpace(mesh, P_0)

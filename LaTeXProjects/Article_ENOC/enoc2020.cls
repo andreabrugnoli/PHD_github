@@ -44,7 +44,7 @@
 \renewcommand{\footrulewidth}{0pt}
 \fancyhead{}
 %\fancyhead[R]{\otherfont{ua1}{\textbf{ENOC 2020}, July 5-10, 2020, Lyon, France}}
-\fancyhead[R]{\textbf{ENOC 2020}, July 5-10, 2020, Lyon, France}
+\fancyhead[R]{\textbf{ENOC 2020}, July 17-22, 2022, Lyon, France}
 \fancyfoot{}
 \renewcommand{\@maketitle}{
  \begin{center}

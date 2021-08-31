@@ -1,6 +1,6 @@
 ## This is a first test to solve the wave equation in 2D domains using the dual filed method
-from warnings import simplefilter
-simplefilter(action='ignore', category=DeprecationWarning)
+# from warnings import simplefilter
+# simplefilter(action='ignore', category=DeprecationWarning)
 
 import os
 os.environ["OMP_NUM_THREADS"] = "1"
@@ -11,9 +11,7 @@ from irksome import GaussLegendre, Dt, AdaptiveTimeStepper, TimeStepper, Lobatto
 import matplotlib.pyplot as plt
 from tools_plotting import setup
 from tqdm import tqdm
-# from time import sleep
-
-
+# from time import sleaep
 
 
 def compute_sol(n_el, n_t, deg=1, t_fin=1):
@@ -33,6 +31,18 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     L = 1/2
     mesh = RectangleMesh(n_el, n_el, L, L, quadrilateral=False)
     n_ver = FacetNormal(mesh)
+
+    # Pp = FiniteElement("DG", tetrahedron, deg - 1)
+    # Pq = FiniteElement("N1curl", tetrahedron, deg, variant='point')
+    #
+    # Pp_d = FiniteElement("CG", tetrahedron, deg)
+    # Pq_d = FiniteElement("RT", tetrahedron, deg, variant='point')
+    #
+    # Vp = FunctionSpace(mesh, Pp)
+    # Vq = FunctionSpace(mesh, Pq)
+    #
+    # Vp_d = FunctionSpace(mesh, Pp_d)
+    # Vq_d = FunctionSpace(mesh, Pq_d)
 
     Vp = FunctionSpace(mesh, 'DG', deg-1)
     Vq = FunctionSpace(mesh, 'N1curl', deg)
@@ -65,6 +75,7 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     Ep = 0.5 * (inner(p0, p0) * dx + inner(q0, q0) * dx)
     Ed = 0.5 * (inner(p0_d, p0_d) * dx + inner(q0_d, q0_d) * dx)
     Es = 0.5 * (p0 * p0_d * dx + dot(q0, q0_d) * dx)
+    # Es = 0.5 * cross_2D(q0, q0_d) * dx
 
     Hdot = div(q0_d) * p0_d * dx + inner(grad(p0_d), q0_d) * dx
     bdflow = p0_d * dot(q0_d, n_ver) * ds
@@ -77,6 +88,10 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     # Form defininig the problem
     f_form = m_form - j_form
 
+<<<<<<< HEAD:PythonProjects/ph_firedrake/FEEC/wave_eq/wave.py
+=======
+    bc = DirichletBC(V.sub(2), 0, "on_boundary")
+>>>>>>> 7a100c73e2c483e3eb6116cdd2be64dab993ad17:PythonProjects/ph_firedrake/FEEC/test_wave.py
 
     t = Constant(0.0)
     w_ex = sin(om_x * x) * sin(om_y * y) * sin(om_t * t)
@@ -89,7 +104,11 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     # rhs = expand_derivatives(diff(uexact, t)) - div(grad(uexact))
 
     dt = Constant(t_fin / n_t)
+<<<<<<< HEAD:PythonProjects/ph_firedrake/FEEC/wave_eq/wave.py
     butcher_tableau = GaussLegendre(3)
+=======
+    butcher_tableau = GaussLegendre(2)
+>>>>>>> 7a100c73e2c483e3eb6116cdd2be64dab993ad17:PythonProjects/ph_firedrake/FEEC/test_wave.py
     # butcher_tableau = LobattoIIIA(2)
 
     params = {"mat_type": "aij",
@@ -167,6 +186,9 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     err_p.assign(pn - interpolate(v_ex, Vp))
     err_pd.assign(pn_d - interpolate(v_ex, Vp_d))
 
+    # err_p.assign(interpolate(v_ex, Vp))
+    # err_pd.assign(interpolate(v_ex, Vp_d))
+
     Ep_f = assemble(Ep)
     Ed_f = assemble(Ed)
     Es_f = assemble(Es)
@@ -186,19 +208,19 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     print(r"Final: ", Es_f)
     print(r"Delta: ", Es_f - Es_0)
 
-    # fig = plt.figure()
-    # axes = fig.add_subplot(111, projection='3d')
-    # contours = trisurf(err_p, axes=axes, cmap="inferno")
-    # axes.set_aspect("auto")
-    # axes.set_title("Error primal velocity")
-    # fig.colorbar(contours)
-    #
-    # fig = plt.figure()
-    # axes = fig.add_subplot(111, projection='3d')
-    # contours = trisurf(err_pd, axes=axes, cmap="inferno")
-    # axes.set_aspect("auto")
-    # axes.set_title("Error dual velocity")
-    # fig.colorbar(contours)
+    fig = plt.figure()
+    axes = fig.add_subplot(111, projection='3d')
+    contours = trisurf(err_p, axes=axes, cmap="inferno")
+    axes.set_aspect("auto")
+    axes.set_title("Error primal velocity")
+    fig.colorbar(contours)
+
+    fig = plt.figure()
+    axes = fig.add_subplot(111, projection='3d')
+    contours = trisurf(err_pd, axes=axes, cmap="inferno")
+    axes.set_aspect("auto")
+    axes.set_title("Error dual velocity")
+    fig.colorbar(contours)
 
     # fig = plt.figure()
     # axes = fig.add_subplot(111, projection='3d')
@@ -226,7 +248,11 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     return t_vec, Ep_vec, Ed_vec, Es_vec, Hdot_vec, bdflow_vec
 
 
+<<<<<<< HEAD:PythonProjects/ph_firedrake/FEEC/wave_eq/wave.py
 t_vec, Ep_vec, Ed_vec, Es_vec, Hdot_vec, bdflow_vec = compute_sol(10, 100, 1, 1)
+=======
+t_vec, Ep_vec, Ed_vec, Es_vec = compute_sol(10, 10, 1, 1)
+>>>>>>> 7a100c73e2c483e3eb6116cdd2be64dab993ad17:PythonProjects/ph_firedrake/FEEC/test_wave.py
 
 plt.figure()
 plt.plot(t_vec, 0.5 * (Ep_vec + Ed_vec), 'g', label=r'Both energies')

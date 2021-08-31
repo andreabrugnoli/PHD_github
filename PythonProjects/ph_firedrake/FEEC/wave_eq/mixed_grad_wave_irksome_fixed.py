@@ -8,7 +8,7 @@ simplefilter(action='ignore', category=DeprecationWarning)
 N = 10
 
 msh = UnitSquareMesh(N, N)
-V = FunctionSpace(msh, "RT", 1)
+V = FunctionSpace(msh, "N1curl", 1)
 W = FunctionSpace(msh, "CG", 1)
 Z = V*W
 
