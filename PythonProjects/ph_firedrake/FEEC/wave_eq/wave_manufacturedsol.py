@@ -1,6 +1,10 @@
 ## This is a first test to solve the wave equation in 2D domains using the dual filed method
-from warnings import simplefilter
-simplefilter(action='ignore', category=DeprecationWarning)
+
+# from warnings import simplefilter
+# simplefilter(action='ignore', category=DeprecationWarning)
+
+import os
+os.environ["OMP_NUM_THREADS"] = "1"
 
 # import numpy as np
 from firedrake import *
@@ -9,8 +13,6 @@ import matplotlib.pyplot as plt
 from tools_plotting import setup
 from tqdm import tqdm
 # from time import sleep
-
-
 
 
 def compute_sol(n_el, n_t, deg=1, t_fin=1):
@@ -24,8 +26,9 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
         some plots
 
        """
-    def cross_2D(a, b):
-        return a[0] * b[1] - a[1] * b[0]
+
+    def rot2D(u_vec):
+        return u_vec[1].dx(0) - u_vec[0].dx(1)
 
     L = 1
     mesh = RectangleMesh(n_el, n_el, L, L, quadrilateral=False)
@@ -50,18 +53,32 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
 
     x, y = SpatialCoordinate(mesh)
 
-    om_x = pi
-    om_y = pi
-    om_t = np.sqrt(om_x**2 + om_y**2)
+    om_x = 4*pi
+    om_y = 4*pi
+    om_t = np.sqrt(om_x ** 2 + om_y ** 2)
+    phi_x = 1
+    phi_y = 2
+    phi_t = 3
 
-    v0 = om_t*sin(om_x*x)*sin(om_y*y)
-    in_cond = project(as_vector([v0, 0, 0, v0, 0, 0]), V)
+    t = Constant(0.0)
+    w_ex = sin(om_x * x + phi_x) * sin(om_y * y + phi_y) * sin(om_t * t + phi_t)
+
+    v_ex = om_t * sin(om_x * x + phi_x) * sin(om_y * y + phi_y) * cos(om_t * t + phi_t)
+    sig_ex = as_vector([om_x * cos(om_x * x + phi_x) * sin(om_y * y + phi_y) * sin(om_t * t + phi_t),
+                        om_y * sin(om_x * x + phi_x) * cos(om_y * y + phi_y) * sin(om_t * t + phi_t)])
+
+
+    # v0 = om_t*sin(om_x*x)*sin(om_y*y)
+    in_cond = project(as_vector([v_ex, sig_ex[0], sig_ex[1], v_ex, sig_ex[0], sig_ex[1]]), V)
 
     p0, q0, p0_d, q0_d = split(in_cond)
 
     Ep = 0.5 * (inner(p0, p0) * dx + inner(q0, q0) * dx)
     Ed = 0.5 * (inner(p0_d, p0_d) * dx + inner(q0_d, q0_d) * dx)
     Es = 0.5 * (p0 * p0_d * dx + dot(q0, q0_d) * dx)
+
+    Hdot = div(q0_d) * p0_d * dx + inner(grad(p0_d), q0_d) * dx
+    bdflow = p0_d * dot(q0_d, n_ver) * ds
 
     m_form = inner(vp, Dt(p0)) * dx + inner(vq, Dt(q0)) * dx + inner(vp_d, Dt(p0_d)) * dx + inner(vq_d, Dt(q0_d)) * dx
 
@@ -71,27 +88,20 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     # Form defininig the problem
     f_form = m_form - j_form
 
-    bc = DirichletBC(V.sub(2), 0, "on_boundary")
-    # bc = []
-
-    t = Constant(0.0)
-    w_ex = sin(om_x * x) * sin(om_y * y) * sin(om_t * t)
-
-    v_ex = om_t * sin(om_x * x) * sin(om_y * y) * cos(om_t * t)
-    sig_ex = as_vector([om_x * cos(om_x * x) * sin(om_y * y) * sin(om_t * t),
-                        om_y * sin(om_x * x) * cos(om_y * y) * sin(om_t * t)])
-
     # Method of manifactured solution: check demo on Firedrake irksome
     # rhs = expand_derivatives(diff(uexact, t)) - div(grad(uexact))
 
     dt = Constant(t_fin / n_t)
-    # butcher_tableau = GaussLegendre(2)
-    butcher_tableau = LobattoIIIA(2)
+    butcher_tableau = GaussLegendre(2)
+    # butcher_tableau = LobattoIIIA(2)
 
     params = {"mat_type": "aij",
               "snes_type": "ksponly",
               "ksp_type": "preonly",
               "pc_type": "lu"}
+
+    bc = DirichletBC(V.sub(2), v_ex, "on_boundary")
+    # bc = []
 
     stepper = TimeStepper(f_form, butcher_tableau, t, dt, in_cond,
                           bcs=bc, solver_parameters=params)
@@ -100,19 +110,38 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     Ed_vec = np.zeros((1+n_t, ))
     Es_vec = np.zeros((1+n_t, ))
 
+    Hdot_vec = np.zeros((1 + n_t,))
+    bdflow_vec = np.zeros((1 + n_t,))
+
+    p_err_L2 = np.zeros((1 + n_t,))
+    q_err_Hrot = np.zeros((1 + n_t,))
+
+    pd_err_H1 = np.zeros((1 + n_t,))
+    qd_err_Hdiv = np.zeros((1 + n_t,))
+
+
+    p_err_L2[0] = np.sqrt(assemble((p0 - v_ex) * (p0 - v_ex) * dx))
+    q_err_Hrot[0] = np.sqrt(assemble(dot(q0 - sig_ex, q0 - sig_ex) * dx))
+
+    pd_err_H1[0] = np.sqrt(assemble((p0_d - v_ex) * (p0_d - v_ex) * dx))
+    qd_err_Hdiv[0] = np.sqrt(assemble(dot(q0_d - sig_ex, q0_d - sig_ex) * dx))
+
     Ppoint = (L/2, L/2)
 
     p_P = np.zeros((1+n_t,))
-    p_P[0] = interpolate(v0, Vp).at(Ppoint)
+    p_P[0] = interpolate(v_ex, Vp).at(Ppoint)
 
     pd_P = np.zeros((1+n_t, ))
-    pd_P[0] = interpolate(v0, Vp_d).at(Ppoint)
+    pd_P[0] = interpolate(v_ex, Vp_d).at(Ppoint)
 
     t_vec = np.linspace(0, n_t * float(dt), 1 + n_t)
 
     Ep_vec[0] = assemble(Ep)
     Ed_vec[0] = assemble(Ed)
     Es_vec[0] = assemble(Es)
+
+    Hdot_vec[0] = assemble(Hdot)
+    bdflow_vec[0] = assemble(bdflow)
 
     print("Time    Energy")
     print("==============")
@@ -134,11 +163,20 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
         Ed_vec[ii+1] = assemble(Ed)
         Es_vec[ii+1] = assemble(Es)
 
+        Hdot_vec[ii+1] = assemble(Hdot)
+        bdflow_vec[ii+1] = assemble(bdflow)
+
         pn.assign(interpolate(p0, Vp))
         pn_d.assign(interpolate(p0_d, Vp_d))
 
         p_P[ii+1] = pn.at(Ppoint)
         pd_P[ii+1] = pn_d.at(Ppoint)
+
+        p_err_L2[ii+1] = np.sqrt(assemble((p0 - v_ex) * (p0 - v_ex) * dx))
+        q_err_Hrot[ii+1] = np.sqrt(assemble(dot(q0 - sig_ex, q0 - sig_ex) * dx))
+
+        pd_err_H1[ii+1] = np.sqrt(assemble((p0_d - v_ex) * (p0_d - v_ex) * dx))
+        qd_err_Hdiv[ii+1] = np.sqrt(assemble(dot(q0_d - sig_ex, q0_d - sig_ex) * dx))
 
         t.assign(float(t) + float(dt))
         # print("Primal energy")
@@ -170,19 +208,19 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     print(r"Final: ", Es_f)
     print(r"Delta: ", Es_f - Es_0)
 
-    # fig = plt.figure()
-    # axes = fig.add_subplot(111, projection='3d')
-    # contours = trisurf(err_p, axes=axes, cmap="inferno")
-    # axes.set_aspect("auto")
-    # axes.set_title("Error primal velocity")
-    # fig.colorbar(contours)
-    #
-    # fig = plt.figure()
-    # axes = fig.add_subplot(111, projection='3d')
-    # contours = trisurf(err_pd, axes=axes, cmap="inferno")
-    # axes.set_aspect("auto")
-    # axes.set_title("Error dual velocity")
-    # fig.colorbar(contours)
+    fig = plt.figure()
+    axes = fig.add_subplot(111, projection='3d')
+    contours = trisurf(err_p, axes=axes, cmap="inferno")
+    axes.set_aspect("auto")
+    axes.set_title("Error primal velocity")
+    fig.colorbar(contours)
+
+    fig = plt.figure()
+    axes = fig.add_subplot(111, projection='3d')
+    contours = trisurf(err_pd, axes=axes, cmap="inferno")
+    axes.set_aspect("auto")
+    axes.set_title("Error dual velocity")
+    fig.colorbar(contours)
 
     fig = plt.figure()
     axes = fig.add_subplot(111, projection='3d')
@@ -201,16 +239,22 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     plt.figure()
     plt.plot(t_vec, p_P, 'r-', label=r'primal $p$')
     plt.plot(t_vec, pd_P, 'b-', label=r'dual $p$')
-    plt.plot(t_vec, om_t * np.sin(om_x * Ppoint[0]) * np.sin(om_y * Ppoint[1]) * np.cos(om_t * t_vec), 'g-',
-             label=r'exact $p$')
+    plt.plot(t_vec, om_t * np.sin(om_x * Ppoint[0] + phi_x) * np.sin(om_y * Ppoint[1] + phi_y) * \
+             np.cos(om_t * t_vec + phi_t), 'g-', label=r'exact $p$')
     plt.xlabel(r'Time [s]')
     plt.title(r'$p$ at ' + str(Ppoint))
     plt.legend()
 
-    return t_vec, Ep_vec, Ed_vec, Es_vec
+    p_err_LinfL2 = max(p_err_L2)
+    q_err_LinfHrot = max(q_err_Hrot)
+
+    pd_err_LinfH1 = max(pd_err_H1)
+    qd_err_LinfHdiv = max(qd_err_Hdiv)
+
+    return t_vec, Ep_vec, Ed_vec, Es_vec, Hdot_vec, bdflow_vec
 
 
-t_vec, Ep_vec, Ed_vec, Es_vec = compute_sol(10, 100, 1, 1)
+t_vec, Ep_vec, Ed_vec, Es_vec, Hdot_vec, bdflow_vec = compute_sol(10, 100, 2, 2)
 
 plt.figure()
 plt.plot(t_vec, 0.5 * (Ep_vec + Ed_vec), 'g', label=r'Both energies')
@@ -225,5 +269,12 @@ plt.plot(t_vec, 0.5 * (Ep_vec + Ed_vec), 'r', label=r'Both energies')
 plt.plot(t_vec, Es_vec, 'b', label=r'Scattering energy')
 plt.xlabel(r'Time [s]')
 plt.title(r'Energy')
+plt.legend()
+
+
+plt.figure()
+plt.plot(t_vec, Hdot_vec - bdflow_vec, 'b--', label=r'Energy residual')
+plt.xlabel(r'Time [s]')
+plt.title(r'Energy residual')
 plt.legend()
 plt.show()
