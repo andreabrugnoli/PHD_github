@@ -1,5 +1,5 @@
-# geo_case = "2D"
-geo_case = "3D"
+geo_case = "2D"
+# geo_case = "3D"
 
 if geo_case=="2D":
     from FEEC.wave_eq.compute_err_wave2D import compute_err
@@ -9,9 +9,9 @@ import numpy as np
 
 save_res = True
 bc_input = "D"
-n_test = 3
+n_test = 2
 
-n_vec = np.array([2 ** (i+2) for i in range(n_test)])
+n_vec = np.array([2 ** (i+3) for i in range(n_test)])
 h_vec = 1./n_vec
 
 vp_err_deg1 = np.zeros((n_test,))

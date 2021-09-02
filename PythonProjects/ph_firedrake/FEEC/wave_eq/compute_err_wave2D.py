@@ -88,6 +88,10 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     Ed = 0.5 * (inner(p0_d, p0_d) * dx + inner(q0_d, q0_d) * dx)
     Es = 0.5 * (p0 * p0_d * dx + dot(q0, q0_d) * dx)
 
+    Ep = 0.5 * (inner(p0, p0) * dx + inner(q0, q0) * dx)
+    Ed = 0.5 * (inner(p0_d, p0_d) * dx + inner(q0_d, q0_d) * dx)
+    Es = 0.5 * (p0 * p0_d * dx + dot(q0, q0_d) * dx)
+
     Hdot = div(q0_d) * p0_d * dx + inner(grad(p0_d), q0_d) * dx
     bdflow = p0_d * dot(q0_d, n_ver) * ds
 
@@ -140,7 +144,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     pd_err_H1_vec[0] = np.sqrt(assemble((p0_d - v_ex)**2 * dx + dot(grad(p0_d - v_ex), grad(p0_d - v_ex))*dx))
     qd_err_Hdiv_vec[0] = np.sqrt(assemble(dot(q0_d - sig_ex, q0_d - sig_ex) * dx + div(q0_d - sig_ex)**2 * dx))
 
-    Ppoint = (L/7, L/5)
+    Ppoint = (L/6, L/4)
 
     p_P = np.zeros((1+n_t,))
     p_P[0] = interpolate(v_ex, Vp).at(Ppoint)
@@ -157,14 +161,14 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     Hdot_vec[0] = assemble(Hdot)
     bdflow_vec[0] = assemble(bdflow)
 
-    # pn = Function(Vp, name="p primal at t_n")
-    # pn_d = Function(Vp_d, name="p dual at t_n")
-    #
-    # qn = Function(Vq, name="q primal at t_n")
-    # qn_d = Function(Vq_d, name="q dual at t_n")
-    #
-    # err_p = Function(Vp, name="p error primal at t_n")
-    # err_pd = Function(Vp_d, name="p error dual at t_n")
+    pn = Function(Vp, name="p primal at t_n")
+    pn_d = Function(Vp_d, name="p dual at t_n")
+
+    qn = Function(Vq, name="q primal at t_n")
+    qn_d = Function(Vq_d, name="q dual at t_n")
+
+    err_p = Function(Vp, name="p error primal at t_n")
+    err_pd = Function(Vp_d, name="p error dual at t_n")
 
     print("Computation of the solution")
     print("==============")
@@ -179,14 +183,14 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         Hdot_vec[ii+1] = assemble(Hdot)
         bdflow_vec[ii+1] = assemble(bdflow)
 
-        # pn.assign(interpolate(p0, Vp))
-        # pn_d.assign(interpolate(p0_d, Vp_d))
-        #
-        # qn.assign(interpolate(q0, Vq))
-        # qn_d.assign(interpolate(q0_d, Vq_d))
-        #
-        # p_P[ii+1] = pn.at(Ppoint)
-        # pd_P[ii+1] = pn_d.at(Ppoint)
+        pn.assign(interpolate(p0, Vp))
+        pn_d.assign(interpolate(p0_d, Vp_d))
+
+        qn.assign(interpolate(q0, Vq))
+        qn_d.assign(interpolate(q0_d, Vq_d))
+
+        p_P[ii+1] = pn.at(Ppoint)
+        pd_P[ii+1] = pn_d.at(Ppoint)
 
         t.assign(float(t) + float(dt))
         # print("Primal energy")
@@ -209,8 +213,33 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         pd_err_H1_vec[ii + 1] = np.sqrt(assemble((p0_d - v_ex) ** 2 * dx + dot(grad(p0_d - v_ex), grad(p0_d - v_ex)) * dx))
         qd_err_Hdiv_vec[ii + 1] = np.sqrt(assemble(dot(q0_d - sig_ex, q0_d - sig_ex) * dx + div(q0_d - sig_ex) ** 2 * dx))
 
-    # err_p.assign(pn - interpolate(v_ex, Vp))
-    # err_pd.assign(pn_d - interpolate(v_ex, Vp_d))
+    err_p.assign(pn - interpolate(v_ex, Vp))
+    err_pd.assign(pn_d - interpolate(v_ex, Vp_d))
+
+    fig = plt.figure()
+    axes = fig.add_subplot(111, projection='3d')
+    contours = trisurf(err_p, axes=axes, cmap="inferno")
+    axes.set_aspect("auto")
+    axes.set_title("Error primal velocity")
+    fig.colorbar(contours)
+
+    fig = plt.figure()
+    axes = fig.add_subplot(111, projection='3d')
+    contours = trisurf(err_pd, axes=axes, cmap="inferno")
+    axes.set_aspect("auto")
+    axes.set_title("Error dual velocity")
+    fig.colorbar(contours)
+
+    plt.figure()
+    plt.plot(t_vec, p_P, 'r-', label=r'primal $p$')
+    plt.plot(t_vec, pd_P, 'b-', label=r'dual $p$')
+    plt.plot(t_vec, om_t * np.sin(om_x * Ppoint[0] + phi_x) * np.sin(om_y * Ppoint[1] + phi_y) * \
+             np.cos(om_t * t_vec + phi_t), 'g-', label=r'exact $p$')
+    plt.xlabel(r'Time [s]')
+    plt.title(r'$p$ at ' + str(Ppoint))
+    plt.legend()
+
+    plt.show()
 
     # print(r"Initial and final primal energy:")
     # print(r"Inital: ", Ep_vec[0])
@@ -227,19 +256,6 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     # print(r"Final: ", Es_vec[-1])
     # print(r"Delta: ", Es_vec[-1] - Es_vec[0])
 
-    # fig = plt.figure()
-    # axes = fig.add_subplot(111, projection='3d')
-    # contours = trisurf(err_p, axes=axes, cmap="inferno")
-    # axes.set_aspect("auto")
-    # axes.set_title("Error primal velocity")
-    # fig.colorbar(contours)
-    #
-    # fig = plt.figure()
-    # axes = fig.add_subplot(111, projection='3d')
-    # contours = trisurf(err_pd, axes=axes, cmap="inferno")
-    # axes.set_aspect("auto")
-    # axes.set_title("Error dual velocity")
-    # fig.colorbar(contours)
     #
     # fig = plt.figure()
     # axes = fig.add_subplot(111, projection='3d')
@@ -255,16 +271,6 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     # axes.set_title("Dual velocity")
     # fig.colorbar(contours)
 
-    # plt.figure()
-    # plt.plot(t_vec, p_P, 'r-', label=r'primal $p$')
-    # plt.plot(t_vec, pd_P, 'b-', label=r'dual $p$')
-    # plt.plot(t_vec, om_t * np.sin(om_x * Ppoint[0] + phi_x) * np.sin(om_y * Ppoint[1] + phi_y) * \
-    #          np.cos(om_t * t_vec + phi_t), 'g-', label=r'exact $p$')
-    # plt.xlabel(r'Time [s]')
-    # plt.title(r'$p$ at ' + str(Ppoint))
-    # plt.legend()
-    #
-    # plt.show()
 
     # p_err_L2 = max(p_err_L2_vec)
     # q_err_Hrot = max(q_err_Hrot_vec)

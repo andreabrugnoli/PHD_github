@@ -88,10 +88,7 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     # Form defininig the problem
     f_form = m_form - j_form
 
-<<<<<<< HEAD:PythonProjects/ph_firedrake/FEEC/wave_eq/wave.py
-=======
     bc = DirichletBC(V.sub(2), 0, "on_boundary")
->>>>>>> 7a100c73e2c483e3eb6116cdd2be64dab993ad17:PythonProjects/ph_firedrake/FEEC/test_wave.py
 
     t = Constant(0.0)
     w_ex = sin(om_x * x) * sin(om_y * y) * sin(om_t * t)
@@ -104,11 +101,7 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     # rhs = expand_derivatives(diff(uexact, t)) - div(grad(uexact))
 
     dt = Constant(t_fin / n_t)
-<<<<<<< HEAD:PythonProjects/ph_firedrake/FEEC/wave_eq/wave.py
-    butcher_tableau = GaussLegendre(3)
-=======
-    butcher_tableau = GaussLegendre(2)
->>>>>>> 7a100c73e2c483e3eb6116cdd2be64dab993ad17:PythonProjects/ph_firedrake/FEEC/test_wave.py
+    butcher_tableau = GaussLegendre(1)
     # butcher_tableau = LobattoIIIA(2)
 
     params = {"mat_type": "aij",
@@ -248,11 +241,7 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     return t_vec, Ep_vec, Ed_vec, Es_vec, Hdot_vec, bdflow_vec
 
 
-<<<<<<< HEAD:PythonProjects/ph_firedrake/FEEC/wave_eq/wave.py
 t_vec, Ep_vec, Ed_vec, Es_vec, Hdot_vec, bdflow_vec = compute_sol(10, 100, 1, 1)
-=======
-t_vec, Ep_vec, Ed_vec, Es_vec = compute_sol(10, 10, 1, 1)
->>>>>>> 7a100c73e2c483e3eb6116cdd2be64dab993ad17:PythonProjects/ph_firedrake/FEEC/test_wave.py
 
 plt.figure()
 plt.plot(t_vec, 0.5 * (Ep_vec + Ed_vec), 'g', label=r'Both energies')
