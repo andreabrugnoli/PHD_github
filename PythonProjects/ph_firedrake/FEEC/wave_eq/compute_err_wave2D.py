@@ -84,13 +84,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     p0, q0, p0_d, q0_d = split(in_cond)
 
-    Ep = 0.5 * (inner(p0, p0) * dx + inner(q0, q0) * dx)
-    Ed = 0.5 * (inner(p0_d, p0_d) * dx + inner(q0_d, q0_d) * dx)
-    Es = 0.5 * (p0 * p0_d * dx + dot(q0, q0_d) * dx)
-
-    Ep = 0.5 * (inner(p0, p0) * dx + inner(q0, q0) * dx)
-    Ed = 0.5 * (inner(p0_d, p0_d) * dx + inner(q0_d, q0_d) * dx)
-    Es = 0.5 * (p0 * p0_d * dx + dot(q0, q0_d) * dx)
+    E_L2Hdiv = 0.5 * (inner(p0, p0) * dx + inner(q0_d, q0_d) * dx)
+    E_H1Hrot = 0.5 * (inner(p0_d, p0_d) * dx + inner(q0, q0) * dx)
 
     Hdot = div(q0_d) * p0_d * dx + inner(grad(p0_d), q0_d) * dx
     bdflow = p0_d * dot(q0_d, n_ver) * ds
@@ -124,9 +119,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     stepper = TimeStepper(f_form, butcher_tableau, t, dt, in_cond,
                           bcs=bc, solver_parameters=params)
 
-    Ep_vec = np.zeros((1+n_t, ))
-    Ed_vec = np.zeros((1+n_t, ))
-    Es_vec = np.zeros((1+n_t, ))
+    E_L2Hdiv_vec = np.zeros((1 + n_t,))
+    E_H1Hrot_vec = np.zeros((1 + n_t,))
 
     Hdot_vec = np.zeros((1 + n_t,))
     bdflow_vec = np.zeros((1 + n_t,))
@@ -154,9 +148,9 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     t_vec = np.linspace(0, n_t * float(dt), 1 + n_t)
 
-    Ep_vec[0] = assemble(Ep)
-    Ed_vec[0] = assemble(Ed)
-    Es_vec[0] = assemble(Es)
+
+    E_L2Hdiv_vec[0] = assemble(E_L2Hdiv)
+    E_H1Hrot_vec[0] = assemble(E_H1Hrot)
 
     Hdot_vec[0] = assemble(Hdot)
     bdflow_vec[0] = assemble(bdflow)
@@ -175,10 +169,6 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     for ii in tqdm(range(n_t)):
         stepper.advance()
-
-        Ep_vec[ii+1] = assemble(Ep)
-        Ed_vec[ii+1] = assemble(Ed)
-        Es_vec[ii+1] = assemble(Es)
 
         Hdot_vec[ii+1] = assemble(Hdot)
         bdflow_vec[ii+1] = assemble(bdflow)
@@ -241,22 +231,16 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     plt.show()
 
-    # print(r"Initial and final primal energy:")
-    # print(r"Inital: ", Ep_vec[0])
-    # print(r"Final: ", Ep_vec[-1])
-    # print(r"Delta: ", Ep_vec[-1] - Ep_vec[0])
+    # print(r"Initial and final L2Hdiv energy:")
+    # print(r"Inital: ", E_L2Hdiv_vec[0])
+    # print(r"Final: ", E_L2Hdiv_vec[-1])
+    # print(r"Delta: ", E_L2Hdiv_vec[-1] - E_L2Hdiv_vec[0])
     #
-    # print(r"Initial and final dual energy:")
-    # print(r"Inital: ", Ed_vec[0])
-    # print(r"Final: ", Ed_vec[-1])
-    # print(r"Delta: ", Ed_vec[-1] - Ed_vec[0])
-    #
-    # print(r"Initial and final scattering energy:")
-    # print(r"Inital: ", Es_vec[0])
-    # print(r"Final: ", Es_vec[-1])
-    # print(r"Delta: ", Es_vec[-1] - Es_vec[0])
+    # print(r"Initial and final H1Hrot energy:")
+    # print(r"Inital: ", E_H1Hrot_vec[0])
+    # print(r"Final: ", E_H1Hrot_vec[-1])
+    # print(r"Delta: ", E_H1Hrot_vec[-1] - E_H1Hrot_vec[0])
 
-    #
     # fig = plt.figure()
     # axes = fig.add_subplot(111, projection='3d')
     # contours = trisurf(pn, axes=axes, cmap="inferno")
@@ -284,8 +268,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     pd_err_H1 = pd_err_H1_vec[-1]
     qd_err_Hdiv = qd_err_Hdiv_vec[-1]
 
-    dict_res = {"t_span": t_vec, "energy_p": Ep_vec, "energy_d": Ed_vec, "energy_s": Es_vec, "power": Hdot_vec, \
-                "flow": bdflow_vec, "p_err": p_err_L2, "q_err": q_err_Hrot, "pd_err": pd_err_H1, "qd_err": qd_err_Hdiv}
+    dict_res = {"t_span": t_vec, "power": Hdot_vec, "flow": bdflow_vec, "p_err": p_err_L2, \
+                "q_err": q_err_Hrot, "pd_err": pd_err_H1, "qd_err": qd_err_Hdiv}
 
     return dict_res
 
