@@ -11,7 +11,7 @@ from vedo.dolfin import plot
 
 tol = 1e-10
 
-L = 1
+L = 10
 n_el = 1
 deg = 1
 
@@ -20,8 +20,8 @@ mesh = BoxMesh(Point(0,0,0), Point(L, L, L), n_el, n_el, n_el)
 # domain = mshr.Box(Point(0,0,0), Point(L,L,L))
 # mesh = mshr.generate_mesh(domain, n_el)
 
-# mesh_plot = plot(mesh) # mode="mesh", interactive=0
-
+mesh_plot = plot(mesh) # mode="mesh", interactive=0
+plt.show()
 # vmesh = mesh_plot.actors[0].lineWidth(0)
 # vmesh.cutWithPlane(origin=(0,0,0), normal=(1,-1,0))
 # plot(vmesh, interactive=1)
@@ -39,7 +39,7 @@ mesh = BoxMesh(Point(0,0,0), Point(L, L, L), n_el, n_el, n_el)
 
 P_0 = FiniteElement("CG", tetrahedron, deg, variant='point')
 P_1 = FiniteElement("N1curl", tetrahedron, deg, variant='integral')
-P_2 = FiniteElement("N1div", tetrahedron, deg, variant='point')
+P_2 = FiniteElement("N1div", tetrahedron, deg, variant='integral')
 P_3 = FiniteElement("DG", tetrahedron, deg-1, variant='point')
 
 V_0 = FunctionSpace(mesh, P_0)

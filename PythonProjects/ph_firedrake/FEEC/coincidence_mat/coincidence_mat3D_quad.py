@@ -16,10 +16,12 @@ deg = 1
 mesh_quad = UnitSquareMesh(n_el, n_el, quadrilateral=True)
 mesh = ExtrudedMesh(mesh_quad, n_el)
 
-P_0 = FiniteElement("CG", hexahedron, deg, variant="spectral")
-P_1 = FiniteElement("NCE", hexahedron, deg, variant="spectral")
-P_2 = FiniteElement("NCF", hexahedron, deg, variant="equispaced")
-P_3 = FiniteElement("DG", hexahedron, deg-1, variant="equispaced")
+# mesh = CubeMesh(n_el, n_el, n_el, L)
+
+P_0 = FiniteElement("CG", hexahedron, deg)
+P_1 = FiniteElement("NCE", hexahedron, deg)
+P_2 = FiniteElement("NCF", hexahedron, deg)
+P_3 = FiniteElement("DG", hexahedron, deg-1)
 
 V_0 = FunctionSpace(mesh, P_0)
 V_1 = FunctionSpace(mesh, P_1)

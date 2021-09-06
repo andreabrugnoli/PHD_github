@@ -9,12 +9,14 @@ import matplotlib.pyplot as plt
 
 tol = 1e-10
 
-L = 1
-n_el = 1
+L = 2
+n_el = 6
 deg = 1
 
 mesh = RectangleMesh(n_el, n_el, L, L)
 
+# triplot(mesh)
+# plt.show()
 
 def curl2D(u):
     return as_vector([- u.dx(1), u.dx(0)])
@@ -24,8 +26,8 @@ def rot2D(u_vec):
 
 
 P_0 = FiniteElement("CG", triangle, deg)
-# P_1 = FiniteElement("N1curl", triangle, deg)
-P_1 = FiniteElement("RT", triangle, deg)
+P_1 = FiniteElement("N1curl", triangle, deg)
+# P_1 = FiniteElement("RT", triangle, deg)
 P_2 = FiniteElement("DG", triangle, deg-1)
 
 V_0 = FunctionSpace(mesh, P_0)

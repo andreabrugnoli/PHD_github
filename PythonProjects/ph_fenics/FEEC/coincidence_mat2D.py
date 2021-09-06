@@ -14,13 +14,12 @@ L = 1
 n_el = 1
 deg = 1
 
-mesh = RectangleMesh(Point(0, 0), Point(L, L), n_el, n_el, "right/left")
+# mesh = RectangleMesh(Point(0, 0), Point(L, L), n_el, n_el)
+domain = mshr.Rectangle(Point(0,0,0), Point(L,L,L))
+mesh = mshr.generate_mesh(domain, n_el)
 
-# domain = mshr.Square(Point(0,0,0), Point(L,L,L))
-# mesh = mshr.generate_mesh(domain, n_el)
-
-# plot(mesh)
-# plt.show()
+plot(mesh)
+plt.show()
 
 
 def curl2D(u):
@@ -104,5 +103,5 @@ D_1.tolil()
 
 D_1[abs(D_1) < tol] = 0.0
 print("D_1")
-print(D_1)
-# print(D_1[abs(D_1)>tol])
+# print(D_1)
+print(D_1[abs(D_1)>tol])

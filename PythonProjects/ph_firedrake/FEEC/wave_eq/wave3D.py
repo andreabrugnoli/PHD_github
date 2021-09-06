@@ -29,7 +29,7 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
 
        """
 
-    L = 1/2
+    L = 3/4
     mesh = CubeMesh(n_el, n_el, n_el, L)
     n_ver = FacetNormal(mesh)
 
@@ -65,15 +65,15 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
 
     x, y, z = SpatialCoordinate(mesh)
 
-    om_x = pi
-    om_y = pi
-    om_z = pi
+    om_x = 2*pi
+    om_y = 2*pi
+    om_z = 2*pi
 
     om_t = np.sqrt(om_x ** 2 + om_y ** 2 + om_z ** 2)
-    phi_x = 1
-    phi_y = 2
-    phi_z = 2
-    phi_t = 3
+    phi_x = 0
+    phi_y = 0
+    phi_z = 0
+    phi_t = 0
 
     t = Constant(0.0)
     w_ex = sin(om_x * x + phi_x) * sin(om_y * y + phi_y) * sin(om_z * z + phi_z) * sin(om_t * t + phi_t)
@@ -90,15 +90,15 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     # v0_d = interpolate(v_ex, V.sub(2).collapse())
     # sig0_d = interpolate(sig_ex, V.sub(3).collapse())
 
-    print("int1")
+    # print("int1")
     v0 = interpolate(v_ex, Vp)
-    print("int2")
+    # print("int2")
     sig0 = interpolate(sig_ex, Vq)
-    print("int3")
+    # print("int3")
     v0_d = interpolate(v_ex, Vp_d)
-    print("int4")
+    # print("int4")
     sig0_d = interpolate(sig_ex, Vq_d)
-    print("int_fin")
+    # print("int_fin")
 
     in_cond = Function(V)
     in_cond.sub(0).assign(v0)
@@ -121,7 +121,7 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
 
     # Check for sign in adjoint system
     j_form = dot(vp, div(q0_d)) * dx + dot(vq, grad(p0_d)) * dx - dot(grad(vp_d), q0) * dx - dot(div(vq_d), p0) * dx \
-               + vp_d * dot(q0_d, n_ver) * ds + dot(vq_d, n_ver) * p0_d * ds
+                + vp_d * dot(q0_d, n_ver) * ds + dot(vq_d, n_ver) * p0_d * ds
     # Form defininig the problem
     f_form = m_form - j_form
 
@@ -228,10 +228,10 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
 
     return dict_res
 
-n_elem = 3
-pol_deg = 3
+n_elem = 8
+pol_deg = 2
 
-n_time = 50
+n_time = 100
 t_fin = 1
 
 results = compute_sol(n_elem, n_time, pol_deg, t_fin)
