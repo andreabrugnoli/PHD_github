@@ -13,9 +13,10 @@ L = 1
 n_el = 3
 deg = 1
 
-mesh = CubeMesh(n_el, n_el, n_el, L)
-# triplot(mesh)
-# plt.show()
+mesh = Mesh("/home/andrea/cube.msh")
+# mesh = CubeMesh(n_el, n_el, n_el, L)
+triplot(mesh)
+plt.show()
 
 P_0 = FiniteElement("CG", tetrahedron, deg)
 P_1 = FiniteElement("N1curl", tetrahedron, deg, variant='point')

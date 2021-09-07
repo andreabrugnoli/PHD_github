@@ -13,12 +13,13 @@ L = 1
 n_el = 2
 deg = 1
 
-mesh = CubeMesh(n_el, n_el, n_el, L)
+mesh = Mesh("/home/andrea/cube.msh")
+# mesh = CubeMesh(n_el, n_el, n_el, L)
 # triplot(mesh)
 # plt.show()
 
 P_0 = FiniteElement("CG", tetrahedron, deg)
-P_1 = FiniteElement("N1curl", tetrahedron, deg, variant='point')
+P_1 = FiniteElement("N1curl", tetrahedron, deg, variant='integral')
 P_2 = FiniteElement("RT", tetrahedron, deg, variant='integral')
 P_3 = FiniteElement("DG", tetrahedron, deg-1)
 
