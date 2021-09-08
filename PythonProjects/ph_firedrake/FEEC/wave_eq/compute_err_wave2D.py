@@ -27,9 +27,6 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
        """
 
-    def rot2D(u_vec):
-        return u_vec[1].dx(0) - u_vec[0].dx(1)
-
     L = 1
     mesh = RectangleMesh(n_el, n_el, L, L, quadrilateral=False)
     n_ver = FacetNormal(mesh)
@@ -64,8 +61,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     x, y = SpatialCoordinate(mesh)
 
-    om_x = 3*pi
-    om_y = 3*pi
+    om_x = 2*pi
+    om_y = 2*pi
     om_t = np.sqrt(om_x ** 2 + om_y ** 2)
     phi_x = 1
     phi_y = 2
@@ -78,9 +75,20 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     sig_ex = as_vector([om_x * cos(om_x * x + phi_x) * sin(om_y * y + phi_y) * sin(om_t * t + phi_t),
                         om_y * sin(om_x * x + phi_x) * cos(om_y * y + phi_y) * sin(om_t * t + phi_t)])
 
+    v0 = interpolate(v_ex, Vp)
+    sig0 = interpolate(sig_ex, Vq)
+
+    v0_d = interpolate(v_ex, Vp_d)
+    sig0_d = interpolate(sig_ex, Vq_d)
+
+    in_cond = Function(V)
+    in_cond.sub(0).assign(v0)
+    in_cond.sub(1).assign(sig0)
+    in_cond.sub(2).assign(v0_d)
+    in_cond.sub(3).assign(sig0_d)
 
     # v0 = om_t*sin(om_x*x)*sin(om_y*y)
-    in_cond = project(as_vector([v_ex, sig_ex[0], sig_ex[1], v_ex, sig_ex[0], sig_ex[1]]), V)
+    # in_cond = project(as_vector([v_ex, sig_ex[0], sig_ex[1], v_ex, sig_ex[0], sig_ex[1]]), V)
 
     p0, q0, p0_d, q0_d = split(in_cond)
 
@@ -131,12 +139,15 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     pd_err_H1_vec = np.zeros((1 + n_t,))
     qd_err_Hdiv_vec = np.zeros((1 + n_t,))
 
-    p_err_L2_vec[0] = np.sqrt(assemble((p0 - v_ex)**2 * dx))
-    q_err_Hrot_vec[0] = np.sqrt(assemble(dot(q0 - sig_ex, q0 - sig_ex) * dx))
-    # q_err_Hrot_vec[0] = np.sqrt(assemble(dot(q0 - sig_ex, q0 - sig_ex) * dx + rot2D(q0 - sig_ex)**2*dx))
+    # p_err_L2_vec[0] = np.sqrt(assemble((p0 - v_ex)**2 * dx))
+    # q_err_Hrot_vec[0] = np.sqrt(assemble(dot(q0 - sig_ex, q0 - sig_ex) * dx))
+    # pd_err_H1_vec[0] = np.sqrt(assemble((p0_d - v_ex)**2 * dx + dot(grad(p0_d - v_ex), grad(p0_d - v_ex))*dx))
+    # qd_err_Hdiv_vec[0] = np.sqrt(assemble(dot(q0_d - sig_ex, q0_d - sig_ex) * dx + div(q0_d - sig_ex)**2 * dx))
 
-    pd_err_H1_vec[0] = np.sqrt(assemble((p0_d - v_ex)**2 * dx + dot(grad(p0_d - v_ex), grad(p0_d - v_ex))*dx))
-    qd_err_Hdiv_vec[0] = np.sqrt(assemble(dot(q0_d - sig_ex, q0_d - sig_ex) * dx + div(q0_d - sig_ex)**2 * dx))
+    p_err_L2_vec[0] = errornorm(v_ex, v0, norm_type="L2")
+    q_err_Hrot_vec[0] = errornorm(sig_ex, sig0, norm_type="L2")
+    pd_err_H1_vec[0] = errornorm(v_ex, v0_d, norm_type="H1")
+    qd_err_Hdiv_vec[0] = errornorm(sig_ex, sig0_d, norm_type="Hdiv")
 
     Ppoint = (L/6, L/4)
 
@@ -179,57 +190,48 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         qn.assign(interpolate(q0, Vq))
         qn_d.assign(interpolate(q0_d, Vq_d))
 
-        p_P[ii+1] = pn.at(Ppoint)
-        pd_P[ii+1] = pn_d.at(Ppoint)
-
         t.assign(float(t) + float(dt))
-        # print("Primal energy")
-        # print("{0:1.1e} {1:5e}".format(float(t), Ep_vec[ii]))
-        # print("Dual energy")
-        # print("{0:1.1e} {1:5e}".format(float(t), Ed_vec[ii]))
-        # print("Scattering energy")
-        # print("{0:1.1e} {1:5e}".format(float(t), Es_vec[ii]))
 
-        # p_err_L2_vec[ii + 1] = np.sqrt(assemble((pn - v_ex) ** 2 * dx))
-        # q_err_Hrot_vec[ii + 1] = np.sqrt(assemble(dot(qn - sig_ex, qn - sig_ex) * dx + rot2D(qn - sig_ex) ** 2 * dx))
-        #
-        # pd_err_H1_vec[ii + 1] = np.sqrt(assemble((pn_d - v_ex) ** 2 * dx + dot(grad(pn_d - v_ex), grad(pn_d - v_ex)) * dx))
-        # qd_err_Hdiv_vec[ii + 1] = np.sqrt(assemble(dot(qn_d - sig_ex, qn_d - sig_ex) * dx + div(qn_d - sig_ex) ** 2 * dx))
+        # p_err_L2_vec[ii + 1] = np.sqrt(assemble((p0 - v_ex) ** 2 * dx))
+        # q_err_Hrot_vec[ii + 1] = np.sqrt(assemble(dot(q0 - sig_ex, q0 - sig_ex) * dx))
+        # pd_err_H1_vec[ii + 1] = np.sqrt(assemble((p0_d - v_ex) ** 2 * dx + dot(grad(p0_d - v_ex), grad(p0_d - v_ex)) * dx))
+        # qd_err_Hdiv_vec[ii + 1] = np.sqrt(assemble(dot(q0_d - sig_ex, q0_d - sig_ex) * dx + div(q0_d - sig_ex) ** 2 * dx))
 
-        p_err_L2_vec[ii + 1] = np.sqrt(assemble((p0 - v_ex) ** 2 * dx))
-        q_err_Hrot_vec[ii + 1] = np.sqrt(assemble(dot(q0 - sig_ex, q0 - sig_ex) * dx))
-        # q_err_Hrot_vec[ii + 1] = np.sqrt(assemble(dot(q0 - sig_ex, q0 - sig_ex) * dx + rot2D(q0 - sig_ex) ** 2 * dx))
+        p_err_L2_vec[ii + 1] = errornorm(v_ex, pn, norm_type="L2")
+        q_err_Hrot_vec[ii + 1] = errornorm(sig_ex, qn, norm_type="L2")
+        pd_err_H1_vec[ii + 1] = errornorm(v_ex, pn_d, norm_type="H1")
+        qd_err_Hdiv_vec[ii + 1] = errornorm(sig_ex, qn_d, norm_type="Hdiv")
 
-        pd_err_H1_vec[ii + 1] = np.sqrt(assemble((p0_d - v_ex) ** 2 * dx + dot(grad(p0_d - v_ex), grad(p0_d - v_ex)) * dx))
-        qd_err_Hdiv_vec[ii + 1] = np.sqrt(assemble(dot(q0_d - sig_ex, q0_d - sig_ex) * dx + div(q0_d - sig_ex) ** 2 * dx))
+        # p_P[ii+1] = pn.at(Ppoint)
+        # pd_P[ii+1] = pn_d.at(Ppoint)
 
-    err_p.assign(pn - interpolate(v_ex, Vp))
-    err_pd.assign(pn_d - interpolate(v_ex, Vp_d))
-
-    fig = plt.figure()
-    axes = fig.add_subplot(111, projection='3d')
-    contours = trisurf(err_p, axes=axes, cmap="inferno")
-    axes.set_aspect("auto")
-    axes.set_title("Error primal velocity")
-    fig.colorbar(contours)
-
-    fig = plt.figure()
-    axes = fig.add_subplot(111, projection='3d')
-    contours = trisurf(err_pd, axes=axes, cmap="inferno")
-    axes.set_aspect("auto")
-    axes.set_title("Error dual velocity")
-    fig.colorbar(contours)
-
-    plt.figure()
-    plt.plot(t_vec, p_P, 'r-', label=r'primal $p$')
-    plt.plot(t_vec, pd_P, 'b-', label=r'dual $p$')
-    plt.plot(t_vec, om_t * np.sin(om_x * Ppoint[0] + phi_x) * np.sin(om_y * Ppoint[1] + phi_y) * \
-             np.cos(om_t * t_vec + phi_t), 'g-', label=r'exact $p$')
-    plt.xlabel(r'Time [s]')
-    plt.title(r'$p$ at ' + str(Ppoint))
-    plt.legend()
-
-    plt.show()
+    # err_p.assign(pn - interpolate(v_ex, Vp))
+    # err_pd.assign(pn_d - interpolate(v_ex, Vp_d))
+    #
+    # fig = plt.figure()
+    # axes = fig.add_subplot(111, projection='3d')
+    # contours = trisurf(err_p, axes=axes, cmap="inferno")
+    # axes.set_aspect("auto")
+    # axes.set_title("Error primal velocity")
+    # fig.colorbar(contours)
+    #
+    # fig = plt.figure()
+    # axes = fig.add_subplot(111, projection='3d')
+    # contours = trisurf(err_pd, axes=axes, cmap="inferno")
+    # axes.set_aspect("auto")
+    # axes.set_title("Error dual velocity")
+    # fig.colorbar(contours)
+    #
+    # plt.figure()
+    # plt.plot(t_vec, p_P, 'r-', label=r'primal $p$')
+    # plt.plot(t_vec, pd_P, 'b-', label=r'dual $p$')
+    # plt.plot(t_vec, om_t * np.sin(om_x * Ppoint[0] + phi_x) * np.sin(om_y * Ppoint[1] + phi_y) * \
+    #          np.cos(om_t * t_vec + phi_t), 'g-', label=r'exact $p$')
+    # plt.xlabel(r'Time [s]')
+    # plt.title(r'$p$ at ' + str(Ppoint))
+    # plt.legend()
+    #
+    # plt.show()
 
     # print(r"Initial and final L2Hdiv energy:")
     # print(r"Inital: ", E_L2Hdiv_vec[0])
@@ -268,8 +270,9 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     pd_err_H1 = pd_err_H1_vec[-1]
     qd_err_Hdiv = qd_err_Hdiv_vec[-1]
 
-    dict_res = {"t_span": t_vec, "power": Hdot_vec, "flow": bdflow_vec, "p_err": p_err_L2, \
-                "q_err": q_err_Hrot, "pd_err": pd_err_H1, "qd_err": qd_err_Hdiv}
+    dict_res = {"t_span": t_vec, "power": Hdot_vec, "flow": bdflow_vec, "err_p3": p_err_L2,\
+                "err_u1": q_err_Hrot, "err_p0": pd_err_H1, "err_u2": qd_err_Hdiv, \
+                "err_p30": None, "err_u12": None}
 
     return dict_res
 
