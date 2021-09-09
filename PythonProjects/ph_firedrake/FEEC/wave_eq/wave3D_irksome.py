@@ -117,6 +117,8 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     Hdot = div(q0_d) * p0_d * dx + inner(grad(p0_d), q0_d) * dx
     bdflow = p0_d * dot(q0_d, n_ver) * ds
 
+    bdflow_ex = v_ex * dot(sig_ex, n_ver) * ds
+
     m_form = inner(vp, Dt(p0)) * dx + inner(vq, Dt(q0)) * dx + inner(vp_d, Dt(p0_d)) * dx + inner(vq_d, Dt(q0_d)) * dx
 
     # Check for sign in adjoint system
@@ -148,6 +150,8 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
 
     Hdot_vec = np.zeros((1 + n_t,))
     bdflow_vec = np.zeros((1 + n_t,))
+
+    bdflow_ex_vec = np.zeros((1 + n_t,))
 
     Ppoint = (L/5, L/5, L/5)
 
@@ -190,6 +194,8 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
         pd_P[ii+1] = pn_d.at(Ppoint)
 
         t.assign(float(t) + float(dt))
+        bdflow_ex_vec[ii + 1] = assemble(bdflow_ex)
+
         # print("Primal energy")
         # print("{0:1.1e} {1:5e}".format(float(t), Ep_vec[ii]))
         # print("Dual energy")
@@ -228,8 +234,8 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
 
     return dict_res
 
-n_elem = 10
-pol_deg = 1
+n_elem = 2
+pol_deg = 2
 
 n_time = 100
 t_fin = 1

@@ -104,6 +104,8 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     Hdot = div(q0_d) * p0_d * dx + inner(grad(p0_d), q0_d) * dx
     bdflow = p0_d * dot(q0_d, n_ver) * ds
 
+    bdflow_ex = v_ex * dot(sig_ex, n_ver) * ds
+
     m_form = inner(vp, Dt(p0)) * dx + inner(vq, Dt(q0)) * dx + inner(vp_d, Dt(p0_d)) * dx + inner(vq_d, Dt(q0_d)) * dx
 
     # Check for sign in adjoint system
@@ -117,7 +119,7 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     # rhs = expand_derivatives(diff(uexact, t)) - div(grad(uexact))
 
     dt = Constant(t_fin / n_t)
-    butcher_tableau = GaussLegendre(1)
+    butcher_tableau = GaussLegendre(3)
     # butcher_tableau = LobattoIIIA(2)
 
     params = {"mat_type": "aij",
@@ -136,6 +138,7 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
 
     Hdot_vec = np.zeros((1 + n_t,))
     bdflow_vec = np.zeros((1 + n_t,))
+    bdflow_ex_vec = np.zeros((1 + n_t,))
 
     Ppoint = (L/5, L/5)
 
@@ -149,6 +152,7 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
 
     Hdot_vec[0] = assemble(Hdot)
     bdflow_vec[0] = assemble(bdflow)
+    bdflow_ex_vec[0] = assemble(bdflow_ex)
 
     E_L2Hdiv_vec[0] = assemble(E_L2Hdiv)
     E_H1Hrot_vec[0] = assemble(E_H1Hrot)
@@ -178,12 +182,7 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
         pd_P[ii+1] = pn_d.at(Ppoint)
 
         t.assign(float(t) + float(dt))
-        # print("Primal energy")
-        # print("{0:1.1e} {1:5e}".format(float(t), Ep_vec[ii]))
-        # print("Dual energy")
-        # print("{0:1.1e} {1:5e}".format(float(t), Ed_vec[ii]))
-        # print("Scattering energy")
-        # print("{0:1.1e} {1:5e}".format(float(t), Es_vec[ii]))
+        bdflow_ex_vec[ii + 1] = assemble(bdflow_ex)
 
     err_p.assign(pn - interpolate(v_ex, Vp))
     err_pd.assign(pn_d - interpolate(v_ex, Vp_d))
@@ -240,20 +239,21 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     plt.legend()
 
     dict_res = {"t_span": t_vec, "power": Hdot_vec, \
-                "flow": bdflow_vec, "energy_L2Hdiv": E_L2Hdiv_vec, "energy_H1Hrot": E_H1Hrot_vec}
+                "flow": bdflow_vec, "flow_ex": bdflow_ex_vec, "energy_L2Hdiv": E_L2Hdiv_vec, "energy_H1Hrot": E_H1Hrot_vec}
 
     return dict_res
 
-n_elem = 30
-pol_deg = 2
+n_elem = 10
+pol_deg = 3
 
-n_time = 100
+n_time = 1000
 t_fin = 1
 results = compute_sol(n_elem, n_time, pol_deg, t_fin)
 
 t_vec = results["t_span"]
 Hdot_vec = results["power"]
 bdflow_vec = results["flow"]
+bdflow_ex_vec = results["flow_ex"]
 
 EL2Hdiv = results["energy_L2Hdiv"]
 EH1Hcurl = results["energy_H1Hrot"]
@@ -271,6 +271,14 @@ plt.plot(t_vec, Hdot_vec - bdflow_vec, 'ro', label=r'Energy residual')
 plt.xlabel(r'Time [s]')
 plt.title(r'Energy residual')
 plt.legend()
+
+plt.figure()
+plt.plot(t_vec, bdflow_vec, 'r', label=r'bd flow')
+plt.plot(t_vec, bdflow_ex_vec, 'b', label=r'bd flow ex')
+plt.xlabel(r'Time [s]')
+plt.title(r'Boundary flow')
+plt.legend()
+
 
 diffH_L2Hdiv = np.diff(EL2Hdiv)
 diffH_H1Hcurl = np.diff(EH1Hcurl)

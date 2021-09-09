@@ -122,8 +122,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     # rhs = expand_derivatives(diff(uexact, t)) - div(grad(uexact))
 
     dt = Constant(t_fin / n_t)
-    butcher_tableau = GaussLegendre(deg)
-    # butcher_tableau = LobattoIIIA(2)
+    butcher_tableau = GaussLegendre(1)
 
     params = {"mat_type": "aij",
               "snes_type": "ksponly",
@@ -157,6 +156,11 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     pd_err_H1_vec[0] = np.sqrt(assemble((p0_d - v_ex)**2 * dx + dot(grad(p0_d - v_ex), grad(p0_d - v_ex))*dx))
     qd_err_Hdiv_vec[0] = np.sqrt(assemble(dot(q0_d - sig_ex, q0_d - sig_ex) * dx + dot(div(q0_d - sig_ex), div(q0_d - sig_ex)) * dx))
+
+    # p_err_L2_vec[0] = errornorm(v_ex, v0, norm_type="L2")
+    # q_err_Hcurl_vec[0] = errornorm(sig_ex, sig0, norm_type="L2")
+    # pd_err_H1_vec[0] = errornorm(v_ex, v0_d, norm_type="H1")
+    # qd_err_Hdiv_vec[0] = errornorm(sig_ex, sig0_d, norm_type="Hdiv")
 
     # Ppoint = (L/7, L/5, L/3)
     #
@@ -194,6 +198,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         E_L2Hdiv_vec[ii+1] = assemble(E_L2Hdiv)
         E_H1Hrot_vec[ii+1] = assemble(E_H1Hrot)
 
+        t.assign(float(t) + float(dt))
+
         # pn.assign(interpolate(p0, Vp))
         # pn_d.assign(interpolate(p0_d, Vp_d))
         #
@@ -203,13 +209,11 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         # p_P[ii+1] = pn.at(Ppoint)
         # pd_P[ii+1] = pn_d.at(Ppoint)
 
-        t.assign(float(t) + float(dt))
-        # print("Primal energy")
-        # print("{0:1.1e} {1:5e}".format(float(t), Ep_vec[ii]))
-        # print("Dual energy")
-        # print("{0:1.1e} {1:5e}".format(float(t), Ed_vec[ii]))
-        # print("Scattering energy")
-        # print("{0:1.1e} {1:5e}".format(float(t), Es_vec[ii]))
+        # p_err_L2_vec[ii + 1] = errornorm(v_ex, pn, norm_type="L2")
+        # q_err_Hcurl_vec[ii + 1] = errornorm(sig_ex, qn, norm_type="L2")
+        # pd_err_H1_vec[ii + 1] = errornorm(v_ex, pn_d, norm_type="H1")
+        # qd_err_Hdiv_vec[ii + 1] = errornorm(sig_ex, qn_d, norm_type="Hdiv")
+
 
         p_err_L2_vec[ii + 1] = np.sqrt(assemble((p0 - v_ex) ** 2 * dx))
         q_err_Hcurl_vec[ii + 1] = np.sqrt(assemble(dot(q0 - sig_ex, q0 - sig_ex)*dx))

@@ -87,7 +87,6 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     in_cond.sub(2).assign(v0_d)
     in_cond.sub(3).assign(sig0_d)
 
-    # v0 = om_t*sin(om_x*x)*sin(om_y*y)
     # in_cond = project(as_vector([v_ex, sig_ex[0], sig_ex[1], v_ex, sig_ex[0], sig_ex[1]]), V)
 
     p0, q0, p0_d, q0_d = split(in_cond)
@@ -110,8 +109,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     # rhs = expand_derivatives(diff(uexact, t)) - div(grad(uexact))
 
     dt = Constant(t_fin / n_t)
-    butcher_tableau = GaussLegendre(deg)
-    # butcher_tableau = LobattoIIIA(2)
+    butcher_tableau = GaussLegendre(2)
 
     params = {"mat_type": "aij",
               "snes_type": "ksponly",
@@ -158,7 +156,6 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     pd_P[0] = interpolate(v_ex, Vp_d).at(Ppoint)
 
     t_vec = np.linspace(0, n_t * float(dt), 1 + n_t)
-
 
     E_L2Hdiv_vec[0] = assemble(E_L2Hdiv)
     E_H1Hrot_vec[0] = assemble(E_H1Hrot)
@@ -257,6 +254,10 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     # axes.set_title("Dual velocity")
     # fig.colorbar(contours)
 
+    # p_err_L2 = np.sqrt(np.sum(float(dt) * np.power(p_err_L2_vec, 2)))
+    # q_err_Hrot = np.sqrt(np.sum(float(dt) * np.power(q_err_Hrot_vec, 2)))
+    # pd_err_H1 = np.sqrt(np.sum(float(dt) * np.power(pd_err_H1_vec, 2)))
+    # qd_err_Hdiv = np.sqrt(np.sum(float(dt) * np.power(qd_err_Hdiv_vec, 2)))
 
     # p_err_L2 = max(p_err_L2_vec)
     # q_err_Hrot = max(q_err_Hrot_vec)
