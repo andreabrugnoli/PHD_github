@@ -27,7 +27,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
        """
 
-    L = 1
+    L = 1/2
     mesh = RectangleMesh(n_el, n_el, L, L, quadrilateral=False)
     n_ver = FacetNormal(mesh)
 
@@ -61,12 +61,12 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     x, y = SpatialCoordinate(mesh)
 
-    om_x = 2*pi
-    om_y = 2*pi
+    om_x = pi
+    om_y = pi
     om_t = np.sqrt(om_x ** 2 + om_y ** 2)
-    phi_x = 1
-    phi_y = 2
-    phi_t = 3
+    phi_x = 0
+    phi_y = 0
+    phi_t = 0
 
     t = Constant(0.0)
     w_ex = sin(om_x * x + phi_x) * sin(om_y * y + phi_y) * sin(om_t * t + phi_t)
@@ -143,7 +143,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     # qd_err_Hdiv_vec[0] = np.sqrt(assemble(dot(q0_d - sig_ex, q0_d - sig_ex) * dx + div(q0_d - sig_ex)**2 * dx))
 
     p_err_L2_vec[0] = errornorm(v_ex, v0, norm_type="L2")
-    q_err_Hrot_vec[0] = errornorm(sig_ex, sig0, norm_type="L2")
+    q_err_Hrot_vec[0] = errornorm(sig_ex, sig0, norm_type="Hcurl")
     pd_err_H1_vec[0] = errornorm(v_ex, v0_d, norm_type="H1")
     qd_err_Hdiv_vec[0] = errornorm(sig_ex, sig0_d, norm_type="Hdiv")
 
@@ -195,9 +195,9 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         # qd_err_Hdiv_vec[ii + 1] = np.sqrt(assemble(dot(q0_d - sig_ex, q0_d - sig_ex) * dx + div(q0_d - sig_ex) ** 2 * dx))
 
         p_err_L2_vec[ii + 1] = errornorm(v_ex, pn, norm_type="L2")
-        q_err_Hrot_vec[ii + 1] = errornorm(sig_ex, qn, norm_type="L2")
+        q_err_Hrot_vec[ii + 1] = errornorm(sig_ex, qn, norm_type="Hcurl")
         pd_err_H1_vec[ii + 1] = errornorm(v_ex, pn_d, norm_type="H1")
-        qd_err_Hdiv_vec[ii + 1] = errornorm(sig_ex, qn_d, norm_type="Hdiv")
+        qd_err_Hdiv_vec[ii + 1] = errornorm(sig_ex, qn_d, norm_type="L2")
 
         # p_P[ii+1] = pn.at(Ppoint)
         # pd_P[ii+1] = pn_d.at(Ppoint)

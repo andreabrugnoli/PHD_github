@@ -276,7 +276,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         ## Integration of 10 system using unmid_2
 
         pnmid_3, unmid_2 = enmid_32.split()
-        b_form10 = m_form10(v_1, un_1, v_0, pn_0) + dt*(0.5*j_form10(v_1, un_1, v_0, pn_0) + bdflow10(v_0, unmid_2))
+        # b_form10 = m_form10(v_1, un_1, v_0, pn_0) + dt*(0.5*j_form10(v_1, un_1, v_0, pn_0) + bdflow10(v_0, unmid_2))
+        b_form10 = m_form10(v_1, un_1, v_0, pn_0) + dt*0.5*j_form10(v_1, un_1, v_0, pn_0)
 
         b_vec10 = assemble(b_form10)
 
@@ -331,72 +332,72 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         err_p30_vec[ii+1] = errornorm(Constant(0), diffn_p30, norm_type="L2")
         err_u12_vec[ii+1] = errornorm(Constant((0.0, 0.0)), diffn_u12, norm_type="L2")
 
-        p_3P[ii + 1] = pn_3.at(Ppoint)
-        p_0P[ii + 1] = pn_0.at(Ppoint)
-
-    err_p3.assign(pn_3 - interpolate(p_ex, V_3))
-    err_p0.assign(pn_0 - interpolate(p_ex, V_0))
-
-    fig = plt.figure()
-    axes = fig.add_subplot(111, projection='3d')
-    contours = trisurf(err_p3, axes=axes, cmap="inferno")
-    axes.set_aspect("auto")
-    axes.set_title("Error $p_3$")
-    fig.colorbar(contours)
-
-    fig = plt.figure()
-    axes = fig.add_subplot(111, projection='3d')
-    contours = trisurf(err_p0, axes=axes, cmap="inferno")
-    axes.set_aspect("auto")
-    axes.set_title("Error $p_0$")
-    fig.colorbar(contours)
-
-    fig = plt.figure()
-    axes = fig.add_subplot(111, projection='3d')
-    contours = trisurf(interpolate(p_ex, V_3), axes=axes, cmap="inferno")
-    axes.set_aspect("auto")
-    axes.set_title("$p_3$ Exact")
-    fig.colorbar(contours)
-
-    fig = plt.figure()
-    axes = fig.add_subplot(111, projection='3d')
-    contours = trisurf(interpolate(p_ex, V_0), axes=axes, cmap="inferno")
-    axes.set_aspect("auto")
-    axes.set_title("$p_0$ Exact")
-    fig.colorbar(contours)
-
-    fig = plt.figure()
-    axes = fig.add_subplot(111, projection='3d')
-    contours = trisurf(pn_3, axes=axes, cmap="inferno")
-    axes.set_aspect("auto")
-    axes.set_title("$P_3$")
-    fig.colorbar(contours)
-
-    fig = plt.figure()
-    axes = fig.add_subplot(111, projection='3d')
-    contours = trisurf(pn_0, axes=axes, cmap="inferno")
-    axes.set_aspect("auto")
-    axes.set_title("$P_0$")
-    fig.colorbar(contours)
-
-    print(r"Initial and final 32 energy:")
-    print(r"Inital: ", H_32_vec[0])
-    print(r"Final: ", H_32_vec[-1])
-    print(r"Delta: ", H_32_vec[-1] - H_32_vec[0])
-
-    print(r"Initial and final 10 energy:")
-    print(r"Inital: ", H_10_vec[0])
-    print(r"Final: ", H_10_vec[-1])
-    print(r"Delta: ", H_10_vec[-1] - H_10_vec[0])
-
-    plt.figure()
-    plt.plot(t_vec, p_3P, 'r-', label=r'$p_3$')
-    plt.plot(t_vec, p_0P, 'b-', label=r'$p_0$')
-    plt.plot(t_vec, om_t * np.sin(om_x * Ppoint[0] + phi_x) * np.sin(om_y * Ppoint[1] + phi_y) \
-             * np.cos(om_t * t_vec + phi_t), 'g-', label=r'exact $p$')
-    plt.xlabel(r'Time [s]')
-    plt.title(r'$p$ at ' + str(Ppoint))
-    plt.legend()
+    #     p_3P[ii + 1] = pn_3.at(Ppoint)
+    #     p_0P[ii + 1] = pn_0.at(Ppoint)
+    #
+    # err_p3.assign(pn_3 - interpolate(p_ex, V_3))
+    # err_p0.assign(pn_0 - interpolate(p_ex, V_0))
+    #
+    # fig = plt.figure()
+    # axes = fig.add_subplot(111, projection='3d')
+    # contours = trisurf(err_p3, axes=axes, cmap="inferno")
+    # axes.set_aspect("auto")
+    # axes.set_title("Error $p_3$")
+    # fig.colorbar(contours)
+    #
+    # fig = plt.figure()
+    # axes = fig.add_subplot(111, projection='3d')
+    # contours = trisurf(err_p0, axes=axes, cmap="inferno")
+    # axes.set_aspect("auto")
+    # axes.set_title("Error $p_0$")
+    # fig.colorbar(contours)
+    #
+    # fig = plt.figure()
+    # axes = fig.add_subplot(111, projection='3d')
+    # contours = trisurf(interpolate(p_ex, V_3), axes=axes, cmap="inferno")
+    # axes.set_aspect("auto")
+    # axes.set_title("$p_3$ Exact")
+    # fig.colorbar(contours)
+    #
+    # fig = plt.figure()
+    # axes = fig.add_subplot(111, projection='3d')
+    # contours = trisurf(interpolate(p_ex, V_0), axes=axes, cmap="inferno")
+    # axes.set_aspect("auto")
+    # axes.set_title("$p_0$ Exact")
+    # fig.colorbar(contours)
+    #
+    # fig = plt.figure()
+    # axes = fig.add_subplot(111, projection='3d')
+    # contours = trisurf(pn_3, axes=axes, cmap="inferno")
+    # axes.set_aspect("auto")
+    # axes.set_title("$P_3$")
+    # fig.colorbar(contours)
+    #
+    # fig = plt.figure()
+    # axes = fig.add_subplot(111, projection='3d')
+    # contours = trisurf(pn_0, axes=axes, cmap="inferno")
+    # axes.set_aspect("auto")
+    # axes.set_title("$P_0$")
+    # fig.colorbar(contours)
+    #
+    # print(r"Initial and final 32 energy:")
+    # print(r"Inital: ", H_32_vec[0])
+    # print(r"Final: ", H_32_vec[-1])
+    # print(r"Delta: ", H_32_vec[-1] - H_32_vec[0])
+    #
+    # print(r"Initial and final 10 energy:")
+    # print(r"Inital: ", H_10_vec[0])
+    # print(r"Final: ", H_10_vec[-1])
+    # print(r"Delta: ", H_10_vec[-1] - H_10_vec[0])
+    #
+    # plt.figure()
+    # plt.plot(t_vec, p_3P, 'r-', label=r'$p_3$')
+    # plt.plot(t_vec, p_0P, 'b-', label=r'$p_0$')
+    # plt.plot(t_vec, om_t * np.sin(om_x * Ppoint[0] + phi_x) * np.sin(om_y * Ppoint[1] + phi_y) \
+    #          * np.cos(om_t * t_vec + phi_t), 'g-', label=r'exact $p$')
+    # plt.xlabel(r'Time [s]')
+    # plt.title(r'$p$ at ' + str(Ppoint))
+    # plt.legend()
 
     # err_p_3 = np.sqrt(np.sum(float(dt) * np.power(err_p_3_vec, 2)))
     # err_u_1 = np.sqrt(np.sum(float(dt) * np.power(err_u_1_vec, 2)))
@@ -427,59 +428,59 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     return dict_res
 
-n_elem = 10
-pol_deg = 2
-
-n_time = 100
-t_fin = 1
-
-results = compute_err(n_elem, n_time, pol_deg, t_fin)
-
-t_vec = results["t_span"]
-Hdot_vec = results["power"]
-bdflow_vec = results["flow"]
-bdflow_ex_vec = results["flow_ex"]
-
-H_32 = results["energy_32"]
-H_10 = results["energy_10"]
-H_ex = results["energy_ex"]
-
-plt.figure()
-plt.plot(t_vec, H_32, 'ro', label=r'$H_{32}$')
-plt.plot(t_vec, H_10, 'b--', label=r'$H_{10}$')
-plt.plot(t_vec, H_ex, '*-', label=r'Exact')
-plt.xlabel(r'Time [s]')
-plt.title(r'Energies')
-plt.legend()
-
-plt.figure()
-plt.plot(t_vec, bdflow_vec, 'r', label=r'bd flow')
-plt.plot(t_vec, bdflow_ex_vec, 'b', label=r'bd flow ex')
-plt.xlabel(r'Time [s]')
-plt.title(r'Boundary flow')
-plt.legend()
-
-
-plt.figure()
-plt.plot(t_vec, Hdot_vec - bdflow_vec, 'r--', label=r'Energy residual')
-plt.xlabel(r'Time [s]')
-plt.title(r'Energy residual')
-plt.legend()
-
-diffH_L2Hdiv = np.diff(H_32)
-diffH_H1Hcurl = np.diff(H_10)
-Delta_t = np.diff(t_vec)
-int_bdflow = np.zeros((n_time, ))
-
-for i in range(n_time):
-    int_bdflow[i] = 0.5*Delta_t[i]*(bdflow_vec[i+1] + bdflow_vec[i])
-
-plt.figure()
-plt.plot(t_vec[1:], diffH_L2Hdiv, 'ro', label=r'$\Delta H_{32}$')
-plt.plot(t_vec[1:], diffH_H1Hcurl, 'b--', label=r'$\Delta H_{10}$')
-plt.plot(t_vec[1:], int_bdflow, '*-', label=r'Bd flow int')
-plt.xlabel(r'Time [s]')
-plt.title(r'Energy balance')
-plt.legend()
-
-plt.show()
+# n_elem = 5
+# pol_deg = 2
+#
+# n_time = 100
+# t_fin = 1
+#
+# results = compute_err(n_elem, n_time, pol_deg, t_fin)
+#
+# t_vec = results["t_span"]
+# Hdot_vec = results["power"]
+# bdflow_vec = results["flow"]
+# bdflow_ex_vec = results["flow_ex"]
+#
+# H_32 = results["energy_32"]
+# H_10 = results["energy_10"]
+# H_ex = results["energy_ex"]
+#
+# plt.figure()
+# plt.plot(t_vec, H_32, 'ro', label=r'$H_{32}$')
+# plt.plot(t_vec, H_10, 'b--', label=r'$H_{10}$')
+# plt.plot(t_vec, H_ex, '*-', label=r'Exact')
+# plt.xlabel(r'Time [s]')
+# plt.title(r'Energies')
+# plt.legend()
+#
+# plt.figure()
+# plt.plot(t_vec, bdflow_vec, 'r', label=r'bd flow')
+# plt.plot(t_vec, bdflow_ex_vec, 'b', label=r'bd flow ex')
+# plt.xlabel(r'Time [s]')
+# plt.title(r'Boundary flow')
+# plt.legend()
+#
+#
+# plt.figure()
+# plt.plot(t_vec, Hdot_vec - bdflow_vec, 'r--', label=r'Energy residual')
+# plt.xlabel(r'Time [s]')
+# plt.title(r'Energy residual')
+# plt.legend()
+#
+# diffH_L2Hdiv = np.diff(H_32)
+# diffH_H1Hcurl = np.diff(H_10)
+# Delta_t = np.diff(t_vec)
+# int_bdflow = np.zeros((n_time, ))
+#
+# for i in range(n_time):
+#     int_bdflow[i] = 0.5*Delta_t[i]*(bdflow_vec[i+1] + bdflow_vec[i])
+#
+# plt.figure()
+# plt.plot(t_vec[1:], diffH_L2Hdiv, 'ro', label=r'$\Delta H_{32}$')
+# plt.plot(t_vec[1:], diffH_H1Hcurl, 'b--', label=r'$\Delta H_{10}$')
+# plt.plot(t_vec[1:], int_bdflow, '*-', label=r'Bd flow int')
+# plt.xlabel(r'Time [s]')
+# plt.title(r'Energy balance')
+# plt.legend()
+#
+# plt.show()

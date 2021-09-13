@@ -16,7 +16,7 @@ save_res = False
 bc_input = "D"
 n_test_deg3 = 3
 
-n_vec_deg3 = np.array([2 ** (i+2) for i in range(n_test_deg3)])
+n_vec_deg3 = np.array([2 ** (i+1) for i in range(n_test_deg3)])
 h_vec_deg3 = 1./n_vec_deg3
 
 p3_err_deg3 = np.zeros((n_test_deg3,))
@@ -36,7 +36,7 @@ order_p30_deg3 = np.zeros((n_test_deg3 - 1,))
 order_u12_deg3 = np.zeros((n_test_deg3 - 1,))
 
 for i in range(n_test_deg3):
-    res_deg3 = compute_err(n_vec_deg3[i], n_vec_deg3[i], deg=DEG, bd_cond=bc_input)
+    res_deg3 = compute_err(n_vec_deg3[i], 100, deg=DEG, bd_cond=bc_input)
 
     # vp_err_deg3[i] = res_deg3["p_err"]
     # sigp_err_deg3[i] = res_deg3["q_err"]
