@@ -14,7 +14,7 @@ else:
 import numpy as np
 
 save_res = False
-bc_input = "DN"
+bc_input = "D"
 n_test_deg2 = 4
 
 n_vec_deg2 = np.array([2 ** (i+1) for i in range(n_test_deg2)])
@@ -37,7 +37,7 @@ order_p30_deg2 = np.zeros((n_test_deg2 - 1,))
 order_u12_deg2 = np.zeros((n_test_deg2 - 1,))
 
 for i in range(n_test_deg2):
-    res_deg2 = compute_err(n_vec_deg2[i], n_vec_deg2[i], deg=DEG, bd_cond=bc_input)
+    res_deg2 = compute_err(n_vec_deg2[i], 100, deg=DEG, bd_cond=bc_input)
 
     p3_err_deg2[i] = res_deg2["err_p3"]
     u1_err_deg2[i] = res_deg2["err_u1"]

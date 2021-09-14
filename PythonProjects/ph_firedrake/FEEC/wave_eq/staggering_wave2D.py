@@ -99,10 +99,27 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     phi_y = 0
     phi_t = 0
 
-    t = Constant(0.0)
+    dt = Constant(t_fin / n_t)
 
-    ft = 2*sin(om_t * t + phi_t) + 3*cos(om_t * t + phi_t)
+    params = {"mat_type": "aij",
+              "snes_type": "ksponly",
+              "ksp_type": "preonly",
+              "pc_type": "lu"}
+
+    t_vec = np.linspace(0, n_t * float(dt), 1 + n_t)
+
+    t = Constant(0.0)
+    t_10 = Constant(0)
+    t_32 = Constant(dt/2)
+
+    ft = 2 * sin(om_t * t + phi_t) + 3 * cos(om_t * t + phi_t)
     dft_t = om_t * (2 * cos(om_t * t + phi_t) - 3 * sin(om_t * t + phi_t))  # diff(dft_t, t)
+
+    ft10 = 2 * sin(om_t * t_10 + phi_t) + 3 * cos(om_t * t_10 + phi_t)
+    dft_t10 = om_t * (2 * cos(om_t * t_10 + phi_t) - 3 * sin(om_t * t_10 + phi_t))  # diff(dft_t, t)
+
+    ft32 = 2 * sin(om_t * t_32 + phi_t) + 3 * cos(om_t * t_32 + phi_t)
+    dft_t32 = om_t * (2 * cos(om_t * t_32 + phi_t) - 3 * sin(om_t * t_32 + phi_t))  # diff(dft_t, t)
 
     gxy = cos(om_x * x + phi_x) * sin(om_y * y + phi_y)
 
@@ -115,6 +132,10 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     u_ex = as_vector([dgxy_x * ft,
                       dgxy_y * ft])  # grad(gxy)
 
+    p_ex10 = gxy * dft_t10
+    u_ex32 = as_vector([dgxy_x * ft32,
+                        dgxy_y * ft32])
+
     p0_3 = interpolate(p_ex, V_3)
     u0_2 = interpolate(u_ex, V_2)
 
@@ -125,17 +146,17 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     # # e0_10 = project(as_vector([sig_ex[0], sig_ex[1], sig_ex[2], v_ex]), V_10)
 
     if bd_cond=="D":
-        bc_D = DirichletBC(V_10.sub(1), p_ex, "on_boundary")
+        bc_D = DirichletBC(V_10.sub(1), p_ex10, "on_boundary")
         bc_N = None
     elif bd_cond=="N":
-        bc_N = DirichletBC(V_32.sub(1), u_ex, "on_boundary")
+        bc_N = DirichletBC(V_32.sub(1), u_ex32, "on_boundary")
         bc_D = None
     else:
-        bc_D = [DirichletBC(V_10.sub(1), p_ex, 1), \
-                DirichletBC(V_10.sub(1), p_ex, 2)]
+        bc_D = [DirichletBC(V_10.sub(1), p_ex10, 1), \
+                DirichletBC(V_10.sub(1), p_ex10, 2)]
 
-        bc_N = [DirichletBC(V_32.sub(1), u_ex, 3), \
-                DirichletBC(V_32.sub(1), u_ex, 4)]
+        bc_N = [DirichletBC(V_32.sub(1), u_ex32, 3), \
+                DirichletBC(V_32.sub(1), u_ex32, 4)]
 
     Ppoint = (L/5, L/5)
 
@@ -153,15 +174,6 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     e0_10.sub(0).assign(u0_1)
     e0_10.sub(1).assign(p0_0)
-
-    dt = Constant(t_fin / n_t)
-
-    params = {"mat_type": "aij",
-              "snes_type": "ksponly",
-              "ksp_type": "preonly",
-              "pc_type": "lu"}
-
-    t_vec = np.linspace(0, n_t * float(dt), 1 + n_t)
 
     enmid_32 = Function(V_32, name="e_32 n+1/2")
     enmid1_32 = Function(V_32, name="e_32 n+3/2")
@@ -240,76 +252,72 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     err_p30_vec[0] = errornorm(Constant(0), diff0_p30, norm_type="L2")
     err_u12_vec[0] = errornorm(Constant((0.0, 0.0)), diff0_u12, norm_type="L2")
 
-    # print("First explicit step")
-    # print("==============")
-    #
-    # a0_form32 = m_form32(v_3, p_3, v_2, u_2)
-    # b0_form32 = m_form32(v_3, p0_3, v_2, u0_2) + dt / 2 * (j_form32(v_3, p0_3, v_2, u0_2) + bdflow32(v_2, p0_0))
-    #
-    # A0_32 = assemble(a0_form32, bcs=bc_N, mat_type='aij')
-    # b0_32 = assemble(b0_form32)
-    #
-    # solve(A0_32, enmid_32, b0_32, solver_parameters=params)
-
-    print("First implicit step")
+    print("First explicit step")
     print("==============")
-    V_3210 = V_32 * V_10
-    w_3210 = TestFunction(V_3210)
-    w_3, w_2, w_1, w_0 = split(w_3210)
 
-    e_3210 = TrialFunction(V_3210)
-    e_3, e_2, e_1, e_0 = split(e_3210)
+    a0_form32 = m_form32(v_3, p_3, v_2, u_2)
+    b0_form32 = m_form32(v_3, p0_3, v_2, u0_2) + dt / 2 * (j_form32(v_3, p0_3, v_2, u0_2) + bdflow32(v_2, p0_0))
 
-    en1 = Function(V_3210)
+    A0_32 = assemble(a0_form32, bcs=bc_N, mat_type='aij')
+    b0_32 = assemble(b0_form32)
 
-    a0_form = m_form32(w_3, e_3, w_2, e_2) + m_form10(w_1, e_1, w_0, e_0) - 0.5 * dt * (j_form10(w_1, e_1, w_0, e_0) \
-                + j_form32(w_3, e_3, w_2, e_2)  + bdflow10(w_0, e_2) + bdflow32(w_2, e_0))
-    b0_form = m_form10(w_1, un_1, w_0, pn_0) + m_form32(w_3, pn_3, w_2, un_2) + 0.5*dt*(j_form10(w_1, un_1, w_0, pn_0)\
-                + j_form32(w_3, pn_3, w_2, un_2) + bdflow10(w_0, un_2) + bdflow32(w_2, pn_0))
+    solve(A0_32, enmid_32, b0_32, solver_parameters=params)
 
-    if bd_cond=="D":
-        bc_D_first = DirichletBC(V_3210.sub(3), p_ex, "on_boundary")
-        A0 = assemble(a0_form, bcs=bc_D_first, mat_type='aij')
-    elif bd_cond=="N":
-        bc_N_first = DirichletBC(V_3210.sub(1), u_ex, "on_boundary")
-        A0 = assemble(a0_form, bcs=bc_N_first, mat_type='aij')
-    else:
-        bc_ND_first =  [DirichletBC(V_3210.sub(3), p_ex, 1), \
-                        DirichletBC(V_3210.sub(3), p_ex, 2), \
-                        DirichletBC(V_3210.sub(1), u_ex, 3), \
-                        DirichletBC(V_3210.sub(1), u_ex, 4)]
-        A0 = assemble(a0_form, bcs=bc_ND_first, mat_type='aij')
-
-    b0 = assemble(b0_form)
-
-    solve(A0, en1, b0, solver_parameters=params)
-
-    en1_32.sub(0).assign(en1.split()[0])
-    en1_32.sub(1).assign(en1.split()[1])
-
-    enmid_32.assign(0.5*(en_32 + en1_32))
+    # print("First implicit step")
+    # print("==============")
+    # V_3210 = V_32 * V_10
+    # w_3210 = TestFunction(V_3210)
+    # w_3, w_2, w_1, w_0 = split(w_3210)
+    #
+    # e_3210 = TrialFunction(V_3210)
+    # e_3, e_2, e_1, e_0 = split(e_3210)
+    #
+    # en1 = Function(V_3210)
+    #
+    # a0_form = m_form32(w_3, e_3, w_2, e_2) + m_form10(w_1, e_1, w_0, e_0) - 0.5 * dt * (j_form10(w_1, e_1, w_0, e_0) \
+    #             + j_form32(w_3, e_3, w_2, e_2)  + bdflow10(w_0, e_2) + bdflow32(w_2, e_0))
+    # b0_form = m_form10(w_1, un_1, w_0, pn_0) + m_form32(w_3, pn_3, w_2, un_2) + 0.5*dt*(j_form10(w_1, un_1, w_0, pn_0)\
+    #             + j_form32(w_3, pn_3, w_2, un_2) + bdflow10(w_0, un_2) + bdflow32(w_2, pn_0))
+    #
+    # if bd_cond=="D":
+    #     bc_D_first = DirichletBC(V_3210.sub(3), p_ex, "on_boundary")
+    #     A0 = assemble(a0_form, bcs=bc_D_first, mat_type='aij')
+    # elif bd_cond=="N":
+    #     bc_N_first = DirichletBC(V_3210.sub(1), u_ex, "on_boundary")
+    #     A0 = assemble(a0_form, bcs=bc_N_first, mat_type='aij')
+    # else:
+    #     bc_ND_first =  [DirichletBC(V_3210.sub(3), p_ex, 1), \
+    #                     DirichletBC(V_3210.sub(3), p_ex, 2), \
+    #                     DirichletBC(V_3210.sub(1), u_ex, 3), \
+    #                     DirichletBC(V_3210.sub(1), u_ex, 4)]
+    #     A0 = assemble(a0_form, bcs=bc_ND_first, mat_type='aij')
+    #
+    # b0 = assemble(b0_form)
+    #
+    # solve(A0, en1, b0, solver_parameters=params)
+    # en1_32.sub(0).assign(en1.split()[0])
+    # en1_32.sub(1).assign(en1.split()[1])
+    # enmid_32.assign(0.5*(en_32 + en1_32))
 
     ## Settings of intermediate variables and matrices for the 2 linear systems
 
-    print("Assemble of the A matrices")
-    print("==============")
-
     a_form10 = m_form10(v_1, u_1, v_0, p_0) - 0.5*dt*j_form10(v_1, u_1, v_0, p_0)
     a_form32 = m_form32(v_3, p_3, v_2, u_2) - 0.5*dt*j_form32(v_3, p_3, v_2, u_2)
-
-    A_10 = assemble(a_form10, bcs=bc_D, mat_type='aij')
-    A_32 = assemble(a_form32, bcs=bc_N, mat_type='aij')
 
     print("Computation of the solution")
     print("==============")
 
     for ii in tqdm(range(n_t)):
 
+
         ## Integration of 10 system using unmid_2
 
+        t_10.assign(float(t) + float(dt))
+        A_10 = assemble(a_form10, bcs=bc_D, mat_type='aij')
+
         pnmid_3, unmid_2 = enmid_32.split()
-        # b_form10 = m_form10(v_1, un_1, v_0, pn_0) + dt*(0.5*j_form10(v_1, un_1, v_0, pn_0) + bdflow10(v_0, unmid_2))
-        b_form10 = m_form10(v_1, un_1, v_0, pn_0) + dt*0.5*j_form10(v_1, un_1, v_0, pn_0)
+        b_form10 = m_form10(v_1, un_1, v_0, pn_0) + dt*(0.5*j_form10(v_1, un_1, v_0, pn_0) + bdflow10(v_0, unmid_2))
+        # b_form10 = m_form10(v_1, un_1, v_0, pn_0) + dt*0.5*j_form10(v_1, un_1, v_0, pn_0)
 
         b_vec10 = assemble(b_form10)
 
@@ -318,6 +326,9 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         un1_1, pn1_0 = en1_10.split()
 
         ## Integration of 32 system using pn1_0
+
+        t_32.assign(float(t) + 3/2*float(dt))
+        A_32 = assemble(a_form32, bcs=bc_N, mat_type='aij')
 
         b_form32 = m_form32(v_3, pnmid_3, v_2, unmid_2) + dt*(0.5*j_form32(v_3, pnmid_3, v_2, unmid_2) \
                                                               + bdflow32(v_2, pn1_0))
@@ -464,7 +475,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     return dict_res
 
-# n_elem = 2
+# n_elem = 8
 # pol_deg = 2
 #
 # n_time = 100

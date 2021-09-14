@@ -142,10 +142,10 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
 
     if bd_cond=="D":
-        bc_D = DirichletBC(V_10.sub(1), p_ex, "on_boundary")
+        bc_D = DirichletBC(V_10.sub(1), p_ex1, "on_boundary")
         bc_N = None
     elif bd_cond=="N":
-        bc_N = DirichletBC(V_32.sub(1), u_ex, "on_boundary")
+        bc_N = DirichletBC(V_32.sub(1), u_ex1, "on_boundary")
         bc_D = None
     else:
         bc_D = None
@@ -259,8 +259,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     a_form10 = m_form10(v_1, u_1, v_0, p_0) - 0.5*dt*j_form10(v_1, u_1, v_0, p_0)
     a_form32 = m_form32(v_3, p_3, v_2, u_2) - 0.5*dt*j_form32(v_3, p_3, v_2, u_2)
 
-    A_10 = assemble(a_form10, bcs=bc_D, mat_type='aij')
-    A_32 = assemble(a_form32, bcs=bc_N, mat_type='aij')
+
 
     print("Computation of the solution")
     print("==============")
@@ -270,6 +269,9 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         ## Integration of 10 system
         t_1.assign(float(t) + float(dt))
         u_ex_mid = 0.5*(u_ex + u_ex1)
+
+        A_10 = assemble(a_form10, bcs=bc_D, mat_type='aij')
+        A_32 = assemble(a_form32, bcs=bc_N, mat_type='aij')
 
         b_form10 = m_form10(v_1, un_1, v_0, pn_0) + dt*(0.5*j_form10(v_1, un_1, v_0, pn_0) + bdflow10(v_0, u_ex_mid))
         # b_form10 = m_form10(v_1, un_1, v_0, pn_0) + dt*(0.5*j_form10(v_1, un_1, v_0, pn_0))
@@ -310,7 +312,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         # print(bdflow_ex_vec[ii+1])
         err_p_3_vec[ii+1] = errornorm(p_ex, pn_3, norm_type="L2")
         err_u_1_vec[ii+1] = errornorm(u_ex, un_1, norm_type="L2")
-        err_p_0_vec[ii+1] = errornorm(p_ex, pn_0, norm_type="H1")
+        err_p_0_vec[ii+1] = errornorm(p_ex, pn_0, norm_type="L2")
         err_u_2_vec[ii+1] = errornorm(u_ex, un_2, norm_type="L2")
 
         diffn_p30 = project(pn_3 - pn_0, V_3)
