@@ -13,10 +13,10 @@ else:
 import numpy as np
 
 save_res = False
-bc_input = "D"
+bc_input = "DN"
 n_test_deg3 = 3
 
-n_vec_deg3 = np.array([2 ** (i+1) for i in range(n_test_deg3)])
+n_vec_deg3 = np.array([2 ** (i) for i in range(n_test_deg3)])
 h_vec_deg3 = 1./n_vec_deg3
 
 p3_err_deg3 = np.zeros((n_test_deg3,))

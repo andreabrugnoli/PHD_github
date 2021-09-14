@@ -244,9 +244,9 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
     return dict_res
 
 n_elem = 10
-pol_deg = 3
+pol_deg = 2
 
-n_time = 1000
+n_time = 300
 t_fin = 1
 results = compute_sol(n_elem, n_time, pol_deg, t_fin)
 

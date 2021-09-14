@@ -100,7 +100,6 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     phi_t = 0
 
     t = Constant(0.0)
-    # w_ex = sin(om_x * x + phi_x) * sin(om_y * y + phi_y) * sin(om_z * z + phi_z) * sin(om_t * t + phi_t)
 
     ft = 2*sin(om_t * t + phi_t) + 3*cos(om_t * t + phi_t)
     dft_t = om_t * (2 * cos(om_t * t + phi_t) - 3 * sin(om_t * t + phi_t))  # diff(dft_t, t)
@@ -132,8 +131,11 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         bc_N = DirichletBC(V_32.sub(1), u_ex, "on_boundary")
         bc_D = None
     else:
-        bc_D = None
-        bc_N = None
+        bc_D = [DirichletBC(V_10.sub(1), p_ex, 1), \
+                DirichletBC(V_10.sub(1), p_ex, 2)]
+
+        bc_N = [DirichletBC(V_32.sub(1), u_ex, 3), \
+                DirichletBC(V_32.sub(1), u_ex, 4)]
 
     Ppoint = (L/5, L/5)
 
@@ -238,48 +240,54 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     err_p30_vec[0] = errornorm(Constant(0), diff0_p30, norm_type="L2")
     err_u12_vec[0] = errornorm(Constant((0.0, 0.0)), diff0_u12, norm_type="L2")
 
-    print("First explicit step")
-    print("==============")
-
-    a0_form32 = m_form32(v_3, p_3, v_2, u_2)
-    b0_form32 = m_form32(v_3, p0_3, v_2, u0_2) + dt / 2 * (j_form32(v_3, p0_3, v_2, u0_2) + bdflow32(v_2, p0_0))
-
-    A0_32 = assemble(a0_form32, bcs=bc_N, mat_type='aij')
-    b0_32 = assemble(b0_form32)
-
-    solve(A0_32, enmid_32, b0_32, solver_parameters=params)
-
-    # print("First implicit step")
+    # print("First explicit step")
     # print("==============")
-    # V_3210 = V_32 * V_10
-    # w_3210 = TestFunction(V_3210)
-    # w_3, w_2, w_1, w_0 = split(w_3210)
     #
-    # e_3210 = TrialFunction(V_3210)
-    # e_3, e_2, e_1, e_0 = split(e_3210)
+    # a0_form32 = m_form32(v_3, p_3, v_2, u_2)
+    # b0_form32 = m_form32(v_3, p0_3, v_2, u0_2) + dt / 2 * (j_form32(v_3, p0_3, v_2, u0_2) + bdflow32(v_2, p0_0))
     #
-    # en1 = Function(V_3210)
+    # A0_32 = assemble(a0_form32, bcs=bc_N, mat_type='aij')
+    # b0_32 = assemble(b0_form32)
     #
-    # a0_form = m_form32(w_3, e_3, w_2, e_2) + m_form10(w_1, e_1, w_0, e_0) - 0.5 * dt * (j_form10(w_1, e_1, w_0, e_0) \
-    #             + j_form32(w_3, e_3, w_2, e_2)  + bdflow10(w_0, e_2) + bdflow32(w_2, e_0))
-    # b0_form = m_form10(w_1, un_1, w_0, pn_0) + m_form32(w_3, pn_3, w_2, un_2) + 0.5*dt*(j_form10(w_1, un_1, w_0, pn_0)\
-    #             + j_form32(w_3, pn_3, w_2, un_2) + bdflow10(w_0, un_2) + bdflow32(w_2, pn_0))
-    #
-    # if bd_cond=="D":
-    #     bc_D_first = DirichletBC(V_3210.sub(3), p_ex, "on_boundary")
-    #     A0 = assemble(a0_form, bcs=bc_D_first, mat_type='aij')
-    # elif bd_cond=="N":
-    #     bc_N_first = DirichletBC(V_3210.sub(1), u_ex, "on_boundary")
-    #     A0 = assemble(a0_form, bcs=bc_N_first, mat_type='aij')
-    #
-    # b0 = assemble(b0_form)
-    #
-    # solve(A0, en1, b0, solver_parameters=params)
-    #
-    # en1_32.sub(0).assign(en1.split()[0])
-    # en1_32.sub(1).assign(en1.split()[1])
-    #
-    # enmid_32.assign(0.5*(en_32 + en1_32))
+    # solve(A0_32, enmid_32, b0_32, solver_parameters=params)
+
+    print("First implicit step")
+    print("==============")
+    V_3210 = V_32 * V_10
+    w_3210 = TestFunction(V_3210)
+    w_3, w_2, w_1, w_0 = split(w_3210)
+
+    e_3210 = TrialFunction(V_3210)
+    e_3, e_2, e_1, e_0 = split(e_3210)
+
+    en1 = Function(V_3210)
+
+    a0_form = m_form32(w_3, e_3, w_2, e_2) + m_form10(w_1, e_1, w_0, e_0) - 0.5 * dt * (j_form10(w_1, e_1, w_0, e_0) \
+                + j_form32(w_3, e_3, w_2, e_2)  + bdflow10(w_0, e_2) + bdflow32(w_2, e_0))
+    b0_form = m_form10(w_1, un_1, w_0, pn_0) + m_form32(w_3, pn_3, w_2, un_2) + 0.5*dt*(j_form10(w_1, un_1, w_0, pn_0)\
+                + j_form32(w_3, pn_3, w_2, un_2) + bdflow10(w_0, un_2) + bdflow32(w_2, pn_0))
+
+    if bd_cond=="D":
+        bc_D_first = DirichletBC(V_3210.sub(3), p_ex, "on_boundary")
+        A0 = assemble(a0_form, bcs=bc_D_first, mat_type='aij')
+    elif bd_cond=="N":
+        bc_N_first = DirichletBC(V_3210.sub(1), u_ex, "on_boundary")
+        A0 = assemble(a0_form, bcs=bc_N_first, mat_type='aij')
+    else:
+        bc_ND_first =  [DirichletBC(V_3210.sub(3), p_ex, 1), \
+                        DirichletBC(V_3210.sub(3), p_ex, 2), \
+                        DirichletBC(V_3210.sub(1), u_ex, 3), \
+                        DirichletBC(V_3210.sub(1), u_ex, 4)]
+        A0 = assemble(a0_form, bcs=bc_ND_first, mat_type='aij')
+
+    b0 = assemble(b0_form)
+
+    solve(A0, en1, b0, solver_parameters=params)
+
+    en1_32.sub(0).assign(en1.split()[0])
+    en1_32.sub(1).assign(en1.split()[1])
+
+    enmid_32.assign(0.5*(en_32 + en1_32))
 
     ## Settings of intermediate variables and matrices for the 2 linear systems
 
@@ -300,8 +308,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         ## Integration of 10 system using unmid_2
 
         pnmid_3, unmid_2 = enmid_32.split()
-        b_form10 = m_form10(v_1, un_1, v_0, pn_0) + dt*(0.5*j_form10(v_1, un_1, v_0, pn_0) + bdflow10(v_0, unmid_2))
-        # b_form10 = m_form10(v_1, un_1, v_0, pn_0) + dt*0.5*j_form10(v_1, un_1, v_0, pn_0)
+        # b_form10 = m_form10(v_1, un_1, v_0, pn_0) + dt*(0.5*j_form10(v_1, un_1, v_0, pn_0) + bdflow10(v_0, unmid_2))
+        b_form10 = m_form10(v_1, un_1, v_0, pn_0) + dt*0.5*j_form10(v_1, un_1, v_0, pn_0)
 
         b_vec10 = assemble(b_form10)
 
@@ -456,10 +464,10 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     return dict_res
 
-# n_elem = 10
+# n_elem = 2
 # pol_deg = 2
 #
-# n_time = 2000
+# n_time = 100
 # t_fin = 1
 #
 # results = compute_err(n_elem, n_time, pol_deg, t_fin)
@@ -475,6 +483,16 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 # H_10 = results["energy_10"]
 # H_ex1 = results["energy_ex1"]
 # H_ex2 = results["energy_ex2"]
+#
+# err_p3 = results["err_p3"]
+# err_u1 = results["err_u1"]
+# err_p0 = results["err_p0"]
+# err_u2 = results["err_u2"]
+#
+# print("Error p3: " + str(err_p3))
+# print("Error u1: " + str(err_u1))
+# print("Error p0: " + str(err_p0))
+# print("Error u2: " + str(err_u2))
 #
 # plt.figure()
 # plt.plot(t_vec, H_32, 'r-.', label=r'$H_{32}$')
@@ -493,30 +511,30 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 # plt.xlabel(r'Time [s]')
 # plt.title(r'Boundary flow')
 # plt.legend()
-
-
-# plt.figure()
-# plt.plot(t_vec, Hdot_vec - bdflow_vec, 'r--', label=r'Energy residual')
-# plt.xlabel(r'Time [s]')
-# plt.title(r'Energy residual')
-# plt.legend()
-
-# plt.show()
-
-# diffH_L2Hdiv = np.diff(H_32)
-# diffH_H1Hcurl = np.diff(H_10)
-# Delta_t = np.diff(t_vec)
-# int_bdflow = np.zeros((n_time, ))
 #
-# for i in range(n_time):
-#     int_bdflow[i] = 0.5*Delta_t[i]*(bdflow_vec[i+1] + bdflow_vec[i])
 #
-# plt.figure()
-# plt.plot(t_vec[1:], diffH_L2Hdiv, 'ro.', label=r'$\Delta H_{32}$')
-# plt.plot(t_vec[1:], diffH_H1Hcurl, 'b--', label=r'$\Delta H_{10}$')
-# plt.plot(t_vec[1:], int_bdflow, '*-.', label=r'Bd flow int')
-# plt.xlabel(r'Time [s]')
-# plt.title(r'Energy balance')
-# plt.legend()
+# # plt.figure()
+# # plt.plot(t_vec, Hdot_vec - bdflow_vec, 'r--', label=r'Energy residual')
+# # plt.xlabel(r'Time [s]')
+# # plt.title(r'Energy residual')
+# # plt.legend()
 #
 # plt.show()
+#
+# # diffH_L2Hdiv = np.diff(H_32)
+# # diffH_H1Hcurl = np.diff(H_10)
+# # Delta_t = np.diff(t_vec)
+# # int_bdflow = np.zeros((n_time, ))
+# #
+# # for i in range(n_time):
+# #     int_bdflow[i] = 0.5*Delta_t[i]*(bdflow_vec[i+1] + bdflow_vec[i])
+# #
+# # plt.figure()
+# # plt.plot(t_vec[1:], diffH_L2Hdiv, 'ro.', label=r'$\Delta H_{32}$')
+# # plt.plot(t_vec[1:], diffH_H1Hcurl, 'b--', label=r'$\Delta H_{10}$')
+# # plt.plot(t_vec[1:], int_bdflow, '*-.', label=r'Bd flow int')
+# # plt.xlabel(r'Time [s]')
+# # plt.title(r'Energy balance')
+# # plt.legend()
+# #
+# # plt.show()

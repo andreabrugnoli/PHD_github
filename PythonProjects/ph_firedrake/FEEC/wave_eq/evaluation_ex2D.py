@@ -7,7 +7,7 @@ import numpy as np
 from firedrake import *
 import  matplotlib.pyplot as plt
 
-n_el = 20
+n_el = 50
 L = 1/2
 mesh = RectangleMesh(n_el, n_el, 1, 0.5, quadrilateral=False)
 n_ver = FacetNormal(mesh)
@@ -96,6 +96,11 @@ for ii, t_n in enumerate(t_vec):
     dHex_t1_vec[ii] = dH_ex_an1_t
     dHex_t2_vec[ii] = dH_ex_an2_t(t_n)
 
+    H_n1_vec[ii] = assemble(H_ex_n1)
+    H_n2_vec[ii] = assemble(H_ex_n2)
+    H_ex_an1_vec[ii] = H_ex_an1
+    H_ex_an2_vec[ii] = H_ex_an2(t_n)
+
 
 
 plt.figure()
@@ -103,26 +108,19 @@ plt.figure()
 # plt.plot(t_vec, bd_flow2_vec, 'b--', label=r'D flow')
 plt.plot(t_vec, bd_flow3_vec, '*-', label=r'Bd flow')
 plt.plot(t_vec, dHex_t1_vec, '+-.', label=r'dH_t1')
-plt.plot(t_vec, dHex_t2_vec, '+-', label=r'dH_t2')
-
+# plt.plot(t_vec, dHex_t2_vec, '+-', label=r'dH_t2')
 plt.xlabel(r'Time [s]')
 plt.title(r'Boundary flows')
 plt.legend()
 
-for ii, value in enumerate(t_vec):
-    t.assign(float(t_n))
-    H_n1_vec[ii] = assemble(H_ex_n1)
-    H_n2_vec[ii] = assemble(H_ex_n2)
-    H_ex_an1_vec[ii] = H_ex_an1
-    H_ex_an2_vec[ii] = H_ex_an2(t_n)
 
 plt.figure()
-plt.plot(t_vec, H_n1_vec, 'p--', label=r'Energy PH')
+plt.plot(t_vec, H_n1_vec, 'y--', label=r'Energy PH')
 plt.plot(t_vec, H_n2_vec, 'g-', label=r'Energy classical')
 plt.plot(t_vec, H_ex_an1_vec, 'r--', label=r'Energy exact1')
-# plt.plot(t_vec, dHex_t1_vec, '+-.', label=r'dH_t1')
+plt.plot(t_vec, dHex_t1_vec, '+-.', label=r'dH_t1')
 plt.plot(t_vec, H_ex_an2_vec, 'b-.', label=r'Energy exact2')
-# plt.plot(t_vec, dHex_t2_vec, '--', label=r'dH_t2')
+plt.plot(t_vec, dHex_t2_vec, '--', label=r'dH_t2')
 
 plt.xlabel(r'Time [s]')
 plt.title(r'Hamiltonian')

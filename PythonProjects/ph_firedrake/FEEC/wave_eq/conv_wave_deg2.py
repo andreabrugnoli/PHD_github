@@ -5,6 +5,7 @@ geo_case = "2D"
 
 if geo_case=="2D":
     # from FEEC.wave_eq.compute_err_wave2D import compute_err
+    # from FEEC.wave_eq.compute_err_wave2D_divgrad import compute_err
     from FEEC.wave_eq.staggering_wave2D import compute_err
 else:
     # from FEEC.wave_eq.compute_err_wave3D import compute_err
@@ -13,7 +14,7 @@ else:
 import numpy as np
 
 save_res = False
-bc_input = "D"
+bc_input = "DN"
 n_test_deg2 = 4
 
 n_vec_deg2 = np.array([2 ** (i+1) for i in range(n_test_deg2)])
@@ -36,7 +37,7 @@ order_p30_deg2 = np.zeros((n_test_deg2 - 1,))
 order_u12_deg2 = np.zeros((n_test_deg2 - 1,))
 
 for i in range(n_test_deg2):
-    res_deg2 = compute_err(n_vec_deg2[i], 1000, deg=DEG, bd_cond=bc_input)
+    res_deg2 = compute_err(n_vec_deg2[i], n_vec_deg2[i], deg=DEG, bd_cond=bc_input)
 
     p3_err_deg2[i] = res_deg2["err_p3"]
     u1_err_deg2[i] = res_deg2["err_u1"]
