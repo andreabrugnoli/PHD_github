@@ -80,14 +80,14 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     dgxyz_x = - om_x * sin(om_x * x + phi_x) * sin(om_y * y + phi_y) * sin(om_z * z + phi_z)
     dgxyz_y = om_y * cos(om_x * x + phi_x) * cos(om_y * y + phi_y) * sin(om_z * z + phi_z)
-    dgxyz_z = om_z * cos(om_x * x + phi_x) * cos(om_y * y + phi_y) * cos(om_z * z + phi_z)
+    dgxyz_z = om_z * cos(om_x * x + phi_x) * sin(om_y * y + phi_y) * cos(om_z * z + phi_z)
 
-    # w_ex = gxy * ft
+    grad_gxyz = as_vector([dgxyz_x,
+                           dgxyz_y,
+                           dgxyz_z])  # grad(gxyz)
 
     p_ex = gxyz * dft_t
-    u_ex = as_vector([dgxyz_x * ft,
-                      dgxyz_y * ft,
-                      dgxyz_z * ft])  # grad(gxy)
+    u_ex = grad_gxyz * ft
 
     p0_3 = interpolate(p_ex, V_3)
     u0_1 = interpolate(u_ex, V_1)

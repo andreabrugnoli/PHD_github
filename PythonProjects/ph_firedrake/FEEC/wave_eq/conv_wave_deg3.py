@@ -37,7 +37,7 @@ order_p30_deg3 = np.zeros((n_test_deg3 - 1,))
 order_u12_deg3 = np.zeros((n_test_deg3 - 1,))
 
 for i in range(n_test_deg3):
-    res_deg3 = compute_err(n_vec_deg3[i], 500, deg=DEG, bd_cond=bc_input)
+    res_deg3 = compute_err(n_vec_deg3[i], 100, deg=DEG, bd_cond=bc_input)
 
     # vp_err_deg3[i] = res_deg3["p_err"]
     # sigp_err_deg3[i] = res_deg3["q_err"]

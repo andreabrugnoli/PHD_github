@@ -58,6 +58,11 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     mesh = RectangleMesh(n_el, n_el, 1, 1/2, quadrilateral=False)
     n_ver = FacetNormal(mesh)
 
+    # P_0 = FiniteElement("CG", quadrilateral, deg)
+    # P_1 = FiniteElement("RTCE", quadrilateral, deg)
+    # P_2 = FiniteElement("RTCF", quadrilateral, deg)
+    # P_3 = FiniteElement("DG", quadrilateral, deg - 1)
+
     P_0 = FiniteElement("CG", triangle, deg)
     P_1 = FiniteElement("N1curl", triangle, deg, variant='integral')
     # P_2 = FiniteElement("RT", triangle, deg)
@@ -138,24 +143,27 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     p0_3 = interpolate(p_ex, V_3)
     u0_2 = interpolate(u_ex, V_2)
+    # u0_2 = project(u_ex, V_2)
 
     u0_1 = interpolate(u_ex, V_1)
+    # u0_1 = project(u_ex, V_1)
     p0_0 = interpolate(p_ex, V_0)
 
     # # e0_32 = project(as_vector([v_ex, sig_ex[0], sig_ex[1], sig_ex[2]]), V_32)
     # # e0_10 = project(as_vector([sig_ex[0], sig_ex[1], sig_ex[2], v_ex]), V_10)
 
     if bd_cond=="D":
-        bc_D = DirichletBC(V_10.sub(1), p_ex10, "on_boundary")
+        bc_D= DirichletBC(V_10.sub(1), p_ex10, "on_boundary")
         bc_N = None
     elif bd_cond=="N":
         bc_N = DirichletBC(V_32.sub(1), u_ex32, "on_boundary")
+
         bc_D = None
     else:
         bc_D = [DirichletBC(V_10.sub(1), p_ex10, 1), \
-                DirichletBC(V_10.sub(1), p_ex10, 2)]
+                DirichletBC(V_10.sub(1), p_ex10, 3)]
 
-        bc_N = [DirichletBC(V_32.sub(1), u_ex32, 3), \
+        bc_N = [DirichletBC(V_32.sub(1), u_ex32, 2), \
                 DirichletBC(V_32.sub(1), u_ex32, 4)]
 
     Ppoint = (L/5, L/5)
@@ -257,7 +265,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     a0_form32 = m_form32(v_3, p_3, v_2, u_2)
     b0_form32 = m_form32(v_3, p0_3, v_2, u0_2) + dt / 2 * (j_form32(v_3, p0_3, v_2, u0_2) + bdflow32(v_2, p0_0))
-
+    # b0_form32 = m_form32(v_3, p0_3, v_2, u0_2) + dt / 2 * (j_form32(v_3, p0_3, v_2, u0_2))
     A0_32 = assemble(a0_form32, bcs=bc_N, mat_type='aij')
     b0_32 = assemble(b0_form32)
 
@@ -332,6 +340,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
         b_form32 = m_form32(v_3, pnmid_3, v_2, unmid_2) + dt*(0.5*j_form32(v_3, pnmid_3, v_2, unmid_2) \
                                                               + bdflow32(v_2, pn1_0))
+        # b_form32 = m_form32(v_3, pnmid_3, v_2, unmid_2) + dt * 0.5 * j_form32(v_3, pnmid_3, v_2, unmid_2)
         b_vec32 = assemble(b_form32)
 
         solve(A_32, enmid1_32, b_vec32, solver_parameters=params)

@@ -14,7 +14,8 @@ n_el = 1
 deg = 1
 
 mesh = RectangleMesh(n_el, n_el, L, L)
-
+triplot(mesh)
+plt.show()
 # triplot(mesh)
 # plt.show()
 
@@ -34,6 +35,12 @@ V_0 = FunctionSpace(mesh, P_0)
 V_1 = FunctionSpace(mesh, P_1)
 V_2 = FunctionSpace(mesh, P_2)
 
+
+vec = Constant((1, .5))
+
+vec_h = interpolate(vec, V_1)
+
+print(vec_h.vector().get_local())
 
 
 u_2 = interpolate(Constant(1), V_2)

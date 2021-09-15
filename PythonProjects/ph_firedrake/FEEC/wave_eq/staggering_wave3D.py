@@ -91,9 +91,9 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     x, y, z = SpatialCoordinate(mesh)
 
-    om_x =1
-    om_y =1
-    om_z =1
+    om_x = 1
+    om_y = 1
+    om_z = 1
 
     om_t = np.sqrt(om_x ** 2 + om_y ** 2 + om_z ** 2)
     phi_x = 0
@@ -127,18 +127,19 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     dgxyz_x = - om_x * sin(om_x * x + phi_x) * sin(om_y * y + phi_y) * sin(om_z * z + phi_z)
     dgxyz_y = om_y * cos(om_x * x + phi_x) * cos(om_y * y + phi_y) * sin(om_z * z + phi_z)
-    dgxyz_z = om_z * cos(om_x * x + phi_x) * cos(om_y * y + phi_y) * cos(om_z * z + phi_z)
+    dgxyz_z = om_z * cos(om_x * x + phi_x) * sin(om_y * y + phi_y) * cos(om_z * z + phi_z)
+
+    grad_gxyz = as_vector([dgxyz_x,
+                           dgxyz_y,
+                           dgxyz_z]) # grad(gxyz)
+
+
 
     p_ex = gxyz * dft_t
-    u_ex = as_vector([dgxyz_x * ft,
-                      dgxyz_y * ft,
-                      dgxyz_z * ft])  # grad(gxy)
+    u_ex = grad_gxyz * ft
 
     p_ex10 = gxyz * dft_t10
-    u_ex32 = as_vector([dgxyz_x * ft32,
-                        dgxyz_y * ft32,
-                        dgxyz_z * ft32
-                        ])
+    u_ex32 = grad_gxyz * ft32
 
     p0_3 = interpolate(p_ex, V_3)
     u0_2 = interpolate(u_ex, V_2)
@@ -477,7 +478,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 n_elem = 5
 pol_deg = 1
 
-n_time = 500
+n_time = 100
 t_fin = 1
 
 results = compute_err(n_elem, n_time, pol_deg, t_fin)

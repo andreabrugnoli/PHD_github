@@ -14,7 +14,7 @@ else:
 import numpy as np
 
 save_res = False
-bc_input = "D"
+bc_input = "NDD"
 n_test_deg2 = 4
 
 n_vec_deg2 = np.array([2 ** (i+1) for i in range(n_test_deg2)])
