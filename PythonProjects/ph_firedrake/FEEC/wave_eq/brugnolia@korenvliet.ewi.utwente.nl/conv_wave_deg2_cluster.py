@@ -1,15 +1,12 @@
 DEG = 2
 
-geo_case = "2D"
-# geo_case = "3D"
+# geo_case = "2D"
+geo_case = "3D"
 
 if geo_case=="2D":
-    # from FEEC.wave_eq.compute_err_wave2D import compute_err
-    # from FEEC.wave_eq.compute_err_wave2D_divgrad import compute_err
-    from FEEC.wave_eq.staggering_wave2D import compute_err
+    from FEEC.wave_eq.cluster.staggering_wave2D_cluster import compute_err
 else:
-    # from FEEC.wave_eq.compute_err_wave3D import compute_err
-    from FEEC.wave_eq.staggering_wave3D import compute_err
+    from FEEC.wave_eq.cluster.staggering_wave3D_cluster import compute_err
 
 import numpy as np
 

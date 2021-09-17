@@ -104,6 +104,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     Hn_32 = 0.5 * (inner(pn_3, pn_3) * dx + inner(un_2, un_2) * dx)
     Hn_10 = 0.5 * (inner(pn_0, pn_0) * dx + inner(un_1, un_1) * dx)
 
+    Hn_s = 0.5 * (dot(pn_0, pn_3) * dx + dot(un_1, un_2) * dx)
+
     Hn_ex1 = 0.5 * (inner(p_ex, p_ex) * dx(domain=mesh) + inner(u_ex, u_ex) * dx(domain=mesh))
 
     a1 = (0.5 - np.sin(0.5) * np.cos(0.5)) * (1 + np.sin(1) * np.cos(1))
@@ -120,6 +122,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     H_32_vec = np.zeros((1 + n_t,))
     H_10_vec = np.zeros((1 + n_t,))
+    Hs_vec = np.zeros((1 + n_t,))
+
     H_ex_vec1 = np.zeros((1 + n_t,))
     H_ex_vec2 = np.zeros((1 + n_t,))
 
@@ -129,17 +133,23 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     Hdot_vec = np.zeros((1 + n_t,))
     Hdot_ex_vec2 = np.zeros((1 + n_t,))
 
-    err_p_3_vec = np.zeros((1 + n_t,))
-    err_u_1_vec = np.zeros((1 + n_t,))
+    errL2_p_3_vec = np.zeros((1 + n_t,))
+    errL2_u_1_vec = np.zeros((1 + n_t,))
 
-    err_p_0_vec = np.zeros((1 + n_t,))
-    err_u_2_vec = np.zeros((1 + n_t,))
+    errL2_p_0_vec = np.zeros((1 + n_t,))
+    errL2_u_2_vec = np.zeros((1 + n_t,))
+
+    errHcurl_u_1_vec = np.zeros((1 + n_t,))
+    errH1_p_0_vec = np.zeros((1 + n_t,))
+    errHdiv_u_2_vec = np.zeros((1 + n_t,))
 
     err_p30_vec = np.zeros((1 + n_t,))
     err_u12_vec = np.zeros((1 + n_t,))
 
     H_32_vec[0] = assemble(Hn_32)
     H_10_vec[0] = assemble(Hn_10)
+    Hs_vec[0] = assemble(Hn_s)
+
     H_ex_vec1[0] = assemble(Hn_ex1)
     H_ex_vec2[0] = Hn_ex2
 
@@ -148,16 +158,23 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     bdflow_ex_vec[0] = assemble(bdflow_ex_n)
     Hdot_ex_vec2[0] = dHn_t_ex2
 
-    err_p_3_vec[0] = errornorm(p_ex, p0_3, norm_type="L2")
-    err_u_1_vec[0] = errornorm(u_ex, u0_1, norm_type="L2")
-    err_p_0_vec[0] = errornorm(p_ex, p0_0, norm_type="H1")
-    err_u_2_vec[0] = errornorm(u_ex, u0_2, norm_type="L2")
+    errL2_p_3_vec[0] = errornorm(p_ex, p0_3, norm_type="L2")
+    errL2_u_1_vec[0] = errornorm(u_ex, u0_1, norm_type="L2")
+    errL2_p_0_vec[0] = errornorm(p_ex, p0_0, norm_type="L2")
+    errL2_u_2_vec[0] = errornorm(u_ex, u0_2, norm_type="L2")
 
-    diff0_p30 = project(p0_3 - p0_0, V_3)
-    diff0_u12 = project(u0_2 - u0_1, V_1)
+    errHcurl_u_1_vec[0] = errornorm(u_ex, u0_1, norm_type="Hcurl")
+    errH1_p_0_vec[0] = errornorm(p_ex, p0_0, norm_type="H1")
+    errHdiv_u_2_vec[0] = errornorm(u_ex, u0_2, norm_type="Hdiv")
 
-    err_p30_vec[0] = errornorm(Constant(0), diff0_p30, norm_type="L2")
-    err_u12_vec[0] = errornorm(Constant((0.0, 0.0)), diff0_u12, norm_type="L2")
+    err_p30_vec[0] = np.sqrt(assemble(inner(p0_3 - p0_0, p0_3 - p0_0) * dx))
+    err_u12_vec[0] = np.sqrt(assemble(inner(u0_2 - u0_1, u0_2 - u0_1) * dx))
+
+    # diff0_p30 = project(p0_3 - p0_0, V_3)
+    # diff0_u12 = project(u0_2 - u0_1, V_1)
+    #
+    # err_p30_vec[0] = errornorm(Constant(0), diff0_p30, norm_type="L2")
+    # err_u12_vec[0] = errornorm(Constant((0.0, 0.0)), diff0_u12, norm_type="L2")
 
     m_form = inner(v_3, Dt(pn_3)) * dx + inner(v_1, Dt(un_1)) * dx \
              + inner(v_0, Dt(pn_0)) * dx + inner(v_2, Dt(un_2)) * dx
@@ -187,8 +204,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         bc = DirichletBC(V_3102.sub(3), u_ex, "on_boundary")
     else:
         bc = [DirichletBC(V_3102.sub(2), p_ex, 1), \
-              DirichletBC(V_3102.sub(2), p_ex, 2), \
-              DirichletBC(V_3102.sub(3), u_ex, 3), \
+              DirichletBC(V_3102.sub(2), p_ex, 3), \
+              DirichletBC(V_3102.sub(3), u_ex, 2), \
               DirichletBC(V_3102.sub(3), u_ex, 4)]
 
     stepper = TimeStepper(f_form, butcher_tableau, t, dt, e0_3102,
@@ -212,6 +229,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
         H_32_vec[ii + 1] = assemble(Hn_32)
         H_10_vec[ii + 1] = assemble(Hn_10)
+        Hs_vec[ii + 1] = assemble(Hn_s)
 
         t.assign(float(t) + float(dt))
 
@@ -221,16 +239,28 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         bdflow_ex_vec[ii + 1] = assemble(bdflow_ex_n)
         Hdot_ex_vec2[ii + 1] = dHn_t_ex2
 
-        err_p_3_vec[ii + 1] = errornorm(p_ex, interpolate(pn_3, V_3), norm_type="L2")
-        err_u_1_vec[ii + 1] = errornorm(u_ex, interpolate(un_1, V_1), norm_type="L2")
-        err_p_0_vec[ii + 1] = errornorm(p_ex, interpolate(pn_0, V_0), norm_type="L2")
-        err_u_2_vec[ii + 1] = errornorm(u_ex, interpolate(un_2, V_2), norm_type="L2")
+        pn_3_i = interpolate(pn_3, V_3)
+        un_1_i = interpolate(un_1, V_1)
+        pn_0_i = interpolate(pn_0, V_0)
+        un_2_i = interpolate(un_2, V_2)
 
-        diffn_p30 = project(pn_3 - pn_0, V_3)
-        diffn_u12 = project(un_2 - un_1, V_2)
+        errL2_p_3_vec[ii + 1] = errornorm(p_ex, pn_3_i, norm_type="L2")
+        errL2_u_1_vec[ii + 1] = errornorm(u_ex, un_1_i, norm_type="L2")
+        errL2_p_0_vec[ii + 1] = errornorm(p_ex, pn_0_i, norm_type="L2")
+        errL2_u_2_vec[ii + 1] = errornorm(u_ex, un_2_i, norm_type="L2")
 
-        err_p30_vec[ii + 1] = errornorm(Constant(0), diffn_p30, norm_type="L2")
-        err_u12_vec[ii + 1] = errornorm(Constant((0.0, 0.0)), diffn_u12, norm_type="L2")
+        errHcurl_u_1_vec[ii + 1] = errornorm(u_ex, un_1_i, norm_type="Hcurl")
+        errH1_p_0_vec[ii + 1] = errornorm(p_ex, pn_0_i, norm_type="H1")
+        errHdiv_u_2_vec[ii + 1] = errornorm(u_ex, un_2_i, norm_type="Hdiv")
+
+        err_p30_vec[ii + 1] = np.sqrt(assemble(inner(pn_3_i - pn_0_i, pn_3_i - pn_0_i) * dx))
+        err_u12_vec[ii + 1] = np.sqrt(assemble(inner(un_2_i - un_1_i, un_2_i - un_1_i) * dx))
+
+        # diffn_p30 = project(pn_3 - pn_0, V_3)
+        # diffn_u12 = project(un_2 - un_1, V_2)
+        #
+        # err_p30_vec[ii + 1] = errornorm(Constant(0), diffn_p30, norm_type="L2")
+        # err_u12_vec[ii + 1] = errornorm(Constant((0.0, 0.0)), diffn_u12, norm_type="L2")
 
         #     p_3P[ii + 1] = pn_3.at(Ppoint)
         #     p_0P[ii + 1] = pn_0.at(Ppoint)
@@ -313,24 +343,30 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         # err_p30 = max(err_p30_vec)
         # err_u12 = max(err_u12_vec)
 
-        err_p_3 = err_p_3_vec[-1]
-        err_u_1 = err_u_1_vec[-1]
+        errL2_p_3 = errL2_p_3_vec[-1]
+        errL2_u_1 = errL2_u_1_vec[-1]
 
-        err_p_0 = err_p_0_vec[-1]
-        err_u_2 = err_u_2_vec[-1]
+        errL2_p_0 = errL2_p_0_vec[-1]
+        errL2_u_2 = errL2_u_2_vec[-1]
+
+        errHcurl_u_1 = errHcurl_u_1_vec[-1]
+
+        errH1_p_0 = errH1_p_0_vec[-1]
+        errHdiv_u_2 = errHdiv_u_2_vec[-1]
 
         err_p30 = err_p30_vec[-1]
         err_u12 = err_u12_vec[-1]
 
-        dict_res = {"t_span": t_vec, "energy_32": H_32_vec, "energy_ex1": H_ex_vec1, "energy_ex2": H_ex_vec2,
-                    "energy_10": H_10_vec, "power": Hdot_vec, \
-                    "power_ex": Hdot_ex_vec2, "flow": bdflow_vec, "flow_ex": bdflow_ex_vec, "err_p3": err_p_3, \
-                    "err_u1": err_u_1, "err_p0": err_p_0, "err_u2": err_u_2, "err_p30": err_p30, "err_u12": err_u12}
+        dict_res = {"t_span": t_vec, "energy_32": H_32_vec, "energy_ex1": H_ex_vec1, "energy_ex2": H_ex_vec2, \
+                    "energy_s": Hs_vec, "energy_10": H_10_vec, "power": Hdot_vec, \
+                    "power_ex": Hdot_ex_vec2, "flow": bdflow_vec, "flow_ex": bdflow_ex_vec, "err_p3": errL2_p_3, \
+                    "err_u1": [errL2_u_1, errHcurl_u_1], "err_p0": [errL2_p_0, errH1_p_0], \
+                    "err_u2": [errL2_u_2, errHdiv_u_2], "err_p30": err_p30, "err_u12": err_u12}
 
     return dict_res
 
-# n_elem = 4
-# pol_deg = 3
+# n_elem = 5
+# pol_deg = 1
 #
 # n_time = 100
 # t_fin = 1
@@ -346,23 +382,32 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 #
 # H_32 = results["energy_32"]
 # H_10 = results["energy_10"]
+# H_s = results["energy_s"]
+#
 # H_ex1 = results["energy_ex1"]
 # H_ex2 = results["energy_ex2"]
 #
-# err_p3 = results["err_p3"]
-# err_u1 = results["err_u1"]
-# err_p0 = results["err_p0"]
-# err_u2 = results["err_u2"]
+# errL2_p3 = results["err_p3"]
+# errL2_u1, errHcurl_u1 = results["err_u1"]
+# errL2_p0, errH1_p0 = results["err_p0"]
+# errL2_u2, errHdiv_u2 = results["err_u2"]
 #
-# print("Error p3: " + str(err_p3))
-# print("Error u1: " + str(err_u1))
-# print("Error p0: " + str(err_p0))
-# print("Error u2: " + str(err_u2))
+# print("Error L2 p3: " + str(errL2_p3))
+#
+# print("Error L2 u1: " + str(errL2_u1))
+# print("Error Hcurl u1: " + str(errHcurl_u1))
+#
+# print("Error L2 p0: " + str(errL2_p0))
+# print("Error H1 p0: " + str(errH1_p0))
+#
+# print("Error L2 u2: " + str(errL2_u2))
+# print("Error Hdiv u2: " + str(errHdiv_u2))
 #
 # plt.figure()
 # plt.plot(t_vec, H_32, 'r-.', label=r'$H_{32}$')
 # plt.plot(t_vec, H_10, 'b--', label=r'$H_{10}$')
 # plt.plot(t_vec, H_ex1, '*-', label=r'H Exact1')
+# plt.plot(t_vec, H_s, '+', label=r'H scat')
 # #plt.plot(t_vec, H_ex2, '+-', label=r'H Exact2')
 # plt.xlabel(r'Time [s]')
 # plt.title(r'Energies')
