@@ -33,6 +33,9 @@
 \usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
 \usepackage{parcolumns}
 \usepackage{comment}
+\usepackage{multirow}
+
+
 
 \usepackage[top=0.8cm, bottom=1cm, left=1.5cm, right=1.5cm]{geometry} % Reduce document margins
 %\setlength{\hintscolumnwidth}{3cm} % Uncomment to change the width of the dates column
@@ -56,23 +59,112 @@
 %\extrainfo{Skype contact: brugnoss}
 %\photo[70pt][0.4pt]{pictures/Foto_cv} % The first bracket is the picture height, the second is the thickness of the frame around the picture (0pt for no frame)
 
-\AtBeginDocument{\hypersetup{baseurl={}}}
+\AtBeginDocument{\hypersetup{colorlinks=true,
+		linkcolor=blue,
+		urlcolor=cyan,}}
+
+
+\patchcmd{\makehead}
+{\hfil}
+{\hspace*{0.15\textwidth}}
+{}
+{}
+\patchcmd{\makehead}
+{\setlength{\makeheaddetailswidth}{0.8\textwidth}}
+{\setlength{\makeheaddetailswidth}{0.67\textwidth}}
+{}
+{}
+\patchcmd{\makehead}
+{\\[2.5em]}
+{\hfil\raisebox{-.7cm}{\framebox{\includegraphics[width=\@photowidth]{\@photo}}}\\[2.5em]}
+{}
+{}
+
+\newcommand*{\httpslink}[2][]{% <=======================================
+	\ifthenelse{\equal{#1}{}}%
+	{\href{https://#2}{#2}}%
+	{\href{https://#2}{#1}}}
+
+\newcommand*{\googlescholarsocialsymbol}  {\includegraphics[width=0.27cm]{logo_scholar}~} % <===================
+\newcommand*{\researchgatesocialsymbol}  {\includegraphics[width=0.27cm]{logo_researchgate}~} % <===================
+
+\makeatletter
+\RenewDocumentCommand{\social}{O{}O{}m}{%
+	\ifthenelse{\equal{#2}{}}%
+	{ 
+		\ifthenelse{\equal{#1}{linkedin}}{\collectionadd[linkedin]{socials}{\protect\httpslink[#3]{www.linkedin.com/in/#3}}}{}%
+		\ifthenelse{\equal{#1}{googlescholar}}{\collectionadd[googlescholar]{socials}{\protect\httpslink[#3]{www.googlescholar.com/profile/#3}}}{}% <================================================================
+		\ifthenelse{\equal{#1}{researchgate}}{\collectionadd[researchgate]{socials}{\protect\httpslink[#3]{www.researchgate.com/profile/#3}}}{}% <================================================================
+		\ifthenelse{\equal{#1}{twitter}} {\collectionadd[twitter]{socials} {\protect\httpslink[#3]{www.twitter.com/#3}}}    {}%
+		\ifthenelse{\equal{#1}{github}}  {\collectionadd[github]{socials}  {\protect\httpslink[#3]{www.github.com/#3}}}     {}%
+	}
+	{\collectionadd[#1]{socials}{\protect\httpslink[#3]{#2}}}}
+\makeatother
+
+\newcommand{\cvdoublecolumn}[2]{%
+	\cvitem[0.75em]{}{%
+		\begin{minipage}[t]{\listdoubleitemcolumnwidth}#1\end{minipage}%
+		\hfill%
+		\begin{minipage}[t]{\listdoubleitemcolumnwidth}#2\end{minipage}%
+	}%
+}
+
+% usage: \cvreference{name}{address line 1}{address line 2}{address line 3}{address line 4}{e-mail address}{phone number}
+% Everything but the name is optional
+% If \addresssymbol, \emailsymbol or \phonesymbol are specified, they will be used.
+% (Per default, \addresssymbol isn't specified, the other two are specified.)
+% If you don't like the symbols, remove them from the following code, including the tilde ~ (space).
+
+\newcommand{\cvreference}[7]{%
+	\textbf{#1}\newline% Name
+	\ifthenelse{\equal{#2}{}}{}{\addresssymbol~#2\newline}%
+	\ifthenelse{\equal{#3}{}}{}{#3\newline}%
+	\ifthenelse{\equal{#4}{}}{}{#4\newline}%
+	\ifthenelse{\equal{#5}{}}{}{#5\newline}%
+	\ifthenelse{\equal{#6}{}}{}{\emailsymbol~\texttt{#6}\newline}%
+	\ifthenelse{\equal{#7}{}}{}{\phonesymbol~#7}}
+
+\makeatletter\renewcommand*{\bibliographyitemlabel}{\@biblabel{\arabic{enumiv}}}\makeatother
+
+%\setlength{\hintscolumnwidth}{3cm} % Uncomment to change the width of the dates column
+%\setlength{\makecvtitlenamewidth}{10cm} % For the 'classic' style, uncomment to adjust the width of the space allocated to your name
+
+%----------------------------------------------------------------------------------------
+%	NAME AND CONTACT INFORMATION SECTION
+%----------------------------------------------------------------------------------------
+
+\name{Andrea}{Brugnoli}
+%\address{103 rue Bonnat}{Toulouse}{France}% optional, remove / comment the line if not wanted; the "postcode city" and "country" arguments can be omitted or provided empty
+\phone[mobile]{+33~7~50~39~47~27}                   % optional, remove / comment the line if not wanted; the optional "type" of the phone can be "mobile" (default), "fixed" or "fax"
+\email{andrea.brugnoli92@gmail.com}                               % optional, remove / comment the line if not wanted
+%\homepage{www.johndoe.com}                         % optional, remove / comment the line if not wanted
+%\social[linkedin]{john.doe}                        % optional, remove / comment the line if not wanted
+%\social[twitter]{jdoe}                             % optional, remove / comment the line if not wanted
+%\social[github]{andreabrugnoli}                              % optional, remove / comment the line if not wanted
+\social[googlescholar][scholar.google.com/citations?user=aze4Eh4AAAAJ&hl=it]{andrea.brugnoli} % <====================================
+\social[researchgate][www.researchgate.net/profile/Andrea_Brugnoli2]{andrea.brugnoli}
+%\extrainfo{additional information}                 % optional, remove / comment the line if not wanted
+\photo[60pt][0.4pt]{Foto_Cv-min}   
+\extrainfo{\Large \textbf{Docteur-Ingénieur en Automatique}}
+
 
 %----------------------------------------------------------------------------------------
 
 \begin{document}
 
-%\makecvtitle % Print the CV title
+\makecvtitle % Print the CV title
 
+
+\begin{comment}
 \begin{minipage}{.8\linewidth}
 {\huge{\textsc{Andrea BRUGNOLI} }}
 
 \vspace{2mm}
-{1 Avenue de Rangueil, 31400 Toulouse (FR)}
+{Mooienhof 10, 7512 Enschede (NL)}
 
 {(+33) 7 50 39 47 27}
 
-{Andrea.BRUGNOLI@supaero.isae.fr or andrea.brugnoli92@gmail.com}
+{a.brugnoli@utwente.nl or andrea.brugnoli92@gmail.com}
 
 \vspace{3mm}
 % \homepage{staff.org.edu/~jsmith}{staff.org.edu/$\sim$jsmith} % The first argument is the url for the clickable link, the second argument is the url displayed in the template - this allows special characters to be displayed such as the tilde in this example
@@ -80,19 +172,17 @@
 %\begin{minipage}{.4\linewidth}
 
 \fcolorbox{cyan}{white}{%
-    \parbox{\textwidth}{\textbf{Ingénieur aérospatial} \newline
-Politecnico di Milano (Milano)/ ISAE-Supaero (Toulouse)   \newline
-  Doté d'un esprit international, d'initiative et capable de s'adapter. Trois langues maîtrisées. 
-  }}
+    \parbox{.45\textwidth}{\textbf{Docteur-Ingénieur en Automatique}}}
 \end{minipage}
 \begin{minipage}{.2\linewidth}
 \begin{center}
-\includegraphics[width=0.8\linewidth]{Foto_Cv-min.jpg}
+\includegraphics[height=1\linewidth]{Foto_Cv-min.jpg}
 \end{center}
 \end{minipage}
 
 \vspace{2mm}
 %\textbf{\'A la recherche d'une position mois à partir de octobre 2017}
+\end{comment}
 
 %----------------------------------------------------------------------------------------
 %	EDUCATION SECTION
@@ -100,24 +190,22 @@ Politecnico di Milano (Milano)/ ISAE-Supaero (Toulouse)   \newline
 
 \vspace{1mm}
 
+\section{Formation}
 
-
-\section{Formation académique}
-
-\cventry{2017, 3 ans}{Thèse}{ISAE-Supaero}{Toulouse}{}{Modélisation et Contrôle par le formalisme pHs des structures flexibles 2D avec des conditions aux limites variantes}
+\cventry{2017-2020}{Thèse en Automatique. Encadrants: Daniel Alazard, Valérie Budinger et Denis Matignon}{ISAE-Supaero}{Toulouse, France}{}{Une formulation port-Hamiltonienne des structures flexibles. Modélisation et discrétisation symplectique par éléments finis.}
 % usage: \cventry[spacing]{years}{degree/job title}{institution/employer}{localization}{optionnal: grade/...}{optional: comment/job description}
 
-\cventry{2016--2017}{Master recherche en automatique et traitement d'images}{Université Paris Saclay/\,Supélec}{Paris/Toulouse}{}{Modules: identification des modèles, dynamique avancée des structures flexibles}
+\cventry{2016--2017}{Master recherche en automatique et traitement d'images}{Université Paris Saclay/\,Supélec}{Paris/Toulouse, France}{}{Modules: identification paramétrique, contrôle avancée des structures flexibles, traitement d'images.}
 
-\cventry{2015--2017}{Double Diplôme en génie aéronautique et aérospatial}{ISAE-Supaero}{Toulouse}{}{Spécialisation mathématiques appliques et automatique avancée: optimisation multidisciplinaire, calcul hautes performances, systèmes non linéaires et calcul de trajectoires optimales}
-
-
-\cventry{2014--2017}{Master en génie spatial}{Politecnico di Milano}{Milan}{\textit{110/110 avec mention}}{Modules : Mécanique orbitale, dynamique et contrôle des structures, propulsion thermochimique}
+\cventry{2015--2017}{Double Diplôme en génie aéronautique et aérospatial}{ISAE-Supaero}{Toulouse, France}{}{Spécialisation mathématiques appliques (calcul scientifique) et automatique avancée.}
 
 
-\cventry{2011--2014}{Licence en génie mécanique}{Politecnico di Milano}{Milan}{\textit{110/110 avec mention} }{Modules : méthode des éléments finis, vibrations mécaniques, calcul numérique }
+\cventry{2014--2017}{Master en génie spatial}{Politecnico di Milano}{Milan, Italie}{\textit{110/110 avec mention}}{Modules : Mécanique orbitale, dynamique et contrôle des structures, propulsion thermochimique.}
 
-%\cventry{2006--2011}{Baccalauréat Littéraire}{Liceo Classico Scipione Maffei}{Verona}{\textit{100/100}}{}
+
+\cventry{2011--2014}{Licence en génie mécanique}{Politecnico di Milano}{Milan, Italie}{\textit{110/110 avec mention} }{Modules : méthode des éléments finis, vibrations mécaniques, calcul numérique }
+
+\cventry{2006--2011}{Baccalauréat Littéraire}{Liceo Classico Scipione Maffei}{Verona, Italie}{\textit{100/100}}{}
 
 %\vspace{1mm}
 
@@ -127,20 +215,84 @@ Politecnico di Milano (Milano)/ ISAE-Supaero (Toulouse)   \newline
 
 \section{Expériences}
 
-\cventry{2017, 6 months}{Stage fin études}{CNES-Centre  des études spatiales}{Toulouse}{}{Analyse des débris spatiaux soumis à la pression de radiation solaire pour identifier configurations périodiques en attitude ou stable en pointage}
+\cventry{Nov. 2020 - Nov. 2022}{Chercheur post-doctorant}{University of Twente}{Enschede, Pays Bas}{}{Methodes numeriques pour problèmes couplés fluide-structure.\\
+	Subvention avancée ERC. Chercheur principal: Stefano Stramigioli.}
+
+\cventry{Juillet 2021}{Ecole d'été en intelligence artificielle et apprentissage par renforcement}{Institut CIFAR}{Toronto, Canada}{}{}
 
 
-\cventry{2016, 5 mois}{Téléopérations intelligents pour systèmes des micro-drones}{ISAE-Supaero en partenariat avec LAAS}{Toulouse}{}{Codage des lois de commande optimal en C/C++ pour micro-drones engagés en tâches complexes. Équipe de 6 personnes.}
+\cventry{Janvier 2019, 4 mois}{Chercheur invité}{ITA-Instituto Tecnol\'{o}gico de Aeron\'{a}utica}{S\~{a}o Jos\'{e} dos Campos, Brésil}{}{Collaboration avec Flavio Cardoso-Riberio: méthodes numériques pour discrétisation des systèmes port-Hamiltoniens.}
 
-\cventry{2016, 4 mois}{Dynamique non linéaire des systèmes multi-corps}{ISAE-Supaero}{Toulouse}{}{Modélisation d'une chaîne ouverte des corps en suivant la logique de Simscape Multibody. Validation en Matlab.}
+\cventry{Janvier 2017, 6 mois}{Stage fin études}{CNES-Centre national des études spatiales}{Toulouse}{}{Analyse des débris spatiaux soumis à la pression de radiation solaire pour identifier configurations stable en pointage.}
+
+
+%\cventry{2016, 5 mois}{Téléopérations intelligents pour systèmes des micro-drones}{ISAE-Supaero en partenariat avec LAAS}{Toulouse}{}{Codage des lois de commande optimal en C/C++ pour micro-drones engagés en tâches complexes. Équipe de 6 personnes.}
+
+%\cventry{2016, 4 mois}{Dynamique non linéaire des systèmes multi-corps}{ISAE-Supaero}{Toulouse}{}{Modélisation d'une chaîne ouverte des corps en suivant la logique de Simscape Multibody. Validation en Matlab.}
 
 %\cventry{2015, 2 mois}{Transfert interplanétaire}{Politecnico di Milano}{Milan}{}{Étude des trajectoires optimales  avec assistance gravitationnelle pour la minimisation du propergol utilisé. Analyse des perturbations.}
 
-\cventry{2014, 4 mois}{Dynamique d'un manipulateur pour machines de forgeage}{Politecnico di Milano en partenariat avec Danieli S.p.A }{Milan}{}{Étude des dessins techniques, modélisation cinématique et analyse dynamique. Présentation chez Danieli (Septembre 2014).}
+\cventry{2014, 4 mois}{Dynamique d'un manipulateur pour machines de forgeage}{Politecnico di Milano en partenariat avec Danieli S.p.A }{Milan/Buttrio, Italie}{}{Modélisation cinématique et analyse dynamique. Projet sélectionné pour une présentation finale chez \href{https://www.danieli.com/}{Danieli}.}
 
 %\cventry{}{Design d'une éolienne é axe horizontal  }{Politecnico di Milano}{Milano}{}{Dimensionnement général, optimisation performance au point nominal, analyse de performance hors design. équipe de quatre personnes. Publié sur Academia  \textcolor{blue}{\texttt{\href{https://www.academia.edu/9561531/Horizontal_Axis_Wind_Turbine_Design}{Horizontal Axis Wind Turbine Design}}} }
 
-\cventry{2014, 4 mois}{Analyse é éléments fins d'une pièce mécanique}{Politecnico di Milano}{Milan}{}{Implantation sur Abaqus et codage en Matlab d'un modèle équivalent, validation et comparaison des résultats.}
+%\cventry{2014, 4 mois}{Analyse é éléments fins d'une pièce mécanique}{Politecnico di Milano}{Milan}{}{Implantation sur Abaqus et codage en Matlab d'un modèle équivalent, validation et comparaison des résultats.}
+
+
+\section{Activités pédagogiques}
+J'ai effectué mes activités d'enseignement à l'Institut Supérieur de l'Aéronautique et de l'Espace, soit pour la formation ingénieur, soit pour le master international.
+
+\begin{tabular}{p{\dimexpr.15\linewidth-2\tabcolsep}p{\dimexpr.15\linewidth-2\tabcolsep}p{\dimexpr.15\linewidth-2\tabcolsep}p{\dimexpr.4\linewidth-2\tabcolsep}p{\dimexpr.15\linewidth-2\tabcolsep}}
+	\hline
+	Année & Niveau & Nature  & Discipline & Durée  \\
+	\hline
+	\multirow{2}{*}{2019-2020} & L1 & TD &  Résolution numérique des EDP & 6h \\
+							   & L1 & TD &  Optimisation & 6h \\
+	\hline
+	\multirow{3}{*}{2018-2019} & L2  & TP-TD  & Automatique & 20h \\
+							   & L2  & TD     & Contrôle des structures flexibles & 8h \\
+							   & L2  & TP-TD  & Automatic control & 15h \\
+	\hline
+	\multirow{2}{*}{2017-2018} & L2  & TP-TD  & Automatique & 20h \\
+							   & L2  & TP-TD  & Automatic control & 15h \\				   
+	\hline
+\end{tabular}
+
+
+\section{Activités scientifiques}
+
+\begin{tabular}{p{\dimexpr.2\linewidth-2\tabcolsep}p{\dimexpr.2\linewidth-2\tabcolsep}p{\dimexpr.6\linewidth-2\tabcolsep}}
+	Année & Lieu & Description  \\
+	\hline
+	2021 & Enschede & Proposition de la thèse "On the modeling and mechanical design of flexures (compliant mechanisms)" entre le département de Robotique et le département d'ingénierie de précision à l'Unieversité de Twente (avec Marijn Nijenhuis). \\
+	\hline
+	2021  & Berlin & Organisation de la session invitée: "Theoretical and numerical advancements in Hamiltonian formulations of continuum mechanics" pour la conference "Lagrangian and Hamiltonian method in non linear control 2021". \\
+	\hline
+	2020 & --- & Réviseur du Journal "Journal of Elasticity". \\
+	\hline
+	2019 -2020 & ISAE-Supaero & Organisation et encadrement du projet ingénierie et entreprise intitulé "Simulation et contrôle des structures thermoélastiques pour
+	applications spatiales". \\
+	\hline
+\end{tabular}
+
+
+\vspace{5mm}
+%----------------------------------------------------------------------------------------
+%	LANGUAGES SECTION
+%----------------------------------------------------------------------------------------
+\begin{minipage}[t]{0.4\linewidth}
+	\section{Langues}
+	\cvitem{Anglais}{courant}
+	\cvitem{Français}{courant}
+	\cvitem{Espagnol}{intermédiaire}
+	\cvitem{Portugais}{intermédiaire}
+	\cvitem{Italien}{langue maternelle}
+\end{minipage}
+\begin{minipage}[t]{0.55\linewidth}
+	\section{Compétences informatiques}
+	\cvitem{Programmes}{Abaqus, Inventor, Solid Works, Labview}
+	\cvitem{Langages}{Python (en particulier librairies à éléments finis Firedrake et Fenics), Matlab/Simulink, Java, C, \LaTeX}
+\end{minipage}
 
 
 %----------------------------------------------------------------------------------------
@@ -156,21 +308,7 @@ Politecnico di Milano (Milano)/ ISAE-Supaero (Toulouse)   \newline
 % \cvitem{2010}{Oral Presentation at the California Business Conference}
 % \cvitem{2009}{Poster at the Annual Business Conference in Oregon}
 
-%----------------------------------------------------------------------------------------
-%	LANGUAGES SECTION
-%----------------------------------------------------------------------------------------
-\begin{minipage}[t]{0.4\linewidth}
-\section{Langues}
-\cvitem{Anglais}{courant (C1) (Toeic 965/990 2014)}
-\cvitem{Français}{courant (C1)}
-\cvitem{Espagnol}{intermédiaire (B1)}
-\cvitem{Italien}{langue maternelle}
-\end{minipage}
-\begin{minipage}[t]{0.55\linewidth}
-\section{Compétences informatiques}
-\cvitem{Programmes}{Matlab, Simulink, Abaqus, Inventor, Solid Works, Labview }
-\cvitem{Langages}{ Java, C, C++, \LaTeX}
-\end{minipage}
+
 
 
 %\cvitem{Italien}{Langue maternelle}{} \cvitem{Anglais}{Niveau courant : Toeic 965/990 (2014)}{}
@@ -179,10 +317,5 @@ Politecnico di Milano (Milano)/ ISAE-Supaero (Toulouse)   \newline
 %----------------------------------------------------------------------------------------
 %	INTERESTS SECTION
 %----------------------------------------------------------------------------------------
-
-\section{Centres d'intérêt}
-
-\cvitem{}{Professeur particulier de mathématiques et physique niveau Bac+1 Bac+2}
-%\cvitem{}{ Tennis, voyages, cinéma, littérature}
 
 \end{document}
