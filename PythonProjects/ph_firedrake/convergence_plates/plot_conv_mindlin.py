@@ -15,8 +15,7 @@ plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 import matplotlib
 matplotlib.rcParams["legend.loc"] = 'best'
 matplotlib.rcParams['text.usetex'] = True
-matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{amsmath}"]
-matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{bm}"]
+matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{amsmath}\usepackage{bm}"]
 
 path_res = "./convergence_results_mindlin/"
 bc_input= "CCCC_AFW_"

@@ -16,3 +16,5 @@ from matplotlib import rcParams
 
 rcParams.update({'figure.autolayout': True})
 rcParams['text.usetex'] = True
+rcParams['text.latex.preamble']=r"\usepackage{amsmath}\usepackage{bm}"
+rcParams["legend.loc"] = 'best'

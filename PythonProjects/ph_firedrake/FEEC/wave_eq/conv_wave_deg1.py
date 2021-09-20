@@ -76,7 +76,7 @@ print("Estimated L2, Hdiv order of convergence for u_2: " + str(order_u2_deg1))
 print("Estimated L2 order of convergence for p_0 - p_3: " + str(order_p30_deg1))
 print("Estimated L2 order of convergence for u_2 - u_1: " + str(order_u12_deg1))
 
-path_res = "results_wave/"
+path_res = "cluster/results_wave/"
 if save_res:
     np.save(path_res + "h_deg1_" + bc_input + "_" + geo_case, h_vec_deg1)
 

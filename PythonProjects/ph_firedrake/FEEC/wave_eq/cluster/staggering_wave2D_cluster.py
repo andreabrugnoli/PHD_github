@@ -6,7 +6,7 @@ os.environ["OMP_NUM_THREADS"] = "1"
 
 # import numpy as np
 from firedrake import *
-import  matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 from tools_plotting import setup
 
 from tqdm import tqdm
