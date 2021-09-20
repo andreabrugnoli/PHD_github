@@ -183,6 +183,11 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     pn_3, un_2 = en_32.split()
     un_1, pn_0 = en_10.split()
 
+    Hn_ex = 0.5 * (inner(p_ex, p_ex) * dx(domain=mesh) + inner(u_ex, u_ex) * dx(domain=mesh))
+    Hn_32 = 0.5 * (inner(pn_3, pn_3) * dx + inner(un_2, un_2) * dx)
+    Hn_10 = 0.5 * (inner(pn_0, pn_0) * dx + inner(un_1, un_1) * dx)
+    Hn_s = 0.5 * (inner(pn_0, pn_3) * dx + inner(un_1, un_2) * dx)
+
     print("First explicit step")
     print("==============")
 
@@ -290,8 +295,13 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     err_p30 = np.sqrt(assemble(inner(pn_3 - pn_0, pn_3 - pn_0) * dx))
     err_u12 = np.sqrt(assemble(inner(un_2 - un_1, un_2 - un_1) * dx))
 
+    errHs = assemble(Hn_s - Hn_ex)
+    errH_10 = assemble(Hn_10 - Hn_ex)
+    errH_32 = assemble(Hn_32 - Hn_ex)
+
     dict_res = {"err_p3": errL2_p_3, "err_u1": [errL2_u_1, errHcurl_u_1], "err_p0": [errL2_p_0, errH1_p_0], \
-                "err_u2": [errL2_u_2, errHdiv_u_2], "err_p30": err_p30, "err_u12": err_u12}
+                "err_u2": [errL2_u_2, errHdiv_u_2], "err_p30": err_p30, "err_u12": err_u12, \
+                "err_H": [errHs, errH_10, errH_32]}
 
     return dict_res
 

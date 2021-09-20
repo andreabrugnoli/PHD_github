@@ -245,11 +245,19 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     err_p30_vec = np.zeros((1 + n_t,))
     err_u12_vec = np.zeros((1 + n_t,))
 
+    errH_32_vec = np.zeros((1 + n_t,))
+    errH_10_vec = np.zeros((1 + n_t,))
+    errHs_vec = np.zeros((1 + n_t,))
+
     H_32_vec[0] = assemble(Hn_32)
     H_10_vec[0] = assemble(Hn_10)
     H_ex_vec1[0] = assemble(Hn_ex1)
     # H_ex_vec2[0] = Hn_ex2
     Hs_vec[0] = assemble(Hn_s)
+
+    errH_32_vec[0] = np.abs(H_32_vec[0] - H_ex_vec1[0])
+    errH_10_vec[0] = np.abs(H_10_vec[0] - H_ex_vec1[0])
+    errHs_vec[0] = np.abs(Hs_vec[0] - H_ex_vec1[0])
 
     Hdot_vec[0] = assemble(Hdot_n)
     bdflow_vec[0] = assemble(bdflow_n)
@@ -320,7 +328,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     a_form10 = m_form10(v_1, u_1, v_0, p_0) - 0.5*dt*j_form10(v_1, u_1, v_0, p_0)
     a_form32 = m_form32(v_3, p_3, v_2, u_2) - 0.5*dt*j_form32(v_3, p_3, v_2, u_2)
 
-    print("Computation of the solution")
+    print("Computation of the solution with n elem " + str(n_el) + " n time " + str(n_t) + " deg " + str(deg))
     print("==============")
 
     for ii in tqdm(range(n_t)):
@@ -385,6 +393,10 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         # Hdot_ex_vec2[ii + 1] = dHn_t_ex2
 
         # print(bdflow_ex_vec[ii+1])
+        errH_32_vec[ii + 1] = np.abs(H_32_vec[ii + 1] - H_ex_vec1[ii + 1])
+        errH_10_vec[ii + 1] = np.abs(H_10_vec[ii + 1] - H_ex_vec1[ii + 1])
+        errHs_vec[ii + 1] = np.abs(Hs_vec[ii + 1] - H_ex_vec1[ii + 1])
+
         errL2_p_3_vec[ii + 1] = errornorm(p_ex, pn_3, norm_type="L2")
         errL2_u_1_vec[ii + 1] = errornorm(u_ex, un_1, norm_type="L2")
         errL2_p_0_vec[ii + 1] = errornorm(p_ex, pn_0, norm_type="L2")
@@ -492,11 +504,16 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     err_p30 = err_p30_vec[-1]
     err_u12 = err_u12_vec[-1]
 
+    errHs = errHs_vec[-1]
+    errH_10 = errH_10_vec[-1]
+    errH_32 = errH_32_vec[-1]
+
     dict_res = {"t_span": t_vec, "energy_32": H_32_vec, "energy_ex1": H_ex_vec1, "energy_ex2": H_ex_vec2, \
                 "energy_s": Hs_vec, "energy_10": H_10_vec, "power": Hdot_vec, \
                 "power_ex": Hdot_ex_vec2, "flow": bdflow_vec, "flow_ex": bdflow_ex_vec, "err_p3": errL2_p_3, \
                 "err_u1": [errL2_u_1, errHcurl_u_1], "err_p0": [errL2_p_0, errH1_p_0], \
-                "err_u2": [errL2_u_2, errHdiv_u_2], "err_p30": err_p30, "err_u12": err_u12}
+                "err_u2": [errL2_u_2, errHdiv_u_2], "err_p30": err_p30, "err_u12": err_u12, \
+                "err_H": [errHs, errH_10, errH_32]}
 
     return dict_res
 
@@ -527,6 +544,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 # errL2_p0, errH1_p0 = results["err_p0"]
 # errL2_u2, errHdiv_u2 = results["err_u2"]
 #
+# err_Hs, err_H10, err_H32 = results["err_H"]
+#
 # print("Error L2 p3: " + str(errL2_p3))
 #
 # print("Error L2 u1: " + str(errL2_u1))
@@ -537,6 +556,10 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 #
 # print("Error L2 u2: " + str(errL2_u2))
 # print("Error Hdiv u2: " + str(errHdiv_u2))
+#
+# print("Error Hs: " + str(err_Hs))
+# print("Error H_10: " + str(err_H10))
+# print("Error H_32: " + str(err_H32))
 #
 # plt.figure()
 # plt.plot(t_vec, H_32, 'r-.', label=r'$H_{32}$')
