@@ -1,0 +1,174 @@
+% WORKAROUND (an update of the geometry package broke beamer...)
+\makeatletter\let\ifGm@compatii\relax\makeatother
+% end of WORKAROUND
+
+
+\documentclass{beamer}
+% \usetheme[uttitlepage=false]{ut}
+\usetheme[euler=false,titlepage=C]{ut}
+\usetheme{ut}
+
+
+\usepackage{tikz-cd}
+\usepackage[most]{tcolorbox}
+
+\usepackage[backend=bibtex, style=authoryear, doi=false,isbn=false,url=false]{biblatex}
+
+\usepackage{bm}
+\usepackage{color}
+\definecolor{theme}{RGB}{0,73,114}
+
+
+\usepackage{graphicx}
+\usepackage{diffcoeff}
+\usepackage[most]{tcolorbox}
+\usepackage{mathtools}
+
+% Math macros
+\DeclareMathOperator*{\grad}{grad}
+\DeclareMathOperator*{\Grad}{Grad}
+\DeclareMathOperator*{\Div}{Div}
+\renewcommand{\div}{\operatorname{div}}
+\DeclareMathOperator*{\Hess}{Hess}
+\DeclareMathOperator*{\curl}{curl}
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator{\Dom}{Dom}
+\DeclareMathOperator*{\esssup}{ess\,sup}
+
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\bbF}{\mathbb{F}}
+\newcommand{\bbA}{\mathbb{A}}
+\newcommand{\bbB}{\mathbb{B}}
+\newcommand{\bbS}{\mathbb{S}}
+
+\newcommand*{\norm}[1]{\ensuremath{\left\|#1\right\|}}
+\newcommand{\where}{\qquad \text{where} \qquad}
+\newcommand{\inner}[3][]{\ensuremath{\left\langle #2, \, #3 \right\rangle_{#1}}}
+\newcommand{\bilprod}[2]{\left\langle \left\langle \, #1, #2 \, \right\rangle \right\rangle}
+\newcommand{\pder}[2]{\ensuremath{\partial_{#2} #1}}
+\newcommand{\dder}[2]{\ensuremath{\delta_{#2} #1}}
+\newcommand{\secref}[1]{\S\ref{#1}}
+\newcommand{\energy}[1]{\frac{1}{2} \int_{\Omega} \left\{ #1 \right\} \d\Omega}
+\newcommand{\crmat}[1]{\ensuremath{\left[#1\right]_\times}}
+\newcommand{\fenics}{\textsc{FEniCS}\xspace}
+\newcommand{\firedrake}{\textsc{Firedrake}\xspace}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+\newtheorem{hypothesis}{Hypothesis}
+\newtheorem{assumption}{Assumption}
+\newtheorem{conjecture}{Conjecture}
+
+
+\def\onedot{$\mathsurround0pt\ldotp$}
+\def\cddot{% two dots stacked vertically
+	\mathbin{\vcenter{\baselineskip.67ex
+			\hbox{\onedot}\hbox{\onedot}}%
+}}
+
+\renewcommand\bibfont{\scriptsize}
+
+
+\makeatletter \renewcommand\d[1]{\ensuremath{%
+		\;\mathrm{d}#1\@ifnextchar\d{\!}{}}}
+\makeatother
+
+
+\graphicspath{{../images/}}
+
+\bibliography{../biblio_LHMNC}
+
+
+%% At begin of each section: show current section and all subsections in the section if any
+%% At begin of each subsection except first: show only the current section/subsection
+\newif\iftocsub
+\tocsubtrue
+\AtBeginSection[] {
+	\begin{frame}[noframenumbering]{Outline}
+		\tableofcontents[sectionstyle=show/shaded, subsectionstyle=show/show/hide]
+	\end{frame}
+	\tocsubfalse
+}
+\AtBeginSubsection[] {
+	\iftocsub
+	\begin{frame}[noframenumbering]{Outline}
+		\tableofcontents[currentsubsection, sectionstyle=show/shaded, subsectionstyle=show/shaded/hide]
+	\end{frame}
+	\fi
+	\tocsubtrue
+}
+
+
+\title{Mixed finite elements for port-Hamiltonian models of von Kármán beams\\
+	\small{7th IFAC Conference onLagrangian and Hamiltonian method for non linear control}}
+%  
+\institute[UT]{\inst{1}University of Twente, Enschede (NL) \and \inst{2}ISAE-SUPAERO, Toulouse (FR)}
+
+% \subtitle[Short subtitle]{I am not using any subtitles}
+\author[A.~Brugnoli]{Andrea Brugnoli\inst{1} \and Ramy Rashad\inst{1} \and Federico Califano\inst{1} \and Stefano Stramigioli\inst{1} \and Denis Matignon\inst{2} } 
+
+\date{\flushright 11-13 October, 2021}
+\footlinetext{[A.~Brugnoli]}
+% \titlegraphic{\includegraphics[height=1cm]{titlegraphic}}
+
+\utbeamerset{tpboxax=5, tpboxay=20, tpboxawd=100, tpboxbht=30, tpboxbx=5, tpboxby=35, tpboxbwd=120, tpboxbht=30,}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}{Overview}
+	\tableofcontents
+\end{frame}
+
+\section{On the von-Karman assumption}
+
+\begin{frame}{The von-Karman }
+	This theory has puzzled mathematicians and physicists as
+	the derivation of the model rely on some not well justified assumptions.
+\end{frame}
+
+\begin{frame}{Membrane-bending problem for thin beams}
+	
+For small deformations the membrane and bending behavior are uncoupled:
+
+\begin{equation*}
+		\diffp{}{t}
+		\begin{pmatrix}
+			\alpha_u \\
+			\alpha_\varepsilon \\
+			\alpha_w \\
+			\alpha_\kappa			
+		\end{pmatrix} = 
+	\begin{bmatrix}
+	0 & \partial_x & 0 & 0 \\
+	\partial_x & 0 & 0 & 0 \\
+	0 & 0 & 0 & -\partial_{xx} \\
+	0 & 0 & \partial_{xx} & 0 \\
+ 	\end{bmatrix}
+ \begin{pmatrix}
+ 	e_u \\
+ 	e_\varepsilon \\
+ 	e_w \\
+ 	e_\kappa			
+ \end{pmatrix}
+\end{equation*}
+ If the material is isotropic 
+
+\end{frame}
+
+
+\begin{frame}[allowframebreaks]{References}
+	\printbibliography
+\end{frame}
+
+
+
+
+
+
+\end{document}
+
