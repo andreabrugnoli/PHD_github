@@ -8,7 +8,6 @@
 \usetheme[euler=false,titlepage=C]{ut}
 \usetheme{ut}
 
-
 \usepackage{tikz-cd}
 \usepackage[most]{tcolorbox}
 
@@ -18,11 +17,13 @@
 \usepackage{color}
 \definecolor{theme}{RGB}{0,73,114}
 
-
 \usepackage{graphicx}
 \usepackage{diffcoeff}
 \usepackage[most]{tcolorbox}
 \usepackage{mathtools}
+
+\usepackage[beamer]{hf-tikz}
+\usetikzlibrary{calc}
 
 % Math macros
 \DeclareMathOperator*{\grad}{grad}
@@ -77,9 +78,9 @@
 \makeatother
 
 
-\graphicspath{{../images/}}
+\graphicspath{{./images/}}
 
-\bibliography{../biblio_LHMNC}
+\bibliography{./biblio_LHMNC}
 
 
 %% At begin of each section: show current section and all subsections in the section if any
@@ -103,7 +104,7 @@
 
 
 \title{Mixed finite elements for port-Hamiltonian models of von Kármán beams\\
-	\small{7th IFAC Conference onLagrangian and Hamiltonian method for non linear control}}
+	\small{7th IFAC Conference on Lagrangian and Hamiltonian method for non linear control}}
 %  
 \institute[UT]{\inst{1}University of Twente, Enschede (NL) \and \inst{2}ISAE-SUPAERO, Toulouse (FR)}
 
@@ -124,11 +125,73 @@
 	\tableofcontents
 \end{frame}
 
-\section{On the von-Karman assumption}
+\section{Von-Karman theory of thin beams/plates}
 
-\begin{frame}{The von-Karman }
-	This theory has puzzled mathematicians and physicists as
-	the derivation of the model rely on some not well justified assumptions.
+\begin{frame}{Linear vs Von-K\`arm\`an plate theory}
+
+	\begin{columns}
+	\begin{column}{.5\textwidth}
+			\includegraphics[width=1\columnwidth]{buckling.jpg}
+	\end{column}
+	\begin{column}{.5\textwidth}
+
+		Non linearity allows to describe bifurcations, i.e. buckling.
+	\end{column}
+	\end{columns}
+	
+\end{frame}
+
+\begin{frame}{The von-K\`arm\`an assumption}
+		
+\begin{block}{Basic geometric assumption}
+	Out of plane deflection comparable compared to the thickness: $w/h = \mathcal{O}(1)$. \\
+\end{block}
+
+\begin{columns}
+	\begin{column}{.55\textwidth}
+		\includegraphics[width=1\columnwidth]{beam_deflected.eps}
+	\end{column}
+	\begin{column}{.45\textwidth}
+		Aspect ratio: $\delta= h/L$.
+		
+		The following terms are kept in the expansion:
+		\begin{equation*}
+		\begin{aligned}
+			w/L &= \mathcal{O}(\delta), \\
+			u/L &= \mathcal{O}(\delta^2), \\
+		\end{aligned}
+		\end{equation*}
+	\end{column}
+\end{columns}
+
+\end{frame}
+
+\begin{frame}{Stresses and Strains}
+	
+Decomposition strain field 
+\begin{equation*}
+	\varepsilon_{xx} = \overbrace{\tikzmarkin<1>[below right offset={0.05,-0.4},above left offset={-0.05,0.7}]{lm}\diffp{u}{x}\tikzmarkend{lm} +  \tikzmarkin<1>[below right offset={0,-0.4},above left offset={-0.05,0.7}]{nlm}\frac{1}{2} \left(\diffp{w}{x} \right)^2\tikzmarkend{nlm}}^{\varepsilon_{xx}^m} - \overbrace{\tikzmarkin<1>[below right offset={0.05,-0.4},above left offset={-0.05,0.7}]{lb}z\diffp[2]{w}{x}\tikzmarkend{lb}}^{\kappa_{xx}}
+\end{equation*}
+
+\begin{tikzpicture}[remember picture,overlay]
+	% adjust the shift from "col" to move the position of the annotation
+	\coordinate (lm-a) at ($(lm)+(-2,-2)$);
+	\coordinate (lm-b) at ($(lm)+(0.4,-1.1)$);
+	\node[align=left] (lmstring) at (lm-a) {\small{Linear membrane def.}};
+	\draw[->, red](lmstring) -| node {} (lm-b);
+	
+	\coordinate (nlm-a) at ($(nlm)+(-3.3,-3)$);
+	\coordinate (nlm-b) at ($(nlm)+(0.8,-1.1)$);
+	\node[align=left] (nlmstring) at (nlm-a) {\small{Non-linear membrane def.}};
+	\draw[->, red](nlmstring) -| node {} (nlm-b);
+	
+	\coordinate (lb-a) at ($(lb)+(+2,-3)$);
+	\coordinate (lb-b) at ($(lb)+(0.3,-1.1)$);
+	\node[align=right] (lbstring) at (lb-a) {\small{Linear bending def.}};
+	\draw[->, red](lbstring) -| node {} (lb-b);
+	
+\end{tikzpicture}
+
 \end{frame}
 
 \begin{frame}{Membrane-bending problem for thin beams}
