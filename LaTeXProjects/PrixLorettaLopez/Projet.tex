@@ -94,34 +94,34 @@ Pour réaliser un développement substantiel dans les domaines d'application les
 
 \subsection{Le projet MORPHEUS}
 Le but de ce projet de recherche consiste à mettre en place des méthodes numériques
-pour accélérer la simulation des problèmes d'interaction fluide-structure (IFS)  d’un facteur 100, par rapport au temps de calcul requis pour une simulation haute-fidélité. La réussite du projet permettra donc d’intégrer des modèles plus économiques, qui pourront remplacer des simulations très coûteuses, et ainsi de faciliter le design et la prise des décisions.
+pour accélérer la simulation des problèmes d'interaction fluide-structure (IFS)  d’un facteur 100, par rapport au temps de calcul requis pour une simulation haute-fidélité. La réussite du projet permettra donc d’intégrer des modèles plus économiques, qui pourront remplacer des simulations très coûteuses, et ainsi de faciliter le design et la prise de décisions.
 
 A la différence de plusieurs méthodes proposées dans la littérature, l'impératif de ce projet reste la fidélité à la physique \cite{willcox2021}. Le formalisme port-Hamiltonien s'avère être un candidat idéal pour atteindre ce but.
 
-La vision qui sous-tend ce projet est que l’utilisation d’algorithmes fidèles à la structure physique du problème pourra radicalement améliorer les techniques normalement utilisées pour la réduction des modèles et l’optimisation. Cette structure est le plus souvent ignorée par les algorithmes de réduction, qui traitent les simulations comme des boîtes noires. Le modèles réduits respectueux de la physique sous-jacente sont beaucoup plus précis des ceux qui ne la garantissent pas \cite{lee2020}. 
+La vision qui sous-tend ce projet est que l’utilisation d’algorithmes fidèles à la structure physique du problème pourra radicalement améliorer les techniques normalement utilisées pour la réduction des modèles et l’optimisation. Cette structure est le plus souvent ignorée par les algorithmes de réduction, qui traitent les simulations comme des boîtes noires. Les modèles réduits respectueux de la physique sous-jacente sont beaucoup plus précis que ceux qui ne la garantissent pas \cite{lee2020}. 
 
 
 \section{Aspects innovants du projet et verrous scientifiques}
 
 \subsection{État de l'art}
 Le coût prohibitif des simulations numériques pour les problèmes couplés d'interaction fluide-structure
-a poussé la communauté scientifique a concevoir des algorithmes capables de réduire la complexité des modèles. La grande majorité de ces méthodes supposent que l'on puisse obtenir un système réduit à travers une méthode essentiellement linéaire, i.e. la Décomposition Orthogonale en Valeurs Propres (POD) \cite{shinde2019,tello2020fluid}. Cette hypothèse n’est pas valable pour tout
+a poussé la communauté scientifique à concevoir des algorithmes capables de réduire la complexité des modèles. La grande majorité de ces méthodes supposent que l'on puisse obtenir un système réduit à travers une méthode essentiellement linéaire, i.e. la Décomposition Orthogonale en Valeurs Propres (POD) \cite{shinde2019,tello2020fluid}. Cette hypothèse n’est pas valable pour tout
 système exhibant un comportement non-linéaire et conduit à surestimer la dimension
 du système réduit \cite{kerschen2005}. Grâce aux progrès récents dans le domaine de l’Intelligence
 Artificielle (IA), de nouvelles méthodes permettent d’obtenir des modèles réduits rapides. Certaines
-méthodes utilisent les données issues des simulations fines \cite{lee2020}, d'autres ne demandent pas des simulations couteuses, mais cherchent \'a minimiser la violation des principes physiques~\cite{sun2020physics}.  Toutes ces méthodes ne garantissent pas le respect de la structure physique dans toute la chaîne qui aboutit au modèle final. 
+méthodes utilisent les données issues des simulations fines \cite{lee2020}, d'autres ne demandent pas de simulations couteuses, mais cherchent à minimiser la violation des principes physiques~\cite{sun2020physics}.  Toutes ces méthodes ne garantissent pas le respect de la structure physique dans toute la chaîne qui aboutit au modèle final. 
 
 
 \subsection{Verrous scientifiques}
 
 
-Le premier défi du projet consiste à implémenter des méthodes numériques pour la résolution des systèmes couplés multiphysiques. Ces modèles numériques devront retenir les propriétés physiques du problème (conservation d’énergie globale, traçage des échanges d’énergie entre les différents sous-systèmes, conservation d’invariants du problème). Dans l'industrie habituellement, des méthodes différentes sont utilisées pour simuler physiques distinctes. Par conséquent, le couplage numérique ne représente pas correctement les flux d’énergie. L’utilisation d’un paradigme de modélisation unifié permettra donc d’effectuer les couplages de manière à respecter la physique. \\
+Le premier défi du projet consiste à implémenter des méthodes numériques pour la résolution des systèmes couplés multiphysiques. Ces modèles numériques devront retenir les propriétés physiques du problème (conservation d’énergie globale, traçage des échanges d’énergie entre les différents sous-systèmes, conservation d’invariants du problème). Dans l'industrie habituellement, des méthodes différentes sont utilisées pour simuler des physiques distinctes. Par conséquent, le couplage numérique ne représente pas correctement les flux d’énergie. L’utilisation d’un paradigme de modélisation unifié permettra donc d’effectuer les couplages de manière à respecter la physique. \\
 
 Le second challenge du projet consiste à intégrer des techniques issues de l’Intelligence
-Artificielle, qui seront utilisées pour obtenir des modèles réduit. Une technique très prometteuse en ce sens est présentée dans \cite{lee2020}, mais ici le respect des lois physiques est imposé a posteriori au travers de contraintes et non pas inclus au niveau de la structure de départ. Dans \cite{sun2020physics} des réseaux de neurones, entraînés pour minimiser l’erreur par rapport au bilan de masse et de la quantité de mouvement, sont utilisés pour s’affranchir de la simulation haute fidélité. Pourtant, cela ne garantit pas le respect de la structure physique et pose des soucis au niveau de l’interprétabilité des résultats. Conserver la structure physique de la simulation haute fidélité dans la représentation réduite permettra d’intégrer des outils d’intelligence artificielle d’une façon interprétable. \\
+Artificielle, qui seront utilisées pour obtenir des modèles réduits. Une technique très prometteuse en ce sens est présentée dans \cite{lee2020}, mais ici le respect des lois physiques est imposé a posteriori au travers de contraintes et non pas inclus au niveau de la structure de départ. Dans \cite{sun2020physics} des réseaux de neurones, entraînés pour minimiser l’erreur par rapport au bilan de masse et de la quantité de mouvement, sont utilisés pour s’affranchir de la simulation haute fidélité. Pourtant, cela ne garantit pas le respect de la structure physique et pose des soucis au niveau de l’interprétabilité des résultats. Conserver la structure physique de la simulation haute fidélité dans la représentation réduite permettra d’intégrer des outils d’intelligence artificielle d’une façon interprétable. \\
 
 Le dernier objectif consistera à utiliser ces modèles réduits pour optimiser le design
-mécanique des structures, et vérifier la validité des modèles réduit. Cette étape permettra
+mécanique des structures, et vérifier la validité des modèles réduits. Cette étape permettra
 d’évaluer la validité et l’efficacité des modèles réduits par rapport aux simulations fines.
 Typiquement dan l'industrie l’optimisation et les études paramétriques sont effectuées sur les
 modèles fins, mais cela comporte des investissement considérables en termes de temps et de
@@ -158,7 +158,7 @@ dans le cadre de ce projet (cf. Fig \ref{fig:applications}): \\
 \begin{itemize}
 	\item Pour réduire les coûts associés à la maintenance des réseaux de distribution (énergie
 	électrique, gas, hydrogène ou hydraulique), des méthodes structurées capables de représenter une hiérarchie de modèles sont nécessaires. Le coût de calcul est trop élevé pour pouvoir optimiser ces modèles directement.
-	\item fin de fournir des services Internet dans des endroits sans accès haut débit, une
+	\item Afin de fournir des services Internet dans des endroits sans accès haut débit, une
 	solution prometteuse consiste à utiliser des constellations de satellites équipés d'antennes constituées de différents modules réflecteurs (reflectarray). Pour concevoir ces modules, des modèles intégrant l’électromagnétisme et la thermomécanique sont nécessaires.
 	\item  La production d’énergie à partir de la fusion nucléaire pose énormément de défis
 	technologiques, à cause des conditions extrêmes de fonctionnement pour le réacteur. La fusion nucléaire représente un cas typique de problème multiphysique, où la dynamique des fluides interagit avec l’électromagnétisme d’une manière complexe.
@@ -168,14 +168,19 @@ dans le cadre de ce projet (cf. Fig \ref{fig:applications}): \\
 
 \subsection{Portée du projet}
 
-Les outils capable de prédire le comportement des systèmes complexes ont une importance fondamentale pour nous aider à affronter les prochaine challenges. Le fait que cette année le Nobel pour la physique à été attribue à trois chercheur travaillant dans ce sujet\footnote{\url{https://www.nobelprize.org/prizes/physics/2021/summary/}} confirme l'importance et l'actualité de ce sujet. Disposer des outils quantitative pour traiter et comprendre la complexité qui nous entoure contribue à:
+Les outils capables de prédire le comportement des systèmes complexes ont une importance
+fondamentale pour nous aider à affronter les prochains défis technologiqes et sociétaux. Le fait que cette année le Prix Nobel de Physique ait été attribué à trois chercheurs travaillant sur ce sujet\footnote{\url{https://www.nobelprize.org/prizes/physics/2021/summary/}} confirme
+l’importance et l’actualité de cet axe de recherche. Disposer d'outils quantitatifs performants pour traiter et comprendre la complexité qui nous entoure contribue :
 
 \begin{enumerate}
-	\item faciliter et pousser le design des technologies opérantes à des conditions extrêmes (avions très flexibles, turbomachines, fusées, etc.);
-	\item prévention des risques dus au vieillissement des infrastructures, bâtiments (l'usure des matériaux introduit des non linéairités);
+	\item à faciliter le design des technologies opérantes, et à les pousser dans conditions extrêmes
+	(avions très flexibles, turbomachines, fusées, etc.);
+	\item à prévenir les risques dus au vieillissement des infrastructures, bâtiments (l’usure
+	des matériaux introduit des non-linéarités);
 \end{enumerate} 
 
-Le fait d'utiliser un outil de modélisation unifiant représente une nouveauté de ce projet. Cela pourra permettre la création d'une infrastructure commune pour les outils digitales et donc faciliter son adoption en industrie. 
+Le fait d’utiliser un outil de modélisation unifié représente une nouveauté essentielle de ce projet.
+Cela pourra permettre la création d’une infrastructure commune pour les outils numériques à la base de la digitalisation,  et donc faciliter son adoption dans l'industrie.
 
 
 \section{Organisation du projet}
@@ -184,7 +189,7 @@ Le projet est divisé en trois work packages :
 \begin{enumerate}
 	\item Développement d'algorithmes numériques haute-fidélité pour des problèmes d'interactions fluide-structures.
 	\item Méthodes de réduction garantissant le respect de la structure physique. 
-	\item Utilisation des modèles réduits pour l'optimisation multidisciplinaire et comparaison avec modeles haute-fidelité.
+	\item Utilisation des modèles réduits pour l'optimisation multidisciplinaire et comparaison avec les  modèles haute-fidélité.
 \end{enumerate}
 
 Chaque macro-tâche est directement associ\'ee \`a une thèse. Pour cela les recrutements des trois doctorants et d'un post-doctorant sont prévus, ainsi que la coopération des trois chercheurs. Chacun d'entre eux sera affecté \`a chaque macro-sujet:
