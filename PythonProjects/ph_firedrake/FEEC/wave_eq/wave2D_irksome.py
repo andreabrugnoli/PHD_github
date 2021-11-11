@@ -29,7 +29,7 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
         return a[0] * b[1] - a[1] * b[0]
 
     L = 1
-    mesh = RectangleMesh(n_el, n_el, L, L, quadrilateral=False)
+    mesh = RectangleMesh(n_el, n_el, 1, 1/2, quadrilateral=False)
     n_ver = FacetNormal(mesh)
 
     P_0 = FiniteElement("CG", triangle, deg)
@@ -62,12 +62,12 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
 
     x, y = SpatialCoordinate(mesh)
 
-    om_x = 2*pi
-    om_y = 2*pi
+    om_x = 1
+    om_y = 1
     om_t = np.sqrt(om_x**2 + om_y**2)
-    phi_x = 1
-    phi_y = 2
-    phi_t = 3
+    phi_x = 0
+    phi_y = 0
+    phi_t = 0
 
     t = Constant(0.0)
     w_ex = sin(om_x * x + phi_x) * sin(om_y * y + phi_y) * sin(om_t * t + phi_t)
@@ -243,10 +243,10 @@ def compute_sol(n_el, n_t, deg=1, t_fin=1):
 
     return dict_res
 
-n_elem = 10
+n_elem = 5
 pol_deg = 2
 
-n_time = 300
+n_time = 50
 t_fin = 1
 results = compute_sol(n_elem, n_time, pol_deg, t_fin)
 

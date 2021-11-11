@@ -7,6 +7,9 @@ from scipy.sparse import csr_matrix, csc_matrix, lil_matrix
 from scipy.sparse.linalg import spsolve
 import matplotlib.pyplot as plt
 
+import os
+os.environ["OMP_NUM_THREADS"] = "1"
+
 tol = 1e-10
 
 L = 1

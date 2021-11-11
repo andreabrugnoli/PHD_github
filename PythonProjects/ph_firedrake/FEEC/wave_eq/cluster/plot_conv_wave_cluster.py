@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tools_plotting import setup
 
-path_res = "cluster/results_wave/"
+path_res = "results_wave/"
 bc_case = "_DN"
 geo_case = "_3D"
 

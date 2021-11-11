@@ -166,6 +166,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         bc_N = [DirichletBC(V_32.sub(1), u_ex32, 2), \
                 DirichletBC(V_32.sub(1), u_ex32, 4)]
 
+
     Ppoint = (L/5, L/5)
 
     p_0P = np.zeros((1+n_t,))
@@ -535,91 +536,91 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     return dict_res
 
-# n_elem = 10
-# pol_deg = 1
+n_elem = 10
+pol_deg = 2
+
+n_time = 100
+t_fin = 10
+
+results = compute_err(n_elem, n_time, pol_deg, t_fin, "NDD")
+
+t_vec = results["t_span"]
+Hdot_vec = results["power"]
+Hdot_ex_vec = results["power_ex"]
+
+bdflow_vec = results["flow"]
+bdflow_ex_vec = results["flow_ex"]
+
+H_32 = results["energy_32"]
+H_10 = results["energy_10"]
+H_ex1 = results["energy_ex1"]
+H_ex2 = results["energy_ex2"]
+H_s = results["energy_s"]
+
+errL2_p3 = results["err_p3"]
+errL2_u1, errHcurl_u1 = results["err_u1"]
+errL2_p0, errH1_p0 = results["err_p0"]
+errL2_u2, errHdiv_u2 = results["err_u2"]
+
+err_Hs, err_H10, err_H32 = results["err_H"]
+
+print("Error L2 p3: " + str(errL2_p3))
+
+print("Error L2 u1: " + str(errL2_u1))
+print("Error Hcurl u1: " + str(errHcurl_u1))
+
+print("Error L2 p0: " + str(errL2_p0))
+print("Error H1 p0: " + str(errH1_p0))
+
+print("Error L2 u2: " + str(errL2_u2))
+print("Error Hdiv u2: " + str(errHdiv_u2))
+
+print("Error Hs: " + str(err_Hs))
+print("Error H_10: " + str(err_H10))
+print("Error H_32: " + str(err_H32))
+
+plt.figure()
+plt.plot(t_vec, H_32, 'r-.', label=r'$H_{32}$')
+plt.plot(t_vec, H_10, 'b--', label=r'$H_{10}$')
+plt.plot(t_vec, H_ex1, '*-', label=r'H Exact1')
+# plt.plot(t_vec, H_ex2, '+-', label=r'H Exact2')
+plt.plot(t_vec, H_s, '+', label=r'H scat')
+plt.xlabel(r'Time [s]')
+plt.title(r'Energies')
+plt.legend()
+
+plt.figure()
+plt.plot(t_vec, bdflow_vec, 'r-.', label=r'bd flow')
+plt.plot(t_vec, bdflow_ex_vec, 'b--', label=r'bd flow ex')
+plt.plot(t_vec, Hdot_vec, '*', label=r'Hdot')
+plt.plot(t_vec, Hdot_ex_vec, '+', label=r'Hdot ex')
+plt.xlabel(r'Time [s]')
+plt.title(r'Boundary flow')
+plt.legend()
+
+
+plt.figure()
+plt.plot(t_vec, Hdot_vec - bdflow_vec, 'r--', label=r'Energy residual')
+plt.xlabel(r'Time [s]')
+plt.title(r'Energy residual')
+plt.legend()
+
+plt.show()
+
+# diffH_L2Hdiv = np.diff(H_32)
+# diffH_H1Hcurl = np.diff(H_10)
+# Delta_t = np.diff(t_vec)
+# int_bdflow = np.zeros((n_time, ))
 #
-# n_time = 100
-# t_fin = 1
-#
-# results = compute_err(n_elem, n_time, pol_deg, t_fin)
-#
-# t_vec = results["t_span"]
-# Hdot_vec = results["power"]
-# Hdot_ex_vec = results["power_ex"]
-#
-# bdflow_vec = results["flow"]
-# bdflow_ex_vec = results["flow_ex"]
-#
-# H_32 = results["energy_32"]
-# H_10 = results["energy_10"]
-# H_ex1 = results["energy_ex1"]
-# H_ex2 = results["energy_ex2"]
-# H_s = results["energy_s"]
-#
-# errL2_p3 = results["err_p3"]
-# errL2_u1, errHcurl_u1 = results["err_u1"]
-# errL2_p0, errH1_p0 = results["err_p0"]
-# errL2_u2, errHdiv_u2 = results["err_u2"]
-#
-# err_Hs, err_H10, err_H32 = results["err_H"]
-#
-# print("Error L2 p3: " + str(errL2_p3))
-#
-# print("Error L2 u1: " + str(errL2_u1))
-# print("Error Hcurl u1: " + str(errHcurl_u1))
-#
-# print("Error L2 p0: " + str(errL2_p0))
-# print("Error H1 p0: " + str(errH1_p0))
-#
-# print("Error L2 u2: " + str(errL2_u2))
-# print("Error Hdiv u2: " + str(errHdiv_u2))
-#
-# print("Error Hs: " + str(err_Hs))
-# print("Error H_10: " + str(err_H10))
-# print("Error H_32: " + str(err_H32))
+# for i in range(n_time):
+#     int_bdflow[i] = 0.5*Delta_t[i]*(bdflow_vec[i+1] + bdflow_vec[i])
 #
 # plt.figure()
-# plt.plot(t_vec, H_32, 'r-.', label=r'$H_{32}$')
-# plt.plot(t_vec, H_10, 'b--', label=r'$H_{10}$')
-# plt.plot(t_vec, H_ex1, '*-', label=r'H Exact1')
-# # plt.plot(t_vec, H_ex2, '+-', label=r'H Exact2')
-# plt.plot(t_vec, H_s, '+', label=r'H scat')
+# plt.plot(t_vec[1:], diffH_L2Hdiv, 'ro.', label=r'$\Delta H_{32}$')
+# plt.plot(t_vec[1:], diffH_H1Hcurl, 'b--', label=r'$\Delta H_{10}$')
+# plt.plot(t_vec[1:], int_bdflow, '*-.', label=r'Bd flow int')
 # plt.xlabel(r'Time [s]')
-# plt.title(r'Energies')
+# plt.title(r'Energy balance')
 # plt.legend()
-#
-# plt.figure()
-# plt.plot(t_vec, bdflow_vec, 'r-.', label=r'bd flow')
-# plt.plot(t_vec, bdflow_ex_vec, 'b--', label=r'bd flow ex')
-# plt.plot(t_vec, Hdot_vec, '*', label=r'Hdot')
-# plt.plot(t_vec, Hdot_ex_vec, '+', label=r'Hdot ex')
-# plt.xlabel(r'Time [s]')
-# plt.title(r'Boundary flow')
-# plt.legend()
-#
-#
-# # plt.figure()
-# # plt.plot(t_vec, Hdot_vec - bdflow_vec, 'r--', label=r'Energy residual')
-# # plt.xlabel(r'Time [s]')
-# # plt.title(r'Energy residual')
-# # plt.legend()
 #
 # plt.show()
-#
-# # diffH_L2Hdiv = np.diff(H_32)
-# # diffH_H1Hcurl = np.diff(H_10)
-# # Delta_t = np.diff(t_vec)
-# # int_bdflow = np.zeros((n_time, ))
-# #
-# # for i in range(n_time):
-# #     int_bdflow[i] = 0.5*Delta_t[i]*(bdflow_vec[i+1] + bdflow_vec[i])
-# #
-# # plt.figure()
-# # plt.plot(t_vec[1:], diffH_L2Hdiv, 'ro.', label=r'$\Delta H_{32}$')
-# # plt.plot(t_vec[1:], diffH_H1Hcurl, 'b--', label=r'$\Delta H_{10}$')
-# # plt.plot(t_vec[1:], int_bdflow, '*-.', label=r'Bd flow int')
-# # plt.xlabel(r'Time [s]')
-# # plt.title(r'Energy balance')
-# # plt.legend()
-# #
-# # plt.show()

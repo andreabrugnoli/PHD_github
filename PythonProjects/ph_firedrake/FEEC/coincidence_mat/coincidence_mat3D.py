@@ -7,15 +7,18 @@ from scipy.sparse import csr_matrix, csc_matrix, lil_matrix
 from scipy.sparse.linalg import spsolve
 import matplotlib.pyplot as plt
 
+import os
+os.environ["OMP_NUM_THREADS"] = "1"
+
 tol = 1e-10
 
 L = 1
-n_el = 3
-deg = 1
+n_el = 1
+deg = 3
 
-mesh = Mesh("/home/andrea/cube.msh")
-# mesh = CubeMesh(n_el, n_el, n_el, L)
-triplot(mesh)
+# mesh = Mesh("/home/andrea/cube.msh")
+mesh = CubeMesh(n_el, n_el, n_el, L)
+# triplot(mesh)
 plt.show()
 
 P_0 = FiniteElement("CG", tetrahedron, deg)
