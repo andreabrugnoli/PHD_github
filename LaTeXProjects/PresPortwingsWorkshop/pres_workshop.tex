@@ -1,0 +1,165 @@
+% beautiful title slides in Beamer
+% Model 6
+% latex-beamer.com
+
+\documentclass[aspectratio=169]{beamer}
+\usepackage{color}
+\definecolor{theme}{RGB}{0,73,114}
+\usepackage{media9}
+\usepackage[backend=bibtex, style=authoryear, doi=false,isbn=false,url=false]{biblatex}
+\usepackage[most]{tcolorbox}
+% Remove navigation bar
+\setbeamertemplate{navigation symbols}{}
+
+% Tikz package
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+
+\graphicspath{{./images/}}
+
+\bibliography{biblio}
+
+
+%% At begin of each section: show current section and all subsections in the section if any
+%% At begin of each subsection except first: show only the current section/subsection
+\newif\iftocsub
+\tocsubtrue
+\AtBeginSection[] {
+	\begin{frame}[noframenumbering]{Outline}
+		\tableofcontents[sectionstyle=show/shaded, subsectionstyle=show/show/hide]
+	\end{frame}
+	\tocsubfalse
+}
+\AtBeginSubsection[] {
+	\iftocsub
+	\begin{frame}[noframenumbering]{Outline}
+		\tableofcontents[currentsubsection, sectionstyle=show/shaded, subsectionstyle=show/shaded/hide]
+	\end{frame}
+	\fi
+	\tocsubtrue
+}
+
+
+\begin{document}
+
+% Title slide frame
+\begin{frame}[plain]
+
+\input{Title_UT}
+    
+\end{frame}
+
+\begin{frame}{Overview}
+	\tableofcontents
+\end{frame}
+
+\section{Introduction}
+
+\begin{frame}{Vision for the portwings project}
+	Numerical methods for port-Hamiltonian system should:
+	\begin{itemize}
+		\item reproduce the physical properties of the problem;
+		\item preserve the modularity inherithed from the Dirac structure;
+		\item work in any spatial dimension;
+		\item adaptable to many physical problems (fluid and solid mechanics, electromagnetism, etc.);
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Classical methods for computational simulation}
+\begin{tcbraster}[raster columns=3, raster equal height]
+	\begin{tcolorbox}[width=0.32\textwidth, nobeforeafter, colframe=theme,title=Finite differences]%%
+	Pros:
+	\begin{itemize}
+		\item quadrature-free implementation;
+		\item diagonal mass matrices;
+	\end{itemize}
+	Cons:
+	\begin{itemize}
+		\item solution is only pointwise;
+		\item difficult bcs. implementation;
+		\item no Galerkin orthogonality;
+	\end{itemize}
+	\end{tcolorbox} 
+	\begin{tcolorbox}[width=0.32\textwidth, nobeforeafter,  colframe=theme,title=Finite volumes]%%
+		Pros:
+		\begin{itemize}
+			\item Exact conservation laws (CFD);
+			\item incorporates discontinous phenomena;
+		\end{itemize}
+		Cons:
+		\begin{itemize}
+			\item low order approximation;
+			\item requires Voronoi dual mesh;
+		\end{itemize}
+	\end{tcolorbox}
+	\begin{tcolorbox}[width=0.32\textwidth, nobeforeafter,  colframe=theme,title=Finite elements]%%
+		Pros:
+		\begin{itemize}
+			\item Galerkin orthogonality;
+			\item geometric flexibility;
+			\item mathematical foundation;
+		\end{itemize}
+		Cons:
+		\begin{itemize}
+			\item trouble at high aspect ratio;
+			\item continuous FEM has trouble with transport;
+		\end{itemize}
+	\end{tcolorbox}
+\end{tcbraster}
+\end{frame}
+
+
+\begin{frame}{Finite difference implementation of Rayleigh-Taylor instability}
+	\begin{figure}
+		\centering
+		\includemedia[
+		label=vidNoRod,
+		addresource=/home/andrea/Videos/Videos_PW/Rayleight_Taylor_FDM.mp4,
+		activate=pageopen,
+		width=10cm, height=6cm, 
+		flashvars={
+			source=/home/andrea/Videos/Videos_PW/Rayleight_Taylor_FDM.mp4
+			&loop=true
+		}
+		]{}{VPlayer.swf}
+	\end{figure}
+	Source: \url{https://wci.llnl.gov/simulation/computer-codes/miranda}
+\end{frame}
+
+
+\begin{frame}{Finite volume simulations in astrophysics}
+	\begin{figure}
+		\centering
+		\includemedia[
+		label=vidNoRod,
+		addresource=/home/andrea/Videos/Videos_PW/turbolence_mach10_FVM.mp4,
+		activate=pageopen,
+		width=10cm, height=6cm, 
+		flashvars={
+			source=/home/andrea/Videos/Videos_PW/turbolence_mach10_FVM.mp4
+			&loop=true
+		}
+		]{}{VPlayer.swf}
+	\end{figure}
+	\fullcite{price2010}
+\end{frame}
+
+\begin{frame}{Finite elements in biology}
+	\begin{figure}
+		\centering
+		\includemedia[
+		label=vidNoRod,
+		addresource=/home/andrea/Videos/Videos_PW/aorta_FEM.mp4,
+		activate=pageopen,
+		width=10cm, height=6cm, 
+		flashvars={
+			source=/home/andrea/Videos/Videos_PW/aorta_FEM.mp4
+			&loop=true
+		}
+		]{}{VPlayer.swf}
+	\end{figure}
+	\fullcite{laadhari2017}
+\end{frame}
+
+
+\end{document}
