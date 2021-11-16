@@ -140,9 +140,10 @@ If successful, the approach will:
 \begin{frame}{The portwings project and its numerical challenges}
 	Numerical methods for port-Hamiltonian system should:
 	\begin{itemize}
-		\item reproduce the physical properties of the problem (conservation laws, symmetries);
 		\item preserve the modularity inherithed from the Dirac structure;
-		\item work in any spatial dimension;
+		\item reproduce the physical properties of the problem (conservation laws, symmetries);
+		\item distinguish between the dynamics and the constitutive equations;
+		\item work in any spatial dimension and coordinate frame;
 		\item adaptable to many physical problems (fluid and solid mechanics, electromagnetism, etc.);
 	\end{itemize}
 \end{frame}
@@ -151,48 +152,39 @@ If successful, the approach will:
 	\only<1>{
 \begin{tcbraster}[raster columns=3, raster equal height]
 	\begin{tcolorbox}[width=0.32\textwidth, nobeforeafter, colframe=theme,title=Finite differences]%%
-	Pros:
+	Taylor expansion of derivative
 	\begin{itemize}
-		\item quadrature-free implementation;
-		\item diagonal mass matrices;
-	\end{itemize}
-	Cons:
-	\begin{itemize}
-		\item solution is only pointwise;
-		\item difficult bcs. implementation;
-		\item no Galerkin orthogonality;
+		\item[\textcolor{green}{\checkmark}] quadrature-free implementation;
+		\item[\textcolor{green}{\checkmark}] diagonal mass matrices;
+		\item[\textcolor{red}{$\times$}] solution is only pointwise;
+		\item[\textcolor{red}{$\times$}] difficult bcs. implementation;
+		\item[\textcolor{red}{$\times$}] no Galerkin orthogonality;
 	\end{itemize}
 	\end{tcolorbox} 
 	\begin{tcolorbox}[width=0.32\textwidth, nobeforeafter,  colframe=theme,title=Finite volumes]%%
-		Pros:
+		Integral form of the equations
 		\begin{itemize}
-			\item Exact conservation laws;
-			\item incorporates discontinous phenomena;
-		\end{itemize}
-		Cons:
-		\begin{itemize}
-			\item low order approximation;
-			\item requires Voronoi dual mesh;
+			\item[\textcolor{green}{\checkmark}]  exact discrete conservation laws;
+			\item[\textcolor{green}{\checkmark}]  discontinous phenomena;
+			\item[\textcolor{red}{$\times$}] low order approximation;
+			\item[\textcolor{red}{$\times$}] requires Delaunay triangulation;
 		\end{itemize}
 	\end{tcolorbox}
 	\begin{tcolorbox}[width=0.32\textwidth, nobeforeafter,  colframe=theme,title=Finite elements]%%
-		Pros:
+		Variational formulation of the PDE
 		\begin{itemize}
-			\item Galerkin orthogonality;
-			\item geometric flexibility;
-			\item mathematical foundation;
-		\end{itemize}
-		Cons:
-		\begin{itemize}
-			\item trouble at high aspect ratio;
-			\item convection problems;
+			\item[\textcolor{green}{\checkmark}] Galerkin orthogonality;
+			\item[\textcolor{green}{\checkmark}] high order elements;
+			\item[\textcolor{green}{\checkmark}] mathematical foundation;
+			\item[\textcolor{red}{$\times$}] trouble at high aspect ratio;
+			\item[\textcolor{red}{$\times$}] convection problems;
 		\end{itemize}
 	\end{tcolorbox}
 \end{tcbraster}
 }
 
 \only<2>{
-	If the construction is based on the same ideas, these schemes are equivalent:\\
+	If the constructions stem from the same ideas, these schemes may be completely equivalent:\\
 	\vspace{.5cm}
 	\fullcite{adler2021}
 	\vspace{1cm}
@@ -220,7 +212,7 @@ If successful, the approach will:
 \end{frame}
 
 
-\begin{frame}{Finite volume simulation of a flexible wing}
+\begin{frame}{Combined finite volume and finite element simulation of a flexible wing}
 	\begin{figure}
 		\centering
 		\includemedia[
@@ -272,63 +264,270 @@ If successful, the approach will:
 
 
 
-\section{Finite Element Exterior Calculus for port-Hamiltonian systems}
+\section{A unified discretization framework for port-Hamiltonian systems}
 
 
 \begin{frame}{Exterior calculus and discretization of PDEs}
-\begin{block}{Bridging the gap with existent literature}
+	
+\begin{block}{A unified discretization framework}
 	\fullcite{arnold2006acta}
 \end{block}
 
-This framework comes with a periodic table of finite elements for unified analysis\footnote{\url{https://sinews.siam.org/Details-Page/periodic-table-of-the-finite-elements}}. 	Some open source librairies were built to implement the FEEC periodic table\footcite{logg2012,rathgeber2017firedrake}.
+This framework comes with a periodic table of finite elements for unified analysis\footnote{\url{https://sinews.siam.org/Details-Page/periodic-table-of-the-finite-elements}}.
 
-\only<1>{
 \centering
-\includegraphics[width=0.6\textwidth]{periodic-table-of-the-finite-elements_cropped.pdf}\\
-}
+\includegraphics[width=10cm, height=4cm]{periodic-table-of-the-finite-elements.pdf}
+\end{frame}
 
-\only<2>{
-\begin{block}{On the importance of FEEC}
-\textit{"Just as the arrangement of the chemical elements in a periodic table led to the discovery of new elements, the periodic table of finite elements has not only clarified existing elements but also highlighted holes in our knowledge and led to new families of finite elements suited for certain purposes."}
-\end{block}
-}
+\begin{frame}{The impact of FEEC}
+		\begin{block}{On the importance of FEEC}
+			\textit{"Just as the arrangement of the chemical elements in a periodic table led to the discovery of new elements, the periodic table of finite elements has not only clarified existing elements but also highlighted holes in our knowledge and led to new families of finite elements suited for certain purposes."}
+		\end{block}
+		Two open source librairies were built to implement the FEEC periodic table\footcite{logg2012,rathgeber2017firedrake}.
+
+\end{frame}
+
+\begin{frame}{Some families from the periodic table}
+The $\mathcal{P}^-_1\Lambda^k$ family (Whitney forms 1957)
+\begin{figure}[t]
+	\begin{subfigure}[t]{0.23\textwidth}
+		\includegraphics[width=\columnwidth]{P1_tetrahedron.png}%
+	\end{subfigure}
+	\begin{subfigure}[t]{0.23\textwidth}
+		\includegraphics[width=\columnwidth]{N1e1_tetrahedron.png}%
+	\end{subfigure}\hfill
+	\begin{subfigure}[t]{0.23\textwidth}
+		\includegraphics[width=\columnwidth]{N1f1_tetrahedron.png}%
+	\end{subfigure}\hfill
+	\begin{subfigure}[t]{0.23\textwidth}
+		\includegraphics[width=\columnwidth]{dP0_tetrahedron.png}%
+	\end{subfigure}\hfill
+\end{figure}
+The $\mathcal{P}^-_2\Lambda^k$ family
+\begin{figure}
+	\begin{subfigure}[t]{0.23\textwidth}
+		\includegraphics[width=\columnwidth]{P2_tetrahedron.png}%
+	\end{subfigure}
+	\begin{subfigure}[t]{0.23\textwidth}
+		\includegraphics[width=\columnwidth]{N1e2_tetrahedron.png}%
+	\end{subfigure}\hfill
+	\begin{subfigure}[t]{0.23\textwidth}
+		\includegraphics[width=\columnwidth]{N1f2_tetrahedron.png}%
+	\end{subfigure}\hfill
+	\begin{subfigure}[t]{0.23\textwidth}
+		\includegraphics[width=\columnwidth]{dP1_tetrahedron.png}%
+	\end{subfigure}\hfill
+\end{figure}
+
 \end{frame}
 
 
 \begin{frame}{On the application of FEEC to port-Hamiltonian systems}
-\begin{overlayarea}{\textwidth}{\textheight}
+
+FEEC seems the right way to go to obtain discrete pH models. \\
 
 \begin{alertblock}{Why has this framework not been used (yet)?}
-The applications of FEEC to pHs raises some difficult points:
+A consistent discretization of pHs raises some difficult points:
 \begin{itemize}
-	\item \only<2-4>{how to mimic the Dirac structure at the discrete level (exact enforcements of the conservation laws)?} \only<5->{\textcolor{blue}{how to mimic the Dirac structure at the discrete level (exact enforcements of the conservation laws)?}}
+	\item \only<2-4>{how to exactly enforce discrete conservation laws?} \only<5->{\textcolor{blue}{how to exactly enforce discrete conservation laws?}}
 	\item \only<3-4>{how to obtain discrete constitutive equations (discrete Hodge operator)?}
-	\only<5->{\textcolor{blue}{how to obtain discrete constitutive equations (discrete hodge operator)?}}
+	\only<5->{\textcolor{blue}{how to obtain discrete constitutive equations (discrete Hodge operator)?}}
 	\item<4-> how to implement generic boundary conditions (modular multiphysics modelling)?
 \end{itemize}
 \end{alertblock}
 
+\end{frame}
+
+\section{Numerical issues in FEM: the illustrative example of the wave equation}
+
+
+\begin{frame}{The irreducible wave equation}
+From the linearization of mass and momentum conservation, the acoustic wave equation in irrudicible form is obtained
+\begin{equation*}
+\frac{1}{\kappa(\bm{x})} \diffp[2]{p}{t} - \div\left(\frac{1}{\rho(\bm{x})}\grad p\right) = 0,  \qquad \bm{x} \in \Omega \subset \bbR^3, \quad p|_{\partial\Omega} =0,
+\end{equation*}
+$p$ is the pressure, $\rho(\bm{x})$ the density and $\kappa(\bm{x})$ the bulk modulus.
+
+
+\begin{block}{The standard discretization (Dupont 1973)}
+	Standard continuos Galerkin scheme:
+	\begin{equation*}
+		\mathbf{M}_{\kappa^{-1}} \ddot{\mathbf{p}} + \mathbf{K}_{\rho^{-1}} \mathbf{p} = \mathbf{0}.
+	\end{equation*}
+	What about conservation of energy? Yes, \textcolor{red}{but a Newmark scheme is needed}.\\
+	Mass and momentum conservation? \textcolor{red}{Lost (additional analysis required)}.
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Maybe the reduction went too far}
+\begin{overlayarea}{\textwidth}{\textheight}
+	Consider two auxiliary variables
+	\begin{equation*}
+		v = \partial_t p, \qquad  \bm{\sigma} = \rho^{-1} \grad p, \qquad (v \text{ satisfies } v|_{\partial \Omega}=0),
+	\end{equation*}
+\only<1>{
+two coupled conservation laws (mass and momentum) are obtained
+\begin{equation*}
+	\begin{bmatrix}
+		\kappa^{-1} & 0 \\
+		\bm{0} & \rho 
+	\end{bmatrix} \diffp{}{t}
+\begin{pmatrix}
+	v \\ \bm{\sigma}
+\end{pmatrix} = 
+\begin{bmatrix}
+	0 & \div \\
+	\grad & \bm{0}
+\end{bmatrix}
+\begin{pmatrix}
+	v \\ \bm{\sigma}
+\end{pmatrix}.
+\end{equation*}
+This system is an Hamiltonian reformulation.
+}
+\only<2>{
+	leading to the discrete equations
+	\begin{equation*}
+		\begin{bmatrix}
+			\kappa^{-1} & 0 \\
+			\bm{0} & \rho 
+		\end{bmatrix} \diffp{}{t}
+		\begin{pmatrix}
+			v_h \\ \bm{\sigma}_h
+		\end{pmatrix} = 
+		\begin{bmatrix}
+			0 & \div \\
+			\grad & \bm{0}
+		\end{bmatrix}
+		\begin{pmatrix}
+			v_h \\ \bm{\sigma}_h
+		\end{pmatrix}.
+	\end{equation*}
+\begin{alertblock}{A naive unstable choice}
+	Using conforming finite elements (i.e. they can undergo the gradient and the divergence operator resp.)
+	\begin{equation*}
+		v_h \subset H(\grad, \Omega\vert \; v=0 \text{ on } \partial \Omega):=H^1_0(\Omega), \qquad \bm{\sigma}_h \subset H(\div, \Omega).
+	\end{equation*} 
+the discretization is unstable (stabilized schemes have been devised for this scheme).
+\end{alertblock}
+}
 \end{overlayarea}
 \end{frame}
 
-\section{An illustrative example: the wave equation}
+\begin{frame}{The mixed finite element (partial) solution}
+\begin{overlayarea}{\textwidth}{\textheight}
+One can use a weak formulation and integration by parts to obtain a stable discretization.
+
+\only<1>{
+	\begin{block}{Mixed $\div$ formulation (Geveci 1988)}
+		Find $v_h \subset L^2(\Omega), \; \bm{\sigma}_h \subset H(\div, \Omega)$ such that
+		\begin{equation*}
+			\begin{aligned}
+				\inner[L^2(\Omega)]{\psi_v}{\partial_t v_h} &= +\inner[L^2(\Omega)]{ \psi_v}{\div\bm{\sigma}_h}, \\
+				\inner[L^2(\Omega)]{\bm{\psi}_\sigma}{\partial_t \bm{\sigma}_h} &= -\inner[L^2(\Omega)]{\div\bm{\psi}_\sigma}{v_h}, \\
+			\end{aligned} \qquad
+			\begin{aligned}
+				\forall \psi_v &\subset L^2(\Omega), \\
+				\forall \bm{\psi}_\sigma &\subset H(\div, \Omega). \\
+			\end{aligned}
+		\end{equation*}
+		Consequences:
+		\begin{itemize}
+			\item[\textcolor{green}{\checkmark}] Symplectic schemes guarantee discrete energy conservation;
+			\item[\textcolor{green}{\checkmark}] Discrete mass conservation;
+			\item[\textcolor{red}{$\times$}] No momentum conservation;
+		\end{itemize}
+	\end{block}
+}
+
+\only<2>{
+	\begin{block}{Mixed $\grad$ formulation (Cohen 2000)}
+		Find $v_h \subset H_0^1(\Omega), \; \bm{\sigma}_h \subset L^2(\Omega, \bbR^3)$ such that
+		\begin{equation*}
+			\begin{aligned}
+				\inner[L^2(\Omega)]{\psi_v}{\partial_t v_h} &= -\inner[L^2(\Omega)]{\grad \psi_v}{\bm{\sigma}_h}, \\
+				\inner[L^2(\Omega)]{\bm{\psi}_\sigma}{\partial_t \bm{\sigma}_h} &= +\inner[L^2(\Omega)]{ \bm{\psi}_\sigma}{\grad v_h}, \\
+			\end{aligned} \qquad
+			\begin{aligned}
+				\forall \psi_v &\subset H^1_0(\Omega), \\
+				\forall \bm{\psi}_\sigma &\subset L^2(\Omega, \bbR^3). \\
+			\end{aligned}
+		\end{equation*}
+		Consequences:
+		\begin{itemize}
+			\item[\textcolor{green}{\checkmark}] Symplectic schemes guarantee discrete energy conservation;
+			\item[\textcolor{green}{\checkmark}] Discrete momentum conservation;
+			\item[\textcolor{red}{$\times$}] No mass conservation;
+		\end{itemize}
+	\end{block}
+	
+	\Large{Conservation laws cannot be both satisfied!}
+}
 
 
-\begin{frame}{The scalar wave equation as a toy problem}
-From the linearization of mass and momentum conservation, the acoustic wave equation in irrudicible form is obtained
-\begin{equation*}
-\rho(\bm{x}) \diffp[2]{p}{t} - \div(\bm{T}(\bm{x})\grad p) = 0,  \qquad \bm{x} \in \Omega \subset \bbR^3, \quad p|_{\partial\Omega} =0.
-\end{equation*}
-$p$ is the pressure, $\rho(\bm{x})$ the density and $\bm{T}(\bm{x}) \in \bbR^{3\times 3}$ the Young modulus.
-
-Standard discretization method (continuos Galerkin):
-\begin{equation*}
-	\mathbf{M}_\rho \ddot{\mathbf{p}} + \mathbf{K}_{T} \mathbf{p} = 0.
-\end{equation*}
-What about conservation of energy? Yes, but a Newmark scheme is needed.\\
-Mass and momentum conservation? Lost.
+\end{overlayarea}
 \end{frame}
 
+\begin{frame}{Some explanations}
+	
+	\begin{block}{The Hodge operator and the unstable scheme}
+		The instability in the very first formulation is related to a uncorrect discretization of the Hodge operator. \\
+		\vspace{.3cm}
+		Variables to the left and to right are dual to each other and cannot be discretized using the same spaces!
+	\end{block}
 
+	\begin{block}{Failure of discrete conservation laws}
+		The integration by parts implies that the conservation law is only weakly satisfied.
+	\end{block}
+
+\end{frame}
+
+\section{Dual field discretization of port-Hamiltonian systems}
+
+\begin{frame}{A glimpse of light at the end of the tunnel}
+	\fullcite{zhang2021mass}\\
+	\vspace{.5cm}
+	This article heavily relies on FEEC to obtain its properties.
+	\begin{block}{Conservative properties of the dual field approach}
+		A dual field discretization essentially used both the $\div$ and $\grad$ mixed formulations
+		\begin{itemize}
+			\item[\textcolor{green}{\checkmark}] Mass conservation;
+			\item[\textcolor{green}{\checkmark}] Momentum conservation;
+			\item[\textcolor{green}{\checkmark}] Energy conservation.
+		\end{itemize}
+		For the Navier Stokes equation the two systems are coupled via the vorticity (convective terms) but a staggered time stepping scheme lead to two \textbf{uncoupled} and \textbf{linear} saddle point problems.
+	\end{block}
+	
+\end{frame}
+
+\begin{frame}{Dual fields discretization and pH systems}
+	The dual field discretization naturally applies to pH systems:
+	\begin{itemize}
+		\item<2-> Mimetically discretize the Dirac structure (fluxes and efforts stay dual);
+		\item<3-> Derive an adjoint Dirac structure ($\mathrm{d} \rightarrow \delta$), whose discretization relies on the integration by parts;
+		\item<4-> Use both the Hamiltonian from the Dirac structure and its adjoint to get rid of the Hodge operator (no discrete Hodge required for constitutive relations);
+		\item<5-> Combine the two systems to reduce the number of unknows.
+	\end{itemize}
+\onslide<6->{
+\begin{exampleblock}{Benefits of using the dual field for pHs.}
+	This approach:
+		\begin{itemize}
+		\item[\textcolor{green}{\checkmark}] is stable by construction;
+		\item[\textcolor{green}{\checkmark}] conserve mass, momentum, energy;
+		\item[\textcolor{green}{\checkmark}] does not require topologically dual meshes;
+		\item[\textcolor{green}{\checkmark}] can enforce generic boundary conditions in a weak manner. 
+	\end{itemize}
+\end{exampleblock}
+}
+\end{frame}
+
+\begin{frame}
+	\Large Any question?
+\end{frame}
+
+\begin{frame}[allowframebreaks]{References}
+	\printbibliography
+\end{frame}
 
 \end{document}
