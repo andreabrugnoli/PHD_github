@@ -1,0 +1,168 @@
+\documentclass[aspectratio=169]{beamer}
+\usepackage{tikz}
+\usepackage{media9}
+\usepackage{color}
+\definecolor{theme}{RGB}{0,73,114}
+
+\newcommand{\tabitem}{%
+	\usebeamertemplate{itemize item}\hspace*{\labelsep}}
+
+\usetikzlibrary{backgrounds,
+	calc,
+	fadings,
+	shadows,
+	shapes.arrows,
+	shapes.symbols
+}
+
+\usepackage{xparse}
+\edef\RestoreEndlinechar{%
+	\endlinechar=\the\endlinechar\relax
+}
+\endlinechar=-1
+\usepackage{smartdiagram}
+\RestoreEndlinechar
+
+\tikzset{bubble node/.append style={
+		draw=none, opacity=0.5
+	}
+}
+
+\definecolor{BlueCLS}{HTML}{00AAFF}
+\definecolor{DarkBlueCLS}{HTML}{122372}
+\definecolor{GrayCLS}{HTML}{B1B3B4}
+\definecolor{LightGrayCLS}{HTML}{D8D9D9}
+\definecolor{YellowCLS}{HTML}{FFED00}
+
+\newcommand{\Aback}{0,0}
+\newcommand{\Bback}{{2.9*\paperwidth/29.7},0}
+\newcommand{\Cback}{{3.6*\paperwidth/29.7},{3*\paperheight/21}}
+\newcommand{\Dback}{0,{1.9*\paperheight/21}}
+\newcommand{\Eback}{{21.2*\paperwidth/29.7},{8.5*\paperheight/21}}
+\newcommand{\Fback}{{7.5*\paperwidth/29.7},\paperheight}
+\newcommand{\Gback}{0,{14.1*\paperheight/21}}
+\newcommand{\Hback}{0,\paperheight}
+\newcommand{\Iback}{\paperwidth,{1*\paperheight/21}}
+\newcommand{\Jback}{\paperwidth,{11*\paperheight/21}}
+\newcommand{\Kback}{\paperwidth,0}
+\newcommand{\Scale}{0.01*\paperwidth/29.7}
+
+\setbeamertemplate{navigation symbols}{}
+\graphicspath{{./images/}}
+
+\begin{document}
+	
+	% Title slide frame
+\begin{frame}[plain]	
+		\input{Title}
+\end{frame}
+
+{
+	\setbeamercolor{background canvas}{bg=black}
+	\begin{frame}<article:0>[plain]
+		\begin{tikzpicture}[remember picture,overlay]
+			\node[at=(current page.center)] {
+				\includegraphics[keepaspectratio,
+				width=\paperwidth,
+				height=\paperheight]{satellite_panels.jpg}
+			};
+		\end{tikzpicture}
+	\end{frame}
+}
+
+
+{
+	\setbeamercolor{background canvas}{bg=black}
+	\begin{frame}<article:0>[plain]
+		\begin{tikzpicture}[remember picture,overlay]
+			\node[at=(current page.center)] {
+				\includegraphics[keepaspectratio,
+				width=\paperwidth,
+				height=\paperheight]{helios.jpg}
+			};
+		\end{tikzpicture}
+	\end{frame}
+}
+
+
+\begin{frame}<article:0>[plain]
+	\begin{tikzpicture}[remember picture,overlay]
+		\node[at=(current page.center)] {
+			\includemedia[
+			label=vidNoRod,
+			addresource=/home/andrea/Videos/PrixThese/flutter_final.mp4,
+			activate=pageopen,
+			keepaspectratio,  width=\paperwidth, height=\paperheight,
+			flashvars={
+				source=/home/andrea/Videos/PrixThese/flutter_final.mp4
+				&loop=true
+			}
+			]{}{VPlayer.swf}
+		};
+	\end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+
+\begin{center}
+	\begin{tabular}{@{}l@{}}
+		Outil de modélisation: \\
+		\tabitem intuitif \\
+		\tabitem respectueux de la physique
+	\end{tabular}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+	Immagine aereo modulare 
+\end{frame}
+
+\begin{frame}
+	Immagine aereo e radar e vortici 
+\end{frame}
+
+\begin{frame}
+	\begin{columns}
+		\begin{column}{.5\textwidth}
+			\smartdiagramset{
+				distance text center bubble=0.5cm,
+				bubble center node size=1cm,
+				bubble node size=2cm,
+				distance center/other bubbles=0.5cm,
+				bubble center node font=\footnotesize,
+				bubble node font=\scriptsize,
+				bubble center node color=cyan,
+				set color list = {yellow, pink, blue, red}
+			}%
+			\smartdiagram[bubble diagram]{%
+				Systèmes \\
+				Hamiltoniens.,
+				\only<1>{Mecanique}\only<2>{\textcolor{red}{\large Mecanique}},
+				Dynamique \\
+				des fluides,
+				Électromagnétisme,
+				Thermodynamique%
+			}%
+		\end{column}
+	\begin{column}{.5\textwidth}
+		\only<2>{
+		\includegraphics[width=\columnwidth]{satellite.pdf}
+	}
+	\end{column}
+	\end{columns}
+	
+	
+\end{frame}
+
+
+\begin{frame}
+	\only<1>{
+	\includegraphics[width=0.5\textwidth]{cube.pdf}\\
+	Domaine physique}
+	\only<2>{
+	\includegraphics[width=0.5\textwidth]{mesh_cube.pdf}\\
+	Maillage}
+\end{frame}
+
+\end{document}
