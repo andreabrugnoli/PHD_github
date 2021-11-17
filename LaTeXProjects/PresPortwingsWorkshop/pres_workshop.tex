@@ -140,7 +140,7 @@ If successful, the approach will:
 \begin{frame}{The portwings project and its numerical challenges}
 	Numerical methods for port-Hamiltonian system should:
 	\begin{itemize}
-		\item preserve the modularity inherithed from the Dirac structure;
+		\item preserve the modularity inherited from the Dirac structure;
 		\item reproduce the physical properties of the problem (conservation laws, symmetries);
 		\item distinguish between the dynamics and the constitutive equations;
 		\item work in any spatial dimension and coordinate frame;
@@ -165,7 +165,7 @@ If successful, the approach will:
 		Integral form of the equations
 		\begin{itemize}
 			\item[\textcolor{green}{\checkmark}]  exact discrete conservation laws;
-			\item[\textcolor{green}{\checkmark}]  discontinous phenomena;
+			\item[\textcolor{green}{\checkmark}]  discontinuous phenomena;
 			\item[\textcolor{red}{$\times$}] low order approximation;
 			\item[\textcolor{red}{$\times$}] requires Delaunay triangulation;
 		\end{itemize}
@@ -283,7 +283,7 @@ This framework comes with a periodic table of finite elements for unified analys
 		\begin{block}{On the importance of FEEC}
 			\textit{"Just as the arrangement of the chemical elements in a periodic table led to the discovery of new elements, the periodic table of finite elements has not only clarified existing elements but also highlighted holes in our knowledge and led to new families of finite elements suited for certain purposes."}
 		\end{block}
-		Two open source librairies were built to implement the FEEC periodic table\footcite{logg2012,rathgeber2017firedrake}.
+		Two open source libraries were built to implement the FEEC periodic table\footcite{logg2012,rathgeber2017firedrake}.
 
 \end{frame}
 
@@ -342,7 +342,7 @@ A consistent discretization of pHs raises some difficult points:
 
 
 \begin{frame}{The irreducible wave equation}
-From the linearization of mass and momentum conservation, the acoustic wave equation in irrudicible form is obtained
+From the linearization of mass and momentum conservation, the acoustic wave equation in irreducible form is obtained
 \begin{equation*}
 \frac{1}{\kappa(\bm{x})} \diffp[2]{p}{t} - \div\left(\frac{1}{\rho(\bm{x})}\grad p\right) = 0,  \qquad \bm{x} \in \Omega \subset \bbR^3, \quad p|_{\partial\Omega} =0,
 \end{equation*}
@@ -350,7 +350,7 @@ $p$ is the pressure, $\rho(\bm{x})$ the density and $\kappa(\bm{x})$ the bulk mo
 
 
 \begin{block}{The standard discretization (Dupont 1973)}
-	Standard continuos Galerkin scheme:
+	Standard continuous Galerkin scheme:
 	\begin{equation*}
 		\mathbf{M}_{\kappa^{-1}} \ddot{\mathbf{p}} + \mathbf{K}_{\rho^{-1}} \mathbf{p} = \mathbf{0}.
 	\end{equation*}
@@ -387,27 +387,21 @@ two coupled conservation laws (mass and momentum) are obtained
 This system is an Hamiltonian reformulation.
 }
 \only<2>{
-	leading to the discrete equations
-	\begin{equation*}
-		\begin{bmatrix}
-			\kappa^{-1} & 0 \\
-			\bm{0} & \rho 
-		\end{bmatrix} \diffp{}{t}
-		\begin{pmatrix}
-			v_h \\ \bm{\sigma}_h
-		\end{pmatrix} = 
-		\begin{bmatrix}
-			0 & \div \\
-			\grad & \bm{0}
-		\end{bmatrix}
-		\begin{pmatrix}
-			v_h \\ \bm{\sigma}_h
-		\end{pmatrix}.
+	leading to the discrete weak formulation: find $v_h \in V_h, \; \bm{\sigma}_h \in \Sigma_h$ such that
+		\begin{equation*}
+		\begin{aligned}
+			\inner[L^2(\Omega)]{\psi_v}{\kappa^{-1}\partial_t v_h} &= \inner[L^2(\Omega)]{ \psi_v}{\div\bm{\sigma}_h}, \\
+			\inner[L^2(\Omega)]{\bm{\psi}_\sigma}{\rho \partial_t \bm{\sigma}_h} &= \inner[L^2(\Omega)]{\bm{\psi}_\sigma}{\grad v_h}, \\
+		\end{aligned} \qquad
+		\begin{aligned}
+			\forall \psi_v &\subset V_h, \\
+			\forall \bm{\psi}_\sigma &\subset \Sigma_h. \\
+		\end{aligned}
 	\end{equation*}
 \begin{alertblock}{A naive unstable choice}
 	Using conforming finite elements (i.e. they can undergo the gradient and the divergence operator resp.)
 	\begin{equation*}
-		v_h \subset H(\grad, \Omega\vert \; v=0 \text{ on } \partial \Omega):=H^1_0(\Omega), \qquad \bm{\sigma}_h \subset H(\div, \Omega).
+		V_h \subset H(\grad, \Omega\vert \; v=0 \text{ on } \partial \Omega):=H^1_0(\Omega), \qquad \Sigma_h \subset H(\div, \Omega).
 	\end{equation*} 
 the discretization is unstable (stabilized schemes have been devised for this scheme).
 \end{alertblock}
@@ -417,21 +411,22 @@ the discretization is unstable (stabilized schemes have been devised for this sc
 
 \begin{frame}{The mixed finite element (partial) solution}
 \begin{overlayarea}{\textwidth}{\textheight}
-One can use a weak formulation and integration by parts to obtain a stable discretization.
+One can use integration by parts to obtain a stable discretization.
 
 \only<1>{
 	\begin{block}{Mixed $\div$ formulation (Geveci 1988)}
-		Find $v_h \subset L^2(\Omega), \; \bm{\sigma}_h \subset H(\div, \Omega)$ such that
+	Find $v_h \in V_h, \; \bm{\sigma}_h \in \Sigma_h$ such that
 		\begin{equation*}
 			\begin{aligned}
-				\inner[L^2(\Omega)]{\psi_v}{\partial_t v_h} &= +\inner[L^2(\Omega)]{ \psi_v}{\div\bm{\sigma}_h}, \\
-				\inner[L^2(\Omega)]{\bm{\psi}_\sigma}{\partial_t \bm{\sigma}_h} &= -\inner[L^2(\Omega)]{\div\bm{\psi}_\sigma}{v_h}, \\
+				\inner[L^2(\Omega)]{\psi_v}{\kappa^{-1}\partial_t v_h} &= +\inner[L^2(\Omega)]{ \psi_v}{\div\bm{\sigma}_h}, \\
+				\inner[L^2(\Omega)]{\bm{\psi}_\sigma}{\rho \partial_t \bm{\sigma}_h} &= -\inner[L^2(\Omega)]{\div\bm{\psi}_\sigma}{v_h}, \\
 			\end{aligned} \qquad
 			\begin{aligned}
-				\forall \psi_v &\subset L^2(\Omega), \\
-				\forall \bm{\psi}_\sigma &\subset H(\div, \Omega). \\
+				\forall \psi_v &\in  V_h, \\
+				\forall \bm{\psi}_\sigma &\in \Sigma_h. \\
 			\end{aligned}
 		\end{equation*}
+		with $V_h\subset L^2(\Omega), \; \Sigma_h \subset H(\div, \Omega)$. \\
 		Consequences:
 		\begin{itemize}
 			\item[\textcolor{green}{\checkmark}] Symplectic schemes guarantee discrete energy conservation;
@@ -443,17 +438,18 @@ One can use a weak formulation and integration by parts to obtain a stable discr
 
 \only<2>{
 	\begin{block}{Mixed $\grad$ formulation (Cohen 2000)}
-		Find $v_h \subset H_0^1(\Omega), \; \bm{\sigma}_h \subset L^2(\Omega, \bbR^3)$ such that
+		Find $v_h \in V_h, \; \bm{\sigma}_h \in \Sigma_h$ such that
 		\begin{equation*}
 			\begin{aligned}
-				\inner[L^2(\Omega)]{\psi_v}{\partial_t v_h} &= -\inner[L^2(\Omega)]{\grad \psi_v}{\bm{\sigma}_h}, \\
-				\inner[L^2(\Omega)]{\bm{\psi}_\sigma}{\partial_t \bm{\sigma}_h} &= +\inner[L^2(\Omega)]{ \bm{\psi}_\sigma}{\grad v_h}, \\
+				\inner[L^2(\Omega)]{\psi_v}{\kappa^{-1}\partial_t v_h} &= -\inner[L^2(\Omega)]{\grad \psi_v}{\bm{\sigma}_h}, \\
+				\inner[L^2(\Omega)]{\bm{\psi}_\sigma}{\rho \partial_t \bm{\sigma}_h} &= +\inner[L^2(\Omega)]{ \bm{\psi}_\sigma}{\grad v_h}, \\
 			\end{aligned} \qquad
 			\begin{aligned}
-				\forall \psi_v &\subset H^1_0(\Omega), \\
-				\forall \bm{\psi}_\sigma &\subset L^2(\Omega, \bbR^3). \\
+				\forall \psi_v &\in V_h, \\
+				\forall \bm{\psi}_\sigma &\in \Sigma_h, \\
 			\end{aligned}
 		\end{equation*}
+	with $V_h\subset H_0^1(\Omega), \; \Sigma_h \subset L^2(\Omega, \bbR^3)$. \\
 		Consequences:
 		\begin{itemize}
 			\item[\textcolor{green}{\checkmark}] Symplectic schemes guarantee discrete energy conservation;
@@ -485,10 +481,10 @@ One can use a weak formulation and integration by parts to obtain a stable discr
 
 \section{Dual field discretization of port-Hamiltonian systems}
 
-\begin{frame}{A glimpse of light at the end of the tunnel}
+\begin{frame}{A glimpse of light}
 	\fullcite{zhang2021mass}\\
 	\vspace{.5cm}
-	This article heavily relies on FEEC to obtain its properties.
+	This article heavily relies on FEEC to obtain the conservation properties.
 	\begin{block}{Conservative properties of the dual field approach}
 		A dual field discretization essentially used both the $\div$ and $\grad$ mixed formulations
 		\begin{itemize}
@@ -507,7 +503,7 @@ One can use a weak formulation and integration by parts to obtain a stable discr
 		\item<2-> Mimetically discretize the Dirac structure (fluxes and efforts stay dual);
 		\item<3-> Derive an adjoint Dirac structure ($\mathrm{d} \rightarrow \delta$), whose discretization relies on the integration by parts;
 		\item<4-> Use both the Hamiltonian from the Dirac structure and its adjoint to get rid of the Hodge operator (no discrete Hodge required for constitutive relations);
-		\item<5-> Combine the two systems to reduce the number of unknows.
+		\item<5-> Combine the two systems to reduce the number of unknowns.
 	\end{itemize}
 \onslide<6->{
 \begin{exampleblock}{Benefits of using the dual field for pHs.}
@@ -516,7 +512,7 @@ One can use a weak formulation and integration by parts to obtain a stable discr
 		\item[\textcolor{green}{\checkmark}] is stable by construction;
 		\item[\textcolor{green}{\checkmark}] conserve mass, momentum, energy;
 		\item[\textcolor{green}{\checkmark}] does not require topologically dual meshes;
-		\item[\textcolor{green}{\checkmark}] can enforce generic boundary conditions in a weak manner. 
+		\item[\textcolor{green}{\checkmark}] can enforce generic boundary conditions in a weak manner(?). 
 	\end{itemize}
 \end{exampleblock}
 }
