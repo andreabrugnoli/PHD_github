@@ -9,9 +9,7 @@ import matplotlib.pyplot as plt
 from tools_plotting import setup
 
 import os
-os.environ["OMP_NUM_THREADS"] = "1"
-
-# from vedo.dolfin import plot
+import vedo
 
 tol = 1e-10
 
@@ -24,12 +22,18 @@ mesh = Mesh("/home/andrea/cube.xml")
 # mesh_plot = plot(mesh) # mode="mesh", interactive=0
 # plt.show()
 
-f = Expression("10*(x[0]+x[1]-1+x[2]-1)", degree = 2)
+f = Expression("10*(x[0]+x[1]-1+pow(x[2], 2) -1)", degree = 2)
 
 # f = Expression("10*exp(-(pow(x[0] - 0.5, 2) + pow(x[1] - 0.5, 2)) / 0.02)", degree = 2)
 V = FunctionSpace(mesh, "CG", 2)
 u = Function(V)
 u.interpolate(f)
-c = plot(u)
-plt.colorbar(c)
+vedo.dolfin.plot(u, elevation=30, azimuth=-60, axes=False, style=1, scalarbar=False)
+
+
+
+# plt.savefig("/home/andrea/" + "u.eps", format="eps")
+
+vedo.io.screenshot(filename='/home/andrea/cube_sol.pdf', scale=None, returnNumpy=False)
+
 plt.show()

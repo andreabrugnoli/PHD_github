@@ -129,24 +129,24 @@
 				distance text center bubble=0.5cm,
 				bubble center node size=1cm,
 				bubble node size=2cm,
-				distance center/other bubbles=0.5cm,
-				bubble center node font=\footnotesize,
-				bubble node font=\scriptsize,
+				distance center/other bubbles=0.7cm,
+				bubble center node font=\normalsize,
+				bubble node font=\footnotesize,
 				bubble center node color=cyan,
-				set color list = {yellow, pink, blue, red}
+				set color list = {pink, blue, red, yellow}
 			}%
-			\smartdiagram[bubble diagram]{%
+			\smartdiagramanimated[bubble diagram]{%
 				Systèmes \\
-				Hamiltoniens.,
-				\only<1>{Mecanique}\only<2>{\textcolor{red}{\large Mecanique}},
+				Hamiltoniens,
 				Dynamique \\
 				des fluides,
 				Électromagnétisme,
-				Thermodynamique%
+				Thermodynamique, 
+				\Large{\textcolor{red}{Mécanique}}%
 			}%
 		\end{column}
 	\begin{column}{.5\textwidth}
-		\only<2>{
+		\only<5>{
 		\includegraphics[width=\columnwidth]{satellite.pdf}
 	}
 	\end{column}
@@ -155,14 +155,119 @@
 	
 \end{frame}
 
+{
+	\setbeamercolor{background canvas}{bg=black}
+	\begin{frame}<article:0>[plain]
+		\begin{tikzpicture}[remember picture,overlay]
+			\node[at=(current page.center)] {
+				\includegraphics[keepaspectratio,
+				width=\paperwidth,
+				height=\paperheight]{code.jpg}
+			};
+		\end{tikzpicture}
+	\end{frame}
+}
+
 
 \begin{frame}
-	\only<1>{
-	\includegraphics[width=0.5\textwidth]{cube.pdf}\\
-	Domaine physique}
-	\only<2>{
-	\includegraphics[width=0.5\textwidth]{mesh_cube.pdf}\\
-	Maillage}
+	\begin{columns}
+		\begin{column}{.5\textwidth}
+		\begin{overlayarea}{\textwidth}{\textheight}
+			\vspace{2.5cm}
+		La méthode \'a éléments finis: \\
+		\vspace{.5cm}
+		\only<2->{
+		\begin{itemize}
+			\item \only<2>{\textcolor{blue}{Domaine spatial (cube)};}\only<3->{Domaine spatial (cube);}
+			\item \only<3>{\textcolor{blue}{Maillage};}\only<4->{Maillage;}
+			\item \only<4>{\textcolor{blue}{Équations de la physique};}
+		\end{itemize}
+		}
+		\end{overlayarea}
+		\end{column}
+		\begin{column}{.5\textwidth}
+			\only<2>{
+				\includegraphics[width=\columnwidth]{cube.pdf}
+			}
+			\only<3>{
+				\includegraphics[width=\columnwidth]{mesh_cube.pdf}
+			}
+			\only<4>{
+				\includegraphics[width=\columnwidth]{cube_sol.pdf}\\
+				\begin{center}\large
+					$-\Delta u = f.$
+				\end{center}
+			}
+		\end{column}
+	\end{columns}
+
+\end{frame}
+
+\begin{frame}<article:0>[plain]
+	\begin{tikzpicture}[remember picture,overlay]
+		\node[at=(current page.center)] {
+			\includemedia[
+			label=vidNoRod,
+			addresource=/home/andrea/Videos/Videos_defense/Kirchh_Rod.mp4,
+			activate=pageopen,
+			keepaspectratio,  width=\paperwidth, height=\paperheight,
+			flashvars={
+				source=/home/andrea/Videos/Videos_defense/Kirchh_Rod.mp4
+				&loop=true
+			}
+			]{}{VPlayer.swf}
+		};
+	\end{tikzpicture}
+\end{frame}
+
+\begin{frame}<article:0>[plain]
+	\begin{tikzpicture}[remember picture,overlay]
+		\node[at=(current page.center)] {
+			\includemedia[
+			label=vidNoRod,
+			addresource=/home/andrea/Videos/Videos_defense/Saint_Venant_nobar.mp4,
+			activate=pageopen,
+			keepaspectratio,  width=\paperwidth, height=\paperheight,
+			flashvars={
+				source=/home/andrea/Videos/Videos_defense/Saint_Venant_nobar.mp4
+				&loop=true
+			}
+			]{}{VPlayer.swf}
+		};
+	\end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+	\begin{columns}
+	\begin{column}{.51\textwidth}
+		\begin{overlayarea}{\textwidth}{\textheight}
+			\vspace{2.5cm}
+			Développements: \\
+			\vspace{.5cm}
+			\only<2->{
+				\begin{itemize}
+					\item \only<2>{\textcolor{blue}{Multiphysique structurée};}\only<3->{Multiphysique structurée;}
+					\item \only<3>{\textcolor{blue}{Asservissement physiquement motivées};}\only<4->{Asservissement physiquement motivées;}
+					\item \only<4>{\textcolor{blue}{Réduction de modèles};}
+				\end{itemize}
+			}
+		\end{overlayarea}
+	\end{column}
+	\begin{column}{.49\textwidth}
+		\only<2>{
+			\includegraphics[width=\columnwidth]{aeroelasticity.jpg}
+		}
+		\only<3>{
+			\includegraphics[width=\columnwidth]{control_newton.eps}
+		}
+			
+	\end{column}
+\end{columns}
+
+\end{frame}
+
+\begin{frame}
+	Immagine Daniel ca tourne plus vite
 \end{frame}
 
 \end{document}

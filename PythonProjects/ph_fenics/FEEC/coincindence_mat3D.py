@@ -17,9 +17,6 @@ deg = 1
 
 mesh = BoxMesh(Point(0,0,0), Point(L, L, L), n_el, n_el, n_el)
 
-
-
-
 # domain = mshr.Box(Point(0,0,0), Point(L,L,L))
 # mesh = mshr.generate_mesh(domain, n_el)
 
