@@ -12,15 +12,12 @@
 \usepackage{diffcoeff}
 
 % Math macros
+\renewcommand\d{\ensuremath{\mathrm{d}}}
+
 \DeclareMathOperator*{\grad}{grad}
 \DeclareMathOperator*{\Grad}{Grad}
 \DeclareMathOperator*{\Div}{Div}
 \renewcommand{\div}{\operatorname{div}}
-\DeclareMathOperator*{\Hess}{Hess}
-\DeclareMathOperator*{\curl}{curl}
-\DeclareMathOperator{\Tr}{Tr}
-\DeclareMathOperator{\Dom}{Dom}
-\DeclareMathOperator*{\esssup}{ess\,sup}
 
 \newcommand{\bbR}{\mathbb{R}}
 \newcommand{\bbF}{\mathbb{F}}
@@ -28,18 +25,17 @@
 \newcommand{\bbB}{\mathbb{B}}
 \newcommand{\bbS}{\mathbb{S}}
 
+\DeclareMathOperator{\tr}{tr}
+
+\newcommand*{\dual}[1]{\ensuremath{\widehat{#1}}}
 \newcommand*{\norm}[1]{\ensuremath{\left\|#1\right\|}}
 \newcommand{\where}{\qquad \text{where} \qquad}
-\newcommand{\inner}[3][]{\ensuremath{\left\langle #2, \, #3 \right\rangle_{#1}}}
-\newcommand{\bilprod}[2]{\left\langle \left\langle \, #1, #2 \, \right\rangle \right\rangle}
+
+\newcommand{\inpr}[3][]{\ensuremath{\langle #2, \, #3 \rangle_{#1}}}
+\newcommand{\dualpr}[3][]{\ensuremath{\langle #2 \, \vert #3 \rangle_{#1}}}
+
 \newcommand{\pder}[2]{\ensuremath{\partial_{#2} #1}}
 \newcommand{\dder}[2]{\ensuremath{\delta_{#2} #1}}
-\newcommand{\secref}[1]{\S\ref{#1}}
-\newcommand{\energy}[1]{\frac{1}{2} \int_{\Omega} \left\{ #1 \right\} \d\Omega}
-\newcommand{\crmat}[1]{\ensuremath{\left[#1\right]_\times}}
-\newcommand{\fenics}{\textsc{FEniCS}\xspace}
-\newcommand{\firedrake}{\textsc{Firedrake}\xspace}
-
 
 % Remove navigation bar
 %\setbeamertemplate{navigation symbols}{}
@@ -66,6 +62,8 @@
 \usetikzlibrary{positioning}
 
 
+
+
 \graphicspath{{./images/}}
 
 \bibliography{biblio}
@@ -90,8 +88,19 @@
 	\tocsubtrue
 }
 
+\newcommand{\beginbackup}{
+	\newcounter{framenumbervorappendix}
+	\setcounter{framenumbervorappendix}{\value{framenumber}}
+}
+\newcommand{\backupend}{
+	\addtocounter{framenumbervorappendix}{-\value{framenumber}}
+	\addtocounter{framenumber}{\value{framenumbervorappendix}} 
+}
 
 \begin{document}
+	
+
+
 
 % Title slide frame
 \begin{frame}[plain]
@@ -344,9 +353,9 @@ A consistent discretization of pHs raises some difficult points:
 \begin{frame}{The irreducible wave equation}
 From the linearization of mass and momentum conservation, the acoustic wave equation in irreducible form is obtained
 \begin{equation*}
-\frac{1}{\kappa(\bm{x})} \diffp[2]{p}{t} - \div\left(\frac{1}{\rho(\bm{x})}\grad p\right) = 0,  \qquad \bm{x} \in \Omega \subset \bbR^3, \quad p|_{\partial\Omega} =0,
+\frac{1}{\kappa} \diffp[2]{p}{t} - \div\left(\frac{1}{\rho}\grad p\right) = 0,  \qquad \bm{x} \in \Omega \subset \bbR^3, \quad p|_{\partial\Omega} =0,
 \end{equation*}
-$p$ is the pressure, $\rho(\bm{x})$ the density and $\kappa(\bm{x})$ the bulk modulus.
+$p$ is the pressure, $\rho$ the density and $\kappa$ the bulk modulus.
 
 
 \begin{block}{The standard discretization (Dupont 1973)}
@@ -390,8 +399,8 @@ This system is an Hamiltonian reformulation.
 	leading to the discrete weak formulation: find $v_h \in V_h, \; \bm{\sigma}_h \in \Sigma_h$ such that
 		\begin{equation*}
 		\begin{aligned}
-			\inner[L^2(\Omega)]{\psi_v}{\kappa^{-1}\partial_t v_h} &= \inner[L^2(\Omega)]{ \psi_v}{\div\bm{\sigma}_h}, \\
-			\inner[L^2(\Omega)]{\bm{\psi}_\sigma}{\rho \partial_t \bm{\sigma}_h} &= \inner[L^2(\Omega)]{\bm{\psi}_\sigma}{\grad v_h}, \\
+			\inpr[L^2(\Omega)]{\psi_v}{\kappa^{-1}\partial_t v_h} &= \inpr[L^2(\Omega)]{ \psi_v}{\div\bm{\sigma}_h}, \\
+			\inpr[L^2(\Omega)]{\bm{\psi}_\sigma}{\rho \partial_t \bm{\sigma}_h} &= \inpr[L^2(\Omega)]{\bm{\psi}_\sigma}{\grad v_h}, \\
 		\end{aligned} \qquad
 		\begin{aligned}
 			\forall \psi_v &\subset V_h, \\
@@ -418,8 +427,8 @@ One can use integration by parts to obtain a stable discretization.
 	Find $v_h \in V_h, \; \bm{\sigma}_h \in \Sigma_h$ such that
 		\begin{equation*}
 			\begin{aligned}
-				\inner[L^2(\Omega)]{\psi_v}{\kappa^{-1}\partial_t v_h} &= +\inner[L^2(\Omega)]{ \psi_v}{\div\bm{\sigma}_h}, \\
-				\inner[L^2(\Omega)]{\bm{\psi}_\sigma}{\rho \partial_t \bm{\sigma}_h} &= -\inner[L^2(\Omega)]{\div\bm{\psi}_\sigma}{v_h}, \\
+				\inpr[L^2(\Omega)]{\psi_v}{\kappa^{-1}\partial_t v_h} &= +\inpr[L^2(\Omega)]{ \psi_v}{\div\bm{\sigma}_h}, \\
+				\inpr[L^2(\Omega)]{\bm{\psi}_\sigma}{\rho \partial_t \bm{\sigma}_h} &= -\inpr[L^2(\Omega)]{\div\bm{\psi}_\sigma}{v_h}, \\
 			\end{aligned} \qquad
 			\begin{aligned}
 				\forall \psi_v &\in  V_h, \\
@@ -441,8 +450,8 @@ One can use integration by parts to obtain a stable discretization.
 		Find $v_h \in V_h, \; \bm{\sigma}_h \in \Sigma_h$ such that
 		\begin{equation*}
 			\begin{aligned}
-				\inner[L^2(\Omega)]{\psi_v}{\kappa^{-1}\partial_t v_h} &= -\inner[L^2(\Omega)]{\grad \psi_v}{\bm{\sigma}_h}, \\
-				\inner[L^2(\Omega)]{\bm{\psi}_\sigma}{\rho \partial_t \bm{\sigma}_h} &= +\inner[L^2(\Omega)]{ \bm{\psi}_\sigma}{\grad v_h}, \\
+				\inpr[L^2(\Omega)]{\psi_v}{\kappa^{-1}\partial_t v_h} &= -\inpr[L^2(\Omega)]{\grad \psi_v}{\bm{\sigma}_h}, \\
+				\inpr[L^2(\Omega)]{\bm{\psi}_\sigma}{\rho \partial_t \bm{\sigma}_h} &= +\inpr[L^2(\Omega)]{ \bm{\psi}_\sigma}{\grad v_h}, \\
 			\end{aligned} \qquad
 			\begin{aligned}
 				\forall \psi_v &\in V_h, \\
@@ -512,18 +521,356 @@ One can use integration by parts to obtain a stable discretization.
 		\item[\textcolor{green}{\checkmark}] is stable by construction;
 		\item[\textcolor{green}{\checkmark}] conserve mass, momentum, energy;
 		\item[\textcolor{green}{\checkmark}] does not require topologically dual meshes;
-		\item[\textcolor{green}{\checkmark}] can enforce generic boundary conditions in a weak manner(?). 
+		\item[\textcolor{green}{\checkmark}] can enforce generic boundary conditions in a weak manner (?). 
 	\end{itemize}
 \end{exampleblock}
 }
 \end{frame}
 
 \begin{frame}
+	
 	\Large Any question?
+	
 \end{frame}
+
+\beginbackup
+
+\begin{frame}{The Whitney forms case: Discrete Stokes Dirac structure}
+	Discrete formulation of the Stokes-Dirac structure:\\
+$f^p_h \in \mathcal{W}_h^p, \; f^q_h \in \mathcal{W}_h^q$ and $e^p_h \in \mathcal{W}_h^{q-1}, \; e^q_h \in \mathcal{W}_h^{p-1}$
+	\begin{equation*}
+		\begin{aligned}
+			\inpr[M]{v^p}{f^p_h} &= \inpr[M]{v^p}{(-1)^r\d e^q_h}, \\
+			\inpr[M]{v^q}{f^q_h} &= \inpr[M]{v^q}{\d e^p_h}, 
+		\end{aligned} \qquad
+		\begin{aligned}
+			f^\partial_h &= \tr e^p_h, \\
+			e^\partial_h &=(-1)^p\tr e^q_h. \\
+		\end{aligned} \qquad 
+		\begin{aligned}
+			\forall v^p \in \mathcal{W}_h^p, \\
+			\forall v^q \in \mathcal{W}_h^q. \\
+		\end{aligned}
+	\end{equation*}
+Algebraic realisation
+\begin{equation*}
+	\begin{aligned}
+		\begin{bmatrix}
+			\mathbf{M}^p & \mathbf{0} \\
+			\mathbf{0} & \mathbf{M}^q
+		\end{bmatrix}
+		\begin{pmatrix}
+			\mathbf{f}^p \\
+			\mathbf{f}^q
+		\end{pmatrix} &=
+		\begin{bmatrix}
+			\mathbf{0} & (-1)^r\mathbf{M}^p\mathbf{d}^{p-1} \\
+			\mathbf{M}^q\mathbf{d}^{q-1} & \mathbf{0}
+		\end{bmatrix}
+		\begin{pmatrix}
+			\mathbf{e}^p \\
+			\mathbf{e}^q
+		\end{pmatrix}, \\
+		\begin{pmatrix}
+			\mathbf{f}^\partial \\
+			\mathbf{e}^\partial \\
+		\end{pmatrix} &= 
+		\begin{bmatrix}
+			\mathbf{T}^{q-1} & \mathbf{0} \\
+			\mathbf{0} & (-1)^p\mathbf{T}^{p-1} \\
+		\end{bmatrix}
+		\begin{pmatrix}
+			\mathbf{e}^p \\
+			\mathbf{e}^q
+		\end{pmatrix}.
+	\end{aligned}
+\end{equation*}
+\end{frame}
+
+
+\begin{frame}{The Whitney forms case: Discrete Adjoint Stokes Dirac structure}
+	Discrete formulation of the adjoint Stokes-Dirac structure:\\
+	$\dual{f}_h^p \in \mathcal{W}_h^{q-1}, \; \dual{f}_h^q \in \mathcal{W}_h^{p-1}, \text{ and } \dual{e}_h^p \in \mathcal{W}_h^{p},  \; \dual{e}_h^q \in \mathcal{W}_h^{q}$ such that
+	\begin{equation*}
+		\begin{aligned}
+			\inpr[M]{\dual{v}^p}{\dual{f}^p_h} &= \inpr[M]{\d\dual{v}^p}{(-1)^{a_0} \dual{e}^q_h} - \dualpr[\partial M]{\dual{v}^p}{(-1)^{b_0} e^q}, \\
+			\inpr[M]{\dual{v}^q}{\dual{f}^q_h} &= \inpr[M]{\d\dual{v}^q}{(-1)^{a_1} \dual{e}^p_h} - \dualpr[\partial M]{\dual{v}^q}{(-1)^{b_1} e^p},
+		\end{aligned} \qquad 
+		\begin{aligned}
+			\forall \dual{v}^p \in \mathcal{W}_h^{q-1}, \\
+			\forall \dual{v}^q \in \mathcal{W}_h^{p-1}, \\
+		\end{aligned}
+	\end{equation*}
+where $\mathcal{W}_h^k$ is the Whitney forms polynomial space of degree $k$. \\
+Algebraic realisation
+\begin{equation*}\footnotesize
+	\begin{bmatrix}
+		\mathbf{M}^{q-1} & \mathbf{0} \\
+		\mathbf{0} & \mathbf{M}^{p-1}
+	\end{bmatrix}
+	\begin{pmatrix}
+		\widehat{\mathbf{f}}^p \\
+		\widehat{\mathbf{f}}^q
+	\end{pmatrix} =
+	\begin{bmatrix}
+		\mathbf{0} & (-1)^{a_0}\mathbf{d}_{q-1}\mathbf{M}^q\\
+		(-1)^{a_1}\mathbf{d}_{p-1}\mathbf{M}^p & \mathbf{0}
+	\end{bmatrix}
+	\begin{pmatrix}
+		\dual{\mathbf{e}}^p \\
+		\dual{\mathbf{e}}^q
+	\end{pmatrix} -
+	\begin{bmatrix}
+		\mathbf{0} & (-1)^{b_0}\mathbf{L}_\partial^{p-1} \\
+		(-1)^{b_1}\mathbf{L}^{q-1}_\partial & \mathbf{0}
+	\end{bmatrix}
+	\begin{pmatrix}
+		{\mathbf{e}}^p \\
+		{\mathbf{e}}^q
+	\end{pmatrix}.
+\end{equation*}
+\end{frame}
+
+\begin{frame}{The General Case (trimmed polynomial space) }
+
+Stokes-Dirac
+\begin{equation*}\footnotesize
+	\begin{bmatrix}
+		\mathbf{M}^p_r & \mathbf{0} \\
+		\mathbf{0} & \mathbf{M}^q_r
+	\end{bmatrix}
+	\begin{pmatrix}
+		\mathbf{f}^p \\
+		\mathbf{f}^q
+	\end{pmatrix} =
+	\begin{bmatrix}
+		\mathbf{0} & (-1)^r\mathbf{D}^{p-1}_r \\
+		\mathbf{D}^{q-1}_r & \mathbf{0}
+	\end{bmatrix}
+	\begin{pmatrix}
+		\mathbf{e}^p \\
+		\mathbf{e}^q
+	\end{pmatrix}, \qquad
+	\begin{pmatrix}
+		\mathbf{f}^\partial \\
+		\mathbf{e}^\partial \\
+	\end{pmatrix} = 
+	\begin{bmatrix}
+		\mathbf{T}^p_r & \mathbf{0} \\
+		\mathbf{0} & (-1)^p\mathbf{T}^q_r \\
+	\end{bmatrix}
+	\begin{pmatrix}
+		\mathbf{e}^p \\
+		\mathbf{e}^q
+	\end{pmatrix}.
+\end{equation*}
+Adjoint Stokes-Dirac
+\begin{equation*}\footnotesize
+	\begin{bmatrix}
+		\mathbf{M}^{q-1}_r & \mathbf{0} \\
+		\mathbf{0} & \mathbf{M}^{p-1}_r
+	\end{bmatrix}
+	\begin{pmatrix}
+		\widehat{\mathbf{f}}^p \\
+		\widehat{\mathbf{f}}^q
+	\end{pmatrix} =
+	\begin{bmatrix}
+		\mathbf{0} & (-1)^{a_0}(\mathbf{D}_r^{q-1})^\top\\
+		(-1)^{a_1}(\mathbf{D}_r^{p-1})^\top & \mathbf{0}
+	\end{bmatrix}
+	\begin{pmatrix}
+		\dual{\mathbf{e}}^p \\
+		\dual{\mathbf{e}}^q
+	\end{pmatrix} -
+	\begin{bmatrix}
+		\mathbf{0} & (-1)^{b_0}\mathbf{L}_{r, \partial}^{p-1} \\
+		(-1)^{b_1}\mathbf{L}^{q-1}_{r, \partial} & \mathbf{0}
+	\end{bmatrix}
+	\begin{pmatrix}
+		{\mathbf{e}}^p \\
+		{\mathbf{e}}^q
+	\end{pmatrix}.
+\end{equation*}
+
+\end{frame}
+
+\begin{frame}{Discrete port-Hamiltonian system}
+	Primal pH system
+	\begin{equation*}\footnotesize
+		\begin{bmatrix}
+			\mathbf{M}^p_r & \mathbf{0} \\
+			\mathbf{0} & \mathbf{M}^q_r
+		\end{bmatrix}
+		\begin{pmatrix}
+			\dot{{\alpha}}^p \\
+			\dot{{\alpha}}^q
+		\end{pmatrix} = -
+		\begin{bmatrix}
+			\mathbf{0} & (-1)^r\mathbf{D}^{p-1}_r \\
+			\mathbf{D}^{q-1}_r & \mathbf{0}
+		\end{bmatrix}
+		\begin{pmatrix}
+			\mathbf{e}^p \\
+			\mathbf{e}^q
+		\end{pmatrix}, \qquad
+		\begin{pmatrix}
+			\mathbf{u}^p \\
+			\mathbf{u}^q \\
+		\end{pmatrix} = 
+		\begin{bmatrix}
+			\mathbf{T}^{q-1}_{r, \Gamma_p} & \mathbf{0} \\
+			\mathbf{0} & (-1)^p\mathbf{T}^{p-1}_{r, \Gamma_q} \\
+		\end{bmatrix}
+		\begin{pmatrix}
+			\mathbf{e}^p \\
+			\mathbf{e}^q
+		\end{pmatrix}.
+	\end{equation*}
+Adjoint pH system
+\begin{equation*}\footnotesize
+	\begin{bmatrix}
+		\mathbf{M}^{q-1}_r & \mathbf{0} \\
+		\mathbf{0} & \mathbf{M}^{p-1}_r
+	\end{bmatrix}
+	\begin{pmatrix}
+		\dot{\dual{\bm{\alpha}}}^p \\
+		\dot{\dual{\bm{\alpha}}}^q
+	\end{pmatrix} = -
+	\begin{bmatrix}
+		\mathbf{0} & (-1)^{a_0}(\mathbf{D}_r^{q-1})^\top\\
+		(-1)^{a_1}(\mathbf{D}_r^{p-1})^\top & \mathbf{0}
+	\end{bmatrix}
+	\begin{pmatrix}
+		\dual{\mathbf{e}}^p \\
+		\dual{\mathbf{e}}^q
+	\end{pmatrix} +
+	\begin{bmatrix}
+		\mathbf{0} & (-1)^{c_0}\mathbf{B}_{r, \Gamma_q}^{p-1} \\
+		(-1)^{c_1}\mathbf{B}^{q-1}_{r, \Gamma_p} & \mathbf{0}
+	\end{bmatrix}
+	\begin{pmatrix}
+		{\mathbf{u}}^p \\
+		{\mathbf{u}}^q
+	\end{pmatrix}. 
+\end{equation*}
+\end{frame}
+
+\begin{frame}{Incorporation of the constitutive equations (Quadratic case)}
+
+Weak form
+\begin{equation*}
+	\begin{aligned}
+		\inpr[M]{{v}^p}{\alpha^p_h} &= \inpr[M]{{v}^p}{C^p \dual{e}^p_h}, \\
+		\inpr[M]{{v}^q}{\alpha^q_h} &= \inpr[M]{{v}^q}{C^q \dual{e}^q_h}, \\ 
+	\end{aligned} \qquad 
+	\begin{aligned}
+		\inpr[M]{\dual{v}^p}{\dual{\alpha}^p_h} &= \inpr[M]{\dual{v}^p}{(-1)^{p(n-p)}\dual{C}^p e^p_h}, \\
+		\inpr[M]{\dual{v}^q}{\dual{\alpha}^q_h} &= \inpr[M]{\dual{v}^q}{(-1)^{q(n-q)} \dual{C}^q e^q_h},
+	\end{aligned}
+\end{equation*}
+Algebraic realisation
+\begin{equation*}
+	\begin{aligned}
+		\mathbf{M}_r^p {\alpha}^p &= \mathbf{M}_{C, r}^p \dual{\mathbf{e}}^p, \\
+		\mathbf{M}_r^q {\alpha}^q &= \mathbf{M}_{C, r}^q \dual{\mathbf{e}}^q, \\
+	\end{aligned} \qquad 
+	\begin{aligned}
+		\mathbf{M}_r^{q-1} \dual{{\alpha}}^p &= (-1)^{p(n-p)}\mathbf{M}_{\dual{C}, r}^{q-1} {\mathbf{e}}^p, \\
+		\mathbf{M}_r^{p-1} \dual{{\alpha}}^q &= (-1)^{q(n-q)}\mathbf{M}_{\dual{C}, r}^{p-1} \mathbf{e}^q, \\
+	\end{aligned}
+\end{equation*}
+Other reductions are possible. This one leads to a pure coenergy formulation.
+\end{frame}
+
+\begin{frame}{The final dynamical system}
+	The first line of the primal  and the second of the adjoint system give
+		\begin{equation*}
+		\begin{aligned}
+			\begin{bmatrix}
+				\mathbf{M}^p_{C, r} & \mathbf{0} \\
+				\mathbf{0} & \mathbf{M}^{p-1}_{\dual{C}, r}
+			\end{bmatrix}
+			\begin{pmatrix}
+				\dot{\dual{\mathbf{e}}}^p \\
+				\dot{\mathbf{e}}^q
+			\end{pmatrix} &= (-1)^r
+			\begin{bmatrix}
+				\mathbf{0} & -\mathbf{D}^{p-1}_r \\
+				(\mathbf{D}_r^{p-1})^\top & \mathbf{0}
+			\end{bmatrix}
+			\begin{pmatrix}
+				\dual{\mathbf{e}}^p \\
+				\mathbf{e}^q
+			\end{pmatrix} +
+			\begin{bmatrix}
+				\mathbf{0}\\
+				(-1)^{p}\mathbf{B}^{q-1}_{r, \Gamma_p}
+			\end{bmatrix}
+			\mathbf{u}^p, \\
+			\mathbf{u}^q &= 
+			\begin{bmatrix}
+				\mathbf{0} & (-1)^p\mathbf{T}^{p-1}_{r, \Gamma_q} \\
+			\end{bmatrix}
+			\begin{pmatrix}
+				\dual{\mathbf{e}}^p \\
+				\mathbf{e}^q
+			\end{pmatrix},
+		\end{aligned}
+	\end{equation*}
+	The second line of the primal and the first of the adjoint system give
+	\begin{equation*}
+		\begin{aligned}
+			\begin{bmatrix}
+				\mathbf{M}^{q-1}_{\dual{C}, r} & \mathbf{0} \\
+				\mathbf{0} & \mathbf{M}^q_{C, r}
+			\end{bmatrix}
+			\begin{pmatrix}
+				\dot{\mathbf{e}}^p \\
+				\dot{\dual{\mathbf{e}}}^q
+			\end{pmatrix} &= 
+			\begin{bmatrix}
+				\mathbf{0} & (\mathbf{D}_r^{q-1})^\top\\
+				-\mathbf{D}^{q-1}_r & \mathbf{0}
+			\end{bmatrix}
+			\begin{pmatrix}
+				\mathbf{e}^p \\
+				\dual{\mathbf{e}}^q
+			\end{pmatrix} +
+			\begin{bmatrix}
+				(-1)^{(p-1)(q-1)}\mathbf{B}_{r, \Gamma_q}^{p-1} \\
+				\mathbf{0}
+			\end{bmatrix}\mathbf{u}^q, \\
+			\mathbf{u}^p &= 
+			\begin{bmatrix}
+				\mathbf{T}^{q-1}_{r, \Gamma_p} & \mathbf{0} \\
+			\end{bmatrix}
+			\begin{pmatrix}
+				\mathbf{e}^p \\
+				\dual{\mathbf{e}}^q
+			\end{pmatrix},
+		\end{aligned}
+	\end{equation*}
+	The output degrees of freedom are given by
+	\begin{equation*}
+		\begin{pmatrix}
+			\mathbf{y}^p \\
+			\mathbf{y}^q
+		\end{pmatrix} = 
+		\begin{bmatrix}
+			\mathbf{T}^{q-1}_{r, \Gamma_q} & \mathbf{0}\\
+			\mathbf{0} & (-1)^p \mathbf{T}^{p-1}_{r, \Gamma_p}
+		\end{bmatrix}
+		\begin{pmatrix}
+			\mathbf{e}^p \\
+			\mathbf{e}^q
+		\end{pmatrix}.
+	\end{equation*}
+\end{frame}
+
 
 \begin{frame}[allowframebreaks]{References}
 	\printbibliography
 \end{frame}
 
+\backupend
 \end{document}
