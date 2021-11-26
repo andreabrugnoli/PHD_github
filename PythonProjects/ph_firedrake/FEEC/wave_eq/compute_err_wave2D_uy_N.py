@@ -4,7 +4,7 @@
 import os
 os.environ["OMP_NUM_THREADS"] = "1"
 
-# import numpy as np
+import numpy as np
 from firedrake import *
 from irksome import GaussLegendre, Dt, AdaptiveTimeStepper, TimeStepper, LobattoIIIA
 
