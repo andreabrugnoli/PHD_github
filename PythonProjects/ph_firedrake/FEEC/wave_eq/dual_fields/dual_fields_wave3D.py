@@ -29,8 +29,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
         return m_form
 
-    def m_form10(v_1, u_1, v_0, u_0):
-        m_form = inner(v_1, u_1) * dx + inner(v_0, u_0) * dx
+    def m_form10(v_1, u_1, v_0, p_0):
+        m_form = inner(v_1, u_1) * dx + inner(v_0, p_0) * dx
 
         return m_form
 
@@ -75,6 +75,11 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     V_32 = V_3 * V_2
     V_10 = V_1 * V_0
 
+    print(V_0.dim())
+    print(V_1.dim())
+    print(V_2.dim())
+    print(V_3.dim())
+
     v_32 = TestFunction(V_32)
     v_3, v_2 = split(v_32)
 
@@ -112,13 +117,13 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     t_vec = np.linspace(0, n_t * float(dt), 1 + n_t)
 
     t = Constant(0.0)
-    t_mid = Constant(dt/2)
+    t_1 = Constant(dt)
 
     ft = 2 * sin(om_t * t + phi_t) + 3 * cos(om_t * t + phi_t)
     dft = om_t * (2 * cos(om_t * t + phi_t) - 3 * sin(om_t * t + phi_t))  # diff(dft_t, t)
 
-    ft_mid = 2 * sin(om_t * t_mid + phi_t) + 3 * cos(om_t * t_mid + phi_t)
-    dft_mid = om_t * (2 * cos(om_t * t_mid + phi_t) - 3 * sin(om_t * t_mid + phi_t))  # diff(dft_t, t)
+    ft_1 = 2 * sin(om_t * t_1 + phi_t) + 3 * cos(om_t * t_1 + phi_t)
+    dft_1 = om_t * (2 * cos(om_t * t_1 + phi_t) - 3 * sin(om_t * t_1 + phi_t))  # diff(dft_t, t)
 
     gxyz = cos(om_x * x + phi_x) * sin(om_y * y + phi_y) * sin(om_z * z + phi_z)
 
@@ -134,8 +139,11 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     p_ex = gxyz * dft
     u_ex = grad_gxyz * ft
 
-    p_ex_mid = gxyz * dft_mid
-    u_ex_mid = grad_gxyz * ft_mid
+    p_ex_1 = gxyz * dft_1
+    u_ex_1 = grad_gxyz * ft_1
+
+    u_ex_mid = 0.5 * (u_ex + u_ex_1)
+    p_ex_mid = 0.5 * (p_ex + p_ex_1)
 
     print("interpolate 3")
     p0_3 = interpolate(p_ex, V_3)
@@ -146,20 +154,82 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     print("interpolate 0")
     p0_0 = interpolate(p_ex, V_0)
 
-    if bd_cond=="D":
-        bc_D = DirichletBC(V_10.sub(1), p_ex_mid, "on_boundary")
-        bc_N = None
-    elif bd_cond=="N":
-        bc_N = DirichletBC(V_32.sub(1), u_ex_mid, "on_boundary")
-        bc_D = None
-    else:
-        bc_D = [DirichletBC(V_10.sub(1), p_ex_mid, 1), \
-                DirichletBC(V_10.sub(1), p_ex_mid, 3),
-                DirichletBC(V_10.sub(1), p_ex_mid, 5)]
+    if bd_cond == "D":
+        bc_D = [DirichletBC(V_10.sub(1), p_ex_1, "on_boundary")]
+        bc_D_nat = None
 
-        bc_N = [DirichletBC(V_32.sub(1), u_ex_mid, 2), \
-                DirichletBC(V_32.sub(1), u_ex_mid, 4),
-                DirichletBC(V_32.sub(1), u_ex_mid, 6)]
+        bc_N = None
+        bc_N_nat = [DirichletBC(V_32.sub(1), u_ex_1, "on_boundary")]
+
+    elif bd_cond == "N":
+        bc_N = [DirichletBC(V_32.sub(1), u_ex_1, "on_boundary")]
+        bc_N_nat = None
+
+        bc_D = None
+        bc_D_nat = [DirichletBC(V_10.sub(1), p_ex_1, "on_boundary")]
+    else:
+        bc_D = [DirichletBC(V_10.sub(1), p_ex_1, 1), \
+                DirichletBC(V_10.sub(1), p_ex_1, 3),
+                DirichletBC(V_10.sub(1), p_ex_1, 5)]
+
+        bc_D_nat = [DirichletBC(V_10.sub(1), p_ex_1, 2), \
+                    DirichletBC(V_10.sub(1), p_ex_1, 4), \
+                    DirichletBC(V_10.sub(1), p_ex_1, 6)]
+
+        bc_N = [DirichletBC(V_32.sub(1), u_ex_1, 2), \
+                DirichletBC(V_32.sub(1), u_ex_1, 4),
+                DirichletBC(V_32.sub(1), u_ex_1, 6)]
+
+        bc_N_nat = [DirichletBC(V_32.sub(1), u_ex_1, 1), \
+                    DirichletBC(V_32.sub(1), u_ex_1, 3), \
+                    DirichletBC(V_32.sub(1), u_ex_1, 5)]
+
+    dofs10_D = []
+    dofs32_D = []
+
+    if bc_D is not None:
+        for ii in range(len(bc_D)):
+            nodes10_D = V_1.dim() + bc_D[ii].nodes
+            nodes32_D = V_3.dim() + bc_N_nat[ii].nodes
+
+            dofs10_D = dofs10_D + list(nodes10_D)
+            dofs32_D = dofs32_D + list(nodes32_D)
+
+
+    dofs10_D = list(set(dofs10_D))
+    dofs32_D = list(set(dofs32_D))
+
+    print("dofs on Gamma_D for 10")
+    print(dofs10_D)
+    print("dofs on Gamma_D for 32")
+    print(dofs32_D)
+
+    dofs10_N = []
+    dofs32_N = []
+
+    if bc_N is not None:
+        for ii in range(len(bc_N)):
+            nodes32_N = V_3.dim() + bc_N[ii].nodes
+            nodes10_N = V_1.dim() + bc_D_nat[ii].nodes
+
+            dofs32_N = dofs32_N + list(nodes32_N)
+            dofs10_N = dofs10_N + list(nodes10_N)
+
+    dofs32_N = list(set(dofs32_N))
+    dofs10_N = list(set(dofs10_N))
+
+    for element in dofs10_D:
+        if element in dofs10_N:
+            dofs10_N.remove(element)
+
+    for element in dofs32_N:
+        if element in dofs32_D:
+            dofs32_D.remove(element)
+
+    print("dofs on Gamma_N for 10")
+    print(dofs10_N)
+    print("dofs on Gamma_N for 32")
+    print(dofs32_N)
 
 
     Ppoint = (L/5, L/5, L/5)
@@ -188,11 +258,18 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     enmid_32 = Function(V_32, name="e_32 n+1/2")
     enmid_10 = Function(V_10, name="e_10 n+1/2")
+
     en1_10 = Function(V_10, name="e_10 n+1")
     en1_32 = Function(V_32, name="e_32 n+1")
 
     pn_3, un_2 = en_32.split()
     un_1, pn_0 = en_10.split()
+
+    pnmid_3, unmid_2 = enmid_32.split()
+    unmid_1, pnmid_0 = enmid_10.split()
+
+    pn1_3, un1_2 = en1_32.split()
+    un1_1, pn1_0 = en1_10.split()
 
     Hn_32 = 0.5 * (inner(pn_3, pn_3) * dx + inner(un_2, un_2) * dx)
     Hn_10 = 0.5 * (inner(pn_0, pn_0) * dx + inner(un_1, un_1) * dx)
@@ -202,9 +279,19 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     Hn_ex = 0.5 * (inner(p_ex, p_ex) * dx(domain=mesh) + inner(u_ex, u_ex) * dx(domain=mesh))
 
-    Hdot_n = div(un_2) * pn_0 * dx + inner(grad(pn_0), un_2) * dx
+    Hdot_n = 1/dt*(dot(pnmid_0, pn1_3 - pn_3) * dx(domain=mesh) + dot(unmid_2, un1_1 - un_1) * dx(domain=mesh))
+    bdflow_midn = pnmid_0 * dot(unmid_2, n_ver) * ds(domain=mesh)
 
-    bdflow_n = pn_0 * dot(un_2, n_ver) * ds
+    y_nmid_ess10 = 1 / dt * m_form10(v_1, un1_1 - un_1, v_0, pn1_0 - pn_0) \
+                   - j_form10(v_1, unmid_1, v_0, pnmid_0)
+    u_nmid_nat10 = bdflow10(v_0, unmid_2)
+
+
+    y_nmid_ess32 = 1 / dt * m_form32(v_3, pn1_3 - pn_3, v_2, un1_2 - un_2) \
+              - j_form32(v_3, pnmid_3, v_2, unmid_2)
+    u_nmid_nat32 = bdflow32(v_2, pnmid_0)
+
+    bdflow_n = pn_0 * dot(un_2, n_ver) * ds(domain=mesh)
     bdflow_ex_n = p_ex * dot(u_ex, n_ver) * ds(domain=mesh)
 
     H_32_vec = np.zeros((1 + n_t,))
@@ -213,12 +300,16 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     H_31_vec = np.zeros((1 + n_t,))
     H_3210_vec = np.zeros((1 + n_t,))
 
+    Hdot_vec = np.zeros((n_t,))
     bdflow_mid_vec = np.zeros((n_t,))
+
+    bdflow10_mid_vec = np.zeros((n_t,))
+    bdflow32_mid_vec = np.zeros((n_t,))
+
     bdflow_vec = np.zeros((1 + n_t,))
     bdflow_ex_vec = np.zeros((1 + n_t,))
 
     H_ex_vec = np.zeros((1 + n_t,))
-    Hdot_vec = np.zeros((1 + n_t,))
 
     errL2_p_3_vec = np.zeros((1 + n_t,))
     errL2_u_1_vec = np.zeros((1 + n_t,))
@@ -267,7 +358,6 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     err_p30_vec[0] = np.sqrt(assemble(inner(p0_3 - p0_0, p0_3 - p0_0) * dx))
     err_u12_vec[0] = np.sqrt(assemble(inner(u0_2 - u0_1, u0_2 - u0_1) * dx))
 
-
     ## Settings of intermediate variables and matrices for the 2 linear systems
 
     a_form10 = m_form10(v_1, u_1, v_0, p_0) - 0.5*dt*j_form10(v_1, u_1, v_0, p_0)
@@ -281,16 +371,6 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         input_2 = interpolate(u_ex_mid, V_2)
         input_0 = interpolate(p_ex_mid, V_0)
 
-        ## Integration of 10 system (Neumann natural)
-
-        A_10 = assemble(a_form10, bcs=bc_D, mat_type='aij')
-
-        b_form10 = m_form10(v_1, un_1, v_0, pn_0) + dt*(0.5*j_form10(v_1, un_1, v_0, pn_0) + bdflow10(v_0, input_2))
-
-        b_vec10 = assemble(b_form10)
-
-        solve(A_10, en1_10, b_vec10, solver_parameters=params)
-
         ## Integration of 32 system (Dirichlet natural)
 
         A_32 = assemble(a_form32, bcs=bc_N, mat_type='aij')
@@ -300,14 +380,46 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
         solve(A_32, en1_32, b_vec32, solver_parameters=params)
 
+        ## Integration of 10 system (Neumann natural)
 
-        enmid_10.assign(0.5*(en_10 + en1_10))
-        enmid_32.assign(0.5*(en_32 + en1_32))
-        pnmid_3, unmid_2 = enmid_32.split()
-        unmid_1, pnmid_0 = enmid_10.split()
-        bdflow_midn = pnmid_0 * dot(unmid_2, n_ver) * ds(domain=mesh)
+        A_10 = assemble(a_form10, bcs=bc_D, mat_type='aij')
 
+        b_form10 = m_form10(v_1, un_1, v_0, pn_0) + dt * (0.5 * j_form10(v_1, un_1, v_0, pn_0) + bdflow10(v_0, input_2))
+
+        b_vec10 = assemble(b_form10)
+
+        solve(A_10, en1_10, b_vec10, solver_parameters=params)
+
+        # Computation of energy rate and fluxes
+
+        enmid_10.assign(0.5 * (en_10 + en1_10))
+        enmid_32.assign(0.5 * (en_32 + en1_32))
+
+        Hdot_vec[ii] = assemble(Hdot_n)
         bdflow_mid_vec[ii] = assemble(bdflow_midn)
+
+        yhat_10 = assemble(y_nmid_ess10).vector().get_local()[dofs10_D]
+        u_midn_10 = enmid_10.vector().get_local()[dofs10_D]
+
+        uhat_10 = assemble(u_nmid_nat10).vector().get_local()[dofs10_N]
+        y_midn_10 = enmid_10.vector().get_local()[dofs10_N]
+
+        bdflow10_nat = np.dot(uhat_10, y_midn_10)
+        bdflow10_ess = np.dot(yhat_10, u_midn_10)
+        bdflow10_mid_vec[ii] = bdflow10_nat + bdflow10_ess
+
+        yhat_32 = assemble(y_nmid_ess32).vector().get_local()[dofs32_N]
+        u_midn_32 = enmid_32.vector().get_local()[dofs32_N]
+
+        uhat_32 = assemble(u_nmid_nat32).vector().get_local()[dofs32_D]
+        y_midn_32 = enmid_32.vector().get_local()[dofs32_D]
+
+        bdflow32_nat = np.dot(uhat_32, y_midn_32)
+        bdflow32_ess = np.dot(yhat_32, u_midn_32)
+        bdflow32_mid_vec[ii] = bdflow32_nat + bdflow32_ess
+
+
+        # New assign
 
         en_32.assign(en1_32)
         en_10.assign(en1_10)
@@ -315,7 +427,6 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         un_1, pn_0 = en_10.split()
         pn_3, un_2 = en_32.split()
 
-        Hdot_vec[ii+1] = assemble(Hdot_n)
         bdflow_vec[ii+1] = assemble(bdflow_n)
 
         H_32_vec[ii+1] = assemble(Hn_32)
@@ -328,7 +439,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         p_0P[ii+1] = pn_0.at(Ppoint)
 
         t.assign(float(t) + float(dt))
-        t_mid.assign(float(t_mid) + float(dt))
+        t_1.assign(float(t_1) + float(dt))
 
         H_ex_vec[ii + 1] = assemble(Hn_ex)
 
@@ -453,28 +564,34 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     dict_res = {"t_span": t_vec, "energy_32": H_32_vec, "energy_ex": H_ex_vec, \
                 "energy_10": H_10_vec, "energy_31": H_31_vec, "energy_3210": H_3210_vec,\
                 "power": Hdot_vec, "flow": bdflow_vec, "flow_ex": bdflow_ex_vec, \
-                "flow_mid": bdflow_mid_vec, "err_p3": errL2_p_3, "err_u1": [errL2_u_1, errHcurl_u_1], \
+                "flow_mid": bdflow_mid_vec, "flow10_mid": bdflow10_mid_vec, "flow32_mid": bdflow32_mid_vec,\
+                "err_p3": errL2_p_3, "err_u1": [errL2_u_1, errHcurl_u_1], \
                 "err_p0": [errL2_p_0, errH1_p_0], "err_u2": [errL2_u_2, errHdiv_u_2], "err_p30": err_p30, \
                 "err_u12": err_u12, "err_H": [errH_3210, errH_10, errH_32]}
 
     return dict_res
 
+bd_cond=input("Enter bc: ")
 
 n_elem = 5
 pol_deg = 2
 
-n_time = 50
+n_time = 10
 t_fin = 1
 
 dt = t_fin / n_time
 
-results = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond="N")
+results = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bd_cond)
 
 t_vec = results["t_span"]
 Hdot_vec = results["power"]
 
 bdflow_vec = results["flow"]
 bdflow_mid = results["flow_mid"]
+
+bdflow10_mid = results["flow10_mid"]
+bdflow32_mid = results["flow32_mid"]
+
 
 H_32 = results["energy_32"]
 H_10 = results["energy_10"]
@@ -492,57 +609,74 @@ errL2_u2, errHdiv_u2 = results["err_u2"]
 
 err_Hs, err_H10, err_H32 = results["err_H"]
 
-print("Error L2 p3: " + str(errL2_p3))
-
-print("Error L2 u1: " + str(errL2_u1))
-print("Error Hcurl u1: " + str(errHcurl_u1))
-
-print("Error L2 p0: " + str(errL2_p0))
-print("Error H1 p0: " + str(errH1_p0))
-
-print("Error L2 u2: " + str(errL2_u2))
-print("Error Hdiv u2: " + str(errHdiv_u2))
-
-print("Error Hs: " + str(err_Hs))
-print("Error H_10: " + str(err_H10))
-print("Error H_32: " + str(err_H32))
 
 plt.figure()
-plt.plot(t_vec, H_32, 'r-.', label=r'$H_{32}$')
-plt.plot(t_vec, H_10, 'b--', label=r'$H_{10}$')
-plt.plot(t_vec, H_ex, '*-', label=r'H Exact')
+plt.plot(t_vec[1:]-dt/2, Hdot_vec - bdflow_mid, 'r-.')
 plt.xlabel(r'Time [s]')
-plt.title(r'Energies')
+plt.title(r'Diff Hdot bdflow')
 plt.legend()
 
 plt.figure()
-plt.plot(t_vec, H_31, 'r-.', label=r'$H_{31}$')
-plt.plot(t_vec, H_3210, 'b--', label=r'$H_{3210}$')
+plt.plot(t_vec[1:]-dt/2, np.diff(H_10)/dt - bdflow10_mid, 'r-.', label= "H_{10}")
+# plt.plot(t_vec[1:]-dt/2, bdflow10_mid, 'b--')
 plt.xlabel(r'Time [s]')
-plt.title(r'Energies dual and dual pr')
+plt.title(r'Diff H_{10} and flow 10')
 plt.legend()
 
 plt.figure()
-plt.plot(t_vec, H_31-H_3210, 'r-.')
+plt.plot(t_vec[1:]-dt/2, np.diff(H_32)/dt - bdflow32_mid, 'r-.', label= "H_{32}")
+# plt.plot(t_vec[1:]-dt/2, bdflow32_mid, 'b--')
 plt.xlabel(r'Time [s]')
-plt.title(r'Diff Energies dual and dual pr')
-plt.legend()
-
-plt.figure()
-plt.plot(t_vec[1:]-dt/2, np.diff(H_31)/dt-bdflow_mid, 'r-.')
-plt.xlabel(r'Time [s]')
-plt.title(r'Diff Energies and bd_flow')
+plt.title(r'Diff H_{32} and flow 32')
 plt.legend()
 
 
 plt.figure()
 plt.plot(t_vec, bdflow_vec, 'r-.', label=r'bd flow')
 plt.plot(t_vec, bdflow_ex_vec, 'b--', label=r'bd flow ex')
-plt.plot(t_vec, Hdot_vec, '*-', label=r'Hdot')
 plt.xlabel(r'Time [s]')
 plt.title(r'Boundary flow')
 plt.legend()
 
+
+plt.show()
+
+
+# print("Error L2 p3: " + str(errL2_p3))
+#
+# print("Error L2 u1: " + str(errL2_u1))
+# print("Error Hcurl u1: " + str(errHcurl_u1))
+#
+# print("Error L2 p0: " + str(errL2_p0))
+# print("Error H1 p0: " + str(errH1_p0))
+#
+# print("Error L2 u2: " + str(errL2_u2))
+# print("Error Hdiv u2: " + str(errHdiv_u2))
+#
+# print("Error Hs: " + str(err_Hs))
+# print("Error H_10: " + str(err_H10))
+# print("Error H_32: " + str(err_H32))
+#
+# plt.figure()
+# plt.plot(t_vec, H_32, 'r-.', label=r'$H_{32}$')
+# plt.plot(t_vec, H_10, 'b--', label=r'$H_{10}$')
+# plt.plot(t_vec, H_ex, '*-', label=r'H Exact')
+# plt.xlabel(r'Time [s]')
+# plt.title(r'Energies')
+# plt.legend()
+#
+# plt.figure()
+# plt.plot(t_vec, H_31, 'r-.', label=r'$H_{31}$')
+# plt.plot(t_vec, H_3210, 'b--', label=r'$H_{3210}$')
+# plt.xlabel(r'Time [s]')
+# plt.title(r'Energies dual and dual pr')
+# plt.legend()
+#
+# plt.figure()
+# plt.plot(t_vec, H_31-H_3210, 'r-.')
+# plt.xlabel(r'Time [s]')
+# plt.title(r'Diff Energies dual and dual pr')
+# plt.legend()
 
 # plt.figure()
 # plt.plot(t_vec, Hdot_vec - bdflow_vec, 'r--', label=r'Energy residual')
@@ -550,7 +684,6 @@ plt.legend()
 # plt.title(r'Energy residual')
 # plt.legend()
 
-plt.show()
 
 # diffH_L2Hdiv = np.diff(H_32)
 # diffH_H1Hcurl = np.diff(H_10)
