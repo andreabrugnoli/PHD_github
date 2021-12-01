@@ -1,21 +1,22 @@
 DEG=1
 
-geo_case = "2D"
-# geo_case = "3D"
+# geo_case = "2D"
+geo_case = "3D"
 
 if geo_case=="2D":
     # from FEEC.wave_eq.compute_err_wave2D import compute_err
     from FEEC.wave_eq.staggering_wave2D import compute_err
 else:
+    from FEEC.wave_eq.dual_fields.dual_fields_wave3D import compute_err
     # from FEEC.wave_eq.compute_err_wave3D import compute_err
-    from FEEC.wave_eq.staggering_wave3D import compute_err
+    # from FEEC.wave_eq.staggering_wave3D import compute_err
 
 import numpy as np
 
-save_res = False
+save_res = False # input("Save results: ")
 path_res = "results_wave/"
 bc_input = "DN"
-n_test_deg1 = 4
+n_test_deg1 = 3
 
 
 n_vec_deg1 = np.array([2 ** (i+1) for i in range(n_test_deg1)])

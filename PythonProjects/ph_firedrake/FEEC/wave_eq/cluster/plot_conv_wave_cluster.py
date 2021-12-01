@@ -177,6 +177,29 @@ plt.legend()
 
 plt.show()
 
+order_p0_deg1 = np.zeros((len(h_dict[1]) - 1, 2))
+order_p0_deg2 = np.zeros((len(h_dict[2]) - 1, 2))
+order_p0_deg3 = np.zeros((len(h_dict[3]) - 1, 2))
+
+for i in range(1,len(h_dict[1])):
+
+    order_p0_deg1[i - 1, 0] = np.log(err_p0_dict[1][i, 0] / err_p0_dict[1][i - 1, 0]) / np.log(h_dict[1][i] / h_dict[1][i - 1])
+    order_p0_deg1[i - 1, 1] = np.log(err_p0_dict[1][i, 1] / err_p0_dict[1][i - 1, 1]) / np.log(h_dict[1][i] / h_dict[1][i - 1])
+
+for i in range(1, len(h_dict[2])):
+
+    order_p0_deg2[i - 1, 0] = np.log(err_p0_dict[2][i, 0] / err_p0_dict[2][i - 1, 0]) / np.log(
+        h_dict[2][i] / h_dict[2][i - 1])
+    order_p0_deg2[i - 1, 1] = np.log(err_p0_dict[2][i, 1] / err_p0_dict[2][i - 1, 1]) / np.log(
+        h_dict[2][i] / h_dict[2][i - 1])
+
+for i in range(1, len(h_dict[3])):
+
+    order_p0_deg3[i - 1, 0] = np.log(err_p0_dict[3][i, 0] / err_p0_dict[3][i - 1, 0]) / np.log(
+        h_dict[3][i] / h_dict[3][i - 1])
+    order_p0_deg3[i - 1, 1] = np.log(err_p0_dict[3][i, 1] / err_p0_dict[3][i - 1, 1]) / np.log(
+        h_dict[3][i] / h_dict[3][i - 1])
+
 #
 # print("Estimated order of convergence for p_3: ")
 # for ii in deg_vec:
