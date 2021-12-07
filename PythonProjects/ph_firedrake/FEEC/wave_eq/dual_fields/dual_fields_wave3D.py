@@ -75,10 +75,10 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     V_32 = V_3 * V_2
     V_10 = V_1 * V_0
 
-    print(V_0.dim())
-    print(V_1.dim())
-    print(V_2.dim())
-    print(V_3.dim())
+    # print(V_0.dim())
+    # print(V_1.dim())
+    # print(V_2.dim())
+    # print(V_3.dim())
 
     v_32 = TestFunction(V_32)
     v_3, v_2 = split(v_32)
@@ -199,10 +199,10 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     dofs10_D = list(set(dofs10_D))
     dofs32_D = list(set(dofs32_D))
 
-    print("dofs on Gamma_D for 10")
-    print(dofs10_D)
-    print("dofs on Gamma_D for 32")
-    print(dofs32_D)
+    # print("dofs on Gamma_D for 10")
+    # print(dofs10_D)
+    # print("dofs on Gamma_D for 32")
+    # print(dofs32_D)
 
     dofs10_N = []
     dofs32_N = []
@@ -226,10 +226,10 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         if element in dofs32_D:
             dofs32_D.remove(element)
 
-    print("dofs on Gamma_N for 10")
-    print(dofs10_N)
-    print("dofs on Gamma_N for 32")
-    print(dofs32_N)
+    # print("dofs on Gamma_N for 10")
+    # print(dofs10_N)
+    # print("dofs on Gamma_N for 32")
+    # print(dofs32_N)
 
 
     Ppoint = (L/5, L/5, L/5)
@@ -573,7 +573,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
 bd_cond=input("Enter bc: ")
 
-n_elem = 5
+n_elem = 4
 pol_deg = 2
 
 n_time = 10
@@ -617,17 +617,17 @@ plt.title(r'Diff Hdot bdflow')
 plt.legend()
 
 plt.figure()
-plt.plot(t_vec[1:]-dt/2, np.diff(H_10)/dt - bdflow10_mid, 'r-.', label= "H_{10}")
+plt.plot(t_vec[1:]-dt/2, np.diff(H_10)/dt - bdflow10_mid, 'r-.', label=r"$H_{10}$")
 # plt.plot(t_vec[1:]-dt/2, bdflow10_mid, 'b--')
 plt.xlabel(r'Time [s]')
-plt.title(r'Diff H_{10} and flow 10')
+plt.title(r'Diff $H_{10}$ and flow 10')
 plt.legend()
 
 plt.figure()
-plt.plot(t_vec[1:]-dt/2, np.diff(H_32)/dt - bdflow32_mid, 'r-.', label= "H_{32}")
+plt.plot(t_vec[1:]-dt/2, np.diff(H_32)/dt - bdflow32_mid, 'r-.', label=r"$H_{32}$")
 # plt.plot(t_vec[1:]-dt/2, bdflow32_mid, 'b--')
 plt.xlabel(r'Time [s]')
-plt.title(r'Diff H_{32} and flow 32')
+plt.title(r'Diff $H_{32}$ and flow 32')
 plt.legend()
 
 
