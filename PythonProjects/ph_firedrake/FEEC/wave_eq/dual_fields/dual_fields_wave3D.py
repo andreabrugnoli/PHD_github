@@ -11,6 +11,10 @@ from tools_plotting import setup
 from tqdm import tqdm
 # from time import sleep
 
+path_fig = "/home/andrea/Pictures/PythonPlots/"
+bc_case = "_DN"
+geo_case = "_3D"
+
 
 def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     """Compute the numerical solution of the wave equation with the dual field method
@@ -145,14 +149,14 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     u_ex_mid = 0.5 * (u_ex + u_ex_1)
     p_ex_mid = 0.5 * (p_ex + p_ex_1)
 
-    print("interpolate 3")
-    p0_3 = interpolate(p_ex, V_3)
-    print("interpolate 2")
-    u0_2 = interpolate(u_ex, V_2)
-    print("interpolate 1")
-    u0_1 = interpolate(u_ex, V_1)
-    print("interpolate 0")
-    p0_0 = interpolate(p_ex, V_0)
+    # print("interpolate 3")
+    # p0_3 = interpolate(p_ex, V_3)
+    # print("interpolate 2")
+    # u0_2 = interpolate(u_ex, V_2)
+    # print("interpolate 1")
+    # u0_1 = interpolate(u_ex, V_1)
+    # print("interpolate 0")
+    # p0_0 = interpolate(p_ex, V_0)
 
     if bd_cond == "D":
         bc_D = [DirichletBC(V_10.sub(1), p_ex_1, "on_boundary")]
@@ -275,6 +279,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     Hn_10 = 0.5 * (inner(pn_0, pn_0) * dx + inner(un_1, un_1) * dx)
 
     Hn_31 = 0.5 * (inner(pn_3, pn_3) * dx + inner(un_1, un_1) * dx)
+    Hn_02 = 0.5 * (inner(pn_0, pn_0) * dx + inner(un_2, un_2) * dx)
+
     Hn_3210 = 0.5 * (dot(pn_0, pn_3) * dx + dot(un_2, un_1) * dx)
 
     Hn_ex = 0.5 * (inner(p_ex, p_ex) * dx(domain=mesh) + inner(u_ex, u_ex) * dx(domain=mesh))
@@ -298,6 +304,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     H_10_vec = np.zeros((1 + n_t,))
 
     H_31_vec = np.zeros((1 + n_t,))
+    H_02_vec = np.zeros((1 + n_t,))
+
     H_3210_vec = np.zeros((1 + n_t,))
 
     Hdot_vec = np.zeros((n_t,))
@@ -433,6 +441,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         H_10_vec[ii+1] = assemble(Hn_10)
 
         H_31_vec[ii+1] = assemble(Hn_31)
+        H_02_vec[ii+1] = assemble(Hn_02)
+
         H_3210_vec[ii+1] = assemble(Hn_3210)
 
         p_3P[ii+1] = pn_3.at(Ppoint)
@@ -561,9 +571,14 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     errH_10 = errH_10_vec[-1]
     errH_32 = errH_32_vec[-1]
 
-    dict_res = {"t_span": t_vec, "energy_32": H_32_vec, "energy_ex": H_ex_vec, \
-                "energy_10": H_10_vec, "energy_31": H_31_vec, "energy_3210": H_3210_vec,\
-                "power": Hdot_vec, "flow": bdflow_vec, "flow_ex": bdflow_ex_vec, \
+    int_bd_flow = np.zeros((1 + n_t,))
+
+    for i in range(n_t):
+        int_bd_flow[i+1] = int_bd_flow[i] + dt*bdflow_mid_vec[i]
+
+    dict_res = {"t_span": t_vec, "energy_ex": H_ex_vec, "energy_32": H_32_vec, \
+                "energy_10": H_10_vec, "energy_31": H_31_vec, "energy_02": H_02_vec, "energy_3210": H_3210_vec,\
+                "power": Hdot_vec, "flow": bdflow_vec, "flow_ex": bdflow_ex_vec, "int_flow": int_bd_flow, \
                 "flow_mid": bdflow_mid_vec, "flow10_mid": bdflow10_mid_vec, "flow32_mid": bdflow32_mid_vec,\
                 "err_p3": errL2_p_3, "err_u1": [errL2_u_1, errHcurl_u_1], \
                 "err_p0": [errL2_p_0, errH1_p_0], "err_u2": [errL2_u_2, errHdiv_u_2], "err_p30": err_p30, \
@@ -573,11 +588,12 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
 
 bd_cond=input("Enter bc: ")
+save_plots=input("Save plots: ")
 
-n_elem = 1
-pol_deg = 1
+n_elem = 4
+pol_deg = 3
 
-n_time = 10
+n_time = 100
 t_fin = 1
 
 dt = t_fin / n_time
@@ -592,12 +608,14 @@ bdflow_mid = results["flow_mid"]
 
 bdflow10_mid = results["flow10_mid"]
 bdflow32_mid = results["flow32_mid"]
+int_bdflow = results["int_flow"]
 
 
 H_32 = results["energy_32"]
 H_10 = results["energy_10"]
 
 H_31 = results["energy_31"]
+H_02 = results["energy_02"]
 H_3210 = results["energy_3210"]
 
 H_ex = results["energy_ex"]
@@ -611,34 +629,95 @@ errL2_u2, errHdiv_u2 = results["err_u2"]
 err_Hs, err_H10, err_H32 = results["err_H"]
 
 
-plt.figure()
-plt.plot(t_vec[1:]-dt/2, Hdot_vec - bdflow_mid, 'r-.')
-plt.xlabel(r'Time [s]')
-plt.title(r'Diff Hdot bdflow')
-plt.legend()
 
 plt.figure()
-plt.plot(t_vec[1:]-dt/2, np.diff(H_10)/dt - bdflow10_mid, 'r-.', label=r"$H_{10}$")
+plt.plot(t_vec[1:]-dt/2, Hdot_vec - bdflow_mid, 'r-.')
+plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.title(r'$\Delta_t H_{h, n+1/2}$ and $<e^\partial_{h}, f^\partial_{h}>_{\partial M}$')
+
+if save_plots:
+    plt.savefig(path_fig + "pow_bal" + geo_case + bc_case + ".eps", format="eps")
+
+plt.figure()
+plt.plot(t_vec[1:]-dt/2, np.diff(H_10)/dt - bdflow10_mid, 'r-.', label=r"$H^{01}$")
 # plt.plot(t_vec[1:]-dt/2, bdflow10_mid, 'b--')
-plt.xlabel(r'Time [s]')
-plt.title(r'Diff $H_{10}$ and flow 10')
-plt.legend()
+plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.title(r'$\frac{H^{01}_{h, n+1} - H^{01}_{h, n}}{\Delta t}$ and its power flow')
+# plt.legend()
+
+if save_plots:
+    plt.savefig(path_fig + "pow_bal10" + geo_case + bc_case + ".eps", format="eps")
 
 plt.figure()
 plt.plot(t_vec[1:]-dt/2, np.diff(H_32)/dt - bdflow32_mid, 'r-.', label=r"$H_{32}$")
 # plt.plot(t_vec[1:]-dt/2, bdflow32_mid, 'b--')
-plt.xlabel(r'Time [s]')
-plt.title(r'Diff $H_{32}$ and flow 32')
-plt.legend()
+plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.title(r'$\frac{H^{32}_{h, n+1} - H^{32}_{h, n}}{\Delta t}$ and its power flow')
+# plt.legend()
+
+if save_plots:
+    plt.savefig(path_fig + "pow_bal32" + geo_case + bc_case + ".eps", format="eps")
+
+plt.figure()
+plt.plot(t_vec[1:]-dt/2, np.diff(H_10)/dt - bdflow_mid, 'r-.', label=r"$H^{01}$")
+# plt.plot(t_vec[1:]-dt/2, bdflow10_mid, 'b--')
+plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.title(r'$\frac{H^{01}_{h, n+1} - H^{01}_{h, n}}{\Delta t}$ and $<e^\partial_{h, n+1/2}, f^\partial_{h, n+1/2}>_{\partial M}$')
+# plt.legend()
+
+if save_plots:
+    plt.savefig(path_fig + "pow_bal10_mid" + geo_case + bc_case + ".eps", format="eps")
+
+plt.figure()
+plt.plot(t_vec[1:]-dt/2, np.diff(H_32)/dt - bdflow_mid, 'r-.', label=r"$H_{32}$")
+# plt.plot(t_vec[1:]-dt/2, bdflow32_mid, 'b--')
+plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.title(r'$\frac{H^{32}_{h, n+1} - H^{32}_{h, n}}{\Delta t}$ and $<e^\partial_{h, n+1/2}, f^\partial_{h, n+1/2}>_{\partial M}$')
+# plt.legend()
+
+if save_plots:
+    plt.savefig(path_fig + "pow_bal32_mid" + geo_case + bc_case + ".eps", format="eps")
 
 
 plt.figure()
-plt.plot(t_vec, bdflow_vec, 'r-.', label=r'bd flow')
-plt.plot(t_vec, bdflow_ex_vec, 'b--', label=r'bd flow ex')
-plt.xlabel(r'Time [s]')
+plt.plot(t_vec, bdflow_vec, 'r-.', label=r'$<e^\partial_{h}, f^\partial_{h}>_{\partial M}$')
+plt.plot(t_vec, bdflow_ex_vec, 'b--', label=r'$<e^\partial_{\mathrm{ex}}, f^\partial_{\mathrm{ex}}>_{\partial M}$')
+plt.xlabel(r'Time $[\mathrm{s}]$')
 plt.title(r'Boundary flow')
 plt.legend()
 
+if save_plots:
+    plt.savefig(path_fig + "bd_flow" + geo_case + bc_case + ".eps", format="eps")
+
+plt.figure()
+plt.plot(t_vec, H_10, 'r-.', label=r'$H^{01}$')
+plt.plot(t_vec, H_ex, 'b--', label=r'$H_{\mathrm{ex}}$')
+plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.title(r'$H^{01}$')
+plt.legend()
+
+if save_plots:
+    plt.savefig(path_fig + "H_01" + geo_case + bc_case + ".eps", format="eps")
+
+plt.figure()
+plt.plot(t_vec, H_32, 'r-.', label=r'$H^{32}$')
+plt.plot(t_vec, H_ex, 'b--', label=r'$H_{\mathrm{ex}}$')
+plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.title(r'$H^{32}$')
+plt.legend()
+
+if save_plots:
+    plt.savefig(path_fig + "H_32" + geo_case + bc_case + ".eps", format="eps")
+
+plt.figure()
+plt.plot(t_vec, H_3210 - H_3210[0], 'r-.', label=r'$\Delta H^{3210}$')
+plt.plot(t_vec, int_bdflow, 'b--', label=r'$\int <e^\partial_{h}, f^\partial_{h}>_{\partial M} dt$')
+plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.title(r'$H^{3210}$')
+plt.legend()
+
+if save_plots:
+    plt.savefig(path_fig + "H_3210" + geo_case + bc_case + ".eps", format="eps")
 
 plt.show()
 

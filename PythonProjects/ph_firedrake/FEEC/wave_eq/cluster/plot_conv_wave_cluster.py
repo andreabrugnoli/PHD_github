@@ -67,7 +67,7 @@ for ii in deg_vec:
     ord_u12_dict[ii] = ord_u12_deg_ii
 
 
-fig1 = plt.figure()
+plt.figure()
 for ii in deg_vec:
     h = h_dict[ii]
     errL2_p3 = err_p3_dict[ii]
@@ -82,7 +82,7 @@ plt.title(r'Error $p^3$')
 plt.legend()
 
 if save_plots:
-    fig1.savefig(path_fig + "p_3" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "p_3" + geo_case + bc_case + ".eps", format="eps")
 
 
 plt.figure()
