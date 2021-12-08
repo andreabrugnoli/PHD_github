@@ -75,10 +75,10 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     V_32 = V_3 * V_2
     V_10 = V_1 * V_0
 
-    print(V_0.dim())
-    print(V_1.dim())
-    print(V_2.dim())
-    print(V_3.dim())
+    # print(V_0.dim())
+    # print(V_1.dim())
+    # print(V_2.dim())
+    # print(V_3.dim())
 
     v_32 = TestFunction(V_32)
     v_3, v_2 = split(v_32)
@@ -571,6 +571,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     return dict_res
 
+<<<<<<< HEAD
 # bd_cond=input("Enter bc: ")
 #
 # n_elem = 5
@@ -640,6 +641,77 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 #
 #
 # plt.show()
+=======
+bd_cond=input("Enter bc: ")
+
+n_elem = 4
+pol_deg = 2
+
+n_time = 10
+t_fin = 1
+
+dt = t_fin / n_time
+
+results = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bd_cond)
+
+t_vec = results["t_span"]
+Hdot_vec = results["power"]
+
+bdflow_vec = results["flow"]
+bdflow_mid = results["flow_mid"]
+
+bdflow10_mid = results["flow10_mid"]
+bdflow32_mid = results["flow32_mid"]
+
+
+H_32 = results["energy_32"]
+H_10 = results["energy_10"]
+
+H_31 = results["energy_31"]
+H_3210 = results["energy_3210"]
+
+H_ex = results["energy_ex"]
+bdflow_ex_vec = results["flow_ex"]
+
+errL2_p3 = results["err_p3"]
+errL2_u1, errHcurl_u1 = results["err_u1"]
+errL2_p0, errH1_p0 = results["err_p0"]
+errL2_u2, errHdiv_u2 = results["err_u2"]
+
+err_Hs, err_H10, err_H32 = results["err_H"]
+
+
+plt.figure()
+plt.plot(t_vec[1:]-dt/2, Hdot_vec - bdflow_mid, 'r-.')
+plt.xlabel(r'Time [s]')
+plt.title(r'Diff Hdot bdflow')
+plt.legend()
+
+plt.figure()
+plt.plot(t_vec[1:]-dt/2, np.diff(H_10)/dt - bdflow10_mid, 'r-.', label=r"$H_{10}$")
+# plt.plot(t_vec[1:]-dt/2, bdflow10_mid, 'b--')
+plt.xlabel(r'Time [s]')
+plt.title(r'Diff $H_{10}$ and flow 10')
+plt.legend()
+
+plt.figure()
+plt.plot(t_vec[1:]-dt/2, np.diff(H_32)/dt - bdflow32_mid, 'r-.', label=r"$H_{32}$")
+# plt.plot(t_vec[1:]-dt/2, bdflow32_mid, 'b--')
+plt.xlabel(r'Time [s]')
+plt.title(r'Diff $H_{32}$ and flow 32')
+plt.legend()
+
+
+plt.figure()
+plt.plot(t_vec, bdflow_vec, 'r-.', label=r'bd flow')
+plt.plot(t_vec, bdflow_ex_vec, 'b--', label=r'bd flow ex')
+plt.xlabel(r'Time [s]')
+plt.title(r'Boundary flow')
+plt.legend()
+
+
+plt.show()
+>>>>>>> f16381a53170edcaf96a975ce7645cd49207a873
 
 
 # print("Error L2 p3: " + str(errL2_p3))
