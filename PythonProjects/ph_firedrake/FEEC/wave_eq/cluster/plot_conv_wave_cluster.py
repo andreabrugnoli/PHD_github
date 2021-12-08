@@ -2,7 +2,8 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 from tools_plotting import setup
-
+save_plots = True
+path_fig = "/home/andrea/Pictures/PythonPlots/"
 path_res = "results_wave/"
 bc_case = "_DN"
 geo_case = "_3D"
@@ -66,7 +67,7 @@ for ii in deg_vec:
     ord_u12_dict[ii] = ord_u12_deg_ii
 
 
-plt.figure()
+fig1 = plt.figure()
 for ii in deg_vec:
     h = h_dict[ii]
     errL2_p3 = err_p3_dict[ii]
@@ -74,9 +75,15 @@ for ii in deg_vec:
     plt.plot(np.log(h), np.log(h**ii) + \
              + 1.1*(np.log(errL2_p3)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
-plt.xlabel(r'$h$')
-plt.title(r'$||p_3||_{L^2}$')
+plt.xlabel(r'$\log(h)$')
+plt.ylabel(r'$\log||p^3 - p^3_{\mathrm{ex}}||_{L^2}$')
+plt.title(r'Error $p^3$')
+
 plt.legend()
+
+if save_plots:
+    fig1.savefig(path_fig + "p_3" + geo_case + bc_case + ".eps", format="eps")
+
 
 plt.figure()
 for ii in deg_vec:
@@ -86,9 +93,14 @@ for ii in deg_vec:
     plt.plot(np.log(h), np.log(h**ii) + \
              + 1.1*(np.log(errL2_p0)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
-plt.xlabel(r'$h$')
-plt.title(r'$||p_0||_{L^2}$')
+plt.xlabel(r'$\log(h)$')
+plt.ylabel(r'$\log||p^0 - p^0_{\mathrm{ex}}||_{L^2}$')
+plt.title(r'Error $p^0$')
+
 plt.legend()
+
+if save_plots:
+    plt.savefig(path_fig + "p_0" + geo_case + bc_case + ".eps", format="eps")
 
 # plt.figure()
 # for ii in deg_vec:
@@ -106,13 +118,18 @@ plt.figure()
 for ii in deg_vec:
     h = h_dict[ii]
     errL2_u1 = err_u1_dict[ii][:, 0]
-    plt.plot(np.log(h), np.log(errL2_u1), '-.+', label=r'NED$_' + str(ii) + '$')
+    plt.plot(np.log(h), np.log(errL2_u1), '-.+', label=r'NED$^1_' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
              + 1.1*(np.log(errL2_u1)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
-plt.xlabel(r'$h$')
-plt.title(r'$||u_1||_{L^2}$')
+plt.xlabel(r'$\log(h)$')
+plt.ylabel(r'$\log||q^1 - q^1_{\mathrm{ex}}||_{L^2}$')
+plt.title(r'Error $q^1$')
+
 plt.legend()
+
+if save_plots:
+    plt.savefig(path_fig + "q_1" + geo_case + bc_case + ".eps", format="eps")
 
 # plt.figure()
 # for ii in deg_vec:
@@ -135,9 +152,15 @@ for ii in deg_vec:
     plt.plot(np.log(h), np.log(h**ii) + \
              + 1.1*(np.log(errL2_u2)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
-plt.xlabel(r'$h$')
-plt.title(r'$||u_2||_{L^2}$')
+plt.xlabel(r'$\log(h)$')
+plt.ylabel(r'$\log||q^2 - q^2_{\mathrm{ex}}||_{L^2}$')
+plt.title(r'Error $q^2$')
+
 plt.legend()
+
+if save_plots:
+    plt.savefig(path_fig + "q_2" + geo_case + bc_case + ".eps", format="eps")
+
 
 # plt.figure()
 # for ii in deg_vec:
@@ -155,13 +178,18 @@ plt.figure()
 for ii in deg_vec:
     h = h_dict[ii]
     errL2_u12 = err_u12_dict[ii]
-    plt.plot(np.log(h), np.log(errL2_u12), '-.+', label=r'NED$_' + str(ii) + '$-RT$_' + str(ii) + '$')
+    plt.plot(np.log(h), np.log(errL2_u12), '-.+', label=r'NED$^1_' + str(ii) + '$-RT$_' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
              + 1.1*(np.log(errL2_u12)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
-plt.xlabel(r'$h$')
-plt.title(r'$||u_1 - u_2||_{L^2}$')
+plt.xlabel(r'$\log(h)$')
+plt.ylabel(r'$\log||q^1 - q^2||_{L^2}$')
+plt.title(r'Error between $q^1$ and $q^2$')
+
 plt.legend()
+
+if save_plots:
+    plt.savefig(path_fig + "q_12" + geo_case + bc_case + ".eps", format="eps")
 
 plt.figure()
 for ii in deg_vec:
@@ -171,9 +199,14 @@ for ii in deg_vec:
     plt.plot(np.log(h), np.log(h**ii) + \
              + 1.1*(np.log(errL2_p30)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
-plt.xlabel(r'$h$')
-plt.title(r'$||p_3 - p_0||_{L^2}$')
+plt.xlabel(r'$\log(h)$')
+plt.ylabel(r'$\log||p^3 - p^0||_{L^2}$')
+plt.title(r'Error between $p^3$ and $p^0$')
+
 plt.legend()
+
+if save_plots:
+    plt.savefig(path_fig + "p_30" + geo_case + bc_case + ".eps", format="eps")
 
 plt.show()
 
