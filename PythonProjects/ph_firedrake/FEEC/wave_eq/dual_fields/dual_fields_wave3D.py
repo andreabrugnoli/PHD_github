@@ -11,7 +11,7 @@ from tools_plotting import setup
 from tqdm import tqdm
 # from time import sleep
 
-path_fig = "/home/andrea/Pictures/PythonPlots/"
+path_fig = "/home/andrea/Pictures/PythonPlots/DualFields_wave3D/"
 bc_case = "_DN"
 geo_case = "_3D"
 
@@ -149,14 +149,10 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     u_ex_mid = 0.5 * (u_ex + u_ex_1)
     p_ex_mid = 0.5 * (p_ex + p_ex_1)
 
-    # print("interpolate 3")
-    # p0_3 = interpolate(p_ex, V_3)
-    # print("interpolate 2")
-    # u0_2 = interpolate(u_ex, V_2)
-    # print("interpolate 1")
-    # u0_1 = interpolate(u_ex, V_1)
-    # print("interpolate 0")
-    # p0_0 = interpolate(p_ex, V_0)
+    p0_3 = interpolate(p_ex, V_3)
+    u0_2 = interpolate(u_ex, V_2)
+    u0_1 = interpolate(u_ex, V_1)
+    p0_0 = interpolate(p_ex, V_0)
 
     if bd_cond == "D":
         bc_D = [DirichletBC(V_10.sub(1), p_ex_1, "on_boundary")]
@@ -286,6 +282,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     Hn_ex = 0.5 * (inner(p_ex, p_ex) * dx(domain=mesh) + inner(u_ex, u_ex) * dx(domain=mesh))
 
     Hdot_n = 1/dt*(dot(pnmid_0, pn1_3 - pn_3) * dx(domain=mesh) + dot(unmid_2, un1_1 - un_1) * dx(domain=mesh))
+
     bdflow_midn = pnmid_0 * dot(unmid_2, n_ver) * ds(domain=mesh)
 
     y_nmid_ess10 = 1 / dt * m_form10(v_1, un1_1 - un_1, v_0, pn1_0 - pn_0) \
@@ -309,6 +306,9 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     H_3210_vec = np.zeros((1 + n_t,))
 
     Hdot_vec = np.zeros((n_t,))
+    H32dot_vec = np.zeros((n_t,))
+    H10dot_vec = np.zeros((n_t,))
+
     bdflow_mid_vec = np.zeros((n_t,))
 
     bdflow10_mid_vec = np.zeros((n_t,))
@@ -404,6 +404,9 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         enmid_32.assign(0.5 * (en_32 + en1_32))
 
         Hdot_vec[ii] = assemble(Hdot_n)
+        H32dot_vec[ii] = assemble(H32dot_n)
+        H10dot_vec[ii] = assemble(H10dot_n)
+
         bdflow_mid_vec[ii] = assemble(bdflow_midn)
 
         yhat_10 = assemble(y_nmid_ess10).vector().get_local()[dofs10_D]
@@ -578,7 +581,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     dict_res = {"t_span": t_vec, "energy_ex": H_ex_vec, "energy_32": H_32_vec, \
                 "energy_10": H_10_vec, "energy_31": H_31_vec, "energy_02": H_02_vec, "energy_3210": H_3210_vec,\
-                "power": Hdot_vec, "flow": bdflow_vec, "flow_ex": bdflow_ex_vec, "int_flow": int_bd_flow, \
+                "power": Hdot_vec, "power_32": H32dot_vec, "power_10": H10dot_vec, \
+                "flow": bdflow_vec, "flow_ex": bdflow_ex_vec, "int_flow": int_bd_flow, \
                 "flow_mid": bdflow_mid_vec, "flow10_mid": bdflow10_mid_vec, "flow32_mid": bdflow32_mid_vec,\
                 "err_p3": errL2_p_3, "err_u1": [errL2_u_1, errHcurl_u_1], \
                 "err_p0": [errL2_p_0, errH1_p_0], "err_u2": [errL2_u_2, errHdiv_u_2], "err_p30": err_p30, \
@@ -590,8 +594,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 bd_cond=input("Enter bc: ")
 save_plots=input("Save plots: ")
 
-n_elem = 4
-pol_deg = 3
+n_elem = 1
+pol_deg = 1
 
 n_time = 100
 t_fin = 1
@@ -646,7 +650,7 @@ plt.title(r'$\frac{H^{01}_{h, n+1} - H^{01}_{h, n}}{\Delta t}$ and its power flo
 # plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "pow_bal10" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "dHdt10" + geo_case + bc_case + ".eps", format="eps")
 
 plt.figure()
 plt.plot(t_vec[1:]-dt/2, np.diff(H_32)/dt - bdflow32_mid, 'r-.', label=r"$H_{32}$")
@@ -656,7 +660,7 @@ plt.title(r'$\frac{H^{32}_{h, n+1} - H^{32}_{h, n}}{\Delta t}$ and its power flo
 # plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "pow_bal32" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "dHdt32" + geo_case + bc_case + ".eps", format="eps")
 
 plt.figure()
 plt.plot(t_vec[1:]-dt/2, np.diff(H_10)/dt - bdflow_mid, 'r-.', label=r"$H^{01}$")
@@ -666,7 +670,7 @@ plt.title(r'$\frac{H^{01}_{h, n+1} - H^{01}_{h, n}}{\Delta t}$ and $<e^\partial_
 # plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "pow_bal10_mid" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "dHdt10_mid" + geo_case + bc_case + ".eps", format="eps")
 
 plt.figure()
 plt.plot(t_vec[1:]-dt/2, np.diff(H_32)/dt - bdflow_mid, 'r-.', label=r"$H_{32}$")
@@ -676,7 +680,7 @@ plt.title(r'$\frac{H^{32}_{h, n+1} - H^{32}_{h, n}}{\Delta t}$ and $<e^\partial_
 # plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "pow_bal32_mid" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "dHdt32_mid" + geo_case + bc_case + ".eps", format="eps")
 
 
 plt.figure()
