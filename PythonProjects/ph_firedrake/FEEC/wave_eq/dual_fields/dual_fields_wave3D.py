@@ -339,8 +339,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     H_31_vec[0] = assemble(Hn_31)
     H_02_vec[0] = assemble(Hn_02)
-    H_3210_vec[0] = assemble(Hn_3210)
 
+    H_3210_vec[0] = assemble(Hn_3210)
 
     H_ex_vec[0] = assemble(Hn_ex)
 
@@ -588,14 +588,14 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     return dict_res
 
 
-bd_cond=input("Enter bc: ")
-save_plots=input("Save plots: ")
+bd_cond = input("Enter bc: ")
+save_plots = input("Save plots: ")
 
 n_elem = 4
 pol_deg = 3
 
-n_time = 100
-t_fin = 1
+n_time = 200
+t_fin = 5
 
 dt = t_fin / n_time
 
@@ -635,132 +635,80 @@ err_Hs, err_H10, err_H32 = results["err_H"]
 plt.figure()
 plt.plot(t_vec[1:]-dt/2, Hdot_vec - bdflow_mid, 'r-.')
 plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.title(r'$\Delta_t H_{h}-<e^\partial_{h}, f^\partial_{h}>_{\partial M}$')
+plt.ylabel(r'$P -<e^\partial_{h}, f^\partial_{h}>_{\partial M}$')
+plt.title(r'Power balance conservation')
 
 if save_plots:
-    plt.savefig(path_fig + "pow_bal" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "pow_bal" + geo_case + bc_case + ".pdf", format="pdf")
 
 plt.figure()
-plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt - bdflow10_mid, 'r-.', label=r"$H^{01}$")
-# plt.plot(t_vec[1:]-dt/2, bdflow10_mid, 'b--')
+plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt - bdflow10_mid, 'r-.')
 plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.ylabel(r'$\dot{H}^{01} - <e^\partial_{h}, f^\partial_{h}>_{\Gamma_q} - \mathbf{u}^p \widehat{\mathbf{y}}^q$')
 plt.title(r'Conservation law $\dot{H}^{01}$')
-# plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "pow_bal_10" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "pow_bal10" + geo_case + bc_case + ".pdf", format="pdf")
 
 plt.figure()
-plt.plot(t_vec[1:]-dt/2, np.diff(H_32)/dt - bdflow32_mid, 'r-.', label=r"$H_{32}$")
-# plt.plot(t_vec[1:]-dt/2, bdflow32_mid, 'b--')
+plt.plot(t_vec[1:]-dt/2, np.diff(H_32)/dt - bdflow32_mid, 'r-.')
 plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.ylabel(r'$\dot{H}^{32} - <e^\partial_{h}, f^\partial_{h}>_{\Gamma_p} - \mathbf{u}^q \widehat{\mathbf{y}}^p$')
 plt.title(r'Conservation law $\dot{H}^{32}$')
-# plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "pow_baL_32" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "pow_bal32" + geo_case + bc_case + ".pdf", format="pdf")
 
 plt.figure()
-plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt - bdflow_mid, 'r-.', label=r"$H^{01}$")
-# plt.plot(t_vec[1:]-dt/2, bdflow10_mid, 'b--')
+plt.plot(t_vec, bdflow_vec - bdflow_ex_vec, 'r-.')
 plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.title(r'$\dot{H}^{01} - <e^\partial_{h}, f^\partial_{h}>_{\partial M}$')
-# plt.legend()
+plt.ylabel(r'$<e^\partial_{h}, f^\partial_{h}>_{\partial M} - <e^\partial_{\mathrm{ex}}, f^\partial_{\mathrm{ex}}>_{\partial M}$')
+plt.title(r'Discrete and exact boundary flow')
 
 if save_plots:
-    plt.savefig(path_fig + "dHdt_10" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "bd_flow" + geo_case + bc_case + ".pdf", format="pdf")
 
 
 plt.figure()
-plt.plot(t_vec[1:]-dt/2, np.diff(H_32)/dt - bdflow_mid, 'r-.', label=r"$H_{32}$")
-# plt.plot(t_vec[1:]-dt/2, bdflow32_mid, 'b--')
+plt.plot(t_vec[1:]-dt/2, np.abs(np.diff(H_01)/dt - bdflow_mid), '-v', label=r"$\dot{H}^{01}$")
+plt.plot(t_vec[1:]-dt/2, np.abs(np.diff(H_32)/dt - bdflow_mid), '--', label=r"$\dot{H}^{32}$")
+# plt.plot(t_vec[1:]-dt/2, np.abs(np.diff(H_02)/dt - bdflow_mid), '-.+', label=r"$\dot{H}^{02}$")
+# plt.plot(t_vec[1:]-dt/2, np.abs(np.diff(H_31)/dt - bdflow_mid), '--*', label=r"$\dot{H}^{31}$")
+plt.plot(t_vec[1:]-dt/2, np.abs(np.diff(H_3210)/dt - bdflow_mid), '-.', label=r'$\dot{H}^{3201}$')
 plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.title(r'$ \dot{H}^{32} - <e^\partial_{h}, f^\partial_{h}>_{\partial M}$')
-# plt.legend()
-
-if save_plots:
-    plt.savefig(path_fig + "dHdt_32" + geo_case + bc_case + ".eps", format="eps")
-
-
-plt.figure()
-plt.plot(t_vec[1:]-dt/2, np.diff(H_3210)/dt - bdflow_mid, 'r-.', label=r'$ \dot{H}^{3210} - <e^\partial_{h}, f^\partial_{h}>_{\partial M}$')
-plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.title(r'$\dot{H}^{3210} - <e^\partial_{h}, f^\partial_{h}>_{\partial M}$')
+plt.title(r'$|\dot{H}_h - <e^\partial_{h}, f^\partial_{h}>_{\partial M}|$')
 plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "dHdt_3210" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "dHdt" + geo_case + bc_case + ".pdf", format="pdf")
 
 plt.figure()
-plt.plot(t_vec, bdflow_vec - bdflow_ex_vec, 'r-.', label=r'$<e^\partial_{h}, f^\partial_{h}>_{\partial M}$')
-# plt.plot(t_vec, bdflow_ex_vec, 'b--', label=r'$<e^\partial_{\mathrm{ex}}, f^\partial_{\mathrm{ex}}>_{\partial M}$')
+plt.plot(t_vec, np.abs((H_01 - H_01[0]) - (H_ex-H_ex[0])), '-v', label=r'$\Delta H^{01}$')
+plt.plot(t_vec, np.abs((H_32 - H_32[0]) - (H_ex-H_ex[0])), '--', label=r'$\Delta H^{32}$')
+#plt.plot(t_vec, np.abs((H_02 - H_02[0]) - (H_ex-H_ex[0])), '-.+', label=r'$\Delta H^{02}$')
+#plt.plot(t_vec, np.abs((H_31 - H_31[0]) - (H_ex-H_ex[0])), '--*', label=r'$\Delta H^{31}$')
+plt.plot(t_vec, np.abs((H_3210 - H_3210[0]) - (H_ex-H_ex[0])), '-.', label=r'$\Delta H^{3210}$')
+plt.plot(t_vec, np.abs(int_bdflow - (H_ex-H_ex[0])), '-.+', label=r'$\int_0^t P(\tau) d\tau$')
 plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.title(r'$<e^\partial_{h}, f^\partial_{h}>_{\partial M} - <e^\partial_{\mathrm{ex}}, f^\partial_{\mathrm{ex}}>_{\partial M}$')
+plt.title(r'$|\Delta H_h - \Delta H_{\mathrm{ex}}|$')
 plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "bd_flow" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "deltaH" + geo_case + bc_case + ".pdf", format="pdf")
 
 plt.figure()
-plt.plot(t_vec, H_01 - H_ex, 'r-.', label=r'$H^{01} - H_{\mathrm{ex}}$')
-# plt.plot(t_vec, H_ex, 'b--', label=r'$H_{\mathrm{ex}}$')
+plt.plot(t_vec, np.abs(H_01 - H_ex), '-v', label=r'$H^{01}$')
+plt.plot(t_vec, np.abs(H_32 - H_ex), '--', label=r'$H^{32}$')
+#plt.plot(t_vec, np.abs(H_02 - H_ex), '-.+', label=r'$H^{02}$')
+#plt.plot(t_vec, np.abs(H_31 - H_ex), '--*', label=r'$H^{31}$')
+plt.plot(t_vec, np.abs(H_3210 - H_ex), '-.', label=r'$H^{3210}$')
+plt.plot(t_vec, np.abs(H_df - H_ex), '-.+', label=r'$H_{\mathrm{df}}$')
 plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.title(r'$H^{01} - H_{\mathrm{ex}}$')
+plt.title(r'$|H_h - H_{\mathrm{ex}}|$')
 plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "H_01" + geo_case + bc_case + ".eps", format="eps")
-
-plt.figure()
-plt.plot(t_vec, H_32 - H_ex, 'r-.', label=r'$H^{32}-H_{\mathrm{ex}}$')
-# plt.plot(t_vec, H_ex, 'b--', label=r'$H_{\mathrm{ex}}$')
-plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.title(r'$H^{32} - H_{\mathrm{ex}}$')
-plt.legend()
-
-if save_plots:
-    plt.savefig(path_fig + "H_32" + geo_case + bc_case + ".eps", format="eps")
-
-plt.figure()
-plt.plot(t_vec, H_02 - H_ex, 'r-.', label=r'$H^{02} - H_{\mathrm{ex}}$')
-# plt.plot(t_vec, H_ex, 'b--', label=r'$H_{\mathrm{ex}}$')
-plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.title(r'$H^{02} - H_{\mathrm{ex}}$')
-plt.legend()
-
-if save_plots:
-    plt.savefig(path_fig + "H_02" + geo_case + bc_case + ".eps", format="eps")
-
-plt.figure()
-plt.plot(t_vec, H_31 - H_ex, 'r-.', label=r'$H^{31}-H_{\mathrm{ex}}$')
-# plt.plot(t_vec, H_ex, 'b--', label=r'$H_{\mathrm{ex}}$')
-plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.title(r'$H^{31} - H_{\mathrm{ex}}$')
-plt.legend()
-
-if save_plots:
-    plt.savefig(path_fig + "H_31" + geo_case + bc_case + ".eps", format="eps")
-
-plt.figure()
-plt.plot(t_vec, H_3210 - H_ex, 'r-.', label=r'$H^{3210}-H_{\mathrm{ex}}$')
-# plt.plot(t_vec, int_bdflow, 'b--', label=r'$\int <e^\partial_{h}, f^\partial_{h}>_{\partial M} dt$')
-plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.title(r'$H^{3210} -H_{\mathrm{ex}}$')
-plt.legend()
-
-if save_plots:
-    plt.savefig(path_fig + "H_3210" + geo_case + bc_case + ".eps", format="eps")
-
-
-plt.figure()
-plt.plot(t_vec, H_df - H_ex, 'r-.', label=r'$H^{\mathrm{df}}-H_{\mathrm{ex}}$')
-# plt.plot(t_vec, int_bdflow, 'b--', label=r'$\int <e^\partial_{h}, f^\partial_{h}>_{\partial M} dt$')
-plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.title(r'$H^{\mathrm{df}} -H_{\mathrm{ex}}$')
-plt.legend()
-
-if save_plots:
-    plt.savefig(path_fig + "H_df" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "H" + geo_case + bc_case + ".pdf", format="pdf")
 
 plt.show()
 
@@ -779,49 +727,3 @@ plt.show()
 # print("Error Hs: " + str(err_Hs))
 # print("Error H_10: " + str(err_H10))
 # print("Error H_32: " + str(err_H32))
-#
-# plt.figure()
-# plt.plot(t_vec, H_32, 'r-.', label=r'$H_{32}$')
-# plt.plot(t_vec, H_10, 'b--', label=r'$H_{10}$')
-# plt.plot(t_vec, H_ex, '*-', label=r'H Exact')
-# plt.xlabel(r'Time [s]')
-# plt.title(r'Energies')
-# plt.legend()
-#
-# plt.figure()
-# plt.plot(t_vec, H_31, 'r-.', label=r'$H_{31}$')
-# plt.plot(t_vec, H_3210, 'b--', label=r'$H_{3210}$')
-# plt.xlabel(r'Time [s]')
-# plt.title(r'Energies dual and dual pr')
-# plt.legend()
-#
-# plt.figure()
-# plt.plot(t_vec, H_31-H_3210, 'r-.')
-# plt.xlabel(r'Time [s]')
-# plt.title(r'Diff Energies dual and dual pr')
-# plt.legend()
-
-# plt.figure()
-# plt.plot(t_vec, Hdot_vec - bdflow_vec, 'r--', label=r'Energy residual')
-# plt.xlabel(r'Time [s]')
-# plt.title(r'Energy residual')
-# plt.legend()
-
-
-# diffH_L2Hdiv = np.diff(H_32)
-# diffH_H1Hcurl = np.diff(H_10)
-# Delta_t = np.diff(t_vec)
-# int_bdflow = np.zeros((n_time, ))
-#
-# for i in range(n_time):
-#     int_bdflow[i] = 0.5*Delta_t[i]*(bdflow_vec[i+1] + bdflow_vec[i])
-#
-# plt.figure()
-# plt.plot(t_vec[1:], diffH_L2Hdiv, 'ro.', label=r'$\Delta H_{32}$')
-# plt.plot(t_vec[1:], diffH_H1Hcurl, 'b--', label=r'$\Delta H_{10}$')
-# plt.plot(t_vec[1:], int_bdflow, '*-.', label=r'Bd flow int')
-# plt.xlabel(r'Time [s]')
-# plt.title(r'Energy balance')
-# plt.legend()
-#
-# plt.show()
