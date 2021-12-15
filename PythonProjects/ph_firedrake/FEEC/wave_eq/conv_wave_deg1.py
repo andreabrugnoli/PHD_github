@@ -7,7 +7,7 @@ if geo_case=="2D":
     # from FEEC.wave_eq.compute_err_wave2D import compute_err
     from FEEC.wave_eq.staggering_wave2D import compute_err
 else:
-    from FEEC.wave_eq.dual_fields.dual_fields_wave3D import compute_err
+    from FEEC.wave_eq.dual_fields.dual_field_wave3D import compute_err
     # from FEEC.wave_eq.compute_err_wave3D import compute_err
     # from FEEC.wave_eq.staggering_wave3D import compute_err
 
