@@ -17,7 +17,7 @@ geo_case = "_3D"
 
 
 def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
-    """Compute the numerical solution of the wave equation with the dual field method
+    """Compute the numerical solution of the Maxwell equations with the dual field method
 
         Parameters:
         n_el: number of elements for the discretization
@@ -28,13 +28,17 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
        """
 
+    c_0 = 299792458
+    mu_0 = 1.25663706212 * 10 ** (-6)
+    eps_0 = 8.85418781762 * 10 ** (-12)
+
     def m_formE2H1(vE_2, E_2, vH_1, H_1):
-        m_form = inner(vE_2, E_2) * dx + inner(vH_1, H_1) * dx
+        m_form = inner(vE_2, eps_0*E_2) * dx + inner(vH_1, mu_0*H_1) * dx
 
         return m_form
 
     def m_formH2E1(vH_2, H_2, vE_1, E_1):
-        m_form = inner(vH_2, H_2) * dx + inner(vE_1, E_1) * dx
+        m_form = inner(vH_2, mu_0*H_2) * dx + inner(vE_1, eps_0*E_1) * dx
 
         return m_form
 
@@ -50,11 +54,13 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     def bdflowE2H1(vH_1, E_1):
         b_form = -dot(cross(vH_1, n_ver), E_1) * ds
+        # b_form = -dot(vH_1, cross(n_ver, E_1)) * ds
 
         return b_form
 
     def bdflowH2E1(vE_1, H_1):
         b_form = dot(cross(vE_1, n_ver), H_1) * ds
+        # b_form = dot(vE_1, cross(n_ver, H_1)) * ds
 
         return b_form
 
@@ -100,10 +106,6 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     om_x = pi
     om_y = pi
     om_z = pi
-
-    c_0 = 299792458
-    mu_0 = 1.25663706212*10**(-6)
-    eps_0 =8.85418781762*10**(-12)
 
     om_t = np.sqrt(om_x ** 2 + om_y ** 2 + om_z ** 2)*c_0
     phi_x = 0
@@ -368,7 +370,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     ## Settings of intermediate variables and matrices for the 2 linear systems
 
     a_formE2H1 = m_formE2H1(v_E2, E_2, v_H1, H_1) - 0.5*dt*j_formE2H1(v_E2, E_2, v_H1, H_1)
-    a_formH2E1  = m_formH2E1(v_H2, H_2, v_E1, E_1) - 0.5*dt*j_formH2E1(v_H2, H_2, v_E1, E_1)
+    a_formH2E1 = m_formH2E1(v_H2, H_2, v_E1, E_1) - 0.5*dt*j_formH2E1(v_H2, H_2, v_E1, E_1)
 
     print("Computation of the solution with n elem " + str(n_el) + " n time " + str(n_t) + " deg " + str(deg))
     print("==============")
@@ -397,36 +399,36 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
         solve(A_H2E1, en1_H2_E1, b_vecH2E1, solver_parameters=params)
 
-    #     # Computation of energy rate and fluxes
-    #
-    #     enmid_10.assign(0.5 * (en_10 + en1_10))
-    #     enmid_32.assign(0.5 * (en_32 + en1_32))
-    #
-    #     Hdot_vec[ii] = assemble(Hdot_n)
-    #
-    #     bdflow_mid_vec[ii] = assemble(bdflow_midn)
-    #
-    #     yhat_10 = assemble(y_nmid_ess10).vector().get_local()[dofs10_D]
-    #     u_midn_10 = enmid_10.vector().get_local()[dofs10_D]
-    #
-    #     uhat_10 = assemble(u_nmid_nat10).vector().get_local()[dofs10_N]
-    #     y_midn_10 = enmid_10.vector().get_local()[dofs10_N]
-    #
-    #     bdflow10_nat = np.dot(uhat_10, y_midn_10)
-    #     bdflow10_ess = np.dot(yhat_10, u_midn_10)
-    #     bdflow10_mid_vec[ii] = bdflow10_nat + bdflow10_ess
-    #
-    #     yhat_32 = assemble(y_nmid_ess32).vector().get_local()[dofs32_N]
-    #     u_midn_32 = enmid_32.vector().get_local()[dofs32_N]
-    #
-    #     uhat_32 = assemble(u_nmid_nat32).vector().get_local()[dofs32_D]
-    #     y_midn_32 = enmid_32.vector().get_local()[dofs32_D]
-    #
-    #     bdflow32_nat = np.dot(uhat_32, y_midn_32)
-    #     bdflow32_ess = np.dot(yhat_32, u_midn_32)
-    #     bdflow32_mid_vec[ii] = bdflow32_nat + bdflow32_ess
-    #
-    #
+        # Computation of energy rate and fluxes
+
+        enmid_E2_H1.assign(0.5 * (en_E2_H1 + en1_E2_H1))
+        enmid_H2_E1.assign(0.5 * (en_H2_E1 + en1_H2_E1))
+
+        Hdot_vec[ii] = assemble(Hdot_n)
+
+        bdflow_mid_vec[ii] = assemble(bdflow_midn)
+
+        yhat_E2H1 = assemble(y_nmid_essE2H1).vector().get_local()[dofsE2_H1_H]
+        u_midn_E2H1 = enmid_E2_H1.vector().get_local()[dofsE2_H1_H]
+
+        uhat_E2H1 = assemble(u_nmid_natE2H1).vector().get_local()[dofsE2_H1_E]
+        y_midn_E2H1 = enmid_E2_H1.vector().get_local()[dofsE2_H1_E]
+
+        bdflowE2H1_nat = np.dot(uhat_E2H1, y_midn_E2H1)
+        bdflowE2H1_ess = np.dot(yhat_E2H1, u_midn_E2H1)
+        bdflowE2H1_mid_vec[ii] = bdflowE2H1_nat + bdflowE2H1_ess
+
+        yhat_H2E1 = assemble(y_nmid_essH2E1).vector().get_local()[dofsH2_E1_E]
+        u_midn_H2E1 = enmid_H2_E1.vector().get_local()[dofsH2_E1_E]
+
+        uhat_H2E1 = assemble(u_nmid_natH2E1).vector().get_local()[dofsH2_E1_H]
+        y_midn_H2E1 = enmid_H2_E1.vector().get_local()[dofsH2_E1_H]
+
+        bdflowH2E1_nat = np.dot(uhat_H2E1, y_midn_H2E1)
+        bdflowH2E1_ess = np.dot(yhat_H2E1, u_midn_H2E1)
+        bdflowH2E1_mid_vec[ii] = bdflowH2E1_nat + bdflowH2E1_ess
+
+
     #     # New assign
     #
     #     en_32.assign(en1_32)
