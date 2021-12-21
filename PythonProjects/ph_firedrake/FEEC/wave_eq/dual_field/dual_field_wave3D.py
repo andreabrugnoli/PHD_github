@@ -593,11 +593,11 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 bd_cond = input("Enter bc: ")
 save_plots = input("Save plots? ")
 
-n_elem = 1
-pol_deg = 1
+n_elem = 4
+pol_deg = 3
 
-n_time = 10
-t_fin = .05
+n_time = 200
+t_fin = 5
 
 dt = t_fin / n_time
 
@@ -647,7 +647,7 @@ plt.figure()
 plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt - bdflow10_mid, 'r-.')
 plt.xlabel(r'Time $[\mathrm{s}]$')
 # plt.ylabel(r'$\dot{H}^{\widehat{3}1} - <e^\partial_{h}, f^\partial_{h}>_{\Gamma_q} - \mathbf{u}^p \widehat{\mathbf{y}}^q$')
-plt.title(r'Conservation law $\dot{H}^{\widehat{3}1}$')
+plt.title(r'Conservation law $\dot{H}^{3\widehat{1}}$')
 
 if save_plots:
     plt.savefig(path_fig + "pow_bal10" + geo_case + bc_case + ".pdf", format="pdf")
@@ -656,7 +656,7 @@ plt.figure()
 plt.plot(t_vec[1:]-dt/2, np.diff(H_32)/dt - bdflow32_mid, 'r-.')
 plt.xlabel(r'Time $[\mathrm{s}]$')
 # plt.ylabel(r'$\dot{H}^{32} - <e^\partial_{h}, f^\partial_{h}>_{\Gamma_p} - \mathbf{u}^q \widehat{\mathbf{y}}^p$')
-plt.title(r'Conservation law $\dot{H}^{3\widehat{1}}$')
+plt.title(r'Conservation law $\dot{H}^{\widehat{3}1}$')
 
 if save_plots:
     plt.savefig(path_fig + "pow_bal32" + geo_case + bc_case + ".pdf", format="pdf")
@@ -673,8 +673,8 @@ if save_plots:
 
 
 plt.figure()
-plt.plot(t_vec[1:]-dt/2, np.abs(np.diff(H_01)/dt - bdflow_mid), '-v', label=r"$\dot{H}_{h}^{\widehat{3}1}$")
-plt.plot(t_vec[1:]-dt/2, np.abs(np.diff(H_32)/dt - bdflow_mid), '--', label=r"$\dot{H}_{h}^{3\widehat{1}}$")
+plt.plot(t_vec[1:]-dt/2, np.abs(np.diff(H_01)/dt - bdflow_mid), '-v', label=r"$\dot{H}_{h}^{3\widehat{1}}$")
+plt.plot(t_vec[1:]-dt/2, np.abs(np.diff(H_32)/dt - bdflow_mid), '--', label=r"$\dot{H}_{h}^{\widehat{3}1}$")
 # plt.plot(t_vec[1:]-dt/2, np.abs(np.diff(H_02)/dt - bdflow_mid), '-.+', label=r"$\dot{H}^{02}$")
 # plt.plot(t_vec[1:]-dt/2, np.abs(np.diff(H_31)/dt - bdflow_mid), '--*', label=r"$\dot{H}^{31}$")
 plt.plot(t_vec[1:]-dt/2, np.abs(np.diff(H_3210)/dt - bdflow_mid), '-.', label=r'$\frac{\dot{H}_{T, h}}{2}$')
@@ -686,8 +686,8 @@ if save_plots:
     plt.savefig(path_fig + "dHdt" + geo_case + bc_case + ".pdf", format="pdf")
 
 plt.figure()
-plt.plot(t_vec, np.abs((H_01 - H_01[0]) - (H_ex-H_ex[0])), '-v', label=r'$\Delta H_{h}^{\widehat{3}1}$')
-plt.plot(t_vec, np.abs((H_32 - H_32[0]) - (H_ex-H_ex[0])), '--', label=r'$\Delta H_{h}^{3\widehat{1}}$')
+plt.plot(t_vec, np.abs((H_01 - H_01[0]) - (H_ex-H_ex[0])), '-v', label=r'$\Delta H_{h}^{3\widehat{1}}$')
+plt.plot(t_vec, np.abs((H_32 - H_32[0]) - (H_ex-H_ex[0])), '--', label=r'$\Delta H_{h}^{\widehat{3}1}$')
 # plt.plot(t_vec, np.abs((H_02 - H_02[0]) - (H_ex-H_ex[0])), '--+', label=r'$\Delta H^{02}$')
 # plt.plot(t_vec, np.abs((H_31 - H_31[0]) - (H_ex-H_ex[0])), '--*', label=r'$\Delta H^{31}$')
 plt.plot(t_vec, np.abs((H_3210 - H_3210[0]) - (H_ex-H_ex[0])), '-.', label=r'$\frac{\Delta H_{T, h}}{2}$')
@@ -700,8 +700,8 @@ if save_plots:
     plt.savefig(path_fig + "deltaH" + geo_case + bc_case + ".pdf", format="pdf")
 
 plt.figure()
-plt.plot(t_vec, np.abs(H_01 - H_ex), '-v', label=r'$H_h^{\widehat{3}1}$')
-plt.plot(t_vec, np.abs(H_32 - H_ex), '--', label=r'$H_h^{3\widehat{1}}$')
+plt.plot(t_vec, np.abs(H_01 - H_ex), '-v', label=r'$H_h^{3\widehat{1}}$')
+plt.plot(t_vec, np.abs(H_32 - H_ex), '--', label=r'$H_h^{\widehat{3}1}$')
 # plt.plot(t_vec, np.abs(H_02 - H_ex), '--+', label=r'$H^{02}$')
 # plt.plot(t_vec, np.abs(H_31 - H_ex), '--*', label=r'$H^{31}$')
 plt.plot(t_vec, np.abs(H_3210 - H_ex), '-.', label=r'$\frac{H_{T, h}}{2}$')
