@@ -2,8 +2,8 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 from tools_plotting import setup
-save_plots = True
-path_fig = "/home/andrea/Pictures/PythonPlots/"
+save_plots = input("Save plots? ")
+path_fig = "/home/andrea/Pictures/PythonPlots/DualField_wave3D/"
 path_res = "results_wave/"
 bc_case = "_DN"
 geo_case = "_3D"
@@ -76,13 +76,13 @@ for ii in deg_vec:
              + 1.1*(np.log(errL2_p3)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||p^3 - p^3_{\mathrm{ex}}||_{L^2}$')
-plt.title(r'Error $p^3$')
+plt.ylabel(r'$\log||p^3_h - p^3_{\mathrm{ex}}||_{L^2}$')
+plt.title(r'Error $p^3_h$')
 
 plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "p_3" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "p_3" + geo_case + bc_case + ".pdf", format="pdf")
 
 
 plt.figure()
@@ -94,13 +94,13 @@ for ii in deg_vec:
              + 1.1*(np.log(errL2_p0)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||p^0 - p^0_{\mathrm{ex}}||_{L^2}$')
-plt.title(r'Error $p^0$')
+plt.ylabel(r'$\log||p^0_h - p^0_{\mathrm{ex}}||_{L^2}$')
+plt.title(r'Error $p^0_h$')
 
 plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "p_0" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "p_0" + geo_case + bc_case + ".pdf", format="pdf")
 
 # plt.figure()
 # for ii in deg_vec:
@@ -123,13 +123,13 @@ for ii in deg_vec:
              + 1.1*(np.log(errL2_u1)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||q^1 - q^1_{\mathrm{ex}}||_{L^2}$')
-plt.title(r'Error $q^1$')
+plt.ylabel(r'$\log||q^1_h - q^1_{\mathrm{ex}}||_{L^2}$')
+plt.title(r'Error $q^1_h$')
 
 plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "q_1" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "q_1" + geo_case + bc_case + ".pdf", format="pdf")
 
 # plt.figure()
 # for ii in deg_vec:
@@ -153,13 +153,13 @@ for ii in deg_vec:
              + 1.1*(np.log(errL2_u2)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||q^2 - q^2_{\mathrm{ex}}||_{L^2}$')
-plt.title(r'Error $q^2$')
+plt.ylabel(r'$\log||q^2_h - q^2_{\mathrm{ex}}||_{L^2}$')
+plt.title(r'Error $q^2_h$')
 
 plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "q_2" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "q_2" + geo_case + bc_case + ".pdf", format="pdf")
 
 
 # plt.figure()
@@ -178,35 +178,35 @@ plt.figure()
 for ii in deg_vec:
     h = h_dict[ii]
     errL2_u12 = err_u12_dict[ii]
-    plt.plot(np.log(h), np.log(errL2_u12), '-.+', label=r'NED$^1_' + str(ii) + '$-RT$_' + str(ii) + '$')
+    plt.plot(np.log(h), np.log(errL2_u12), '-.+', label=r'$s=' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.1*(np.log(errL2_u12)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.15*(np.log(errL2_u12)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||q^1 - q^2||_{L^2}$')
-plt.title(r'Error between $q^1$ and $q^2$')
+plt.ylabel(r'$\log||q^1_h - q^2_h||_{L^2}$')
+plt.title(r'Error between $q^1_h$ and $q^2_h$')
 
 plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "q_12" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "q_12" + geo_case + bc_case + ".pdf", format="pdf")
 
 plt.figure()
 for ii in deg_vec:
     h = h_dict[ii]
     errL2_p30 = err_p30_dict[ii]
-    plt.plot(np.log(h), np.log(errL2_p30), '-.+', label=r'DG$_' + str(ii-1) + '$-CG$_' + str(ii) + '$')
+    plt.plot(np.log(h), np.log(errL2_p30), '-.+', label=r'$s=' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
              + 1.1*(np.log(errL2_p30)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||p^3 - p^0||_{L^2}$')
+plt.ylabel(r'$\log||p^3_h - p^0_h||_{L^2}$')
 plt.title(r'Error between $p^3$ and $p^0$')
 
 plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "p_30" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "p_30" + geo_case + bc_case + ".pdf", format="pdf")
 
 plt.show()
 

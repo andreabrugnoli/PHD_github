@@ -2,13 +2,13 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 from tools_plotting import setup
-save_plots = True
+save_plots = input("Save plots? ")
 path_fig = "/home/andrea/Pictures/PythonPlots/DualField_Maxwell3D/"
 path_res = "results_maxwell/"
 bc_case = "_EH"
 geo_case = "_3D"
 
-deg_vec = [1] # np.arange(1, 4)
+deg_vec = np.arange(1, 4)
 
 h_dict = {}
 err_E2_dict = {}
@@ -73,16 +73,16 @@ for ii in deg_vec:
     errL2_E2 = err_E2_dict[ii][:, 0]
     plt.plot(np.log(h), np.log(errL2_E2), '-.+', label=r'RT$_' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.1*(np.log(errL2_E2)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.15*(np.log(errL2_E2)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||E^2 - E^2_{\mathrm{ex}}||_{L^2}$')
-plt.title(r'Error $E^2$')
+plt.ylabel(r'$\log||E^2_h - E^2_{\mathrm{ex}}||_{L^2}$')
+plt.title(r'Error $E^2_h$')
 
 plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "E_2" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "E_2" + geo_case + bc_case + ".pdf", format="pdf")
 
 
 plt.figure()
@@ -91,16 +91,16 @@ for ii in deg_vec:
     errL2_H2 = err_H2_dict[ii][:, 0]
     plt.plot(np.log(h), np.log(errL2_H2), '-.+', label=r'RT$_' + str(ii)+ '$')
     plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.1*(np.log(errL2_H2)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.15*(np.log(errL2_H2)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||H^2 - H^2_{\mathrm{ex}}||_{L^2}$')
-plt.title(r'Error $H^2$')
+plt.ylabel(r'$\log||H^2_h - H^2_{\mathrm{ex}}||_{L^2}$')
+plt.title(r'Error $H^2_h$')
 
 plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "H_2" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "H_2" + geo_case + bc_case + ".pdf", format="pdf")
 
 
 plt.figure()
@@ -112,13 +112,13 @@ for ii in deg_vec:
              + 1.1*(np.log(errL2_E1)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||E^1 - E^1_{\mathrm{ex}}||_{L^2}$')
-plt.title(r'Error $E^1$')
+plt.ylabel(r'$\log||E^1_h - E^1_{\mathrm{ex}}||_{L^2}$')
+plt.title(r'Error $E^1_h$')
 
 plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "E_1" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "E_1" + geo_case + bc_case + ".pdf", format="pdf")
 
 # plt.figure()
 # for ii in deg_vec:
@@ -139,16 +139,16 @@ for ii in deg_vec:
     errL2_H1 = err_H1_dict[ii][:, 0]
     plt.plot(np.log(h), np.log(errL2_H1), '-.+', label=r'NED$^1_' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.1*(np.log(errL2_H1)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.15*(np.log(errL2_H1)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||H^1 - H^1_{\mathrm{ex}}||_{L^2}$')
-plt.title(r'Error $H^1$')
+plt.ylabel(r'$\log||H^1_h - H^1_{\mathrm{ex}}||_{L^2}$')
+plt.title(r'Error $H^1_h$')
 
 plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "H_1" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "H_1" + geo_case + bc_case + ".pdf", format="pdf")
 
 
 # plt.figure()
@@ -167,35 +167,35 @@ plt.figure()
 for ii in deg_vec:
     h = h_dict[ii]
     errL2_E21 = err_E21_dict[ii]
-    plt.plot(np.log(h), np.log(errL2_E21), '-.+', label=r'NED$^1_' + str(ii) + '$-RT$_' + str(ii) + '$')
+    plt.plot(np.log(h), np.log(errL2_E21), '-.+', label=r'$s=' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.1*(np.log(errL2_E21)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.15*(np.log(errL2_E21)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||E^1 - E^2||_{L^2}$')
-plt.title(r'Error between $E^1$ and $E^2$')
+plt.ylabel(r'$\log||E^1_h - E^2_h||_{L^2}$')
+plt.title(r'Error between $E^1_h$ and $E^2_h$')
 
 plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "E_21" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "E_21" + geo_case + bc_case + ".pdf", format="pdf")
 
 plt.figure()
 for ii in deg_vec:
     h = h_dict[ii]
     errL2_H21 = err_H21_dict[ii]
-    plt.plot(np.log(h), np.log(errL2_H21), '-.+', label=r'NED$^1_' + str(ii) + '$-RT$_' + str(ii) + '$')
+    plt.plot(np.log(h), np.log(errL2_H21), '-.+', label=r'$s=' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.1*(np.log(errL2_H21)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.15*(np.log(errL2_H21)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||H^1 - H^2||_{L^2}$')
-plt.title(r'Error between $H^1$ and $H^2$')
+plt.ylabel(r'$\log||H^1_h - H^2_h||_{L^2}$')
+plt.title(r'Error between $H^1_h$ and $H^2_h$')
 
 plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "H_21" + geo_case + bc_case + ".eps", format="eps")
+    plt.savefig(path_fig + "H_21" + geo_case + bc_case + ".pdf", format="pdf")
 
 plt.show()
 

@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 from tools_plotting import setup
 from tqdm import tqdm
 # from time import sleep
+from matplotlib.ticker import FormatStrFormatter
+
 
 path_fig = "/home/andrea/Pictures/PythonPlots/DualField_wave3D/"
 bc_case = "_DN"
@@ -589,7 +591,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
 
 bd_cond = input("Enter bc: ")
-save_plots = input("Save plots: ")
+save_plots = input("Save plots? ")
 
 n_elem = 4
 pol_deg = 3
@@ -660,6 +662,8 @@ if save_plots:
     plt.savefig(path_fig + "pow_bal32" + geo_case + bc_case + ".pdf", format="pdf")
 
 plt.figure()
+ax = plt.gca()
+ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
 plt.plot(t_vec, bdflow_vec - bdflow_ex_vec, 'r-.')
 plt.xlabel(r'Time $[\mathrm{s}]$')
 plt.ylabel(r'$<e^\partial_{h}, f^\partial_{h}>_{\partial M} - <e^\partial_{\mathrm{ex}}, f^\partial_{\mathrm{ex}}>_{\partial M}$')
