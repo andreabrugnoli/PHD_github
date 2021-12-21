@@ -14,7 +14,8 @@ plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 from matplotlib import rcParams
 
-# rcParams.update({'figure.autolayout': True})
+rcParams.update({'figure.autolayout': True})
 rcParams['text.usetex'] = True
 rcParams['text.latex.preamble']=r"\usepackage{amsmath}\usepackage{bm}"
 rcParams["legend.loc"] = 'best'
+

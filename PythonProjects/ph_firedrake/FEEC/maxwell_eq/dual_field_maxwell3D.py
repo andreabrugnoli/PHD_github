@@ -566,7 +566,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="H"):
 bd_cond = input("Enter bc: ")
 save_plots = input("Save plots: ")
 
-n_elem = 2
+n_elem = 3
 pol_deg = 3
 
 n_time = 200
