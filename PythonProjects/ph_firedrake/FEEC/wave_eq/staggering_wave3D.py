@@ -283,6 +283,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     errL2_p_3_vec[0] = errornorm(p_ex, p0_3, norm_type="L2")
     errL2_u_1_vec[0] = errornorm(u_ex, u0_1, norm_type="L2")
+
     errL2_p_0_vec[0] = errornorm(p_ex, p0_0, norm_type="L2")
     errL2_u_2_vec[0] = errornorm(u_ex, u0_2, norm_type="L2")
 
