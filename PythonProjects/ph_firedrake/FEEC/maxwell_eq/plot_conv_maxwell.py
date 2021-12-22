@@ -199,45 +199,27 @@ if save_plots:
 
 plt.show()
 
-# order_E2_deg1 = np.zeros((len(h_dict[1]) - 1, 2))
-# order_E2_deg2 = np.zeros((len(h_dict[2]) - 1, 2))
-# order_E2_deg3 = np.zeros((len(h_dict[3]) - 1, 2))
-#
-# for i in range(1,len(h_dict[1])):
-#
-#     order_E2_deg1[i - 1, 0] = np.log(err_E2_dict[1][i, 0] / err_E2_dict[1][i - 1, 0]) / np.log(h_dict[1][i] / h_dict[1][i - 1])
-#     order_E2_deg1[i - 1, 1] = np.log(err_E2_dict[1][i, 1] / err_E2_dict[1][i - 1, 1]) / np.log(h_dict[1][i] / h_dict[1][i - 1])
-#
+for ii in range(1, 4):
+    order_E1_deg_ii = np.load(path_res + "order_E1_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    print("Order E1 for deg " + str(ii))
+    print(order_E1_deg_ii)
 
-#
-# print("Estimated order of convergence for p_3: ")
-# for ii in deg_vec:
-#     print("degree: " + str(ii))
-#     print(ord_p3_dict[ii])
-#
-# print("Estimated order of convergence for p_0: ")
-# for ii in deg_vec:
-#     print("degree: " + str(ii))
-#     print(ord_p0_dict[ii])
-#
-# print("Estimated order of convergence for u_1: ")
-# for ii in deg_vec:
-#     print("degree: " + str(ii))
-#     print(ord_u1_dict[ii])
-#
-# print("Estimated order of convergence for u_2: ")
-# for ii in deg_vec:
-#     print("degree: " + str(ii))
-#     print(ord_u2_dict[ii])
-#
-# print("Estimated order of convergence for p_0 - p_3: ")
-# for ii in deg_vec:
-#     print("degree: " + str(ii))
-#     print(ord_p30_dict[ii])
-#
-# print("Estimated order of convergence for u_1 - u_2: ")
-# for ii in deg_vec:
-#     print("degree: " + str(ii))
-#     print(ord_u12_dict[ii])
-#
-#
+    order_H1_deg_ii = np.load(path_res + "order_H1_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    print("Order H1 for deg " + str(ii))
+    print(order_H1_deg_ii)
+
+    order_E2_deg_ii = np.load(path_res + "order_E2_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    print("Order E2 for deg " + str(ii))
+    print(order_E2_deg_ii)
+
+    order_H2_deg_ii = np.load(path_res + "order_H2_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    print("Order H2 for deg " + str(ii))
+    print(order_H2_deg_ii)
+
+    order_E21_deg_ii = np.load(path_res + "order_E21_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    print("Order E21 for deg " + str(ii))
+    print(order_E21_deg_ii)
+
+    order_H21_deg_ii = np.load(path_res + "order_H21_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    print("Order H2 for deg " + str(ii))
+    print(order_H21_deg_ii)

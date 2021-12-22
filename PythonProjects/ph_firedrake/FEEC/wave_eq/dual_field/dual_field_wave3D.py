@@ -647,7 +647,7 @@ plt.figure()
 plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt - bdflow10_mid, 'r-.')
 plt.xlabel(r'Time $[\mathrm{s}]$')
 # plt.ylabel(r'$\dot{H}^{\widehat{3}1} - <e^\partial_{h}, f^\partial_{h}>_{\Gamma_q} - \mathbf{u}^p \widehat{\mathbf{y}}^q$')
-plt.title(r'Conservation law $\dot{H}^{3\widehat{1}}$')
+plt.title(r'Conservation law $\dot{H}^{3\widehat{1}}_h$')
 
 if save_plots:
     plt.savefig(path_fig + "pow_bal10" + geo_case + bc_case + ".pdf", format="pdf")
@@ -656,7 +656,7 @@ plt.figure()
 plt.plot(t_vec[1:]-dt/2, np.diff(H_32)/dt - bdflow32_mid, 'r-.')
 plt.xlabel(r'Time $[\mathrm{s}]$')
 # plt.ylabel(r'$\dot{H}^{32} - <e^\partial_{h}, f^\partial_{h}>_{\Gamma_p} - \mathbf{u}^q \widehat{\mathbf{y}}^p$')
-plt.title(r'Conservation law $\dot{H}^{\widehat{3}1}$')
+plt.title(r'Conservation law $\dot{H}^{\widehat{3}1}_h$')
 
 if save_plots:
     plt.savefig(path_fig + "pow_bal32" + geo_case + bc_case + ".pdf", format="pdf")
