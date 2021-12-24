@@ -354,7 +354,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         ## Integration of 10 system using unmid_2
 
         t_10.assign(float(t) + float(dt))
-        A_10 = assemble(a_form10, bcs=bc_D, mat_type='aij')
+        A_10 = assemble(a_form10,  bcs=bc_D, mat_type='aij')
 
         pnmid_3, unmid_2 = enmid_32.split()
         b_form10 = m_form10(v_1, un_1, v_0, pn_0) + dt*(0.5*j_form10(v_1, un_1, v_0, pn_0) + bdflow10(v_0, unmid_2))
