@@ -14,8 +14,8 @@
 	a4paper,
 	left=20mm,
 	right=20mm,
-	top=30mm,
-	bottom=30mm,
+	top=25mm,
+	bottom=25mm,
 }
 
 \usepackage{pgfgantt}
@@ -71,35 +71,131 @@ l’importance et l'actualité de cet axe de recherche.
 
 \section{Développement du projet scientifique}
 
+\subsection{Les problèmes multiphysiques}
+L'ingénierie computationnelle est une science récente, multidisciplinaire et en expansion rapide. Son but consiste à mettre en place des modèles mathématiques et numériques pour prédire le comportement des systèmes complexes. Cela permet d'éviter l'utilisation des tests expérimentales très couteaux pour les systèmes en phase de conception et de détecter de fautes pendant le cycle de vie des composants. Ce domaine est en expansion rapide car aujourd'hui on dispose des ordinateur plus puissant et surtout parce que, grâce au développement des codes open source, les logiciels des calcul sont beaucoup plus accessibles, robustes et faciles à utiliser. Toutefois les problèmes multiphysique, qui sont centrales dans les applications industrielles, sont extrêmement compliqués à traiter. Cela est d\^u d'une part à la difficulté associé au traitement des différentes physique et d'autre part à la taille des systèmes obtenus, qui nécessitent des plusieurs jours, voir plusieurs semaines, pour être résolu à l'aide d'un supercalculateur \cite{keyes2013}. Ces problématiques posent des barrières pour l'utilisation des modèles numériques en industrie. 
 
 
+\subsection{Outils scientifiques du projet Morpheus}
+
+\paragraph{\large Un formalisme unifiant pour la modélisation des systèmes dynamiques\\}
+Un formalisme mathématique très prometteur pour traiter les problèmes multiphysique est le formalisme port-Hamiltonienne \cite{vanderSchaft2002}, basé sur la mécanique Hamiltonienne et les graphes de liaisons pour la modélisation des systèmes dynamiques. Au c\oe{}ur de ce formalisme il y a l'idée que tout système physique peut être décrit d'une manière modulaire, c'est a dire à partir des ses composant simples, qui interagissent entre eux et avec le milieu environnant à travers des portes. Les portes d'interactions contiennent l'information relative au flux d'énergie entre les différents composants et entre différents domaines physiques (mécanique, électromagnétisme ou fluidodynamique). La conception modulaire est fondamentale dans l'ingénierie, car le design de tout système technologique est fait à partir des éléments simples qui sont assemblés pour donner lieu à la complexité qui nous entoure. Prenez par exemple un avion, un hélicoptère, un satellite (cf. Fig. \ref{fig:satellite}) ou un téléphone portable : pour pouvoir optimiser leur design il est indispensable de disposer d'un outil de modélisation capable de décomposer la complexité d'une manière à retrouver les différents composants clés.
+
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=.6\textwidth]{satellite.pdf}
+	\caption{Schéma modulaire représentant un satellite de télécommunication.}
+	\label{fig:satellite}
+\end{figure}
+
+\paragraph{\large Une methodologie structurée pour la discretisation des EDP\\}
+Les algorithmes numériques utilisés en industrie sont adaptés à la nature physique du problème. Pour la mécanique la méthode des éléments finis est privilège par les ingénieur. Pour la fluidodynamique, les volumes finis sont majoritairement utilisés car il garantissent le respect des lois de conservation. Quand il faut utiliser ces deux approches simultanément, par exemple pour traiter des problèmes couplés, leur couplage pose plusieurs challenges. Les deux méthodes utilisent des dégrées de liberté différents (i.e. différents entités topologique du maillage) et l'interconnexion introduit forcement des erreurs. Un outil de modélisation général nécessite d'une méthode de discrétisation également générale, capable de  garantir la possibilité d'interconnecter des physiques distinctes. Ce formalisme unifiant, la méthode des éléments finis en calcul extérieur or FEEC\footnote{Le calcul extérieur représente une généralisation du calcul vectorielle basée sur la géométrie différentielle.},  à été développé récemment \cite{arnold2006acta}. Cette théorie mathématique à permis des développement importants pour la discrétisation des équation à dérivées partielles issues de la physique. Elle à été appliqué avec succès au cas de la mécanique des solides, la fluidodynamique et l'électromagnétisme et elle représente un outil puissant pour les application multiphysique. 
+
+\paragraph{\large L'intelligence artificielle pour obtenir des modeles reduits\\}
+Toute méthode de discrétisation, même les plus sophistiquées, amène à des systèmes dont la taille dépasse facilement le million d'inconnus. Pour pouvoir optimiser le design des composantes mécaniques, il faut simuler ces modèles plusieurs fois. Cela amène à des coûts computationnelles prohibitifs même pour les entreprises dotés de plus avancés centres de calcul. Il est donc indispensable d'introduire des méthodes de réduction, qui sont sensé construire un modèle plus simple, capable néanmoins de retenir les propriétés principales du système de départ. La grande majorité de ces méthodes supposent que l'on puisse obtenir un système réduit à travers une méthode essentiellement linéaire, i.e. la Décomposition Orthogonale en Valeurs Propres (POD) \cite{shinde2019,tello2020fluid}. Cette hypothèse n’est pas valable pour tout système exhibant un comportement non-linéaire et conduit à surestimer la dimension du système réduit. Grâce aux progrès récents dans le domaine de l'Intelligence
+Artificielle (IA), de nouvelles méthodes permettent d'obtenir des modèles réduits rapides. Récemment, des chercheurs ont proposé une architecture basée sur le réseaux neuronaux convolutifs \cite{lee2020} pour obtenir des modèles beaucoup plus rapide (d'un facteur 100 environ) par rapport aux discrétisation haute fidélité. Leur technique représente une extension non linéaire des méthodologie couramment utilisée. Les résultats obtenus démontrent la gain de performance qu'il est possible obtenir avec cette méthodologie \ref{fig:deepROM}.
+
+\begin{figure}[t]
+	\begin{subfigure}[t]{0.48\textwidth}
+		\includegraphics[width=\columnwidth]{GROM_T_param1.pdf}%
+		\caption{Modèle réduit avec la méthode linéaire POD.}
+		\label{fig:POD_ROM}
+	\end{subfigure}\hfill
+	\begin{subfigure}[t]{0.465\textwidth}
+		\includegraphics[width=\columnwidth]{DGROM_T_param1.pdf} 
+		\caption{Modèle réduit avec réseaux des neurones.}
+		\label{fig:DG_ROM}
+	\end{subfigure}
+	\caption[]{Réduction de modèle pour un problème de convection-diffusion-réaction. En utilisant un réseaux neuronaux convolutifs pour générer une variété non linéaire l'erreur associé à la réduction est drastiquement réduit par rapport à la méthode POD (de $10^{-2}$ à $10^{-5}$). Reproduit de \cite{lee2020} avec permission.}%
+	\label{fig:deepROM}%
+\end{figure}
 
 
-\subsection{Contexte}
-L'ingénierie computationnelle est une science récente, multidisciplinaire et en expansion rapide. Son but consiste à mettre en place des modèles mathématiques et numériques pour prédire le comportement des systèmes complexes. Cela permet d'éviter l'utilisation des tests expérimentales très couteaux pour les systèmes en phase de conception et de détecter de fautes pendant le cycle de vie des composants. Ce domaine est en expansion rapide car aujourd'hui on dispose des ordinateur plus puissant et surtout parce que, grâce au développement des codes open source, les logiciels des calcul sont beaucoup plus accessibles, robustes et faciles à utiliser. Toutefois les problèmes multiphysique, qui sont centrales dans les applications industrielles, sont extrêmement compliqués à traiter. Cela est d\^u d'une part à la difficulté associé au traitement des différentes physique et d'autre part à la taille des systèmes obtenus, qui nécessitent des plusieurs jours, voir plusieurs semaines, pour être résolu à l'aide d'un supercalculateur \cite{keyes2013}. Ces problématiques posent des barrières pour l'utilisation des modèles numériques en industrie. \\
+\subsection{Lot de travaux}
+Le projet est divisé en trois lots de travaux :
+
+\begin{enumerate}
+	\item Développement d'algorithmes numériques haute-fidélité pour des problèmes d'interactions fluide-structures basée sur le formalisme port-Hamiltonien et les élément finis en calcul extérieur.
+	\item Méthodes de réduction garantissant le respect de la structure physique générés en utilisant les réseaux des neurones. 
+	\item Utilisation des modèles réduits pour l'optimisation et comparaison avec les  modèles haute-fidélité.
+\end{enumerate}
+
+Chaque macro-tâche est directement associ\'ee \`a une thèse. 
 
 
+\paragraph{\large WP1 : méthodes numériques pour systèmes couplés fluide-structure\\
+Résponsable: Andrea Brugnoli et Doctorant 1\\}
 
-Un formalisme mathématique très prometteur pour accomplir cette tache est le formalisme port-Hamiltonienne, basé sur la mécanique Hamiltonienne et les graphes de liaisons pour la modélisation des systèmes dynamiques. Au c\oe{}ur de ce formalisme il y a l'idée que tout système physique peut être décrit d'une manière modulaire, c'est a dire à partir des ses composant simples, qui interagissent entre eux et avec le milieu environnant à travers des portes. Les portes d'interactions contiennent l'information relative au flux d'énergie entre les différents composants et entre différents domaines physiques (mécanique, électromagnétisme ou fluidodynamique). La conception modulaire est fondamentale dans l'ingénierie, car le design de tout système technologique est fait à partir des éléments simples qui sont assemblés pour donner lieu à la complexité qui nous entoure. Prenez par exemple un avion, un hélicoptère, un satellite ou un téléphone portable : pour pouvoir optimiser leur design il est indispensable de disposer d'un outil de modélisation capable de décomposer la complexité d'une manière à retrouver les différents composants clés.
+La formalisation des problème fluide-structure au sein du formalisme port-Hamiltonien à été formalisé in \cite{califano2021energetic}. Pourtant, ce type d'interconnexion suppose que la partie mécanique soit représenté par un corps rigide. Dans ce premier lot de travail, on cherche à obtenir des modèles couplés d'interaction fluide-structure dans le cas où la partie structurelle est considérer déformable. Une fois que ces modèles seront dérivées, le focus principal de ce lot sera de générer des chemins numériques pour la préservations de la structure Hamiltonien à l'aide de la méthode à éléments finis en calcul extérieur. Cette tache représente un véritable défi computationnelle, spécialement si on cherche à résoudre le cas plus général possible d'interaction fluide-structure où la partie mécanique est très flexible et effectue des mouvements rigides. On pourra alors diviser la tache en considérant des problèmes de complexité croissante. 
+\begin{enumerate}
+	\item Si la structure est encastrée et les déformations sont petits, prenez par exemple une aile d'avion en conditions nominaux, on peut utiliser un maillage fixe au cours du temps. Ceci est du au fait que on peut utiliser les équations linéaire pour l'élasticité. 
+	\item Si la structure peut bouger d'une manière rigide mais les déformations restent petit, par exemple dans le cas des turbomachine, des approches existent pour limiter la complexité des équations.
+	\item Dans le cas le plus général, les équations de l'élasticité doivent être utilisés.
+\end{enumerate}
+Le doctorant choisi pour cette thèse devra alors concevoir des méthodes numériques capable de s'adapter à cette complexité croissante. La première défi portera à la résolution du premier cas, qui ne demandera pas d'introduire des technique spéciales pour modifier le maillage. Au contraire le cas successifs devront utiliser des méthodes pour considérer les déplacement du corps élastique (comme par exemple la méthode de frontières immergées \cite{peskin2002}).
 
 
+\begin{figure}[h!]
+	\begin{center}
+		\begin{ganttchart}[y unit title=0.6cm,
+			y unit chart=0.6cm, 
+			x unit=0.4cm,
+			vgrid,hgrid, 
+			title label anchor/.style={below=-1.6ex},
+			title left shift=.05,
+			title right shift=-.05,
+			title height=1,
+			progress label text={},
+			bar height=0.7,
+			group right shift=0,
+			group top shift=.6,
+			group height=.4]{1}{30}
+			%labels
+			\gantttitle{Dur\'ee totale}{30} \\
+			\gantttitle{$T_0 + 12$}{6} 
+			\gantttitle{$T_0 + 24$}{6} 
+			\gantttitle{$T_0 + 36$}{6} 
+			\gantttitle{$T_0 + 48$}{6} 
+			\gantttitle{$T_0 + 60$}{6} \\
+			%tasks
+			\ganttbar{Partenariats}{1}{2} \\
+			\ganttbar{Code SCRIMP}{1}{1} \\
+			\ganttbar{1$^\circ$ th\`ese}{4}{21} \\
+			\ganttbar{2$^\circ$ th\`ese}{10}{27} \\
+			\ganttbar{3$^\circ$ th\`ese}{13}{30} \\
+			\ganttbar{Post-Doc}{16}{27} \\
+			\ganttbar{Soutenances}{22}{30} \\
+			\ganttbar{Dissémination}{28}{30} 
+			%relations 
+			\ganttlink{elem0}{elem2} 
+			\ganttlink{elem1}{elem2} 
+			\ganttlink{elem1}{elem3} 
+			\ganttlink{elem1}{elem4} 
+			\ganttlink{elem1}{elem5}
+			\ganttlink{elem2}{elem5}
+			\ganttlink{elem3}{elem5}
+		\end{ganttchart}
+	\end{center}		
+\end{figure}
 
-Aujourd'hui ce formalisme a désormais atteint le niveau de maturit\'e nécessaire pour attaquer les applications industrielles. Le professeur Volker Mehrmann, vice-président de la société mathématique européenne (EMS), en est pleinement convaincu, et il a récemment illustré les avantages de cette approche  lors de la SIAM Conference on Computational Science and Engineering en 2021\footnote{\url{https://meetings.siam.org/sess/dsp_programsess.cfm?SESSIONCODE=70329}}. Ce niveau de maturit\'e est aussi attesté par le fait que le conseil de la recherche européen (ERC) \`a récemment attribu\'e au Prof. Stefano Stramigioli une subvention de 2.8 millions \euro{} pour le projet Portwings\footnote{\url{http://www.portwings.eu/}}. Ce projet, dans le quel je suis impliqu\'e pour mon post-doctorat, cherche \`a améliorer la compréhension du vol battu pour pouvoir perfectionner le design et la construction des robots biomimétiques. L'ambition réside dans le fait d'utiliser la théorie port-Hamiltonienne pour expliquer les interactions complexes entre l'aérodynamique et la flexibilit\'e de l'aile (cf. Fig. \ref{fig:pH_view_bird}). \\
 
-Pour réaliser un développement substantiel dans les domaines d'application les plus critiques pour la société, des investissements considérables seront nécessaires dans les méthodes mathématiques et informatiques : il faudra disposer  de techniques de déploiement robustes, rapides et accessibles \cite{niederer2021}. Étant donné le potentiel du formalisme port-Hamiltonien pour les traitement unifié des problèmes multiphysiques, \`a travers différentes échelles et précision, il est probable que son adoption en industrie soit de nature \`a faciliter cette révolution digitale. 
+\subsection{Moyens et partenariats}
+Pour ce que il concerne la mise en place du projet, des différents partenariats en France et \`a l'international seront mis en place. Pour ce qui concerne les aspect théoriques fondamentaux Bernhard Maschke (Universit\'e de Lyon), Arjan van der Schaft (University of Groningen) et Stefano Stramigioli (University of Twente) constitueront les interlocuteurs académiques principaux. \\
+
+Pour ce qui concerne la première macro-tâche, il sera possible de prolonger le travail effectué dans le cadre de ma thèse, qui a donn\'e lieu a un code de calcul pour application multiphysique (le code SCRIMP décrit dans~\cite{brugnoli2021num}). Ce code sera ultérieurement développé pour traiter des problèmes d'interaction fluide-structure. Pour ce qui concerne la préservation de la physique au sein des algorithmes, des collaborations avec Marc Gerritsma (département d'aérodynamique de l'Universit\'e de Delft) et Herbert Egger (Johannes Kepler University Linz) seront mises en place. Pour ce qui concerne l'interaction fluide-structure, l'office National d'Études et de Recherches Aérospatiales (ONERA), garant d'une profonde expertise en ce domaine, représentera l'interlocuteur principal pour les problèmes liés au couplage multiphysique. 
+\\
+
+
+Pour ce qui concerne la deuxième macro-tâche, i.e. la réduction des modèles, il sera possible de mettre en place des collaboration avec Charles Poussot-Vassal (chercheur principal \`a l'ONERA),  Volker Mehrmann (TU Berlin) et George Haller (ETH Zurich). \\
+
+Pour la troisième partie, il sera important de dialoguer avec Joseph Morlier (ISAE-Supa\'ero et Institut Clément Ader).
 
 \subsection{Le projet MORPHEUS}
 
 
 \section{Aspects innovants du projet et verrous scientifiques}
 
-\subsection{État de l'art}
-Le coût prohibitif des simulations numériques pour les problèmes couplés d'interaction fluide-structure
-a poussé la communauté scientifique à concevoir des algorithmes capables de réduire la complexité des modèles. La grande majorité de ces méthodes supposent que l'on puisse obtenir un système réduit à travers une méthode essentiellement linéaire, i.e. la Décomposition Orthogonale en Valeurs Propres (POD) \cite{shinde2019,tello2020fluid}. Cette hypothèse n’est pas valable pour tout
-système exhibant un comportement non-linéaire et conduit à surestimer la dimension
-du système réduit \cite{kerschen2005}. Grâce aux progrès récents dans le domaine de l’Intelligence
-Artificielle (IA), de nouvelles méthodes permettent d’obtenir des modèles réduits rapides. Certaines
-méthodes utilisent les données issues des simulations fines \cite{lee2020}, d'autres ne demandent pas de simulations couteuses, mais cherchent à minimiser la violation des principes physiques~\cite{sun2020physics}.  Toutes ces méthodes ne garantissent pas le respect de la structure physique dans toute la chaîne qui aboutit au modèle final. 
+
+
 
 
 \subsection{Verrous scientifiques}
@@ -172,77 +268,6 @@ l’importance et l’actualité de cet axe de recherche. Disposer d'outils quan
 Le fait d’utiliser un outil de modélisation unifié représente une nouveauté essentielle de ce projet.
 Cela pourra permettre la création d’une infrastructure commune pour les outils numériques à la base de la digitalisation,  et donc faciliter son adoption dans l'industrie.
 
-
-\section{Organisation du projet}
-Le projet est divisé en trois work packages :
-
-\begin{enumerate}
-	\item Développement d'algorithmes numériques haute-fidélité pour des problèmes d'interactions fluide-structures.
-	\item Méthodes de réduction garantissant le respect de la structure physique. 
-	\item Utilisation des modèles réduits pour l'optimisation multidisciplinaire et comparaison avec les  modèles haute-fidélité.
-\end{enumerate}
-
-Chaque macro-tâche est directement associ\'ee \`a une thèse. Pour cela les recrutements des trois doctorants et d'un post-doctorant sont prévus, ainsi que la coopération des trois chercheurs. Chacun d'entre eux sera affecté \`a chaque macro-sujet:
-\begin{itemize}
-\item développement du code pour calcul scientifique;
-\item développement du code pour la partie intelligence artificielle;
-\item expertise pour l'optimisation multidisciplinaire.
-\end{itemize} 
-\begin{figure}[h!]
-	\begin{center}
-	\begin{ganttchart}[y unit title=0.6cm,
-		y unit chart=0.6cm, 
-		x unit=0.4cm,
-		vgrid,hgrid, 
-		title label anchor/.style={below=-1.6ex},
-		title left shift=.05,
-		title right shift=-.05,
-		title height=1,
-		progress label text={},
-		bar height=0.7,
-		group right shift=0,
-		group top shift=.6,
-		group height=.4]{1}{30}
-		%labels
-		\gantttitle{Dur\'ee totale}{30} \\
-		\gantttitle{$T_0 + 12$}{6} 
-		\gantttitle{$T_0 + 24$}{6} 
-		\gantttitle{$T_0 + 36$}{6} 
-		\gantttitle{$T_0 + 48$}{6} 
-		\gantttitle{$T_0 + 60$}{6} \\
-		%tasks
-		\ganttbar{Partenariats}{1}{2} \\
-		\ganttbar{Code SCRIMP}{1}{1} \\
-		\ganttbar{1$^\circ$ th\`ese}{4}{21} \\
-		\ganttbar{2$^\circ$ th\`ese}{10}{27} \\
-		\ganttbar{3$^\circ$ th\`ese}{13}{30} \\
-		\ganttbar{Post-Doc}{16}{27} \\
-		\ganttbar{Soutenances}{22}{30} \\
-		\ganttbar{Dissémination}{28}{30} 
-		%relations 
-		\ganttlink{elem0}{elem2} 
-		\ganttlink{elem1}{elem2} 
-		\ganttlink{elem1}{elem3} 
-		\ganttlink{elem1}{elem4} 
-		\ganttlink{elem1}{elem5}
-		\ganttlink{elem2}{elem5}
-		\ganttlink{elem3}{elem5}
-	\end{ganttchart}
-	\end{center}		
-\end{figure}
-
-\`A la fin du projet, le livrable consistera en un code capable de modéliser des problèmes multiphysiques et de générer des modèles réduits utilisables en lieu et place des modèles haute fidélité.
-
-\subsection{Moyens et partenariats}
-Pour ce que il concerne la mise en place du projet, des différents partenariats en France et \`a l'international seront mis en place. Pour ce qui concerne les aspect théoriques fondamentaux Bernhard Maschke (Universit\'e de Lyon), Arjan van der Schaft (University of Groningen) et Stefano Stramigioli (University of Twente) constitueront les interlocuteurs académiques principaux. \\
-
-Pour ce qui concerne la première macro-tâche, il sera possible de prolonger le travail effectué dans le cadre de ma thèse, qui a donn\'e lieu a un code de calcul pour application multiphysique (le code SCRIMP décrit dans~\cite{brugnoli2021num}). Ce code sera ultérieurement développé pour traiter des problèmes d'interaction fluide-structure. Pour ce qui concerne la préservation de la physique au sein des algorithmes, des collaborations avec Marc Gerritsma (département d'aérodynamique de l'Universit\'e de Delft) et Herbert Egger (Johannes Kepler University Linz) seront mises en place. Pour ce qui concerne l'interaction fluide-structure, l'office National d'Études et de Recherches Aérospatiales (ONERA), garant d'une profonde expertise en ce domaine, représentera l'interlocuteur principal pour les problèmes liés au couplage multiphysique. 
-\\
-
-
-Pour ce qui concerne la deuxième macro-tâche, i.e. la réduction des modèles, il sera possible de mettre en place des collaboration avec Charles Poussot-Vassal (chercheur principal \`a l'ONERA),  Volker Mehrmann (TU Berlin) et George Haller (ETH Zurich). \\
-
-Pour la troisième partie, il sera important de dialoguer avec Joseph Morlier (ISAE-Supa\'ero et Institut Clément Ader).
 
 
 \subsection{Budget}
