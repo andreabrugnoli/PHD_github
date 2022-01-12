@@ -20,13 +20,18 @@
 
 \usepackage{pgfgantt}
 \usepackage{eurosym}
+\usepackage{pdfpages}
 
-%\usepackage[babel=true, kerning=true]{microtype}
 
 \usepackage{subcaption}
 
 \usepackage[unicode=true,pdfusetitle,bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
 breaklinks=false,pdfborder={0 0 0},backref=false,colorlinks=true,urlcolor=blue]{hyperref}
+
+\usepackage{multibib}
+\newcites{article,conf,confnoproc}{{Articles dans des revues internationales à comité de lecture
+	},{Communications dans des congrès internationaux à comité de lecture et actes
+	publiés},{Communications dans des congrès internationaux sans comité de lecture}}
 
 \graphicspath{{images/}}
 
@@ -75,7 +80,7 @@ l’importance et l'actualité de cet axe de recherche.
 L'ingénierie computationnelle est une science récente, multidisciplinaire et en expansion rapide. Son but consiste à mettre en place des modèles mathématiques et numériques pour prédire le comportement des systèmes complexes. Cela permet d'éviter l'utilisation des tests expérimentales très couteaux pour les systèmes en phase de conception et de détecter de fautes pendant le cycle de vie des composants. Ce domaine est en expansion rapide car aujourd'hui on dispose des ordinateur plus puissant et surtout parce que, grâce au développement des codes open source, les logiciels des calcul sont beaucoup plus accessibles, robustes et faciles à utiliser. Toutefois les problèmes multiphysique, qui sont centrales dans les applications industrielles, sont extrêmement compliqués à traiter. Cela est d\^u d'une part à la difficulté associé au traitement des différentes physique et d'autre part à la taille des systèmes obtenus, qui nécessitent des plusieurs jours, voir plusieurs semaines, pour être résolu à l'aide d'un supercalculateur \cite{keyes2013}. Ces problématiques posent des barrières pour l'utilisation des modèles numériques en industrie. 
 
 
-\subsection{Outils scientifiques du projet Morpheus}
+\subsection{Outils scientifiques du projet MORPHEUS}
 
 \begin{figure}[tb]
 	\centering
@@ -127,13 +132,13 @@ Chaque macro-tâche est directement associ\'ee \`a une thèse. Pour ce qui conce
 Responsable: Andrea Brugnoli et Doctorant 1, co-encadré par Denis Matignon (DISC, ISAE)\\}
  Dans ce premier lot de travail, on cherche à obtenir des modèles couplés d'interaction fluide-structure dans le cas où la partie structurelle est considérer déformable. Une fois que ces modèles seront dérivées, le focus principal de ce lot sera de générer des chemins numériques pour la préservations de la structure Hamiltonien à l'aide de la méthode à éléments finis en calcul extérieur. Cette tache représente un véritable défi computationnelle, spécialement si on cherche à résoudre le cas plus général possible d'interaction fluide-structure où la partie mécanique est très flexible et effectue des mouvements rigides. On pourra alors diviser la tache en considérant des problèmes de complexité croissante. 
 \begin{enumerate}
-	\item Si la structure est encastrée et les déformations sont petits, prenez par exemple une aile d'avion en conditions nominaux, on peut utiliser un maillage fixe au cours du temps. Ceci est du au fait que on peut utiliser les équations linéaire pour l'élasticité. 
+	\item Si la structure est encastrée et les déformations sont petits, par exemple une aile d'avion en conditions nominaux, on peut utiliser un maillage fixe au cours du temps. Ceci est du au fait que on peut utiliser les équations linéaire pour l'élasticité. 
 	\item Si la structure peut bouger d'une manière rigide mais les déformations restent petites des approches existent pour limiter la complexité des équations.
-	\item Dans le cas le plus général, les équations de l'élasticité non linéaire doivent être utilisés. Pour les modèles de poutres des formulation intrinsèque Hamiltonienne sont déjà disponibles \cite{hodges2003exact}.
+	\item Dans le cas le plus général, l'élasticité non linéaire doit être considérée. Pour les structures minces, des formulation intrinsèque Hamiltonienne sont déjà disponibles \cite{hodges2003exact}.
 \end{enumerate}
 Le doctorant devra alors concevoir des méthodes numériques capable de s'adapter à cette complexité croissante. La première défi portera à la résolution du premier cas, qui ne demandera pas d'introduire des technique spéciales pour modifier le maillage. Au contraire le cas successifs devront utiliser des méthodes pour considérer le déplacement du corps élastique (comme par exemple la méthode de frontières immergées \cite{peskin2002}). Ces modèles numériques devront retenir les propriétés physiques du problème (conservation d'énergie globale, traçage des échanges d'énergie entre les différents sous-systèmes, conservation d'invariants du problème).
 
-Pour ce première macro-tâche, il sera possible de prolonger le travail effectué dans le cadre de ma thèse, qui a donn\'e lieu a un code de calcul pour application multiphysique (le code SCRIMP décrit dans~\cite{brugnoli2021num}). Ce code sera ultérieurement développé pour traiter des problèmes d'interaction fluide-structure. Le co-encadrant de thèse sera Denis Matignon, du fait de sa grande expertise concernant les mathématique numérique et les systèmes port-Hamiltonien.
+Pour ce première macro-tâche, il sera possible de prolonger le travail effectué dans le cadre de ma thèse, qui a donn\'e lieu a un code de calcul pour application multiphysique (le code SCRIMP décrit dans \url{https://zenodo.org/record/4945329#.Yd8UJoTMJH4}). Ce code sera ultérieurement développé pour traiter des problèmes d'interaction fluide-structure. Le co-encadrant de thèse sera Denis Matignon, du fait de sa grande expertise concernant les mathématique numérique et les systèmes port-Hamiltonien.
 
 Pour ce qui concerne la préservation de la physique au sein des algorithmes, des collaborations avec Marc Gerritsma (département d'aérodynamique à TU Delft) et Herbert Egger (Johannes Kepler University Linz) seront mises en place. Pour ce qui concerne l'interaction fluide-structure, l'office National d'Études et de Recherches Aérospatiales (ONERA), garant d'une profonde expertise en ce domaine, représentera l'interlocuteur principal pour les problèmes liés au couplage multiphysique.
 
@@ -154,7 +159,7 @@ Pour ce qui concerne la deuxième macro-tâche, il sera possible de mettre en pl
 Les techniques développes dans les deux premières lots de travaux permettront d'obtenir des modèles pour décrire l'aéroélasticité et la dynamiques des drones robotiques dans un fluide.
 Le dernier objectif consistera à utiliser ces modèles réduits pour l'optimisation. Cette étape permettra d’évaluer la validité et l’efficacité des modèles réduits par rapport aux simulations fines. Selon le cas d'application, différents scénarios ou l'optimisation est nécessaire peuvent être évalués (cf. Fig. \ref{fig:optmisation}): 
 \begin{itemize}
-	\item L'optimisation structurelle des composant mécaniques en aéronautique, pour augmenter les performances aérodynamiques (minimisation de la traînée) et minimiser la consommation du carburant (cf. Fig. \ref{fig:wing}); 
+	\item L'optimisation structurelle des composant mécaniques en aéronautique, pour augmenter les performances aérodynamiques (minimisation de la traînée et donc la consommation du carburant, cf. Fig. \ref{fig:wing}); 
 	\item Co-design de la partie structurelle et du contrôleur embarqué. Cette méthodologie consiste à optimiser le performance du contrôleur (qui cherche par exemple à limiter les vibrations), au même temps que les caractéristiques structurelles du véhicule (par exemple la masse ou la rigidité). Ce type d'optimisation est souvent utilisé pour les satellites (cf. Fig. \ref{fig:codesign_sat}).
 	\item Contrôle optimal pour suivi de trajectoire. Ce type des problématiques apparaissent fréquemment en robotique. Les chercheurs s'intéressent de plus en plus à la robotique molle (soft robotics en anglais, cf. Fig. \ref{fig:sofi-mit}), ou la flexibilité des composants ne peut pas être négligée.
 \end{itemize}
@@ -162,7 +167,7 @@ Le dernier objectif consistera à utiliser ces modèles réduits pour l'optimisa
 Typiquement dan l'industrie l'optimisation et les études paramétriques sont effectuées sur les
 modèles de substitution, car optimiser directement les modèle fines amène à des coûts computationnelles absolument prohibitifs. Venir à bout de ces trois macro-tâches
 permettra de mieux comprendre le compromis entre temps de calcul et précision pour des
-applications d’intérêt industriel. Potentiellement, les techniques développées dans ce projet pourront fournir des solutions plus performantes que celles normalement utilisées en industrie.
+applications d’intérêt industriel. Potentiellement, les techniques développées dans ce projet pourront fournir des solutions plus performantes que celles normalement utilisées en industrie. Pour cette tache un doctorant et un chercheur doctoral seront embauchés. 
 
 \begin{figure}[t]
 	\begin{subfigure}[t]{0.3\textwidth}
@@ -177,7 +182,7 @@ applications d’intérêt industriel. Potentiellement, les techniques développ
 	\end{subfigure}\hfill
 	\begin{subfigure}[t]{0.35\textwidth}
 		\includegraphics[width=\columnwidth]{Sofi_MIT.jpeg}%
-		\caption{Le drone robotique sofi du MIT (\href{https://www.csail.mit.edu/research/sofi-soft-robotic-fish}{Lien à la page web})}
+		\caption{Le drone robotique Sofi du MIT (\href{https://www.csail.mit.edu/research/sofi-soft-robotic-fish}{Lien à la page web})}
 		\label{fig:sofi-mit}
 	\end{subfigure}
 	\caption[]{Cas d'application pour les problèmes optimisation dans la WP3.}%
@@ -193,14 +198,14 @@ Le travail sera effectuer au sein du département DISC de l'ISAE. Pour ce qui co
 
 \begin{itemize}
 	\item \textbf{De T0 à T0 + 6 mois :} Création des partenariat académiques et industriels.
-	Pour ce qui concerne l'architecture logiciel pour le calcul haute performance, on cherchera à organiser la première thèse en collaboration avec le CEA (centre pour l'énergie atomique). Cette structure possède l'un de centre de calcul plus sophistiqué de France. Il est donc logique d'envisager la création d'une thèse CIFRE avec cette institution. On cherchera également d'effectuer de collaboration pour de thèse CIFRE avec Airbus, spécialement pour ce qui concerne la partie optimisation.
+	Pour ce qui concerne l'architecture logiciel pour le calcul haute performance, on cherchera à organiser la première thèse en collaboration avec le CEA (centre pour l'énergie atomique). Cette structure possède l'un de centre de calcul plus sophistiqué de France. Il est donc logique d'envisager la création d'une thèse en cotutelle avec cette institution. On cherchera également d'effectuer de collaboration avec Airbus, spécialement pour ce qui concerne la partie optimisation.
 	\item \textbf{De T0 + 6 mois à T0 + 12 mois : } Recrutement du première doctorat, chargé du premier lot de travail. Cette thèse sera effectuer en cotutelle avec le CEA. Le doctorant devra avoir des compétence en mathématiques appliquées et modèles pour l'ingénierie. Cette thèse aura comme but la génération d'un code multiphysique pour la mécanique et la fluidodynamique.
-	\item \textbf{De T0 + 12 mois à T0 + 18 mois : } Recrutement du deuxième doctorant, en collaboration avec Charles Poussot-Vassal et l'Onera. Pour cette thèse, on cherchera un doctorant avec des compétences en calculs scientifique et Intelligence Artificielle. Cette thèse sera organiser en sort que les modèles générer dans le WP1 puissent être utilisés par le doctorant 2.
+	\item \textbf{De T0 + 12 mois à T0 + 18 mois : } Recrutement du deuxième doctorant, en collaboration avec Charles Poussot-Vassal et l'Onera. Pour cette thèse, on cherchera un doctorant avec des compétences en calculs scientifique et Intelligence Artificielle. Cette thèse sera organisée en sort que les modèles générés dans le WP1 puissent être utilisés par le doctorant 2.
 	\item \textbf{De T0 + 18 mois à T0 + 24 mois : } Recrutement du troisième doctorant. Pour cette thèse, on cherchera un profile ingénieur avec des compétences solides en mécanique. Ce thésard travaillera avec le département MS2M de l'ISAE. Il sera possible d'organiser cette thèse en collaboration avec AIRBUS.
-	\item \textbf{De T0 + 24 mois à T0 + 30 mois : } Recrutement d'un post-Doc. Ce post-Doc sera expert en utilisation de l'intelligence artificielle pour l'optimisation et les problèmes physiques et accompagnera le thésard 3. 
+	\item \textbf{De T0 + 24 mois à T0 + 30 mois : } Recrutement d'un chercheur doctoral. La personne embauchée sera expert en utilisation de l'intelligence artificielle pour l'optimisation et accompagnera le thésard 3. 
 	\item \textbf{De T0 + 36 mois à T0 + 42 mois : } Mise en forme du logiciel de calcul développé dans le WP1. Création de la documentation pour le code et des tutoriaux pour son utilisation.
-	\item \textbf{De T0 + 48 mois à T0 + 54 mois : } Validation du code pour la réduction de modèles pour le problemes d'interaction couplés.
-	\item \textbf{De T0 + 54 mois à T0 + 60 mois : } Finalisation du code de calcul, regroupant la génération des modèles haute-fidélité, la réduction de modèles et l'optimisation. Dissémination des résultats
+	\item \textbf{De T0 + 48 mois à T0 + 54 mois : } Validation du code pour la réduction de modèles pour les problèmes d'interaction couplés.
+	\item \textbf{De T0 + 54 mois à T0 + 60 mois : } Finalisation du code de calcul, regroupant la génération des modèles haute-fidélité, la réduction de modèles et l'optimisation. Dissémination des résultats.
 \end{itemize} 
 
 \begin{figure}[h!]
@@ -248,7 +253,7 @@ Le travail sera effectuer au sein du département DISC de l'ISAE. Pour ce qui co
 
 
 \subsection{Choix de l'institution d'accueil}
-Pour ce projet, on choisi l'ISAE et sa grande expertise dans le domaine aéronautique. En effet les applications aéronautiques sont centrales dans ce projet. En plus, l'intégration des compétences diverses au sein de l'institution permettra le dialogue entre experts dans les différentes disciplines requises : calcul numérique, intelligence artificielle (département DISC), aérodynamique (DAEP) reduction de modeles (DCAS), optimisation structurelle (MS2M).
+Pour ce projet, on choisi l'ISAE et sa grande expertise dans le domaine aéronautique. En effet les applications aéronautiques sont centrales dans ce projet. En plus, l'intégration des compétences diverses au sein de l'institution permettra le dialogue entre experts dans les différentes disciplines requises : calcul numérique et intelligence artificielle (département DISC), aérodynamique (DAEP) réduction de modèles (DCAS), optimisation structurelle (MS2M).
 
 
 \subsection{Budget}
@@ -271,9 +276,34 @@ Pour ce projet, on choisi l'ISAE et sa grande expertise dans le domaine aéronau
 \end{tabular}
 \end{center}
 
+\includepdf[pages=-]{cv_french.pdf}
+
+\section{Plan de carrière}
+
+La technologie, les sciences et leur impact sur l'humain m'ont toujours intéressé. C'est pour cela que j'ai effectué mes études en ingénierie dans des institutions prestigieuses (double diplôme Politecnico di Milano et ISAE-SUPAERO et master de recherche en collaboration avec Supélec/Université Paris Saclay). Mes études ont été centrés sur le calcul numérique, les systèmes dynamiques et l'automatique. Mon intérêt pour la simulation des problèmes physiques m'a amené au centre national d'études spatiales (CNES) pour mon stage de fin études. \\
+
+L'ISAE a financé le projet de thèse pour le quel j'avais été sélectionné. Dans ce travail, j'ai exploré le potentiel d'un formalisme mathématique pour la modélisation des systèmes mécaniques complexes. J'ai pu développer des compétences à l'intersection des mathématiques appliques, physique et ingénierie des systèmes. La révolution digitale qui est en cours maintenant donne aux ingénieurs des instruments puissants pour pousser les avancés technologiques. Je considère l'expertise acquise pendant la thèse comme fondamentale, car maintenant je possède les compétences nécessaires pour être acteur de cette révolution. Cette même expertise m'a permit d'être sélectionné comme chercheur doctoral dans un projet ERC à l'université de Twente. Ce projet est extrêmement passionnant car il réuni différents chercheurs travaillant dans les aspects théoriques et/ou pratiques de la robotique pour perfectionner le design d'un drone bio-inspire. \\
+
+\`A moyen terme je souhaite postuler comme ingénieur de recherche ou maître de conférence dans une Université ou Laboratoire en France. Je souhaite continuer à travailler dans la modélisation mathématique pour l'ingénierie, en travaillant entre les mathématiques appliquées et l'informatique. Mon idéal serait de travailler dans un organisme qui cherche à résoudre des problèmes d'intérêt sociétal, en utilisant les outils de l'ingénierie computationnel.  Si le projet MORPHEUS sera sélectionné pour le prix Lopez-Loreta, je me consacrerai au plein temps à sa réalisation. Ce projet touche à différentes thématiques qui sont centrales dans mes intérêts. La possibilité de pouvoir le financer pendant 5 ans représente une opportunité unique de croissance professionnelle. J'envisage de soutenir une Habilitation à diriger des recherches dans un horizon de 10 ans.
 
 
-\footnotesize
+\section{Production scientifique}
+{
+\nocitearticle{brugnoli2019ammmin,brugnoli2019ammkir,brugnoli2020msd,brugnoli2021ther,brugnoli2021num,califano2021}
+\bibliographystylearticle{unsrt}
+\bibliographyarticle{biblio_articles}
+
+\nociteconf{brugnoli2019cpde,brugnoli2019cdc,cardoso2019cdc,brugnoli2020wc,brugnoli2020mtns,brugnoli2021vk,cherifi2021data,rashad2021ext}
+\bibliographystyleconf{unsrt}
+\bibliographyconf{biblio_conf}  
+ 
+\nociteconfnoproc{brugnoli2021siamcse}
+\bibliographystyleconfnoproc{unsrt}
+\bibliographyconfnoproc{biblio_confnoproc}   
+}
+
+
+
 \bibliographystyle{unsrt}
 \bibliography{biblio_dossierLL}
 
