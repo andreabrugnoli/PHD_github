@@ -5,7 +5,7 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from mpl_toolkits.mplot3d import Axes3D
 
-from firedrake.plot import _two_dimension_triangle_func_val
+from firedrake.plot import trisurf
 
 
 matplotlib.rcParams['text.usetex'] = True
@@ -32,14 +32,8 @@ def animateInt2D(minSol, maxSol, solPl_list, x2, y2, solRod, t,\
         ax.collections.clear()
         ax.lines.pop(0)
         lab = 'Time =' + '{0:.2e}'.format(t[frame_number])
-        coords, Z, triangles = _two_dimension_triangle_func_val(solPl_list[frame_number], 10)
-        
-        coords = toreal(coords, "real")
-        x, y = coords[:, 0], coords[:, 1]
-        triangulation = matplotlib.tri.Triangulation(x, y, triangles=triangles)
-    
-        plot_pl = ax.plot_trisurf( \
-            triangulation, Z, cmap=cm.jet, label=lab, linewidth=0, antialiased=False)
+
+        plot_pl = trisurf(solPl_list[frame_number], axes=ax)
 
         ax.plot(x2, y2, solRod[:, frame_number],\
                             linewidth=5, label = z2label, color='black')
@@ -64,16 +58,11 @@ def animateInt2D(minSol, maxSol, solPl_list, x2, y2, solRod, t,\
     ax.set_title(title, fontsize=fntsize, loc ='left')
 
     lab = 'Time =' + '{0:.2e}'.format(t[0])
-    coords, Z, triangles = _two_dimension_triangle_func_val(solPl_list[0], 10)
-    
-    coords = toreal(coords, "real")
-    x, y = coords[:, 0], coords[:, 1]
-    triangulation = matplotlib.tri.Triangulation(x, y, triangles=triangles)
-    
-    ax.plot_trisurf( triangulation, Z, cmap=cm.jet, label=lab, linewidth=0, antialiased=False)
+
+    trisurf(solPl_list[0], axes=ax)
     ax.plot(x2, y2, solRod[:, 0], label=z2label, color='black')
 
-    anim =  animation.FuncAnimation(fig, update_plot, frames=len(t),\
+    anim = animation.FuncAnimation(fig, update_plot, frames=len(t),\
                                     interval=10, fargs=(solPl_list, solRod))
 
 

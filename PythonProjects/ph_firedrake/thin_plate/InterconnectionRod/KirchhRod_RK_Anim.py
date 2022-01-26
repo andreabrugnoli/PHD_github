@@ -377,56 +377,58 @@ fps = 20
 Writer = animation.writers['ffmpeg']
 writer = Writer(fps= fps, metadata=dict(artist='Me'), bitrate=1800)
 
+plt.show()
+
 # anim.save(path_out + 'Kirchh_Rod.mp4', writer=writer)
 
-save_solutions = False
-if save_solutions:
-
-    matplotlib.rcParams['text.usetex'] = True
-
-    n_fig = 4
-    tol = 1e-6
-
-    for i in range(n_fig):
-        index = int(n_ev/n_fig*(i+1)-1)
-        w_fun = Function(Vp)
-        w_fun.vector()[:] = w_pl_mm[:, index]
-
-        Vp_CG = FunctionSpace(mesh, 'Lagrange', 3)
-        wmm_wCG = project(w_fun, Vp_CG)
-
-        from firedrake.plot import _two_dimension_triangle_func_val
-
-        triangulation, Z = _two_dimension_triangle_func_val(wmm_wCG, 10)
-        fig = plt.figure()
-
-        ax = fig.add_subplot(111, projection="3d")
-        ax.collections.clear()
-
-        surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False} #, 'vmin': minZ, 'vmax': maxZ}
-        # lab = 'Time =' + '{0:.2e}'.format(t_ev[index])
-        tri_surf = ax.plot_trisurf(triangulation, Z, **surf_opts)
-        tri_line = ax.plot(x_rod, y_rod, w_rod_mm[:, index], linewidth=5, label='Rod', color='black')
-
-        tri_surf._facecolors2d = tri_surf._facecolors3d
-        tri_surf._edgecolors2d = tri_surf._edgecolors3d
-        ax.legend(handles=[tri_line[0]])
-        # fig.colorbar(surf)
-
-        ax.set_xbound(-tol, l_x + tol)
-        ax.set_xlabel('$x \; \mathrm{[m]}$')
-
-        ax.set_ybound(-tol, l_y + tol)
-        ax.set_ylabel('$y \; \mathrm{[m]}$')
-
-        ax.w_zaxis.set_major_locator(LinearLocator(10))
-        ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
-
-        ax.set_zlabel('$w \; \mathrm{[mm]}$')
-        ax.set_title('Vertical displacement ' +'$(t=$' + '{0:.1f}'.format(1000*t_ev[index]) + '$\; \mathrm{[ms]})$', loc='center')
-
-        ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
-
-        plt.savefig(path_out + "SnapRod_t" + str(index + 1) + ".eps", format="eps")
-
-plt.show()
+# save_solutions = False
+# if save_solutions:
+#
+#     matplotlib.rcParams['text.usetex'] = True
+#
+#     n_fig = 4
+#     tol = 1e-6
+#
+#     for i in range(n_fig):
+#         index = int(n_ev/n_fig*(i+1)-1)
+#         w_fun = Function(Vp)
+#         w_fun.vector()[:] = w_pl_mm[:, index]
+#
+#         Vp_CG = FunctionSpace(mesh, 'Lagrange', 3)
+#         wmm_wCG = project(w_fun, Vp_CG)
+#
+#         from firedrake.plot import _two_dimension_triangle_func_val
+#
+#         triangulation, Z = _two_dimension_triangle_func_val(wmm_wCG, 10)
+#         fig = plt.figure()
+#
+#         ax = fig.add_subplot(111, projection="3d")
+#         ax.collections.clear()
+#
+#         surf_opts = {'cmap': cm.jet, 'linewidth': 0, 'antialiased': False} #, 'vmin': minZ, 'vmax': maxZ}
+#         # lab = 'Time =' + '{0:.2e}'.format(t_ev[index])
+#         tri_surf = ax.plot_trisurf(triangulation, Z, **surf_opts)
+#         tri_line = ax.plot(x_rod, y_rod, w_rod_mm[:, index], linewidth=5, label='Rod', color='black')
+#
+#         tri_surf._facecolors2d = tri_surf._facecolors3d
+#         tri_surf._edgecolors2d = tri_surf._edgecolors3d
+#         ax.legend(handles=[tri_line[0]])
+#         # fig.colorbar(surf)
+#
+#         ax.set_xbound(-tol, l_x + tol)
+#         ax.set_xlabel('$x \; \mathrm{[m]}$')
+#
+#         ax.set_ybound(-tol, l_y + tol)
+#         ax.set_ylabel('$y \; \mathrm{[m]}$')
+#
+#         ax.w_zaxis.set_major_locator(LinearLocator(10))
+#         ax.w_zaxis.set_major_formatter(FormatStrFormatter('%1.2g'))
+#
+#         ax.set_zlabel('$w \; \mathrm{[mm]}$')
+#         ax.set_title('Vertical displacement ' +'$(t=$' + '{0:.1f}'.format(1000*t_ev[index]) + '$\; \mathrm{[ms]})$', loc='center')
+#
+#         ax.set_zlim3d(minZ - 0.01 * abs(minZ), maxZ + 0.01 * abs(maxZ))
+#
+#         plt.savefig(path_out + "SnapRod_t" + str(index + 1) + ".eps", format="eps")
+#
+# plt.show()
