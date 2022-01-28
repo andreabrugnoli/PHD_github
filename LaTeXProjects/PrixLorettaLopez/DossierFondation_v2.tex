@@ -1,0 +1,370 @@
+\documentclass[12pt, french]{article}
+\usepackage{fontspec}
+\setmainfont{Arial}
+\usepackage{setspace}
+\singlespacing
+
+\usepackage{graphicx}
+\usepackage{caption}
+%\usepackage[T1]{fontenc}
+%\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\geometry{
+	a4paper,
+	left=20mm,
+	right=20mm,
+	top=25mm,
+	bottom=25mm,
+}
+
+\usepackage{pgfgantt}
+\usepackage{eurosym}
+
+\usepackage{pdfpages}
+
+
+\usepackage{subcaption}
+
+\usepackage[unicode=true,pdfusetitle,bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
+breaklinks=false,pdfborder={0 0 0},backref=false,colorlinks=true,urlcolor=blue]{hyperref}
+
+\usepackage{multibib}
+\newcites{article,conf,confnoproc}{{Articles dans des revues internationales à comité de lecture
+	},{Communications dans des congrès internationaux à comité de lecture et actes
+		publiés},{Communications dans des congrès internationaux sans comité de lecture}}
+
+
+\newcommand{\review}[1]{\textcolor{blue}{#1}}
+
+\graphicspath{{images/}}
+
+\author{Andrea Brugnoli \\ 
+	\hspace{2.8pt} Docteur ISAE-Supaéro 2020\\
+	Ingénieur ISAE-Supaéro 2017}
+\title{Project MORPHEUS \\
+	\vspace{.3cm}
+	\Large{Model Order Reduction for multi-PHysical and Energy-Unified Systems}  }
+
+\date{}
+
+\begin{document}
+	
+	\maketitle
+	
+	\large{\noindent Dossier de candidature au prix de la fondation Jean-Jacques et Félicia
+		Lopez-Loreta pour l'excellence académique.}
+	
+	\vspace{1cm}
+	\large{\noindent \review{Candidat sélectionné par ISAE-SUPAERO}}
+	
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=.95\textwidth]{3Dplane.jpg}
+		\captionsetup{labelformat=empty}
+		\caption{Source: \href{http://www.fenics-hpc.org/}{FEniCS-HPC website}}
+	\end{figure}
+	
+	
+	
+	
+	
+	\thispagestyle{empty}
+	
+	\newpage
+	
+	\section{Résume du projet}
+	
+	Le but du projet MORPHEUS consiste à mettre en place des méthodes numériques
+	pour accélérer la simulation des problèmes d'interaction fluide-structure (IFS), par rapport au temps de calcul requis pour une simulation haute-fidélité. Il sera donc possible d'intégrer des modèles plus économiques, qui pourront remplacer des simulations très coûteuses, et ainsi de faciliter le design optimisé des composant et la prise de décisions. A la différence de plusieurs méthodes proposées dans la littérature, l'impératif est la fidélité à la structure physique du problème.  Cette structure est le plus souvent ignorée par les algorithmes de réduction, qui traitent les simulations comme des boîtes noires. Les modèles réduits respectueux de la physique sont beaucoup plus précis que ceux qui ne la garantissent pas et leur utilisation pourra radicalement améliorer les techniques normalement utilisées pour la réduction des modèles et l'optimisation. Pour realiser son ambition, ce projet vise à utiliser des formalismes mathématiques récents pour la modélisation multiphysique et la digitalisation des modèles. Les outils capables de prédire précisément le comportement des systèmes complexes ont une importance fondamentale pour nous aider à affronter les prochains défis technologiques et sociétaux. Le fait que cette année le Prix Nobel de Physique ait été attribué à trois chercheurs travaillant sur ce sujet\footnote{\url{https://www.nobelprize.org/prizes/physics/2021/summary/}} confirme
+	l'importance et l'actualité de cet axe de recherche.
+	
+	
+	\section{Développement du projet scientifique}
+	
+	\subsection{Les problèmes multiphysiques}
+	L'ingénierie computationnelle est une science récente, multidisciplinaire et en expansion rapide. Son but consiste à mettre en place des modèles mathématiques et numériques pour prédire le comportement des systèmes complexes. Cela permet de concevoir des systèmes ex novo ou bien de détecter de fautes pendant le cycle de vie des composants, sans devoir utiliser des tests expérimentaux très couteaux. Ce domaine est en expansion rapide car aujourd'hui on dispose de ordinateurs plus puissants et surtout parce que les algorithmes des calcul ont été optimisés pour être plus rapides, robustes et faciles à utiliser. Toutefois les problèmes multiphysiques, qui sont centrales dans les applications industrielles, sont extrêmement compliqués à traiter. Cela est d\^u d'une part à la difficulté associée au traitement des différentes physiques et d'autre part à la taille des systèmes obtenus, qui nécessitent plusieurs jours, voire plusieurs semaines, pour être résolus à l'aide d'un supercalculateur \cite{keyes2013}. Ces problématiques posent des barrières pour l'utilisation des modèles numériques en industrie. 
+	
+	
+	\subsection{Outils scientifiques du projet MORPHEUS}
+	
+	\begin{figure}[tb]
+		\centering
+		\includegraphics[width=.6\textwidth]{satellite.pdf}
+		\caption{Schéma modulaire représentant un satellite de télécommunication.}
+		\label{fig:satellite}
+	\end{figure}
+	
+	\paragraph{\large Un formalisme unificateur pour la modélisation des systèmes dynamiques\\}
+	Un formalisme mathématique très prometteur pour traiter les problèmes multiphysique est le formalisme port-Hamiltonien \cite{vanderSchaft2002}, basé sur la mécanique Hamiltonienne et les graphes de liaisons pour la modélisation des systèmes dynamiques. Au c\oe{}ur de ce formalisme, il y a l'idée que tout système physique peut être décrit d'une manière modulaire, c'est-à-dire à partir des ses composant simples, qui interagissent entre eux et avec le milieu environnant à travers des portes. Les portes d'interaction contiennent l'information relative au flux d'énergie entre les différents composants et entre différents domaines physiques (mécanique, électromagnétisme ou dynamique des fluides). La conception modulaire est fondamentale dans l'ingénierie, car le design de tout système technologique est fait à partir des éléments simples qui sont assemblés pour donner lieu à la complexité qui nous entoure. Prenez par exemple un avion, un hélicoptère, un satellite (cf. Fig. \ref{fig:satellite}) ou un téléphone portable : pour pouvoir optimiser leur design il est indispensable de disposer d'un outil de modélisation capable de décomposer la complexité d'une manière à retrouver les différents composants clés. Le fait d'utiliser un outil de modélisation unifié représente une nouveauté essentielle de ce projet. Cela pourra permettre la création d'une infrastructure commune pour les outils numériques à la base de la digitalisation, et donc faciliter son adoption dans l'industrie.
+	
+	\paragraph{\large Une méthodologie structurée pour la discrétisation \\}
+	Les algorithmes numériques utilisés en industrie sont adaptés à la nature physique du problème. Pour la mécanique des solides la méthode des éléments finis est privilégiée par les ingénieurs. Pour la dynamique des fluides les volumes finis sont majoritairement utilisés car il garantissent le respect des lois de conservation. Quand il faut utiliser ces deux approches simultanément, par exemple pour traiter des problèmes couplés, leur couplage pose plusieurs challenges. Les deux méthodes utilisent des degrés de liberté différents (i.e. différentes entités topologiques du maillage) et l'interconnexion introduit forcement des erreurs. Un outil de modélisation général nécessite une méthode de discrétisation également générale, capable de  garantir la possibilité d'interconnecter des physiques distinctes. Récemment un formalisme unificateur pour la discrétisation des équations à dérivées partielles  à été développé  \cite{arnold2006acta}. Cette théorie mathématique, appelée la méthode des éléments finis en calcul extérieur or FEEC\footnote{Le calcul extérieur représente une généralisation du calcul vectoriel basée sur la géométrie différentielle.}, a permis des développement importants pour la discrétisation des équation aux dérivées partielles issues de la physique. Elle à été appliqué avec succès au cas de la mécanique des solides, la dynamique des fluides et l'électromagnétisme et elle représente un outil puissant pour les applications multiphysiques. La portée de cette théorie est témoignée par le fait que l'Angleterre a décidé d'utiliser cette nouvelle méthode pour renouveler les codes de calcul pour la météorologie 
+	
+	\paragraph{\large L'intelligence artificielle pour obtenir des modèles réduits\\}
+	Toute méthode de discrétisation, même la plus sophistiquée, amène à des systèmes dont la taille dépasse facilement le million d'inconnues. Pour pouvoir optimiser le design des composantes mécaniques, il faut simuler ces modèles plusieurs fois. Cela amène à des coûts computationnels prohibitifs même pour les entreprises dotés des centres de calcul les plus avancés. Il est donc indispensable d'introduire des méthodes de réduction, qui sont censées construire un modèle plus simple, capable néanmoins de retenir les propriétés principales du système de départ. La grande majorité de ces méthodes supposent que l'on puisse obtenir un système réduit à travers une méthode essentiellement linéaire, i.e. la Décomposition Orthogonale en Valeurs Propres (POD) \cite{shinde2019,tello2020fluid}. Cette hypothèse n'est pas valable pour tout système exhibant un comportement non-linéaire et conduit à surestimer la dimension du système réduit. Grâce aux progrès récents dans le domaine de l'Intelligence Artificielle (IA), de nouvelles méthodes permettent d'obtenir des modèles réduits plus performants. Par exemple, des chercheurs ont proposé une architecture basée sur les réseaux neuronaux convolutifs \cite{lee2020} pour obtenir des modèles beaucoup plus rapides (d'un facteur 100 environ) par rapport aux discrétisation haute fidélité. Leur technique représente une extension non linéaire des méthodologies couramment utilisées. Les résultats obtenus démontrent la gain de performance qu'il est possible obtenir en utilisant les réseaux neuronaux convolutifs (cf. \ref{fig:deepROM}).
+	
+	\begin{figure}[t]
+		
+		\begin{subfigure}[t]{0.465\textwidth}
+			\includegraphics[width=\columnwidth]{DGROM_T_param1.pdf} 
+			\caption{Modèle réduit avec réseaux des neurones.}
+			\label{fig:DG_ROM}
+		\end{subfigure}\hfill
+		\begin{subfigure}[t]{0.48\textwidth}
+			\includegraphics[width=\columnwidth]{GROM_T_param1.pdf}%
+			\caption{Modèle réduit avec la méthode linéaire POD.}
+			\label{fig:POD_ROM}
+		\end{subfigure}
+		\caption[]{Erreur des modèles réduits sur le champ de température pour un problème de convection-diffusion-réaction. En utilisant un réseaux neuronaux convolutifs pour générer une variété non linéaire (cf. Fig. \ref{fig:DG_ROM}) l'erreur associée à la réduction  est drastiquement réduite, de $10^{-2}$ à $10^{-5}$, par rapport à la méthode POD (cf. Fig. \ref{fig:POD_ROM}). Reproduit de \cite{lee2020} avec permission.}%
+		\label{fig:deepROM}%
+	\end{figure}
+
+\review{
+\subsection{Verrous scientifiques et lots de travaux pour les adresser}
+Le premier défi du projet consiste à implémenter des méthodes numériques pour la résolution des systèmes couplés multiphysiques. Ces modèles numériques devront retenir les propriétés physiques du problème (conservation d’énergie globale, traçage des échanges d’énergie entre les différents sous-systèmes, conservation d’invariants du problème). Dans l'industrie des méthodes différentes sont habituellement utilisées pour simuler des physiques distinctes. Par conséquent, le couplage numérique ne représente pas correctement les flux d’énergie. Le premier lot de travail (\textbf{WP1}) cherche à résoudre le problématiques liées au couplage multiphysique. 
+\begin{itemize}
+	\item \textbf{WP1} : Développement d'algorithmes numériques haute-fidélité pour des problèmes d'interactions fluide-structures basée sur le formalisme port-Hamiltonien et les élément finis en calcul extérieur.
+\end{itemize}
+L’utilisation d’un paradigme de modélisation unifié permettra d’effectuer les couplages de manière à respecter la physique.}\\
+
+\review{
+Le second challenge du projet consiste à intégrer des techniques issues de l'Intelligence
+Artificielle, qui seront utilisées pour obtenir des modèles réduits. Il s'agit d'un thème de recherche récent mais en expansion rapide. Par exemple dans \cite{sun2020physics} des réseaux de neurones, entraînés pour minimiser l'erreur par rapport au bilan de masse et de la quantité de mouvement, sont utilisés pour s'affranchir de la simulation haute fidélité. Cela ne garantit pas le respect de la structure physique et pose des soucis au niveau de l'interprétation des résultats. Une technique très prometteuse en ce sens est présentée dans \cite{lee2020}, mais ici le respect des lois physiques est imposé a posteriori au travers de contraintes et non pas inclus au niveau de la structure de départ. Le deuxième lot de travail (\textbf{WP2}) a comme bout la génération des modèles réduits capables d'incorporer la physique du problème d'une manière interprétable.
+\begin{itemize}
+	\item \textbf{WP2} : Méthodes de réduction garantissant le respect de la structure physique implémentées en utilisant les réseaux des neurones.
+\end{itemize}
+} 
+
+\review{ L'optimisation et les études paramétriques sont typiquement effectuées sur les
+modèles de substitution en industrie, car optimiser directement les modèles fins entraîne des coûts computationnels absolument prohibitifs. Le dernier défi du projet est de démontrer que les modèles réduits obtenu dans le \textbf{WP2} pourront servir de modèles de substitution plus fiables que ceux qui sont normalement utilisés. Dans le troisième lot de travail (\textbf{WP3}) les modèles réduits seront donc employés pour optimiser le design mécanique des structures et pour le contrôle optimale des structures flexibles. Cette étape permettra d’évaluer la validité et l’efficacité des modèles réduits par rapport aux simulations fines. 
+	\begin{itemize}
+		\item \textbf{WP3} : Utilisation des modèles réduits pour l'optimisation et le contrôle optimale et comparaison avec les  modèles haute-fidélité.
+	\end{itemize}
+}	
+Chaque lot de travail est directement associ\'ee \`a une thèse. Venir à bout de ces trois macro-tâches permettra de mieux comprendre le compromis entre temps de calcul et précision pour des applications d'intérêt industriel. Potentiellement, les techniques développées dans ce projet pourront fournir des solutions plus performantes que celles normalement utilisées en industrie. 
+
+\subsection{Description de lots de travaux}
+	
+	
+	\paragraph{\large WP1 : méthodes numériques pour systèmes couplés fluide-structure\\
+		Responsable: Andrea Brugnoli et Doctorant 1, co-encadré par Denis Matignon (DISC, ISAE)\\}
+	Dans ce premier lot de travail, on cherche à obtenir des modèles couplés d'interaction fluide-structure dans le cas où la partie structurelle est considérée déformable. Une fois que ces modèles seront dérivés, le focus principal de ce lot sera de générer des chemins numériques pour la préservations de la structure Hamiltonienne à l'aide de la méthode à éléments finis en calcul extérieur. Cette t\^ache représente un véritable défi computationnel, spécialement si on cherche à résoudre le cas plus général possible d'interaction fluide-structure où la partie mécanique est très flexible et effectue des mouvements rigides. On pourra alors diviser la tache en considérant des problèmes de complexité croissante. 
+	\begin{enumerate}
+		\item Si la structure est encastrée et les déformations sont petites, par exemple une aile d'avion en conditions nominaux, on peut utiliser un maillage fixe au cours du temps (élasticité linéaire). 
+		\item Si la structure bouge d'une manière rigide mais les déformations restent petites, des approches existent pour limiter la complexité des équations.
+		\item Dans le cas le plus général, l'élasticité non linéaire doit être considérée.
+	\end{enumerate}
+	Le doctorant devra alors concevoir des méthodes numériques capables de s'adapter à cette complexité croissante. Le premier défi portera sur la résolution du premier cas, qui ne demandera pas d'introduire des technique spéciales pour modifier le maillage. Au contraire les cas successifs devront utiliser des méthodes pour considérer le déplacement du corps élastique (comme par exemple la méthode de frontières immergées \cite{peskin2002}). Ces modèles numériques devront retenir les propriétés physiques du problème (conservation d'énergie globale, traçage des échanges d'énergie entre les différents sous-systèmes, conservation d'invariants du problème).
+	
+	Pour cette première macro-tâche, il sera possible de prolonger le travail effectué dans le cadre de ma thèse, qui a donn\'e lieu a un code de calcul pour application multiphysique (le code SCRIMP décrit dans \url{https://zenodo.org/record/4945329#.Yd8UJoTMJH4}). Ce code sera ultérieurement développé pour traiter des problèmes d'interaction fluide-structure. Le co-encadrant de thèse sera Denis Matignon, du fait de son expertise concernant les mathématiques numériques et les systèmes port-Hamiltoniens.
+	
+	Pour ce qui concerne la préservation de la physique au sein des algorithmes, des collaborations avec Marc Gerritsma (TU Delft, Pays Bas) et Herbert Egger (Johannes Kepler University Linz, Autriche) seront mises en place. Pour ce qui concerne l'interaction fluide-structure, l'office National d'Études et de Recherches Aérospatiales (ONERA), garant d'une profonde expertise en ce domaine, représentera l'interlocuteur principal pour les problèmes liés au couplage multiphysique.
+	
+	\paragraph{\large WP2 : réduction de modèles garantissant le respect de la structure physique\\
+		Responsable: Andrea Brugnoli et Doctorant 2, co-encadré par Charles Poussot-Vassal (ONERA)\\}
+	
+	\review{Dans ce deuxième lot de travail des algorithme numériques pour la réduction de modèle seront implémentés. Dans cette étape l'impératif est la préservation de la structure physique du problème.}
+	Par structure physique du problème, on entend la présence des lois de conservation (associé à un opérateur antisymétrique) et des effets dissipatifs, et les variables qui définissent l'interconnexion entre le fluide et le solide. Conserver la structure physique de la simulation haute fidélité dans la représentation réduite permettra d'intégrer des outils d'intelligence artificielle d'une façon interprétable. Par exemple, des réseaux des neurones peuvent être utilisé pour représenté l'énergie (i.e une fonction entre la dimension de l'état et un scalaire positif), ou l'opérateur associé à la conservation d'énergie, ou bien à sa dissipation. \review{L'apprentissage automatique nécessite d'une base des donnés. Les donnés générés dans le \textbf{WP1}, représentés par des résultats des simulations des modèles haute fidélité (appelés \textit{snapshots} en anglais), seront donc utilisé pour entraîner les réseaux des neurones à obtenir des modèles réduit en minimisant certains métriques.}
+	
+	Pour ce qui concerne la deuxième macro-tâche, il sera possible de mettre en place des collaborations avec Volker Mehrmann (TU Berlin) et George Haller (ETH Zurich).
+	
+	
+	\paragraph{\large WP3 : optimisation à l'aide des modèles réduits\\
+		Responsable: Andrea Brugnoli et Doctorant 3, co-encadré par Joseph Morlier (DMSM, ISAE) et Post-doc 1\\}
+	
+	Les techniques développées dans les deux premiers lots de travaux permettront d'obtenir des modèles pour décrire l'aéroélasticité, la dynamique des drones robotiques dans un fluide et d'autres cas d'application.
+	Le dernier objectif consistera à utiliser ces modèles réduits pour l'optimisation. Cette étape permettra d'évaluer la validité et l'efficacité des modèles réduits par rapport aux simulations fines. Selon le cas d'application, différents scénarios peuvent être considérés (cf. Fig. \ref{fig:optmisation}): 
+	\begin{itemize}
+		\item L'optimisation structurelle des composants mécaniques en aéronautique, pour augmenter les performances aérodynamiques (minimisation de la traînée et donc de la consommation du carburant, cf. Fig. \ref{fig:wing}); 
+		\item Co-design de la partie structurelle et du contrôleur embarqué. Cette méthodologie consiste à optimiser la performance du contrôleur (qui cherche par exemple à limiter les vibrations), en même temps que les caractéristiques structurelles du véhicule (par exemple la masse ou la rigidité). Ce type d'optimisation est souvent utilisé pour les satellites (cf. Fig. \ref{fig:codesign_sat}).
+		\item Contrôle optimal pour suivi de trajectoire. Ce type de problématiques apparaît fréquemment en robotique. Les chercheurs s'intéressent de plus en plus à la robotique molle (soft robotics en anglais, cf. Fig. \ref{fig:sofi-mit}), ou la flexibilité des composants ne peut pas être négligée.
+	\end{itemize}
+	
+	\begin{figure}[t]
+		\begin{subfigure}[t]{0.3\textwidth}
+			\includegraphics[width=\columnwidth]{MDo_wing.png}%
+			\caption{Optimisation multidisciplinaire d'une aile: rouge design optimisé (reproduit avec permission de \cite{masColomer2021mdo}). }
+			\label{fig:wing}
+		\end{subfigure}\hfill
+		\begin{subfigure}[t]{0.3\textwidth}
+			\includegraphics[width=\columnwidth]{Codesign_satellite.pdf} 
+			\caption{Modèle d'un satellite pour le co-design contrôle/structure (reproduit avec permission de \cite{finozzi2022sub})}
+			\label{fig:codesign_sat}
+		\end{subfigure}\hfill
+		\begin{subfigure}[t]{0.35\textwidth}
+			\includegraphics[width=\columnwidth]{Sofi_MIT.jpeg}%
+			\caption{Le drone robotique Sofi du MIT (\href{https://www.csail.mit.edu/research/sofi-soft-robotic-fish}{Lien à la page web})}
+			\label{fig:sofi-mit}
+		\end{subfigure}
+		\caption[]{Cas d'application pour les problèmes d'optimisation dans la WP3.}%
+		\label{fig:optmisation}%
+	\end{figure}
+	
+	
+	\section{Mise en \oe{}vre du projet}
+	
+	\subsection{Objectifs et échéances}
+	
+		\begin{figure}[htb]
+		\begin{center}
+			\begin{ganttchart}[y unit title=0.6cm,
+				y unit chart=0.6cm, 
+				x unit=0.4cm,
+				vgrid,hgrid, 
+				title label anchor/.style={below=-1.6ex},
+				title left shift=.05,
+				title right shift=-.05,
+				title height=1,
+				progress label text={},
+				bar height=0.7,
+				group right shift=0,
+				group top shift=.6,
+				group height=.4]{1}{30}
+				%labels
+				\gantttitle{Dur\'ee totale}{30} \\
+				\gantttitle{$T_0 + 12$}{6} 
+				\gantttitle{$T_0 + 24$}{6} 
+				\gantttitle{$T_0 + 36$}{6} 
+				\gantttitle{$T_0 + 48$}{6} 
+				\gantttitle{$T_0 + 60$}{6} \\
+				%tasks
+				\ganttbar{Partenariats}{1}{2} \\
+				\ganttbar{Code SCRIMP}{1}{1} \\
+				\ganttbar{1$^\circ$ th\`ese}{4}{21} \\
+				\ganttbar{2$^\circ$ th\`ese}{10}{27} \\
+				\ganttbar{3$^\circ$ th\`ese}{13}{30} \\
+				\ganttbar{Post-Doc}{16}{27} \\
+				\ganttbar{Soutenances}{22}{30} \\
+				\ganttbar{Dissémination}{25}{30} 
+				%relations 
+				\ganttlink{elem0}{elem2} 
+				\ganttlink{elem1}{elem2} 
+				\ganttlink{elem1}{elem3} 
+				\ganttlink{elem1}{elem4} 
+				\ganttlink{elem1}{elem5}
+				\ganttlink{elem2}{elem5}
+				\ganttlink{elem3}{elem5}
+			\end{ganttchart}
+		\end{center}		
+		\caption{Gaant chart du projet}
+	\end{figure}
+	
+	Le travail sera effectué au sein du département DISC de l'ISAE. \review{
+		Le recrutement des 3 thésards et un chercheurs post-doctoral est prévu selon les étapes suivantes :
+		\begin{itemize}
+			\item \textbf{T0 + 6 mois} : Recrutement du premier doctorat, chargé du premier lot de travail. Le doctorant devra avoir des compétence en mathématiques appliquées et modèles pour l'ingénierie.
+			\item \textbf{T0 + 18 mois} : Recrutement du deuxième doctorant, en collaboration avec Charles Poussot-Vassal et l'Onera. Pour cette thèse, on cherchera des compétences en calcul scientifique et IA.
+			\item \textbf{T0 + 24 mois} : Recrutement du troisième doctorant. Pour cette thèse, on cherchera un profil ingénieur avec des compétences solides en mécanique. Ce thésard travaillera avec Joseph Morlier (département DMSM de l'ISAE).
+			\item \textbf{T0 + 30 mois} : Recrutement d'un chercheur post-doctoral expert en optimisation.
+		\end{itemize}
+	Le développement du projet se déroulera selon les objectifs suivants:
+	\begin{itemize}
+		\item \textbf{T0 + 6 mois} : Création des partenariats académiques et industriels.
+		Pour ce qui concerne l'architecture logicielle pour le Calcul Haute Performance, on cherchera à organiser la première thèse en collaboration avec le CEA (centre pour l'énergie atomique). Cette structure possède l'un des centres de calcul les plus sophistiqués de France. Il est donc logique d'envisager la création d'une thèse en cotutelle avec cette institution. On cherchera également à effectuer une collaboration avec Airbus, spécialement pour ce qui concerne la partie optimisation.
+		\item \textbf{T0 + 36 mois} : Premier livrable : code pour la simulation couplée pour l'interaction fluide-structure (WP1). Le logiciel sera accompagné des tutoriaux démonstratifs.
+		\item \textbf{T0 + 48 mois} : Deuxième livrable : création d'un code de calcul capable d'extraire des modèles réduits à partir des donnés des simulations haute fidélité (WP2). Les performances du code seront validées sur la base du trade-off gain de temps et fidélité au modèle non réduit.
+		\item \textbf{T0 + 54 mois} : Troisième livrable : code pour l'optimisation des modèles réduits (WP3). La fiabilité de l'approche sera démontré grâce à la comparaison des résultats obtenus sur les modèles haute fidélité et réduit. 
+		\item \textbf{De T0 + 54 mois à T0 + 60 mois} : Livrable final regroupant les différents codes. 		Dissémination des résultats. 
+	\end{itemize} 
+}
+	
+	
+	\subsection{Choix de l'institution d'accueil}
+	Pour ce projet, on choisit l'ISAE et sa grande expertise dans le domaine aéronautique. En effet les applications aéronautiques sont centrales dans ce projet. De plus, l'intégration des compétences diverses au sein de l'institution permettra le dialogue entre experts dans les différentes disciplines requises : calcul numérique et intelligence artificielle (département DISC), aérodynamique (DAEP) réduction de modèles (DCAS), optimisation structurelle (DMSM).
+	
+	
+	\subsection{Budget}
+
+	\begin{center}
+		\begin{tabular}{|c|c|}
+			\hline
+			D\'epense & Co\^{u}t \\
+			\hline
+			Porteur du projet (temps plein) & $5\times 60000=300000$ \\
+			3 doctorants (temps plein) & $3\times 3\times 40000=360000$  \\
+			1 Post-Doc (temps plein) & $2\times 55000=110000$ \\
+			Personnels ISAE & $100000$ \\
+			Matériel  et calcul HPC & $60000$ \\
+			Frais annexes (conférences, workshops) & $60000$ \\
+			\hline
+			\textbf{Total} & 1000000 \\
+			\hline
+		\end{tabular}
+	\end{center}
+	
+	
+	
+	\includepdf[pages=1, pagecommand=\section{Curriculum Vitae}, offset=0 -1.5cm]{cv_french.pdf}
+	\includepdf[pages=2-,pagecommand={}]{cv_french.pdf}
+	
+	\section{Plan de carrière}
+	
+	La technologie, les sciences et leur impact sur l'humain m'ont toujours intéressé. C'est pour cela que j'ai effectué mes études en ingénierie dans des institutions prestigieuses (double diplôme Politecnico di Milano et ISAE-SUPAERO et master de recherche en collaboration avec Supélec/Université Paris Saclay). Mes études ont été centrées sur le calcul numérique, les systèmes dynamiques et l'automatique. Mon intérêt pour la simulation des problèmes physiques m'a amené au centre national d'études spatiales (CNES) pour mon stage de fin études. \\
+	
+	L'ISAE a financé le projet de thèse pour le quel j'avais été sélectionné. Dans ce travail, j'ai exploré le potentiel d'un formalisme mathématique pour la modélisation des systèmes mécaniques complexes. J'ai pu développer des compétences à l'intersection des mathématiques appliques, de la physique et de l'ingénierie des systèmes. La révolution digitale qui est en cours maintenant donne aux ingénieurs des instruments puissants pour pousser les avancées technologiques. Je considère l'expertise acquise pendant la thèse comme fondamentale, car maintenant je possède les compétences nécessaires pour être acteur de cette révolution. Cette même expertise m'a permis d'être sélectionné comme chercheur post-doctoral dans un projet ERC à l'université de Twente. Ce projet est extrêmement passionnant car il réunit différents chercheurs travaillant sur les aspects théoriques et/ou pratiques de la robotique pour perfectionner le design d'un drone bio-inspiré. \\
+	
+	\`A moyen terme je souhaite postuler comme ingénieur de recherche ou maître de conférence dans une Université ou Laboratoire en France. Je veux continuer à travailler dans la modélisation mathématique pour l'ingénierie, entre les mathématiques appliquées et l'informatique. Mon idéal serait de travailler dans un organisme qui cherche à résoudre des problèmes d'intérêt sociétal, en utilisant les outils de l'ingénierie computationnelle.  Si le projet MORPHEUS est sélectionné pour le prix Lopez-Loreta, je me consacrerai à plein temps à sa réalisation. Ce projet touche à différentes thématiques qui sont au centre de mes intérêts. La possibilité de pouvoir le financer pendant 5 ans représente une opportunité unique de croissance professionnelle. J'envisage également de soutenir une Habilitation à Diriger des Recherches dans un horizon moins de 10 ans.
+	
+	
+	\section{Production scientifique}
+	{
+		\nocitearticle{brugnoli2019ammmin,brugnoli2019ammkir,brugnoli2020msd,brugnoli2021ther,brugnoli2021num,califano2021,brugnoli2022df}
+		\bibliographystylearticle{unsrt}
+		\bibliographyarticle{biblio_articles}
+		
+		\nociteconf{brugnoli2019cpde,brugnoli2019cdc,cardoso2019cdc,brugnoli2020wc,brugnoli2020mtns,brugnoli2021vk,cherifi2021data,rashad2021ext}
+		\bibliographystyleconf{unsrt}
+		\bibliographyconf{biblio_conf}  
+		
+		\nociteconfnoproc{brugnoli2021siamcse}
+		\bibliographystyleconfnoproc{unsrt}
+		\bibliographyconfnoproc{biblio_confnoproc}   
+	}
+	
+	
+	\section{Réussites professionnelles}
+	
+	Pendant mon parcours professionnel, j'ai pu vivre des moments extrêmement gratifiants. \\
+	
+	En premier, l'obtention de mon doctorat, défendu face à une jury d'experts internationaux, venants de France, Italie et Belgique. La qualité du travail a été reconnue à l'unanimité par les membres du jury et également par la fondation ISAE-SUPAERO, qui m'attribué un des 5 prix de thèse 2021 (la vidéo de présentation de mon travail pour être visualisée à ce lien \url{https://www.youtube.com/watch?v=2nNE4LgIkzA}). \\
+	
+	Les travaux effectués dans le cadre de ma thèse ont donné lieu à 5 articles dans des revues scientifiques de haut niveau \citearticle{brugnoli2019ammmin,brugnoli2019ammkir,brugnoli2020msd,brugnoli2021ther,brugnoli2021num} (\textit{Applied Mathematical Modelling}, \textit{Multibody System Dynamics}, \textit{Journal of Thermal Stresses}). La portée du travail est démontrée par le fait que ces journaux touchent à des aspects différents de la modélisation mathématique en ingénierie. Dans le cadre de ma thèse, j'ai aussi effectué une  mobilité à l'ITA, Istitito Techn\'ologico de Aeron\'autica (São José dos Campos, Brésil). Ce séjour, qui à donné lieu à trois contributions dans des conférences internationales prestigieuses \citeconf{brugnoli2019cdc,cardoso2019cdc,brugnoli2020wc}, m'énormément enrichi au niveau professionnel et humaine. \\
+	
+	La dernière expérience que je souhaite mentionner a été mon déménagement aux Pays-Bas pour travailler au sein du projet Portwings. Ce ambitieux projet demande des compétences extrêmement diversifiées et chaque membre du groupe est en effet responsable d'une thématique spécifique. J'ai pu m'intégrer rapidement, en arrivant à instaurer une discussion scientifique très constructive avec des chercheurs ayants une formation différente de la mienne. Mon travail à déjà donné lieu à un article de revue soumis à un journal très réputé dans le domaine de la physique computationnelle \citearticle{brugnoli2022df}. 
+	
+	
+	\includepdf[pages=1, pagecommand=\section{Lettre d'invitation de l'institution d'accueil}]{gsLettreDISC.pdf}
+	\includepdf[pages=2-,pagecommand={}]{gsLettreDISC.pdf}
+	
+	\section{Description de l'institution d'accueil}
+	
+	L'ISAE-SUPAERO est un établissement public à caractère scientifique, culturel et professionnel (EPSCP) sous tutelle de la DGA du ministère des armées. Implanté à Toulouse, il est une référence mondiale de la formation et de la recherche dans les domaines aéronautiques, spatial et systèmes connexes. L'Institut délivre des
+	formations de haut niveau d'ingénieurs, de masters, de masters spécialisés et de doctorats aux débouchés diversifiés. L'ISAE mène également des activités de recherche et développement et dispose de 8 laboratoires ou équipes de recherche (électronique, optronique, signal, aérodynamique énergétique et propulsion,
+	mécanique des structures et matériaux, aéronautique et spatial).
+	
+	
+	\appendix
+	
+	\section{Lettres de manifestations d'intérêt}
+	
+	A support du fait que le projet MORHPEUS présente un fort intérêt industriel et de recherche, j'ai engagé des discussions avec des acteurs industries dans le domaine aérospatial, ainsi que avec des centre de recherche très réputes pour leur compétences en simulation numérique et intelligence artificielle et des professeurs universitaires. 
+	
+	\review{
+	Les personnes suivantes ont donné leur support au projet:
+	\begin{itemize}
+		\item Isabelle Bloy, Head of Single aisle New developments in Chief Engineering, est ingénieur à AIRBUS depuis plus que vingt ans. Elle à été chef de projet dans le domaine de la physique du vol.
+		\item Michele Colombo, Technical Specialist Digital Enablers, est spécialiste technique pour la partie Intelligence Artificielle du département aéroélasticité à AIRBUS.
+		\item Pierre-Henri Maire, Directeur de la Recherche, est un expert dans le domaine de la physique computationnelle au CEA à Bordeaux.
+		\item Volker Mehrmann, Président de l'association européenne des mathématiques et professeur à TU Berlin, est un mathématicien spécialisé dans les développement d'algorithme numériques pour les applications industrielles (équations différentielles-algébriques, réduction de modèle et contrôle optimale).
+		\item Stefano Stramigioli, Vice Président of euRobotics et professeur à l'Université de Twente, est un roboticien spécialisé dans les systèmes port-Hamiltoniens et leur utilisation pour le contrôle de manipulateurs robotiques.
+	\end{itemize}
+	}
+	
+	
+	\bibliographystyle{unsrt}
+	\bibliography{biblio_dossierLL}
+	
+	
+\end{document}
