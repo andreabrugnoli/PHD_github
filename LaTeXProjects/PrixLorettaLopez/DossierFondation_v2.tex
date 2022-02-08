@@ -1,6 +1,8 @@
 \documentclass[12pt, french]{article}
 \usepackage{fontspec}
 \setmainfont{Arial}
+\usepackage{wrapfig}
+
 \usepackage{setspace}
 \singlespacing
 
@@ -334,7 +336,7 @@ Pour accomplir les objectifs des recrutements seront effectués :
 	
 	En premier, l'obtention de mon doctorat, défendu face à une jury d'experts internationaux, venants de France, Italie et Belgique. La qualité du travail a été reconnue à l'unanimité par les membres du jury et également par la fondation ISAE-SUPAERO, qui m'attribué un des 5 prix de thèse 2021 (la vidéo de présentation de mon travail pour être visualisée à ce lien \url{https://www.youtube.com/watch?v=2nNE4LgIkzA}). \\
 	
-	Les travaux effectués dans le cadre de ma thèse ont donné lieu à 5 articles dans des revues scientifiques de haut niveau \citearticle{brugnoli2019ammmin,brugnoli2019ammkir,brugnoli2020msd,brugnoli2021ther,brugnoli2021num} (\textit{Applied Mathematical Modelling}, \textit{Multibody System Dynamics}, \textit{Journal of Thermal Stresses}). La portée du travail est démontrée par le fait que ces journaux touchent à des aspects différents de la modélisation mathématique en ingénierie. Dans le cadre de ma thèse, j'ai aussi effectué une  mobilité à l'ITA, Istitito Techn\'ologico de Aeron\'autica (São José dos Campos, Brésil). Ce séjour, qui à donné lieu à trois contributions dans des conférences internationales prestigieuses \citeconf{brugnoli2019cdc,cardoso2019cdc,brugnoli2020wc}, m'a énormément enrichi au niveau professionnel et humain; en particulier j'ai pu decouvrir les collaborations entre la compagnie aerienne Embraer \\
+	Les travaux effectués dans le cadre de ma thèse ont donné lieu à 5 articles dans des revues scientifiques de haut niveau \citearticle{brugnoli2019ammmin,brugnoli2019ammkir,brugnoli2020msd,brugnoli2021ther,brugnoli2021num} (\textit{Applied Mathematical Modelling}, \textit{Multibody System Dynamics}, \textit{Journal of Thermal Stresses}). La portée du travail est démontrée par le fait que ces journaux touchent à des aspects différents de la modélisation mathématique en ingénierie. Dans le cadre de ma thèse, j'ai aussi effectué une  mobilité à l'ITA, Istitito Techn\'ologico de Aeron\'autica (São José dos Campos, Brésil). Ce séjour, qui à donné lieu à trois contributions dans des conférences internationales prestigieuses \citeconf{brugnoli2019cdc,cardoso2019cdc,brugnoli2020wc}, m'a énormément enrichi au niveau professionnel et humain; en particulier j'ai pu découvrir les activités de recherche entre l'ITA et la compagnie aérienne Embraer, centrées sur la caractérisation des non-linéarité géométrique pour des avions expérimentaux très souples.  \\
 	
 	La dernière expérience que je souhaite mentionner a été mon déménagement aux Pays-Bas pour travailler au sein du projet Portwings. Cet ambitieux projet demande des compétences extrêmement diversifiées et chaque membre du groupe est en effet responsable d'une thématique spécifique. Ma mission est de mettre en place les algorithmes numériques pour la simulation du vol battu, qui représente un exemple extrêmement compliqué d'interaction fluide-structure. J'ai pu m'intégrer rapidement, en arrivant à instaurer une discussion scientifique très constructive avec des chercheurs ayant une formation différente de la mienne. Mon travail à déjà donné lieu à un article de revue soumis à un journal très réputé dans le domaine de la physique computationelle \citearticle{brugnoli2022df}. 
 	
@@ -375,7 +377,50 @@ Pour accomplir les objectifs des recrutements seront effectués :
 \includepdf[pages=1-]{./Letters/Lettre_Soutien_Lapeyre.pdf}
 
 
-	\section{Le code SCRIMP}\label{sec:SCRIMP}
+\section{Les systèmes port-Hamiltoniens}
+
+Dans cette annexe la théorie des systèmes port-Hamiltoniens est rapidement présentée. La discussion reprends l'introduction du livre \cite{van2014port}. \\
+
+La théorie des systèmes port-Hamiltoniens rassemble différentes traditions dans la modélisation et l'analyse des systèmes physiques. Premièrement, du point de vue de la modélisation, elle trouve son origine dans la modélisation basée sur les ports, lancée par Henry Paynter à la fin des années 50. Ce formalisme vise à fournir un cadre unifié pour la modélisation de systèmes appartenant à différents domaines physiques (mécanique, électrique, hydraulique, thermique, \dots). Ceci est réalisé en reconnaissant l'énergie comme \textit{lingua franca} entre les domaines physiques, et en identifiant composants système idéaux capturant les principales caractéristiques physiques (stockage d'énergie, dissipation d'énergie, routage d'énergie, etc.).  \\
+
+Une deuxième origine de la théorie des systèmes port-Hamiltoniens est la mécanique géométrique. Dans ce branche de la physique mathématique la formulation Hamiltonienne de la mécanique classique est formalisée de manière géométrique. Le paradigme de base
+de la mécanique géométrique est de représenter la dynamique Hamiltonienne dans un
+manière sans coordonnées en utilisant un espace d'état doté d'une structure symplectique ou de Poisson, ainsi que d'une fonction Hamiltonienne représentant l'énergie. Cette
+approche géométrique a conduit à une théorie élégante et puissante pour
+l'analyse du comportement dynamique des systèmes Hamiltoniens, affichant leurs caractéristiques intrinsèques, telles que les symétries et quantités conservées, de manière transparente. \\
+
+\begin{figure}
+	\begin{center}
+		\includegraphics[width=0.38\textwidth]{sketch_PH.eps}
+	\end{center}
+	\caption{Un système port-Hamiltonien est un système Hamiltonien sujet \`a l'interaction avec le monde extérieur.}
+	\label{fig:sketchPH}
+\end{figure}
+
+Enfin, un troisième pilier sous-jacent au cadre des systèmes port Hamiltoniens est la théorie des systèmes et du contrôle, o\'u les systèmes dynamiques sont décrits comme étant ouverts à l'interaction avec l'environnement (par exemple via des entrées et des sorties, cf. Fig. \ref{fig:sketchPH}) et comme étant susceptibles d'être contrôlées activement. \\
+
+Une différence principale entre la théorie des systèmes port-Hamiltoniens et la mécanique géométrique réside dans le fait que pour les premières la structure géométrique sous-jacente n'est pas nécessairement la structure symplectique de l'espace des phases, mais est en fait déterminée par la structure d'interconnexion du système.  En ce sens la théorie port-Hamiltonien des systèmes fusionne intrinsèquement la géométrie avec la théorie des réseaux, grace \`a la notion de structure de Dirac. Une propriété clé des structures de Dirac est le fait que la composition de structures de Dirac est à nouveau une structure de Dirac. Cela a pour conséquence cruciale que la conservation de l'énergie l'interconnexion des systèmes port-Hamiltoniens (par leur ports) est à nouveau un système port-Hamiltonien (cf. Fig. \ref{fig:intPH}). Une autre extension principale de la théorie des systèmes port-hamiltoniens par rapport à la mécanique géométrique est l'inclusion d'éléments dissipateurs d'énergie, qui sont largement absents dans les systèmes Hamiltoniens classiques. Cette élargit considérablement le domaine d'application des systèmes port-Hamiltoniens par rapport à celui des systèmes Hamiltoniens en dynamique analytique. \\
+
+La modélisation port-Hamiltonien apparaît comme une théorie générale pour la modélisation des systèmes physiques complexes rencontrés dans de nombreux domaines de l'ingénierie.
+
+
+	\begin{figure}[t]
+	\begin{subfigure}[t]{0.45\textwidth}
+		\includegraphics[width=\columnwidth]{sketch_PH_gyrator.eps} 
+		\caption{Gyrateur}
+		\label{fig:pHsys_gyr}
+	\end{subfigure}\hfill
+	\begin{subfigure}[t]{0.45\textwidth}
+		\includegraphics[width=\columnwidth]{sketch_PH_transformer.eps}%
+		\caption{Transformer}
+		\label{fig:pHsys_tran}
+	\end{subfigure}
+	\caption[]{Interconnexion des deux systèmes port-Hamiltonien: ces deux type d'interconnexion sont telles \`a préserver les échanges de puissance entre les deux systèmes.}%
+	\label{fig:intPH}%
+\end{figure}
+
+
+\section{Le code SCRIMP}\label{sec:SCRIMP}
 Le code SCRIMP (Simulation and ContRol of Interactions in Multi-Physics) est un projet Python pour l'approximation numérique d'équations aux dérivées partielles contrôlées a la frontière en utilisant le formalisme port-Hamiltonien. La principale motivation derrière le développement de SCRIMP était de fournir un cadre facile à utiliser pour la solution numérique de systèmes port-Hamiltoniens de dimension infinie à la fois à des fins de recherche et d'enseignement. Les approximations numériques avec des discrétisations sont gérées par le logiciel d'éléments finis FEniCS (\url{https://fenicsproject.org/}). Des applications à divers problèmes de modèles bi ou tridimensionnels basés sur des équations aux dérivées partielles paraboliques ou hyperboliques sont abordées. Plusieurs cahiers sont fournis pour démontrer l'utilisation de SCRIMP dans ce cadre \url{https://zenodo.org/record/4945329\#.YflFPVvMJH5}.
 	
 	\bibliographystyle{unsrt}
