@@ -8,17 +8,10 @@ from numpy import ndarray
 os.environ["OMP_NUM_THREADS"] = "1"
 
 # import numpy as np
-from firedrake import *
+from fenics import *
 import matplotlib.pyplot as plt
 from tools_plotting import setup
 
-from firedrake.petsc import PETSc
-try:
-    from slepc4py import SLEPc
-except ImportError:
-    import sys
-    warning("Unable to import SLEPc, eigenvalue computation not possible (try firedrake-update --slepc)")
-    sys.exit(0)
 
 save_plots = input("Save plots? ")
 
@@ -36,16 +29,47 @@ def compute_eig(n_el, n_eig, deg=1):
 
     Lx = pi
     Ly = pi
-    mesh = RectangleMesh(n_el, n_el, Lx, Ly, quadrilateral=False)
+    mesh = RectangleMesh(Point(0, 0), Point(Lx, Ly), n_el, n_el)
     n_ver = FacetNormal(mesh)
+
+    class Left(SubDomain):
+        def inside(self, x, on_boundary):
+            return abs(x[0] - 0.0) < DOLFIN_EPS and on_boundary
+
+    class Right(SubDomain):
+        def inside(self, x, on_boundary):
+            return abs(x[0] - Lx) < DOLFIN_EPS and on_boundary
+
+    class Lower(SubDomain):
+        def inside(self, x, on_boundary):
+            return abs(x[1] - 0.0) < DOLFIN_EPS and on_boundary
+
+    class Upper(SubDomain):
+        def inside(self, x, on_boundary):
+            return abs(x[1] - Ly) < DOLFIN_EPS and on_boundary
+
+    # Boundary conditions on rotations
+    left = Left()
+    right = Right()
+    lower = Lower()
+    upper = Upper()
+
+    boundaries = MeshFunction("size_t", mesh, mesh.topology().dim() - 1)
+    boundaries.set_all(5)
+    left.mark(boundaries, 1)
+    right.mark(boundaries, 2)
+    lower.mark(boundaries, 3)
+    upper.mark(boundaries, 4)
+
+
+    # Finite element defition
 
     P_1 = FiniteElement("CG", triangle, deg)
     P_2 = FiniteElement("RT", triangle, deg, variant='integral')
 
-    V_1 = FunctionSpace(mesh, P_1)
-    V_2 = FunctionSpace(mesh, P_2)
+    element = MixedElement([P_1, P_2])
+    V = FunctionSpace(mesh, element)
 
-    V = V_1 * V_2
 
     v = TestFunction(V)
     v_1, v_2 = split(v)
@@ -55,8 +79,6 @@ def compute_eig(n_el, n_eig, deg=1):
 
     dx = Measure('dx')
     ds = Measure('ds')
-
-    x, y = SpatialCoordinate(mesh)
 
     ## Exact eigenvalues
 
@@ -79,99 +101,84 @@ def compute_eig(n_el, n_eig, deg=1):
 
     m_form = inner(v_1, e_1) * dx + inner(v_2, e_2) * dx
 
-    J_weak = assemble(j_form, mat_type='aij')
-    M_weak = assemble(m_form, mat_type='aij')
-    petsc_j_wk = J_weak.M.handle
-    petsc_m_wk = M_weak.M.handle
 
-    bc1 = DirichletBC(V.sub(0), Constant(0.0), 1)
-    bc2 = DirichletBC(V.sub(0), Constant(0.0), 2)
+    J_weak = PETScMatrix()
+    assemble(j_form, tensor=J_weak)
+
+    M_weak = PETScMatrix()
+    assemble(m_form, tensor=M_weak)
+
+    bc1 = DirichletBC(V.sub(0), Constant(0.0), left)
+    bc2 = DirichletBC(V.sub(0), Constant(0.0), right)
 
     bcs = [bc1, bc2]
 
-    J_strong = assemble(j_form, bcs=bcs, mat_type='aij')
-    M_strong = assemble(m_form, mat_type='aij')
-    petsc_m_st = M_strong.M.handle
-    petsc_j_st = J_strong.M.handle
+    j_form_st = dot(v_2, grad(e_1)) * dx - dot(grad(v_1), e_2) * dx
+
+    l_form = Constant(1.) * v_1 * dx
+    J_strong = PETScMatrix()
+
+    assemble_system(j_form_st, l_form, bcs, A_tensor=J_strong)
+
+    M_strong = PETScMatrix()
+    assemble_system(m_form, l_form, bcs, A_tensor=M_strong)
+    [bc.zero(M_strong) for bc in bcs]
 
     num_eigenvalues = 2*n_eig**2
 
     tol = 1e-11
-    target = 1
-    opts = PETSc.Options()
-    opts.setValue("pos_gen_non_hermitian", None)
-    # opts.setValue("pos_gen_hermitian", True)
+    tol_zero = 1e-12
+    solver_wk = SLEPcEigenSolver(J_weak, M_weak)
+    solver_wk.parameters["solver"] = "krylov-schur"
+    solver_wk.parameters["problem_type"] = "pos_gen_non_hermitian"
+    solver_wk.parameters['spectral_transform'] = 'shift-and-invert'
+    solver_wk.parameters["spectrum"] = "target imaginary"
+    solver_wk.parameters['spectral_shift'] = 1.
 
-    opts.setValue("st_pc_factor_shift_type", "NONZERO")
-    opts.setValue("eps_type", "krylovschur")
-    opts.setValue("eps_tol", tol)
-    opts.setValue("st_type", "sinvert")
-    # opts.setValue("eps_target_imaginary", None)
-    opts.setValue("st_shift", target)
-    opts.setValue("eps_target", target)
+    solver_wk.solve(num_eigenvalues)
+    nconv_wk = solver_wk.get_number_converged()
 
-    es = SLEPc.EPS().create(comm=COMM_WORLD)
-    es.setFromOptions()
-    es.setDimensions(num_eigenvalues)
-    # st = es.getST()
-    # st.setShift(0)
-    # st.setType("sinvert")
-    # es.setST(st)
-    # es.setWhichEigenpairs(1)
-
-    tol_zero = 1e-16
-    ## Compute numerical eigenvalues weak
-    es.setOperators(petsc_j_wk, petsc_m_wk)
-    es.solve()
-
-    nconv_wk = es.getConverged()
-    if nconv_wk == 0:
-        import sys
-        warning("Did not converge any eigenvalues (weak)")
-        sys.exit(0)
 
     omega_num_pos_wk = []
     omega_num_zero_wk = []
-    vr_wk, vi_wk = petsc_j_wk.getVecs()
     for i in range(nconv_wk):
-        om_i_wk = es.getEigenpair(i, vr_wk, vi_wk)
+        lam_r, lam_i, psi_r, psi_i = solver_wk.get_eigenpair(i)
 
-        imag_om_i_wk = np.imag(om_i_wk)
 
-        if imag_om_i_wk>tol:
-            omega_num_pos_wk.append(imag_om_i_wk)
-        elif np.abs(imag_om_i_wk)<tol_zero:
-            omega_num_zero_wk.append(imag_om_i_wk)
+        if lam_i>tol:
+            omega_num_pos_wk.append(lam_i)
+        elif np.abs(lam_i)<tol_zero:
+            omega_num_zero_wk.append(lam_i)
 
     omega_num_pos_wk.sort()
 
     ## Compute numerical eigenvalues strong
-    es.setOperators(petsc_j_st, petsc_m_st)
-    es.solve()
 
-    nconv_st = es.getConverged()
-    if nconv_st == 0:
-        import sys
-        warning("Did not converge any eigenvalues (strong)")
-        sys.exit(0)
+    solver_st = SLEPcEigenSolver(J_strong, M_strong)
+    solver_st.parameters["solver"] = "krylov-schur"
+    solver_st.parameters["problem_type"] = "pos_gen_non_hermitian"
+    solver_st.parameters['spectral_transform'] = 'shift-and-invert'
+    solver_st.parameters["spectrum"] = "target imaginary"
+    solver_st.parameters['spectral_shift'] = 1.
+
+    solver_st.solve(num_eigenvalues)
+    nconv_st = solver_st.get_number_converged()
 
     omega_num_pos_st = []
     omega_num_zero_st = []
-    vr_st, vi_st = petsc_j_st.getVecs()
     for i in range(nconv_st):
-        om_i_st = es.getEigenpair(i, vr_st, vi_st)
+        lam_r, lam_i, psi_r, psi_i = solver_st.get_eigenpair(i)
 
-        imag_om_i_st = np.imag(om_i_st)
 
-        if imag_om_i_st > tol:
-            omega_num_pos_st.append(imag_om_i_st)
-        elif np.abs(imag_om_i_st)<tol_zero:
-            omega_num_zero_st.append(imag_om_i_st)
+        if lam_i > tol:
+            omega_num_pos_st.append(lam_i)
+        elif np.abs(lam_i)<tol_zero:
+            omega_num_zero_st.append(lam_i)
 
     omega_num_pos_st.sort()
 
-    print("First 5 eigenvalues strong")
-    print(omega_num_pos_st[:5])
+    print("First 5 eigenvalues weak")
+    print(omega_num_pos_wk[:20])
 
     return omega_num_pos_wk, omega_num_zero_wk, omega_num_pos_st, omega_num_zero_st, omega_ex_vec
 
@@ -222,7 +229,7 @@ plt.legend()
 path_fig="/home/andrea/Pictures/PythonPlots/MTNS22/"
 
 if save_plots:
-    plt.savefig(path_fig + "Eigs_weak.pdf", format="pdf")
+    plt.savefig(path_fig + "Eigs_weak_fenics.pdf", format="pdf")
 
 plt.figure()
 
@@ -238,6 +245,6 @@ plt.title(r'Eigenvalues (strong bcs)')
 plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "Eigs_strong.pdf", format="pdf")
+    plt.savefig(path_fig + "Eigs_strong_fenics.pdf", format="pdf")
 
 plt.show()

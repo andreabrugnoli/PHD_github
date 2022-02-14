@@ -132,7 +132,7 @@ upper = Upper()
 
 boundaries = MeshFunction("size_t", mesh, mesh.topology().dim() - 1)
 boundaries.set_all(0)
-right.mark(boundaries, 1)
+left.mark(boundaries, 1)
 upper.mark(boundaries, 2)
 right.mark(boundaries, 3)
 lower.mark(boundaries, 4)
