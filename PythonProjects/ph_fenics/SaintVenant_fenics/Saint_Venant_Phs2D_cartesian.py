@@ -33,7 +33,7 @@ from scipy import linalg as la
 from math import ceil, floor
 
 n = 20
-deg_p = 0
+deg_p = 1
 deg_q = 1
 
 g = 10
@@ -80,7 +80,8 @@ dx = Measure('dx')
 
 # Finite element defition
 
-P_p = VectorElement('DG', mesh.ufl_cell(), deg_p)
+# P_p = VectorElement('DG', mesh.ufl_cell(), deg_p)
+P_p = FiniteElement('N1curl', mesh.ufl_cell(), deg_p)
 P_q = FiniteElement('CG', mesh.ufl_cell(), deg_q)
 
 Vp = FunctionSpace(mesh, P_p)

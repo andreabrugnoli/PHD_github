@@ -11,11 +11,14 @@ os.environ["OMP_NUM_THREADS"] = "1"
 from fenics import *
 import matplotlib.pyplot as plt
 from tools_plotting import setup
+from scipy.sparse import csr_matrix
+from scipy.sparse import lil_matrix
+from scipy.sparse.linalg import eigs
 
 
 save_plots = input("Save plots? ")
 
-def compute_eig(n_el, n_eig, deg=1):
+def compute_eig(n_el, n_eig, deg=1, solver="SLEPc"):
     """Compute the numerical solution of the wave equation with the dual field method
 
         Parameters:
@@ -55,7 +58,7 @@ def compute_eig(n_el, n_eig, deg=1):
     upper = Upper()
 
     boundaries = MeshFunction("size_t", mesh, mesh.topology().dim() - 1)
-    boundaries.set_all(5)
+    boundaries.set_all(0)
     left.mark(boundaries, 1)
     right.mark(boundaries, 2)
     lower.mark(boundaries, 3)
@@ -78,7 +81,7 @@ def compute_eig(n_el, n_eig, deg=1):
     e_1, e_2 = split(e)
 
     dx = Measure('dx')
-    ds = Measure('ds')
+    ds = Measure('ds', subdomain_data=boundaries)
 
     ## Exact eigenvalues
 
@@ -98,9 +101,7 @@ def compute_eig(n_el, n_eig, deg=1):
     j_form = dot(v_2, grad(e_1)) * dx - dot(grad(v_1), e_2) * dx \
             + v_1 * dot(e_2, n_ver) * ds(1) + v_1 * dot(e_2, n_ver) * ds(2) \
             - e_1 * dot(v_2, n_ver) * ds(1) - e_1 * dot(v_2, n_ver) * ds(2)
-
     m_form = inner(v_1, e_1) * dx + inner(v_2, e_2) * dx
-
 
     J_weak = PETScMatrix()
     assemble(j_form, tensor=J_weak)
@@ -117,7 +118,6 @@ def compute_eig(n_el, n_eig, deg=1):
 
     l_form = Constant(1.) * v_1 * dx
     J_strong = PETScMatrix()
-
     assemble_system(j_form_st, l_form, bcs, A_tensor=J_strong)
 
     M_strong = PETScMatrix()
@@ -126,72 +126,94 @@ def compute_eig(n_el, n_eig, deg=1):
 
     num_eigenvalues = 2*n_eig**2
 
-    tol = 1e-11
-    tol_zero = 1e-12
-    solver_wk = SLEPcEigenSolver(J_weak, M_weak)
-    solver_wk.parameters["solver"] = "krylov-schur"
-    solver_wk.parameters["problem_type"] = "pos_gen_non_hermitian"
-    solver_wk.parameters['spectral_transform'] = 'shift-and-invert'
-    solver_wk.parameters["spectrum"] = "target imaginary"
-    solver_wk.parameters['spectral_shift'] = 1.
+    if solver=="SLEPc":
+        ## Compute numerical eigenvalues weak
+        omega_num_pos_wk, omega_num_zero_wk = compute_eigs_SLEPc(J_weak, M_weak, num_eigenvalues)
+        ## Compute numerical eigenvalues strong
+        omega_num_pos_st, omega_num_zero_st = compute_eigs_SLEPc(J_strong, M_strong, num_eigenvalues)
 
-    solver_wk.solve(num_eigenvalues)
-    nconv_wk = solver_wk.get_number_converged()
-
-
-    omega_num_pos_wk = []
-    omega_num_zero_wk = []
-    for i in range(nconv_wk):
-        lam_r, lam_i, psi_r, psi_i = solver_wk.get_eigenpair(i)
-
-
-        if lam_i>tol:
-            omega_num_pos_wk.append(lam_i)
-        elif np.abs(lam_i)<tol_zero:
-            omega_num_zero_wk.append(lam_i)
-
-    omega_num_pos_wk.sort()
-
-    ## Compute numerical eigenvalues strong
-
-    solver_st = SLEPcEigenSolver(J_strong, M_strong)
-    solver_st.parameters["solver"] = "krylov-schur"
-    solver_st.parameters["problem_type"] = "pos_gen_non_hermitian"
-    solver_st.parameters['spectral_transform'] = 'shift-and-invert'
-    solver_st.parameters["spectrum"] = "target imaginary"
-    solver_st.parameters['spectral_shift'] = 1.
-
-    solver_st.solve(num_eigenvalues)
-    nconv_st = solver_st.get_number_converged()
-
-    omega_num_pos_st = []
-    omega_num_zero_st = []
-    for i in range(nconv_st):
-        lam_r, lam_i, psi_r, psi_i = solver_st.get_eigenpair(i)
-
-
-        if lam_i > tol:
-            omega_num_pos_st.append(lam_i)
-        elif np.abs(lam_i)<tol_zero:
-            omega_num_zero_st.append(lam_i)
-
-    omega_num_pos_st.sort()
+    else:
+        ## Compute numerical eigenvalues weak
+        omega_num_pos_wk, omega_num_zero_wk = compute_eigs_Scipy(J_weak, M_weak, num_eigenvalues)
+        ## Compute numerical eigenvalues strong
+        omega_num_pos_st, omega_num_zero_st = compute_eigs_Scipy(J_strong, M_strong, num_eigenvalues)
 
     print("First 5 eigenvalues weak")
     print(omega_num_pos_wk[:20])
 
+    print("First 5 eigenvalues strong")
+    print(omega_num_pos_st[:20])
+
     return omega_num_pos_wk, omega_num_zero_wk, omega_num_pos_st, omega_num_zero_st, omega_ex_vec
+
+def compute_eigs_SLEPc(J, M, n_eig_solver=20, tol_zero=1e-12):
+    solver = SLEPcEigenSolver(J, M)
+    solver.parameters["solver"] = "krylov-schur"
+    solver.parameters["problem_type"] = "pos_gen_non_hermitian"
+    solver.parameters['spectral_transform'] = 'shift-and-invert'
+    solver.parameters["spectrum"] = "target imaginary"
+    solver.parameters['spectral_shift'] = 1.
+
+    solver.solve(n_eig_solver)
+    nconv = solver.get_number_converged()
+
+    omega_num_pos = []
+    omega_num_zero = []
+    for i in range(nconv):
+        lam_r, lam_i, psi_r, psi_i = solver.get_eigenpair(i)
+
+        if lam_i > tol_zero:
+            omega_num_pos.append(lam_i)
+        elif np.abs(lam_i) < tol_zero:
+            omega_num_zero.append(lam_i)
+
+    omega_num_pos.sort()
+
+    return omega_num_pos, omega_num_zero
+
+
+def compute_eigs_Scipy(J, M, n_eig_scipy=20, tol=1e-6, tol_zero=1e-12):
+    J_scipy = csr_matrix(J.mat().getValuesCSR()[::-1])  # for fenics J.mat()
+    M_scipy = csr_matrix(M.mat().getValuesCSR()[::-1])  # for fenics M.mat()
+   # Shift value
+    shift = 1
+
+
+
+    if n_eig_scipy>=(M_scipy.shape[0]-1):
+        k_scipy = M_scipy.shape[0]-2
+    else: k_scipy=n_eig_scipy
+    # Resolution of the eigenproblem
+
+    eigenvalues, eigvectors = eigs(J_scipy, k=k_scipy, M=M_scipy, \
+                                   sigma=shift, which='LM', tol=tol)
+
+    omega_num_pos = []
+    omega_num_zero = []
+    for i in range(len(eigenvalues)):
+
+        lam_i = np.imag(eigenvalues[i])
+        if lam_i > tol_zero:
+            omega_num_pos.append(lam_i)
+        elif np.abs(lam_i) < tol_zero:
+            omega_num_zero.append(lam_i)
+
+    omega_num_pos.sort()
+
+    return omega_num_pos, omega_num_zero
 
 n_elem = 5
 n_eig = 50
 n_eigs_plot = 50
 
 num_eigs_pos_wk_deg1, num_eigs_zero_wk_deg1, num_eigs_pos_st_deg1, num_eigs_zero_st_deg1, ex_eigs = compute_eig(n_elem, n_eig, 1)
+# num_eigs_pos_wk_deg1, num_eigs_zero_wk_deg1, num_eigs_pos_st_deg1, num_eigs_zero_st_deg1, ex_eigs = compute_eig(n_elem, n_eig, 1, solver="Scipy")
 print("Degree 1 completed")
 num_eigs_pos_wk_deg2, num_eigs_zero_wk_deg2, num_eigs_pos_st_deg2, num_eigs_zero_st_deg2, ex_eigs = compute_eig(n_elem, n_eig, 2)
+# num_eigs_pos_wk_deg2, num_eigs_zero_wk_deg2, num_eigs_pos_st_deg2, num_eigs_zero_st_deg2, ex_eigs = compute_eig(n_elem, n_eig, 2, solver="Scipy")
 print("Degree 2 completed")
 num_eigs_pos_wk_deg3, num_eigs_zero_wk_deg3, num_eigs_pos_st_deg3, num_eigs_zero_st_deg3, ex_eigs = compute_eig(n_elem, n_eig, 3)
-print("Degree 3 completed")
+# print("Degree 3 completed")
 num_eigs_pos_wk_deg4, num_eigs_zero_wk_deg4, num_eigs_pos_st_deg4, num_eigs_zero_st_deg4, ex_eigs = compute_eig(n_elem, n_eig, 4)
 print("Degree 4 completed")
 # num_eigs_pos_wk_deg5, num_eigs_zero_wk_deg5, num_eigs_pos_st_deg5, num_eigs_zero_st_deg5, ex_eigs = compute_eig(n_elem, n_eig, 5)

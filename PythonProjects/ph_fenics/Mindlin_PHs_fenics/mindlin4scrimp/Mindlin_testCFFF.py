@@ -48,7 +48,7 @@ eps = '0'
 Mindlin_test.Set_Damping(damp=['internal'], eps=eps)
 
 ### Final time 
-tf = 0.001
+tf = 0.01
 Mindlin_test.Set_Initial_Final_Time(initial_time=0, final_time=tf)
 #%%
 
@@ -56,7 +56,7 @@ Mindlin_test.Set_Initial_Final_Time(initial_time=0, final_time=tf)
 #%% Space discretization
 ### Mesh
 #Mindlin_test.Set_Gmsh_Mesh('rectangle.xml', rfn_num=1)
-Mindlin_test.Generate_Mesh(5, structured_mesh=True)
+Mindlin_test.Generate_Mesh(10, structured_mesh=True)
 
 
 ### Finite elements spaces

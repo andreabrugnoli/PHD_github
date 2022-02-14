@@ -20,8 +20,8 @@ from scipy.sparse.linalg import factorized, spsolve, eigs
 from scipy.sparse import issparse
 from scikits import umfpack
 
-from assimulo.problem import Explicit_Problem, Implicit_Problem
-from assimulo.solvers.sundials import IDA, CVode 
+#from assimulo.problem import Explicit_Problem, Implicit_Problem
+#from assimulo.solvers.sundials import IDA, CVode
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
