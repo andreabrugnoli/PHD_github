@@ -1,0 +1,77 @@
+\documentclass[a4paper, 10pt]{article}
+\usepackage[top=1.5in, bottom=1.5in, left=1.5in, right=1.5in]{geometry}
+\usepackage{diffcoeff}
+\usepackage{filecontents}
+
+\usepackage{amsmath,amssymb}
+\usepackage{dsfont}
+\usepackage{bm}
+\usepackage{mathrsfs}
+\usepackage{amsthm}
+
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\bbF}{\mathbb{F}}
+\newcommand{\bbA}{\mathbb{A}}
+\newcommand{\bbB}{\mathbb{B}}
+\newcommand{\bbS}{\mathbb{S}}
+
+\title{Review to paper NMCM-2022-0010\\
+\textit{Explicit port-Hamiltonian FEM models for geometrically non linear mechanical systems}}
+
+\date{}
+
+\begin{document}
+	\maketitle
+	
+	The authors present an original port-Hamiltonian formulation for geometrical non-linear hyperelastic continua. The model is entirely formulated in the reference configuration by using the Green (or Lagrangian) Strain tensor and the second Piola-Kirchhoff stress tensor.  The constitutive equations are expressed using the Saint-Venant Kirchhoff law, that relates linearly the strain and stress tensors.  An explicit, i.e. without algebraic constrains, finite-dimensional model is obtained by using a mixed finite element formulation together with a weak imposition of the boundary conditions. \\
+	
+	The paper is well written, well motivated and perfectly fits into the scope of the journal. The results are original and of great interest for mechanical engineers interested in system based modeling techniques. This article undoubtedly represents a valuable contribution for \textit{Mathematical and Computer Modelling of Dynamical Systems}. \\
+	
+	I have a few minor remarks that could improve the overall quality of the manuscript.
+	
+	
+	\section{Minor remarks}
+	
+	\begin{itemize}
+	\item Page 2, at line 14, the phrase\\
+		\textit{Due to the fact that only geometrically nonlinear systems are considered, ...} \\
+		is a bit unclear to me. I would reformulate it as: \\
+		\textit{Due to the fact that only geometrical nonlinearities are considered, ...}.
+		\item Page 2, at line 20 the phrase\\
+		\textit{In this article, PH modeling of general three-dimensional geometrically non-linear continua is  treated, where, unlike in [13], Lagrange multipliers can additionally be omitted to satisfy different boundary conditions.}\\
+		is really confusing to me. I guess you meant that the formulation does not rely on Lagrange multipliers. Please reformulate.
+		\item Page 2, line 47: it is important to state that the material points $X$ and the spatial position $x$ are computed using the same reference frame, as illustrated in Fig. 1.
+		\item  Page 3, Eq. 4: it could be helpful to write $E$ (that is also called the Lagrangian strain tensor) in terms of the displacement field $u$
+		\begin{equation}
+			E =\frac{1}{2} \left[ \left(\diffp{u}{X}\right)^\top + \left(\diffp{u}{X}\right) + \left(\diffp{u}{X}\right)^\top \cdot \left(\diffp{u}{X}\right) \right].
+		\end{equation}
+		In this way the remark concerning the linearization is immediately evident.
+		\item Page 4, line 17: it would be nice to cite a reference for the equation of translational equilibrium .
+		\item Page 5, line 32: as you stated tensor $C$ is a fourth order tensor. As such it can be thought as a linear bounded operator from symmetric second order tensor to symmetric second order tensors, i.e.
+		$C \in \mathcal{L}(\bbR^{3 \times 3}_{\text{sym}}) = \bbR^{3 \times 3 \times 3 \times 3}$.
+		\item Page 6, line 6, the phrase\\
+		\textit{By applying the variational
+			derivatives, which, for the Hamiltonian without spatial derivatives, are simply the
+			partial derivatives of the Hamiltonian density} \\
+		is really not precise. I would rephrase as \\
+		\textit{Since the Hamiltonian does not depend on spatial derivatives of the fields, its variational derivative coincide with the partial derivatives of the associated density}.
+		\item Page 11, Eqs from  36 to 40: the initial condition for $F \cdot S$ is not compatible with its boundary condition:
+		\begin{equation*}
+			F(X, 0) \cdot S(X, 0) = 0,
+		\end{equation*}	
+	whereas
+	\begin{equation*}
+	 F(X=L, t) \cdot S(X=L, t) = \overline{\tau}_0
+	\end{equation*}
+	with
+	\begin{equation*}
+		F(X=L, 0) \cdot S(X=L, 0) = 100 \mathrm{N}
+	\end{equation*}
+	The non compatibility of the two is critical in the case of differential algebraic systems. I suggest to rerun the first simulation with compatible initial and boundary conditions.
+	\item Page 19, Appendix B: the Voigt notation is here introduced. It is worth mentioning that the conversion from symmetric tensors to vectors has to be performed in such a way that the inner product is preserved. For this reason the strain vector contains twice the off-diagonal terms.
+	\item Page 19, Eq. B5: it should be $\underline{F} \in \bbR^9$.
+	\item Page 20, Eq. E4: it should be $\underline{N} \in \bbR^3$.
+	\item Check the bibliography carefully. For example for references [9], [10] the journal information is missing.
+	\end{itemize}
+	
+\end{document}
