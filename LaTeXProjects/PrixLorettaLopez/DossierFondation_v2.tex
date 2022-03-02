@@ -122,12 +122,14 @@ breaklinks=false,pdfborder={0 0 0},backref=false,colorlinks=true,urlcolor=magent
 	\paragraph{\large Un formalisme unificateur pour la modélisation des systèmes dynamiques\\}
 	Un formalisme mathématique très prometteur pour traiter les problèmes multiphysiques est le formalisme port-Hamiltonien \cite{vanderSchaft2002}, basé sur la mécanique Hamiltonienne et les graphes de liaisons pour la modélisation des systèmes dynamiques (cf. l'annexe \ref{sec:pHreview} pour plus de détails sur cette théorie). Au c\oe{}ur de ce formalisme, il y a l'idée que tout système physique peut être décrit d'une manière modulaire, c'est-à-dire à partir des ses composantes simples, interagissant entre elles et avec le milieu environnant à travers des portes. Les portes d'interaction contiennent l'information relative au flux d'énergie entre les différents composants et entre différents domaines physiques: mécanique, électromagnétisme ou dynamique des fluides. La conception modulaire est centrale dans l'ingénierie, car le design de tout système technologique est fait à partir des éléments simples qui sont assemblés pour donner lieu à la complexité qui nous entoure. Prenez par exemple un avion, un hélicoptère, un satellite (cf. Fig. \ref{fig:satellite}) : pour pouvoir optimiser leur design il est indispensable de disposer d'un outil de modélisation capable de décomposer la complexité de manière à retrouver les différents composants clés. 
 	
-	\begin{figure}[hb]
+	\begin{figure}[h!b]
 		\centering
 		\includegraphics[width=.55\textwidth]{satellite.pdf}
 		\caption{Schéma modulaire représentant un satellite de télécommunication.}
 		\label{fig:satellite}
 	\end{figure}
+	
+	\vspace{.5cm}
 	
 	Le fait d'utiliser un outil de modélisation unifié représente une nouveauté essentielle de ce projet. Cela pourra permettre la création d'une infrastructure commune pour les outils numériques à la base de la digitalisation, afin de faciliter son adoption dans l'industrie.
 	
@@ -160,7 +162,9 @@ breaklinks=false,pdfborder={0 0 0},backref=false,colorlinks=true,urlcolor=magent
 
 \subsection{Verrous scientifiques et lots de travaux pour les adresser}
 \textbf{Le premier défi} est lié \`a la résolution des systèmes couplés multiphysiques.  Dans l'industrie des méthodes différentes sont habituellement utilisées pour simuler des physiques distinctes. Par conséquent, il est souvent nécessaire d'integrer différents solveurs et logiciels pour pouvoir simuler ces problèmes. Cela amène \`a une complexification des procédures industriels. Par ailleurs, le couplage numérique ne représente pas correctement les flux d’énergie. \\
-Le premier lot des travaux (\textbf{WP1}) cherche donc à résoudre les problématiques liées au couplage multiphysique, d'une manière \`a garantir le respect des flux d'energie entre différentes physiques (mécanique et dynamique des fluides). Ces modèles numériques devront retenir les propriétés physiques du problème (conservation d’énergie globale, traçage des échanges d’énergie entre les différents sous-systèmes, invariants du problème). \\
+Le premier lot des travaux (\textbf{WP1}) cherche donc à résoudre les problématiques liées au couplage multiphysique, d'une manière \`a garantir le respect des flux d'energie entre différentes physiques (mécanique et dynamique des fluides).
+\newline\newline
+ Ces modèles numériques devront retenir les propriétés physiques du problème (conservation d’énergie globale, traçage des échanges d’énergie entre les différents sous-systèmes, invariants du problème). \\
 
 \begin{itemize}
 	\item \textbf{WP1} : Développement d'algorithmes numériques haute-fidélité pour des problèmes d'interactions fluide-structures, basés sur les élément finis en calcul extérieur et le formalisme port-Hamiltonien. \\
@@ -214,9 +218,7 @@ La résolution de ces trois macro-tâches permettra de mieux comprendre le compr
 	\paragraph[\large WP2 : réduction de modèles garantissant le respect de la structure physique\\
 	Responsables: Andrea Brugnoli et Doctorant 2, co-encadré par Charles Poussot-Vassal (ONERA)]{\large WP2 : réduction de modèles garantissant le respect de la structure physique\\
 		Responsables: Andrea Brugnoli et Doctorant 2, co-encadré par Charles Poussot-Vassal (ONERA)\\}
-	La méthode POD (équivalente \`a l'analyse en composantes principales ou PCA en statistique) représente une méthode de régression linéaire et peut également être implémentée via un réseau de neurones profond linéaire. Il est donc naturel d'analyse le comportement lorsque un réseau de neurones non-linéaire est utilisé pour cette tache. C'est exactement ce qui \`a été proposé dans \cite{lee2020}, avec des résultats probants en terme de qualité du modèle obtenu. Dans ce deuxième lot des travaux, la même idée sera explorée mais en gardant l'impératif de la préservation de la structure physique du problème.
-	\newline\newline
-	Par structure physique, on entend la présence des lois de conservation (associés à un opérateur antisymétrique) et des effets dissipatifs, et les variables qui définissent l'interconnexion entre le fluide et le solide. Conserver la structure physique de la simulation haute fidélité dans la représentation réduite permettra d'intégrer des outils d'intelligence artificielle d'une façon interprétable. Par exemple, des réseaux de neurones peuvent être utilisés pour représenter l'énergie (i.e une fonction entre la dimension de l'état et un scalaire positif), ou l'opérateur associé à la conservation d'énergie, ou bien à sa dissipation. L'apprentissage automatique nécessite l'utilisation d'une base de données. Les données générées dans le \textbf{WP1}, représentées par les résultats des simulations des modèles haute fidélité (appelés \textit{snapshots} en anglais), seront donc utilisés pour entraîner les réseaux de neurones à obtenir des modèles réduits en minimisant certaines métriques. 
+	La méthode POD (équivalente \`a l'analyse en composantes principales ou PCA en statistique) représente une méthode de régression linéaire et peut également être implémentée via un réseau de neurones profond linéaire. Il est donc naturel d'analyse le comportement lorsque un réseau de neurones non-linéaire est utilisé pour cette tache. C'est exactement ce qui \`a été proposé dans \cite{lee2020}, avec des résultats probants en terme de qualité du modèle obtenu. Dans ce deuxième lot des travaux, la même idée sera explorée mais en gardant l'impératif de la préservation de la structure physique du problème. Par structure physique, on entend la présence des lois de conservation (associés à un opérateur antisymétrique) et des effets dissipatifs, et les variables qui définissent l'interconnexion entre le fluide et le solide. Conserver la structure physique de la simulation haute fidélité dans la représentation réduite permettra d'intégrer des outils d'intelligence artificielle d'une façon interprétable. Par exemple, des réseaux de neurones peuvent être utilisés pour représenter l'énergie (i.e une fonction entre la dimension de l'état et un scalaire positif), ou l'opérateur associé à la conservation d'énergie, ou bien à sa dissipation. L'apprentissage automatique nécessite l'utilisation d'une base de données. Les données générées dans le \textbf{WP1}, représentées par les résultats des simulations des modèles haute fidélité (appelés \textit{snapshots} en anglais), seront donc utilisés pour entraîner les réseaux de neurones à obtenir des modèles réduits en minimisant certaines métriques. 
 	Pour ce qui concerne la deuxième macro-tâche, il sera possible de mettre en place des collaborations avec Volker Mehrmann (TU Berlin) et George Haller (ETH Zurich).
 	
 	
@@ -249,9 +251,7 @@ La résolution de ces trois macro-tâches permettra de mieux comprendre le compr
 	\begin{itemize}
 		\item L'optimisation structurelle des composants mécaniques en aéronautique, pour augmenter les performances aérodynamiques (minimisation de la traînée et donc de la consommation du carburant, cf. Fig. \ref{fig:wing}); 
 		\item Co-design de la partie structurelle et du contrôleur embarqué. Cette méthodologie consiste à optimiser la performance du contrôleur (qui cherche par exemple à limiter les vibrations), en même temps que les caractéristiques structurelles du véhicule (par exemple la masse ou la rigidité). Ce type d'optimisation est souvent utilisé pour les satellites (cf. Fig. \ref{fig:codesign_sat}).
-		\item Contrôle optimal pour suivi de trajectoire. Ce type de problématiques apparaît fréquemment en robotique.
-		\newline
-		Les chercheurs s'intéressent de plus en plus à la \textit{soft robotics}\footnote{\url{https://en.wikipedia.org/wiki/Soft_robotics}}, domaine dans lequel la flexibilité des composants ne peut pas être négligée (cf. Fig. \ref{fig:sofi-mit}).
+		\item Contrôle optimal pour suivi de trajectoire. Ce type de problématiques apparaît fréquemment en robotique. Les chercheurs s'intéressent de plus en plus à la \textit{soft robotics}\footnote{\url{https://en.wikipedia.org/wiki/Soft_robotics}}, domaine dans lequel la flexibilité des composants ne peut pas être négligée (cf. Fig. \ref{fig:sofi-mit}).
 	\end{itemize}
 	
 	
@@ -455,11 +455,11 @@ Pour accomplir les objectifs, des recrutements seront effectués :
 		\item Charles Poussot-Vassal, chercheur à l'ONERA, est un expert dans la réduction des modèles pour l'analyse et le contrôle des système dynamiques, en particulier pour l'industrie aéronautique et automobile.
 	\end{itemize}
 
+\includepdf[pages=1-]{./Letters/LettreAIRBUS_Signed.pdf}
 \includepdf[pages=1-]{./Letters/LetterCERFACS-MORPHEUS.pdf}
 \includepdf[pages=1-]{./Letters/Lettre_Soutien_Lapeyre.pdf}
-\includepdf[pages=1-]{./Letters/LettreAIRBUS_Signed.pdf}
 \includepdf[pages=1-]{./Letters/Letter_Stramigioli.pdf}
-
+\includepdf[pages=1-]{./Letters/LettrePussot.pdf}
 
 
 
