@@ -181,8 +181,7 @@ Le deuxième lot de travail (\textbf{WP2}) a donc comme but la génération des 
 
 Ce lot de travail consentira d'obtenir des modèles de petite dimension, prêts à être utilisés pour la partie optimisation.\\ 
 
-L'optimisation et les études paramétriques sont typiquement effectuées sur les
-modèles de substitution en industrie, car optimiser directement les modèles fins entraîne des coûts computationels absolument prohibitifs. Il est très difficile de savoir \`a l'avance quelle méthode utiliser pour générer un modèle de substitution un certain problème physique \cite{lancaster2018}. La fiabilité des ces modèles est également difficile \'a prévoir, vu que le sens physique est détruit par la procédure de réduction. \\
+En industrie l'optimisation et les études paramétriques sont typiquement effectuées sur les modèles de substitution, car optimiser directement les modèles fins entraîne des coûts computationels prohibitifs. Il est très difficile de savoir \`a l'avance quelle méthode utiliser pour générer un modèle de substitution pour un problème physique donné \cite{lancaster2018}. La fiabilité des ces modèles est difficile \'a prévoir, vu que le sens physique est détruit par la réduction. \\
 \textbf{Le dernier défi} du projet est de démontrer que les modèles réduits obtenus dans le \textbf{WP2} pourront servir de modèles de substitution plus fiables que ceux qui sont normalement utilisés. Dans le troisième lot de travail (\textbf{WP3}) les modèles réduits seront donc employés pour optimiser le design mécanique des structures et pour le contrôle optimal des structures flexibles. Cette étape permettra d’évaluer la validité et l’efficacité des modèles réduits par rapport aux simulations fines. \\
 
 	\begin{itemize}
@@ -213,12 +212,12 @@ La résolution de ces trois macro-tâches permettra de mieux comprendre le compr
 	
 	Pour cette première macro-tâche, il sera possible de prolonger le travail effectué dans le cadre de ma thèse, qui a donn\'e lieu a un code de calcul pour application multiphysique (le code SCRIMP décrit dans l'Annexe \ref{sec:SCRIMP} et \url{https://zenodo.org/record/4945329#.Yd8UJoTMJH4}). Ce code sera ultérieurement développé pour traiter des problèmes d'interaction fluide-structure. Le co-encadrant de thèse sera Denis Matignon, du fait de son expertise concernant les mathématiques numériques et les systèmes port-Hamiltoniens.
 	
-	Pour ce qui concerne la préservation de la physique au sein des algorithmes, des collaborations avec Marc Gerritsma (TU Delft, Pays Bas) et Herbert Egger (Johannes Kepler University Linz, Autriche) seront recherchées en place. Pour ce qui concerne l'interaction fluide-structure, l'office National d'Études et de Recherches Aérospatiales (ONERA\footnote{Office National d'Etudes et de Recherches Aérospatiales}), garant d'une profonde expertise en ce domaine, représentera l'interlocuteur principal pour les problèmes liés au couplage multiphysique.
+	Pour ce qui concerne la préservation de la physique au sein des algorithmes, des collaborations avec Marc Gerritsma (TU Delft, Pays Bas) et Herbert Egger (Johannes Kepler University Linz, Autriche) seront recherchées. Pour ce qui concerne l'interaction fluide-structure, l'office National d'Études et de Recherches Aérospatiales (ONERA\footnote{Office National d'Etudes et de Recherches Aérospatiales}), garant d'une profonde expertise en ce domaine, représentera l'interlocuteur principal pour les problèmes liés au couplage multiphysique.
 	
 	\paragraph[\large WP2 : réduction de modèles garantissant le respect de la structure physique\\
 	Responsables: Andrea Brugnoli et Doctorant 2, co-encadré par Charles Poussot-Vassal (ONERA)]{\large WP2 : réduction de modèles garantissant le respect de la structure physique\\
 		Responsables: Andrea Brugnoli et Doctorant 2, co-encadré par Charles Poussot-Vassal (ONERA)\\}
-	La méthode POD (équivalente \`a l'analyse en composantes principales ou PCA en statistique) représente une méthode de régression linéaire et peut également être implémentée via un réseau de neurones profond linéaire. Il est donc naturel d'analyse le comportement lorsque un réseau de neurones non-linéaire est utilisé pour cette tache. C'est exactement ce qui \`a été proposé dans \cite{lee2020}, avec des résultats probants en terme de qualité du modèle obtenu. Dans ce deuxième lot des travaux, la même idée sera explorée mais en gardant l'impératif de la préservation de la structure physique du problème. Par structure physique, on entend la présence des lois de conservation (associés à un opérateur antisymétrique) et des effets dissipatifs, et les variables qui définissent l'interconnexion entre le fluide et le solide. Conserver la structure physique de la simulation haute fidélité dans la représentation réduite permettra d'intégrer des outils d'intelligence artificielle d'une façon interprétable. Par exemple, des réseaux de neurones peuvent être utilisés pour représenter l'énergie (i.e une fonction entre la dimension de l'état et un scalaire positif), ou l'opérateur associé à la conservation d'énergie, ou bien à sa dissipation. L'apprentissage automatique nécessite l'utilisation d'une base de données. Les données générées dans le \textbf{WP1}, représentées par les résultats des simulations des modèles haute fidélité (appelés \textit{snapshots} en anglais), seront donc utilisés pour entraîner les réseaux de neurones à obtenir des modèles réduits en minimisant certaines métriques. 
+	La méthode POD (équivalente \`a l'analyse en composantes principales ou PCA en statistique) représente une méthode de régression linéaire et peut également être implémentée via un réseau de neurones profond linéaire. Il est donc naturel d'analyse le comportement lorsque un réseau de neurones non-linéaire est utilisé pour cette tache. C'est exactement ce qui \`a été proposé dans \cite{lee2020}, avec des résultats probants en terme de qualité du modèle obtenu. Dans ce deuxième lot des travaux, la même idée sera explorée mais en gardant l'impératif de la préservation de la structure physique du problème. Par structure physique, on entend la présence des lois de conservation et des effets dissipatifs, et les variables qui définissent l'interconnexion entre le fluide et le solide. Conserver la structure physique de la simulation haute fidélité dans la représentation réduite permettra d'intégrer des outils d'intelligence artificielle d'une façon interprétable.  Par exemple, des réseaux de neurones peuvent être utilisés pour représenter l'énergie, ou bien pour représenter l'opérateur associé à sa conservation ou à sa dissipation. L'apprentissage automatique nécessite l'utilisation d'une base de données. Les données générées dans le \textbf{WP1}, représentées par les résultats des simulations des modèles haute fidélité (appelés \textit{snapshots} en anglais), seront donc utilisés pour entraîner les réseaux de neurones à obtenir des modèles réduits en minimisant certaines métriques. 
 	Pour ce qui concerne la deuxième macro-tâche, il sera possible de mettre en place des collaborations avec Volker Mehrmann (TU Berlin) et George Haller (ETH Zurich).
 	
 	
@@ -250,7 +249,7 @@ La résolution de ces trois macro-tâches permettra de mieux comprendre le compr
 	
 	\begin{itemize}
 		\item L'optimisation structurelle des composants mécaniques en aéronautique, pour augmenter les performances aérodynamiques (minimisation de la traînée et donc de la consommation du carburant, cf. Fig. \ref{fig:wing}); 
-		\item Co-design de la partie structurelle et du contrôleur embarqué. Cette méthodologie consiste à optimiser la performance du contrôleur (qui cherche par exemple à limiter les vibrations), en même temps que les caractéristiques structurelles du véhicule (par exemple la masse ou la rigidité). Ce type d'optimisation est souvent utilisé pour les satellites (cf. Fig. \ref{fig:codesign_sat}).
+		\item Co-design de la partie structurelle et du contrôleur embarqué. Cette méthodologie consiste à optimiser la performance du contrôleur (qui cherche à limiter les vibrations), en même temps que les caractéristiques structurelles du véhicule (par exemple la masse ou la rigidité). Ce type d'optimisation est souvent utilisé pour les satellites (cf. Fig. \ref{fig:codesign_sat}).
 		\item Contrôle optimal pour suivi de trajectoire. Ce type de problématiques apparaît fréquemment en robotique. Les chercheurs s'intéressent de plus en plus à la \textit{soft robotics}\footnote{\url{https://en.wikipedia.org/wiki/Soft_robotics}}, domaine dans lequel la flexibilité des composants ne peut pas être négligée (cf. Fig. \ref{fig:sofi-mit}).
 	\end{itemize}
 	
@@ -329,6 +328,7 @@ Pour accomplir les objectifs, des recrutements seront effectués :
 	\caption{Gantt Chart du projet. \sqbox{red!50} \textcolor{red!50}{\textbf{WP1}}, \ \sqbox{cyan!70} \textcolor{cyan!70}{\textbf{WP2}}, \ \sqbox{orange!70} \textcolor{orange!70}{\textbf{WP3}}.} 
 \end{figure}
 
+\newpage
 
 	
 \subsection{Choix de l'institution d'accueil}
@@ -441,14 +441,15 @@ Pour ce projet, on choisit l'ISAE-SUPAERO et sa grande expertise dans le domaine
 	
 	\section{Lettres de manifestations d'intérêt}
 	
-	Comme le projet MORPHEUS présente un fort intérêt industriel et académique, j'ai contacté des acteurs industriels dans le domaine aérospatial, et également avec des centres de recherche très réputés pour leur compétences en simulation numérique et intelligence artificielle, et des professeurs universitaires. 
+	Comme le projet MORPHEUS présente un fort intérêt industriel et académique, j'ai contacté des acteurs industriels dans le domaine aérospatial, des centres de recherche très réputés pour leur compétences en simulation numérique et intelligence artificielle, et des professeurs universitaires. 
+	\vspace{.5cm}
 	
 	Les personnes suivantes ont donné leur support au projet:
 	\begin{itemize}
 		\item Isabelle Bloy, Head of Single aisle  à Airbus et responsable du programme A321 XLR dans le département New developments in Chief Engineering.
-		\item Michele Colombo, Technical Specialist Digital Enablers à Airbus, est spécialiste technique pour la partie Intelligence Artificielle et aéroélasticité.
-		\item Catherine Lambert, présidente du Cerfacs\footnote{Centre Européen de Recherche et Formation Avancée en Calcul Scientifique}, est une experte en traitement du signal et compression de données. 
-		\item Corentin Lapeyre, coordinateur principal de l'equipe Helios au Cerfacs, est un expert dans le domaine de l'IA appliquée à la physique computationnelle.
+		%\item Michele Colombo, Technical Specialist Digital Enablers à Airbus, est spécialiste technique pour la partie Intelligence Artificielle et aéroélasticité.
+		\item Catherine Lambert, Présidente du Cerfacs\footnote{Centre Européen de Recherche et Formation Avancée en Calcul Scientifique}, est une experte en traitement du signal et compression de données. 
+		\item Corentin Lapeyre, Coordinateur  de l'equipe Helios au Cerfacs, est un expert dans le domaine de l'IA appliquée à la physique computationnelle.
 		\item Jean-Pierre Giannini, Directeur du centre CESTA\footnote{Centre d'études scientifiques et techniques d'Aquitaine} du CEA, est un expert dans le domaine du calcul scientifique.
 		\item Volker Mehrmann, Président de l'association européenne des mathématiques et professeur à TU Berlin, est un mathématicien spécialisé dans le développement d'algorithmes numériques pour les applications industrielles (réduction de modèle et contrôle optimal).
 		\item Stefano Stramigioli, Vice Président of euRobotics et professeur à l'Université de Twente, est un roboticien spécialisé dans les systèmes port-Hamiltoniens et leur utilisation pour le contrôle de manipulateurs robotiques.
@@ -459,6 +460,7 @@ Pour ce projet, on choisit l'ISAE-SUPAERO et sa grande expertise dans le domaine
 \includepdf[pages=1-]{./Letters/LetterCERFACS-MORPHEUS.pdf}
 \includepdf[pages=1-]{./Letters/Lettre_Soutien_Lapeyre.pdf}
 \includepdf[pages=1-]{./Letters/LettreCEA.pdf}
+\includepdf[pages=1-]{./Letters/LetterMehrmann.pdf}
 \includepdf[pages=1-]{./Letters/Letter_Stramigioli.pdf}
 \includepdf[pages=1-]{./Letters/LettrePussot.pdf}
 
