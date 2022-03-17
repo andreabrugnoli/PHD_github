@@ -26,6 +26,8 @@ class TaylorGreen3D(ProblemBase):
         self.periodic = True
         # Solution is not exact
         self.exact = False
+        # Quad mesh
+        self.quad = False
 
     def initial_conditions(self, V_v, V_w, V_p):
         x, y, z = SpatialCoordinate(self.mesh)

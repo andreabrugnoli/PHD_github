@@ -7,7 +7,7 @@ class TaylorGreen2D(ProblemBase):
     def __init__(self, options):
         ProblemBase.__init__(self, options)
 
-        self.mesh = PeriodicRectangleMesh(self.n_el, self.n_el, 2, 2, direction="both", quadrilateral=False)
+        self.mesh = PeriodicRectangleMesh(self.n_el, self.n_el, 2, 2, direction="both", quadrilateral=True)
         self.init_mesh()
         self.structured_time_grid()
 
@@ -21,6 +21,8 @@ class TaylorGreen2D(ProblemBase):
         self.periodic = True
         # Solution exact
         self.exact = True
+        # Quadrilateral mesh
+        self.quad = True
 
 
     def exact_solution(self, time=0):
@@ -42,13 +44,22 @@ class TaylorGreen2D(ProblemBase):
         return v_ex, w_ex, p_ex
 
     def initial_conditions(self, V_v, V_w, V_p):
-        v_ex, w_ex, p_ex = self.exact_solution()
-        v_init = interpolate(v_ex, V_v)
-        if V_w is not None:
-            w_init = interpolate(w_ex, V_w)
+        if self.quad == False:
+            v_ex, w_ex, p_ex = self.exact_solution()
+            v_init = interpolate(v_ex, V_v)
+            if V_w is not None:
+                w_init = interpolate(w_ex, V_w)
+            else:
+                w_init = None
+            p_init = interpolate(p_ex, V_p)
         else:
-            w_init = None
-        p_init = interpolate(p_ex, V_p)
+            v_ex, w_ex, p_ex = self.exact_solution()
+            v_init = project(v_ex, V_v)
+            if V_w is not None:
+                w_init = project(w_ex, V_w)
+            else:
+                w_init = None
+            p_init = project(p_ex, V_p)
         return [v_init, w_init, p_init]
 
 

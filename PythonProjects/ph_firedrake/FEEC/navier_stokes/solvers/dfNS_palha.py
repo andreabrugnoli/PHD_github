@@ -43,23 +43,38 @@ def compute_sol(problem, pol_deg, n_t, t_fin=1):
     problem.init_mesh()
 
     # Primal trimmed polynomial finite element families
-    V_1 = FunctionSpace(mesh, "N1curl", pol_deg)
-    V_0 = FunctionSpace(mesh, "CG", pol_deg)
-    if problem.dimM == 3:
-        V_2 = FunctionSpace(mesh, "RT", pol_deg)
-    elif problem.dimM == 2:
-        V_2 = FunctionSpace(mesh, "DG", pol_deg - 1)
+    if problem.quad == False:
+        V_1 = FunctionSpace(mesh, "N1curl", pol_deg)
+        V_0 = FunctionSpace(mesh, "CG", pol_deg)
+        if problem.dimM == 3:
+            V_2 = FunctionSpace(mesh, "RT", pol_deg)
+        elif problem.dimM == 2:
+            V_2 = FunctionSpace(mesh, "DG", pol_deg - 1)
+        # Dual trimmed polynomial finite element families
+        VT_n1 = FunctionSpace(mesh, "RT", pol_deg)
+        VT_n = FunctionSpace(mesh, "DG", pol_deg - 1)
+        if problem.dimM == 3:
+            VT_n2 = FunctionSpace(mesh, "N1curl", pol_deg)
+        elif problem.dimM == 2:
+            VT_n2 = FunctionSpace(mesh, "CG", pol_deg)
+    else:
+        V_0 = FunctionSpace(mesh, "CG", pol_deg)
+        if problem.dimM == 3:
+            V_1 = FunctionSpace(mesh, "NCE", pol_deg)
+            V_2 = FunctionSpace(mesh, "NCF", pol_deg)
+        elif problem.dimM == 2:
+            V_1 = FunctionSpace(mesh, "RTCE", pol_deg)
+            V_2 = FunctionSpace(mesh, "DG", pol_deg - 1)
+        # Dual trimmed polynomial finite element families
+        VT_n = FunctionSpace(mesh, "DG", pol_deg - 1)
+        if problem.dimM == 3:
+            VT_n1 = FunctionSpace(mesh, "NCF", pol_deg)
+            VT_n2 = FunctionSpace(mesh, "NCE", pol_deg)
+        elif problem.dimM == 2:
+            VT_n2 = FunctionSpace(mesh, "CG", pol_deg)
+            VT_n1 = FunctionSpace(mesh, "RTCF", pol_deg)
 
     V_primal = V_1 * V_2 * V_0
-
-    # Dual trimmed polynomial finite element families
-    VT_n1 = FunctionSpace(mesh, "RT", pol_deg)
-    VT_n = FunctionSpace(mesh, "DG", pol_deg - 1)
-    if problem.dimM == 3:
-        VT_n2 = FunctionSpace(mesh, "N1curl", pol_deg)
-    elif problem.dimM == 2:
-        VT_n2 = FunctionSpace(mesh, "CG", pol_deg)
-
     V_dual = VT_n1 * VT_n2 * VT_n
 
     print("Function Space dimensions, Primal - Dual: ", [V_primal.dim(), V_dual.dim()])
@@ -269,11 +284,12 @@ def gradp_form(chi_1, p_0):
     return form
 
 def adj_curlw_form(chi_1, w_2, dimM, Re):
-    if dimM==3:
-        form = -1./Re*inner(curl(chi_1),w_2) * dx
-    elif dimM==2:
-        form = -1./Re*dot(curl2D(chi_1),w_2) * dx
-    return form
+    # if dimM==3:
+    #     form = -1./Re*inner(curl(chi_1),w_2) * dx
+    # elif dimM==2:
+    #     form = -1./Re*dot(curl2D(chi_1),w_2) * dx
+    # return form
+    return 0
 
 def adj_divu_form(chi_0, v_1):
     form = inner(grad(chi_0),v_1) * dx
@@ -310,12 +326,13 @@ def adj_gradp_form(chi_2,pT_3):
     return form
 
 def curlw_form(chi_2,wT_1,dimM, Re):
-    if dimM == 3:
-        form = -1./Re*inner(chi_2, curl(wT_1)) * dx
-    elif dimM == 2:
-        form = -1./Re*dot(chi_2, rot2D(wT_1)) * dx
-        # 2D Curl i.e. rotated grad:  // ux = u.dx(0) // uy = u.dx(1) // as_vector((uy, -ux))
-    return form
+    # if dimM == 3:
+    #     form = -1./Re*inner(chi_2, curl(wT_1)) * dx
+    # elif dimM == 2:
+    #     form = -1./Re*dot(chi_2, rot2D(wT_1)) * dx
+    #     # 2D Curl i.e. rotated grad:  // ux = u.dx(0) // uy = u.dx(1) // as_vector((uy, -ux))
+    # return form
+    return 0
 
 def divu_form(chi_3, vT_2):
     form = -inner(chi_3, div(vT_2)) * dx
