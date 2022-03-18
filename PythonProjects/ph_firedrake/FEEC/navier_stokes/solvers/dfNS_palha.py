@@ -4,8 +4,8 @@ from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
 
-def explicit_step_primal(dt_0, problem, x_n, V_vel, V_vor, param={"ksp_type": "preonly", "pc_type": "lu"}):
-    v_n = x_n[0]
+def explicit_step_primal(dt_0, problem, x_n, wT_n, V_vel, V_vor, param={"ksp_type": "preonly", "pc_type": "lu"}):
+    u_n = x_n[0]
     w_n = x_n[1]
     p_n = x_n[2]
 
@@ -15,12 +15,14 @@ def explicit_step_primal(dt_0, problem, x_n, V_vel, V_vor, param={"ksp_type": "p
     a_form_vel = (1 / dt_0) * m_form(chi_1, u_1)
     A_vel = assemble(a_form_vel, mat_type='aij')
 
-    b_form_vel = (1 / dt_0) * m_form(chi_1, v_n) + wcross1_form(chi_1, v_n, w_n, problem.dimM) \
-                 + gradp_form(chi_1, p_n) + adj_curlw_form(chi_1, w_n, problem.dimM, problem.Re)
+    ptot_n = p_n + 0.5*dot(u_n, u_n)
+
+    b_form_vel = (1 / dt_0) * m_form(chi_1, u_n) + wcross1_form(chi_1, u_n, wT_n, problem.dimM) \
+                 + gradp_form(chi_1, ptot_n) + adj_curlw_form(chi_1, w_n, problem.dimM, problem.Re)
     b_vel = assemble(b_form_vel)
 
-    v_sol = Function(V_vel)
-    solve(A_vel, v_sol, b_vel, solver_parameters=param)
+    u_sol = Function(V_vel)
+    solve(A_vel, u_sol, b_vel, solver_parameters=param)
 
     chi_w = TestFunction(V_vor)
     w_trial = TrialFunction(V_vor)
@@ -28,14 +30,14 @@ def explicit_step_primal(dt_0, problem, x_n, V_vel, V_vor, param={"ksp_type": "p
     a_form_vor = m_form(chi_w, w_trial)
     A_vor = assemble(a_form_vor)
 
-    b_form_vor = curlu_form(chi_w, v_sol, problem.dimM)
+    b_form_vor = curlu_form(chi_w, u_sol, problem.dimM)
     b_vor = assemble(b_form_vor)
 
     w_sol = Function(V_vor)
 
     solve(A_vor, w_sol, b_vor, solver_parameters=param)
 
-    return v_sol, w_sol
+    return u_sol, w_sol
 
 def compute_sol(problem, pol_deg, n_t, t_fin=1):
     # Implementation of the dual field formulation for periodic navier stokes
@@ -106,7 +108,7 @@ def compute_sol(problem, pol_deg, n_t, t_fin=1):
     tvec_int = np.linspace(0, n_t * float(dt), 1 + n_t)
     tvec_stag = np.linspace(float(dt)/2, float(dt)*(n_t + 1/2), n_t+1)
 
-    u_pr_half, w_pr_half = explicit_step_primal(dt / 2, problem, x_pr_0, V_1, V_2)
+    u_pr_half, w_pr_half = explicit_step_primal(dt / 2, problem, x_pr_0, w_dl_0, V_1, V_2)
 
     print("Explicit step solved")
 

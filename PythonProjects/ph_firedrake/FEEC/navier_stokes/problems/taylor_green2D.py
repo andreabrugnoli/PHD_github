@@ -6,8 +6,10 @@ class TaylorGreen2D(ProblemBase):
     "2D Taylor Green problem."
     def __init__(self, options):
         ProblemBase.__init__(self, options)
+        # Quadrilateral mesh
+        self.quad = False
+        self.mesh = PeriodicRectangleMesh(self.n_el, self.n_el, 2, 2, direction="both", quadrilateral=self.quad)
 
-        self.mesh = PeriodicRectangleMesh(self.n_el, self.n_el, 2, 2, direction="both", quadrilateral=True)
         self.init_mesh()
         self.structured_time_grid()
 
@@ -21,8 +23,6 @@ class TaylorGreen2D(ProblemBase):
         self.periodic = True
         # Solution exact
         self.exact = True
-        # Quadrilateral mesh
-        self.quad = True
 
 
     def exact_solution(self, time=0):

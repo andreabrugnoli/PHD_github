@@ -12,9 +12,9 @@ d = 2 #int(input("Spatial dimension ? "))
 if __name__ == '__main__':
     # 1. Select Problem:
     # Taylor Green 2D
-    deg = 3
+    deg = 2
     n_t = 10
-    Delta_t = 1/50
+    Delta_t = 1/100
     t_f = n_t * Delta_t
     options = {"n_el":3, "t_fin": t_f, "n_t": n_t}
     # if d == 2:
@@ -28,9 +28,13 @@ if __name__ == '__main__':
 
     plt.figure()
     plt.plot(tvec_stag, H_pr, 'b', label="H primal")
-    plt.plot(tvec_int, H_dl, 'r', label="H dual")
     # plt.plot(tvec_int, H_ex, 'g', label="H exact")
     plt.legend()
+
+    plt.figure()
+    plt.plot(tvec_int, H_dl, 'r', label="H dual")
+    plt.legend()
+
 
 
     # plt.figure()
