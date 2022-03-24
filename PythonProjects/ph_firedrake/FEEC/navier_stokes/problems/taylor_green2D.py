@@ -9,7 +9,8 @@ class TaylorGreen2D(ProblemBase):
         # Quadrilateral mesh
         self.quad = False
         self.mesh = PeriodicRectangleMesh(self.n_el, self.n_el, 2, 2, direction="both", quadrilateral=self.quad)
-
+        self.mesh.coordinates.dat.data[:, 0] -= 1
+        self.mesh.coordinates.dat.data[:, 1] -= 1
         self.init_mesh()
         self.structured_time_grid()
 
@@ -31,12 +32,12 @@ class TaylorGreen2D(ProblemBase):
         t = Constant(time)
         # Mesh coordinates
 
-        v_1 = -sin(pi*x)*cos(pi*y)*exp(-2*(pi**2)*self.mu*t)
-        v_2 = cos(pi*x)*sin(pi*y)*exp(-2*(pi**2)*self.mu*t)
+        v_1 = -cos(pi*x)*sin(pi*y)*exp(-2*(pi**2)*self.mu*t)
+        v_2 = sin(pi*x)*cos(pi*y)*exp(-2*(pi**2)*self.mu*t)
 
-        p = (1/4)*(cos(2*pi*x) + cos(2*pi*y))*exp(4*(pi**2)*self.mu*t)
+        p = -(1/4)*(cos(2*pi*x) + cos(2*pi*y))*exp(-4*(pi**2)*self.mu*t)
 
-        w = -2*pi*sin(pi*x)*sin(pi*y)*exp(-2*(pi**2)*self.mu*t)
+        w = 2*pi*cos(pi*x)*cos(pi*y)*exp(-2*(pi**2)*self.mu*t)
         return as_vector([v_1,v_2]), w, p
 
     def get_exact_sol_at_t(self, t_i):
@@ -70,7 +71,7 @@ class TaylorGreen2D(ProblemBase):
         H_ex_t = 0.5 * (inner(u_ex_t, u_ex_t) * dx(domain=self.mesh))
         E_ex_t = 0.5 * (inner(w_ex_t, w_ex_t) * dx(domain=self.mesh))
         Ch_ex_t = None#(inner(u_ex_t, w_ex_t) * dx(domain=self.mesh))
-        return [u_ex_t, w_ex_t, p_ex_t,H_ex_t,E_ex_t,Ch_ex_t]
+        return u_ex_t, w_ex_t, p_ex_t,H_ex_t,E_ex_t,Ch_ex_t
 
     def calculate_outputs(self,exact_arr, u_t,w_t,p_t):
         err_u = errornorm(exact_arr[0], u_t, norm_type="L2")
