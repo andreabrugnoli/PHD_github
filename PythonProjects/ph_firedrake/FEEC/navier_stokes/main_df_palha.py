@@ -9,23 +9,23 @@ os.environ["OMP_NUM_THREADS"] = "1"
 import numpy as np
 from math import pi
 d = 2 # int(input("Spatial dimension ? "))
-
-param = {"ksp_type": "gmres", "ksp_gmres_restart":100, "pc_type":"ilu"}
-# param = {"ksp_type": "gmres", "pc_type": "ilu", 'pc_hypre_type': 'boomeramg'}
+#
+# param = {"ksp_type": "gmres", "ksp_gmres_restart":100, "pc_type":"ilu"}
+# # param = {"ksp_type": "gmres", "pc_type": "ilu", 'pc_hypre_type': 'boomeramg'}
 
 if __name__ == '__main__':
     # 1. Select Problem:
     # Taylor Green 2D
-    deg = 2
-    n_t = 100
-    Delta_t = 1/100
+    deg = 3
+    n_t = 50
+    Delta_t = 1/50
     t_f = n_t * Delta_t
-    options = {"n_el": 10, "t_fin": t_f, "n_t": n_t}
+    options = {"n_el": 20, "t_fin": t_f, "n_t": n_t}
     if d == 2:
         problem = TaylorGreen2D(options)
     else:
         problem = TaylorGreen3D(options)
-    results = compute_sol(problem, deg, n_t, t_f, param=param)
+    results = compute_sol(problem, deg, n_t, t_f)
 
     tvec_int = results["tspan_int"]
     tvec_stag = results["tspan_stag"]
@@ -53,6 +53,10 @@ if __name__ == '__main__':
     pdynP_ex = results["pdynP_ex"]
     pdynP_pr = results["pdynP_pr"]
     pdynP_dl = results["pdynP_dl"]
+
+    pP_ex = results["pP_ex"]
+    pP_pr = results["pP_pr"]
+    pP_dl = results["pP_dl"]
 
     divu_pr_L2 = results["divu_pr_L2"]
     divu_dl_L2 = results["divu_dl_L2"]
@@ -98,6 +102,13 @@ if __name__ == '__main__':
     if problem.exact:
         plt.plot(tvec_int, pdynP_ex, 'g', label="p dyn at P exact")
     plt.legend()
+
+    # plt.figure()
+    # plt.plot(tvec_int, pP_pr, 'b', label="p at P primal")
+    # plt.plot(tvec_stag, pP_dl, 'r', label="p at P dual")
+    # if problem.exact:
+    #     plt.plot(tvec_int, pP_ex, 'g', label="p at P exact")
+    # plt.legend()
 
     plt.figure()
     plt.plot(tvec_int, divu_pr_L2, 'b', label="L2 norm div u primal")
