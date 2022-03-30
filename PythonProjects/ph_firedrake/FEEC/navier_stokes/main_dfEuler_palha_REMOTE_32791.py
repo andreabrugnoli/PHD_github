@@ -1,32 +1,22 @@
-from problems.taylor_green2D import TaylorGreen2D
-from problems.taylor_green3D import TaylorGreen3D
-from solvers.dfNS_palha import compute_sol
+from problems.periodicEuler2D_exact import ExactEuler2D
+from problems.conservation_properties3D import ConservationProperties3D
+from solvers.dfEuler_palha import compute_sol
 import matplotlib.pyplot as plt
-
-import os
-os.environ["OMP_NUM_THREADS"] = "1"
-
 import numpy as np
 from math import pi
 d = 2 # int(input("Spatial dimension ? "))
-#
-# param = {"ksp_type": "gmres", "ksp_gmres_restart":100, "pc_type":"ilu"}
-# # param = {"ksp_type": "gmres", "pc_type": "ilu", 'pc_hypre_type': 'boomeramg'}
 
 if __name__ == '__main__':
     # 1. Select Problem:
     # Taylor Green 2D
-
     deg = 2
-    n_t = 100
+    n_t = 10
     Delta_t = 1/100
     t_f = n_t * Delta_t
-    options = {"n_el": 10, "t_fin": t_f, "n_t": n_t}
+    options = {"n_el":3 , "t_fin": t_f, "n_t": n_t}
 
-    if d == 2:
-        problem = TaylorGreen2D(options)
-    else:
-        problem = TaylorGreen3D(options)
+    # problem = ExactEuler2D(options)
+    problem = ConservationProperties3D(options)
     results = compute_sol(problem, deg, n_t, t_f)
 
     tvec_int = results["tspan_int"]
@@ -56,18 +46,26 @@ if __name__ == '__main__':
     pdynP_pr = results["pdynP_pr"]
     pdynP_dl = results["pdynP_dl"]
 
-    pP_ex = results["pP_ex"]
-    pP_pr = results["pP_pr"]
-    pP_dl = results["pP_dl"]
-
     divu_pr_L2 = results["divu_pr_L2"]
     divu_dl_L2 = results["divu_dl_L2"]
 
     plt.figure()
     plt.plot(tvec_int, H_pr, 'b', label="H primal")
+    plt.legend()
+
+    plt.figure()
     plt.plot(tvec_int, H_dl, 'r', label="H dual")
+    plt.plot(tvec_int, H_pr, 'b', label="H primal")
     if problem.exact:
         plt.plot(tvec_int, H_ex, 'g', label="H exact")
+    plt.legend()
+
+
+    plt.figure()
+    plt.plot(tvec_int, Hel_dl, 'r', label="Hel dual")
+    plt.plot(tvec_int, Hel_pr, 'b', label="Hel primal")
+    if problem.exact:
+        plt.plot(tvec_int, Hel_ex, 'g', label="E exact")
     plt.legend()
 
     plt.figure()
@@ -92,28 +90,21 @@ if __name__ == '__main__':
     plt.legend()
 
     plt.figure()
-    plt.plot(tvec_int, wP_pr, 'b', label="w at P primal")
-    plt.plot(tvec_int, wP_dl, 'r', label="w at P dual")
+    plt.plot(tvec_int, wP_pr[:, 0], 'b', label="w at P primal")
+    plt.plot(tvec_int, wP_dl[:, 0], 'r', label="w at P dual")
     if problem.exact:
-        plt.plot(tvec_int, wP_ex, 'g', label="w at P exact")
+        plt.plot(tvec_int, wP_ex[:, 0], 'g', label="w at P exact")
     plt.legend()
 
     plt.figure()
     plt.plot(tvec_int, pdynP_pr, 'b', label="p dyn at P primal")
     plt.plot(tvec_stag, pdynP_dl, 'r', label="p dyn at P dual")
     if problem.exact:
-        plt.plot(tvec_int, -pdynP_ex, 'g', label="p dyn at P exact")
-    plt.legend()
-
-    plt.figure()
-    plt.plot(tvec_int, pP_pr, 'b', label="p at P primal")
-    plt.plot(tvec_stag, pP_dl, 'r', label="p at P dual")
-    if problem.exact:
-        plt.plot(tvec_int, pP_ex, 'g', label="p at P exact")
+        plt.plot(tvec_int, pdynP_ex, 'g', label="p dyn at P exact")
     plt.legend()
 
     plt.figure()
     plt.plot(tvec_int, divu_pr_L2, 'b', label="L2 norm div u primal")
-    plt.plot(tvec_int, divu_dl_L2, 'r', label="L2 norm div u dual")
+    plt.plot(tvec_stag, divu_dl_L2, 'r', label="L2 norm div u dual")
     plt.legend()
     plt.show()

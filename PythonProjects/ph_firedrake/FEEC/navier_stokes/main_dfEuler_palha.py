@@ -11,12 +11,14 @@ if __name__ == '__main__':
     # Taylor Green 2D
     deg = 2
     n_t = 10
-    Delta_t = 1/1000
-    t_f = n_t * Delta_t
-    options = {"n_el": 20, "t_fin": t_f, "n_t": n_t}
 
-    problem = ExactEuler2D(options)
-    # problem = ConservationProperties3D(options)
+    Delta_t = 1/100
+    t_f = n_t * Delta_t
+    options = {"n_el":3 , "t_fin": t_f, "n_t": n_t}
+
+    # problem = ExactEuler2D(options)
+    problem = ConservationProperties3D(options)
+ 
     results = compute_sol(problem, deg, n_t, t_f)
 
     tvec_int = results["tspan_int"]
@@ -50,6 +52,12 @@ if __name__ == '__main__':
     divu_dl_L2 = results["divu_dl_L2"]
 
     plt.figure()
+
+    plt.plot(tvec_int, H_pr, 'b', label="H primal")
+    plt.legend()
+
+    plt.figure()
+
     plt.plot(tvec_int, H_dl, 'r', label="H dual")
     plt.plot(tvec_int, H_pr, 'b', label="H primal")
     if problem.exact:

@@ -5,8 +5,13 @@ from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
 
+<<<<<<< HEAD
 # solver_param = {"mat_type": "aij", "ksp_type": "preonly", "pc_type": "lu", "pc_factor_mat_solver_type": "mumps"}
 solver_param = {}
+=======
+solver_param = {"mat_type": "aij", "ksp_type": "preonly", "pc_type": "lu", "pc_factor_mat_solver_type": "mumps"}
+# solver_param = {}
+>>>>>>> afcae155e7b8325865fbcdb111c25277722676e8
 
 def explicit_step_primal(dt_0, problem, x_n, wT_n, V, system="primal"):
     u_n = x_n[0]
