@@ -6,10 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # solver_param = {"mat_type": "aij", "ksp_type": "preonly", "pc_type": "lu", "pc_factor_mat_solver_type": "mumps"}
-solver_param = {"ksp_type": "gmres", "ksp_gmres_restart":100, "ksp_rtol": 1e-8, "pc_type": "ilu"}
-# solver_param = {"ksp_type": "preonly"}
-
-# solver_param = {}
+solver_param = {}
 
 def explicit_step_primal(dt_0, problem, x_n, wT_n, V, system="primal"):
     u_n = x_n[0]
@@ -25,23 +22,19 @@ def explicit_step_primal(dt_0, problem, x_n, wT_n, V, system="primal"):
     if system == "primal":
 
         a1_form_vel = (1 / dt_0) * m_form(chi_u, u) - gradp_form(chi_u, p) \
-                      - 0.5 * wcross1_form(chi_u, u, wT_n, problem.dimM) \
-                      - 0.5 * adj_curlw_form(chi_u, w, problem.dimM, problem.Re)
+                      - 0.5 * wcross1_form(chi_u, u, wT_n, problem.dimM)
         a2_form_vor = m_form(chi_w, w) - curlu_form(chi_w, u, problem.dimM)
         a3_form_p = - adj_divu_form(chi_p, u)
 
-        b1_form = (1 / dt_0) * m_form(chi_u, u_n) + 0.5 * wcross1_form(chi_u, u_n, wT_n, problem.dimM) \
-                      + 0.5 * adj_curlw_form(chi_u, w_n, problem.dimM, problem.Re)
+        b1_form = (1 / dt_0) * m_form(chi_u, u_n) + 0.5 * wcross1_form(chi_u, u_n, wT_n, problem.dimM)
     else:
 
         a1_form_vel = (1 / dt_0) * m_form(chi_u, u) - adj_gradp_form(chi_u, p) \
-                      - 0.5 * wcross2_form(chi_u, u, wT_n, problem.dimM) \
-                      - 0.5 * curlw_form(chi_u, w, problem.dimM, problem.Re)
+                      - 0.5 * wcross2_form(chi_u, u, wT_n, problem.dimM)
         a2_form_vor = m_form(chi_w, w) - adj_curlu_form(chi_w, u, problem.dimM)
         a3_form_p = - divu_form(chi_p, u)
 
-        b1_form = (1 / dt_0) * m_form(chi_u, u_n) + 0.5 * wcross2_form(chi_u, u_n, wT_n, problem.dimM) \
-                      + 0.5 * curlw_form(chi_u, w_n, problem.dimM, problem.Re)
+        b1_form = (1 / dt_0) * m_form(chi_u, u_n) + 0.5 * wcross2_form(chi_u, u_n, wT_n, problem.dimM)
 
     V_nullspace = MixedVectorSpaceBasis(V, [V.sub(0), V.sub(1), VectorSpaceBasis(constant=True)])
 
@@ -260,8 +253,7 @@ def compute_sol(problem, pol_deg, n_t, t_fin=1):
     u_pr, w_pr, p_pr = split(x_primal)
 
     # Static part of the primal A operator
-    a1_primal_static = (1 / dt) * m_form(chi_u_pr, u_pr) - gradp_form(chi_u_pr, p_pr) \
-                       - 0.5 * adj_curlw_form(chi_u_pr, w_pr, problem.dimM, problem.Re)
+    a1_primal_static = (1 / dt) * m_form(chi_u_pr, u_pr) - gradp_form(chi_u_pr, p_pr)
     a2_primal_static = m_form(chi_w_pr, w_pr) - curlu_form(chi_w_pr, u_pr, problem.dimM)
     a3_primal_static = - adj_divu_form(chi_p_pr, u_pr)
 
@@ -273,8 +265,7 @@ def compute_sol(problem, pol_deg, n_t, t_fin=1):
     u_dl, w_dl, p_dl = split(x_dual)
 
     # Static part of the dual A operator
-    a1_dual_static = (1 / dt) * m_form(chi_u_dl, u_dl) - adj_gradp_form(chi_u_dl, p_dl) \
-                     - 0.5 * curlw_form(chi_u_dl, w_dl, problem.dimM, problem.Re)
+    a1_dual_static = (1 / dt) * m_form(chi_u_dl, u_dl) - adj_gradp_form(chi_u_dl, p_dl)
     a2_dual_static = m_form(chi_w_dl, w_dl) - adj_curlu_form(chi_w_dl, u_dl, problem.dimM)
     a3_dual_static = - divu_form(chi_p_dl, u_dl)
 
@@ -285,7 +276,7 @@ def compute_sol(problem, pol_deg, n_t, t_fin=1):
     for ii in tqdm(range(1, n_t+1)):
 
         # Solve dual system for n+1
-        u_pr_n12, w_pr_n12, p_pr_n = xprimal_n12.split()
+        u_pr_n12, w_pr_n12, p_pr_n12 = xprimal_n12.split()
         a_dual_dynamic = - 0.5*wcross2_form(chi_u_dl, u_dl, w_pr_n12, problem.dimM)
         A_dual = assemble(a1_dual_static + a2_dual_static + a3_dual_static + a_dual_dynamic, mat_type='aij')
         # A_dual_dynamic = assemble(a_dual_dynamic, mat_type='aij')
@@ -293,11 +284,11 @@ def compute_sol(problem, pol_deg, n_t, t_fin=1):
 
         u_dl_n, w_dl_n, p_dl_12n = xdual_n.split()
 
-        b1_dual = (1/dt) * m_form(chi_u_dl, u_dl_n) + 0.5*wcross2_form(chi_u_dl, u_dl_n, w_pr_n12, problem.dimM) \
-                  + 0.5*curlw_form(chi_u_dl, w_dl_n, problem.dimM, problem.Re)
+        b1_dual = (1/dt) * m_form(chi_u_dl, u_dl_n) + 0.5*wcross2_form(chi_u_dl, u_dl_n, w_pr_n12, problem.dimM)
         bvec_dual = assemble(b1_dual)
         # solve(A_dual, xdual_n1, bvec_dual, solver_parameters=solver_param)
         solve(A_dual, xdual_n1, bvec_dual, nullspace=Vdual_nullspace, solver_parameters=solver_param)
+
 
         u_dl_n1, w_dl_n1, p_dl_n12 = xdual_n1.split()
         H_dl_n1 = 0.5 * dot(u_dl_n1, u_dl_n1) * dx
@@ -309,8 +300,8 @@ def compute_sol(problem, pol_deg, n_t, t_fin=1):
         # A_primal_dynamic = assemble(a_primal_dynamic)
         # A_primal = A_primal_static + A_primal_dynamic
 
-        b1_primal = (1/dt) * m_form(chi_u_pr, u_pr_n12) + 0.5*wcross1_form(chi_u_pr, u_pr_n12, w_dl_n1, problem.dimM) \
-                    + 0.5*adj_curlw_form(chi_u_pr, w_pr_n12, problem.dimM, problem.Re)
+        u_pr_n12, w_pr_n12, p_pr_n12 = xprimal_n12.split()
+        b1_primal = (1/dt) * m_form(chi_u_pr, u_pr_n12) + 0.5*wcross1_form(chi_u_pr, u_pr_n12, w_dl_n1, problem.dimM)
         bvec_primal = assemble(b1_primal)
         solve(A_primal, xprimal_n32, bvec_primal, nullspace=Vprimal_nullspace, solver_parameters=solver_param)
 
@@ -348,52 +339,6 @@ def compute_sol(problem, pol_deg, n_t, t_fin=1):
             Hel_pr_vec[ii] = assemble(Hel_pr_n1)
             Hel_dl_vec[ii] = assemble(Hel_dl_n1)
 
-        # Compute exact energy and vorticity
-        if problem.exact == True:
-            t_act = ii * dt
-            t_prev = (ii-1) * dt
-            u_ex_n1, w_ex_n1, p_ex_n1, H_ex_n1, E_ex_n1, Hel_ex_n1 = problem.init_outputs(t_act)
-            u_ex_n, w_ex_n, p_ex_n, H_ex_n, E_ex_n, Hel_ex_n = problem.init_outputs(t_prev)
-
-            H_ex_vec[ii] = assemble(H_ex_n1)
-            E_ex_vec[ii] = assemble(E_ex_n1)
-            if problem.dimM == 3:
-                Hel_ex_vec[ii] = assemble(Hel_ex_n1)
-                for jj in range(np.shape(w_ex_P_vec)[1]):
-                    w_ex_P_vec[ii, jj] = w_ex_n1[jj](point_P)
-            else:
-                w_ex_P_vec[ii, :] = w_ex_n1(point_P)
-
-            for jj in range(np.shape(u_ex_P_vec)[1]):
-                u_ex_P_vec[ii, jj] = u_ex_n1[jj](point_P)
-            p_ex_P_vec[ii] = p_ex_n1(point_P)
-            pdyn_ex_P_vec[ii] = p_ex_P_vec[ii] + 0.5 * np.dot(u_ex_P_vec[ii, :], u_ex_P_vec[ii, :])
-
-            # Redefine pressure fields to have numerical and exact solution match in one point
-            # Compute offset at (0, 0)
-            pex_st_at_origin_n1 = p_ex_n1((0, 0))
-            pex_dyn_at_origin_n1 = 0
-
-            pex_st_at_origin_n = p_ex_n((0, 0))
-            pex_dyn_at_origin_n = 0
-            for jj in range(np.shape(u_ex_P_vec)[1]):
-                pex_dyn_at_origin_n1 += 0.5*np.dot(u_ex_n1[jj]((0, 0)), u_ex_n1[jj]((0, 0)))
-
-                pex_dyn_at_origin_n += 0.5 * np.dot(u_ex_n[jj]((0, 0)), u_ex_n[jj]((0, 0)))
-
-            pex_tot_at_origin_n1 = pex_st_at_origin_n1 + pex_dyn_at_origin_n1
-            pex_tot_at_origin_n = pex_st_at_origin_n + pex_dyn_at_origin_n
-
-
-            offset_p_pr_n1 = pex_tot_at_origin_n1 - p_pr_n1.at((0, 0))
-            p_pr_n1.assign(p_pr_n1 + Constant(offset_p_pr_n1))
-
-            offset_p_dl_n12 = 0.5*(pex_tot_at_origin_n + pex_tot_at_origin_n1) - p_dl_n12.at((0, 0))
-            p_dl_n12.assign(p_dl_n12 + Constant(offset_p_dl_n12))
-
-            # offset_p_pr = pex_tot_at_origin - p_pr_n1.at((0, 0))
-            # p_pr_n1.assign(p_pr_n1 + Constant(offset_p_pr))
-
         # Compute solution at a given point to assess convergence
         u_pr_P_vec[ii, :] = u_pr_n1.at(point_P)
         w_pr_P_vec[ii, :] = w_pr_n1.at(point_P)
@@ -415,7 +360,24 @@ def compute_sol(problem, pol_deg, n_t, t_fin=1):
         # print("Rotational term")
         # print(assemble(wcross2_form(w_pr_n12, u_dl_n1, w_pr_n12, problem.dimM)))
 
+        # Compute exact energy and vorticity
+    if problem.exact == True:
+        for ii in tqdm(range(1, n_t + 1)):
+            t_act = ii * dt
+            u_ex_t, w_ex_t, p_ex_t, H_ex_t, E_ex_t, Hel_ex_t = problem.init_outputs(t_act)
+            H_ex_vec[ii] = assemble(H_ex_t)
+            E_ex_vec[ii] = assemble(E_ex_t)
+            if problem.dimM == 3:
+                Hel_ex_vec[ii] = assemble(Hel_ex_t)
+                for jj in range(np.shape(w_ex_P_vec)[1]):
+                    w_ex_P_vec[ii, jj] = w_ex_t[jj](point_P)
+            else:
+                w_ex_P_vec[ii, :] = w_ex_t(point_P)
 
+            for jj in range(np.shape(u_ex_P_vec)[1]):
+                u_ex_P_vec[ii, jj] = u_ex_t[jj](point_P)
+            p_ex_P_vec[ii] = p_ex_t(point_P)
+            pdyn_ex_P_vec[ii] = p_ex_P_vec[ii] + 0.5 * np.dot(u_ex_P_vec[ii, :], u_ex_P_vec[ii, :])
 
     dict_res = {"tspan_int": tvec_int, "tspan_stag": tvec_stag, \
                 "energy_ex": H_ex_vec, "energy_pr": H_pr_vec, "energy_dl": H_dl_vec, \
