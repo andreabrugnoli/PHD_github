@@ -5,12 +5,9 @@ from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
 
-<<<<<<< HEAD
 # solver_param = {"mat_type": "aij", "ksp_type": "preonly", "pc_type": "lu", "pc_factor_mat_solver_type": "mumps"}
 solver_param = {"ksp_type": "gmres", "ksp_gmres_restart":100, "ksp_rtol": 1e-8, "pc_type": "ilu"}
-=======
-solver_param = {"mat_type": "aij", "ksp_type": "preonly", "pc_type": "lu", "pc_factor_mat_solver_type": "mumps"}
->>>>>>> afcae155e7b8325865fbcdb111c25277722676e8
+
 # solver_param = {"ksp_type": "preonly"}
 
 # solver_param = {}
