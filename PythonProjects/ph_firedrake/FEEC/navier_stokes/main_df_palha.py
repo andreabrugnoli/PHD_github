@@ -16,11 +16,11 @@ d = 2 # int(input("Spatial dimension ? "))
 if __name__ == '__main__':
     # 1. Select Problem:
     # Taylor Green 2D
-    deg = 2
+    deg = 3
     n_t = 100
     Delta_t = 1/100
     t_f = n_t * Delta_t
-    options = {"n_el": 10, "t_fin": t_f, "n_t": n_t}
+    options = {"n_el": 630, "t_fin": t_f, "n_t": n_t}
     if d == 2:
         problem = TaylorGreen2D(options)
     else:
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     plt.plot(tvec_int, pdynP_pr, 'b', label="p dyn at P primal")
     plt.plot(tvec_stag, pdynP_dl, 'r', label="p dyn at P dual")
     if problem.exact:
-        plt.plot(tvec_int, -pdynP_ex, 'g', label="p dyn at P exact")
+        plt.plot(tvec_int, pdynP_ex, 'g', label="p dyn at P exact")
     plt.legend()
 
     plt.figure()

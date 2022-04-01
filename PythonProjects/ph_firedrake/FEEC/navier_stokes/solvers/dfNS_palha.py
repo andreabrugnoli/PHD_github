@@ -295,7 +295,7 @@ def compute_sol(problem, pol_deg, n_t, t_fin=1):
         b1_dual = (1/dt) * m_form(chi_u_dl, u_dl_n) + 0.5*wcross2_form(chi_u_dl, u_dl_n, w_pr_n12, problem.dimM) \
                   + 0.5*curlw_form(chi_u_dl, w_dl_n, problem.dimM, problem.Re)
         bvec_dual = assemble(b1_dual)
-        # solve(A_dual, xdual_n1, bvec_dual, solver_parameters=solver_param)
+        solve(A_dual, xdual_n1, bvec_dual, solver_parameters=solver_param)
         solve(A_dual, xdual_n1, bvec_dual, nullspace=Vdual_nullspace, solver_parameters=solver_param)
 
         u_dl_n1, w_dl_n1, p_dl_n12 = xdual_n1.split()
@@ -382,7 +382,6 @@ def compute_sol(problem, pol_deg, n_t, t_fin=1):
 
             pex_tot_at_origin_n1 = pex_st_at_origin_n1 + pex_dyn_at_origin_n1
             pex_tot_at_origin_n = pex_st_at_origin_n + pex_dyn_at_origin_n
-
 
             offset_p_pr_n1 = pex_tot_at_origin_n1 - p_pr_n1.at((0, 0))
             p_pr_n1.assign(p_pr_n1 + Constant(offset_p_pr_n1))
