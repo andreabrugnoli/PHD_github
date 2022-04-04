@@ -102,7 +102,7 @@ if __name__ == '__main__':
     plt.plot(tvec_int, pdynP_pr, 'b', label="p dyn at P primal")
     plt.plot(tvec_stag, pdynP_dl, 'r', label="p dyn at P dual")
     if problem.exact:
-        plt.plot(tvec_int, -pdynP_ex, 'g', label="p dyn at P exact")
+        plt.plot(tvec_int, pdynP_ex, 'g', label="p dyn at P exact")
     plt.legend()
 
     plt.figure()
