@@ -1,6 +1,6 @@
-\documentclass[aspectratio=169, french]{ISAE-Beamer}
+\documentclass[aspectratio=169, french]{beamer}
 \usepackage{fontspec}
-%\usepackage[french]{babel}
+\usepackage[french]{babel}
 \usefonttheme[onlymath]{serif}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{arydshln,mathtools}
@@ -24,7 +24,9 @@
 
 
 \usepackage{media9}
-\usepackage[backend=bibtex,style=verbose,doi=false,isbn=false,url=false,eprint=false,autocite=footnote]{biblatex}
+\usepackage[backend=bibtex, style=verbose]{biblatex}
+\bibliography{biblioTrEquation}
+%\renewcommand\bibfont{\scriptsize}
 
 \addtobeamertemplate{footnote}{\vspace{-6pt}\advance\hsize-0.5cm}{\vspace{6pt}}
 \makeatletter
@@ -36,7 +38,7 @@
 
 \graphicspath{{./images/}}
 
-\bibliography{biblioTrEquation}
+
 
 % Math macros
 \DeclareMathOperator*{\grad}{grad}
@@ -83,7 +85,6 @@
 			\hbox{\onedot}\hbox{\onedot}}%
 }}
 
-\renewcommand\bibfont{\scriptsize}
 
 
 \makeatletter \renewcommand\d[1]{\ensuremath{%
@@ -93,28 +94,22 @@
 
 \graphicspath{{./imagesEqTr/}}
 
-\title[DF Transport 1D]{Méthode des différences finies pour l'EDP de transport 1D}
-
-
-\author[Andrea Brugnoli]{Andrea Brugnoli}
-
-\date[11/4/22]{11 Avril 2022}
-
-%\thanks{}
-
-
 
 \begin{document}
 	
 	
-	\maketitle
+\begin{frame}[plain]
+	
+	\input{TitleEqTransport}
+	
+\end{frame}
 	
 	
-	\begin{frame}{Outline}
-		
-		\tableofcontents
-		
-	\end{frame}
+\begin{frame}{Aperçu}
+	
+	\tableofcontents
+	
+\end{frame}
 
 \section{Équation du transport 1D : le cas continu}
 
@@ -122,7 +117,7 @@
 	\begin{tcolorbox}[title = L'EDP la plus simple, coltitle=white]
 		L'évolution d'un champ scalaire $u(x, t)$ transporté par un fluide satisfait 
 		\begin{equation*}
-			\diffp{u}{t} + \diffp{q}{x} = 0, \qquad x \in [0, l], \quad t \in  (0, T]. 
+			\diffp{u}{t} + \diffp{q}{x} = 0, \qquad x \in [0, L], \quad t \in  (0, T]. 
 		\end{equation*}
 	\end{tcolorbox}
 
@@ -134,32 +129,37 @@
 	Le problème est bien posé lorsque on spécifie 
 	\begin{align*}
 		u(x, 0) &= g(x), \qquad \text{Donnée initiale}, \\
-		u(0, t) &= f(t), \qquad \text{Condition au bord (compatible, i.e. $f(0) = g(0)$).}
+		u(0, t) &= f(t), \qquad \text{Condition au bord}.
 	\end{align*}
 \end{tcolorbox}
 
 \end{frame}
 
 \begin{frame}{Solution Analytique}
-En utilisant un argument géométrique ou algébrique, on obtient la solution analytique :
+	Si $f, \; g$ sont régulières, i.e. $C^{1}$, et $f(0) = g(0), \; f'(0) = -c g'(0)$
+alors  $u \in C^1([0, T]\times[0, L])$ 
 \begin{equation*}
-	u(x, t) = g(x - ct), \qquad\text{i.e. $u$ constant sur $\gamma$ telle que $\dot{\gamma} = (c ,1)$.}
+	u(x, t) = \begin{cases}
+	g(x - ct), \quad &x\ge ct\\
+	f(t-x/c), \quad &x\le ct,
+	\end{cases}
+	\qquad\text{i.e. $u$ constant sur $\gamma$ telle que $\dot{\gamma} = (c ,1)$.}
 \end{equation*}
 
 \begin{columns}
-	\begin{column}{.45\textwidth}
-	Exemple : 
+	\begin{column}{.4\textwidth}
+	Exemple : $c=2, \quad L=20, \quad T = 10$
 	\begin{align*}
-		c=2, \quad l=20, \quad T = 10. \\
-		g(x) = \exp(-x^2/4), \\
-		f(t) = \exp(-t^2/4),
-	\end{align*}
-	donne $u(x, t)= \exp(-(x-2t)^2/4)$.
+		g(x) &= \exp(-x^2/4), \\
+		f(t) &= \only<1>{1,}  \only<2>{\exp(-t^2),}  \only<3>{\cos^2(t),}
+ 	\end{align*}
 	\end{column}
-	\begin{column}{.5\textwidth}
+	\begin{column}{.6\textwidth}
 		\begin{figure}
 			\centering
-			\includegraphics[height=.74\textheight]{u_sol.eps}
+			\only<1>{\includegraphics[height=.65\textheight]{u_sol_f1.eps}}
+			\only<2>{\includegraphics[height=.65\textheight]{u_sol_f2.eps}}			
+			\only<3>{\includegraphics[height=.65\textheight]{u_sol_f3.eps}}
 		\end{figure}
 	\end{column}
 \end{columns}	
@@ -168,8 +168,36 @@ En utilisant un argument géométrique ou algébrique, on obtient la solution an
 
 \section{Discrétisation par différence finies}
 
-\begin{frame}{}
+\begin{frame}{Discrétisation du domaine : le maillage}
+On considère un maillage rectangulaire uniforme $(t_j, x_m)$ : \\
+cela signifie que $\Delta x = x_{i+1}- x_i $ et $\Delta t = t_{n+1}- t_n$ sont constants. \\
+  \vspace{.5cm}
+La champs scalaire discret est noté par $u_{i, n} \approx u(x_i, t_n)$ et représente une approximation de la solution exact.
 
+
+\begin{figure}
+\includegraphics[height=.6\textheight]{mesh.eps}
+\caption*{Exemple de maillage rectangulaire uniforme : $\Delta x = L/10, \quad; \Delta t=T/10$.}
+\end{figure}
+	
+\end{frame}
+
+\begin{frame}{Approximation des dérivées}
+	\begin{block}{Premier essai : schema d'Euler explicite}
+		On considère l'approximation au premier ordre
+		\begin{equation*}
+			\diffp{u}{t}(x_i, t_j) \approx \frac{u_{i, n+1} - u_{i, n}}{\Delta t} + O(\Delta t), \qquad \diffp{u}{x}(x_i, t_j) \approx \frac{u_{i+1, n} - u_{i, n}}{\Delta x} + O(\Delta x) 
+		\end{equation*}
+	\end{block}
+\end{frame}
+
+
+
+
+\begin{frame}{Bibliographie}
+	%\bibliographystyle{unsrt}
+	\nocite{*}
+	\printbibliography
 \end{frame}
 	
 	
