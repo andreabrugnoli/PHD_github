@@ -52,6 +52,7 @@
 \DeclareMathOperator*{\esssup}{ess\,sup}
 
 \newcommand{\bbR}{\mathbb{R}}
+\newcommand{\bbC}{\mathbb{C}}
 \newcommand{\bbF}{\mathbb{F}}
 \newcommand{\bbA}{\mathbb{A}}
 \newcommand{\bbB}{\mathbb{B}}
@@ -282,27 +283,26 @@ cela signifie que $\Delta x = x_{i+1}- x_i $ et $\Delta t = t_{n+1}- t_n$ sont c
 
 
 \begin{frame}{Quoi choisir? Analyse de Von Neumann}
-	\begin{block}{Analyse de von Neumann : un outils simple mais très puissant}
+	\textbf{Intuition : } Solution de l'EDP de transport pour $u_0(x) = e^{j \xi x}, (j = \sqrt{-1})$ :
+	\begin{equation*}
+	u(x, t) = e^{j \xi(x-ct)} = e^{j \xi x}e^{-jct}, \qquad \text{Onde plane.}
+	\end{equation*}
+	\textbf{Justification (analyse de Fourier)} :  la transformé de Fourier de $u(x, \cdot)$ est
+	\begin{equation*}
+		\widehat{u}(\xi, \cdot) = \mathcal{F}\{u\}(\xi, \cdot) = \int_{-\infty}^{+\infty} u(x, \cdot)e^{- j \xi x}  \d{x}, \qquad \xi \in \bbR,
+	\end{equation*}
+
+La transformé de la dérivée est donnée par
+\begin{equation*}
+\mathcal{F}\{\partial_{x} u\}(\xi, \cdot) = j \xi \widehat{u}(\xi, \cdot).
+\end{equation*}
+	Pour l'EDP du transport : $\partial_t{\widehat{u}}(\xi, t) = -c  j  \xi \widehat{u}(\xi, t).$
+\begin{block}{Analyse de von Neumann : un outils simple mais très efficace}
 		On considère alors l'évolution en temps discret du mode
 		\begin{equation*}
-			u_{i, n} = \psi_n e^{\, j \xi  i  \Delta x}, \quad \psi_n \in \bbR.
+			u_{i, n} = \psi_n e^{\, j \xi  i  \Delta x}, \quad \psi_n \in \bbC.
 		\end{equation*}
-	\end{block}
-	\textbf{Intuition : } La solution de l'EDP de transport pour $u_0(x) = e^{j \xi x}$ est donnée par  
-	\begin{equation*}
-	u(x, t) = e^{j \xi(x-ct)}, \qquad j = \sqrt{-1}, \qquad \text{Onde plane.}
-	\end{equation*}
-	\textbf{Justification par analyse de Fourier} : si $u_0(x) \in L^2(\bbR)$ alors
-	la transformé de Fourier
-	\begin{equation*}
-		\widehat{u}_0(\xi) = \mathcal{F}\{u_0\}(\xi) = \int_{-\infty}^{+\infty} u_0(x)e^{- j \xi x}  \d{x}, \qquad \xi \in \bbR,
-	\end{equation*}
-appartient à $L^2(\bbR)$. 
-%La transformé de la dérivée est donnée par
-%\begin{equation*}
-%\mathcal{F}\{\partial_{x} u\}(\xi, \cdot) = j \xi \widehat{u}(\xi, \cdot).
-%\end{equation*}
-%	Pour l'EDP du transport : $\partial_t{\widehat{u}}(\xi, t) = -c  j  \xi \widehat{u}(\xi, t).$
+\end{block}
 \end{frame}
 
 \begin{frame}{Les schémas que on va analyser}
@@ -317,11 +317,11 @@ appartient à $L^2(\bbR)$.
 \begin{frame}{Rappel : stabilité des systèmes dynamiques discrets}
 	\begin{columns}
 		\begin{column}{.5\textwidth}
-			\begin{block}{Stabilité en temps discret}
-				Le système discret scalaire temps invariant
+			\begin{block}{Stabilité en temps discret (cas complexe)}
+				Le système discret temps invariant
 				\begin{equation*}
 					\begin{aligned}
-						\psi_{n+1} &= A \psi_n, \qquad A \in \mathbb{C}, \\
+						\psi_{n+1} &= A \psi_n, \qquad \psi_n \in \mathbb{C}, A \in \mathbb{C},\\
 						\psi_0 &= \overline{\psi},
 					\end{aligned}
 				\end{equation*}  
