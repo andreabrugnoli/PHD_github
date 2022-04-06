@@ -1,7 +1,7 @@
 \documentclass[aspectratio=169, french]{beamer}
 \usepackage{fontspec}
 \usepackage[french]{babel}
-\usefonttheme[onlymath]{serif}
+\usefonttheme{professionalfonts}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{arydshln,mathtools}
 \usepackage{bm}
@@ -86,6 +86,18 @@
 }}
 
 
+\setbeamertemplate{blocks}[rounded][shadow]
+
+\setbeamercolor{block body alerted}{bg=alerted text.fg!10}
+\setbeamercolor{block title alerted}{bg=alerted text.fg!20}
+\setbeamercolor{block body}{bg=structure!10}
+\setbeamercolor{block title}{bg=structure!20}
+\setbeamercolor{block body example}{bg=green!10}
+\setbeamercolor{block title example}{bg=green!20}
+
+% Remove navigation bar
+\setbeamertemplate{navigation symbols}{}
+
 
 \makeatletter \renewcommand\d[1]{\ensuremath{%
 		\;\mathrm{d}#1\@ifnextchar\d{\!}{}}}
@@ -93,6 +105,32 @@
 
 
 \graphicspath{{./imagesEqTr/}}
+
+\newif\iftocsub
+\tocsubtrue
+\AtBeginSection[] {
+	\begin{frame}[noframenumbering]{Outline}
+		\tableofcontents[sectionstyle=show/shaded, subsectionstyle=show/show/hide]
+	\end{frame}
+	\tocsubfalse
+}
+\AtBeginSubsection[] {
+	\iftocsub
+	\begin{frame}[noframenumbering]{Outline}
+		\tableofcontents[currentsubsection, sectionstyle=show/shaded, subsectionstyle=show/shaded/hide]
+	\end{frame}
+	\fi
+	\tocsubtrue
+}
+
+\newcommand{\beginbackup}{
+	\newcounter{framenumbervorappendix}
+	\setcounter{framenumbervorappendix}{\value{framenumber}}
+}
+\newcommand{\backupend}{
+	\addtocounter{framenumbervorappendix}{-\value{framenumber}}
+	\addtocounter{framenumber}{\value{framenumbervorappendix}} 
+}
 
 
 \begin{document}
@@ -117,81 +155,283 @@
 	\begin{tcolorbox}[title = L'EDP la plus simple, coltitle=white]
 		L'évolution d'un champ scalaire $u(x, t)$ transporté par un fluide satisfait 
 		\begin{equation*}
-			\diffp{u}{t} + \diffp{q}{x} = 0, \qquad x \in [0, L], \quad t \in  (0, T]. 
+			\diffp{u}{t} + \diffp{q}{x} = 0, \qquad x \in \bbR, \quad t \in  (0, T]. 
 		\end{equation*}
 	\end{tcolorbox}
 
 \begin{tcolorbox}
 	Pour le flux $q(u, x, t)$ on considère une vitesse constante pour le fluide
 	\begin{equation*}
-		q(u, x, t) = c \ u(x, t), \qquad c>0.
+		q(u, x, t) = c \, u(x, t), \qquad c \in \bbR.
 	\end{equation*}
-	Le problème est bien posé lorsque on spécifie 
+	Le problème est bien posé lorsque on spécifie la donnée initiale
 	\begin{align*}
-		u(x, 0) &= g(x), \qquad \text{Donnée initiale}, \\
-		u(0, t) &= f(t), \qquad \text{Condition au bord}.
+		u(x, 0) &= u_0(x). 
 	\end{align*}
 \end{tcolorbox}
 
 \end{frame}
 
 \begin{frame}{Solution Analytique}
-	Si $f, \; g$ sont régulières, i.e. $C^{1}$, et $f(0) = g(0), \; f'(0) = -c g'(0)$
-alors  $u \in C^1([0, T]\times[0, L])$ 
-\begin{equation*}
-	u(x, t) = \begin{cases}
-	g(x - ct), \quad &x\ge ct\\
-	f(t-x/c), \quad &x\le ct,
-	\end{cases}
-	\qquad\text{i.e. $u$ constant sur $\gamma$ telle que $\dot{\gamma} = (c ,1)$.}
-\end{equation*}
-
-\begin{columns}
-	\begin{column}{.4\textwidth}
-	Exemple : $c=2, \quad L=20, \quad T = 10$
-	\begin{align*}
-		g(x) &= \exp(-x^2/4), \\
-		f(t) &= \only<1>{1,}  \only<2>{\exp(-t^2),}  \only<3>{\cos^2(t),}
- 	\end{align*}
+	\begin{columns}
+	\begin{column}{.58\textwidth}
+		\begin{overlayarea}{\textwidth}{\textheight}
+		\vspace{1cm}
+		\begin{tcolorbox}[title = Solution analytique regulière, coltitle=white]
+			Si $u_0 \in C^{1}(\bbR)$ alors  
+			$u \in C^{1}(\bbR \times[0, T])$ et
+			\begin{equation*}
+				u(x, t) = 	u_0(x - ct),
+			\end{equation*}
+		i.e. $u$ constant sur $\gamma$ telle que $\dot{\gamma} = (c ,1)$. \\
+		Les courbes $\gamma$ sont appelées caractéristiques.
+		\end{tcolorbox}
+		\end{overlayarea}
 	\end{column}
-	\begin{column}{.6\textwidth}
-		\begin{figure}
-			\centering
-			\only<1>{\includegraphics[height=.65\textheight]{u_sol_f1.eps}}
-			\only<2>{\includegraphics[height=.65\textheight]{u_sol_f2.eps}}			
-			\only<3>{\includegraphics[height=.65\textheight]{u_sol_f3.eps}}
+	\begin{column}{.42\textwidth}
+		\begin{overlayarea}{\textwidth}{\textheight}
+		\begin{figure}[t]
+			\only<1>{\includegraphics[height=.75\textheight]{u_sol_c_pos_nobcs.eps}%
+				\caption*{Exemple : $u_0(x) = e^{-x^2/4}, \; c>0$.}
+			}
+			\only<2>{
+				\includegraphics[height=.75\textheight]{u_sol_c_neg_nobcs.eps} 
+				\caption*{Exemple : $u_0(x) = e^{-x^2/4}, \; c<0$.}
+			}
 		\end{figure}
+		\end{overlayarea}
 	\end{column}
-\end{columns}	
+\end{columns}
+
 
 \end{frame}
 
 \section{Discrétisation par différence finies}
 
 \begin{frame}{Discrétisation du domaine : le maillage}
-On considère un maillage rectangulaire uniforme $(t_j, x_m)$ : \\
+On considère un maillage rectangulaire uniforme $(x_i, t_n)$ : \\
 cela signifie que $\Delta x = x_{i+1}- x_i $ et $\Delta t = t_{n+1}- t_n$ sont constants. \\
-  \vspace{.5cm}
-La champs scalaire discret est noté par $u_{i, n} \approx u(x_i, t_n)$ et représente une approximation de la solution exact.
+  
 
+	\begin{columns}
+	\begin{column}{.5\textwidth}
+	\begin{figure}
+		\includegraphics[height=.5\textheight]{mesh.eps}
+		\caption*{Exemple de maillage rectangulaire uniforme :\\ $\Delta x = 4, \quad \Delta t=2$.}
+	\end{figure}	
+	\end{column}
+	\begin{column}{.5\textwidth}
+		\begin{tcolorbox}
+			La solution discrète $u_{i, n}$ au n\oe{}ud $(x_i, t_n)$ est une approximation  de la valeur exacte $u(x_i, t_n)$
+			\begin{equation*}
+				u_{i, n} \approx u(x_i, t_n).
+			\end{equation*} 
+		\end{tcolorbox}
+	\end{column}
+\end{columns}	
 
-\begin{figure}
-\includegraphics[height=.6\textheight]{mesh.eps}
-\caption*{Exemple de maillage rectangulaire uniforme : $\Delta x = L/10, \quad; \Delta t=T/10$.}
-\end{figure}
+\end{frame}
+
+\begin{frame}{Approximation des dérivées : développement de Taylor}
+	\textbf{Différences finies : on remplace la dérivée par un quotient différentiel}
+	
+	
+	\begin{columns}
+		\begin{column}{.5\textwidth}
+			\begin{tcolorbox}[title=Discrétisation en temps, coltitle=white]
+				Explicite
+				\begin{equation*}
+					\begin{aligned}
+						\diffp{u}{t}(x_i, t_n) \approx \frac{u_{i, n+1} - u_{i, n}}{\Delta t} + O(\Delta t).
+					\end{aligned}
+				\end{equation*}
+				Implicite
+				\begin{equation*}
+					\begin{aligned}
+						\diffp{u}{t}(x_i, t_n) \approx \frac{u_{i, n} - u_{i, n-1}}{\Delta t} + O(\Delta t).
+					\end{aligned}
+				\end{equation*}
+				Centrée
+				\begin{equation*}
+					\begin{aligned}
+						\diffp{u}{t}(x_i, t_n) \approx \frac{u_{i, n+1} - u_{i, n-1}}{2\Delta t} + O(\Delta t^2)
+					\end{aligned}
+				\end{equation*}
+			\end{tcolorbox}
+		\end{column}
+		\begin{column}{.5\textwidth}
+			\begin{tcolorbox}[title=Discrétisation en espace, coltitle=white]
+				Aval
+				\begin{equation*}
+					\diffp{u}{x}(x_i, t_n) \approx \frac{u_{i+1, n} - u_{i, n}}{\Delta x} + O(\Delta x).
+				\end{equation*}
+				Amont
+				\begin{equation*}
+					\diffp{u}{x}(x_i, t_n) \approx \frac{u_{i, n} - u_{i-1, n}}{\Delta x} + O(\Delta x).
+				\end{equation*}
+				Centrée
+				\begin{equation*}
+					\diffp{u}{t}(x_i, t_n) \approx \frac{u_{i+1, n} - u_{i-1, n}}{2\Delta x} + O(\Delta x^2)
+				\end{equation*}
+			\end{tcolorbox}
+			\end{column}
+		\end{columns}	
+	
 	
 \end{frame}
 
-\begin{frame}{Approximation des dérivées}
-	\begin{block}{Premier essai : schema d'Euler explicite}
-		On considère l'approximation au premier ordre
+
+\begin{frame}{Quoi choisir? Analyse de Von Neumann}
+	\begin{block}{Analyse de von Neumann : un outils simple mais très puissant}
+		On considère alors l'évolution en temps discret du mode
 		\begin{equation*}
-			\diffp{u}{t}(x_i, t_j) \approx \frac{u_{i, n+1} - u_{i, n}}{\Delta t} + O(\Delta t), \qquad \diffp{u}{x}(x_i, t_j) \approx \frac{u_{i+1, n} - u_{i, n}}{\Delta x} + O(\Delta x) 
+			u_{i, n} = \psi_n e^{\, j \xi  i  \Delta x}, \quad \psi_n \in \bbR.
 		\end{equation*}
 	\end{block}
+	\textbf{Intuition : } La solution de l'EDP de transport pour $u_0(x) = e^{j \xi x}$ est donnée par  
+	\begin{equation*}
+	u(x, t) = e^{j \xi(x-ct)}, \qquad j = \sqrt{-1}, \qquad \text{Onde plane.}
+	\end{equation*}
+	\textbf{Justification par analyse de Fourier} : si $u_0(x) \in L^2(\bbR)$ alors
+	la transformé de Fourier
+	\begin{equation*}
+		\widehat{u}_0(\xi) = \mathcal{F}\{u_0\}(\xi) = \int_{-\infty}^{+\infty} u_0(x)e^{- j \xi x}  \d{x}, \qquad \xi \in \bbR,
+	\end{equation*}
+appartient à $L^2(\bbR)$. 
+%La transformé de la dérivée est donnée par
+%\begin{equation*}
+%\mathcal{F}\{\partial_{x} u\}(\xi, \cdot) = j \xi \widehat{u}(\xi, \cdot).
+%\end{equation*}
+%	Pour l'EDP du transport : $\partial_t{\widehat{u}}(\xi, t) = -c  j  \xi \widehat{u}(\xi, t).$
+\end{frame}
+
+\begin{frame}{Les schémas que on va analyser}
+\begin{enumerate}
+	\item Explicite en temps, aval en espace.
+	\item Explicite en temps, amont en espace.
+	\item Explicite en temps, centré en espace.
+	\item Implicite en temps, amont en espace.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Rappel : stabilité des systèmes dynamiques discrets}
+	\begin{columns}
+		\begin{column}{.5\textwidth}
+			\begin{block}{Stabilité en temps discret}
+				Le système discret scalaire temps invariant
+				\begin{equation*}
+					\begin{aligned}
+						\psi_{n+1} &= A \psi_n, \qquad A \in \mathbb{C}, \\
+						\psi_0 &= \overline{\psi},
+					\end{aligned}
+				\end{equation*}  
+				est stable si $|A|<1$ et stable au sens de Lyapunov si $|A|=1$.
+			\end{block}
+		\end{column}
+		\begin{column}{.5\textwidth}
+			\begin{figure}
+				\centering
+				\includegraphics[height=.7\textheight]{discrete_stability.pdf}
+			\end{figure}
+		\end{column}
+	\end{columns}	
+\end{frame}
+
+\begin{frame}{Cas 1 : Schéma explicite en temps et aval en espace}
+Schéma résultant : 
+$u_{i, n+1} = u_{i, n} - \sigma(u_{i+1, n} - u_{i, n})$ où $\sigma = c/c_{\mathrm{num}}$.\\
+ $c_{\mathrm{num}} = \Delta x/\Delta t$ est la vitesse numérique
+
+\begin{tcolorbox}
+L'hypothèse du Von Neumann $u_{i, n} = \psi_n e^{\, j  \xi  i  \Delta x}$ donne $\psi_{n+1} = A(\xi) \psi_n$ où
+\begin{equation*}
+	A(\xi) = 1 - \sigma(e^{j  \xi \Delta x}-1), \qquad \text{Coefficient d'amplification}.
+\end{equation*}
+Le schéma est stable lorsque
+\begin{equation*}
+	|A(\xi)|^2 = 1 + 2 \sigma(\sigma + 1)(1 - \cos(\xi \Delta x))\le 1
+\end{equation*}
+Pour la stabilité on obtient $-1 \le \sigma \le 0$. Cela implique
+\begin{equation*}
+	c<1, \qquad c_{\mathrm{num}}> |c|.
+\end{equation*}
+Le vitesse numérique doit etre majeur de la vitesse physique : il s'agit de la condition CFL (Courant, Friedrichs et Lewy)
+\end{tcolorbox}
+
 \end{frame}
 
 
+\section{Pour aller plus loin : domaine borné et conditions au bord}
+
+\begin{frame}{Domaine borné en espace}
+	
+On considère le transport du champ $u(x, t)$ dans un domaine spatial borné
+\begin{equation*}
+	\diffp{u}{t} + c \diffp{u}{x} = 0, \qquad c > 0, \quad  x \in [0, L], \quad t \in (0, T]. 
+\end{equation*}
+		
+		Le problème est bien posé lorsque on spécifie 
+		\begin{equation*}
+			\begin{aligned}
+			u(x, 0) &= u_0(x),\\
+			u(0, t) &= f(t),
+			\end{aligned} \qquad
+			\begin{aligned}
+			\text{Donnée initiale}, \\
+			\text{Condition au bord}.
+			\end{aligned}
+		\end{equation*}
+	\begin{tcolorbox}[title = Solution analytique, coltitle=white]
+Si $f, \; u_0 \in C^{1}$, et $f(0) = u_0(0), \; f^{'}(0) = -c u_0{'}(0)$
+alors  $u \in C^{1}([0, L]\times [0, T])$ 
+\begin{equation*}
+	u(x, t) = \begin{cases}
+		u_0(x - ct), \quad &x\ge ct\\
+		f(t-x/c), \quad &x\le ct,
+	\end{cases}
+	\qquad\text{i.e. $u$ constant sur $\gamma$ telle que $\dot{\gamma} = (c ,1)$.}
+\end{equation*}
+\end{tcolorbox}
+	
+\end{frame}
+
+\begin{frame}{Compatibilité de données}
+
+	\begin{columns}
+		\begin{column}{.5\textwidth}
+			\begin{overlayarea}{\textwidth}{\textheight}
+			\begin{block}{Interaction entre les données}
+				\begin{equation*}
+					u(x, t) = 
+					\begin{cases}
+						u_0(x - ct), \quad &x\ge ct\\
+						f(t-x/c), \quad &x\le ct,
+					\end{cases}
+				\end{equation*}
+				$f$ et $u_0$ interagissent seulement sur $x=ct$.
+			\end{block}
+				\begin{tcolorbox}[title = Exemples, coltitle=white]
+					$c=2, \quad L=20, \quad T = 10$.
+					\begin{align*}
+						u_0(x) &= e^{-x^2/4}, \\
+						f(t) &= \only<1>{1,}  \only<2>{e^{-t^2},}  \only<3>{\cos^2(t),}
+					\end{align*}
+				\end{tcolorbox}	
+			\end{overlayarea}
+		\end{column}
+		\begin{column}{.5\textwidth}
+		\begin{overlayarea}{\textwidth}{\textheight}
+			\begin{figure}
+				\centering
+				\only<1>{\includegraphics[height=.8\textheight]{u_sol_f1.eps}}
+				\only<2>{\includegraphics[height=.8\textheight]{u_sol_f2.eps}}			
+				\only<3>{\includegraphics[height=.8\textheight]{u_sol_f3.eps}}
+			\end{figure}
+		\end{overlayarea}
+		\end{column}
+	\end{columns}	
+
+\end{frame}
 
 
 \begin{frame}{Bibliographie}

@@ -54,6 +54,32 @@
 
 \graphicspath{{./images/}}
 
+\newif\iftocsub
+\tocsubtrue
+\AtBeginSection[] {
+	\begin{frame}[noframenumbering]{Outline}
+		\tableofcontents[sectionstyle=show/shaded, subsectionstyle=show/show/hide]
+	\end{frame}
+	\tocsubfalse
+}
+\AtBeginSubsection[] {
+	\iftocsub
+	\begin{frame}[noframenumbering]{Outline}
+		\tableofcontents[currentsubsection, sectionstyle=show/shaded, subsectionstyle=show/shaded/hide]
+	\end{frame}
+	\fi
+	\tocsubtrue
+}
+
+\newcommand{\beginbackup}{
+	\newcounter{framenumbervorappendix}
+	\setcounter{framenumbervorappendix}{\value{framenumber}}
+}
+\newcommand{\backupend}{
+	\addtocounter{framenumbervorappendix}{-\value{framenumber}}
+	\addtocounter{framenumber}{\value{framenumbervorappendix}} 
+}
+
 
 \begin{document}
 	
@@ -274,7 +300,7 @@ Les partenariats industriels sont fondamentaux pour les PIR en 2A, les PIE du do
 \begin{figure}[t]
 	\begin{subfigure}{0.45\textwidth}
 		\includegraphics[height=.45\textheight]{MDO_wing.pdf}%
-		\caption*{\textbf{Optimisation multidisciplinaire d'une aile} (\cite {masColomer2021mdo}). }
+		\caption*{\textbf{Optimisation multidisciplinaire d'une aile} (\cite{masColomer2021mdo}). }
 	\end{subfigure}\hfill
 	\begin{subfigure}{0.5\textwidth}
 		\includegraphics[height=.45\textheight]{Codesign_satellite.pdf} 
@@ -303,6 +329,15 @@ J'aimerais proposer des cours entre le calcul scientifique et les systèmes dyna
 	\end{subfigure}
 \end{figure}
 \end{frame}
+
+\begin{comment}
+\begin{frame}[allowframebreaks]{Références}
+\cite{brugnoli2019ammkir}\\
+\cite{brugnoli2019ammkir}
+
+\end{frame}
+\end{comment}
+
 	
 
 
