@@ -209,6 +209,8 @@
 
 \section{Discrétisation par différence finies}
 
+\subsection{Maillage et approximation des dérivées}
+
 \begin{frame}{Discrétisation du domaine : le maillage}
 On considère un maillage rectangulaire uniforme $(x_i, t_n)$ : \\
 cela signifie que $\Delta x = x_{i+1}- x_i $ et $\Delta t = t_{n+1}- t_n$ sont constants. \\
@@ -232,6 +234,7 @@ cela signifie que $\Delta x = x_{i+1}- x_i $ et $\Delta t = t_{n+1}- t_n$ sont c
 \end{columns}	
 
 \end{frame}
+
 
 \begin{frame}{Approximation des dérivées : développement de Taylor}
 	\textbf{Différences finies : on remplace la dérivée par un quotient différentiel}
@@ -282,21 +285,24 @@ cela signifie que $\Delta x = x_{i+1}- x_i $ et $\Delta t = t_{n+1}- t_n$ sont c
 \end{frame}
 
 
+\subsection{Stabilité : analyse de Von Neumann}
+
+
 \begin{frame}{Quoi choisir? Analyse de Von Neumann}
-	\textbf{Intuition : } Solution de l'EDP de transport pour $u_0(x) = e^{j \xi x}, (j = \sqrt{-1})$ :
+	\textbf{Intuition : } Solution de l'EDP de transport pour $u_0(x) = e^{j \xi x} \; (j = \sqrt{-1})$ :
 	\begin{equation*}
 	u(x, t) = e^{j \xi(x-ct)} = e^{j \xi x}e^{-jct}, \qquad \text{Onde plane.}
 	\end{equation*}
 	\textbf{Justification (analyse de Fourier)} :  la transformé de Fourier de $u(x, \cdot)$ est
 	\begin{equation*}
-		\widehat{u}(\xi, \cdot) = \mathcal{F}\{u\}(\xi, \cdot) = \int_{-\infty}^{+\infty} u(x, \cdot)e^{- j \xi x}  \d{x}, \qquad \xi \in \bbR,
+		\widehat{u}(\xi, \cdot) = \mathcal{F}\{u\}(\xi, \cdot) = \int_{-\infty}^{+\infty} u(x, \cdot)e^{- j \xi x}  \d{x}, \qquad \xi \in \bbR.
 	\end{equation*}
 
 La transformé de la dérivée est donnée par
 \begin{equation*}
 \mathcal{F}\{\partial_{x} u\}(\xi, \cdot) = j \xi \widehat{u}(\xi, \cdot).
 \end{equation*}
-	Pour l'EDP du transport : $\partial_t{\widehat{u}}(\xi, t) = -c  j  \xi \widehat{u}(\xi, t).$
+EDP du transport : $\partial_t{\widehat{u}}(\xi, t) = -c  j  \xi \widehat{u}(\xi, t)$ \hspace{.3cm} (Eq. algébrique in $\bbC$).
 \begin{block}{Analyse de von Neumann : un outils simple mais très efficace}
 		On considère alors l'évolution en temps discret du mode
 		\begin{equation*}
@@ -305,30 +311,21 @@ La transformé de la dérivée est donnée par
 \end{block}
 \end{frame}
 
-\begin{frame}{Les schémas que on va analyser}
-\begin{enumerate}
-	\item Explicite en temps, aval en espace.
-	\item Explicite en temps, amont en espace.
-	\item Explicite en temps, centré en espace.
-	\item Implicite en temps, amont en espace.
-\end{enumerate}
-\end{frame}
-
 \begin{frame}{Rappel : stabilité des systèmes dynamiques discrets}
 	\begin{columns}
-		\begin{column}{.5\textwidth}
+		\begin{column}{.55\textwidth}
 			\begin{block}{Stabilité en temps discret (cas complexe)}
 				Le système discret temps invariant
 				\begin{equation*}
 					\begin{aligned}
-						\psi_{n+1} &= A \psi_n, \qquad \psi_n \in \mathbb{C}, A \in \mathbb{C},\\
+						\psi_{n+1} &= A \psi_n, \qquad \psi_n \in \mathbb{C},  \; A \in \mathbb{C},\\
 						\psi_0 &= \overline{\psi},
 					\end{aligned}
 				\end{equation*}  
 				est stable si $|A|<1$ et stable au sens de Lyapunov si $|A|=1$.
 			\end{block}
 		\end{column}
-		\begin{column}{.5\textwidth}
+		\begin{column}{.45\textwidth}
 			\begin{figure}
 				\centering
 				\includegraphics[height=.7\textheight]{discrete_stability.pdf}
@@ -337,28 +334,144 @@ La transformé de la dérivée est donnée par
 	\end{columns}	
 \end{frame}
 
+\subsection{Applications}
+
+\begin{frame}{Les schémas que on va analyser}
+\begin{enumerate}
+	\item Explicite en temps, aval en espace.
+	\item Explicite en temps, amont en espace.
+	\item Explicite en temps, centré en espace.
+	\item Implicite en temps, amont en espace.
+\end{enumerate} 
+\end{frame}
+
+
 \begin{frame}{Cas 1 : Schéma explicite en temps et aval en espace}
 Schéma résultant : 
-$u_{i, n+1} = u_{i, n} - \sigma(u_{i+1, n} - u_{i, n})$ où $\sigma = c/c_{\mathrm{num}}$.\\
- $c_{\mathrm{num}} = \Delta x/\Delta t$ est la vitesse numérique
+$u_{i, n+1} = u_{i, n} - \sigma(u_{i+1, n} - u_{i, n})$ \\
+où $\sigma = c/c_{\mathrm{num}}$. ($c_{\mathrm{num}} = \Delta x/\Delta t$ est la \textbf{vitesse numérique})
 
 \begin{tcolorbox}
 L'hypothèse du Von Neumann $u_{i, n} = \psi_n e^{\, j  \xi  i  \Delta x}$ donne $\psi_{n+1} = A(\xi) \psi_n$ où
 \begin{equation*}
 	A(\xi) = 1 - \sigma(e^{j  \xi \Delta x}-1), \qquad \text{Coefficient d'amplification}.
 \end{equation*}
-Le schéma est stable lorsque
+Le critère de stabilité est respecté si
 \begin{equation*}
-	|A(\xi)|^2 = 1 + 2 \sigma(\sigma + 1)(1 - \cos(\xi \Delta x))\le 1
+	|A(\xi)|^2 = 1 + 2 \sigma(\sigma + 1)(1 - \cos(\xi \Delta x))\le 1 \implies \textbf{Stable si}   -1 \le \sigma \le 0
 \end{equation*}
-Pour la stabilité on obtient $-1 \le \sigma \le 0$. Cela implique
+Si $\sigma=-1 \implies |A(\xi)|=1$ (pas de viscosité numérique)\\
+Si $-1 < \sigma \le 0 \implies |A(\xi)|<1$ (viscosité numérique)
 \begin{equation*}
-	c<1, \qquad c_{\mathrm{num}}> |c|.
+	\begin{aligned}
+	c<0, \\
+	c_{\mathrm{num}}>|c|, 
+	\end{aligned}
+	\qquad 
+	\begin{aligned}
+	\text{Discrétisation aval ne peut pas traiter vitesse postive}, \\
+	\text{Condition CFL (Courant, Friedrichs et Lewy 1928).}
+	\end{aligned}
 \end{equation*}
-Le vitesse numérique doit etre majeur de la vitesse physique : il s'agit de la condition CFL (Courant, Friedrichs et Lewy)
+
 \end{tcolorbox}
 
 \end{frame}
+
+
+
+\begin{frame}{Résultats simulation}
+	
+\only<1>{
+\centering
+\includemedia[
+label=vidcas1_sig_m1,
+addresource=/home/andrea/Videos/PresEqTransport/cas1_sig_m1.mp4,
+activate=pageopen, 
+deactivate=onclick,
+width=.8\textwidth, height=.7\textheight,
+flashvars={
+	source=/home/andrea/Videos/PresEqTransport/cas1_sig_m1.mp4
+	&%
+	autoPlay=true&%
+	loop=true%
+}
+]{}{VPlayer.swf}
+Cas stable sans viscosité numérique.
+%\mediabutton[
+%mediacommand=vidPlateRod:playPause
+%]{\fbox{Play/Pause}}
+}
+
+	
+\only<1>{
+	\centering
+	\includemedia[
+	label=vidcas1_sig_mdot5,
+	addresource=/home/andrea/Videos/PresEqTransport/cas1_sig_mdot5.mp4,
+	activate=pageopen, 
+	deactivate=onclick,
+	width=.8\textwidth, height=.7\textheight,
+	flashvars={
+		source=/home/andrea/Videos/PresEqTransport/cas1_sig_mdot5.mp4
+		&%
+		autoPlay=true&%
+		loop=true%
+	}
+	]{}{VPlayer.swf}
+	Cas stable avec viscosité numérique.
+	%\mediabutton[
+	%mediacommand=vidPlateRod:playPause
+	%]{\fbox{Play/Pause}}
+}
+
+	
+\only<1>{
+	\centering
+	\includemedia[
+	label=vidcas1_sig_m2,
+	addresource=/home/andrea/Videos/PresEqTransport/cas1_sig_m2.mp4,
+	activate=pageopen, 
+	deactivate=onclick,
+	width=.8\textwidth, height=.7\textheight,
+	flashvars={
+		source=/home/andrea/Videos/PresEqTransport/cas1_sig_m2.mp4
+		&%
+		autoPlay=true&%
+		loop=true%
+	}
+	]{}{VPlayer.swf}
+	Instable : CFL non respectée.
+	%\mediabutton[
+	%mediacommand=vidPlateRod:playPause
+	%]{\fbox{Play/Pause}}
+}
+
+	
+\only<4>{
+	\centering
+	\includemedia[
+	label=vidcas1_sig_dot5,
+	addresource=/home/andrea/Videos/PresEqTransport/cas1_sig_dot5.mp4,
+	activate=pageopen, 
+	deactivate=onclick,
+	width=.8\textwidth, height=.7\textheight,
+	flashvars={
+		source=/home/andrea/Videos/PresEqTransport/cas1_sig_dot5.mp4
+		&%
+		autoPlay=true&%
+		loop=true%
+	}
+	]{}{VPlayer.swf}
+	Cas instable (c>0).
+	%\mediabutton[
+	%mediacommand=vidPlateRod:playPause
+	%]{\fbox{Play/Pause}}
+}
+
+\end{frame}
+
+
 
 
 \section{Pour aller plus loin : domaine borné et conditions au bord}
