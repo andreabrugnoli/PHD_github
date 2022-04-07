@@ -6,6 +6,8 @@ from matplotlib import animation
 import tutorials.utilities.plot_setup
 
 path_fig = "/home/andrea/PHD_github/LaTeXProjects/CandidatureISAE/imagesEqTr/"
+path_video = "/home/andrea/Videos/PresEqTransport/"
+
 
 def u_0(x):
     # x : array of spatial coordinates
@@ -81,25 +83,59 @@ def exp_time_amont_space(fun_u0, sigma, x_vec, t_vec):
 
     return u_sol
 
-def animate_sol(x_vec, t_vec, u_sol, save_anim = False):
+
+def animate_sol(x_vec, t_vec, u_num, c, sig, save_anim = False):
     fig = plt.figure()
 
-    ax = plt.axes(xlim=(min(x_vec), max(x_vec)), ylim=(0, 1))
-    line, = ax.plot([], [], lw=2)
+
+
+    min_sol = 0
+    max_sol = 1
+
+    min_plot_sol = min_sol-np.abs(min_sol)/10
+    max_plot_sol = max_sol+np.abs(max_sol)/10
+
+    x_min = min(x_vec)
+    x_max = max(x_vec)
+
+    if c > 0:
+        loc_str = "upper left"
+        cord_ann = (x_min, max_sol)
+    else:
+        loc_str = "upper right"
+        cord_ann = (x_max, max_sol)
+
+    ax = plt.axes(xlim=(x_min, x_max), ylim=(min_plot_sol, max_plot_sol))
+    ax.set_xlabel(r'Space')
+    ax.set_title(r'$c=' + str(c) + ",\quad \sigma=" + str(sig) + "$")
+    # line, = ax.plot([], [], lw=2)
 
     # initialization function: plot the background of each frame
     def init():
-        line.set_data(x_vec, u_sol[0, :])
-        return line,
+        # line.set_data(x_vec, u_num[:, 0])
+        # line.set_data(x_vec, u_0(x_vec))
+        ax.plot(x_vec, u_num[:, 0], 'b')
+        ax.plot(x_vec, u_0(x_vec), 'r')
+
+        return 0
 
     # animation function.  This is called sequentially
     def animate(i):
-        line.set_data(x_vec, u_sol[:, i])
-        return line,
+        ax.lines.clear()
+
+        # line.set_data(x_vec, u_num[:, i])
+        # line.set_data(x_vec, u_0(x_vec-c*t_vec[i]))
+        ax.plot(x_vec, u_num[:, i], 'b', label="numerical")
+        ax.plot(x_vec, u_0(x_vec-c*t_vec[i]), 'r', label="exact")
+        ax.set_title(r'$c=' + str(c) + ",\quad \sigma=" + str(sig) + ", \quad t=" + '{0:.2}'.format(t_vec[i]) + ".$")
+
+        ax.legend(loc=loc_str, frameon=False)
+
+        return 0
 
     # call the animator.  blit=True means only re-draw the parts that have changed.
     anim = animation.FuncAnimation(fig, animate, init_func=init,
-                                   frames=len(t_vec), interval=20, blit=False)
+                                   frames=len(t_vec), interval=0, blit=False)
 
     # save the animation as an mp4.  This requires ffmpeg or mencoder to be
     # installed.  The extra_args ensure that the x264 codec is used, so that
@@ -107,43 +143,10 @@ def animate_sol(x_vec, t_vec, u_sol, save_anim = False):
     # your system: for more information, see
     # http://matplotlib.sourceforge.net/api/animation_api.html
     if save_anim:
-        anim.save('basic_animation.mp4', fps=1, extra_args=['-vcodec', 'libx264'])
+        name_vid = input("Name video : ")
+        anim.save(path_video + name_vid + '.mp4', fps=20, extra_args=['-vcodec', 'libx264'])
 
     plt.show()
 
     return 1
-
-x_min = -20
-x_max = 20
-t_end = 10
-c = -2
-
-n_x = int(input("Enter points x : "))
-x_vec = np.linspace(x_min, x_max, n_x)
-
-n_t = int(input("Enter points t : "))
-t_vec = np.linspace(0, t_end, n_t)
-
-Dx = (x_max-x_min)/(n_x+1)
-Dt = t_end/(n_t+1)
-print("Dx : ")
-print(Dx)
-print("Dt : ")
-print(Dt)
-
-c_num = Dx/Dt
-sigma = c/c_num
-
-print("sigma : ")
-print(sigma)
-x_grid, t_grid = mesh(x_vec, t_vec)
-
-u_sol_num = exp_time_amont_space(u_0, sigma, x_vec, t_vec)
-
-animate_sol(x_vec, t_vec, u_sol_num)
-
-
-
-
-
 
