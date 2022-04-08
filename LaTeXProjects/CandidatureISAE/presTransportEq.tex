@@ -110,14 +110,14 @@
 \newif\iftocsub
 \tocsubtrue
 \AtBeginSection[] {
-	\begin{frame}[noframenumbering]{Outline}
+	\begin{frame}[noframenumbering]{Aperçu}
 		\tableofcontents[sectionstyle=show/shaded, subsectionstyle=show/show/hide]
 	\end{frame}
 	\tocsubfalse
 }
 \AtBeginSubsection[] {
 	\iftocsub
-	\begin{frame}[noframenumbering]{Outline}
+	\begin{frame}[noframenumbering]{Aperçu}
 		\tableofcontents[currentsubsection, sectionstyle=show/shaded, subsectionstyle=show/shaded/hide]
 	\end{frame}
 	\fi
@@ -189,8 +189,9 @@
 		\end{tcolorbox}
 		\vspace{.2cm}
 		\begin{tcolorbox}[title = Conservation de l'energie, coltitle=white]
+			Si $u_0(x) \in L^2(\bbR)$
 			\begin{equation*}
-				\diff{}{t}\norm{u(x, t)}_{L^2}^2 = 0 \implies \norm{u(x, t)}_{L^2} = \mathrm{Const}.
+				\diff{}{t}\norm{u(x, t)}_{L^2}^2 = 0 \implies \norm{u(x, t)}^2_{L^2} = \mathrm{Const}.
 			\end{equation*}
 		\end{tcolorbox}
 		\end{overlayarea}
@@ -233,7 +234,7 @@ cela signifie que $\Delta x = x_{i+1}- x_i $ et $\Delta t = t_{n+1}- t_n$ sont c
 		\begin{tcolorbox}
 			La solution discrète $u_{i, n}$ au n\oe{}ud $(x_i, t_n)$ est une approximation  de la valeur exacte $u(x_i, t_n)$
 			\begin{equation*}
-				u_{i, n} \approx u(x_i, t_n).
+				u_{i}^n \approx u(x_i, t_n).
 			\end{equation*} 
 		\end{tcolorbox}
 	
@@ -253,19 +254,19 @@ cela signifie que $\Delta x = x_{i+1}- x_i $ et $\Delta t = t_{n+1}- t_n$ sont c
 				Explicite
 				\begin{equation*}
 					\begin{aligned}
-						\diffp{u}{t}(x_i, t_n) \approx \frac{u_{i, n+1} - u_{i, n}}{\Delta t} + O(\Delta t).
+						\diffp{u}{t}(x_i, t_n) \approx \frac{u_{i}^{n+1} - u_{i}^{n}}{\Delta t} + O(\Delta t).
 					\end{aligned}
 				\end{equation*}
 				Implicite
 				\begin{equation*}
 					\begin{aligned}
-						\diffp{u}{t}(x_i, t_n) \approx \frac{u_{i, n} - u_{i, n-1}}{\Delta t} + O(\Delta t).
+						\diffp{u}{t}(x_i, t_n) \approx \frac{u_{i}^{n} - u_{i}^{n-1}}{\Delta t} + O(\Delta t).
 					\end{aligned}
 				\end{equation*}
 				Centrée
 				\begin{equation*}
 					\begin{aligned}
-						\diffp{u}{t}(x_i, t_n) \approx \frac{u_{i, n+1} - u_{i, n-1}}{2\Delta t} + O(\Delta t^2)
+						\diffp{u}{t}(x_i, t_n) \approx \frac{u_{i}^{n+1} - u_{i}^{n-1}}{2\Delta t} + O(\Delta t^2)
 					\end{aligned}
 				\end{equation*}
 			\end{tcolorbox}
@@ -274,15 +275,15 @@ cela signifie que $\Delta x = x_{i+1}- x_i $ et $\Delta t = t_{n+1}- t_n$ sont c
 			\begin{tcolorbox}[title=Discrétisation en espace, coltitle=white]
 				Aval
 				\begin{equation*}
-					\diffp{u}{x}(x_i, t_n) \approx \frac{u_{i+1, n} - u_{i, n}}{\Delta x} + O(\Delta x).
+					\diffp{u}{x}(x_i, t_n) \approx \frac{u_{i+1}^{n} - u_{i}^n}{\Delta x} + O(\Delta x).
 				\end{equation*}
 				Amont
 				\begin{equation*}
-					\diffp{u}{x}(x_i, t_n) \approx \frac{u_{i, n} - u_{i-1, n}}{\Delta x} + O(\Delta x).
+					\diffp{u}{x}(x_i, t_n) \approx \frac{u_{i}^{n} - u_{i-1}^{n}}{\Delta x} + O(\Delta x).
 				\end{equation*}
 				Centrée
 				\begin{equation*}
-					\diffp{u}{t}(x_i, t_n) \approx \frac{u_{i+1, n} - u_{i-1, n}}{2\Delta x} + O(\Delta x^2)
+					\diffp{u}{t}(x_i, t_n) \approx \frac{u_{i+1}^{n} - u_{i-1}^{n}}{2\Delta x} + O(\Delta x^2)
 				\end{equation*}
 			\end{tcolorbox}
 			\end{column}
@@ -313,7 +314,7 @@ EDP du transport : $\partial_t{\widehat{u}}(\xi, t) = -c  j  \xi \widehat{u}(\xi
 \begin{block}{Analyse de von Neumann}
 		On considère alors l'évolution en temps discret du mode
 		\begin{equation*}
-			u_{i, n} = \psi_n e^{\, j \xi  i  \Delta x}, \quad \psi_n \in \bbC.
+			u_i^n = \psi_n e^{\, j \xi  i  \Delta x}, \quad \psi_n \in \bbC.
 		\end{equation*}
 \end{block}
 \end{frame}
@@ -355,8 +356,8 @@ EDP du transport : $\partial_t{\widehat{u}}(\xi, t) = -c  j  \xi \widehat{u}(\xi
 
 \begin{frame}{Cas 1 : Schéma explicite en temps et aval en espace}
 Schéma résultant : 
-$u_{i, n+1} = u_{i, n} - \sigma(u_{i+1, n} - u_{i, n}), \qquad \sigma = c/c_{\mathrm{num}}$. \\ $c_{\mathrm{num}} = \Delta x/\Delta t$ est la \textbf{vitesse numérique}. \\
-L'hypothèse du Von Neumann $u_{i, n} = \psi_n e^{\, j  \xi  i  \Delta x}$ donne 
+$u_{i}^{n+1} = u_{i}^n - \sigma(u_{i+1}^n - u_{i}^{n}), \qquad \sigma = c/c_{\mathrm{num}}$. \\ $c_{\mathrm{num}} = \Delta x/\Delta t$ est la \textbf{vitesse numérique}. \\
+L'hypothèse du Von Neumann $u_{i}^{n} = \psi_n e^{\, j  \xi  i  \Delta x}$ donne 
 \begin{equation*}
 \psi_{n+1} = A(\xi) \psi_n, \qquad	A(\xi) = 1 + \sigma(1 - e^{j  \xi \Delta x}), \qquad \text{Coefficient d'amplification}.
 \end{equation*}
@@ -387,7 +388,7 @@ Si $-1 < \sigma \le 0 \implies |A(\xi)|<1$ \hspace{.5cm} (viscosité numérique)
 
 
 
-\begin{frame}{Résultats simulation}
+\begin{frame}{Cas 1 : résultats simulation}
 	
 \only<1>{
 \centering
@@ -474,7 +475,7 @@ Cas stable sans viscosité numérique.
 	}
 	]{}{VPlayer.swf}
 	
-	Cas instable (c>0).
+	Cas instable ($c>0$ et schéma aval).
 	%\mediabutton[
 	%mediacommand=vidPlateRod:playPause
 	%]{\fbox{Play/Pause}}
@@ -485,8 +486,9 @@ Cas stable sans viscosité numérique.
 
 \begin{frame}{Cas 2 : Schéma explicite en temps et amont en espace}
 	Schéma résultant : 
-	$u_{i, n+1} = u_{i, n} - \sigma(u_{i, n} - u_{i-1, n})$ . \\
-	Dans ce cas le coefficient d'amplification est donné par
+	$u_{i}^{n+1} = u_{i}^n - \sigma(u_{i}^n - u_{i-1}^n)$ . \\
+	\vspace{.5cm}
+	Coefficient d'amplification :
 	\begin{equation*}
 		A(\xi) = 1 - \sigma(1- e^{-j  \xi \Delta x})
 	\end{equation*}
@@ -514,9 +516,107 @@ Cas stable sans viscosité numérique.
 \end{frame}
 
 
+\begin{frame}{Cas 2 : résultats simulation}
+	
+	\only<1>{
+		\centering
+		\includemedia[
+		label=vidcas2_sig_1,
+		addresource=/home/andrea/Videos/PresEqTransport/cas2_sig_1.mp4,
+		activate=pageopen, 
+		deactivate=onclick,
+		width=.8\textwidth, height=.7\textheight,
+		flashvars={
+			source=/home/andrea/Videos/PresEqTransport/cas2_sig_1.mp4
+			&%
+			autoPlay=true&%
+			loop=true%
+		}
+		]{}{VPlayer.swf}
+		
+		Cas stable sans viscosité numérique.
+		%\mediabutton[
+		%mediacommand=vidPlateRod:playPause
+		%]{\fbox{Play/Pause}}
+	}
+	
+	
+	
+	\only<2>{
+		\centering
+		\includemedia[
+		label=vidcas2_sig_dot5,
+		addresource=/home/andrea/Videos/PresEqTransport/cas2_sig_dot5.mp4,
+		activate=pageopen, 
+		deactivate=onclick,
+		width=.8\textwidth, height=.7\textheight,
+		flashvars={
+			source=/home/andrea/Videos/PresEqTransport/cas2_sig_dot5.mp4
+			&%
+			autoPlay=true&%
+			loop=true%
+		}
+		]{}{VPlayer.swf}
+		
+		Cas stable avec viscosité numérique.
+		%\mediabutton[
+		%mediacommand=vidPlateRod:playPause
+		%]{\fbox{Play/Pause}}
+	}
+	
+	
+	\only<3>{
+		\centering
+		\includemedia[
+		label=vidcas2_sig_2,
+		addresource=/home/andrea/Videos/PresEqTransport/cas2_sig_2.mp4,
+		activate=pageopen, 
+		deactivate=onclick,
+		width=.8\textwidth, height=.7\textheight,
+		flashvars={
+			source=/home/andrea/Videos/PresEqTransport/cas2_sig_2.mp4
+			&%
+			autoPlay=true&%
+			loop=true%
+		}
+		]{}{VPlayer.swf}
+		
+		Instable : CFL non respectée.
+		%\mediabutton[
+		%mediacommand=vidPlateRod:playPause
+		%]{\fbox{Play/Pause}}
+	}
+	
+	
+	\only<4>{
+		\centering
+		\includemedia[
+		label=vidcas2_sig_mdot5,
+		addresource=/home/andrea/Videos/PresEqTransport/cas2_sig_mdot5.mp4,
+		activate=pageopen, 
+		deactivate=onclick,
+		width=.8\textwidth, height=.7\textheight,
+		flashvars={
+			source=/home/andrea/Videos/PresEqTransport/cas2_sig_mdot5.mp4
+			&%
+			autoPlay=true&%
+			loop=true%
+		}
+		]{}{VPlayer.swf}
+		
+		Cas instable : $c<0$ et schéma amont.
+		%\mediabutton[
+		%mediacommand=vidPlateRod:playPause
+		%]{\fbox{Play/Pause}}
+	}
+
+\end{frame}
+
+
+
 \begin{frame}{Cas 3 : Schéma explicite en temps et centré en espace}
 	Schéma résultant : 
-	$u_{i, n+1} = u_{i, n} - \sigma/2(u_{i+1, n} - u_{i-1, n})$ 
+	$u_{i}^{n+1} = u_{i}^n - \frac{\sigma}{2}(u_{i+1}^n - u_{i-1}^n)$ 
 	
 	\begin{tcolorbox}
 		Dans ce cas le coefficient d'amplification est donné par
@@ -533,24 +633,152 @@ Cas stable sans viscosité numérique.
 	
 \end{frame}
 
+
+
+\begin{frame}{Cas 3 : résultats simulation}
+	
+	\only<1>{
+		\centering
+		\includemedia[
+		label=vidcas3_sig_dot5,
+		addresource=/home/andrea/Videos/PresEqTransport/cas3_sig_dot5.mp4,
+		activate=pageopen, 
+		deactivate=onclick,
+		width=.8\textwidth, height=.7\textheight,
+		flashvars={
+			source=/home/andrea/Videos/PresEqTransport/cas3_sig_dot5.mp4
+			&%
+			autoPlay=true&%
+			loop=true%
+		}
+		]{}{VPlayer.swf}
+		
+		%\mediabutton[
+		%mediacommand=vidPlateRod:playPause
+		%]{\fbox{Play/Pause}}
+	}
+	
+	
+	\only<2>{
+		\centering
+		\includemedia[
+		label=vidcas3_sig_mdot5,
+		addresource=/home/andrea/Videos/PresEqTransport/cas3_sig_mdot5.mp4,
+		activate=pageopen, 
+		deactivate=onclick,
+		width=.8\textwidth, height=.7\textheight,
+		flashvars={
+			source=/home/andrea/Videos/PresEqTransport/cas3_sig_mdot5.mp4
+			&%
+			autoPlay=true&%
+			loop=true%
+		}
+		]{}{VPlayer.swf}
+		
+		%\mediabutton[
+		%mediacommand=vidPlateRod:playPause
+		%]{\fbox{Play/Pause}}
+	}
+	
+	
+\end{frame}
+
+
 \begin{frame}{Cas 4 : Schéma implicite en temps et amont en espace}
 	Schéma résultant : 
-	$(1+\sigma)u_{i, n+1} - \sigma u_{i-1, n+1} = u_{i, n} $ 
+	$(1+\sigma)u_{i}^{n+1} - \sigma u_{i-1}^{n+1} = u_{i}^n $ 
 	
 	\begin{tcolorbox}
 		Dans ce cas le coefficient d'amplification est donné par
 		\begin{equation*}
 			A(\xi) = \frac{1}{1 + \sigma - \sigma e^{-j\xi \Delta x}}
 		\end{equation*}
-Du fait que $|A(\xi)|^2\le1 \iff |\frac{1}{A(\xi)}|^2\ge1$ :
+Du fait que $|A(\xi)|\l e1 \iff |\frac{1}{A(\xi)}|\ge 1$ :
 \begin{equation*}
-	1 + \sigma- \sigma e^{-j\xi \Delta x} \ge 1, \qquad \forall \sigma >0. 
+	|\frac{1}{A(\xi)}| = |1 + \sigma- \sigma e^{-j\xi \Delta x}| \ge 1, \qquad \forall \sigma >0. 
 \end{equation*}
 \textbf{Si $\sigma>0$ (i.e. $c>0.$) ce schéma est toujours stable! Plus de CFL. }
 		
 	\end{tcolorbox}
 	
+Mais on aura $\forall \sigma >0, |A(xi)|< 1$ : viscosité numérique toujours présente. 
 \end{frame}
+
+
+
+\begin{frame}{Cas 4 : résultats simulation}
+	
+	\only<1>{
+		\centering
+		\includemedia[
+		label=vidcas4_sig_2,
+		addresource=/home/andrea/Videos/PresEqTransport/cas4_sig_2.mp4,
+		activate=pageopen, 
+		deactivate=onclick,
+		width=.8\textwidth, height=.7\textheight,
+		flashvars={
+			source=/home/andrea/Videos/PresEqTransport/cas4_sig_2.mp4
+			&%
+			autoPlay=true&%
+			loop=true%
+		}
+		]{}{VPlayer.swf}
+		
+		Cas stable : $c>0$  ($\sigma=2$, no CFL)
+		%\mediabutton[
+		%mediacommand=vidPlateRod:playPause
+		%]{\fbox{Play/Pause}}
+	}
+	
+	
+	
+	\only<2>{
+		\centering
+		\includemedia[
+		label=vidcas2_sig_1,
+		addresource=/home/andrea/Videos/PresEqTransport/cas4_sig_1.mp4,
+		activate=pageopen, 
+		deactivate=onclick,
+		width=.8\textwidth, height=.7\textheight,
+		flashvars={
+			source=/home/andrea/Videos/PresEqTransport/cas4_sig_1.mp4
+			&%
+			autoPlay=true&%
+			loop=true%
+		}
+		]{}{VPlayer.swf}
+		
+		Cas stable : $c>0, \; \sigma=1$ (viscosité numérique)
+		%\mediabutton[
+		%mediacommand=vidPlateRod:playPause
+		%]{\fbox{Play/Pause}}
+	}
+	
+	
+	\only<3>{
+		\centering
+		\includemedia[
+		label=vidcas4_sig_mdot5,
+		addresource=/home/andrea/Videos/PresEqTransport/cas4_sig_mdot5.mp4,
+		activate=pageopen, 
+		deactivate=onclick,
+		width=.8\textwidth, height=.7\textheight,
+		flashvars={
+			source=/home/andrea/Videos/PresEqTransport/cas4_sig_mdot5.mp4
+			&%
+			autoPlay=true&%
+			loop=true%
+		}
+		]{}{VPlayer.swf}
+		
+		Cas instable : $c<0$ et schéma amont.
+		%\mediabutton[
+		%mediacommand=vidPlateRod:playPause
+		%]{\fbox{Play/Pause}}
+	}
+	
+\end{frame}
+
 
 \begin{frame}{Récapitulatif}
 \begin{tabular}{c|c}
@@ -558,9 +786,9 @@ Du fait que $|A(\xi)|^2\le1 \iff |\frac{1}{A(\xi)}|^2\ge1$ :
 Cas	&  Stabilité \\
 	\hline
 Explicite en temps, aval espace	& Conditionnellement Stable : $c<0, \quad c_{\text{num}} > |c|$.   \\
-Explicite en temps, amont espace	& Conditionnellement Stable : $c>0, \quad c_{\text{num}} > |c|$.  \\
-Explicite en temps, centré espace	&  Instable $\forall c_{\text{num}}$. \\
-Implicite en temps, amont espace	& Stable si $c>0$ (no CFL). \\
+Explicite en temps, amont espace & Conditionnellement Stable : $c>0, \quad c_{\text{num}} > |c|$.  \\
+Explicite en temps, centré espace &  Instable $\forall c, \; \forall c_{\text{num}}$. \\
+Implicite en temps, amont espace & Conditionnellement Stable : $c>0$ (no CFL). \\
 	\hline
 \end{tabular}
 \end{frame}

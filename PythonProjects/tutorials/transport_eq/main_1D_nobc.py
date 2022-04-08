@@ -1,7 +1,10 @@
-from FD_1D_nobc import mesh, u_0, exp_time_amont_space, ex_solution,animate_sol
+from FD_1D_nobc import mesh, u_0, ex_solution,animate_sol, \
+    exp_time_aval_space, exp_time_amont_space, exp_time_centre_space, imp_time_amont_space
 import numpy as np
 
 if __name__ == '__main__':
+
+    num_cas = 4 #int(input("Enter case number : "))
 
     t_end = 10
     Dt = t_end/100
@@ -35,7 +38,14 @@ if __name__ == '__main__':
 
     # x_grid, t_grid = mesh(x_vec, t_vec)
 
-    u_sol_num = exp_time_amont_space(u_0, sigma, x_vec, t_vec)
+    if num_cas == 1:
+        u_sol_num = exp_time_aval_space(u_0, sigma, x_vec, t_vec)
+    elif num_cas == 2:
+        u_sol_num = exp_time_amont_space(u_0, sigma, x_vec, t_vec)
+    elif num_cas == 3:
+        u_sol_num = exp_time_centre_space(u_0, sigma, x_vec, t_vec)
+    elif num_cas == 4:
+        u_sol_num = imp_time_amont_space(u_0, sigma, x_vec, t_vec)
 
     anim = animate_sol(x_vec, t_vec, u_sol_num, c, sigma, save_anim=True)
 

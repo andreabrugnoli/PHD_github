@@ -71,19 +71,6 @@ def mesh(x_vec, t_vec, save_fig=False, plot_fig=False):
     return x_grid, t_grid
 
 
-def exp_time_amont_space(fun_u0, sigma, x_vec, t_vec):
-    n_x = len(x_vec)
-    n_t = len(t_vec)
-    u_sol = np.zeros((n_x, n_t))
-
-    u_sol[:, 0] = fun_u0(x_vec)
-
-    for n in range(1, n_t):
-        u_sol[:-1, n] = -sigma*u_sol[1:, n-1] + (sigma+1) * u_sol[:-1, n-1]
-
-    return u_sol
-
-
 def animate_sol(x_vec, t_vec, u_num, c, sig, save_anim = False):
     fig = plt.figure()
 
@@ -150,3 +137,65 @@ def animate_sol(x_vec, t_vec, u_num, c, sig, save_anim = False):
 
     return 1
 
+
+def exp_time_aval_space(fun_u0, sigma, x_vec, t_vec):
+    n_x = len(x_vec)
+    n_t = len(t_vec)
+    u_sol = np.zeros((n_x, n_t))
+
+    u_sol[:, 0] = fun_u0(x_vec)
+
+    for n in range(1, n_t):
+        u_sol[:-1, n] = -sigma*u_sol[1:, n-1] + (sigma+1) * u_sol[:-1, n-1]
+
+    return u_sol
+
+
+def exp_time_amont_space(fun_u0, sigma, x_vec, t_vec):
+    n_x = len(x_vec)
+    n_t = len(t_vec)
+    u_sol = np.zeros((n_x, n_t))
+
+    u_sol[:, 0] = fun_u0(x_vec)
+
+    for n in range(1, n_t):
+        u_sol[1:, n] = sigma*u_sol[:-1, n-1] + (1-sigma) * u_sol[1:, n-1]
+
+    return u_sol
+
+
+def exp_time_centre_space(fun_u0, sigma, x_vec, t_vec):
+    n_x = len(x_vec)
+    n_t = len(t_vec)
+    u_sol = np.zeros((n_x, n_t))
+
+    u_sol[:, 0] = fun_u0(x_vec)
+
+    for n in range(1, n_t):
+        u_sol[1:-1, n] = u_sol[1:-1, n-1] + sigma/2 * (u_sol[2:, n-1]-u_sol[:-2, n-1])
+
+    return u_sol
+
+
+def imp_time_amont_space(fun_u0, sigma, x_vec, t_vec):
+    n_x = len(x_vec)
+    n_t = len(t_vec)
+    u_sol = np.zeros((n_x, n_t))
+
+    u_sol[:, 0] = fun_u0(x_vec)
+
+    A = np.zeros((n_x, n_x))
+
+    np.fill_diagonal(A, 1+sigma)
+
+    A[0, 0] = 1
+
+    for ii in range(1, n_x):
+        A[ii, ii-1] = -sigma
+
+    invA = np.linalg.inv(A)
+
+    for n in range(1, n_t):
+        u_sol[:, n] = invA.dot(u_sol[:, n-1])
+
+    return u_sol
