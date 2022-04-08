@@ -177,15 +177,21 @@
 	\begin{columns}
 	\begin{column}{.58\textwidth}
 		\begin{overlayarea}{\textwidth}{\textheight}
-		\vspace{1cm}
+		\vspace{.2cm}
 		\begin{tcolorbox}[title = Solution analytique regulière, coltitle=white]
 			Si $u_0 \in C^{1}(\bbR)$ alors  
 			$u \in C^{1}(\bbR \times[0, T])$ et
 			\begin{equation*}
-				u(x, t) = 	u_0(x - ct),
+				u(x, t) = 	u_0(x - c\, t),
 			\end{equation*}
 		i.e. $u$ constant sur $\gamma$ telle que $\dot{\gamma} = (c ,1)$. \\
 		Les courbes $\gamma$ sont appelées caractéristiques.
+		\end{tcolorbox}
+		\vspace{.2cm}
+		\begin{tcolorbox}[title = Conservation de l'energie, coltitle=white]
+			\begin{equation*}
+				\diff{}{t}\norm{u(x, t)}_{L^2}^2 = 0 \implies \norm{u(x, t)}_{L^2} = \mathrm{Const}.
+			\end{equation*}
 		\end{tcolorbox}
 		\end{overlayarea}
 	\end{column}
@@ -230,6 +236,7 @@ cela signifie que $\Delta x = x_{i+1}- x_i $ et $\Delta t = t_{n+1}- t_n$ sont c
 				u_{i, n} \approx u(x_i, t_n).
 			\end{equation*} 
 		\end{tcolorbox}
+	
 	\end{column}
 \end{columns}	
 
@@ -289,7 +296,7 @@ cela signifie que $\Delta x = x_{i+1}- x_i $ et $\Delta t = t_{n+1}- t_n$ sont c
 
 
 \begin{frame}{Quoi choisir? Analyse de Von Neumann}
-	\textbf{Intuition : } Solution de l'EDP de transport pour $u_0(x) = e^{j \xi x} \; (j = \sqrt{-1})$ :
+	\textbf{Intuition : } Solution de l'EDP de transport pour $u_0(x) = e^{j \xi x} \quad (j = \sqrt{-1})$ :
 	\begin{equation*}
 	u(x, t) = e^{j \xi(x-ct)} = e^{j \xi x}e^{-jct}, \qquad \text{Onde plane.}
 	\end{equation*}
@@ -303,7 +310,7 @@ La transformé de la dérivée est donnée par
 \mathcal{F}\{\partial_{x} u\}(\xi, \cdot) = j \xi \widehat{u}(\xi, \cdot).
 \end{equation*}
 EDP du transport : $\partial_t{\widehat{u}}(\xi, t) = -c  j  \xi \widehat{u}(\xi, t)$ \hspace{.3cm} (Eq. algébrique in $\bbC$).
-\begin{block}{Analyse de von Neumann : un outils simple mais très efficace}
+\begin{block}{Analyse de von Neumann}
 		On considère alors l'évolution en temps discret du mode
 		\begin{equation*}
 			u_{i, n} = \psi_n e^{\, j \xi  i  \Delta x}, \quad \psi_n \in \bbC.
@@ -348,33 +355,33 @@ EDP du transport : $\partial_t{\widehat{u}}(\xi, t) = -c  j  \xi \widehat{u}(\xi
 
 \begin{frame}{Cas 1 : Schéma explicite en temps et aval en espace}
 Schéma résultant : 
-$u_{i, n+1} = u_{i, n} - \sigma(u_{i+1, n} - u_{i, n})$ \\
-où $\sigma = c/c_{\mathrm{num}}$. ($c_{\mathrm{num}} = \Delta x/\Delta t$ est la \textbf{vitesse numérique})
-
-\begin{tcolorbox}
-L'hypothèse du Von Neumann $u_{i, n} = \psi_n e^{\, j  \xi  i  \Delta x}$ donne $\psi_{n+1} = A(\xi) \psi_n$ où
+$u_{i, n+1} = u_{i, n} - \sigma(u_{i+1, n} - u_{i, n}), \qquad \sigma = c/c_{\mathrm{num}}$. \\ $c_{\mathrm{num}} = \Delta x/\Delta t$ est la \textbf{vitesse numérique}. \\
+L'hypothèse du Von Neumann $u_{i, n} = \psi_n e^{\, j  \xi  i  \Delta x}$ donne 
 \begin{equation*}
-	A(\xi) = 1 - \sigma(e^{j  \xi \Delta x}-1), \qquad \text{Coefficient d'amplification}.
+\psi_{n+1} = A(\xi) \psi_n, \qquad	A(\xi) = 1 + \sigma(1 - e^{j  \xi \Delta x}), \qquad \text{Coefficient d'amplification}.
 \end{equation*}
-Le critère de stabilité est respecté si
+Le critère de stabilité est respecté si $\forall \xi$ on a
 \begin{equation*}
-	|A(\xi)|^2 = 1 + 2 \sigma(\sigma + 1)(1 - \cos(\xi \Delta x))\le 1 \implies \textbf{Stable si}   -1 \le \sigma \le 0
+	|A(\xi)|^2 = 1 + 2 \sigma(\sigma + 1)(1 - \cos(\xi \Delta x))\le 1   
 \end{equation*}
-Si $\sigma=-1 \implies |A(\xi)|=1$ (pas de viscosité numérique)\\
-Si $-1 < \sigma \le 0 \implies |A(\xi)|<1$ (viscosité numérique)
+\begin{tcolorbox}[title=Conditions de stabilité, coltitle=white]
+		 \textbf{Stable si } $-1 \le \sigma \le 0$
 \begin{equation*}
 	\begin{aligned}
-	c<0, \\
-	c_{\mathrm{num}}>|c|, 
+		c<0, \\
+		c_{\mathrm{num}}>|c|, 
 	\end{aligned}
 	\qquad 
 	\begin{aligned}
-	\text{Discrétisation aval ne peut pas traiter vitesse postive}, \\
-	\text{Condition CFL (Courant, Friedrichs et Lewy 1928).}
+		\textbf{Discrétisation aval ne peut pas traiter vitesse positive}, \\
+		\text{Condition CFL (Courant, Friedrichs et Lewy 1928).}
 	\end{aligned}
 \end{equation*}
 
 \end{tcolorbox}
+
+Si $\sigma=-1 \implies |A(\xi)|=1$ \hspace{.5cm} (pas de viscosité numérique)\\
+Si $-1 < \sigma \le 0 \implies |A(\xi)|<1$ \hspace{.5cm} (viscosité numérique)
 
 \end{frame}
 
@@ -397,6 +404,7 @@ flashvars={
 	loop=true%
 }
 ]{}{VPlayer.swf}
+
 Cas stable sans viscosité numérique.
 %\mediabutton[
 %mediacommand=vidPlateRod:playPause
@@ -404,7 +412,7 @@ Cas stable sans viscosité numérique.
 }
 
 	
-\only<1>{
+\only<2>{
 	\centering
 	\includemedia[
 	label=vidcas1_sig_mdot5,
@@ -419,6 +427,7 @@ Cas stable sans viscosité numérique.
 		loop=true%
 	}
 	]{}{VPlayer.swf}
+	
 	Cas stable avec viscosité numérique.
 	%\mediabutton[
 	%mediacommand=vidPlateRod:playPause
@@ -426,7 +435,7 @@ Cas stable sans viscosité numérique.
 }
 
 	
-\only<1>{
+\only<3>{
 	\centering
 	\includemedia[
 	label=vidcas1_sig_m2,
@@ -441,6 +450,7 @@ Cas stable sans viscosité numérique.
 		loop=true%
 	}
 	]{}{VPlayer.swf}
+	
 	Instable : CFL non respectée.
 	%\mediabutton[
 	%mediacommand=vidPlateRod:playPause
@@ -463,6 +473,7 @@ Cas stable sans viscosité numérique.
 		loop=true%
 	}
 	]{}{VPlayer.swf}
+	
 	Cas instable (c>0).
 	%\mediabutton[
 	%mediacommand=vidPlateRod:playPause
@@ -472,7 +483,87 @@ Cas stable sans viscosité numérique.
 \end{frame}
 
 
+\begin{frame}{Cas 2 : Schéma explicite en temps et amont en espace}
+	Schéma résultant : 
+	$u_{i, n+1} = u_{i, n} - \sigma(u_{i, n} - u_{i-1, n})$ . \\
+	Dans ce cas le coefficient d'amplification est donné par
+	\begin{equation*}
+		A(\xi) = 1 - \sigma(1- e^{-j  \xi \Delta x})
+	\end{equation*}
+	Le critère de stabilité est respecté si $\forall \xi$ on a
+	\begin{equation*}
+		|A(\xi)|^2 = 1 - 2 \sigma(1-\sigma)(1 - \cos(\xi \Delta x))\le 1.
+	\end{equation*}
+	
+	\begin{tcolorbox}[title=Conditions de stabilité, coltitle=white]
+	\textbf{Stable si }   $0 \le \sigma \le 1$
+	\begin{equation*}
+		\begin{aligned}
+			c>0, \\
+			c_{\mathrm{num}}>|c|, 
+		\end{aligned}
+		\qquad 
+		\begin{aligned}
+			\textbf{Discrétisation amont ne peut pas traiter vitesse negative}, \\
+			\text{Condition CFL.}
+		\end{aligned}
+	\end{equation*}
+		
+	\end{tcolorbox}
+	
+\end{frame}
 
+
+\begin{frame}{Cas 3 : Schéma explicite en temps et centré en espace}
+	Schéma résultant : 
+	$u_{i, n+1} = u_{i, n} - \sigma/2(u_{i+1, n} - u_{i-1, n})$ 
+	
+	\begin{tcolorbox}
+		Dans ce cas le coefficient d'amplification est donné par
+		\begin{equation*}
+			A(\xi) = 1 - j\sigma\sin(\xi \Delta x).
+		\end{equation*}
+		On remarque que
+		\begin{equation*}
+			|A(\xi)| > 1, \qquad \forall \sigma \ne 0!
+		\end{equation*}
+	\textbf{Ce schéma est toujours instable!}
+		
+	\end{tcolorbox}
+	
+\end{frame}
+
+\begin{frame}{Cas 4 : Schéma implicite en temps et amont en espace}
+	Schéma résultant : 
+	$(1+\sigma)u_{i, n+1} - \sigma u_{i-1, n+1} = u_{i, n} $ 
+	
+	\begin{tcolorbox}
+		Dans ce cas le coefficient d'amplification est donné par
+		\begin{equation*}
+			A(\xi) = \frac{1}{1 + \sigma - \sigma e^{-j\xi \Delta x}}
+		\end{equation*}
+Du fait que $|A(\xi)|^2\le1 \iff |\frac{1}{A(\xi)}|^2\ge1$ :
+\begin{equation*}
+	1 + \sigma- \sigma e^{-j\xi \Delta x} \ge 1, \qquad \forall \sigma >0. 
+\end{equation*}
+\textbf{Si $\sigma>0$ (i.e. $c>0.$) ce schéma est toujours stable! Plus de CFL. }
+		
+	\end{tcolorbox}
+	
+\end{frame}
+
+\begin{frame}{Récapitulatif}
+\begin{tabular}{c|c}
+	\hline
+Cas	&  Stabilité \\
+	\hline
+Explicite en temps, aval espace	& Conditionnellement Stable : $c<0, \quad c_{\text{num}} > |c|$.   \\
+Explicite en temps, amont espace	& Conditionnellement Stable : $c>0, \quad c_{\text{num}} > |c|$.  \\
+Explicite en temps, centré espace	&  Instable $\forall c_{\text{num}}$. \\
+Implicite en temps, amont espace	& Stable si $c>0$ (no CFL). \\
+	\hline
+\end{tabular}
+\end{frame}
 
 \section{Pour aller plus loin : domaine borné et conditions au bord}
 
