@@ -99,13 +99,20 @@
 % Remove navigation bar
 \setbeamertemplate{navigation symbols}{}
 
+\addtobeamertemplate{navigation symbols}{}{%
+	\usebeamerfont{footline}%
+	\usebeamercolor[fg]{footline}%
+	\hspace{1em}%
+	\insertframenumber/\inserttotalframenumber
+}
+
 
 \makeatletter \renewcommand\d[1]{\ensuremath{%
 		\;\mathrm{d}#1\@ifnextchar\d{\!}{}}}
 \makeatother
 
 
-\graphicspath{{./imagesEqTr/}}
+\graphicspath{{./images/}}
 
 \newif\iftocsub
 \tocsubtrue
@@ -152,14 +159,209 @@
 
 \section{Introduction}
 
-\section{Lyapunov Functions}
+\begin{frame}{Why dissipative dynamical systems?}
 
-\section{Dissipative systems}
+\begin{tcolorbox}[width=0.95\textwidth, nobeforeafter, colframe=theme,title=All engineering systems exhibit dissipation.]
+\begin{itemize}
+	\item Electrical networks with resistors;
+	\item Mechanical systems (viscoelastic or Coulomb friction);
+	\item Thermodynamic systems: dissipation leads to an increase in entropy.
+\end{itemize}
+\end{tcolorbox}
+The notion of dissipativity establishes a natural link between the properties of input-output and state-space models. Many modern computational tools for the analysis and synthesis of control systems  are based on it.
+\vspace{.3cm}
 
-\begin{frame}{}
-	
+\footnotesize{
+\fullcite{willems1972part1}\\
+\fullcite{willems1972part2}\\
+\cite{schaft1999l2}}
 
 \end{frame}
+
+\begin{frame}{Some mathematical notation}
+\begin{overlayarea}{\textwidth}{\textheight}
+$\bbR_+ = [0, \infty)$ denotes the set of positive reals. \\
+Let $V$ be a finite dimensional normed liner space with norm $||\cdot||_V$. \\
+\vspace{.1cm}
+(If $V=\bbR^n$ then the Euclidean norm is denoted by$||x||_2 = \sqrt{x^\top x}$)
+\only<1>{
+\begin{definition}[$L^p$ Banach spaces]
+	For each positive integer $p \in {1, 2, \dots}$, the set $L^p(\bbR_+, V)$ consists of all functions $f : \bbR_+ \rightarrow V$, which are measurable and satisfy
+	\begin{equation*}
+		\int_0^\infty ||f(t)||^p_V \d t< \infty,
+	\end{equation*}
+	The case $p=\infty$ consists of all bounded measurable functions, i.e. $\sup_{t \in \bbR_+} f(t) < \infty.$
+The $L^p$ spaces are Banach spaces (complete normed linear spaces) w.r.t. the norm
+\begin{equation*}
+	||f||_{L^p} = \left(\int_0^\infty ||f(t)||^p_V \d t \right)^{\frac{1}{p}}, \quad q=1,2,\dots \qquad ||f||_{L^\infty} = \sup_{t \in \bbR^+} |f(t)|, \quad q=\infty.
+\end{equation*} 
+			
+\end{definition}
+}
+\only<2>{
+\begin{definition}[Extended $L^p$ Banach spaces]
+	For each $T \in \bbR_+$ the function $f_T: \bbR_+ \rightarrow V$ defined by
+	\begin{equation*}
+		f_T= 
+		\begin{cases}
+		f(t), \\
+		0, 
+		\end{cases} \quad
+	\begin{aligned}
+		0\le t < T, \\
+		t \ge T
+	\end{aligned}
+	\end{equation*}
+	is called the truncation of $f$.\\
+	For $q=1,2,\dots, \infty$ the set $L^{pe}(\bbR_+, V)$ consists of all measurable functions $f: \bbR_+ \rightarrow V$ such that $f_T \in L^p(\bbR_+, V), \quad  \forall T, \; 0 \le T < \infty$. \\
+	The spaces $L^{pe}$ are called the extended $L^p$ spaces. It holds $L^p(\bbR_+, V) \subset L^{pe}(\bbR_+, V)$.
+\end{definition}
+}
+\end{overlayarea}
+\end{frame}
+
+\begin{frame}{General setting}
+Consider the state-space system with inputs and outputs
+\begin{equation*}
+	\Sigma : \quad 
+	\begin{aligned}
+		\dot{x} &= f(x, u), \\
+		y &= h(x,u),
+	\end{aligned} \qquad
+	\begin{aligned}
+		u(t) \in U, \\
+		y(t) \in Y.
+	\end{aligned}
+\end{equation*} 
+
+\begin{itemize}
+	\item $x(t)$ belong to the state manifold $\mathcal{X}$ ($\mathrm{dim}\ \mathcal{X} = n$ and ($x_1(t), \dots, x_n(t)) \in \bbR^n$ are local coordinates).
+	\item $U$ and $Y$ are linear spaces with $\mathrm{dim}\; U = m, \; \mathrm{dim}\; Y = p$.\\
+	 For simplicity it is assumed that $U = \bbR^m, \; Y= \bbR^p$.
+\end{itemize}
+\begin{assumption}
+	There exists a unique solution trajectory $x(\cdot)$ on the infinite time
+	interval $t \in \bbR^+$ of the differential equation $\dot{x}=f(x,u), \quad \forall\, x(0) \in \mathcal{X}, \; \forall\, u(\cdot) \in L^{2e}(U)$.\\ Furthermore, it will be assumed that the thus generated output functions $y(\cdot) = h(x(\cdot), u(\cdot))$ are in $L^{2e}(Y)$.
+\end{assumption}
+\end{frame}
+
+\begin{frame}{Reachability and controllability}
+	Notation:
+	$\bbR^2_+:=\{(t_1, t_2) \in \bbR^2 |\;  t_2\ge t_1\}$ (causal triangular sector of $\bbR^2$). \\
+	Given two sets $A, B$ the notation $B^A$ indicates the set of functions $f: A \rightarrow B$. \\
+	\begin{definition}[State transition function]
+		Given a state space system $\Sigma$, the state transition function $\phi$ is the map 
+		\begin{equation*}
+			\phi(t_1, t_0, x(t_0), u) : \bbR_+^2 \times \mathcal{X} \times U^\bbR \rightarrow \mathcal{X}
+		\end{equation*}
+		such that $x(t_1) = \phi(t_1, t_0, x(t_0), u)$.
+	\end{definition}
+	\begin{definition}[Reachability and controllability]
+		The state space $\mathcal{X}$ of system $\Sigma$ is said to be reachable
+		from $x_{-1}$ if \\
+		$\forall \, x \in \mathcal{X}, \; \exists\,  t_{-1} \le 0, \, \exists u(\cdot) \in U^\bbR$ such that $x = \phi(0, t_{-1}, x_{-1}, u(\cdot))$. \\
+		It is said to be controllable to $x_1$ if for any $x \in \mathcal{X}, \; \exists t_1 > 0$ and $u(\cdot) \in \mathcal{U}$ such that $x_1 = \phi(0, t_{-1}, x_{-1}, u(\cdot))$.
+	\end{definition}
+\end{frame}
+
+\section{Definition and characterization of dissipativity}
+
+\begin{frame}{The mathematical definition of dissipativity}
+On the combined space $U × Y$ consider the supply rate function $s : U \times Y \rightarrow \bbR$.
+
+\begin{definition}[Dissipative state space system]
+A state space system $\Sigma$ is said to be dissipative w.r.t. the supply rate $s$ if there exists a function $S : \mathcal{X} \rightarrow \bbR_+$ (the storage function), such
+that $\forall \, x(t_0) \in \mathcal{X}$ at any time $t_0$, and $\forall\,  u(\cdot)$ and $\forall\, t_1 \ge t_0$ and the following inequality holds
+\begin{equation*}\label{eq:diss_ineq}
+	S(x(t_1)) \le S(x(t_0)) + \int_{t_0}^{t_1} s(u(t), y(t)) \d t, \qquad \text{Dissipation Inequality}.
+\end{equation*}
+It equality holds then the system is called conservative (w.r.t. the supply rate $s$). 
+\end{definition}
+\begin{corollary}[Convexity of the storage functions set]
+	Given two storage functions $S_1$ and $S_2$ then any convex combination $\alpha S_1 + (1-\alpha) S_2, \; \alpha=[0,1]$ is also a storage function.
+\end{corollary}
+
+\end{frame}
+
+\begin{frame}{Passive systems and $L^2$ finite gain}
+\begin{overlayarea}{\textwidth}{\textheight}
+	Two important class of supply rate functions:
+	\begin{itemize}
+		\item passive systems $s(u, y) = u^\top y$;
+		\item finite $L^2$ gain $s(u, y) = \frac{1}{2} \gamma ||u||^2_2 - \frac{1}{2} ||y||^2_2, \quad \gamma \ge 0$.
+	\end{itemize}
+
+\only<1>{
+	\begin{definition}[Passive system]
+	A system $\Sigma$ with $U = Y = \bbR^m$ is passive if it is dissipative w.r.t. $s(u, y) = u^\top y.$ \\
+	\vspace{.3cm}
+	$\Sigma$ is input strictly passive if $\exists \delta > 0$ such that $\Sigma$ is dissipative w.r.t. $s(u, y) = u^\top y − \delta||u||^2_2$. \\
+	\vspace{.3cm}
+	$\Sigma$ is output strictly passive if there exists $\varepsilon >0$ such that $\Sigma$ is dissipative with respect
+	to $s(u, y) = u^\top y − \varepsilon ||y||^2_2$ .\\
+	\vspace{.3cm}
+	$\Sigma$ is lossless if it is conservative with respect to
+	$s(u, y) = u^\top y$.
+	\end{definition}
+}
+\only<2>{
+\begin{definition}[$L^2$ finite gain]
+	A system $\Sigma$ with $U = \bbR^m, \; Y = \bbR^p$ has $L^2$-gain $\le \gamma$ ($\gamma \ge 0$)
+	if it is dissipative w.r.t.
+	$$s(u, y) = \frac{1}{2}\gamma||u||^2_2 − \frac{1}{2}||y||^2_2.$$ 
+	The $L^2$-gain of $\Sigma$ is defined as 
+	$$\gamma(\Sigma) := \inf\{\gamma | \; \Sigma \text{ has } L^2\text{-gain} \le \gamma\}.$$
+	$\Sigma$ is said to have $L^2$-gain $<\gamma$ if $\exists\, \tilde{\gamma} \le \gamma$ such that $\Sigma$ has $L^2$-gain $\le \tilde{\gamma}$. \\
+	\vspace{.3cm}
+	$\Sigma$ is called inner if it is conservative with respect to $s(u, y) = \frac{1}{2}||u||^2_2 − \frac{1}{2}||y||^2_2$.
+\end{definition}
+}
+\end{overlayarea}
+\end{frame}
+
+
+
+
+\begin{frame}{How to establish dissipativity?}
+	
+\begin{theorem}[Necessary and sufficient conditions for dissipativity]
+Consider system $\Sigma$ and supply rate $s(u, y)$. $\Sigma$ is dissipative with respect to $s$ iff
+\begin{equation*}
+	S_a(x):= \sup_{\substack{u(\cdot) \\ T \ge 0}} - \int_0^T s(u(t), y(t)) \d t, \qquad x(0) = x
+\end{equation*}
+is finite $\forall \, x \in \mathcal{X}$. Furthermore, if $S_a$ is finite $\forall \, x \in \mathcal{X}$ then $S_a$
+is a storage function, called the available storage, and all other possible storage functions $S$ satisfy
+\begin{equation*}
+	S_a(x) \le S(x) - \inf_x S(x), \qquad \forall \,  x \in \mathcal{X}
+\end{equation*}
+Moreover $\inf_x S_a(x)=0.$
+\end{theorem}
+	
+\end{frame}
+
+\begin{frame}{Proof}
+
+		\begin{itemize}
+			\item ($\implies$) Suppose $S_a$ is finite. Then $S_a \ge 0$ (supremum of a set that contains 0). Given $u: [t_0, t_1] \rightarrow \bbR^m$ compare $S(x(t_0))$ and $S(x(t_1)) - \int_{t_0}^{t_1} s(u(t), y(t))\d t$. Since $S_a$ is the supremum over all $u(\cdot)$ it follows
+			\begin{equation*}
+				S_a(x(t_0)) \ge S_a(x(t_1)) - \int_{t_0}^{t_1} s(u(t), y(t)) \d t \implies S_a \text{ is a storage function.}
+			\end{equation*}
+			\item ($\impliedby$) Suppose $\Sigma$ dissipative. Then $\exists\,  S \ge 0$ such that $\forall \, u(\cdot)$
+			\begin{equation*}
+				S(x(t)) + \int_0^T s(u(t), y(t)) \d t \ge S(x(T)) \ge 0.
+			\end{equation*}
+		This implies that $$S(x(0)) \ge \sup_{\substack{u(\cdot) \\ T \ge 0}} - \int_0^T s(u(t), y(t)) \d t = S_a(x(0)) \implies S_a(x(0)) < \infty$$
+		\end{itemize}
+\end{frame}
+
+\begin{frame}{Reachability and Storage functions}
+If the system is reachable from some state, then the finiteness of $S_a$ needs only to be checked for this initial condition.
+\begin{theorem}
+	Assume that $\Sigma$ is reachable from $x^* \in \mathcal{X}$. Then $\Sigma$ is dissipative
+	iff $S_a (x^∗) < \infty$.
+\end{theorem}
+\end{frame}
+
 
 
 
