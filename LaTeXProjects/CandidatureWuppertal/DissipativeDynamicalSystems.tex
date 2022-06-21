@@ -36,6 +36,16 @@
 % \renewcommand*{\footnoterule}{\kern 6pt}
 \makeatother
 
+
+\makeatletter
+\g@addto@macro\normalsize{%
+	\setlength\abovedisplayskip{5pt}
+	\setlength\belowdisplayskip{5pt}
+	\setlength\abovedisplayshortskip{5pt}
+	\setlength\belowdisplayshortskip{5pt}
+}
+\makeatother
+
 \graphicspath{{./images/}}
 
 
@@ -179,49 +189,61 @@ The notion of dissipativity establishes a natural link between the properties of
 \end{frame}
 
 \begin{frame}{Some mathematical notation}
-\begin{overlayarea}{\textwidth}{\textheight}
 $\bbR_+ = [0, \infty)$ denotes the set of positive reals. \\
 Let $V$ be a finite dimensional normed liner space with norm $||\cdot||_V$. \\
 \vspace{.1cm}
 (If $V=\bbR^n$ then the Euclidean norm is denoted by$||x||_2 = \sqrt{x^\top x}$)
-\only<1>{
-\begin{definition}[$L^p$ Banach spaces]
-	For each positive integer $p \in {1, 2, \dots}$, the set $L^p(\bbR_+, V)$ consists of all functions $f : \bbR_+ \rightarrow V$, which are measurable and satisfy
+
+\begin{definition}[Local $L^p_{\text{loc}}$ Banach spaces]
+	For each positive integer $p \in {1, 2, \dots}$, the set $L^p_{\text{loc}}(\bbR, V)$ consists of all functions $f : \bbR \rightarrow V$, which are measurable and satisfy
 	\begin{equation*}
-		\int_0^\infty ||f(t)||^p_V \d t< \infty,
+		\int_a^b ||f(t)||^p_V \d t< \infty, \qquad \forall\,  a, b \in \bbR.
 	\end{equation*}
-	The case $p=\infty$ consists of all bounded measurable functions, i.e. $\sup_{t \in \bbR_+} f(t) < \infty.$
-The $L^p$ spaces are Banach spaces (complete normed linear spaces) w.r.t. the norm
-\begin{equation*}
-	||f||_{L^p} = \left(\int_0^\infty ||f(t)||^p_V \d t \right)^{\frac{1}{p}}, \quad q=1,2,\dots \qquad ||f||_{L^\infty} = \sup_{t \in \bbR^+} |f(t)|, \quad q=\infty.
-\end{equation*} 
-			
+	The case $p=\infty$ consists of all bounded measurable functions on compact intervals, i.e. $\sup_{t \in [a, b]} f(t) < \infty.$
+	
 \end{definition}
-}
-\only<2>{
-\begin{definition}[Extended $L^p$ Banach spaces]
-	For each $T \in \bbR_+$ the function $f_T: \bbR_+ \rightarrow V$ defined by
-	\begin{equation*}
-		f_T= 
-		\begin{cases}
-		f(t), \\
-		0, 
-		\end{cases} \quad
-	\begin{aligned}
-		0\le t < T, \\
-		t \ge T
-	\end{aligned}
-	\end{equation*}
-	is called the truncation of $f$.\\
-	For $q=1,2,\dots, \infty$ the set $L^{pe}(\bbR_+, V)$ consists of all measurable functions $f: \bbR_+ \rightarrow V$ such that $f_T \in L^p(\bbR_+, V), \quad  \forall T, \; 0 \le T < \infty$. \\
-	The spaces $L^{pe}$ are called the extended $L^p$ spaces. It holds $L^p(\bbR_+, V) \subset L^{pe}(\bbR_+, V)$.
-\end{definition}
-}
-\end{overlayarea}
+
 \end{frame}
 
+
+
+\begin{comment}
+	
+	\begin{definition}[$L^p$ Banach spaces]
+		For each positive integer $p \in {1, 2, \dots}$, the set $L^p(\bbR, V)$ consists of all functions $f : \bbR \rightarrow V$, which are measurable and satisfy
+		\begin{equation*}
+			\int_{\bbR} ||f(t)||^p_V \d t< \infty,
+		\end{equation*}
+		The case $p=\infty$ consists of all bounded measurable functions, i.e. $\sup_{t \in \bbR} f(t) < \infty.$
+		The $L^p$ spaces are Banach spaces (complete normed linear spaces) w.r.t. the norm
+		\begin{equation*}
+			||f||_{L^p} = \left(\int_0^\infty ||f(t)||^p_V \d t \right)^{\frac{1}{p}}, \quad q=1,2,\dots \qquad ||f||_{L^\infty} = \sup_{t \in \bbR} |f(t)|, \quad q=\infty.
+		\end{equation*} 
+		
+	\end{definition}
+	
+	\begin{definition}[Extended $L^p$ Banach spaces]
+		For each $T \in \bbR_+$ the function $f_T: \bbR_+ \rightarrow V$ defined by
+		\begin{equation*}
+			f_T= 
+			\begin{cases}
+				f(t), \\
+				0, 
+			\end{cases} \quad
+			\begin{aligned}
+				0\le t < T, \\
+				t \ge T
+			\end{aligned}
+		\end{equation*}
+		is called the truncation of $f$.\\
+		For $q=1,2,\dots, \infty$ the set $L^{pe}(\bbR_+, V)$ consists of all measurable functions $f: \bbR_+ \rightarrow V$ such that $f_T \in L^p(\bbR_+, V), \quad  \forall T, \; 0 \le T < \infty$. \\
+		The spaces $L^{pe}$ are called the extended $L^p$ spaces. It holds $L^p(\bbR_+, V) \subset L^{pe}(\bbR_+, V)$.
+	\end{definition}
+	
+\end{comment}
+
 \begin{frame}{General setting}
-Consider the state-space system with inputs and outputs
+Consider the state-space system  with inputs and outputs
 \begin{equation*}
 	\Sigma : \quad 
 	\begin{aligned}
@@ -230,37 +252,40 @@ Consider the state-space system with inputs and outputs
 	\end{aligned} \qquad
 	\begin{aligned}
 		u(t) \in U, \\
-		y(t) \in Y.
+		y(t) \in Y,
 	\end{aligned}
 \end{equation*} 
+where $x(t) \in \mathcal{X}$. In general $\mathcal{X}$ is a manifold and $U,\; Y$ vector spaces. \\
 
-\begin{itemize}
-	\item $x(t)$ belong to the state manifold $\mathcal{X}$ ($\mathrm{dim}\ \mathcal{X} = n$ and ($x_1(t), \dots, x_n(t)) \in \bbR^n$ are local coordinates).
-	\item $U$ and $Y$ are linear spaces with $\mathrm{dim}\; U = m, \; \mathrm{dim}\; Y = p$.\\
-	 For simplicity it is assumed that $U = \bbR^m, \; Y= \bbR^p$.
-\end{itemize}
-\begin{assumption}
-	There exists a unique solution trajectory $x(\cdot)$ on the infinite time
-	interval $t \in \bbR^+$ of the differential equation $\dot{x}=f(x,u), \quad \forall\, x(0) \in \mathcal{X}, \; \forall\, u(\cdot) \in L^{2e}(U)$.\\ Furthermore, it will be assumed that the thus generated output functions $y(\cdot) = h(x(\cdot), u(\cdot))$ are in $L^{2e}(Y)$.
-\end{assumption}
+For sake simplicity, assume $\mathcal{X}= \bbR^n,\; U=\bbR^m, \; Y=\bbR^p$.
+
+\begin{theorem}
+	Suppose $f, h$ to be Lipschitz continuous in $x$ and $u$ jointly. Then system $\Sigma$ has a unique solution $\forall x(t_0) \in \bbR^n, \; u(\cdot) \in L^2_{\text{loc}}(\bbR, U)$ with $x(\cdot) \in L^2_{\text{loc}}(\bbR, \mathcal{X}), \ y(\cdot) \in L^2_{\text{loc}}(\bbR, Y)$.
+\end{theorem}
+
 \end{frame}
 
 \begin{frame}{Reachability and controllability}
 	Notation:
 	$\bbR^2_+:=\{(t_1, t_2) \in \bbR^2 |\;  t_2\ge t_1\}$ (causal triangular sector of $\bbR^2$). \\
-	Given two sets $A, B$ the notation $B^A$ indicates the set of functions $f: A \rightarrow B$. \\
+	%Given two sets $A, B$ the notation $B^A$ indicates the set of functions $f: A \rightarrow B$. \\
 	\begin{definition}[State transition function]
-		Given a state space system $\Sigma$, the state transition function $\phi$ is the map 
+		Given the system $\Sigma$, the state transition function $\phi$ is the map 
 		\begin{equation*}
-			\phi(t_1, t_0, x(t_0), u) : \bbR_+^2 \times \mathcal{X} \times U^\bbR \rightarrow \mathcal{X}
+			\phi(t_1, t_0, x(t_0), u(\cdot)) : \bbR_+^2 \times \mathcal{X} \times L^{2}_{\text{loc}}(\bbR, U) \rightarrow \bbR^n
 		\end{equation*}
-		such that $x(t_1) = \phi(t_1, t_0, x(t_0), u)$.
+		such that $x(t_1) = \phi(t_1, t_0, x(t_0), u(\cdot))$. 
 	\end{definition}
 	\begin{definition}[Reachability and controllability]
-		The state space $\mathcal{X}$ of system $\Sigma$ is said to be reachable
-		from $x_{-1}$ if \\
-		$\forall \, x \in \mathcal{X}, \; \exists\,  t_{-1} \le 0, \, \exists u(\cdot) \in U^\bbR$ such that $x = \phi(0, t_{-1}, x_{-1}, u(\cdot))$. \\
-		It is said to be controllable to $x_1$ if for any $x \in \mathcal{X}, \; \exists t_1 > 0$ and $u(\cdot) \in \mathcal{U}$ such that $x_1 = \phi(0, t_{-1}, x_{-1}, u(\cdot))$.
+		The state space $\mathcal{X}$ of system $\Sigma$ is said to be \textbf{reachable}
+		from $x_{-1}$ if 
+		\begin{equation*}
+		\forall\, x \in \mathcal{X}, \; \exists\,  t_{-1} \le 0, \, \exists\, u(\cdot) \in L^{2}_{\text{loc}}(\bbR, U) \text{ such that } x = \phi(0, t_{-1}, x_{-1}, u(\cdot)).
+		\end{equation*}
+				It is said to be \textbf{controllable} to $x_1$ if 
+		\begin{equation*}
+			\forall\, x \in \mathcal{X}, \; \exists\, t_1 > 0, \; \exists \, u(\cdot) \in L^{2}_{\text{loc}}(\bbR, U) \text{ such that } x_1 = \phi(t_1, 0, x, u(\cdot)).
+		\end{equation*}
 	\end{definition}
 \end{frame}
 
@@ -293,14 +318,19 @@ It equality holds then the system is called conservative (w.r.t. the supply rate
 
 \only<1>{
 	\begin{definition}[Passive system]
-	A system $\Sigma$ with $U = Y = \bbR^m$ is passive if it is dissipative w.r.t. $s(u, y) = u^\top y.$ \\
-	\vspace{.3cm}
-	$\Sigma$ is input strictly passive if $\exists \delta > 0$ such that $\Sigma$ is dissipative w.r.t. $s(u, y) = u^\top y − \delta||u||^2_2$. \\
-	\vspace{.3cm}
-	$\Sigma$ is output strictly passive if there exists $\varepsilon >0$ such that $\Sigma$ is dissipative with respect
-	to $s(u, y) = u^\top y − \varepsilon ||y||^2_2$ .\\
-	\vspace{.3cm}
-	$\Sigma$ is lossless if it is conservative with respect to
+	$\Sigma$ with $U = Y = \bbR^m$ is \textbf{passive} if it is dissipative w.r.t.
+	\begin{equation*}
+		s(u, y) = u^\top y.
+	\end{equation*}
+	$\Sigma$ is \textbf{input strictly passive} if $\exists\, \delta > 0$ such that $\Sigma$ is dissipative w.r.t.
+	\begin{equation*}
+		s(u, y) = u^\top y − \delta||u||^2_2.
+	\end{equation*}  
+	$\Sigma$ is \textbf{output strictly passive} if $\exists\, \varepsilon >0$ such that $\Sigma$ is dissipative w.r.t.
+	\begin{equation*}
+		s(u, y) = u^\top y − \varepsilon ||y||^2_2
+	\end{equation*}
+	$\Sigma$ is \textbf{lossless} if it is conservative with respect to
 	$s(u, y) = u^\top y$.
 	\end{definition}
 }
@@ -308,12 +338,17 @@ It equality holds then the system is called conservative (w.r.t. the supply rate
 \begin{definition}[$L^2$ finite gain]
 	A system $\Sigma$ with $U = \bbR^m, \; Y = \bbR^p$ has $L^2$-gain $\le \gamma$ ($\gamma \ge 0$)
 	if it is dissipative w.r.t.
-	$$s(u, y) = \frac{1}{2}\gamma||u||^2_2 − \frac{1}{2}||y||^2_2.$$ 
+	\begin{equation*}
+		s(u, y) = \frac{1}{2}\gamma||u||^2_2 − \frac{1}{2}||y||^2_2.
+	\end{equation*}
+	 
 	The $L^2$-gain of $\Sigma$ is defined as 
-	$$\gamma(\Sigma) := \inf\{\gamma | \; \Sigma \text{ has } L^2\text{-gain} \le \gamma\}.$$
+	\begin{equation*}
+		\gamma(\Sigma) := \inf\{\gamma | \; \Sigma \text{ has } L^2\text{-gain} \le \gamma\}.
+	\end{equation*}
 	$\Sigma$ is said to have $L^2$-gain $<\gamma$ if $\exists\, \tilde{\gamma} \le \gamma$ such that $\Sigma$ has $L^2$-gain $\le \tilde{\gamma}$. \\
 	\vspace{.3cm}
-	$\Sigma$ is called inner if it is conservative with respect to $s(u, y) = \frac{1}{2}||u||^2_2 − \frac{1}{2}||y||^2_2$.
+	$\Sigma$ is called {inner} if it is conservative with respect to $s(u, y) = \frac{1}{2}||u||^2_2 − \frac{1}{2}||y||^2_2$.
 \end{definition}
 }
 \end{overlayarea}
@@ -322,27 +357,29 @@ It equality holds then the system is called conservative (w.r.t. the supply rate
 
 
 
-\begin{frame}{How to establish dissipativity?}
+\begin{frame}{How to establish dissipativity? The available storage}
 	
 \begin{theorem}[Necessary and sufficient conditions for dissipativity]
 Consider system $\Sigma$ and supply rate $s(u, y)$. $\Sigma$ is dissipative with respect to $s$ iff
 \begin{equation*}
-	S_a(x):= \sup_{\substack{u(\cdot) \\ T \ge 0}} - \int_0^T s(u(t), y(t)) \d t, \qquad x(0) = x
+	S_a(x):= \sup_{\substack{u(\cdot) \\ T \ge 0}} - \int_0^T s(u(t), y(t)) \d t, \qquad x(0) = x,
 \end{equation*}
-is finite $\forall \, x \in \mathcal{X}$. Furthermore, if $S_a$ is finite $\forall \, x \in \mathcal{X}$ then $S_a$
-is a storage function, called the available storage, and all other possible storage functions $S$ satisfy
+is finite $\forall \, x \in \mathcal{X}$. Furthermore, if $S_a$ is finite $\forall \, x \in \mathcal{X}$ then $S_a$ is a storage function, called the \textbf{available storage}, and all other possible storage functions $S$ satisfy
 \begin{equation*}
 	S_a(x) \le S(x) - \inf_x S(x), \qquad \forall \,  x \in \mathcal{X}
 \end{equation*}
 Moreover $\inf_x S_a(x)=0.$
 \end{theorem}
+
+The available storage is the minimal storage function.
 	
 \end{frame}
 
 \begin{frame}{Proof}
 
 		\begin{itemize}
-			\item ($\implies$) Suppose $S_a$ is finite. Then $S_a \ge 0$ (supremum of a set that contains 0). Given $u: [t_0, t_1] \rightarrow \bbR^m$ compare $S(x(t_0))$ and $S(x(t_1)) - \int_{t_0}^{t_1} s(u(t), y(t))\d t$. Since $S_a$ is the supremum over all $u(\cdot)$ it follows
+			\item ($\implies$) Suppose $S_a$ is finite. Then $S_a \ge 0$ (supremum of a set that contains 0).  Compare $S(x(t_0))$ and $S(x(t_1)) - \int_{t_0}^{t_1} s(u(t), y(t))\d t$ with $s(u, y)$ evaluated on a trajectory generated by $u: [t_0, t_1] \rightarrow \bbR^m$ that drives $x(t_0)$ at $t_0$ to $x(t_1)$ at $t_1$. \\
+			Since $S_a$ is the supremum over all $u(\cdot)$ it follows
 			\begin{equation*}
 				S_a(x(t_0)) \ge S_a(x(t_1)) - \int_{t_0}^{t_1} s(u(t), y(t)) \d t \implies S_a \text{ is a storage function.}
 			\end{equation*}
@@ -355,13 +392,61 @@ Moreover $\inf_x S_a(x)=0.$
 \end{frame}
 
 \begin{frame}{Reachability and Storage functions}
-If the system is reachable from some state, then the finiteness of $S_a$ needs only to be checked for this initial condition.
+If the system is reachable from $x^*$, the finiteness of $S_a$ needs to be checked only in $x^*$
 \begin{theorem}
 	Assume that $\Sigma$ is reachable from $x^* \in \mathcal{X}$. Then $\Sigma$ is dissipative
 	iff $S_a (x^∗) < \infty$.
 \end{theorem}
+
+\textbf{Proof} \\
+($\impliedby$) Suppose there exists $x \in \mathcal{X}$ such that $S_a(x) = \infty$. Since
+by reachability $x$  can be reached from $x^*$ in finite time, this would imply (by time
+invariance) that also $S_a (x^*) = \infty$.
+
+
 \end{frame}
 
+\begin{frame}{The maximal storage: the required supply}
+	If $\Sigma$ is reachable from $x^∗$, there
+	exists another canonically defined storage function. 
+\begin{theorem}
+	Assume that $\Sigma$ is reachable from $x^∗ \in \mathcal{X}$. Define the required supply (from $x^*$) $S_r : \mathcal{X} \rightarrow \bbR \cup \{-\infty\}$ as
+\begin{equation*}
+	S_r(x) := \inf_{\substack{u(\cdot) \\ T \ge 0}} \int_{-T}^0 s(u(t), y(t)) \d t, \qquad x(-T)=x^*, \quad x(0)=x.
+\end{equation*}
+Then $S_r$ satisfies the dissipation inequality. Furthermore, $\Sigma$ is dissipative iff $\exists\, K > −\infty$ such that $S_r (x) \ge K, \; \forall \, x \in \mathcal{X}$. Moreover, if $S$ is a
+storage function for $\Sigma$, then
+\begin{equation*}
+S(x) \le S_r(x) + S(x^*), \qquad x \in \mathcal{X},
+\end{equation*}
+and $S_r(x) + S(x^∗)$ is itself a storage function (and in particular $S_r(x) + S_a(x^*)$). 
+\end{theorem}
+\end{frame}
+
+\begin{frame}{Proof}
+	
+	To steer the system from $x^∗$ at $-T$ to $x(t_1)$  consider $u(\cdot) : [-T, t_1] \rightarrow U$ which first
+	take $x^∗$ to $x(t_0)$ at time $t_0 \le t_1$, and then equal to a given input $u(\cdot) : [t_0 , t_1] \rightarrow U$ transferring $x(t_0) $ to $x(t_1)$. This is a suboptimal control policy, whence
+	\begin{equation*}
+		S_r(x(t_0)) + \int_{t_0}^{t_1} s(u(t), y(t)) \d t \ge S_r(x(t_1)).
+	\end{equation*}
+
+	For the second claim, note that by definition of $S_a$ and $S_r$
+	\begin{equation*}
+	S_a(x^∗) = \sup_x −S_r(x),
+	\end{equation*}
+	
+	
+	By the previous theorem, $\Sigma$ is dissipative iff $\exists K > -\infty$ such that $S_r(x) \ge -K, \; \forall x$. \\
+	Finally, let $S$ satisfy the dissipation inequality. Then for any $u(\cdot) : [-T, 0] \rightarrow U$ transferring $x(-T) = x^∗$ to $x(0) = x$ we have by the dissipation inequality
+	\begin{equation*}
+		S(x) - S(x^*) \le \int_{-T}^{0} s(u(t), y(t)) \d t.
+	\end{equation*}
+	
+	Taking the infimum on the right-hand side over all $u(\cdot)$ proves the claim. \\
+	If $S \ge 0$, then $S_r + S(x^∗) \ge 0$, and also $S_r + S(x^*)$ satisfies the dissipation inequality.
+	
+\end{frame}
 
 
 
