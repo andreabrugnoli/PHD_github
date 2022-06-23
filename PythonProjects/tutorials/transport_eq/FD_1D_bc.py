@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.tri as mtri
 from matplotlib.collections import LineCollection
 
-import tutorials.utilities.plot_setup
+import utilities.plot_setup
 
 path_fig = "/home/andrea/PHD_github/LaTeXProjects/CandidatureISAE/imagesEqTr/"
 

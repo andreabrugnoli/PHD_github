@@ -46,7 +46,7 @@
 }
 \makeatother
 
-\graphicspath{{./images/}}
+\graphicspath{{./imagesDiss/}}
 
 
 
@@ -122,7 +122,7 @@
 \makeatother
 
 
-\graphicspath{{./images/}}
+\graphicspath{{./imagesDiss/}}
 
 \newif\iftocsub
 \tocsubtrue
@@ -278,19 +278,8 @@ For sake simplicity, assume $\mathcal{X} \subseteq \bbR^n,\; U=\bbR^m, \; Y=\bbR
 		such that $x(t_1) = \phi(t_1, t_0, x(t_0), u(\cdot))$. 
 \end{definition}
 
-\only<1>{
-The state transition function verifies:
-\begin{itemize}
-	\item Consistency: $x_0 = \phi(t_0, t_0, x_0, u)$, for all $t_0 \in \bbR, \; x_0 \in \mathcal{X}, \; u \in L^2_{\text{loc}}(\bbR, U)$.
-	\item Determinism: $\phi(t_1, t_0, x_0, u_1) = \phi(t_1, t_0, x_0, u_2)$, \; for all $(t_1, t_0) \in \bbR_+^2, \; x_0 \in \mathcal{X}$ and $u_1, u_2 \in L^2_{\text{loc}}(\bbR, U)$ such that $u_1(t) = u_2(t), \; t_0 \le t \le t_1$.
-	\item Semi group property: $\phi(t_2, t_0, x_0, u) = \phi(t_2, t_1, \phi(t_1, t_0, x_0, u), u)$, \\
-	for all $t_0 \le t_1 \le t_2, \; x_0 \in \mathcal{X}$ and $u,\in L^2_{\text{loc}}(\bbR, U)$.
-	\item Stationary: $\phi(t_1+T, t_0+T, x_0, u_T) = \phi(t_1, t_0, x_0, u)$, \\
-	for all $(t_1, t_0) \in \bbR_+^2, \; x_0 \in \mathcal{X}$ and $u, u_T \in L^2_{\text{loc}}(\bbR, U)$ and $u_T(t) = u(t+T)$.
-\end{itemize}
-}
-\only<2>{
-	\begin{definition}[Reachability and controllability]
+
+\begin{definition}[Reachability and controllability]
 		The state space $\mathcal{X}$ of system $\Sigma$ is said to be \textbf{reachable}
 		from $x_{-1}$ if 
 		\begin{equation*}
@@ -300,10 +289,23 @@ The state transition function verifies:
 		\begin{equation*}
 			\forall\, x \in \mathcal{X}, \; \exists\, t_1 > 0, \; \exists \, u(\cdot) \in L^{2}_{\text{loc}}(\bbR, U) \text{ such that } x_1 = \phi(t_1, 0, x, u(\cdot)).
 		\end{equation*}
-	\end{definition}
-}
+\end{definition}
+
 \end{overlayarea}
+
 \end{frame}
+
+\begin{comment}
+	The state transition function verifies:
+	\begin{itemize}
+		\item Consistency: $x_0 = \phi(t_0, t_0, x_0, u)$, for all $t_0 \in \bbR, \; x_0 \in \mathcal{X}, \; u \in L^2_{\text{loc}}(\bbR, U)$.
+		\item Determinism: $\phi(t_1, t_0, x_0, u_1) = \phi(t_1, t_0, x_0, u_2)$, \; for all $(t_1, t_0) \in \bbR_+^2, \; x_0 \in \mathcal{X}$ and $u_1, u_2 \in L^2_{\text{loc}}(\bbR, U)$ such that $u_1(t) = u_2(t), \; t_0 \le t \le t_1$.
+		\item Semi group property: $\phi(t_2, t_0, x_0, u) = \phi(t_2, t_1, \phi(t_1, t_0, x_0, u), u)$, \\
+		for all $t_0 \le t_1 \le t_2, \; x_0 \in \mathcal{X}$ and $u,\in L^2_{\text{loc}}(\bbR, U)$.
+		\item Stationary: $\phi(t_1+T, t_0+T, x_0, u_T) = \phi(t_1, t_0, x_0, u)$, \\
+		for all $(t_1, t_0) \in \bbR_+^2, \; x_0 \in \mathcal{X}$ and $u, u_T \in L^2_{\text{loc}}(\bbR, U)$ and $u_T(t) = u(t+T)$.
+	\end{itemize}
+\end{comment}
 
 \section{Definition and characterization of dissipativity}
 
@@ -402,19 +404,24 @@ The available storage is the minimal storage function.
 			\end{equation*}
 			\item (Only if) Suppose $\Sigma$ dissipative. Then $\exists\,  S \ge 0$ such that $\forall \, u(\cdot)$
 			\begin{equation*}
-				S(x(t)) + \int_0^T s(u(t), y(t)) \d t \ge S(x(T)) \ge 0.
+				S(x(0)) + \int_0^T s(u(t), y(t)) \d t \ge S(x(T)) \ge 0.
 			\end{equation*}
 		This implies that $$S(x(0)) \ge \sup_{\substack{u(\cdot) \\ T \ge 0}} - \int_0^T s(u(t), y(t)) \d t = S_a(x(0)) \implies S_a(x(0)) < \infty$$
 		\end{itemize}
 		Then $S'= S - \inf_x S(x)$ satisfy the dissipation inequality so $S'(x) \ge S_a(x), \forall x$ and $\inf_x S'(x)=0$ (and hence $\inf S_a(x)=0$).
 \end{frame}
 
+\begin{frame}
+\centering
+\includegraphics[width=.6\textwidth]{proof1.eps}
+\end{frame}
+
 \begin{frame}{Reachability and Storage functions}
 If the system is reachable from $x^*$, the finiteness of $S_a$ needs to be checked only in $x^*$
-\begin{theorem}
+\begin{proposition}
 	Assume that $\Sigma$ is reachable from $x^* \in \mathcal{X}$. Then $\Sigma$ is dissipative
 	iff $S_a (x^∗) < \infty$.
-\end{theorem}
+\end{proposition}
 
 \textbf{Proof} \\
 (If) Suppose there exists $x \in \mathcal{X}$ such that $S_a(x) = \infty$. Since
@@ -482,7 +489,7 @@ Then the following holds:
 \end{frame}
 
 \begin{frame}{Alternative definition of dissipativity}
-if $\Sigma$ is dissipative with a storage function $S$ for which $x^* = \argmin_x S(x)$, then also $S -S(x^∗)$ is a storage function, which is zero at $x^*$. Then it holds
+If $\Sigma$ is dissipative with a storage function $S$ for which $x^* = \argmin_x S(x)$, then also $S -S(x^∗)$ is a storage function, which is zero at $x^*$. Motions starting from $x^*$ verify
 \begin{equation}\label{eq:dissIneq_x}
 \int_{0}^{T} s(u(t), y(t)) \ge 0, \qquad x(0) = x^*, \quad \forall T \ge 0. 
 \end{equation}
@@ -491,11 +498,11 @@ if $\Sigma$ is dissipative with a storage function $S$ for which $x^* = \argmin_
 \end{definition}
 
 \begin{proposition}
-	Let $\Sigma$ be dissipative with storage function $S$ satisfying $S(x^∗)=0$. Then the system is also dissipative from $x^*$. Conversely, if the system is dissipative
-	from $x^∗$ then $S_a (x^*) = 0$. If additionally the system is reachable from $x^∗$ then the
+	A dissipative system $\Sigma$ is dissipative from $x^0$ iff its storage function satisfies $S(x^∗)=0$. \\
+	If additionally the system is reachable from $x^∗$ then the
 	system is dissipative and its required supply satisfies $S_r(x^∗) = 0$.
 \end{proposition}
-\textbf{Proof} ($\impliedby$) Assume $\Sigma$ is dissipative from $x^*$. Then by definition of $S_a$ if follows  $S_a(x^∗) = 0$. It follows that the system is dissipative, and $S_r(x^∗) = 0$.
+\textbf{Proof} (Only if) Assume $\Sigma$ is dissipative from $x^*$. By definition of $S_a$ if holds  $S_a(x^∗) = 0$. If is reachable from $x^*$ then by the previous proposition the system is dissipative, and $S_r(x^∗) = 0$.
 
 \end{frame}
 
@@ -503,7 +510,7 @@ if $\Sigma$ is dissipative with a storage function $S$ for which $x^* = \argmin_
 	\begin{theorem}
 		Let $\Sigma$ be dissipative and dissipative from $x^*$. Suppose that $s$ is such that 
 		\begin{equation}\label{eq:s_neg}
-		\exists u(x) \text{ such that }	s(u(x), h(x,u(x))) \le 0, \qquad x \in \mathcal{X}.
+		\exists u(x) \; \text{  such that  } \;	s(u(x), h(x,u(x))) \le 0, \qquad x \in \mathcal{X}.
 		\end{equation}
 		for which $x^*$ is a globally asymptotically equilibrium for the closed-loop system $\dot{x}̇ = f (x, u(x))$. Then any storage function $S$ attains its minimum at $x^*$ and 
 		\begin{equation*}
@@ -520,7 +527,7 @@ considering on $(T, \infty)$ a feedback $u(x)$ verifying \eqref{eq:s_neg} such t
 \begin{equation*}
 	-\int_0^T s(u(t), y(t)) \d t\le S(x) - S(x^*)
 \end{equation*}
-Taking the supremum at the left-hand side for $u(\cdot) : [0, T] \rightarrow$ and $T\ge 0$ concludes.
+Taking the supremum at the left-hand side for $u(\cdot) : [0, T] \rightarrow U$ concludes the proof.
 	
 \end{frame}
 
@@ -547,17 +554,17 @@ Denote $x(t; x_0)$ the solution for $x(0)=x_0$ with $t \in [0, T(x_0))$ and $T(x
 	Let $x^∗$ be an equilibrium $f(x^*) = 0$, and thus
 	$x(t; x^*) = x^*, \; \forall t$. The equilibrium $x^*$ is
 	\begin{enumerate}
-	 \item stable, if for each $\varepsilon>0, \; \exists \delta(\varepsilon)>0$ such that
+	 \item \textbf{stable}, if for each $\varepsilon>0, \; \exists \delta(\varepsilon)>0$ such that
 	 \begin{equation*}
 	 	||x_0 - x^*|| \le \delta(\varepsilon) \implies ||x(t; x_0) - x^*||< \varepsilon, \qquad \forall t \ge 0.
 	 \end{equation*}
-	 \item asymptotically stable, if it is stable and additionally there exists $\widehat{\delta}$ such that
+	 \item \textbf{asymptotically stable}, if it is stable and additionally there exists $\widehat{\delta}$ such that
 	 \begin{equation*}
 	 	||x_0 - x^*|| \le \widehat{\delta} \implies \lim_{t \rightarrow \infty} x(t; x_0) = x^*
 	 \end{equation*}
-	 \item globally asymptotically stable, if it is stable and 
+	 \item \textbf{globally asymptotically stable}, if it is stable and 
 	 $$\lim_{t \rightarrow \infty} x(t; x_0) = x^∗, \qquad \forall x_0 \in \mathcal{X}.$$
-	 \item unstable, if it is not stable.
+	 \item \textbf{unstable}, if it is not stable.
 	\end{enumerate}
 \end{definition}
 
@@ -571,9 +578,9 @@ Denote $x(t; x_0)$ the solution for $x(0)=x_0$ with $t \in [0, T(x_0))$ and $T(x
 	\begin{equation*}
 		V(x^∗) = 0, \quad V(x) > 0, \quad x \neq x^∗,
 	\end{equation*}
-	that is V is positive definite at $x^*$, and
+	that is $V$ is positive definite at $x^*$, and
 	\begin{equation*}
-	\dot{V}(x) := \nabla V(x) f(x) \le 0, \qquad x \in \mathcal{X},
+	\dot{V}(x) := \nabla V(x) \cdot f(x) \le 0, \qquad x \in \mathcal{X},
 	\end{equation*}
 	is called a Lyapunov function for the equilibrium $x^*$
 	\end{definition}
@@ -585,7 +592,7 @@ Denote $x(t; x_0)$ the solution for $x(0)=x_0$ with $t \in [0, T(x_0))$ and $T(x
 		\dot{V}(x) <0, \qquad \forall x \in \mathcal{X}, \quad x\neq x^*,
 	\end{equation*}
 	then $x^*$ is an asymptotically stable equilibrium, which is globally asymptotically
-	stable if $V$ is proper (that is, the sets $\{x \in \mathcal{X} | 0 \le V (x) \le c\}$ are compact for every
+	stable if $V$ is proper (that is, the sets $\{x \in \mathcal{X} |\; 0 \le V (x) \le c\}$ are compact for every
 	$c \in \bbR_+$, equivalent to $V$ is radially unbounded if $\mathcal{X} = \bbR^n$).
 \end{theorem}
 \end{frame}
@@ -593,7 +600,7 @@ Denote $x(t; x_0)$ the solution for $x(0)=x_0$ with $t \in [0, T(x_0))$ and $T(x
 \begin{frame}{First stability result}
 	Assume $S(x) \in C^1(\mathcal{X}, \bbR_+)$. Then it holds
 	\begin{equation*}
-		\nabla S(x) f(x, u) \le s(u, h(x, u)), \qquad \forall x, u. 
+		\nabla S(x)\cdot f(x, u) \le s(u, h(x, u)), \qquad \forall x, u. 
 	\end{equation*}
 
 	\begin{proposition}
@@ -602,28 +609,60 @@ Denote $x(t; x_0)$ the solution for $x(0)=x_0$ with $t \in [0, T(x_0))$ and $T(x
 		\begin{equation*}
 			s(0, y) \le 0, \qquad \forall y \in Y,
 		\end{equation*}
-		Assume furthermore that $x^* \in \mathcal{X}$ is a strict local minimum for $S$. Then $x^*$ is a stable
-		equilibrium of the unforced system $ẋ = f (x, 0)$ with Lyapunov function $V(x):=
+		Assume that $x^* \in \mathcal{X}$ is an equilibrium for the unforced system $ẋ = f (x, 0)$. Then $x^*$ is a stable equilibrium of the unforced system  with Lyapunov function $V(x):=
 		S(x) - S(x^*)$ for $x$ around $x^*$, while $s(0, h(x^∗, 0)) = 0$. If additionally, $\dot{S}̇(x) < 0, \; \forall x \neq x^*$, then $x^*$ is an asymptotically stable equilibrium
 	\end{proposition}
-\textbf{Proof} Since $\nabla S(x) f(x, 0) \le s(0, h(x, 0)) \le 0$, $S$ is nonincreasing along solutions of $\dot{x}=f(x,0)$. Since $S$ has a strict minimum at $x^*$ this
-implies $f(x^∗ , 0) = 0$, and thus $s(0, h(x^∗, 0)) = 0$. The rest follows from Lyapunov stability theorem.
+\textbf{Proof} Since $\nabla S(x) \cdot f(x, 0) \le s(0, h(x, 0)) \le 0$, $S$ is nonincreasing along solutions of $\dot{x}=f(x,0)$. Since $f(x^∗ , 0) = 0$, it holds $s(0, h(x^∗, 0)) = 0$. The rest follows from Lyapunov stability theorem.
 	
 \end{frame}
 
 \begin{frame}{Refinement via LaSalle}
 	The condition $\dot{S} <0$ can be relaxed by using the LaSalle invariance principle.
 	\begin{definition}[Invariant set]
-		A set $\mathcal{N} \subset \mathcal{X}$ is invariant for $\dot{x} = f(x)$ if $x(t; x_0) \in \mathcal{X}, 
+		A set $\mathcal{N} \subset \mathcal{X}$ is invariant for $\dot{x} = f(x)$ if $x(t; x_0) \in \mathcal{N}, 
 		\; \forall  x_0 \in \mathcal{N}, \, \forall t \in \bbR$, and is positively invariant if this holds $\forall t\ge 0$
 	\end{definition}
 	
 	\begin{theorem}[LaSalle's invariance principle]
-		Let $V : X \rightarrow \bbR$ be a $C^1$ function for which $\dot{V}(x) := \nabla V(x)
+		Let $V : X \rightarrow \bbR$ be a $C^1$ function for which $\dot{V}(x) := \nabla V(x) \cdot 
 		f(x) \le 0, \, \forall \, x \in \mathcal{X}$. Suppose there exists a compact set $\mathcal{C}$ which is positively invariant for $\dot{x} = f(x)$. Then for any $x_0 \in C$ the solution $x(t; x_0)$ converges
-		for $t \rightarrow \infty$ to the largest subset of $\{x \in \mathcal{X} | \; \dot{V}(x) = 0\} \cap \mathcal{C}$ that is invariant for $\dot{x} = f(x)$
+		for $t \rightarrow \infty$ to the largest subset $\mathcal{I}$ of $\mathcal{A} = \{x \in \mathcal{X} | \; \dot{V}(x) = 0\} \cap \mathcal{C}$ that is invariant for $\dot{x} = f(x)$.
 	\end{theorem}
 	
+\end{frame}
+
+\begin{frame}{The pendulum example}
+	\begin{columns}
+		\begin{column}{0.3\textwidth}
+			Dynamics:
+			\begin{equation*}
+				\begin{aligned}
+					\dot{x}_1 &= x_2, \\
+					\dot{x}_2 &= -\frac{g}{l} \sin(x_1) - \frac{r}{m l^2}x_2
+				\end{aligned}
+			\end{equation*}
+		Sets:
+		\begin{equation*}
+			\begin{aligned}
+				\mathcal{C} &= \{x \in \mathcal{X}|\; V(x_1, x_2) \le k\}, \\
+				\mathcal{A} &= \{x \in \mathcal{X}|\; \dot{V} = 0\} \cap \mathcal{C}, \\
+							&= \{x_2=0\} \cap \mathcal{C}, \\
+				\mathcal{I} &= \{(0, 0)\}
+			\end{aligned}
+		\end{equation*}
+		\end{column}
+	\begin{column}{0.7\textwidth}
+		\centering
+		\includegraphics[width=.85\columnwidth]{pendulum.eps}
+		\begin{equation*}
+			\begin{aligned}
+				V(x_1, x_2) = &m g l(1-\cos{x_1}) + \frac{1}{2}\, m l^2 x_2^2
+			\end{aligned}
+		\end{equation*}
+	\end{column}
+		
+		
+	\end{columns}
 \end{frame}
 
 \begin{frame}
