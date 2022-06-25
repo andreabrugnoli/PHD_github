@@ -76,6 +76,8 @@
 \newcommand{\inpr}[3][]{\ensuremath{( #2, \, #3 )_{#1}}}
 \newcommand{\dualpr}[3][]{\ensuremath{\langle #2 \, \vert #3 \rangle_{#1}}}
 
+\newcommand{\bilprod}[2]{\langle \langle \, #1, #2 \, \rangle \rangle}
+
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
 
@@ -118,6 +120,8 @@
 \makeatother
 
 
+%% At begin of each section: show current section and all subsections in the section if any
+%% At begin of each subsection except first: show only the current section/subsection
 \newif\iftocsub
 \tocsubtrue
 \AtBeginSection[] {
@@ -266,7 +270,7 @@ The Taylor-Hood element does not lead to divergence free velocity $||\nabla \cdo
 \section{Port-Hamiltonian systems as a unified language for multiphysics}
 
 \begin{frame}{A unified language for multiphysics in engineering}
-	The port-Hamiltonian paradigm provides a language to understand multiphysics:
+	The port-Hamiltonian (pH) paradigm provides a language to understand multiphysics:
 	\vspace{.5cm}
 	\begin{columns}
 		\begin{column}{.6\textwidth}
@@ -284,11 +288,96 @@ The Taylor-Hood element does not lead to divergence free velocity $||\nabla \cdo
 
 \end{frame}
 
+\begin{frame}{Finite dimensional pH systems}
+	\begin{alertblock}{Still not a well established theory}
+	There is \textbf{not a unique definition} of pH systems, even in finite dimension.
+	\end{alertblock}
+	\begin{definition}[Finite dimensional pH system]
+		The time-invariant dynamical system
+	\begin{equation*}
+		\begin{aligned}
+			\dot{\mathbf{x}} &= \left( \mathbf{J} - \mathbf{R} \right) \nabla H(\mathbf{x}) + \mathbf{B}\mathbf{u}, \\
+			\mathbf{y} &= \mathbf{B}^\top ~ \nabla H(\mathbf{x}),
+		\end{aligned}
+	\end{equation*}
+	where $\mathbf{x}$ is the state, $\mathbf{u}$ the control input, $\mathbf{y}$ the collocated output and
+	\begin{itemize}
+		\item $H(\mathbf{x}) : \mathbb{R}^n \rightarrow \mathbb{R}$, the Hamiltonian, is bounded from below.
+		\item $\mathbf{J}=-\mathbf{J}^\top $ the interconnection operator.
+		\item $\mathbf{R}=\mathbf{R}^\top \in \bbR^{n \times n}, \; \mathbf{R} \ge 0$ the resistive operator.
+		\item $\mathbf{B} \in \bbR^{n \times m}$ the control operator.
+	\end{itemize}
+	is a pH system.
+	\end{definition}
+	
+	
+
+
+	
+\end{frame}
+
+
+\begin{frame}{The geometric structure of pH systems\footcite{courant1990}}
+	\begin{definition}[Finite dimensional Dirac structure]
+		Given a finite-dimensional vector space ${F}$ and its dual ${E}=F'$ with respect to the duality product $\dualpr{\cdot}{\cdot} : {E} \times {F} \rightarrow \mathbb{R}$, consider the symmetric bilinear form:
+		$$
+		\bilprod{(\mathbf{f}_1, \mathbf{e}_1)}{(\mathbf{f}_2, \mathbf{e}_2)} := {\dualpr{\mathbf{e}_1}{\mathbf{f}_2}} + {\dualpr{\mathbf{e}_2}{\mathbf{f}_1}}, \text{ where } (\mathbf{f}_i, \mathbf{e}_i) \in {B}, \; i = 1, 2.
+		$$
+		A Dirac structure on ${B} := {F} \times {E}$ is a linear subspace ${D} \subset {B}$ which equals its orthogonal companion with respect to $\left\langle \left\langle \cdot, \cdot \right\rangle \right\rangle$, {\it i.e.} ${D} ={D}^{[\perp]}$, where:
+		$$
+		{D}^{[\perp]} := \left\{ (\mathbf{f}, \mathbf{e}) \in {B} ~ \mid ~ \bilprod{(\mathbf{f}, \mathbf{e})}{(\widehat{\mathbf{f}}, \widehat{\mathbf{e}})} = 0, ~ \forall ~ (\widehat{\mathbf{f}}, \widehat{\mathbf{e}}) \in {D} \right\}.
+		$$
+	\end{definition}
+	\begin{theorem}
+		Given a finite-dimensional vector space ${F}$ and its dual ${E}=F'$ a subspace $D \subset F × E$ is a Dirac structure iff $\dualpr{\mathbf{e}}{\mathbf{f}}=0$ and $\mathrm{dim}\, D = \mathrm{dim}\, F$.
+	\end{theorem}
+\end{frame}
+
+\begin{frame}{Dirac structure and pH systems}
+	
+	From classical matrix factorization $\exists \, \mathbf{G} \in \bbR^{k \times n}$ and $\mathbf{K} = \mathbf{K}^\top \in \bbR^{k \times k}, \; \mathbf{K} \ge 0$ such that $\mathbf{R} = \mathbf{G}^\top ~ \mathbf{K} \mathbf{G}$. \\
+	
+	\begin{block}{Dirac structure representation}
+		Considering the following \textbf{ports}:
+		\begin{itemize}
+			\item
+			the \textbf{storage ports} $(\mathbf{f}_{{x}}, \mathbf{e}_{{x}}) := \left(-\dot{\mathbf{x}}, \nabla H(\mathbf{x}) \right) \in \mathbb{R}^n \times \mathbb{R}^n$;
+			\item
+			the \textbf{resistive ports} $(\mathbf{f}_{r}, \mathbf{e}_{r}) \in \mathbb{R}^k \times \mathbb{R}^k$;
+			\item
+			the \textbf{interconnection ports} $(\mathbf{f}_{{u}}, \mathbf{e}_{{u}}) := (\mathbf{y}, \mathbf{u} ) \in \mathbb{R}^m \times \mathbb{R}^m$.
+		\end{itemize}
+		Given this port behavior, the pH system rewrites
+		\begin{equation*}
+			\begin{pmatrix}
+				\mathbf{f}_{x} \\
+				\mathbf{f}_{r} \\
+				\mathbf{f}_{u}
+			\end{pmatrix}
+			=
+			\underbrace{\begin{bmatrix}
+					-\mathbf{J}	& \mathbf{G}^\top	& -\mathbf{B} \\
+					\mathbf{G} 	& \mathbf{0}		& \mathbf{0} \\
+					\mathbf{B}^\top	& \mathbf{0}	& \mathbf{0} \\
+			\end{bmatrix}}_{\mathbf{J}_e}
+			\begin{pmatrix}
+				\mathbf{e}_{x}\\
+				\mathbf{e}_{r}\\
+				\mathbf{e}_{u}
+			\end{pmatrix}, \qquad \mathbf{e}_{r} = \mathbf{K} \mathbf{f}_{r}.
+		\end{equation*}
+	
+	Since $\mathbf{J}_e$ is skewsymmetric its graph defines a Dirac structure.
+	\end{block}
+	
+\end{frame}
+
+
 \subsection{Functional analytic structure}
 
 \begin{frame}{A simple definition\footcite{reis2021pH}}
 	\begin{definition}[Port-Hamiltonian system]
-		Let $X_\mathcal{S}, \; X_\mathcal{R}, \; \mathcal{X}_S$ be Banach spaces. A port-Hamiltonian system is a triple $(\mathcal{D}, H, \mathcal{R})$:
+		Let $X_\mathcal{S}, \; X_\mathcal{R}, \; {X}_{\mathcal{S}}$ be Banach spaces. A port-Hamiltonian system is a triple $(\mathcal{D}, H, \mathcal{R})$:
 		\begin{itemize}
 			\item $\mathcal{D} \subset (X_\mathcal{S}, \; X_\mathcal{R}, \; X_\mathcal{P}) \times (X^{'}_\mathcal{S}, \; X^{'}_\mathcal{R}, \; X^{'}_\mathcal{P})$ is a Dirac structure.
 			\item $\mathcal{H} : U \rightarrow \bbR$ (with $U \subset X_\mathcal{S}$ open) is a Hamiltonian.
@@ -310,7 +399,7 @@ The Taylor-Hood element does not lead to divergence free velocity $||\nabla \cdo
 	\begin{block}{Dirac structure}
 			Let $X$ be a Banach space. A subspace $\mathcal{D}\subset X \times X^{'}$ is called a Dirac structure, if $\forall \, f \in X, e \in X^{'}$, it holds
 			\begin{equation*}
-				(f, e) \in \mathcal{D} \iff \left( \dualpr{f}{\hat{e}} + \dualpr{\hat{f}}{e}=0, \quad \forall\, (\hat{f}, \hat{e})\right).
+				(f, e) \in \mathcal{D} \iff \left( \dualpr{\widehat{e}}{f} + \dualpr{e}{\widehat{f}}=0, \quad \forall\, (\widehat{f}, \widehat{e}) \in \mathcal{D}\right).
 			\end{equation*}
 		\end{block}
 
@@ -322,7 +411,7 @@ The Taylor-Hood element does not lead to divergence free velocity $||\nabla \cdo
 			Let $X$ be a Banach space.
 			A relation $\mathcal{R} \subset X \times X^{'}$ is called resistive, if
 			\begin{equation*}
-				\dualpr{f}{e} \le 0, \qquad \forall\, (f,e) \in \mathcal{R}.
+				\dualpr{e}{f} \le 0, \qquad \forall\, (f,e) \in \mathcal{R}.
 			\end{equation*}
 		
 		\end{block}
@@ -330,57 +419,59 @@ The Taylor-Hood element does not lead to divergence free velocity $||\nabla \cdo
 \end{frame}
 
 \begin{frame}{Operators}
-	If $J \in \mathcal{L}(X^{'}, X)$ is a skew-dual operator $\dualpr{J v}{w}= \dualpr{v}{-Jw}\; \forall\, v, w \in X^{'}$ then $D = \{(J e, e) : e \in X^{'}\}$ is a Dirac structure\footcite{reis2022passivity}.\\
+	If $J \in \mathcal{L}(X^{'}, X)$ is a skew-dual operator $\dualpr{w}{J v}= \dualpr{v}{-Jw}\; \forall\, v, w \in X^{'}$ then $D = \{(J e, e) : e \in X^{'}\}$ is a Dirac structure\footcite{reis2022passivity}.\\
 	\vspace{.2cm}
-	If $R :X^{'} \rightarrow X$ is dissipative $\dualpr{x{'}}{G(x{'})} \le 0,\; \forall \, x{'} \in X^{'}$, then $\mathcal{R} = \{(G(e), e) : e \in X^{'}\}$ is a resistive relation.
+	If $K :X \rightarrow X^{'}$ is dissipative $\dualpr{K(x)}{x} \le 0,\; \forall \, x \in X$, then $\mathcal{R} = \{(K(f), f) : e \in X^{'}\}$ is a resistive relation.
 	
 	\begin{equation*}
 		\begin{pmatrix}
-			\partial_t x \\
+			-\partial_t x \\
 			f_\mathcal{R} \\
 			f_\mathcal{P} \\
 		\end{pmatrix} =
 		J
 		\begin{pmatrix}
-			D\mathcal{H}(x(t)) \\
+			D_x\mathcal{H} \\
 			e_\mathcal{R} \\
 			e_\mathcal{P} \\
-		\end{pmatrix}, \qquad f_{\mathcal{R}} = G(e_{\mathcal{R}}).
+		\end{pmatrix}, \qquad e_{\mathcal{R}} = K(f_{\mathcal{R}}).
 	\end{equation*}
 \end{frame}
+
 
 \begin{frame}{Example: the wave equation}
 	Consider the Hamiltonian
 	\begin{equation*}
-		\mathcal{H} = \inpr[L^2(\Omega)]{p}{\kappa p} + \inpr[L^2(\Omega, \bbR^3)]{\bm{u}}{\rho^{-1}\bm{u}}.
+		\mathcal{H} = \inpr[L^2(\Omega)]{p}{\kappa p} + \inpr[L^2(\Omega, \bbR^3)]{\bm{v}}{\rho^{-1}\bm{v}}.
 	\end{equation*}
 	where $\kappa$ is the Bulk modulus and $\rho$ is the density. \\
 	\vspace{.5cm}
 	The wave equation on $\Omega \subset \bbR^3$ with Dirichlet boundary condition reads:
 	\begin{equation*}
+		\diffp{}{t}
 			\begin{pmatrix}
-			\partial_t p \\
-			\partial_{t} \bm{u} \\
+			 p \\
+			\bm{v} \\
 		\end{pmatrix} =
 		\begin{bmatrix}
 			0 & \div \\
 			\grad_w & 0
 		\end{bmatrix}
 		\begin{pmatrix}
-			D\mathcal{H}(p(t)) \\
-			D\mathcal{H}(\bm{u}(t)) \\
-		\end{pmatrix}, \qquad D\mathcal{H}(p(t))|_{\partial\Omega} = g. 
+			D_p\mathcal{H} \\
+			D_{\bm{v}}\mathcal{H}\\
+		\end{pmatrix}, \qquad \gamma_0(D_p\mathcal{H}) = u \in H^{1/2}(\partial\Omega),
 	\end{equation*}
-where $\grad_w$ corresponds to a weak definition of the gradient.\\
-In this case: $X_{\mathcal{S}}= L^2(\Omega) \times H^{\div}(\Omega)^{'}, \; X_{\mathcal{R}} = \emptyset, \; X_{\mathcal{P}}= H^{1/2}(\Omega)$ and
+where $\grad_w$ corresponds to a weak gradient and $\gamma_0$ is the Dirichlet trace.\\
+In this case: $X_{\mathcal{S}}= L^2(\Omega) \times H^{\div}(\Omega)^{'}, \; X_{\mathcal{R}} = \emptyset, \; X_{\mathcal{P}}= H^{-1/2}(\partial\Omega)$ and
 \begin{equation*}
 		J = \begin{bmatrix}
-			0 & \div & \gamma_0 \\
-			\grad_w & 0 & 0 \\
-			\gamma_{\bm{n}} & 0 & 0 
+			0 & -\div & 0 \\
+			-\grad_w & 0 & \mathrm{Id} \\
+			0 & \gamma_{\bm{n}} & 0 
 		\end{bmatrix}
 	\end{equation*}
-where $\gamma_0$ is the Dirichlet trace  and $\gamma_{\bm{n}}$ is the normal trace.
+where $\gamma_{\bm{n}}$ is the normal trace.
 
 \end{frame}
 
@@ -401,15 +492,15 @@ where  $\varepsilon$ is the electric permittivity and $\mu$ is the magnetic perm
 			-\curl_w & 0 \\
 		\end{bmatrix}
 		\begin{pmatrix}
-			D\mathcal{H}(\bm{D}(t)) \\
-			D\mathcal{H}(\bm{B}(t)) \\
-		\end{pmatrix},\qquad D\mathcal{H}(\bm{D}(t)) \times \bm{n}|_{\partial\Omega}=0,
+			D_{\bm{D}}\mathcal{H} \\
+			D_{\bm{B}}\mathcal{H} \\
+		\end{pmatrix},\qquad D_{\bm{D}}\mathcal{H} \times \bm{n}|_{\partial\Omega}= \bm{E} \times \bm{n}=0,
 	\end{equation*}
 	where $\curl_w$ corresponds to a weak $\curl$ operator and the field $\bm{D}, \; \bm{B}$ satisfy
 	\begin{equation*}
 			\nabla \cdot \bm{D}= 0, \qquad	\nabla \cdot \bm{B}= 0.
 	\end{equation*}
-In this case: $X_{\mathcal{S}}= L^2(\Omega, \bbR^3|\div=0) \times H^{\curl}(\Omega| \div=0)^{'}, \; X_{\mathcal{R}} = \emptyset, \; X_{\mathcal{P}}= \emptyset$ and
+In this case: $X_{\mathcal{S}}= L^2(\Omega, \bbR^3|\div=0) \times H^{\curl}_0(\Omega| \div=0)^{'}, \; X_{\mathcal{R}} = \emptyset, \; X_{\mathcal{P}}= \emptyset$ and
 \begin{equation*}
 	J = \begin{bmatrix}
 		0 & \curl \\
@@ -437,7 +528,7 @@ In this case: $X_{\mathcal{S}}= L^2(\Omega, \bbR^3|\div=0) \times H^{\curl}(\Ome
 
 
 \begin{frame}{The canonical geometric port-Hamiltonian system}
-	Distributed port-Hamiltonian were initially defined in a differential geometric setting\footcite{vanderSchaft2002}.\\
+	Distributed port-Hamiltonian were initially defined in a differential geometric setting\footcite{vanderSchaft2002}. In this setting the duality is the Hodge duality, given by the Hodge star $\star$.\\
 	
 	Given two fields  of smooth differential forms $\alpha^p \in \Lambda^p(\Omega)$ and $\beta \in \Lambda^q(\Omega)$ the following systems
 	\begin{equation*}
@@ -452,18 +543,18 @@ In this case: $X_{\mathcal{S}}= L^2(\Omega, \bbR^3|\div=0) \times H^{\curl}(\Ome
 		\begin{pmatrix}
 			\delta_{\alpha} H^{n-p}\\
 			\delta_{\beta} H^{n-q}\\
-		\end{pmatrix}
+		\end{pmatrix},
 	\end{equation*}
-
+together will appropriate boundary conditions are port-Hamiltonian distributed systems.
 
 \end{frame}
 
 
 \section{Mimetic discretization of port-Hamiltonian systems}
 	
-\begin{frame}{Bibliography}
+\begin{frame}[allowframebreaks]{Bibliography}
 	%\bibliographystyle{unsrt}
-	\nocite{*}
+	%\nocite{*}
 	\printbibliography
 \end{frame}
 
