@@ -290,7 +290,7 @@ The Taylor-Hood element does not lead to divergence free velocity $||\nabla \cdo
 		\end{column}
 	\end{columns}
 \begin{block}{A quest for duality}
-	The concept of \textbf{interconnection} and the port behavior of pH systems is mathematically formalized as \textbf{duality pairing}.	 How exactly is that defined ?
+	The concept of \textbf{interconnection} and the \textbf{port} behavior of pH systems is mathematically formalized as \textbf{duality pairing}.	 How exactly is that defined ?
 \end{block}
 
 
@@ -669,7 +669,7 @@ Then the dynamical system defines a Dirac structure.
 			\begin{aligned}
 				\begin{pmatrix}
 					\partial_t p^3 \\
-					\partial_t \bm{u}^1\\
+					\partial_t \bm{v}^1\\
 				\end{pmatrix} &= 
 				-\begin{bmatrix}
 					0 & \div \\
@@ -677,8 +677,8 @@ Then the dynamical system defines a Dirac structure.
 				\end{bmatrix}
 				\begin{pmatrix}
 					\delta_{p} H^{0}\\
-					\delta_{\bm{u}} H^{2}\\
-				\end{pmatrix}, \qquad -\delta_{\bm{u}} H^{2} \cdot \bm{n}|_{\partial\Omega}  = u^{2}, \\
+					\delta_{\bm{v}} H^{2}\\
+				\end{pmatrix}, \qquad -\delta_{\bm{v}} H^{2} \cdot \bm{n}|_{\partial\Omega}  = u^{2}, \\
 				y^{0} &= \delta_{p} H^{0}|_{\partial\Omega}.
 			\end{aligned}	
 	\end{equation*}
@@ -751,42 +751,49 @@ Nevertheless, using conforming finite elements for $H\Lambda^k$, one can obtaine
 
 \end{frame}
 	
-\begin{frame}{Mimetic dual-field discretization\footcite{brugnoli2022df}}
+\begin{frame}{Dual-field discretization\footcite{brugnoli2022df}}
 	\begin{itemize}
 		\item Combining the port-Hamiltonian system and its adjoint, \textbf{two dynamical systems}, whose dynamics is governed \textbf{by skew-adjoint operators} are constructed.
 		\item The two systems are put into \textbf{weak form} considering variables that live in $H\Lambda^k(\Omega)$ using the $L^2$ inner product. The codifferential is interpreted weakly using the integration by parts formula.
-		\item Conforming finite element $\mathcal{V}^k \subset H\Lambda^k(\Omega)$ are used for the variables.
+		\item Conforming finite element $\mathcal{V}^k \subset H\Lambda^k(\Omega)$, that give rise to a discrete de Rham complex, are used for the variables.
 		\item Time integration performed with symplectic Runge-Kutta method based on Gauss-Legendre collocation points.
 	\end{itemize}
 	
 \end{frame}
 
 \begin{frame}[fragile]\frametitle{The key ingredient for discretization: the De Rham complex}
-\centering
+\centering{
 	\begin{tikzcd}
-		H\Omega^0(M) \arrow[r, "\d{}"] \arrow[d, leftrightarrow, "Id"]
-		& H\Omega^{1}(M) \arrow[r, "\d{}"] \arrow[d, "\sharp", xshift=10pt] & H\Omega^2(M) \arrow[r, "\d{}"] \arrow[d, "\beta^{-1}", xshift=10pt]
-		& H\Omega^{3}(M) \arrow[d, "\star", xshift=10pt]  \\
-		H^1(M) \arrow[r, "\grad"] \arrow[d, "\Pi_{s, h}^{-, 0}"]
-		& H^{\curl}(M) \arrow[r, "\curl"] \arrow[u, "\flat"] \arrow[d, "\Pi_{s, h}^{-, 1}"] & H^{\div}(M) \arrow[r, "\div"] \arrow[u, "\beta"] \arrow[d, "\Pi_{s, h}^{-, 2}"]
-		& L^2(M) \arrow[u, "\star^{-1}"] \arrow[d, "\Pi_{s, h}^{-, 1}"] \\
-			\mathrm{CG}_s(\mathcal{T}_h) \arrow[r, "\grad"] 
-		& \mathrm{NED}_s^1(\mathcal{T}_h) \arrow[r, "\curl"] & \mathrm{RT}_s(\mathcal{T}_h) \arrow[r, "\div"]
-		& \mathrm{DG}_{s-1}(\mathcal{T}_h) 
+		H\Lambda^0(\Omega) \arrow[r, "\d{}"] \arrow[d, leftrightarrow, "Id"]
+		& H\Lambda^{1}(\Omega) \arrow[r, "\d{}"] \arrow[d, "\sharp", xshift=10pt] & H\Lambda^2(\Omega) \arrow[r, "\d{}"] \arrow[d, "\beta^{-1}", xshift=10pt]
+		& H\Lambda^{3}(\Omega) \arrow[d, "\star", xshift=10pt]  \\
+		H^1(\Omega) \arrow[r, "\grad"] \arrow[d, "\Pi_{s, h}^{-, 0}"]
+		& H^{\curl}(\Omega) \arrow[r, "\curl"] \arrow[u, "\flat"] \arrow[d, "\Pi_{s, h}^{-, 1}"] & H^{\div}(\Omega) \arrow[r, "\div"] \arrow[u, "\beta"] \arrow[d, "\Pi_{s, h}^{-, 2}"]
+		& L^2(\Omega) \arrow[u, "\star^{-1}"] \arrow[d, "\Pi_{s, h}^{-, 1}"] \\
+			\mathrm{CG}_s(\Omega_h) \arrow[r, "\grad"] 
+		& \mathrm{NED}_s^1(\Omega_h) \arrow[r, "\curl"] & \mathrm{RT}_s(\Omega_h) \arrow[r, "\div"]
+		& \mathrm{DG}_{s-1}(\Omega_h) 
 	\end{tikzcd}  
+}
 
-	
-
+\vspace{1cm}
+The finite elements in the figure form a subcomplex of the de Rham complex:
+\begin{itemize}
+	\item $\grad \mathrm{CG}_s(\Omega_h) \subset \mathrm{NED}_s^1(\Omega_h)$,
+	\item $\curl \mathrm{NED}_s^1(\Omega_h) \subset \mathrm{RT}_s(\Omega_h)$,
+	\item $\div \mathrm{RT}_s(\Omega_h) \subset \mathrm{DG}_{s-1}(\Omega_h)$.
+\end{itemize}	
 
 \end{frame}
 
 
-\begin{frame}{Illustration: the wave equation in 3D}
+\begin{frame}{Illustration: 3D wave equation with mixed boundary conditions}
+	Dynamics and constitutive equations:
 \begin{equation*}
 	\begin{aligned}
 		\begin{pmatrix}
 			\partial_t p^3 \\
-			\partial_t \bm{u}^1\\
+			\partial_t \bm{v}^1\\
 		\end{pmatrix} &= 
 		-\begin{bmatrix}
 			0 & \div \\
@@ -794,27 +801,280 @@ Nevertheless, using conforming finite elements for $H\Lambda^k$, one can obtaine
 		\end{bmatrix}
 		\begin{pmatrix}
 			\delta_{p} H^{0}\\
-			\delta_{\bm{u}} H^{2}\\
-		\end{pmatrix}, \qquad 
-	\begin{aligned}
-		\delta_{p} H^{0}|_{\Gamma_1} = u^0_1, \\
-		-\delta_{\bm{u}} H^{2} \cdot \bm{n}|_{\Gamma_2}  = u^{2}_2,
-	\end{aligned}\\
-		y^2_2 &= -\delta_{\bm{u}} H^{2} \cdot \bm{n}|_{\Gamma_1}, \\
-		y^{0}_1 &= \delta_{p} H^{0}|_{\Gamma_2}.
-	\end{aligned}	
+			\delta_{\bm{v}} H^{2}\\
+		\end{pmatrix}, \\
+	\end{aligned}	\qquad
+\begin{aligned}
+	\delta_{p} H^{0} &= \star p^3 := p^0\\
+	\delta_{\bm{v}} H^{2} &= \star \bm{v}^1:= \bm{v}^2. \\
+\end{aligned}
 \end{equation*}
-
+Input-output behavior (the boundary conditions data coincide with the inputs):
+\begin{equation*}
+	\begin{aligned}
+		p^0|_{\Gamma_1} &= u^0_1, \\
+	-\bm{v}^2\cdot \bm{n}|_{\Gamma_2}  &= u^{2}_2, \\
+	\end{aligned}	\qquad
+	\begin{aligned}
+		y^2_2 &= -\bm{v}^2\cdot \bm{n}|_{\Gamma_1}, \\
+		y^{0}_1 &= p^0|_{\Gamma_2}.
+	\end{aligned}
+\end{equation*}
 
 \begin{figure}
 \centering
 \includegraphics[width=.5\textwidth]{bound_part.eps}
-\caption*{Wave equation with mixed Dirichlet and Neumann boundary conditions}
+\caption*{Wave equation with mixed \textcolor{blue}{Dirichlet} and \textcolor{red}{Neumann} boundary conditions}
 \end{figure}
 
 \end{frame}	
 
+\begin{frame}{The adjoint system}
+The initial system
+	\begin{equation*}
+		\begin{aligned}
+			\begin{pmatrix}
+				\partial_t p^3 \\
+				\partial_t \bm{v}^1\\
+			\end{pmatrix} &= 
+			-\begin{bmatrix}
+				0 & \div \\
+				\grad & 0 \\
+			\end{bmatrix}
+			\begin{pmatrix}
+				p^0\\
+			 \bm{v}^2\\
+			\end{pmatrix}, \\
+		\end{aligned}	
+	\end{equation*}
+The adjoint system
 
+\begin{equation*}
+	\begin{aligned}
+		\begin{pmatrix}
+			\partial_t p^0 \\
+			\partial_t \bm{v}^2\\
+		\end{pmatrix} &= 
+		-\begin{bmatrix}
+			0 & \div_w \\
+			\grad_w & 0 \\
+		\end{bmatrix}
+		\begin{pmatrix}
+			p^3\\
+			\bm{v}^1\\
+		\end{pmatrix}, \\
+	\end{aligned}	
+\end{equation*}
+
+Boundary conditions:
+\begin{equation*}
+		p^0|_{\Gamma_1} = u^0_1, \qquad
+		-\bm{v}^2\cdot \bm{n}|_{\Gamma_2}  = u^{2}_2.
+\end{equation*}
+
+\end{frame}
+
+\begin{frame}{Weak formulations}
+Introducing Sobolev spaces with boundary conditions	
+\begin{equation*}
+		H^1_{\Gamma_1}(\Omega) = \{\phi \in H^1(\Omega) |\; \phi|_{\Gamma_1} = 0\}, \qquad
+		H^{\div}_{\Gamma_2}(\Omega) = \{\bm{\phi} \in H^{\div}(\Omega) |; \bm{\phi} \cdot \bm{n}|_{\Gamma_2} = 0\}.
+\end{equation*}
+
+
+\begin{tcolorbox}[nobeforeafter, colframe=theme,title=Primal weak formulation]%%
+Find $p^0 \in H^1(\Omega), \; \bm{v}^1 \in H^{\curl}(\Omega)$ such that $p^0|_{\Gamma_1} = u^0_1$ and
+\begin{equation*}
+	\begin{aligned}
+		\inpr[\Omega]{\psi^0}{\partial_t p^0} &= +\inpr[\Omega]{\grad \psi^0}{\bm{v}^1} + \dualpr[\Gamma_2]{\psi^0}{u^2_2}, \\
+		\inpr[\Omega]{\bm{\psi}^1}{\partial_t \bm{v}^1} &= -\inpr[\Omega]{\bm{\psi}^1}{\grad {p}^0},
+	\end{aligned} \qquad
+	\begin{aligned}
+		&\forall \psi^0 \in H^1_{\Gamma_1}(\Omega), \\
+		&\forall \bm{\psi}^1 \in H^{\curl}(\Omega)
+	\end{aligned}
+\end{equation*}
+\end{tcolorbox} 
+
+\begin{tcolorbox}[nobeforeafter, colframe=theme,title=Dual weak formulation]%%
+find $p^3 \in L^2(\Omega), \; \bm{v}^2 \in H^{\div}(\Omega)$ such that $\bm{v}^2 \cdot \bm{n}|_{\Gamma_2} = u^2_2$ and
+\begin{equation*}
+	\begin{aligned}
+		\inpr[\Omega]{\psi^3}{\partial_t p^3} &= -\inpr[\Omega]{\psi_3}{\div\bm{v}^2}, \\
+		\inpr[\Omega]{\bm{\psi}^2}{\partial_t \bm{v}^2} &= +\inpr[\Omega]{\div \bm{\psi}^2}{\grad {p}^3} - \dualpr[\Gamma_1]{\bm{\psi}^2 \cdot \bm{n}}{u^0_1},
+	\end{aligned} \qquad
+	\begin{aligned}
+		&\forall \psi^3 \in L^"(\Omega), \\
+		&\forall \bm{\psi}^2 \in H^{\div}_{\Gamma_2}(\Omega)
+	\end{aligned}
+\end{equation*}
+\end{tcolorbox} 
+The two formulations are uncoupled.
+\end{frame}
+
+\begin{frame}{Propagation of an eigensolution in a cavity}
+	Box-shaped three-dimensional domain:
+	$$\Omega = \{ (x,y,z) \in [0, 1]\times[0, 1/2]\times[0, 1/2] \}.$$ 
+	Boundary sub-partitions:
+	\begin{equation*}
+		\Gamma_1 = \{(x,y,z) \vert \; x=0 \cup y=0 \cup z=0\}, \qquad \Gamma_2 = \{(x, y, z) \vert \; x=1 \cup y=1/2 \cup z=1/2 \}.
+	\end{equation*}
+
+Given the functions
+\begin{equation*}
+	g(x, y, z) = \cos(x) \sin(y) \sin(z), \qquad f(t) = 2 \sin(\sqrt{3} t) + 3 \cos(\sqrt{3} t),
+\end{equation*}
+an exact solution  is given by
+\begin{equation*}\	\begin{aligned}
+		p^3_{\mathrm{ex}} &= \star g \diff{f}{t}, \\    
+		\bm{v}^1_{\mathrm{ex}} &= -\d{g} f, 
+	\end{aligned} \qquad 
+	\begin{aligned}
+		p^0_{\mathrm{ex}} &= g \diff{f}{t}, \\
+		\bm{v}^2_{\mathrm{ex}} &= -\star \d{g} f,
+	\end{aligned}
+\end{equation*}
+The exact solution provides the appropriate inputs to be fed into the system
+\begin{equation*}
+	u^0_1 =\tr p^0_{\mathrm{ex}}|_{\Gamma_1}, \qquad u^2_2 =  -\tr \bm{v}^2_{\mathrm{ex}}\vert_{\Gamma_2}.
+	\end{equation*}
+\end{frame}
+
+
+\begin{frame}{Results obtained with a direct solver and implicit midpoint}
+	
+	\only<1>{
+		
+		\begin{columns}		
+			\begin{column}{.45\textwidth}
+				\includemedia[
+				addresource=/home/andrea/Videos/CandidatureISAE/Wavep33D.mp4,
+				activate=pageopen, 
+				deactivate=onclick,
+				width=7cm, height=6cm,
+				flashvars={
+					source=/home/andrea/Videos/CandidatureISAE/Wavep33D.mp4
+					&%
+					autoPlay=true&%
+					loop=true%
+				}
+				]{}{VPlayer.swf}
+				$p^3$
+			\end{column}
+			\begin{column}{.45\textwidth}
+				\includemedia[
+				addresource=/home/andrea/Videos/CandidatureISAE/Wavep03D.mp4,
+				activate=pageopen, 
+				deactivate=onclick,
+				width=7cm, height=6cm,
+				flashvars={
+					source=/home/andrea/Videos/CandidatureISAE/Wavep03D.mp4&%
+					autoPlay=true&%
+					loop=true%
+				}
+				]{}{VPlayer.swf}
+				$p^0$
+			\end{column}
+		\end{columns}	
+	}
+	
+	\only<2>{
+		
+		\begin{columns}		
+			\begin{column}{.45\textwidth}
+				\includemedia[
+				addresource=/home/andrea/Videos/CandidatureISAE/Waveu23D.mp4,
+				activate=pageopen, 
+				deactivate=onclick,
+				width=7cm, height=6cm,
+				flashvars={
+					source=/home/andrea/Videos/CandidatureISAE/Waveu23D.mp4
+					&%
+					autoPlay=true&%
+					loop=true%
+				}
+				]{}{VPlayer.swf}
+				$\bm{v}^2$
+			\end{column}
+			\begin{column}{.45\textwidth}
+				\includemedia[
+				addresource=/home/andrea/Videos/CandidatureISAE/Waveu13D.mp4,
+				activate=pageopen, 
+				deactivate=onclick,
+				width=7cm, height=6cm,
+				flashvars={
+					source=/home/andrea/Videos/CandidatureISAE/Waveu13D.mp4&%
+					autoPlay=true&%
+					loop=true%
+				}
+				]{}{VPlayer.swf}
+				$\bm{v}^1$
+			\end{column}
+			
+		\end{columns}	
+	}
+	
+	\only<3>{	
+		\begin{figure}
+			\centering
+			\subfloat[][$||p^3_h - {p}_{\text{ex}}||_{L^2}$]{%
+				\label{fig:err_p3}%
+				\includegraphics[width=0.48\columnwidth]{p_3_3D_DN.pdf}}%
+			\hspace{8pt}%
+			\subfloat[][$||p^0_h - {p}_{\text{ex}}||_{L^2}$]{%
+				\label{fig:err_p0}%
+				\includegraphics[width=0.48\columnwidth]{p_0_3D_DN.pdf}}%
+			\caption*{Convergence rate for $p$}%
+		\end{figure}
+	}
+	\only<4>{	
+		\begin{figure}
+			\centering
+			\subfloat[][$||\bm{v}^1_h - \bm{v}_{\text{ex}}||_{L^2}$]{%
+				\label{fig:err_u1}%
+				\includegraphics[width=0.48\columnwidth]{q_1_3D_DN.pdf}}
+			\hspace{8pt}%
+			\subfloat[][$||\bm{v}^2_h - \bm{v}_{\text{ex}}||_{L^2}$]{%
+				\label{fig:err_u2}%
+				\includegraphics[width=0.48\columnwidth]{q_2_3D_DN.pdf}}
+			\caption*{Convergence rate for $\bm{v}$}%
+		\end{figure}
+	}
+	\only<5>{
+		\begin{figure}
+			\centering
+			\subfloat[][$||p^3_h - p^0_h||_{L^2}$]{%
+				\label{fig:diff_p30}%
+				\includegraphics[width=0.48\columnwidth]{p_30_3D_DN.pdf}}%
+			\hspace{8pt}%
+			\subfloat[][$||\bm{v}^1_h - \bm{v}^2_h||_{L^2}$]{%
+				\label{fig:diff_q12}%
+				\includegraphics[width=0.48\columnwidth]{q_12_3D_DN.pdf}}%
+			\caption*{$L^2$ norm of the difference between dual representation.}%
+		\end{figure}
+	}
+	
+	
+	
+\end{frame}
+
+\begin{frame}{Conclusion}
+	The open character of pH systems has the capacity to improve the status quo of multiphysics simulation in industry.  \\
+	\vspace{1cm}
+	But first it needs to become an established physical theory:
+	\begin{itemize}
+		\item unique definition of (infinite dimensional) port-Hamiltonian system on manifolds;
+		\item incorporation of geometric and functional analytic aspects;
+		\item extension of the geometric theory to continuum mechanics;
+	\end{itemize}
+	\vspace{1cm}
+	For engineering, pH systems need to become more efficient than the available tools:
+	\begin{itemize}
+		\item efficient strategy for the resolution of large-scale pH models;
+		\item model reduction of models arising from PDEs discretization;
+		\item more open-source code and benchmark problems.
+	\end{itemize}
+\end{frame}
 	
 \begin{frame}[allowframebreaks]{Bibliography}
 	%\bibliographystyle{unsrt}
