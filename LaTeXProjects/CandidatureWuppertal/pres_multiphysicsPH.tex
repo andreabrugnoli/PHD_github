@@ -9,6 +9,8 @@
 \usepackage{multicol}
 %\usepackage[caption=false]{subfig}
 \usepackage{subcaption}
+\usepackage{tikz-cd}
+
 
 \usepackage{comment}
 
@@ -482,7 +484,7 @@ The Taylor-Hood element does not lead to divergence free velocity $||\nabla \cdo
 			\begin{pmatrix}
 				p \\
 				\bm{v} \\
-			\end{pmatrix} &=
+			\end{pmatrix} &=-
 			\begin{bmatrix}
 				0 & \div \\
 				\grad_w & 0
@@ -505,8 +507,8 @@ The Taylor-Hood element does not lead to divergence free velocity $||\nabla \cdo
 	\textbf{Spaces}: $X_{\mathcal{S}}= L^2(\bbR^3) \times H^{\div}(\bbR^3)^{'}, \; X_{\mathcal{R}} = \emptyset, \; X_{\mathcal{P}}= L^{2}(\bbR^3)$.
 	\begin{equation*}
 		J = \begin{bmatrix}
-			0 & -\div & - \mathrm{Id} \\
-			-\grad_w & 0 & 0 \\
+			0 & \div & - \mathrm{Id} \\
+			\grad_w & 0 & 0 \\
 			\mathrm{Id} & 0 & 0 
 		\end{bmatrix}.
 	\end{equation*}
@@ -519,7 +521,7 @@ The Taylor-Hood element does not lead to divergence free velocity $||\nabla \cdo
 \begin{frame}{Example: the Maxwell equations}
 	Consider the Hamiltonian:
 	\begin{equation*}
-		{H} = \frac{1}{2} \inpr[L^2(\Omega, \bbR^3)]{\bm{D}}{\varepsilon^{-1}\bm{D}} + \frac{1}{2} \inpr[L^2(\Omega, \bbR^3)]{\bm{B}}{\mu^{-1}\bm{B}}.
+		{H} = \frac{1}{2} \inpr[L^2(\Omega; \bbR^3)]{\bm{D}}{\varepsilon^{-1}\bm{D}} + \frac{1}{2} \inpr[L^2(\Omega; \bbR^3)]{\bm{B}}{\mu^{-1}\bm{B}}.
 	\end{equation*}
 where  $\varepsilon$ is the electric permittivity and $\mu$ is the magnetic permeability.\\
 \vspace{.3cm}
@@ -709,10 +711,10 @@ Consider the Sobolev space
 \end{equation*}
 One could replace spaces of smooth forms with forms living in this Sobolev space. \\
 However, the \textbf{Stokes formula} has only been proven when \textbf{more regularity} is present.
-\begin{theorem}[Theorem 6.3 in D. Arnold \textit{Finite Element Exterior calculus}]
+\begin{theorem}[D. Arnold \textit{Finite Element Exterior calculus}]
 	In a manifold $\Omega$ with Lipschitz boundary it holds
 	\begin{equation*}
-		\int_\Omega \d{\mu} \wedge \lambda + (-1)^k \int_\Omega \alpha \wedge \d{\beta} = \int_{\partial \Omega}\tr {\mu} \wedge \tr{\lambda}, \qquad \mu \in H^1\Lambda^{k}(\Omega), \quad \lambda \in H \Lambda^{n-k-1}(\Omega),
+		\int_\Omega \d{\mu} \wedge \lambda + (-1)^k \int_\Omega \mu \wedge \d{\lambda} = \int_{\partial \Omega}\tr {\mu} \wedge \tr{\lambda}, \qquad \mu \in H^1\Lambda^{k}(\Omega), \quad \lambda \in H \Lambda^{n-k-1}(\Omega),
 	\end{equation*}
 	where $H^1\Lambda^k(\Omega)$ is the space of $k$-forms with coefficient in $H^1(\Omega)$.
 \end{theorem}
@@ -749,15 +751,68 @@ Nevertheless, using conforming finite elements for $H\Lambda^k$, one can obtaine
 
 \end{frame}
 	
-	\begin{frame}{Mimetic dual-field discretization\footcite{zhang2021mass}}
-		\begin{itemize}
-			\item Combining the port-Hamiltonian system and its adjoint, \textbf{two dynamical systems}, whose dynamics is \textbf{ruled by skew-adjoint operators} are constructed.
-			\item The two systems are put into \textbf{weak form} considering variables that live in $H\Lambda^k(\Omega)$ using the $L^2$ inner product. The codifferential is interpreted weakly using the integration by parts formula.
-			\item Conforming finite element $\mathcal{V}^k \subset H\Lambda^k(\Omega)$ are used for the variables.
-		\end{itemize}
-		
-	\end{frame}
+\begin{frame}{Mimetic dual-field discretization\footcite{brugnoli2022df}}
+	\begin{itemize}
+		\item Combining the port-Hamiltonian system and its adjoint, \textbf{two dynamical systems}, whose dynamics is governed \textbf{by skew-adjoint operators} are constructed.
+		\item The two systems are put into \textbf{weak form} considering variables that live in $H\Lambda^k(\Omega)$ using the $L^2$ inner product. The codifferential is interpreted weakly using the integration by parts formula.
+		\item Conforming finite element $\mathcal{V}^k \subset H\Lambda^k(\Omega)$ are used for the variables.
+		\item Time integration performed with symplectic Runge-Kutta method based on Gauss-Legendre collocation points.
+	\end{itemize}
 	
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{The key ingredient for discretization: the De Rham complex}
+\centering
+	\begin{tikzcd}
+		H\Omega^0(M) \arrow[r, "\d{}"] \arrow[d, leftrightarrow, "Id"]
+		& H\Omega^{1}(M) \arrow[r, "\d{}"] \arrow[d, "\sharp", xshift=10pt] & H\Omega^2(M) \arrow[r, "\d{}"] \arrow[d, "\beta^{-1}", xshift=10pt]
+		& H\Omega^{3}(M) \arrow[d, "\star", xshift=10pt]  \\
+		H^1(M) \arrow[r, "\grad"] \arrow[d, "\Pi_{s, h}^{-, 0}"]
+		& H^{\curl}(M) \arrow[r, "\curl"] \arrow[u, "\flat"] \arrow[d, "\Pi_{s, h}^{-, 1}"] & H^{\div}(M) \arrow[r, "\div"] \arrow[u, "\beta"] \arrow[d, "\Pi_{s, h}^{-, 2}"]
+		& L^2(M) \arrow[u, "\star^{-1}"] \arrow[d, "\Pi_{s, h}^{-, 1}"] \\
+			\mathrm{CG}_s(\mathcal{T}_h) \arrow[r, "\grad"] 
+		& \mathrm{NED}_s^1(\mathcal{T}_h) \arrow[r, "\curl"] & \mathrm{RT}_s(\mathcal{T}_h) \arrow[r, "\div"]
+		& \mathrm{DG}_{s-1}(\mathcal{T}_h) 
+	\end{tikzcd}  
+
+	
+
+
+\end{frame}
+
+
+\begin{frame}{Illustration: the wave equation in 3D}
+\begin{equation*}
+	\begin{aligned}
+		\begin{pmatrix}
+			\partial_t p^3 \\
+			\partial_t \bm{u}^1\\
+		\end{pmatrix} &= 
+		-\begin{bmatrix}
+			0 & \div \\
+			\grad & 0 \\
+		\end{bmatrix}
+		\begin{pmatrix}
+			\delta_{p} H^{0}\\
+			\delta_{\bm{u}} H^{2}\\
+		\end{pmatrix}, \qquad 
+	\begin{aligned}
+		\delta_{p} H^{0}|_{\Gamma_1} = u^0_1, \\
+		-\delta_{\bm{u}} H^{2} \cdot \bm{n}|_{\Gamma_2}  = u^{2}_2,
+	\end{aligned}\\
+		y^2_2 &= -\delta_{\bm{u}} H^{2} \cdot \bm{n}|_{\Gamma_1}, \\
+		y^{0}_1 &= \delta_{p} H^{0}|_{\Gamma_2}.
+	\end{aligned}	
+\end{equation*}
+
+
+\begin{figure}
+\centering
+\includegraphics[width=.5\textwidth]{bound_part.eps}
+\caption*{Wave equation with mixed Dirichlet and Neumann boundary conditions}
+\end{figure}
+
+\end{frame}	
 
 
 	
