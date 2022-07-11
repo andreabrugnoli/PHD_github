@@ -18,7 +18,8 @@ matplotlib.rcParams['text.usetex'] = True
 matplotlib.rcParams['text.latex.preamble']=r"\usepackage{amsmath} \usepackage{bm}"
 
 path_res = "./errors_data_plate10/"
-path_fig = "/home/andrea/Plots/Python/VonKarman/Plates/"
+# path_fig = "/home/andrea/Plots/Python/VonKarman/Plates/"
+path_fig = "/home/andrea/Pictures/PythonPlots/ENOC2022/"
 
 save_fig = True
 
@@ -304,5 +305,4 @@ plt.legend()
 if save_fig:
     plt.savefig(path_fig + "w.eps", format="eps")
     
-    
-    
+plt.show()
