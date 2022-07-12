@@ -53,6 +53,7 @@
 \renewcommand{\div}{\operatorname{div}}
 \DeclareMathOperator*{\Hess}{Hess}
 \DeclareMathOperator*{\curl}{curl}
+\DeclareMathOperator*{\rot}{rot}
 \DeclareMathOperator{\Tr}{Tr}
 \DeclareMathOperator{\Dom}{Dom}
 \DeclareMathOperator*{\esssup}{ess\,sup}
@@ -108,10 +109,10 @@
 
 \makeatletter
 \g@addto@macro\normalsize{%
-	\setlength\abovedisplayskip{5pt}
-	\setlength\belowdisplayskip{5pt}
-	\setlength\abovedisplayshortskip{5pt}
-	\setlength\belowdisplayshortskip{5pt}
+	\setlength\abovedisplayskip{4pt}
+	\setlength\belowdisplayskip{4pt}
+	\setlength\abovedisplayshortskip{4pt}
+	\setlength\belowdisplayshortskip{4pt}
 }
 \makeatother
 
@@ -217,7 +218,8 @@
 		\end{equation*}
 		$\mathbf{x}(t) \in \mathcal{X} \subseteq \bbR^n$ is the state, $\mathbf{u}(t), \mathbf{y}(t) \in \bbR^m$ the input and output and
 		\begin{itemize}
-			\item $\mathbf{J}(\mathbf{x})=-\mathbf{J}(\mathbf{x})^\top \in \bbR^{n \times n}, \; \mathbf{B} \in \bbR^{n \times m}$ the interconnection and control operator.
+			\item $\mathbf{J}(\mathbf{x})=-\mathbf{J}(\mathbf{x})^\top \in \bbR^{n \times n}$ the interconnection operator
+			\item $\mathbf{B} \in \bbR^{n \times m}$ the control operator.
 			\item $H(\mathbf{x}) = \frac{1}{2} \mathbf{x}^\top \mathbf{M} \mathbf{x} : \mathbb{R}^n \rightarrow \mathbb{R}$ with $\mathbf{M} > 0$, the Hamiltonian.
 		\end{itemize}
 	\end{definition}
@@ -265,7 +267,7 @@
 \end{frame}
 
 \begin{frame}{The von-K\'arm\'an assumption}
-Second-order approximation of geometrically exact beam theory \textbf{capturing the axial bending coupling.}	
+Second-order approximation of geometrically exact beam/plate theory \textbf{capturing the axial bending coupling.}	
 
 \begin{columns}
 	\begin{column}{.5\textwidth}
@@ -291,17 +293,28 @@ Second-order approximation of geometrically exact beam theory \textbf{capturing 
 	
 	The axial and bending behavior are uncoupled if $w/h \ll 1$:
 	
-	\begin{block}{Axial displacement (planar elastodynamics)}
+	\begin{tcbraster}[raster columns=2, raster equal height]
+		\begin{tcolorbox}[width=0.48\textwidth, nobeforeafter,  colframe=theme,title=Axial displacement \\
+			(planar elastodynamics)]%%
+			\begin{equation*}
+				\begin{aligned}
+				\rho h \partial_{tt} \bm{u} &= \Div \bm{N}, \\
+				\bm{N}&=D_m\bm{\Phi}(\bm{\varepsilon}_m), \\
+				\bm{\varepsilon}_m &= \mathrm{Sym}(\nabla \bm{u}) = \Grad \bm{u}
+				\end{aligned} 
+			\end{equation*}
+		\end{tcolorbox}
+		\begin{tcolorbox}[width=0.48\textwidth, nobeforeafter,  colframe=theme,title=Vertical displacement\\ (Kirchhoff plate)]%%
 		\begin{equation*}
-			\rho h \partial_{tt} \bm{u} = \Div \bm{N}, \qquad \bm{N}=D_m\bm{\Phi}(\bm{\varepsilon}_m), \qquad \bm{\varepsilon}_m = \frac{1}{2} (\nabla \bm{u} + \nabla^\top \bm{u}) = \Grad \bm{u}.
+			\begin{aligned}
+				\rho h \partial_{tt} w &= -\div\Div \bm{M}, \\
+				\bm{M} &= D_b \bm{\Phi}(\bm{\kappa}), \\
+				\bm{\kappa}&= \Hess w = \Grad \grad w. 
+			\end{aligned}
 		\end{equation*}
-	\end{block}
+		\end{tcolorbox}
+	\end{tcbraster}
 	
-	\begin{block}{Vertical displacement (Kirchhoff plate)}
-		\begin{equation*}
-			\rho h \partial_{tt} w = -\div\Div \bm{M}, \qquad \bm{M} = D_b \bm{\Phi}(\bm{\kappa}), \qquad \bm{\kappa}= \Hess w = \Grad \grad w. 
-		\end{equation*}
-	\end{block}
 	The linear mapping $\bm\Phi (\bm{A}) = \nu \Tr(\bm{A})\bm{1} + (1 - \nu) \bm{A}$ is positive and preserves symmetry.
 	
 \end{frame}
@@ -309,6 +322,7 @@ Second-order approximation of geometrically exact beam theory \textbf{capturing 
 
 \begin{frame}{Von-K\'arm\'an plates}
 Decomposition strain field 
+\vspace{.3cm}
 \begin{equation*}
 	\bm{\varepsilon} = \tikzmarkin<1>[below right offset={0.05,-0.4},above left offset={-0.05,0.7}]{lm}\Grad \bm{u}\tikzmarkend{lm} +  \tikzmarkin<1>[below right offset={0,-0.4},above left offset={-0.05,0.7}]{nlm}1/2 \grad w \otimes \grad w\tikzmarkend{nlm} - z \; \tikzmarkin<1>[below right offset={0.05,-0.4},above left offset={-0.05,0.7}]{lb}\Hess w\tikzmarkend{lb} = \bm{\varepsilon}_m -z \bm{\kappa}.
 \end{equation*}
@@ -317,12 +331,12 @@ Decomposition strain field
 	% adjust the shift from "col" to move the position of the annotation
 	\coordinate (lm-a) at ($(lm)+(-1.5,-1.5)$);
 	\coordinate (lm-b) at ($(lm)+(0.4,-1.1)$);
-	\node[align=left] (lmstring) at (lm-a) {\small{Linear axial def.}};
+	\node[align=left] (lmstring) at (lm-a) {\small{Linear membrane def.}};
 	\draw[->, red](lmstring) -| node {} (lm-b);
 	
 	\coordinate (nlm-a) at ($(nlm)+(-2.2,-2)$);
 	\coordinate (nlm-b) at ($(nlm)+(0.8,-1.1)$);
-	\node[align=left] (nlmstring) at (nlm-a) {\small{Non-linear axial def.}};
+	\node[align=left] (nlmstring) at (nlm-a) {\small{Quadratic membrane def.}};
 	\draw[->, red](nlmstring) -| node {} (nlm-b);
 	
 	\coordinate (lb-a) at ($(lb)+(+2,-2)$);
@@ -347,22 +361,46 @@ Total energy $H= \frac{1}{2} \int_{\Omega} \{ D_m \bm{\Phi}(\bm{\varepsilon}_m) 
 
 \begin{frame}{Port-Hamiltonian Von-K\'arm\'an plates}
 	
-\begin{block}{Energy and coenergy variables}
-	\begin{equation*}
-		\begin{aligned}
-			\bm{\alpha}_u &= \rho h \partial_t \bm{u}, \\
-			\alpha_w &= \rho h \partial_t{w},\\
-		\end{aligned} \qquad
-		\begin{aligned}
-			\bm{A}_\varepsilon &= \bm{\varepsilon}_m, \\
-			\bm{A}_\kappa &= \bm{\kappa}.
-		\end{aligned}
-	\end{equation*}
-	Linear constitutive equations $\bm{e} := \delta_\alpha H = \mathcal{Q} \bm{\alpha}$ with
-	\begin{equation*}
-		\mathcal{Q} = \mathrm{Diag}\left[(\rho h)^{-1}, \; D_m \bm{\Phi}, \; (\rho h)^{-1}, \; D_b \bm{\Phi}\right]^{-1}.
-	\end{equation*}
-\end{block}
+\begin{tcolorbox}[width=0.95\textwidth, nobeforeafter, colframe=theme,title=Energy variables]
+The Hamiltonian functional is quadratic in the following variables
+\begin{equation*}
+	\begin{aligned}
+		\bm{\alpha}_u &= \rho h \partial_t \bm{u},\\
+		\bm{A}_\varepsilon &= \bm{\varepsilon}_m, \\
+	\end{aligned} \quad
+	\begin{aligned}
+		&\text{Axial momentum},\\
+		&\text{Membrane strain}, \\
+	\end{aligned} \qquad
+	\begin{aligned}
+		\alpha_w &= \rho h \partial_t{w}, \\
+		\bm{A}_\kappa &= \bm{\kappa},
+	\end{aligned}\quad
+	\begin{aligned}
+		&\text{Bending momentum}, \\
+		&\text{Curvature}
+	\end{aligned}
+\end{equation*}
+\end{tcolorbox}
+\vspace{.3cm}
+\begin{tcolorbox}[width=0.95\textwidth, nobeforeafter, colframe=theme,title=Co-energy variables]
+The variational derivative of the Hamiltonian gives the co-energy variables
+\begin{equation*}
+	\begin{aligned}
+		\bm{e}_u &:= \delta_{\bm\alpha_u} H = \dot{\bm{u}},\\
+		\bm{E}_\varepsilon &:= \delta_{\bm{A}_\varepsilon} H = D_m \bm{\Phi}(\bm{A}_\varepsilon),
+	\end{aligned} \qquad
+	\begin{aligned}
+		\bm{e}_w &:= \delta_{\alpha_w} H = \dot{w}, \\
+		\bm{E}_\kappa &:= \delta_{\bm{A}_\kappa} H = D_b\bm{\Phi}(\bm{A}_\kappa)
+	\end{aligned}
+\end{equation*}
+or more compactly $\bm{e} := \delta_\alpha H = \mathcal{Q} \bm{\alpha}$ with
+\begin{equation*}
+	\mathcal{Q} = \mathrm{Diag}\left[(\rho h)^{-1}, \; D_m \bm{\Phi}, \; (\rho h)^{-1}, \; D_b \bm{\Phi}\right].
+\end{equation*}
+\end{tcolorbox}
+
 
 \end{frame}
 
@@ -393,14 +431,56 @@ Total energy $H= \frac{1}{2} \int_{\Omega} \{ D_m \bm{\Phi}(\bm{\varepsilon}_m) 
 		\delta_{\bm{A}_\kappa} H
 	\end{pmatrix},
 \end{equation*}
-where 
+The operator $\mathcal{J}$ is formally skew-adjoint. \\
+The coupling term reads
 \begin{equation*}
 	\begin{aligned}
-		\mathcal{C}(w)(\bm{T}) &= \div(\bm{T} \grad w), \\
-		\mathcal{C}(w)^*(\cdot) &= -\frac{1}{2} \left[\grad (\cdot) \otimes \grad(w) + \grad(w) \otimes \grad(\cdot) \right].
+		\mathcal{C}(w)(\cdot): L^2(\Omega; \bbR^{2\times 2}) \rightarrow L^2(\Omega), \\
+								\bm{X}  \rightarrow \div( \bm{X} \grad w), \\
+	\end{aligned} 
+\end{equation*}
+and its formal adjoint
+\begin{equation*}
+	\begin{aligned}
+		\mathcal{C}(w)^*(\cdot): L^2(\Omega) \rightarrow L^2(\Omega; \bbR^{2\times 2}), \\
+		y  \rightarrow  -\mathrm{Sym}\left[\grad (y) \otimes \grad(w)\right].
 	\end{aligned}
 \end{equation*}
 
+
+\end{frame}
+
+\begin{frame}{Pure coenergy formulation}
+	
+	\begin{block}{Incorporation of the constitutive equations}
+		Once the $\mathcal{Q}$ operator (matrix) is inverted, the dynamics is expressed :
+		\begin{equation*}
+			\begin{pmatrix}
+				\rho h\partial_t \bm{e}_u \\
+				(D_m \bm{\Phi})^{-1} \partial_t \bm{E}_\varepsilon \\
+				\partial_t w \\
+				\rho h\partial_t e_w \\
+				(D_b \bm{\Phi})^{-1} \partial_t \bm{E}_\kappa
+			\end{pmatrix} = 
+			\begin{bmatrix}
+				\bm{0} & \Div & \bm{0} & \bm{0} & \bm{0}\\
+				\Grad & \bm{0} & \bm{0} & -\mathcal{C}(w)^* & \bm{0} \\
+				0 & 0 & 0 & 1 & 0 \\
+				0 & \mathcal{C}(w) & -1 & 0 & -\div\Div \\
+				\bm{0} & \bm{0} & \bm{0} & \Grad\grad & \bm{0} \\ 
+			\end{bmatrix}
+			\begin{pmatrix}
+				\bm{e}_u \\
+				\bm{E}_\varepsilon \\
+				\delta_{w} H \\
+				e_w \\
+				\bm{E}_\kappa
+			\end{pmatrix},
+		\end{equation*}
+		
+	\end{block}
+	In the sequel, the quantity $\delta_w H$ is removed as no displacement dependent potential (e.g. gravity) is considered
+	
 \end{frame}
 
 
@@ -412,7 +492,7 @@ where
 	\end{equation*}
 \begin{itemize}
 	\item $\gamma_0\bm{e}_u= \bm{e}_u\vert_{\partial\Omega}$ is the Dirichlet trace;
-	\item $\gamma_\perp \bm{E}_\varepsilon = \bm{E}_\varepsilon \cdot \bm{n}\vert_{\partial\Omega}$ is the normal trace;
+	\item $\gamma_\perp \bm{E}_\varepsilon = \bm{E}_\varepsilon \bm{n}\vert_{\partial\Omega}$ is the normal trace;
 	\item $\gamma_{\perp\perp, 1} \bm{E}_\kappa = - \bm{n} \cdot \Div \bm{E}_\kappa - \partial_{\bm{s}}(\bm{n}^\top \bm{E}_\kappa \bm{s})\vert_{\partial\Omega}$ is the effective shear force;
 	\item $\gamma_1 \bm{e}_w = \partial_{\bm{n}} \bm{e}_w\vert_{\partial\Omega}$ is the normal derivative trace;
 	\item $\gamma_{\perp\perp} \bm{E}_\kappa = \bm{n}^\top \bm{E}_\kappa \bm{n}$ is the normal to normal trace.
@@ -426,8 +506,8 @@ where
 		\hline 
 		BCs & Traction & \multicolumn{2}{c}{Bending} \\ 
 		\hline 
-		Dirichlet BCs. & $e_u\vert_0^L$ & $e_w\vert_0^L$  & $\partial_x e_w\vert_0^L$  \\
-		Neumann BCs. & $e_\varepsilon\vert_0^L$ & $e_\varepsilon \partial_x w -\partial_x e_\kappa\vert_0^L$ & $e_\kappa\vert_0^L$ \\ 
+		Kinematical/Dirichlet & $\gamma_0 \bm{e}_u$ & $\gamma_0\bm{e}_w$  & $\gamma_1 \bm{e}_w $  \\
+		Dynamical/Neumann & $\gamma_\perp \bm{E}_\varepsilon$ & $\gamma_{\perp\perp, 1} \bm{E}_\kappa + \gamma_0(\bm{E}_\varepsilon \bm{n} \cdot \grad w)$ & $\gamma_{\perp\perp} \bm{E}_\kappa$ \\ 
 		\hline 
 	\end{tabular} 
 \end{table}
@@ -437,78 +517,59 @@ where
 
 \section{Numerical discretization}
 
-\begin{frame}{Pure coenergy formulation}
+\begin{frame}[fragile]\frametitle{Mixed finite element construction}
+	Crucial concept to derive stable convergent approximations: \textbf{Hilbert complexes}.
 	
-	\begin{block}{Coenergy formulation for linear constitutive equations}
-		If the $\mathcal{Q}$ operator is inverted:
-		\begin{equation*}
-			\begin{pmatrix}
-				\rho A \dot{e}_u \\
-				C_a \dot{e}_\varepsilon \\
-				\rho A \dot{e}_w \\
-				C_b \dot{e}_\kappa \\
-				\dot{w} \\
-			\end{pmatrix} = 
-			\begin{bmatrix}
-				0 & \partial_x & 0 & 0 & 0\\
-				\partial_x & 0 & \partial_x w \, \partial_x & 0 & 0 \\
-				0 & \partial_x(\cdot \, \partial_x w) & 0 & -\partial_{xx}^2 & -1 \\
-				0 & 0 & \partial_{xx}^2 & 0 & 0 \\ 
-				0 & 0 & 1 & 0 & 0 \\
-			\end{bmatrix}
-			\begin{pmatrix}
-				e_u \\
-				e_\varepsilon \\
-				e_w \\
-				e_\kappa \\
-				\delta_w H \\
-			\end{pmatrix}.
-		\end{equation*}
-	\end{block}
-In the sequel, the quantity $\delta_w H$ is removed as no displacement dependent potential (e.g. gravity) is considered
-	
+	The most famous complex is the de Rham complex in 3D:
+	\begin{figure}[h]
+		\centering
+		\begin{tikzcd}
+			H^1(\Omega) \arrow[r, "\grad"] 
+			& H(\curl, \Omega) \arrow[r, "\curl"] & H(\div, \Omega) \arrow[r, "\div"] 
+			& L^2(\Omega)  
+			\end{tikzcd}  
+	\end{figure}
+But there are many more. 
+\begin{tcolorbox}[width=0.95\textwidth, nobeforeafter, colframe=theme,title=Planar elastodynamics]
+	Strain elasticity complex in 2D 
+	\begin{figure}[h]
+		\centering
+		\begin{tikzcd}
+			H^1(\Omega; \bbR^2) \arrow[r, "\Grad"]
+			& H(\rot\rot, \Omega; \bbS) \arrow[r, "\rot\rot"]  & L^2(\Omega)   
+		\end{tikzcd}  
+	\end{figure}
+\end{tcolorbox}
+
+\begin{tcolorbox}[width=0.95\textwidth, nobeforeafter, colframe=theme,title=Planar elastodynamics]
+	Strain elasticity complex in 2D 
+	\begin{figure}[h]
+		\centering
+		\begin{tikzcd}
+			H^1(\Omega; \bbR^2) \arrow[r, "\Grad"]
+			& H(\rot\rot, \Omega; \bbS) \arrow[r, "\rot\rot"]  & L^2(\Omega)   
+		\end{tikzcd}  
+	\end{figure}
+\end{tcolorbox}
+
+Strain elasticity complex in 2D 
+
+
+
+
+The $\div\Div$ complex in 2D with lower regularity (Kirchhoff plate):
+\begin{figure}[h]
+	\centering
+	\begin{tikzcd}
+		H^1(\Omega, \bbR^2) \arrow[r, "\mathrm{Sym}\curl"]
+		& H^{-1}(\div\Div, \Omega; \bbS) \arrow[r, "\div\Div"]  & L^2(\Omega)   
+	\end{tikzcd}  
+\end{figure}
 \end{frame}
 
-\begin{frame}{Weak formulation}
-	
-	Introducing test functions and integrating by parts the first, third and fourth, we get the weak formulation.
-	
-	\begin{block}{Weak formulation}
-		\only<1>{Find $(e_u, e_w, e_\kappa, w) \in H^1(\Omega), \, e_\varepsilon \in L^2(\Omega)$ such that 
-			\begin{equation*}
-				\begin{aligned}
-					\inpr[\Omega]{\psi_u}{\rho A \, \dot{e}_u} &= -\inpr[\Omega]{\partial_x \psi_u}{ e_\varepsilon} +  \inpr[\partial\Omega]{\psi_u}{e_\varepsilon}. \\
-					\inpr[\Omega]{\psi_\varepsilon}{C_a \, \dot{e}_\varepsilon} &= \inpr[\Omega]{\psi_\varepsilon}{\partial_x e_u} + \inpr[\Omega]{\psi_\varepsilon}{\partial_x w \, \partial_x e_w}, \\
-					\inpr[\Omega]{\psi_w}{\rho A\dot{e}_w} &= -\inpr[\Omega]{\partial_x \psi_w \partial_x w}{e_\varepsilon} + \inpr[\Omega]{\partial_{x} \psi_w}{\partial_{x} e_\kappa} \\
-					&\quad +\inpr[\partial\Omega]{\psi_w}{e_\varepsilon \partial_x w - \partial_x e_\kappa}, \\
-					\inpr[\Omega]{\psi_\kappa}{C_b \, \dot{e}_\kappa} &= - \inpr[\Omega]{\partial_{x} \psi_\kappa}{\partial_{x} e_w} + \inpr[\partial\Omega]{\psi_\kappa}{\partial_x e_w}, \\
-					\inpr[\Omega]{\psi}{\dot{w}} &= \inpr[\Omega]{\psi}{e_w}. \\
-				\end{aligned}
-			\end{equation*}
-			holds $\forall (\psi_u, \psi_w, \psi_\kappa, \psi) \in H^1(\Omega), \, \forall \psi_\varepsilon \in L^2(\Omega)$.}
-		\only<2>{
-		Find $\bm{e} =(e_u,  e_\varepsilon, e_w, e_\kappa) \in H^1\times L^2\times H^1\times H^1$ such that 
-		\begin{equation*}
-			\begin{aligned}
-				m(\bm{\psi}, \partial_t \bm{e}) &= j_w(\bm{\psi}, \bm{e}) + b(\bm{\psi})\mathbf{u},\\
-				\partial_t w &= \begin{bmatrix}
-					0 & 0 & 1 & 0
-				\end{bmatrix}\bm{e}, \\
-				\mathbf{y} &= b^\top(\bm{e}),
-			\end{aligned} 
-		\end{equation*}
-		$\forall \bm{\psi} \in H^1\times L^2\times H^1\times H^1:= X$
-		\begin{itemize}
-			\item $m$ is a symmetric, coercive, bilinear form;
-			\item $j_w$ is a skew-symmetric bilinear form modulated by $w$;
-			\item $b: X \rightarrow \bbR^6$ vector-valued functional.
-		\end{itemize}  
-	}
-	\end{block}
-\end{frame}
 
 \begin{frame}{Mixed finite element construction\footcite{arnold2006acta}}
-	\textcolor{blue}{Crucial concept: Hilbert complex $H^1 \xrightarrow{\partial_x} L^2$.} \\
+	\textcolor{blue}{Crucial concept: Hilbert complexes for elasticity $H^1 \xrightarrow{\partial_x} L^2$.} \\
 	\begin{block}{Key requirements for mixed Galerkin approximation}
 		
 	\begin{itemize}
