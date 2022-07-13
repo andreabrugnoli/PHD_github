@@ -1,28 +1,29 @@
-\frametitle{Mixed finite element construction}
-^^ICrucial concept to derive stable convergent approximations: \textbf{Hilbert complexes}.
+\frametitle{Mixed finite element construction: Kirchhoff plate}
 ^^I
-^^IThe most famous complex is the de Rham complex in 3D:
+^^I
+^^IFind $(e_w, \bm{E}_\kappa) \in \mathrm{CG}_s \times \mathrm{HHJ}_{s-1}$ such that
+^^I\begin{equation*}
+^^I^^I\begin{aligned}
+^^I^^I^^I\inpr[\Omega]{\psi_w}{\rho b \partial_t {e}_w} &= +d_h(\psi_w, \ \bm{E}_{\kappa}), \\
+^^I^^I^^I\inpr[\Omega]{\bm{\Psi}_\kappa}{(D_b \bm{\Phi})^{-1}\partial_t {\bm{E}}_\kappa} &= -d_h(e_w, \ \bm{\Psi}_{\kappa}), \\
+^^I^^I\end{aligned} \qquad
+^^I^^I\begin{aligned}
+^^I^^I^^I\forall \; \psi_w &\in \mathrm{CG}_s, \\
+^^I^^I^^I\forall \; \bm{\Psi}_{\kappa} &\in \mathrm{HHJ}_{s-1}. \\
+^^I^^I\end{aligned}
+^^I\end{equation*}
+This method is non-conforming and includes inter-cells terms
+^^I\begin{equation*}
+^^I^^Id_h(v_w, \ \bm{E}_{\kappa}) := - \sum_{T \in \mathcal{T}_h} \inpr[\Omega]{\Hess v_w}{\bm{E}_\kappa} + \sum_{E \in \mathcal{E}_h} \inpr[\Omega]{[\![\partial_n v_w]\!]}{\bm{n}^\top\bm{E}_\kappa \bm{n}}.
+^^I\end{equation*}
+^^I
+^^IThe $\div\Div$ distributional complex in 2D and the HHJ finite element complex:
 ^^I\begin{figure}[h]
 ^^I^^I\centering
 ^^I^^I\begin{tikzcd}
-^^I^^I^^IH^1(\Omega) \arrow[r, "\grad"]
-^^I^^I^^I& H(\curl, \Omega) \arrow[r, "\curl"] & H(\div, \Omega) \arrow[r, "\div"]
-^^I^^I^^I& L^2(\Omega)
-^^I^^I^^I\end{tikzcd}
+^^I^^I^^IH^1(\Omega; \bbR^2) \arrow[r, "\mathrm{Sym}\curl"] \arrow[d, "\bm{I}_h"]
+^^I^^I^^I& H^{-1}(\div\Div, \Omega; \bbR^{2\times 2}_{\text{sym}}) \arrow[r, "\div\Div"] \arrow[d, "\bm{\Pi}_h"]  & L^2(\Omega) \arrow[d, "Q_h"] \\
+^^I^^I^^I\mathrm{CG}_s \arrow[r, "\mathrm{Sym}\curl"]
+^^I^^I^^I& \mathrm{HHJ}_{s-1} \arrow[r, "\div\Div_h"]  & \mathrm{CG}_s, \\
+^^I^^I\end{tikzcd}
 ^^I\end{figure}
-But there are many more. Strain elasticity complex in 2D (planar elastodynamics):
-\begin{figure}[h]
-^^I\centering
-^^I\begin{tikzcd}
-^^I^^IH^1(\Omega; \bbR^2) \arrow[r, "\Grad"]
-^^I^^I& H(\rot\rot, \Omega; \bbS) \arrow[r, "\rot\rot"]  & L^2(\Omega)
-^^I\end{tikzcd}
-\end{figure}
-The $\div\Div$ complex in 2D with lower regularity (Kirchhoff plate):
-\begin{figure}[h]
-^^I\centering
-^^I\begin{tikzcd}
-^^I^^IH^1(\Omega, \bbR^2) \arrow[r, "\mathrm{Sym}\curl"]
-^^I^^I& H^{-1}(\div\Div, \Omega; \bbS) \arrow[r, "\div\Div"]  & L^2(\Omega)
-^^I\end{tikzcd}
-\end{figure}

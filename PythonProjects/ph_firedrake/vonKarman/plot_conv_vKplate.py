@@ -128,10 +128,10 @@ plt.plot(np.log(h_vec), np.log(h_vec**2) + coeff*(np.log(e_u_err_deg2)[-1] \
 
 plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log($||\bm{e}_u - \bm{e}_u^h||_{L^\infty H^1}$)')
-plt.title(r'Error for $e_u$')
+plt.title(r'Error for $\bm{e}_u^h$')
 plt.legend()
 if save_fig:
-    plt.savefig(path_fig + "u_dot.eps", format="eps")
+    plt.savefig(path_fig + "u_dot.ps", format="ps")
 
 
 r_int_e_eps_deg1 = np.polyfit(np.log(h_vec), np.log(e_eps_err_deg1), 1)[0]
@@ -171,10 +171,10 @@ plt.plot(np.log(h_vec), np.log(h_vec**2) + 0.95*(np.log(e_eps_err_deg2)[-1] \
 
 plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log($||\bm{E}_\varepsilon - \bm{E}_\varepsilon^h||_{L^\infty L^2}$)')
-plt.title(r'Error for $e_\varepsilon$')
+plt.title(r'Error for $\bm{E}_\varepsilon^h$')
 plt.legend()
 if save_fig:
-    plt.savefig(path_fig + "N_tens.eps", format="eps")
+    plt.savefig(path_fig + "N_tens.ps", format="ps")
 
 
 r_int_e_w_deg1 = np.polyfit(np.log(h_vec), np.log(e_w_err_deg1), 1)[0]
@@ -214,10 +214,10 @@ plt.plot(np.log(h_vec), np.log(h_vec**2) + coeff*(np.log(e_w_err_deg2)[-1] \
 
 plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log($||e_w - e_w^h||_{L^\infty H^1}$)')
-plt.title(r'Error for $e_w$')
+plt.title(r'Error for $e_w^h$')
 plt.legend()
 if save_fig:
-    plt.savefig(path_fig + "w_dot.eps", format="eps")
+    plt.savefig(path_fig + "w_dot.ps", format="ps")
     
     
 r_int_e_kap_deg1 = np.polyfit(np.log(h_vec), np.log(e_kap_err_deg1), 1)[0]
@@ -257,10 +257,10 @@ plt.plot(np.log(h_vec), np.log(h_vec**2) + coeff*(np.log(e_kap_err_deg2)[-1] \
 
 plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log($||\bm{E}_\kappa - \bm{E}_\kappa^h||_{L^\infty L^2}$)')
-plt.title(r'Error for $e_\kappa$')
+plt.title(r'Error for $\bm{E}_\kappa^h$')
 plt.legend()
 if save_fig:
-    plt.savefig(path_fig + "M_tens.eps", format="eps")
+    plt.savefig(path_fig + "M_tens.ps", format="ps")
     
     
 r_int_e_disp_deg1 = np.polyfit(np.log(h_vec), np.log(e_disp_err_deg1), 1)[0]
@@ -300,9 +300,9 @@ plt.plot(np.log(h_vec), np.log(h_vec**2) + coeff*(np.log(e_disp_err_deg2)[-1] \
 
 plt.xlabel(r'log(Mesh size $h$)')
 plt.ylabel(r'log($||w - w^h||_{L^\infty H^1}$)')
-plt.title(r'Error for $w$')
+plt.title(r'Error for $w^h$')
 plt.legend()
 if save_fig:
-    plt.savefig(path_fig + "w.eps", format="eps")
+    plt.savefig(path_fig + "w.ps", format="ps")
     
 plt.show()

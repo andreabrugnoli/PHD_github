@@ -1,7 +1,10 @@
 \documentclass[aspectratio=169]{beamer}
+\usepackage{fontspec}
+\usefonttheme{professionalfonts}
 \usepackage{arydshln}
 \usepackage{tikz-cd}
 \usepackage[most]{tcolorbox}
+\usepackage{subcaption}
 
 \usepackage[backend=bibtex, style=authoryear, doi=false,isbn=false,url=false]{biblatex}
 \bibliography{biblio_VKpres}
@@ -15,12 +18,13 @@
 \usepackage[most]{tcolorbox}
 \usepackage{mathtools}
 
+\usepackage{appendixnumberbeamer}
 
 \setbeamertemplate{caption}{\raggedright\insertcaption\par}
 
-
 \usepackage[beamer]{hf-tikz}
 \usetikzlibrary{calc}
+
 
 \addtobeamertemplate{footnote}{}{\vspace{2ex}}
 
@@ -109,10 +113,10 @@
 
 \makeatletter
 \g@addto@macro\normalsize{%
-	\setlength\abovedisplayskip{4pt}
-	\setlength\belowdisplayskip{4pt}
-	\setlength\abovedisplayshortskip{4pt}
-	\setlength\belowdisplayshortskip{4pt}
+	\setlength\abovedisplayskip{5pt}
+	\setlength\belowdisplayskip{5pt}
+	\setlength\abovedisplayshortskip{5pt}
+	\setlength\belowdisplayshortskip{5pt}
 }
 \makeatother
 
@@ -184,14 +188,14 @@
 	\vspace{.3cm}
 	
 	\begin{columns}
-		\begin{column}{.65\textwidth}
+		\begin{column}{.68\textwidth}
 			\begin{itemize}
-				\item \textbf{Physics} is at the core: port-Hamiltonian systems are \textbf{passive} with respect to the \textbf{energy storage function}.
-				\item The \textbf{topological} and \textbf{metrical} structure of the equation is clearly separated (mimetic discretization).
+				\item \textbf{Physics} is at the core: pH systems are \textbf{passive} with respect to the \textbf{energy storage function}.
+				\item The \textbf{topological} and \textbf{metrical} structure of the equations is clearly separated (mimetic discretization).
 				\item PH systems are \textbf{closed under interconnection}. 
 			\end{itemize}
 		\end{column}
-		\begin{column}{.35\textwidth}
+		\begin{column}{.32\textwidth}
 			\centering
 			\includegraphics[width=.9\columnwidth]{babel_tower.jpeg}
 		\end{column}
@@ -275,7 +279,7 @@ Second-order approximation of geometrically exact beam/plate theory \textbf{capt
 	\end{column}
 	\begin{column}{.5\textwidth}
 	
-	\begin{block}{Basic geometric assumption}
+	\begin{block}{Basic geometric assumptions}
 		\begin{itemize}
 		\item Out of plane deflection comparable to the thickness: $w/h = \mathcal{O}(1)$.
 		\item The squares of the in-plane stretching terms are negligible compared to the square of the rotations.
@@ -289,13 +293,13 @@ Second-order approximation of geometrically exact beam/plate theory \textbf{capt
 \end{frame}
 
 
-\begin{frame}{Linear isotropic plates}
+\begin{frame}{Linear isotropic plates ($\Omega \subset \bbR^2$)}
 	
 	The axial and bending behavior are uncoupled if $w/h \ll 1$:
 	
 	\begin{tcbraster}[raster columns=2, raster equal height]
-		\begin{tcolorbox}[width=0.48\textwidth, nobeforeafter,  colframe=theme,title=Axial displacement \\
-			(planar elastodynamics)]%%
+		\begin{tcolorbox}[width=0.49\textwidth, nobeforeafter,  colframe=theme,title=Membrane displacement \\
+			(2D elastodynamics)]%%
 			\begin{equation*}
 				\begin{aligned}
 				\rho h \partial_{tt} \bm{u} &= \Div \bm{N}, \\
@@ -303,14 +307,24 @@ Second-order approximation of geometrically exact beam/plate theory \textbf{capt
 				\bm{\varepsilon}_m &= \mathrm{Sym}(\nabla \bm{u}) = \Grad \bm{u}
 				\end{aligned} 
 			\end{equation*}
+		Total membrane energy
+		\begin{equation*}
+			\small
+			H_m= \frac{1}{2} \int_{\Omega} \rho h ||\partial_t \bm{u}||^2  + D_m \bm{\Phi}(\bm{\varepsilon}_m) \cddot \bm{N} \d\Omega.
+		\end{equation*}
 		\end{tcolorbox}
-		\begin{tcolorbox}[width=0.48\textwidth, nobeforeafter,  colframe=theme,title=Vertical displacement\\ (Kirchhoff plate)]%%
+		\begin{tcolorbox}[width=0.49\textwidth, nobeforeafter,  colframe=theme,title=Vertical displacement\\ (Kirchhoff plate)]%%
 		\begin{equation*}
 			\begin{aligned}
 				\rho h \partial_{tt} w &= -\div\Div \bm{M}, \\
 				\bm{M} &= D_b \bm{\Phi}(\bm{\kappa}), \\
 				\bm{\kappa}&= \Hess w = \Grad \grad w. 
 			\end{aligned}
+		\end{equation*}
+		Total bending energy
+		\begin{equation*}
+			\small
+			H_b = \frac{1}{2} \int_{\Omega} \rho h (\partial_t w)^2 + D_b \bm{\Phi}(\bm{\kappa}) \cddot \bm{M} \d\Omega.
 		\end{equation*}
 		\end{tcolorbox}
 	\end{tcbraster}
@@ -349,11 +363,12 @@ Decomposition strain field
 \begin{block}{Von-K\'arm\'an plate Dynamics}
 	\begin{equation*}
 		\begin{aligned}
-			\rho A \partial_{tt}{u} &= \Div \; \tikzmarkin<1>{cp1}\bm{N}\tikzmarkend{cp1}, \\
-			\rho A \partial_{tt}{w} &= -\div\Div \bm{M} + \div(\tikzmarkin<1>{cp2}\bm{N}\tikzmarkend{cp2} \grad w),
+			\rho h \partial_{tt}{u} &= \Div \; \bm{N}, \\
+			\rho h \partial_{tt}{w} &= -\div\Div \bm{M} + \div(\bm{N} \grad w),
 		\end{aligned} 
 	\end{equation*}
-Total energy $H= \frac{1}{2} \int_{\Omega} \{ D_m \bm{\Phi}(\bm{\varepsilon}_m) \cddot \bm{N} + D_b \bm{\Phi}(\kappa)\cddot \bm{M}\} \d\Omega$ 
+Total energy 
+$$H= \frac{1}{2} \int_{\Omega} \rho h \{||\partial_t \bm{u}||^2 + ||\partial_t w||^2\} + D_m \bm{\Phi}(\bm{\varepsilon}_m) \cddot \bm{N} + D_b \bm{\Phi}(\kappa)\cddot \bm{M} \d\Omega$$ 
 \end{block}
 
 \end{frame}
@@ -391,7 +406,7 @@ The variational derivative of the Hamiltonian gives the co-energy variables
 		\bm{E}_\varepsilon &:= \delta_{\bm{A}_\varepsilon} H = D_m \bm{\Phi}(\bm{A}_\varepsilon),
 	\end{aligned} \qquad
 	\begin{aligned}
-		\bm{e}_w &:= \delta_{\alpha_w} H = \dot{w}, \\
+		{e}_w &:= \delta_{\alpha_w} H = \dot{w}, \\
 		\bm{E}_\kappa &:= \delta_{\bm{A}_\kappa} H = D_b\bm{\Phi}(\bm{A}_\kappa)
 	\end{aligned}
 \end{equation*}
@@ -404,45 +419,41 @@ or more compactly $\bm{e} := \delta_\alpha H = \mathcal{Q} \bm{\alpha}$ with
 
 \end{frame}
 
-\begin{frame}{The port-Hamiltonian realization}
-	To close the system, variable $w$ has to be accessible. 
+\begin{frame}[fragile]\frametitle{The port-Hamiltonian realization}
+	
 	\begin{equation*}
-	%\diffp{}{t}
 	\frac{\partial}{\partial t}
 	\begin{pmatrix}
 		\bm{\alpha}_u \\
 		\bm{A}_\varepsilon \\
-		w \\
 		\alpha_w \\
 		\bm{A}_\kappa
 	\end{pmatrix} = 
 	\underbrace{\begin{bmatrix}
-			\bm{0} & \Div & \bm{0} & \bm{0} & \bm{0}\\
-			\Grad & \bm{0} & \bm{0} & -\mathcal{C}(w)^* & \bm{0} \\
-			0 & 0 & 0 & 1 & 0 \\
-			0 & \mathcal{C}(w) & -1 & 0 & -\div\Div \\
-			\bm{0} & \bm{0} & \bm{0} & \Grad\grad & \bm{0} \\ 
-	\end{bmatrix}}_{\mathcal{J}}
+			\bm{0} & \Div & \bm{0} & \bm{0} \\
+			\Grad & \bm{0} & -\mathcal{C}(w)^* & \bm{0} \\
+			\bm{0} & \mathcal{C}(w) &  \bm{0} & -\div\Div \\
+			\bm{0} & \bm{0} & \Grad\grad & \bm{0} \\ 
+	\end{bmatrix}}_{\mathcal{J}}  
 	\begin{pmatrix}
 		\delta_{\bm\alpha_u} H \\
 		\delta_{\bm{A}_\varepsilon} H \\
-		\delta_{w} H \\
 		\delta_{\alpha_w} H \\
 		\delta_{\bm{A}_\kappa} H
-	\end{pmatrix},
+	\end{pmatrix}.
 \end{equation*}
 The operator $\mathcal{J}$ is formally skew-adjoint. \\
 The coupling term reads
 \begin{equation*}
 	\begin{aligned}
-		\mathcal{C}(w)(\cdot): L^2(\Omega; \bbR^{2\times 2}) \rightarrow L^2(\Omega), \\
+		\mathcal{C}(w)(\cdot): L^2(\Omega; \bbR^{2\times 2}_{\text{sym}}) \rightarrow L^2(\Omega), \\
 								\bm{X}  \rightarrow \div( \bm{X} \grad w), \\
 	\end{aligned} 
 \end{equation*}
 and its formal adjoint
 \begin{equation*}
 	\begin{aligned}
-		\mathcal{C}(w)^*(\cdot): L^2(\Omega) \rightarrow L^2(\Omega; \bbR^{2\times 2}), \\
+		\mathcal{C}(w)^*(\cdot): L^2(\Omega) \rightarrow L^2(\Omega; \bbR^{2\times 2}_{\text{sym}}), \\
 		y  \rightarrow  -\mathrm{Sym}\left[\grad (y) \otimes \grad(w)\right].
 	\end{aligned}
 \end{equation*}
@@ -452,34 +463,34 @@ and its formal adjoint
 
 \begin{frame}{Pure coenergy formulation}
 	
-	\begin{block}{Incorporation of the constitutive equations}
+	\begin{tcolorbox}[nobeforeafter, colframe=theme,title=Incorporation of the constitutive equations]
 		Once the $\mathcal{Q}$ operator (matrix) is inverted, the dynamics is expressed :
 		\begin{equation*}
 			\begin{pmatrix}
 				\rho h\partial_t \bm{e}_u \\
 				(D_m \bm{\Phi})^{-1} \partial_t \bm{E}_\varepsilon \\
-				\partial_t w \\
 				\rho h\partial_t e_w \\
 				(D_b \bm{\Phi})^{-1} \partial_t \bm{E}_\kappa
 			\end{pmatrix} = 
 			\begin{bmatrix}
-				\bm{0} & \Div & \bm{0} & \bm{0} & \bm{0}\\
-				\Grad & \bm{0} & \bm{0} & -\mathcal{C}(w)^* & \bm{0} \\
-				0 & 0 & 0 & 1 & 0 \\
-				0 & \mathcal{C}(w) & -1 & 0 & -\div\Div \\
-				\bm{0} & \bm{0} & \bm{0} & \Grad\grad & \bm{0} \\ 
+				\bm{0} & \Div & \bm{0} & \bm{0} \\
+				\Grad & \bm{0} & -\mathcal{C}(w)^* & \bm{0} \\
+				0 & \mathcal{C}(w) & 0 & -\div\Div \\
+				\bm{0} & \bm{0} & \Grad\grad & \bm{0} \\ 
 			\end{bmatrix}
 			\begin{pmatrix}
 				\bm{e}_u \\
 				\bm{E}_\varepsilon \\
-				\delta_{w} H \\
 				e_w \\
 				\bm{E}_\kappa
 			\end{pmatrix},
 		\end{equation*}
-		
-	\end{block}
-	In the sequel, the quantity $\delta_w H$ is removed as no displacement dependent potential (e.g. gravity) is considered
+		where the vertical position is given by 
+		\begin{equation*}
+		w(t) = w_0 + \int_0^t e_w(\tau) \d\tau.
+		\end{equation*}
+	\end{tcolorbox}
+
 	
 \end{frame}
 
@@ -517,95 +528,98 @@ and its formal adjoint
 
 \section{Numerical discretization}
 
-\begin{frame}[fragile]\frametitle{Mixed finite element construction}
-	Crucial concept to derive stable convergent approximations: \textbf{Hilbert complexes}.
+\begin{frame}{Mixed finite elements for elasticity}
+	Crucial concept to derive stable convergent approximations: \textbf{Hilbert complexes}.\\
+	This framework is well developed for linear wave propagation problems \footfullcite{arnold2006acta} and open source finite elements libraries implement them.
+	\begin{figure}
+		\centering
+			\includegraphics[width=.9\textwidth]{Whitney.png}
+		\caption*{The Whitney forms}
+	\end{figure}
+
+	Definitely less for non linear elasticity problems.
 	
-	The most famous complex is the de Rham complex in 3D:
-	\begin{figure}[h]
-		\centering
-		\begin{tikzcd}
-			H^1(\Omega) \arrow[r, "\grad"] 
-			& H(\curl, \Omega) \arrow[r, "\curl"] & H(\div, \Omega) \arrow[r, "\div"] 
-			& L^2(\Omega)  
-			\end{tikzcd}  
-	\end{figure}
-But there are many more. 
-\begin{tcolorbox}[width=0.95\textwidth, nobeforeafter, colframe=theme,title=Planar elastodynamics]
-	Strain elasticity complex in 2D 
-	\begin{figure}[h]
-		\centering
-		\begin{tikzcd}
-			H^1(\Omega; \bbR^2) \arrow[r, "\Grad"]
-			& H(\rot\rot, \Omega; \bbS) \arrow[r, "\rot\rot"]  & L^2(\Omega)   
-		\end{tikzcd}  
-	\end{figure}
-\end{tcolorbox}
+\end{frame}
 
-\begin{tcolorbox}[width=0.95\textwidth, nobeforeafter, colframe=theme,title=Planar elastodynamics]
-	Strain elasticity complex in 2D 
-	\begin{figure}[h]
-		\centering
-		\begin{tikzcd}
-			H^1(\Omega; \bbR^2) \arrow[r, "\Grad"]
-			& H(\rot\rot, \Omega; \bbS) \arrow[r, "\rot\rot"]  & L^2(\Omega)   
-		\end{tikzcd}  
-	\end{figure}
-\end{tcolorbox}
+\begin{frame}[fragile]\frametitle{Weak formulation for 2D Elastodynamics}
+	
+\begin{tcolorbox}[nobeforeafter, colframe=theme,title=$\Grad$ formulation]%%
+	Suppose the traction (Neumann) boundary condition $\gamma_\perp\bm{E}_\varepsilon = \bm{g}_N$.\\
+	Find $\bm{e}_u \in H^1(\Omega; \bbR^2), \; \bm{E}_{\varepsilon} \in H(\rot\rot, \Omega; \bbR^{2\times 2}_{\text{sym}})$ \\
+	such that $\forall \bm{\psi}_u \in H^1(\Omega; \bbR^2), \; \forall \bm{\Psi}_\varepsilon \in H(\rot\rot, \Omega; \bbR^{2\times 2}_{\text{sym}})$ the following holds
+	\begin{equation*}
+		\begin{aligned}
+			\inpr[\Omega]{\bm{\psi}_u}{\rho h \partial_t \bm{e}_u} &= -\inpr[\Omega]{\Grad \bm{\psi}_u}{\bm{e}_u} + \dualpr[\partial\Omega]{\gamma_0\bm{\psi}_u}{\bm{g}_N}, \\
+			\inpr[\Omega]{\bm{\Psi}_\varepsilon}{(D_m \bm{\Phi})^{-1} \partial_t \bm{E}_{\varepsilon}} &= \inpr[\Omega]{\bm{\Psi}_\varepsilon}{\Grad \bm{e}_u},
+		\end{aligned}
+	\end{equation*}
+ 
+\vspace{.5cm}
 
-Strain elasticity complex in 2D 
-
-
-
-
-The $\div\Div$ complex in 2D with lower regularity (Kirchhoff plate):
+This formulation is related to the strain elasticity complex in 2D 
 \begin{figure}[h]
 	\centering
 	\begin{tikzcd}
-		H^1(\Omega, \bbR^2) \arrow[r, "\mathrm{Sym}\curl"]
-		& H^{-1}(\div\Div, \Omega; \bbS) \arrow[r, "\div\Div"]  & L^2(\Omega)   
+		H^1(\Omega; \bbR^2) \arrow[r, "\Grad"]
+		& H(\rot\rot, \Omega; \bbR^{2\times 2}_{\text{sym}}) \arrow[r, "\rot\rot"]  & L^2(\Omega).
 	\end{tikzcd}  
 \end{figure}
+\end{tcolorbox} 
+
+
 \end{frame}
 
-
-\begin{frame}{Mixed finite element construction\footcite{arnold2006acta}}
-	\textcolor{blue}{Crucial concept: Hilbert complexes for elasticity $H^1 \xrightarrow{\partial_x} L^2$.} \\
-	\begin{block}{Key requirements for mixed Galerkin approximation}
+\begin{frame}[fragile]\frametitle{Weak formulation for 2D Elastodynamics}
 		
-	\begin{itemize}
-		\item The subspaces $H^1_h \subset H^1, \; L^2_h \subset L^2$ form a subcomplex $H^1_h \xrightarrow{\partial_x} L^2_h$ \hspace{1cm}(i.e. $\partial_x H^1_h \subset L^2_h$).
-		\item they admit bounded linear projections $\pi_h^{H^1}: H^1 \rightarrow  
-		H^1_h$  and $\pi_h^{L^2}: L^2 \rightarrow  
-		L^2_h$ which commute with $\partial_x$:
-		\vspace*{-\baselineskip}\vspace*{3pt}
-		\[\partial_x \pi_h^{H^1} = \pi_h^{L^2} \partial_x.\]
-	\end{itemize}
-	\end{block}
+	\begin{tcolorbox}[nobeforeafter, colframe=theme,title=$\Div$ formulation]%%
+		Suppose the kinematic (Dirichlet) boundary condition $\gamma_0 \bm{e}_u = \bm{g}_D$. \\
+		Find $\bm{e}_u \in L^2(\Omega; \bbR^2), \; \bm{E}_{\varepsilon} \in H(\Div, \Omega; \bbR^{2\times 2}_{\text{sym}})$ \\
+		such that $\forall \bm{\psi}_u \in L^2(\Omega; \bbR^2), \; \forall \bm{\Psi}_\varepsilon \in H(\Div, \Omega; \bbR^{2\times 2}_{\text{sym}})$ the following holds
+		\begin{equation*}
+			\begin{aligned}
+				\inpr[\Omega]{\bm{\psi}_u}{\rho h \partial_t \bm{e}_u} &= \inpr[\Omega]{\bm{\psi}_u}{\Div\bm{E}_{\varepsilon}}, \\
+				\inpr[\Omega]{\bm{\Psi}_\varepsilon}{(D_m \bm{\Phi})^{-1} \partial_t \bm{E}_{\varepsilon}} &= -\inpr[\Omega]{\Div \bm{\Psi}_\varepsilon}{ \bm{e}_u} + \dualpr[\partial\Omega]{\gamma_\perp \bm{E}_\varepsilon}{\bm{g}_D}.
+			\end{aligned} 
+		\end{equation*}
+	\vspace{.5cm}
+	
+	This formulation is related to the Elasticity complex in 2D 
+	\begin{figure}[h]
+		\centering
+		\begin{tikzcd}
+			H^2(\Omega) \arrow[r, "\curl\curl"]
+			& H(\Div, \Omega; \bbS) \arrow[r, "\Div"]  & L^2(\Omega; \bbR^2).
+		\end{tikzcd}  
+	\end{figure}
+	\end{tcolorbox} 
 
-	Satisfied for $CG_k \xrightarrow{\partial_x} DG_{k-1}$ 
-	\begin{equation*}
-		\begin{aligned}
-			\mathrm{CG}_k &= \{u \in H^1(\Omega) | \: \forall \text{edge in the mesh}, \; u|_{\text{edge}} \in P_k\}, \\
-			\mathrm{DG}_{k-1} &= \{u \in L^2(\Omega) | \: \forall \text{edge in the mesh}, \; u|_{\text{edge}} \in P_{k-1}\}, \\
-		\end{aligned}
-	\end{equation*}
-	where $P_k$ space of polynomials of degree $k$.
-	\vspace{.1cm}
 \end{frame}
+
+
+\begin{frame}{Finite element complexes}
+Semi discretization in space is obtained using finite elements forming a \textbf{subcomplex of original Hilbert complex}. But the theory is still under development\footfullcite{chen2022finite} and no open source software. \\
+\vspace{1cm}
+So heuristic choice of the finite elements.
+\end{frame}
+
+
 
 \begin{frame}{Finite element choice and final system}
 	For the proposed weak formulation, the FE spaces become
 	\begin{equation*}
-			e_u^h \in \mathrm{CG}_{2k-1}, \qquad
-			e_{\varepsilon}^h \in \mathrm{DG}_{2k-2}, \qquad 
-			(e_w^h, \; e_\kappa^h, \; w^h) \in CG_{k}, \quad k\ge 1.
+			\bm{e}_u^h \in \mathrm{CG}_{2s-1}, \qquad
+			\bm{E}_{\varepsilon}^h \in \mathrm{DG}_{2s-2}, \qquad 
+			e_w^h \in \mathrm{CG}_{s}, \qquad \bm{E}_\kappa^h \in \mathrm{HHJ}_{s-1}, \quad s\ge 1.
 	\end{equation*}
-Implications:
-\begin{itemize}
-	\item Subcomplex property for the linear part: $\partial_x \mathrm{CG}_{2k-1} \subset \mathrm{DG}_{2k-2}$.
-	\item The non linear part respects
-	$$\partial_x \mathrm{CG}_k \cdot  \partial_x \mathrm{CG}_k \subset \mathrm{DG}_{2k-2}.$$
-\end{itemize}
+
+\begin{equation*}
+	\begin{aligned}
+		\inpr[\Omega]{\bm{\psi}_u^h}{\rho h \partial_t \bm{e}_u^h} &= -\inpr[\Omega]{\Grad \bm{\psi}_u^h}{\bm{e}_u^h}, \\
+		\inpr[\Omega]{\bm{\Psi}_\varepsilon^h}{(D_m \bm{\Phi})^{-1} \partial_t \bm{E}_{\varepsilon}^h} &= \inpr[\Omega]{\bm{\Psi}_\varepsilon^h}{\Grad \bm{e}_u^h} + \inpr[\Omega]{\bm{\Psi}_\varepsilon^h}{\mathrm{Sym}\{\grad e_w^h \otimes \grad w^h\}}, \\
+		\inpr[\Omega]{\psi_w^h}{\rho b \partial_t {e}_w^h} &= +d_h(\psi_w^h, \ \bm{E}_{\kappa}^h) - \inpr[\Omega]{\mathrm{Sym}\{\grad \psi_w^h \otimes \grad w^h\}}{\bm{E}_\varepsilon^h}, \\ 
+		\inpr[\Omega]{\bm{\Psi}_\kappa^h}{(D_b \bm{\Phi})^{-1}\partial_t {\bm{E}}_\kappa^h} &= -d_h(e_w^h, \ \bm{\Psi}_{\kappa}^h). \\ 
+	\end{aligned}
+\end{equation*}
 
 \begin{block}{Finite dimensional system (Galerkin projection)}
 		\begin{equation*}
@@ -625,16 +639,19 @@ Implications:
 \section{Numerical convergence study}
 
 \begin{frame}{Manufactured solution}
-	The following manufactured solution is considered
+	Consider $\Omega= [0,1] \times [0, 1]$. The following manufactured solution is considered
 	\begin{equation*}
 		\begin{aligned}
-			u^{\text{ex}} &= x^3[1-(x/L)^3] \sin(2 \pi t), \qquad
-			w^{\text{ex}} &= \sin(\pi x/L)\sin(2 \pi t), 
+			\bm{u}^{\text{ex}} &= \begin{pmatrix}
+				x^4 (1-x^4)\sin^2(\pi y) \\
+				\sin^2(\pi x) y^4 (1-y^4)
+			\end{pmatrix} \sin(2\pi t), \qquad
+			w^{\text{ex}} &= \sin(\pi x)\sin(\pi y)\sin(2 \pi t), 
 		\end{aligned}
 	\end{equation*}
 	together with the boundary conditions
 	\begin{equation*}
-		u\vert_0^L = 0, \quad w\vert_0^L =0, \quad m_{xx}\vert_{0}^L=0.
+		\bm{u}|_{\partial\Omega} = 0, \quad w|_{\partial\Omega}=0, \quad \bm{n}^\top\bm{M}\bm{n}|_{\partial\Omega}=0.
 	\end{equation*}
 A Crank-Nicholson scheme is used for time integration.
 \begin{block}{Convergence measure}
@@ -650,112 +667,79 @@ A Crank-Nicholson scheme is used for time integration.
 \begin{frame}{Results}
 	\only<1>{
 		\begin{figure}[b]
-			\begin{minipage}[b]{0.58\linewidth}
 				\centering
-				\includegraphics[width=1\textwidth]{u_dot.eps}
+				\includegraphics[width=.7\textwidth]{u_dot.eps}
 				\caption{$L^\infty_{\Delta t} (H^1)$ error for $e_u$.}
-			\end{minipage}
-			\begin{minipage}[b]{0.4\linewidth}
-				\centering
-				\includegraphics[width=1\textwidth]{plot_e_u_cropped.pdf}
-				\caption{$e_u^h$ ($h=2^{-5}, k=2$).}
-			\end{minipage}
 		\end{figure}
 	}
 	\only<2>{
 		\begin{figure}[b]
-			\begin{minipage}[b]{0.58\linewidth}
 				\centering
-				\includegraphics[width=1\textwidth]{n_xx.eps}
+				\includegraphics[width=.7\textwidth]{N_tens.eps}
 				\caption{$L^\infty_{\Delta t} (L^2)$ error for $e_\varepsilon$.}
-			\end{minipage}
-			\begin{minipage}[b]{0.4\linewidth}
-				\centering
-				\includegraphics[width=1\textwidth]{plot_e_eps_cropped.pdf}
-				\caption{$e_\varepsilon^h$ for $h=2^{-5}, k=2$.}
-			\end{minipage}
 		\end{figure}
 	}
 	\only<3>{
 		\begin{figure}[b]
-			\begin{minipage}[b]{0.58\linewidth}
 				\centering
-				\includegraphics[width=1\textwidth]{w_dot.eps}
+				\includegraphics[width=.7\textwidth]{w_dot.eps}
 				\caption{$L^\infty_{\Delta t} (H^1)$ error for $e_w$.}
-			\end{minipage}
-			\begin{minipage}[b]{0.4\linewidth}
-				\centering
-				\includegraphics[width=1\textwidth]{plot_e_w_cropped.pdf}
-				\caption{$e_w^h$ for $h=2^{-5}, k=2$.}
-			\end{minipage}
 		\end{figure}
 	}
 	\only<4>{
 		\begin{figure}[b]
-			\begin{minipage}[b]{0.58\linewidth}
 				\centering
-				\includegraphics[width=1\textwidth]{m_xx.eps}
+				\includegraphics[width=.7\textwidth]{M_tens.eps}
 				\caption{$L^\infty_{\Delta t} (H^1)$ error for $e_\kappa$.}
-			\end{minipage}
-			\begin{minipage}[b]{0.4\linewidth}
-				\centering
-				\includegraphics[width=1\textwidth]{plot_e_kap_cropped.pdf}
-				\caption{$e_\kappa^h$ for $h=2^{-5}, k=2$.}
-			\end{minipage}
 		\end{figure}
 	}
 \end{frame}
 
 \begin{frame}{Conclusion and Outlook}
 \begin{itemize}
-	\item First step into pH non linear mechanics. The geometrical non linearities belong to the interconnection operator.
-	\item Natural extension for the 2D case (fancier FE).
-	\item Can be used to study more complex phenomena. The discretization method guarantees energy conservation.
+	\item First step into pH non linear mechanics. The \textbf{geometrical non linearities} belong to the \textbf{interconnection operator}.
+	\item Can be used to study more complex phenomena. The discretization method guarantees \textbf{exact discrete energy conservation} when \textbf{symplectic time integration} is used.
+	\item \textbf{System theory perspective}: incorporates \textbf{interactions} with the environment by means of the \textbf{boundary conditions}.
 \end{itemize}
 \end{frame}
+
+\appendix
 
 \begin{frame}[allowframebreaks]{References}\label{lastslide}
 	\printbibliography
 \end{frame}
 
 
-\begin{frame}{Port-Hamiltonian von-K\'arm\'an plates}
+\begin{frame}[fragile]\frametitle{Mixed finite element construction: Kirchhoff plate}
+	
+	
+	Find $(e_w, \bm{E}_\kappa) \in \mathrm{CG}_s \times \mathrm{HHJ}_{s-1}$ such that
 	\begin{equation*}
-		%\diffp{}{t}
-		\frac{\partial}{\partial t}
-		\begin{pmatrix}
-			\bm{\alpha}_u \\
-			\bm{A}_\varepsilon \\
-			w \\
-			\alpha_w \\
-			\bm{A}_\kappa
-		\end{pmatrix} = 
-		\underbrace{\begin{bmatrix}
-				\bm{0} & \Div & \bm{0} & \bm{0} & \bm{0}\\
-				\Grad & \bm{0} & \bm{0} & -\mathcal{C}(w)^* & \bm{0} \\
-				0 & 0 & 0 & 1 & 0 \\
-				0 & \mathcal{C}(w) & -1 & 0 & -\div\Div \\
-				\bm{0} & \bm{0} & \bm{0} & \Grad\grad & \bm{0} \\ 
-		\end{bmatrix}}_{\mathcal{J}}
-		\begin{pmatrix}
-			\delta_{\bm\alpha_u} H \\
-			\delta_{\bm{A}_\varepsilon} H \\
-			\delta_{w} H \\
-			\delta_{\alpha_w} H \\
-			\delta_{\bm{A}_\kappa} H
-		\end{pmatrix},
+		\begin{aligned}
+			\inpr[\Omega]{\psi_w}{\rho b \partial_t {e}_w} &= +d_h(\psi_w, \ \bm{E}_{\kappa}), \\ 
+			\inpr[\Omega]{\bm{\Psi}_\kappa}{(D_b \bm{\Phi})^{-1}\partial_t {\bm{E}}_\kappa} &= -d_h(e_w, \ \bm{\Psi}_{\kappa}), \\ 
+		\end{aligned} \qquad
+		\begin{aligned}
+			\forall \; \psi_w &\in \mathrm{CG}_s, \\
+			\forall \; \bm{\Psi}_{\kappa} &\in \mathrm{HHJ}_{s-1}. \\
+		\end{aligned}
 	\end{equation*}
-where 
-\begin{equation*}
-	\begin{aligned}
-		\mathcal{C}(w)(\bm{T}) &= \div(\bm{T} \grad w), \\
-		\mathcal{C}(w)^*(\cdot) &= -\frac{1}{2} \left[\grad (\cdot) \otimes \grad(w) + \grad(w) \otimes \grad(\cdot) \right].
-	\end{aligned}
-\end{equation*}
-
+This method is non-conforming and includes inter-cells terms
+	\begin{equation*}
+		d_h(v_w, \ \bm{E}_{\kappa}) := - \sum_{T \in \mathcal{T}_h} \inpr[\Omega]{\Hess v_w}{\bm{E}_\kappa} + \sum_{E \in \mathcal{E}_h} \inpr[\Omega]{[\![\partial_n v_w]\!]}{\bm{n}^\top\bm{E}_\kappa \bm{n}}. 
+	\end{equation*}
+	
+	The $\div\Div$ distributional complex in 2D and the HHJ finite element complex:
+	\begin{figure}[h] 
+		\centering
+		\begin{tikzcd}
+			H^1(\Omega; \bbR^2) \arrow[r, "\mathrm{Sym}\curl"] \arrow[d, "\bm{I}_h"]
+			& H^{-1}(\div\Div, \Omega; \bbR^{2\times 2}_{\text{sym}}) \arrow[r, "\div\Div"] \arrow[d, "\bm{\Pi}_h"]  & L^2(\Omega) \arrow[d, "Q_h"] \\ 
+			\mathrm{CG}_s \arrow[r, "\mathrm{Sym}\curl"]
+			& \mathrm{HHJ}_{s-1} \arrow[r, "\div\Div_h"]  & \mathrm{CG}_s, \\ 
+		\end{tikzcd}  
+	\end{figure}
 \end{frame}
-
-
 
 
 \end{document}
