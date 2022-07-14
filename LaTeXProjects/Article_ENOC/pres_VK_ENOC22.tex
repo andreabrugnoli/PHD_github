@@ -528,29 +528,36 @@ and its formal adjoint
 
 \section{Numerical discretization}
 
-\begin{frame}{Mixed finite elements for elasticity}
-	Crucial concept to derive stable convergent approximations: \textbf{Hilbert complexes}.\\
-	This framework is well developed for linear wave propagation problems \footfullcite{arnold2006acta} and open source finite elements libraries implement them.
+\begin{frame}[fragile]\frametitle{Mixed finite elements for elasticity}
+	Crucial concept to derive stable convergent approximations: \textbf{Hilbert complexes}.
+	
 	\begin{figure}
 		\centering
-			\includegraphics[width=.9\textwidth]{Whitney.png}
-		\caption*{The Whitney forms}
+		\begin{tikzcd}
+			H^1(\Omega) \arrow[r, "\grad"] \arrow[d, "\Pi_{s, h}^{-, 0}"]
+			& H^{\curl}(\Omega) \arrow[r, "\curl"] \arrow[d, "\Pi_{s, h}^{-, 1}"] & H^{\div}(\Omega) \arrow[r, "\div"] \arrow[d, "\Pi_{s, h}^{-, 2}"]
+			& L^2(\Omega) \arrow[d, "\Pi_{s, h}^{-, 1}"] \\
+			\mathrm{CG}_s(\Omega_h) \arrow[r, "\grad"] 
+			& \mathrm{NED}_s^1(\Omega_h) \arrow[r, "\curl"] & \mathrm{RT}_s(\Omega_h) \arrow[r, "\div"]
+			& \mathrm{DG}_{s-1}(\Omega_h) 
+		\end{tikzcd}  
+			\includegraphics[width=.75\textwidth]{Whitney.png}
+		\caption*{The Whitney forms $s=0$ form a subcomplex of the de Rham complex}
 	\end{figure}
-
-	Definitely less for non linear elasticity problems.
+	This framework is well developed for linear problems \footfullcite{arnold2006acta} and open source finite elements libraries implement them. 	Definitely less for non linear elasticity problems. \vspace{.2cm}
 	
 \end{frame}
 
 \begin{frame}[fragile]\frametitle{Weak formulation for 2D Elastodynamics}
 	
-\begin{tcolorbox}[nobeforeafter, colframe=theme,title=$\Grad$ formulation]%%
+\begin{tcolorbox}[nobeforeafter, colframe=theme,title=$\Grad$ primal formulation]%%
 	Suppose the traction (Neumann) boundary condition $\gamma_\perp\bm{E}_\varepsilon = \bm{g}_N$.\\
 	Find $\bm{e}_u \in H^1(\Omega; \bbR^2), \; \bm{E}_{\varepsilon} \in H(\rot\rot, \Omega; \bbR^{2\times 2}_{\text{sym}})$ \\
 	such that $\forall \bm{\psi}_u \in H^1(\Omega; \bbR^2), \; \forall \bm{\Psi}_\varepsilon \in H(\rot\rot, \Omega; \bbR^{2\times 2}_{\text{sym}})$ the following holds
 	\begin{equation*}
 		\begin{aligned}
 			\inpr[\Omega]{\bm{\psi}_u}{\rho h \partial_t \bm{e}_u} &= -\inpr[\Omega]{\Grad \bm{\psi}_u}{\bm{e}_u} + \dualpr[\partial\Omega]{\gamma_0\bm{\psi}_u}{\bm{g}_N}, \\
-			\inpr[\Omega]{\bm{\Psi}_\varepsilon}{(D_m \bm{\Phi})^{-1} \partial_t \bm{E}_{\varepsilon}} &= \inpr[\Omega]{\bm{\Psi}_\varepsilon}{\Grad \bm{e}_u},
+			\inpr[\Omega]{\bm{\Psi}_\varepsilon}{(D_m \bm{\Phi})^{-1} \partial_t \bm{E}_{\varepsilon}} &= \inpr[\Omega]{\bm{\Psi}_\varepsilon}{\Grad \bm{e}_u}.
 		\end{aligned}
 	\end{equation*}
  
@@ -571,7 +578,7 @@ This formulation is related to the strain elasticity complex in 2D
 
 \begin{frame}[fragile]\frametitle{Weak formulation for 2D Elastodynamics}
 		
-	\begin{tcolorbox}[nobeforeafter, colframe=theme,title=$\Div$ formulation]%%
+	\begin{tcolorbox}[nobeforeafter, colframe=theme,title=$\Div$ dual formulation]%%
 		Suppose the kinematic (Dirichlet) boundary condition $\gamma_0 \bm{e}_u = \bm{g}_D$. \\
 		Find $\bm{e}_u \in L^2(\Omega; \bbR^2), \; \bm{E}_{\varepsilon} \in H(\Div, \Omega; \bbR^{2\times 2}_{\text{sym}})$ \\
 		such that $\forall \bm{\psi}_u \in L^2(\Omega; \bbR^2), \; \forall \bm{\Psi}_\varepsilon \in H(\Div, \Omega; \bbR^{2\times 2}_{\text{sym}})$ the following holds

@@ -114,11 +114,11 @@ print("")
 
 plt.figure()
 
-plt.plot(np.log(h_vec), np.log(e_u_err_deg1), '-.+', label='$k=1$')
+plt.plot(np.log(h_vec), np.log(e_u_err_deg1), '-.+', label='$s=1$')
 plt.plot(np.log(h_vec), np.log(h_vec) + coeff*(np.log(e_u_err_deg1)[-1] \
                                                - np.log(h_vec)[-1]), '-v', label=r'$h$')
 
-plt.plot(np.log(h_vec), np.log(e_u_err_deg2), '-.+', label='$k=2$')
+plt.plot(np.log(h_vec), np.log(e_u_err_deg2), '-.+', label='$s=2$')
 plt.plot(np.log(h_vec), np.log(h_vec**2) + coeff*(np.log(e_u_err_deg2)[-1] \
                                                     - np.log(h_vec**2)[-1]), '-v', label=r'$h^2$')
 
@@ -157,11 +157,11 @@ print("")
 
 plt.figure()
 
-plt.plot(np.log(h_vec), np.log(e_eps_err_deg1), '-.+', label='$k=1$')
+plt.plot(np.log(h_vec), np.log(e_eps_err_deg1), '-.+', label='$s=1$')
 plt.plot(np.log(h_vec), np.log(h_vec) +0.95*(np.log(e_eps_err_deg1)[-1] \
                                                - np.log(h_vec)[-1]), '-v', label=r'$h$')
 
-plt.plot(np.log(h_vec), np.log(e_eps_err_deg2), '-.+', label='$k=2$')
+plt.plot(np.log(h_vec), np.log(e_eps_err_deg2), '-.+', label='$s=2$')
 plt.plot(np.log(h_vec), np.log(h_vec**2) + 0.95*(np.log(e_eps_err_deg2)[-1] \
                                                     - np.log(h_vec**2)[-1]), '-v', label=r'$h^2$')
 
@@ -200,11 +200,11 @@ print("")
 
 plt.figure()
 
-plt.plot(np.log(h_vec), np.log(e_w_err_deg1), '-.+', label='$k=1$')
+plt.plot(np.log(h_vec), np.log(e_w_err_deg1), '-.+', label='$s=1$')
 plt.plot(np.log(h_vec), np.log(h_vec) + coeff*(np.log(e_w_err_deg1)[-1] \
                                                - np.log(h_vec)[-1]), '-v', label=r'$h$')
 
-plt.plot(np.log(h_vec), np.log(e_w_err_deg2), '-.+', label='$k=2$')
+plt.plot(np.log(h_vec), np.log(e_w_err_deg2), '-.+', label='$s=2$')
 plt.plot(np.log(h_vec), np.log(h_vec**2) + coeff*(np.log(e_w_err_deg2)[-1] \
                                                     - np.log(h_vec**2)[-1]), '-v', label=r'$h^2$')
 
@@ -243,11 +243,11 @@ print("")
 
 plt.figure()
 
-plt.plot(np.log(h_vec), np.log(e_kap_err_deg1), '-.+', label='$k=1$')
+plt.plot(np.log(h_vec), np.log(e_kap_err_deg1), '-.+', label='$s=1$')
 plt.plot(np.log(h_vec), np.log(h_vec) + coeff*(np.log(e_kap_err_deg1)[-1] \
                                                - np.log(h_vec)[-1]), '-v', label=r'$h$')
 
-plt.plot(np.log(h_vec), np.log(e_kap_err_deg2), '-.+', label='$k=2$')
+plt.plot(np.log(h_vec), np.log(e_kap_err_deg2), '-.+', label='$s=2$')
 plt.plot(np.log(h_vec), np.log(h_vec**2) + coeff*(np.log(e_kap_err_deg2)[-1] \
                                                     - np.log(h_vec**2)[-1]), '-v', label=r'$h^2$')
 
@@ -286,11 +286,11 @@ print("")
 
 plt.figure()
 
-plt.plot(np.log(h_vec), np.log(e_disp_err_deg1), '-.+', label='$k=1$')
+plt.plot(np.log(h_vec), np.log(e_disp_err_deg1), '-.+', label='$s=1$')
 plt.plot(np.log(h_vec), np.log(h_vec) + coeff*(np.log(e_disp_err_deg1)[-1] \
                                                - 0.9*np.log(h_vec)[-1]), '-v', label=r'$h$')
 
-plt.plot(np.log(h_vec), np.log(e_disp_err_deg2), '-.+', label='$k=2$')
+plt.plot(np.log(h_vec), np.log(e_disp_err_deg2), '-.+', label='$s=2$')
 plt.plot(np.log(h_vec), np.log(h_vec**2) + coeff*(np.log(e_disp_err_deg2)[-1] \
                                                     - 0.9*np.log(h_vec**2)[-1]), '-v', label=r'$h^2$')
 
