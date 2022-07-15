@@ -256,19 +256,6 @@
 
 \section{Von-K\'arm\'an theory of thin beams in pH form}
 
-\begin{frame}{Linear vs Von-K\'arm\'an plate theory}
-
-	\begin{columns}
-	\begin{column}{.5\textwidth}
-			\includegraphics[width=.8\columnwidth]{buckling.jpg}
-	\end{column}
-	\begin{column}{.5\textwidth}
-
-		Geometrical non-linearities allow describing bifurcations (i.e. buckling).
-	\end{column}
-	\end{columns}
-	
-\end{frame}
 
 \begin{frame}{The von-K\'arm\'an assumption}
 Second-order approximation of geometrically exact beam/plate theory \textbf{capturing the axial bending coupling.}	
@@ -279,6 +266,7 @@ Second-order approximation of geometrically exact beam/plate theory \textbf{capt
 	\end{column}
 	\begin{column}{.5\textwidth}
 	
+	\only<1>{
 	\begin{block}{Basic geometric assumptions}
 		\begin{itemize}
 		\item Out of plane deflection comparable to the thickness: $w/h = \mathcal{O}(1)$.
@@ -286,11 +274,21 @@ Second-order approximation of geometrically exact beam/plate theory \textbf{capt
 		\end{itemize}
 		
 	\end{block}
+}
+\only<2>{
+	\begin{figure}
+		\centering
+		\includegraphics[height=.6\textheight]{buckling.jpg}
+		\caption*{Geometrical non-linearities allow describing bifurcations (i.e. buckling).}
+	\end{figure}
+	
+}
+
 	
 	\end{column}
 \end{columns}
 
-\end{frame}
+xt\end{frame}
 
 
 \begin{frame}{Linear isotropic plates ($\Omega \subset \bbR^2$)}
@@ -528,7 +526,7 @@ and its formal adjoint
 
 \section{Numerical discretization}
 
-\begin{frame}[fragile]\frametitle{Mixed finite elements for elasticity}
+\begin{frame}[fragile]\frametitle{Hilbert complexes and stable discretization of PDEs}
 	Crucial concept to derive stable convergent approximations: \textbf{Hilbert complexes}.
 	
 	\begin{figure}
@@ -603,7 +601,7 @@ This formulation is related to the strain elasticity complex in 2D
 \end{frame}
 
 
-\begin{frame}{Finite element complexes}
+\begin{frame}{The theory is not directly applicable to this problem}
 Semi discretization in space is obtained using finite elements forming a \textbf{subcomplex of original Hilbert complex}. But the theory is still under development\footfullcite{chen2022finite} and no open source software. \\
 \vspace{1cm}
 So heuristic choice of the finite elements.
@@ -611,14 +609,14 @@ So heuristic choice of the finite elements.
 
 
 
-\begin{frame}{Finite element choice and final system}
-	For the proposed weak formulation, the FE spaces become
+\begin{frame}{Heuristic Finite element choice and final system}
+	For the proposed weak formulation, the following FE spaces are selected 
 	\begin{equation*}
 			\bm{e}_u^h \in \mathrm{CG}_{2s-1}, \qquad
 			\bm{E}_{\varepsilon}^h \in \mathrm{DG}_{2s-2}, \qquad 
 			e_w^h \in \mathrm{CG}_{s}, \qquad \bm{E}_\kappa^h \in \mathrm{HHJ}_{s-1}, \quad s\ge 1.
 	\end{equation*}
-
+Combination of spectral FE for the membrane part and the non conforming Hellan-Hermann-Johnson method for bending.
 \begin{equation*}
 	\begin{aligned}
 		\inpr[\Omega]{\bm{\psi}_u^h}{\rho h \partial_t \bm{e}_u^h} &= -\inpr[\Omega]{\Grad \bm{\psi}_u^h}{\bm{e}_u^h}, \\
@@ -628,17 +626,18 @@ So heuristic choice of the finite elements.
 	\end{aligned}
 \end{equation*}
 
-\begin{block}{Finite dimensional system (Galerkin projection)}
-		\begin{equation*}
-		\begin{aligned}
-			\mathbf{M} \dot{\mathbf{e}} &= \mathbf{J}(\mathbf{w})\mathbf{e} + \mathbf{B}\mathbf{u}, \\
-			\dot{\mathbf{w}} &= \begin{bmatrix}
-				\mathbf{0} & \mathbf{0} & \mathbf{I} & \mathbf{0} \\
-			\end{bmatrix} \mathbf{e}, \\
-			\mathbf{y} &= \mathbf{B}^\top \mathbf{e}.
-		\end{aligned}
-	\end{equation*}
-\end{block}
+\begin{tcolorbox}[nobeforeafter, colframe=theme,title=Finite dimensional system (Galerkin projection)]%%
+	\vspace{-.3cm}
+\begin{equation*}
+	\begin{aligned}
+		\mathbf{M} \dot{\mathbf{e}} &= \mathbf{J}(\mathbf{w})\mathbf{e} + \mathbf{B}\mathbf{u}, \\
+		\dot{\mathbf{w}} &= \begin{bmatrix}
+			\mathbf{0} & \mathbf{0} & \mathbf{I} & \mathbf{0} \\
+		\end{bmatrix} \mathbf{e}, \\
+		\mathbf{y} &= \mathbf{B}^\top \mathbf{e}.
+	\end{aligned}
+\end{equation*}
+\end{tcolorbox}
 
 \end{frame}
 

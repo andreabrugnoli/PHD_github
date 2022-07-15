@@ -1,6 +1,7 @@
 \documentclass[10pt,aspectratio=43]{ISAE-Beamer}
 \usefonttheme[onlymath]{serif}
 \usepackage{media9}
+\usepackage{appendixnumberbeamer}
 % === PACKAGES === %
 
 \usepackage{
@@ -300,24 +301,23 @@ ulem
 	
 	\begin{itemize}
 		\item<1->
-		The \emph{energy variables} $\alp$ (vector field);
+		The \emph{energy variables} $\alp$;
 		\item<1->
 		The \emph{Hamiltonian} $\Ham(\alp(t))$ (positive functional);
 		\item<2->
-		The \emph{co-energy variables} $\e_{\alp} \eqdef \delta_{\alp} \Ham$ (vector field), \\ \qquad $\leadsto$ the variational derivative of $\Ham$ w.r.t $\alp$;
+		The \emph{co-energy variables} $\e_{\alp} \eqdef \delta_{\alp} \Ham$, (the variational derivative of $\Ham$);
 		\item<3->
 		The \emph{\textit{structure} operator} $J$ (linear and \textit{formally skew-symmetric});
 		\item<3->
-		The \emph{resistive/dissipative operator} $R$ (linear and \textit{positive});
+		The \emph{resistive/dissipative operator} $R$ (linear and \textit{positive} semi-definite);
 		\item<4->
 		The \emph{control operator} $B$ (linear);
 		\item<4->
 		The \emph{input} $\u$ and the \emph{collocated output} $\y$ (boundary fields);
-		\item<5->
-		The \emph{dynamical system}:
+		\onslide<5->
 		\begin{tcolorbox}
 			\centering
-			$
+			$ \text{Dynamics}
 			\left\{\begin{array}{l}
 				\partial_t \alp(t) = \left( J - R \right) \e_{\alp}(t) + B \u(t), \\
 				\y(t) = B^* \e_{\alp}(t).
@@ -326,13 +326,13 @@ ulem
 		\end{tcolorbox}
 	\end{itemize}
 	\onslide<6->
-	\begin{alertblock}{\textbf{Lossy Power Balance}}
+	\begin{alertblock}{\textbf{Dissipation inequality}}
 		\centering
-		$
+		$ 
 		\frac{\rm d}{{\rm d}t} \Ham(\alp(t)) = - \psl R \e_{\alp}(t), \e_{\alp}(t) \psr_J + \psl \u(t), \y(t) \psr_B \; \le \; \psl \u(t), \y(t) \psr_B.
 		$
 	\end{alertblock}
-	\hspace{-6pt}\warning\hspace{-6pt} Although \textbf{\red{the underlying geometry}} is well-determined with the above equality, \emph{constitutive relations} between $\alp$ and $\e_{\alp}$ are also needed to solve the system!
+	\hspace{-6pt}\warning\hspace{-6pt} \emph{Constitutive relations} between $\alp$ and $\e_{\alp}$ are also needed!
 	
 \end{frame}
 
@@ -401,7 +401,7 @@ ulem
 \begin{frame}{Conservative System: PFEM strategy}
 	
 	\onslide<1->
-	\begin{block}{The strategy follows:}
+	\begin{block}{Three main steps:}
 		\begin{enumerate}
 			\item<2->
 			Write the \textbf{weak formulation};
@@ -472,60 +472,13 @@ ulem
 \end{frame}
 
 
-\begin{frame}{Conservative System: Power Balance}
-	
-	\onslide<1->
-	\begin{alertblock}{Finite-Dimensional extended structure operator}
-		\centering
-		$
-		\green{\J}_d \eqdef \matl 0 & D & B \\ -D^\top & 0 & 0 \\ -B^\top & 0 & 0 \matr.% \quad \Longrightarrow \quad \D_d \eqdef \graph \left( \green{\J}_d \right).
-		$
-	\end{alertblock}
-	\onslide<2-> \warning The inner product on $\R^{N_q}$, $\R^{N_p}$ and $\R^{N_\partial}$ has to be taken w.r.t. the mass matrices $\vector{M}_q$, $M_p$ and $M_\partial$: \eg $\psl \v_1, \v_2 \psr_{N_q} \eqdef \v_2^\top \cdot \vector{M}_q \cdot \v_1$.\vspace{-2pt}
-	\onslide<3-> 
-	\begin{alertblock}{Discrete Hamiltonian}
-		\centering
-		$
-		\green{\Ham}_d \left( \underline{\alph}_q, \underline{\alph}_p \right) \eqdef \Ham \left( \alp_q^{ap}, \alph_p^{ap} \right) = \frac{1}{2} \left( \underline{\alph}_q^\top \cdot \vector{M}_{\Tens} \cdot \underline{\alph}_q + \underline{\alph}_p^\top \cdot M_{\frac{1}{\rhoo}} \cdot \underline{\alph}_p \right),
-		$\vfill
-		\onslide<4-> $\vector{M}_{\Tens} \eqdef \int_\Omega \vector{\Phi}_q \cdot \Tens \cdot \vector{\Phi}_q^\top$ \qquad \& \qquad $M_{\frac{1}{\rhoo}} \eqdef \int_\Omega \frac{1}{\rhoo} {\boldsymbol \phi}_p \cdot {\boldsymbol \phi}_p^\top$.
-	\end{alertblock}
-	\onslide<5-> \textbf{Constitutive relations}: \quad $\vector{M}_q \cdot \underline{\eff}_q = \vector{M}_{\Tens} \cdot \underline{\alph}_q$ \quad \& \quad $M_p \cdot \underline{\eff}_p = M_{\frac{1}{\rhoo}} \cdot \underline{\alph}_p$ \hfill \check \check \vfill
-	\onslide<6-> Denote $\underline{\flo} \eqdef \matl \frac{\rm d}{{\rm d}t}\underline{\alph}_q, & \frac{\rm d}{{\rm d}t}\underline{\alph}_p, & -\underline{\y} \matr^\top$ and $\underline{\eff} \eqdef \matl \underline{\eff}_q, & \underline{\eff}_p, & \underline{\u} \matr^\top$, then:
-	\begin{alertblock}{Discrete Lossless \textbf{Power Balance}}
-		\centering
-		$
-		%\matl \underline{\flo} \\ \underline{\eff} \matr \in \D_d \; \Rightarrow \; \psl \underline{\flo}, \underline{\eff} \psr_{N_p, N_q, N_\partial} = 0 
-		%\; \Rightarrow \; 
-		\frac{\rm d}{{\rm d}t}\Ham_d \left( \underline{\alph}_q, \underline{\alph}_p \right) = \underline{\u}^\top \cdot M_\partial \cdot \underline{\y}.
-		$
-	\end{alertblock}
-	
-\end{frame}
-
-
-\begin{frame}{A Proof of the Discrete Power Balance}
-	Since by definition the discrete Hamiltonian reads:
-	$$\green{\Ham}_d \left( \underline{\alph}_q, \underline{\alph}_p \right)  = \frac{1}{2} \left( \underline{\alph}_q^\top \cdot \vector{M}_{\Tens} \cdot \underline{\alph}_q + \underline{\alph}_p^\top \cdot M_{\frac{1}{\rhoo}} \cdot \underline{\alph}_p \right),$$
-	we can compute its time derivative along the trajectories:
-	\begin{eqnarray*}
-		\frac{\rm d}{{\rm d}t}\Ham_d \left( \underline{\alph}_q, \underline{\alph}_p \right)
-		&=& ({\frac{\rm d}{{\rm d}t}\underline{\alph}_q})^\top \cdot \vector{M}_{\Tens} \cdot \underline{\alph}_q + ({\frac{\rm d}{{\rm d}t}\underline{\alph}_p})^\top \cdot M_{\frac{1}{\rhoo}} \cdot \underline{\alph}_p ,\\
-		&=& ({\frac{\rm d}{{\rm d}t}\underline{\alph}_q})^\top \cdot \vector{M}_q \cdot \underline{\eff}_q + ({\frac{\rm d}{{\rm d}t}\underline{\alph}_p})^\top \cdot M_p \cdot \underline{\eff}_p ,\\
-		&=& (\vector{M}_q\cdot {\frac{\rm d}{{\rm d}t}\underline{\alph}_q})^\top \cdot  \underline{\eff}_q + (M_p \cdot {\frac{\rm d}{{\rm d}t}\underline{\alph}_p})^\top \cdot \underline{\eff}_p ,\\
-		&=& (  D \cdot \underline{\eff}_p(t) + B \cdot \underline{\u}(t) )^\top \cdot  \underline{\eff}_q + ( -D^\top \cdot \underline{\eff}_q(t)  )^\top \cdot \underline{\eff}_p ,\\
-		&=&  \underline{\u}(t)^\top \cdot  B^\top\cdot  \underline{\eff}_q\\
-		&=& \underline{\u}(t)^\top \cdot M_\partial \cdot\underline{\y}(t) . \qed
-	\end{eqnarray*}
-\end{frame}
-
 \begin{frame}{PFEM for pHs gives rise to PH-DAEs}
 	
-	Summarizing the main steps: discretization of the structure and of the constitutive relations are made separately.
+	PFEM separately discretizes of the structure and of the constitutive relations.
 	
-	\begin{block}{The discretized system is a PH-DAE:}
+	\begin{block}{Final system}
 		\centering
-		$
+		$ \text{Dynamics}
 		\left\{\begin{array}{l}
 			\vector{M}_q \cdot \frac{\rm d}{{\rm d}t}\underline{\alph}_q(t) = D \cdot \underline{\eff}_p(t) + B \cdot \underline{\u}(t), \\
 			M_p \cdot \frac{\rm d}{{\rm d}t}\underline{\alph}_p(t) = -D^\top \cdot \underline{\eff}_q(t), \\
@@ -533,15 +486,30 @@ ulem
 		\end{array}\right.
 		$
 		
-		together with
+		together with 
 		
-		$
+		$ \text{constitutive equations}
 		\left\{\begin{array}{l}
 			\vector{M}_q \cdot \underline{\eff}_q(t) = \vector{M}_{\Tens} \cdot \underline{\alph}_q(t), \\
 			M_p \cdot \underline{\eff}_p(t) = M_{\frac{1}{\rhoo}} \cdot \underline{\alph}_p(t)
 		\end{array}\right.
 		$
 	\end{block}
+\begin{alertblock}{Discrete Hamiltonian}
+	\centering
+	$
+	\green{\Ham}_d \left( \underline{\alph}_q, \underline{\alph}_p \right) \eqdef \Ham \left( \alp_q^{ap}, \alph_p^{ap} \right) = \frac{1}{2} \left( \underline{\alph}_q^\top \cdot \vector{M}_{\Tens} \cdot \underline{\alph}_q + \underline{\alph}_p^\top \cdot M_{\frac{1}{\rhoo}} \cdot \underline{\alph}_p \right),
+	$\vfill
+	$\vector{M}_{\Tens} \eqdef \int_\Omega \vector{\Phi}_q \cdot \Tens \cdot \vector{\Phi}_q^\top$ \qquad \& \qquad $M_{\frac{1}{\rhoo}} \eqdef \int_\Omega \frac{1}{\rhoo} {\boldsymbol \phi}_p \cdot {\boldsymbol \phi}_p^\top$.
+\end{alertblock}
+\begin{alertblock}{Discrete Lossless \textbf{Power Balance}}
+	\centering
+	$
+	%\matl \underline{\flo} \\ \underline{\eff} \matr \in \D_d \; \Rightarrow \; \psl \underline{\flo}, \underline{\eff} \psr_{N_p, N_q, N_\partial} = 0 
+	%\; \Rightarrow \; 
+	\frac{\rm d}{{\rm d}t}\Ham_d \left( \underline{\alph}_q, \underline{\alph}_p \right) = \underline{\u}^\top \cdot M_\partial \cdot \underline{\y}.
+	$
+\end{alertblock}
 	
 	
 \end{frame}
@@ -549,34 +517,7 @@ ulem
 
 \subsection{Convergence of PFEM}
 
-\begin{frame}{Convergence rate: theory}
-	
-	\onslide<1->
-	\begin{block}{Theorem (Haine, Matignon \& Serhani,  2020)}
-		
-		Let $\kappa\ge\delta$ be an integer, where $\delta=0$ if $\Omega$ is convex and $1$ otherwise, and $T>0$.
-		
-		Let $\matl {\Alphaq}_0 \\ {\alphap}_0 \matr \in \mathcal Z_\kappa := \matl \Tens & 0 \\ 0 & \frac{1}{\rhoo} \matr^{-1} \left[ \begin{matrix} \H_\divs^{\kappa+1}(\Omega) \\ H^{\kappa+1}(\Omega) \end{matrix} \right]$, $\u \in C^2([0,\infty);H^{\kappa+1}(\partial\Omega))$.
-		
-		Let $\matl \Alphaq^{ap}(0) \\ \alphap^{ap}(0) \matr$, $\u^{ap}$ be their interpolations with $\left(\mathbb P^{k}\right)^N \times \mathbb P^{\ell} \times \mathbb P^{m}$.
-		
-		Let ${\bf E}(t) \eqdef \nol \matl (\Alphaq-\Alphaq^{ap})(t), & (\alphap-\alphap^{ap})(t) \matr^\top \nor_{\L^2 \times L^2}$,
-		
-		$\exists C_T>0$, independent of $\matl {\Alphaq}_0 \\ {\alphap}_0 \matr$, and $\u$: for all $h$ and all $t \in [0,T]$
-		$$
-		{\bf E}(t)
-		\le C_T
-		h^{\min \left\{ \ell - \delta \, ; \, k \, ; \, m \right\}} 
-		\left( \nol \matl \Alphaq \\ \alphap \matr \nor_{L^\infty([0,T];\mathcal Z_{\kappa})} 
-		+ \nol \u \nor_{L^\infty([0,T];H^{\kappa+1}(\partial\Omega))} \right).
-		$$
-		The \emph{optimal} order is $\red{\kappa-\delta}$, when $k=\kappa-\delta$, $\ell=\max\{\kappa;1\}$ and $m=\kappa-\delta$.
-	\end{block}
-	
-	\onslide<2->
-	$RT_{\kappa-1-\delta} \times \mathbb P^{\kappa} \times \mathbb P^{\kappa-\delta}$ \hfill $BDM_{\kappa-\delta} \times \mathbb P^{\kappa} \times \mathbb P^{\kappa-\delta}$ \hfill $BDFM_{\kappa-\delta} \times \mathbb P^{\kappa} \times \mathbb P^{\kappa-\delta}$~
-	
-\end{frame}
+
 
 \begin{frame}{Convergence rate: numerics}
 	\begin{figure}
@@ -604,9 +545,8 @@ ulem
 	\onslide<1-> The Impedance Boundary Condition, with $\Zo\ge0$ on $\partial\Omega$, and $\nuo$ as new control, is considered:\hfill~
 	$
 	\nuo = \eff_p + \Zo \e_q \cdot \n
-	$\hfill~$\Leftrightarrow$\hfill~$\nuo = \partial_t w + \Zo \left( \Tens \cdot \grad \left( w \right) \right) \cdot \n$.~
-	\onslide<2-> \warning This kind of dissipation does not \textit{easily} fit in the ``$J-R$ framework''.\vfill
-	\onslide<3-> It can be seen as an \textit{output feedback law} $\u = -\Zo \y + \nuo$ in the previous case. 
+	$\hfill~$\Leftrightarrow$\hfill~$\nuo = \partial_t w + \Zo \left( \Tens \cdot \grad \left( w \right) \right) \cdot \n$.~ \\
+	\onslide<2-> It can be seen as an \textit{output feedback law} $\u = -\Zo \y + \nuo$ in the previous case. 
 	\begin{alertblock}{Lossy \textbf{Power Balance}}
 		\centering
 		$
@@ -616,7 +556,7 @@ ulem
 		\vfill
 	\end{alertblock}
 	\vfill
-	\onslide<4-> Add \textbf{impedance ports} $(\flo_i, \eff_i)$ and \textbf{dissipative constitutive relation} $\eff_i = \Zo \flo_i$,\vfill
+	\onslide<3-> Add \textbf{impedance ports} $(\flo_i, \eff_i)$ and \textbf{dissipative constitutive relation} $\eff_i = \Zo \flo_i$,\vfill
 	and approximate $\flo_i$ and $\eff_i$ in the boundary FEM basis ${\boldsymbol \Psi}$:
 	{\scriptsize~\vspace{-3pt}
 		$$
@@ -658,7 +598,7 @@ ulem
 	$
 	\psl \Zo \psr \eqdef \int_{\partial\Omega} \Zo {\boldsymbol \Psi} \cdot {\boldsymbol \Psi}^\top \ge 0.
 	$
-	\onslide<5-> 
+	\onslide<4-> 
 	\begin{alertblock}{Discrete Lossy \textbf{Power Balance}}
 		\centering
 		$
@@ -702,6 +642,48 @@ ulem
 \end{frame}
 
 \section{Nonlinear wave equation: the 2D Shallow Water Equation}
+
+\frame{\frametitle{Shallow Water Equations: applications}
+	
+	\begin{minipage}[t]{0.48\textwidth}
+		%\hspace{-5cm}
+		\centering
+		\includemedia[
+		addresource = /home/andrea/Videos/ENOC2022/Tsunami.mp4,
+		activate=pageopen,
+		width=6cm,height=3cm,
+		width=0.5\paperwidth,
+		flashvars={source=/home/andrea/Videos/ENOC2022/Tsunami.mp4
+			&loop=true}
+		]{}{VPlayer.swf}
+		
+		\small
+		Ocean waves propagation
+	\end{minipage}
+	\begin{minipage}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=0.7\linewidth]{sloshpool.jpg}
+		
+		\small
+		Waves in a swimming pool.
+	\end{minipage}
+	
+	\begin{minipage}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=0.7\linewidth]{falcon1.jpg}
+		
+		\small Falcon 1 rocket with liquid propellant
+	\end{minipage}
+	\begin{minipage}[t]{0.48\textwidth}
+		\centering
+		\includegraphics[width=0.8\linewidth]{f80.jpg}
+		
+		\small
+		F80 airplane with tip tanks
+	\end{minipage}
+	
+}
+
 
 %%%%%%%%%%%%%%%%%%%%%%% SS SWE as a pHs
 \subsection{Modelling: SWE as a pHs}
@@ -790,10 +772,6 @@ ulem
 	\int_\Omega {\boldsymbol \phi}_h \frac{1}{\rho} {\vector{\phi}_v^k}^\top \cdot \vector{\Phi}_v^\top
 	\right) \cdot \underline{\alph_v}(t) .
 	$$
-	
-	{\bf Remark}: the sizes of the vectors and  matrices do match as well (exercise).
-	
-	$\Longrightarrow$ \red{Off-line computation proves possible!} 
 	
 	
 \end{frame}
@@ -895,6 +873,53 @@ ulem
 		\textbf{\quad Brugnoli A., Haine G., Serhani A., Vasseur X.}
 		\quad  \textit{Journal of Applied Mathematics and Physics, vol.9,  pp. 1278--1321 (2021)}.
 	\end{itemize}
+	
+\end{frame}
+
+\appendix
+
+\begin{frame}{A Proof of the Discrete Power Balance}
+	Since by definition the discrete Hamiltonian reads:
+	$$\green{\Ham}_d \left( \underline{\alph}_q, \underline{\alph}_p \right)  = \frac{1}{2} \left( \underline{\alph}_q^\top \cdot \vector{M}_{\Tens} \cdot \underline{\alph}_q + \underline{\alph}_p^\top \cdot M_{\frac{1}{\rhoo}} \cdot \underline{\alph}_p \right),$$
+	we can compute its time derivative along the trajectories:
+	\begin{eqnarray*}
+		\frac{\rm d}{{\rm d}t}\Ham_d \left( \underline{\alph}_q, \underline{\alph}_p \right)
+		&=& ({\frac{\rm d}{{\rm d}t}\underline{\alph}_q})^\top \cdot \vector{M}_{\Tens} \cdot \underline{\alph}_q + ({\frac{\rm d}{{\rm d}t}\underline{\alph}_p})^\top \cdot M_{\frac{1}{\rhoo}} \cdot \underline{\alph}_p ,\\
+		&=& ({\frac{\rm d}{{\rm d}t}\underline{\alph}_q})^\top \cdot \vector{M}_q \cdot \underline{\eff}_q + ({\frac{\rm d}{{\rm d}t}\underline{\alph}_p})^\top \cdot M_p \cdot \underline{\eff}_p ,\\
+		&=& (\vector{M}_q\cdot {\frac{\rm d}{{\rm d}t}\underline{\alph}_q})^\top \cdot  \underline{\eff}_q + (M_p \cdot {\frac{\rm d}{{\rm d}t}\underline{\alph}_p})^\top \cdot \underline{\eff}_p ,\\
+		&=& (  D \cdot \underline{\eff}_p(t) + B \cdot \underline{\u}(t) )^\top \cdot  \underline{\eff}_q + ( -D^\top \cdot \underline{\eff}_q(t)  )^\top \cdot \underline{\eff}_p ,\\
+		&=&  \underline{\u}(t)^\top \cdot  B^\top\cdot  \underline{\eff}_q\\
+		&=& \underline{\u}(t)^\top \cdot M_\partial \cdot\underline{\y}(t) . \qed
+	\end{eqnarray*}
+\end{frame}
+
+
+\begin{frame}{Convergence rate: theory}
+	
+	\onslide<1->
+	\begin{block}{Theorem (Haine, Matignon \& Serhani,  2020)}
+		
+		Let $\kappa\ge\delta$ be an integer, where $\delta=0$ if $\Omega$ is convex and $1$ otherwise, and $T>0$.
+		
+		Let $\matl {\Alphaq}_0 \\ {\alphap}_0 \matr \in \mathcal Z_\kappa := \matl \Tens & 0 \\ 0 & \frac{1}{\rhoo} \matr^{-1} \left[ \begin{matrix} \H_\divs^{\kappa+1}(\Omega) \\ H^{\kappa+1}(\Omega) \end{matrix} \right]$, $\u \in C^2([0,\infty);H^{\kappa+1}(\partial\Omega))$.
+		
+		Let $\matl \Alphaq^{ap}(0) \\ \alphap^{ap}(0) \matr$, $\u^{ap}$ be their interpolations with $\left(\mathbb P^{k}\right)^N \times \mathbb P^{\ell} \times \mathbb P^{m}$.
+		
+		Let ${\bf E}(t) \eqdef \nol \matl (\Alphaq-\Alphaq^{ap})(t), & (\alphap-\alphap^{ap})(t) \matr^\top \nor_{\L^2 \times L^2}$,
+		
+		$\exists C_T>0$, independent of $\matl {\Alphaq}_0 \\ {\alphap}_0 \matr$, and $\u$: for all $h$ and all $t \in [0,T]$
+		$$
+		{\bf E}(t)
+		\le C_T
+		h^{\min \left\{ \ell - \delta \, ; \, k \, ; \, m \right\}} 
+		\left( \nol \matl \Alphaq \\ \alphap \matr \nor_{L^\infty([0,T];\mathcal Z_{\kappa})} 
+		+ \nol \u \nor_{L^\infty([0,T];H^{\kappa+1}(\partial\Omega))} \right).
+		$$
+		The \emph{optimal} order is $\red{\kappa-\delta}$, when $k=\kappa-\delta$, $\ell=\max\{\kappa;1\}$ and $m=\kappa-\delta$.
+	\end{block}
+	
+	\onslide<2->
+	$RT_{\kappa-1-\delta} \times \mathbb P^{\kappa} \times \mathbb P^{\kappa-\delta}$ \hfill $BDM_{\kappa-\delta} \times \mathbb P^{\kappa} \times \mathbb P^{\kappa-\delta}$ \hfill $BDFM_{\kappa-\delta} \times \mathbb P^{\kappa} \times \mathbb P^{\kappa-\delta}$~
 	
 \end{frame}
 
