@@ -175,19 +175,13 @@
 \begin{frame}{A unified language for multiphysics in engineering}
 	The port-Hamiltonian (pH) paradigm provides a language to understand multiphysics:
 	\vspace{.3cm}
-	\begin{columns}
-		\begin{column}{.65\textwidth}
+
 			\begin{itemize}
 				\item \textbf{Physics} is at the core: port-Hamiltonian systems are \textbf{passive} with respect to the \textbf{energy storage function}.
 				\item The \textbf{topological} and \textbf{metrical} structure of the equation is clearly separated (mimetic discretization).
 				\item PH systems are \textbf{closed under interconnection}. 
 			\end{itemize}
-		\end{column}
-		\begin{column}{.35\textwidth}
-			\centering
-			\includegraphics[width=.9\columnwidth]{babel_tower.jpeg}
-		\end{column}
-	\end{columns}
+
 	\begin{block}{A quest for duality}
 		The concept of \textbf{interconnection} and the \textbf{port} behavior of pH systems is mathematically formalized as \textbf{duality pairing}. How exactly is that defined?
 	\end{block}
@@ -442,7 +436,32 @@ Nevertheless, using conforming finite elements for $H\Lambda^k$, one can obtaine
 
 \section{Discretization of port-Hamiltonian systems based on Finite Element Exterior calculus}
 
-\begin{frame}{The adjoint pH structure}
+\begin{frame}{Why the dual field formulation}
+	The problem is how to construct a discrete Hodge star
+	\begin{equation*}
+		\lambda^k = \star \mu^{n-k}, 
+	\end{equation*}
+	In a finite element context one relies on a weak formulation
+	\begin{equation*}
+			\inpr[\Omega]{v^k_h}{\lambda^k_h} = (-1)^{k(n-k)}\dualpr[\Omega]{v^k_h}{\mu^{n-k}_h}
+	\end{equation*}
+	To construct an \textbf{isomorphic Hodge star} \textbf{dual meshes} are needed. Difficulties:
+	\begin{itemize}
+		\item Constructing high quality dual meshes is difficult and no open software is available;
+		\item Mesh entities for the dual mesh lay outside of the physical domain.
+	\end{itemize}
+	
+
+
+	If only \textbf{one computational mesh} is used, the weak Hodge corresponds to the \textbf{$L^2$ projection between dual finite element spaces}
+	\begin{equation*}
+	 \mathbf{M}^k \bm{\lambda}^k =(-1)^{k(n-k)} \mathbf{L}^{n-k} \bm{\mu}^{n-k},
+	\end{equation*}
+	where $\mathbf{L}^{n-k}$ is rectangular.
+\end{frame}
+
+
+\begin{frame}{How to circumvent the Hodge: the adjoint pH structure}
 	Using the \textbf{Hodge isometry} an adjoint pH structure (associated to an adjoint Dirac structure) is computed
 	
 	\begin{tcolorbox}[nobeforeafter, colframe=theme,title=Adjoint pH system]%%
@@ -487,18 +506,18 @@ Nevertheless, using conforming finite elements for $H\Lambda^k$, one can obtaine
 		H^1(\Omega) \arrow[r, "\grad"] \arrow[d, "\Pi_{s, h}^{-, 0}"]
 		& H^{\curl}(\Omega) \arrow[r, "\curl"] \arrow[u, "\flat"] \arrow[d, "\Pi_{s, h}^{-, 1}"] & H^{\div}(\Omega) \arrow[r, "\div"] \arrow[u, "\beta"] \arrow[d, "\Pi_{s, h}^{-, 2}"]
 		& L^2(\Omega) \arrow[u, "\star^{-1}"] \arrow[d, "\Pi_{s, h}^{-, 1}"] \\
-			\mathrm{CG}_s(\Omega_h) \arrow[r, "\grad"] 
-		& \mathrm{NED}_s^1(\Omega_h) \arrow[r, "\curl"] & \mathrm{RT}_s(\Omega_h) \arrow[r, "\div"]
-		& \mathrm{DG}_{s-1}(\Omega_h) 
+			\mathrm{CG}_s(\Omega) \arrow[r, "\grad"] 
+		& \mathrm{NED}_s^1(\Omega) \arrow[r, "\curl"] & \mathrm{RT}_s(\Omega) \arrow[r, "\div"]
+		& \mathrm{DG}_{s-1}(\Omega) 
 	\end{tikzcd}  
 }
 
 \vspace{1cm}
 The finite elements in the figure form a subcomplex of the de Rham complex:
 \begin{itemize}
-	\item $\grad \mathrm{CG}_s(\Omega_h) \subset \mathrm{NED}_s^1(\Omega_h)$,
-	\item $\curl \mathrm{NED}_s^1(\Omega_h) \subset \mathrm{RT}_s(\Omega_h)$,
-	\item $\div \mathrm{RT}_s(\Omega_h) \subset \mathrm{DG}_{s-1}(\Omega_h)$.
+	\item $\grad \mathrm{CG}_s(\Omega) \subset \mathrm{NED}_s^1(\Omega)$,
+	\item $\curl \mathrm{NED}_s^1(\Omega) \subset \mathrm{RT}_s(\Omega)$,
+	\item $\div \mathrm{RT}_s(\Omega) \subset \mathrm{DG}_{s-1}(\Omega)$.
 \end{itemize}	
 
 \end{frame}
@@ -617,8 +636,8 @@ Find $p^0 \in H^1(\Omega), \; \bm{v}^1 \in H^{\curl}(\Omega)$ such that $p^0|_{\
 find $p^3 \in L^2(\Omega), \; \bm{v}^2 \in H^{\div}(\Omega)$ such that $\bm{v}^2 \cdot \bm{n}|_{\Gamma_2} = u^2_2$ and
 \begin{equation*}
 	\begin{aligned}
-		\inpr[\Omega]{\psi^3}{\partial_t p^3} &= -\inpr[\Omega]{\psi_3}{\div\bm{v}^2}, \\
-		\inpr[\Omega]{\bm{\psi}^2}{\partial_t \bm{v}^2} &= +\inpr[\Omega]{\div \bm{\psi}^2}{\grad {p}^3} - \dualpr[\Gamma_1]{\bm{\psi}^2 \cdot \bm{n}}{u^0_1},
+		\inpr[\Omega]{\psi^3}{\partial_t p^3} &= -\inpr[\Omega]{\psi^3}{\div\bm{v}^2}, \\
+		\inpr[\Omega]{\bm{\psi}^2}{\partial_t \bm{v}^2} &= +\inpr[\Omega]{\div \bm{\psi}^2}{p^3} - \dualpr[\Gamma_1]{\bm{\psi}^2 \cdot \bm{n}}{u^0_1},
 	\end{aligned} \qquad
 	\begin{aligned}
 		&\forall \psi^3 \in L^2(\Omega), \\
@@ -628,6 +647,188 @@ find $p^3 \in L^2(\Omega), \; \bm{v}^2 \in H^{\div}(\Omega)$ such that $\bm{v}^2
 \end{tcolorbox} 
 The two formulations are uncoupled.
 \end{frame}
+
+
+\begin{frame}{Discrete formulations}
+	\begin{equation*}
+		\begin{aligned}
+		\mathrm{CG}_{s, \Gamma_1}(\Omega) = \{\phi_h \in \mathrm{CG}_{s}(\Omega) |\; \phi_h|_{\Gamma_1} = 0\}, \\
+		\mathrm{RT}_{s, \Gamma_2}(\Omega) = \{\bm{\phi}_h \in \mathrm{RT}_{s}(\Omega) |\; \bm{\phi}_h \cdot \bm{n}|_{\Gamma_2} = 0\}.
+		\end{aligned}
+	\end{equation*}
+	
+		
+		
+		\begin{tcolorbox}[nobeforeafter, colframe=theme,title=Primal weak formulation]%%
+		Find $p^0_h \in \mathrm{CG}_{s}(\Omega), \; \bm{v}^1_h \in \mathrm{NED}^1_s(\Omega)$ such that $p^0_h|_{\Gamma_1} = u^0_{1, h}$ and
+		\begin{equation*}
+			\begin{aligned}
+				\inpr[\Omega]{\psi^0_h}{\partial_t p^0_h} &= +\inpr[\Omega]{\grad \psi^0_h}{\bm{v}^1_h} + \dualpr[\Gamma_2]{\psi^0_h}{u^2_{2, h}}, \\
+				\inpr[\Omega]{\bm{\psi}^1_h}{\partial_t \bm{v}^1_h} &= -\inpr[\Omega]{\bm{\psi}^1_h}{\grad {p}^0_h},
+			\end{aligned} \qquad
+			\begin{aligned}
+				&\forall \psi^0_h \in \mathrm{CG}_{s, \Gamma_1}(\Omega), \\
+				&\forall \bm{\psi}^1_h \in \mathrm{NED}^1_{s}(\Omega).
+			\end{aligned}
+		\end{equation*}	
+			
+		\end{tcolorbox} 
+	
+		
+	\begin{tcolorbox}[nobeforeafter, colframe=theme,title=Dual weak formulation]%%
+		find $p^3_h \in \mathrm{DG}_{s-1}(\Omega), \; \bm{v}^2_h \in \mathrm{RT}_{s}(\Omega)$ such that $\bm{v}^2_h \cdot \bm{n}|_{\Gamma_2} = u^2_{2, h}$ and
+		\begin{equation*}
+			\begin{aligned}
+				\inpr[\Omega]{\psi^3_h}{\partial_t p^3_h} &= -\inpr[\Omega]{\psi^3_h}{\div\bm{v}^2_h}, \\
+				\inpr[\Omega]{\bm{\psi}^2_h}{\partial_t \bm{v}^2_h} &= +\inpr[\Omega]{\div \bm{\psi}^2_h}{{p}^3_h} - \dualpr[\Gamma_1]{\bm{\psi}^2_h \cdot \bm{n}}{u^0_{1, h}},
+			\end{aligned} \qquad
+			\begin{aligned}
+				&\forall \psi^3_h \in \mathrm{DG}_{s-1}(\Omega), \\
+				&\forall \bm{\psi}^2_h \in \mathrm{RT}_{s, \Gamma_2}(\Omega).
+			\end{aligned}
+		\end{equation*}
+	\end{tcolorbox} 
+
+	\end{frame}
+
+
+
+\begin{frame}{Algebraic realization}
+	Given a matrix $\mathbf{A} \in \bbR^{n_R \times n_C}$ the notation $[\mathbf{A}]_{R}^C$ ($R$ and $C$ index sets) indicates the matrix containing the rows and the columns associated with the index set $R$  and $C$.
+	
+	\only<1>{
+\begin{figure}[tbh]%
+	\centering
+	\subfloat[][Boundary splitting.]{%
+		\label{fig:domain}%
+		\includegraphics[width=0.33\columnwidth]{domain.pdf}}%
+	\hspace{8pt}%
+	\subfloat[][Computational mesh]{%
+		\label{fig:mesh}%
+		\includegraphics[width=0.36\columnwidth]{mesh.pdf}}%
+	\\
+	\subfloat[][Dofs 0-form.]{%
+		\label{fig:zero_form}%
+		\includegraphics[width=0.35\columnwidth]{zero_form.pdf}}
+	\hspace{8pt}%
+	\subfloat[][Dofs 1-form.]{%
+		\label{fig:one_form}%
+		\includegraphics[width=0.35\columnwidth]{one_form.pdf}}
+	
+\end{figure}	
+
+}
+	
+	
+	\only<2>{
+	\begin{tcolorbox}	
+			Algebraic primal formulation
+		\begin{equation*}
+			\begin{aligned}
+				\begin{bmatrix}
+					[\mathbf{M}^{0}_{s}]_{I \cup \Gamma_2} & \mathbf{0} \\
+					\mathbf{0} & \mathbf{M}^1_{s}
+				\end{bmatrix}
+				\begin{pmatrix}
+					\dot{\mathbf{p}}^{0} \\
+					\dot{\mathbf{v}}^1
+				\end{pmatrix} &= 
+				\begin{bmatrix}
+					\mathbf{0} & [(\mathbf{D}_{s}^{0})^\top]_{I \cup \Gamma_2}\\
+					-\mathbf{D}^{0}_s & \mathbf{0}
+				\end{bmatrix}
+				\begin{pmatrix}
+					\mathbf{p}^{0} \\
+					\mathbf{v}^1
+				\end{pmatrix} +
+				\begin{bmatrix}
+					[\mathbf{B}_{s}^{2}]_{I \cup \Gamma_2}^{\Gamma_2} \\
+					\mathbf{0}
+				\end{bmatrix}\mathbf{u}^{2}_2, \\
+				[\mathbf{p}^{0}]_{\Gamma_1} &= 
+				\begin{bmatrix}
+					[\mathbf{T}^{0}_{s}]_{\Gamma_1} & \mathbf{0} \\
+				\end{bmatrix}
+				\begin{pmatrix}
+					\mathbf{p}^{0} \\
+					\mathbf{v}^1
+				\end{pmatrix} = \mathbf{u}^{0}_1,
+			\end{aligned}
+		\end{equation*}
+		Algebraic dual formulation
+		\begin{equation*}
+			\begin{aligned}
+				\begin{bmatrix}
+					\mathbf{M}^3_{s} & \mathbf{0} \\
+					\mathbf{0} & [\mathbf{M}^{2}_{s}]_{I \cup \Gamma_1}
+				\end{bmatrix}
+				\begin{pmatrix}
+					\dot{\mathbf{p}}^3 \\
+					\dot{\mathbf{v}}^2 \\
+				\end{pmatrix} &=  
+				\begin{bmatrix}
+					\mathbf{0} & -\mathbf{D}^{2}_s \\
+					[(\mathbf{D}_{s}^{2})^\top]_{I \cup \Gamma_1} & \mathbf{0}
+				\end{bmatrix}
+				\begin{pmatrix}
+					{\mathbf{p}}^3 \\
+					{\mathbf{v}}^2 \\
+				\end{pmatrix} -
+				\begin{bmatrix}
+					\mathbf{0}\\
+					[\mathbf{B}^{0}_{s}]_{I \cup \Gamma_1}^{\Gamma_1}
+				\end{bmatrix}
+				\mathbf{u}^{0}_1, \\
+				[{\mathbf{v}}^{2}]_{\Gamma_2} &= 
+				\begin{bmatrix}
+					\mathbf{0} & -[\mathbf{T}^{p-1}_{s}]_{\Gamma_2} \\
+				\end{bmatrix}
+				\begin{pmatrix}
+					{\mathbf{p}}^3 \\
+					{\mathbf{v}}^2 \\
+				\end{pmatrix}  ={\mathbf{u}}^{2}_2,
+			\end{aligned}
+		\end{equation*}
+	\end{tcolorbox} 
+}
+	
+	
+\end{frame}
+
+
+
+\begin{frame}{Each discretization carries an energy rate}
+	
+	\begin{proposition}
+		The energy rate of the Hamiltonian $H_{\mathrm{primal}} = \frac{1}{2}\{\inpr{p^0_h}{p^0_h} + \inpr{\bm{v}^1_h}{\bm{v}^1_h}\}$ satisfy
+		\begin{equation*}
+			\diff{{H}_{\mathrm{primal}}}{t} = (\mathbf{u}^{0}_1)^\top \widetilde{\mathbf{y}}^{0} + ({\mathbf{u}}^{2}_2)^\top[{\Psi}^{0}_{s, \partial}]_{\Gamma_2}^{\Gamma_2} \mathbf{y}^{0}_1,
+		\end{equation*} 
+		where ${\mathbf{y}}^{0}_1 = [\mathbf{p}^{0}]_{\Gamma_2}$ and $
+			\widetilde{\mathbf{y}}^{0} := [\mathbf{M}^{0}_{s}]_{\Gamma_1} \dot{\mathbf{p}}^{0} -[(\mathbf{D}_{s}^{0})^\top]_{\Gamma_1} {\mathbf{v}}^1$.
+	\end{proposition}
+
+	\begin{proposition}
+		The energy rate of the Hamiltonian $H_{\mathrm{dual}} = \frac{1}{2}\{\inpr{p^3_h}{p^3_h} + \inpr{\bm{v}^2_h}{\bm{v}^2_h}\}$ satisfy
+	\begin{equation*}
+		\diff{{H}_{\mathrm{dual}}}{t} = ({\mathbf{u}}^{2}_2)^\top \widetilde{\mathbf{y}}^{2} + (\mathbf{y}^{2}_2)^\top[{\Psi}^{0}_{s, \partial}]_{\Gamma_1}^{\Gamma_1} \mathbf{u}^{0}_1, 
+	\end{equation*} 
+	where ${\mathbf{y}}^{2}_2 = -[{\mathbf{v}}^{2}]_{\Gamma_1}$ and $\widetilde{\mathbf{y}}^{2} :=  -[\mathbf{M}^{2}_{s}]_{\Gamma_2} \dot{{\mathbf{v}}}^{2}  +[(\mathbf{D}_{s}^{2})^\top]_{\Gamma_2} {\mathbf{p}}^3$.
+	\end{proposition}
+\end{frame}
+
+\begin{frame}{Recovery the power balance}
+	
+	\begin{proposition}
+		Combining the information of the two systems, a discrete power balance is obtained
+	\begin{equation*}
+		\dualpr[\Omega]{p^{0}_h}{\partial_t p^3_h} + \dualpr[\Omega]{\bm{v}^{2}_h}{\partial_t \bm{v}^{1}_h} + \dualpr[\partial \Omega]{\bm{v}^2_h \cdot \bm{n}}{p_{h}^{0}} = 0.
+	\end{equation*}
+
+	\end{proposition}
+	
+\end{frame}
+
 
 \begin{frame}{Propagation of an eigensolution in a cavity}
 	Box-shaped three-dimensional domain:
