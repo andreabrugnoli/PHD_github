@@ -430,7 +430,7 @@ However, the \textbf{Stokes formula} has only been proven when \textbf{more regu
 	where $H^1\Lambda^k(\Omega)$ is the space of $k$-forms with coefficient in $H^1(\Omega)$.
 \end{theorem}
 
-Nevertheless, using conforming finite elements for $H\Lambda^k$, one can obtained a discrete version of the Dirac structure.
+Nevertheless, using conforming finite elements for $H\Lambda^k$, one can obtained a discrete version of the power balance (integration by parts).
 
 \end{frame}
 
@@ -441,7 +441,7 @@ Nevertheless, using conforming finite elements for $H\Lambda^k$, one can obtaine
 	\begin{equation*}
 		\lambda^k = \star \mu^{n-k}, 
 	\end{equation*}
-	In a finite element context one relies on a weak formulation
+	In a finite element context one relies on a weak formulation\footfullcite{hiptmair2001}
 	\begin{equation*}
 			\inpr[\Omega]{v^k_h}{\lambda^k_h} = (-1)^{k(n-k)}\dualpr[\Omega]{v^k_h}{\mu^{n-k}_h}
 	\end{equation*}
@@ -693,27 +693,25 @@ The two formulations are uncoupled.
 
 
 
-\begin{frame}{Algebraic realization}
-	Given a matrix $\mathbf{A} \in \bbR^{n_R \times n_C}$ the notation $[\mathbf{A}]_{R}^C$ ($R$ and $C$ index sets) indicates the matrix containing the rows and the columns associated with the index set $R$  and $C$.
-	
+\begin{frame}{Algebraic realization}	
 	\only<1>{
 \begin{figure}[tbh]%
 	\centering
 	\subfloat[][Boundary splitting.]{%
 		\label{fig:domain}%
-		\includegraphics[width=0.33\columnwidth]{domain.pdf}}%
-	\hspace{8pt}%
+		\includegraphics[width=0.4\columnwidth]{domain.pdf}}%
+	\hspace{20pt}%
 	\subfloat[][Computational mesh]{%
 		\label{fig:mesh}%
-		\includegraphics[width=0.36\columnwidth]{mesh.pdf}}%
+		\includegraphics[width=0.4\columnwidth]{mesh.pdf}}%
 	\\
 	\subfloat[][Dofs 0-form.]{%
 		\label{fig:zero_form}%
-		\includegraphics[width=0.35\columnwidth]{zero_form.pdf}}
-	\hspace{8pt}%
+		\includegraphics[width=0.4\columnwidth]{zero_form.pdf}}
+	\hspace{20pt}%
 	\subfloat[][Dofs 1-form.]{%
 		\label{fig:one_form}%
-		\includegraphics[width=0.35\columnwidth]{one_form.pdf}}
+		\includegraphics[width=0.4\columnwidth]{one_form.pdf}}
 	
 \end{figure}	
 
@@ -721,6 +719,7 @@ The two formulations are uncoupled.
 	
 	
 	\only<2>{
+			Given a matrix $\mathbf{A} \in \bbR^{n_R \times n_C}$ the notation $[\mathbf{A}]_{R}^C$ ($R$ and $C$ index sets) indicates the matrix containing the rows and the columns associated with the index set $R$  and $C$.
 	\begin{tcolorbox}	
 			Algebraic primal formulation
 		\begin{equation*}
@@ -745,14 +744,14 @@ The two formulations are uncoupled.
 					[\mathbf{B}_{s}^{2}]_{I \cup \Gamma_2}^{\Gamma_2} \\
 					\mathbf{0}
 				\end{bmatrix}\mathbf{u}^{2}_2, \\
-				[\mathbf{p}^{0}]_{\Gamma_1} &= 
+				\mathbf{u}^{0}_1 &= 
 				\begin{bmatrix}
 					[\mathbf{T}^{0}_{s}]_{\Gamma_1} & \mathbf{0} \\
 				\end{bmatrix}
 				\begin{pmatrix}
 					\mathbf{p}^{0} \\
 					\mathbf{v}^1
-				\end{pmatrix} = \mathbf{u}^{0}_1,
+				\end{pmatrix}
 			\end{aligned}
 		\end{equation*}
 		Algebraic dual formulation
@@ -779,14 +778,14 @@ The two formulations are uncoupled.
 					[\mathbf{B}^{0}_{s}]_{I \cup \Gamma_1}^{\Gamma_1}
 				\end{bmatrix}
 				\mathbf{u}^{0}_1, \\
-				[{\mathbf{v}}^{2}]_{\Gamma_2} &= 
+				{\mathbf{u}}^{2}_2 &= 
 				\begin{bmatrix}
-					\mathbf{0} & -[\mathbf{T}^{p-1}_{s}]_{\Gamma_2} \\
+					\mathbf{0} & -[\mathbf{T}^{2}_{s}]_{\Gamma_2} \\
 				\end{bmatrix}
 				\begin{pmatrix}
 					{\mathbf{p}}^3 \\
 					{\mathbf{v}}^2 \\
-				\end{pmatrix}  ={\mathbf{u}}^{2}_2,
+				\end{pmatrix}
 			\end{aligned}
 		\end{equation*}
 	\end{tcolorbox} 
@@ -819,14 +818,26 @@ The two formulations are uncoupled.
 
 \begin{frame}{Recovery the power balance}
 	
-	\begin{proposition}
-		Combining the information of the two systems, a discrete power balance is obtained
+	\begin{proposition}[Discrete power balance]
+%\vspace*{-\baselineskip}\setlength\belowdisplayshortskip{10pt}
 	\begin{equation*}
 		\dualpr[\Omega]{p^{0}_h}{\partial_t p^3_h} + \dualpr[\Omega]{\bm{v}^{2}_h}{\partial_t \bm{v}^{1}_h} + \dualpr[\partial \Omega]{\bm{v}^2_h \cdot \bm{n}}{p_{h}^{0}} = 0.
 	\end{equation*}
-
 	\end{proposition}
-	
+\textbf{Proof} Since the considered FE form a de Rham subcomplex $\div \bm{v}^2_h \subseteq \mathrm{RT}_s$ and $\grad p_h^0 \subseteq \mathrm{NED}_s^1$. Hence by linearity and non degeneracy of the inner product it holds
+\begin{equation*}
+	\partial_t p_h^3 = -\div \bm{v}^2_h, \qquad \partial_t \bm{v}_h^1 = -\grad p_h^0.
+\end{equation*}
+	Taking the duality product with $p_h^0$ and $\bm{v}_h^2$ on each cell $T$ of the mesh, summing up and applying Stokes theorem on each cell
+\begin{equation*}
+	\sum_{T \in \mathcal{T}_h} \dualpr[T]{p_h^0}{\partial_t p_h^3} + \dualpr[T]{\bm{v}^{2}_h}{\partial_t \bm{v}^{1}_h} = -\sum_{T \in \mathcal{T}_h} \dualpr[\partial T]{\bm{v}^2_h \cdot \bm{n}}{p_h^0}
+\end{equation*}
+
+From the finite elements properties, $p_h^0$ is continuous across cells as well as the normal component of $\bm{v}^{2}_h$. Therefore, the inter-cell terms vanish, leading to
+\begin{equation*}
+	\dualpr[\Omega]{p_h^0}{\partial_t p_h^3} + \dualpr[\Omega]{\bm{v}^{2}_h}{\partial_t \bm{v}^{1}_h}  = - \dualpr[\partial \Omega]{\bm{v}^2_h \cdot \bm{n}}{p_h^0}
+\end{equation*}
+
 \end{frame}
 
 
@@ -912,7 +923,7 @@ The exact solution provides the appropriate inputs to be fed into the system
 					loop=true%
 				}
 				]{}{VPlayer.swf}
-				$\bm{v}^2$
+				$|\bm{v}^2|$
 			\end{column}
 			\begin{column}{.45\textwidth}
 				\includemedia[
@@ -926,7 +937,7 @@ The exact solution provides the appropriate inputs to be fed into the system
 					loop=true%
 				}
 				]{}{VPlayer.swf}
-				$\bm{v}^1$
+				$|\bm{v}^1|$
 			\end{column}
 			
 		\end{columns}	
@@ -1002,9 +1013,8 @@ The exact solution provides the appropriate inputs to be fed into the system
 	\vspace{.3cm}\\
 	\begin{tcolorbox}[nobeforeafter, colframe=theme,title=Application oriented developments]%%
 	\begin{itemize}
-		\item efficient strategy for the resolution of large-scale pH models;
-		\item model reduction of models arising from PDEs discretization;
-		\item more open-source code and benchmark problems.
+		\item efficient algebraic strategies for the resolution of large-scale pH models;
+		\item model reduction of models arising from PDEs discretization.
 	\end{itemize}
 	\end{tcolorbox}
 
