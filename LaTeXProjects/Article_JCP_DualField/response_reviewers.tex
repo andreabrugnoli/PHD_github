@@ -1,0 +1,1890 @@
+%% LyX 2.1.5 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage{color}
+\usepackage{tcolorbox}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{diffcoeff}
+\usepackage{amsthm}
+\usepackage[unicode=true,pdfusetitle,
+ bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
+ breaklinks=false,pdfborder={0 0 0},backref=false,colorlinks=true]
+ {hyperref}
+\hypersetup{
+ allcolors=red}
+
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+%===================================
+%% --  Page margins
+\usepackage{geometry}
+\geometry{verbose,twoside,a4paper,
+    % Main margins 
+top=3cm,
+bottom=3cm,
+inner=2.5cm,outer=2.5cm,
+    % Split of top margins
+headheight=2.2cm,headsep=0.5cm,
+    % Split of bottom margin
+footskip=0.5cm,
+    % Split of outer margin
+marginparsep=0.5cm,
+marginparwidth=12.5pt % width of icon \faNewspaperO at 11pt
+}
+% Width of icon is computed with
+% \newlength{\myl} \settowidth{\myl}{\faNewspaperO} Width of icon \faNewspaperO is \the\myl.
+%===================================
+
+%===================================
+%% -- Header
+%\renewcommand{\thepage}{\roman{page}}% Roman numerals for page counter
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+% Custom fancy style (can be modified on the fly within the document as well)
+\fancyhf{} %Clear Everything.
+  % Current page number on the exterior
+\fancyhead[R]{Brugnoli {\it et al.}, JCOMP-D-22-00129, \thepage}
+  % Chapter name on the interior of even pages
+\fancyhead[L]{\nouppercase{\leftmark}}
+% Redefinition of the plain style
+% (This page style is used for the first page of Chapter, table of contents,
+% etc...)
+\fancypagestyle{plain}{
+       \fancyhf{} %Clear Everything.
+       \renewcommand{\headrule}{\hrule height 2pt \vspace{1mm}\hrule height 1pt}
+       \fancyhead[R]{\thepage}
+}
+%===================================
+
+%===================================
+%% -- tcolorbox to quote
+%\usepackage[most]{tcolorbox}
+\tcbuselibrary{most}
+\tcbuselibrary{breakable} % breakable boxes
+%\definecolor{background}{HTML}{F9F5E9}
+%\definecolor{linecolor}{HTML}{E0D7BC}
+\colorlet{background}{lightgray!80!white}
+\colorlet{linecolor}{black}
+
+\newtcolorbox{quotebox}[2][]{%
+leftupper=2em,
+colback=background,
+colframe=background,
+%fonttitle=\bfseries,
+coltitle=black,
+breakable,
+enhanced,
+attach boxed title to top right,
+boxed title style={empty},
+sharp corners,
+borderline north={0.5pt}{0pt}{linecolor},
+borderline north={0.5pt}{1.5pt}{linecolor},
+borderline south={0.5pt}{0pt}{linecolor},
+borderline south={0.5pt}{1.5pt}{linecolor},
+title=#2,#1}
+
+\tcbset{colback=white,
+%colframe=green!50!black,
+%fonttitle=\bfseries,
+coltitle=white,
+breakable,enhanced jigsaw,%breakable box
+%sharp corners,
+}
+%===================================
+
+%===================================
+%-- 'Remark' and TODO' command
+\usepackage{fontawesome}
+\usepackage{tcolorbox}
+ 
+\newcounter{todocounter}
+\newcommand{\todo}[1]{\stepcounter{todocounter}\textbf{\textcolor{red}{(TODO \arabic{todocounter} -- #1)}}}
+   % disable macro
+%\renewcommand{\todo}[1]{\stepcounter{todocounter} \textbf{ \textcolor{red}{(\arabic{todocounter})} }}
+%===================================
+
+%===================================
+%%-- Misc.
+\usepackage{lipsum}
+% Write 'et al.'
+% Use \etal (no trailing space) or \etal{} (trailing space)
+\newcommand{\etal}{\emph{et al.}}
+  % Line numbering
+\usepackage{lineno}
+\modulolinenumbers[5]
+  % For option 'stretch fill image'
+\tcbuselibrary{skins}
+%===================================
+
+%===================================
+%% -- Color for review
+   % background color
+\colorlet{colorRevBG1}{blue!60!black} % dark blue
+\colorlet{colorRevBG2}{red!60!black} % dark red
+  % front color
+\colorlet{colorRev1}{blue!80!black} % dark blue
+\colorlet{colorRev2}{red!80!black} % dark red
+% Macro to enter revisions
+% Usage: \revision[No.]{text}
+%\usepackage{ifthen}
+\usepackage{xstring}
+\newcommand{\revision}[2]{%
+\IfStrEqCase{#1}{{1}{\textcolor{colorRev1}{#2}}
+    {2}{\textcolor{colorRev2}{#2}}
+    }
+    [\PackageError{rev}{Unknown reviewer: #1}{Choose available.}]%
+}
+
+%===================================
+% math macros
+\newcommand{\revOne}[1]{{\textcolor{colorRev1}{#1}}}
+\newcommand{\revTwo}[1]{{\textcolor{colorRev2}{#1}}}
+
+\renewcommand\d{\ensuremath{\mathrm{d}}}
+
+
+% inner products
+\def\onedot{$\mathsurround0pt\ldotp$}
+\def\cddot{% two dots stacked vertically
+	\mathbin{\vcenter{\baselineskip.67ex
+			\hbox{\onedot}\hbox{\onedot}}%
+}}
+
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\bbF}{\mathbb{F}}
+\newcommand{\bbA}{\mathbb{A}}
+\newcommand{\bbB}{\mathbb{B}}
+\newcommand{\bbS}{\mathbb{S}}
+
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator*{\grad}{grad}
+\DeclareMathOperator*{\Grad}{Grad}
+\DeclareMathOperator*{\Div}{Div}
+\renewcommand{\div}{\operatorname{div}}
+\DeclareMathOperator*{\Hess}{Hess}
+\DeclareMathOperator*{\curl}{curl}
+
+\DeclareMathOperator{\Dom}{Dom}
+\DeclareMathOperator*{\esssup}{ess\,sup}
+
+\newcommand*{\dual}[1]{\ensuremath{\widehat{#1}}}
+\newcommand*{\norm}[1]{\ensuremath{\left\|#1\right\|}}
+\newcommand{\where}{\qquad \text{where} \qquad}
+
+\newcommand{\inpr}[3][]{\ensuremath{( #2, \, #3 )_{#1}}}
+
+
+\newcommand{\dualpr}[3][]{\ensuremath{\langle #2 \, \vert #3 \rangle_{#1}}}
+
+\newcommand{\bilprod}[2]{\left\langle \left\langle \, #1, #2 \, \right\rangle \right\rangle}
+
+\newtheorem{remark}{Remark}
+\newtheorem{definition}{Definition}
+
+\usepackage{xspace}
+\newcommand{\fenics}{\textsc{FEniCS}\xspace}
+\newcommand{\firedrake}{\textsc{Firedrake}\xspace}
+
+\makeatother
+
+\makeatother
+
+\begin{document}
+\thispagestyle{plain}
+
+\noindent {\Large{}JCOMP-D-22-00129}{\Large \par}
+
+\noindent \begin{flushleft}
+{\Large{}Dual field structure-preserving discretization of port-Hamiltonian
+systems using finite element exterior calculus}
+\par\end{flushleft}{\Large \par}
+
+\noindent \begin{flushleft}
+Andrea Brugnoli, Ramy Rashad, Stefano Stramigioli
+\par\end{flushleft}
+
+\noindent \begin{flushleft}
+\today
+\par\end{flushleft}
+
+\begin{center}
+\textbf{\Large{}Response to reviewers}
+\par\end{center}{\Large \par}
+
+We gratefully acknowledge each reviewer for his/her most constructive comments. The quality of the paper has greatly benefited from their suggestions. Our responses are provided in this document. 
+
+Revised passages have been highlighted in the PDF version of the manuscript,
+with a different color for \textcolor{colorRev1}{Reviewer \#1}, \textcolor{colorRev2}{Reviewer \#2}.
+
+
+
+\tableofcontents{}
+
+\clearpage{}
+
+
+\section{Summary of revisions}
+
+The manuscript has been revised to account for the comments of the
+two reviewers. The revisions are highlighted in \revision{1}{blue
+for reviewer \#1} and in \revision{2}{red for reviewer \#2}. A summary of the revisions
+is given below.
+
+\begin{tcolorbox}[title=Summary of revisions (Reviewer No. 1),colframe=colorRevBG1]
+
+\begin{itemize}
+\item The collocated nature of the output is detailed thanks to a pHDAE formulation (cf. Remark 7 in the revised version).
+\end{itemize}
+\end{tcolorbox}
+
+
+\begin{tcolorbox}[title=Summary of revisions (Reviewer No. 2),colframe=colorRevBG2]
+
+\begin{itemize}
+\item The introduction has been considerably reduced to include a brief discussion on exterior calculus and the $L^2$ theory of differential forms. The appendix on higher order finite elements has been removed.
+\item The notation has been modified throughout the paper. Now every continuous or discrete differential forms has the exponent denoting the degree of the form, e.g $\omega^k \in \Omega^k(M)$. An hat $\widehat{\cdot}$ denotes outer oriented forms, e.g. $\star \omega^k = \dual{\omega}^{n-k} \in \dual{\Omega}^{n-k}(M)$. The fields $\alpha^p, \alpha^q$ are now denoted with different letters $\dual{\alpha}^p$ and $\beta^q$.
+\item The exposition in Sec. 4 and 5 has been substantially modified. The decoupled formulation of the dynamics is immediately presented in a strong form (cf. Sec. 4.4.). The term  primal and dual system now refers to the system of outer and inner oriented forms respectively. The same decoupling also applies for the primal and dual Stokes-Dirac structures.
+\item The discrete integration by parts formula is proven for the examples of the paper (i.e. the Maxwell and wave equations) using a vector calculus notation (cf. Appendix A).
+\end{itemize}
+\end{tcolorbox}
+
+The following minor modification is also introduced in the revised version and in this document:
+\begin{itemize}
+\item following a recommendation of \revTwo{reviewer 2}, the inner product of forms is denoted by $\inpr[M]{\cdot}{\cdot}$ in the revised version and in the present document.
+\item the energy of the adjoint system is denoted by $\widetilde{H}$ in the revised version, as $\widehat{H}^p_h$ will be used for the energy of the discrete primal system that contains outer oriented (or pseudo) forms, denoted by an hat.
+\item the variables for the Maxwell equations are indicated in lower case to avoid confusion between the magnetizing field and the Hamiltonian.
+\end{itemize}
+
+
+\clearpage{}
+
+
+\section[Document format]{Format of the present document}
+
+
+\subsubsection*{Format of response}
+
+An answer is formatted as follows. The reviewer is first quoted with
+a gray box that also indicates the position of the quote in the original
+review. The comment is then answered in the subsequent paragraph(s).
+A description of the revisions and their positions is then given in
+a colored box.
+
+\begin{quotebox}{Reviewer No.$i\in\left\{1{,}2\right\} $ -- Position of the quote}
+"Direct quote of a comment provided by the reviewer No.$i$."
+\end{quotebox}
+
+Answer to the comment (reviewer n$^\circ$ 1).
+
+\begin{tcolorbox}[title=Revision (Reviewer No. $1$),colframe=colorRevBG1]
+ Descriptions of the corresponding revisions in the manuscript.
+\end{tcolorbox}
+
+Answer to the comment (reviewer n$^\circ$ 2).
+
+\begin{tcolorbox}[title=Revision (Reviewer No. $1$),colframe=colorRevBG2]
+ Descriptions of the corresponding revisions in the manuscript.
+\end{tcolorbox}
+The color of the box matches the text color used in the revised manuscript,
+given below.
+\begin{itemize}
+\item \revOne{Reviewer \#1} 
+\item \revTwo{Reviewer \#2} 
+\end{itemize}
+
+\subsubsection*{Remark on the use of references}
+
+In our responses, we refer to two families of bibliographic entries:
+\begin{itemize}
+\item The ones that are contained in the \textbf{revised} manuscript, which are referred
+to using the numerical style of the \emph{Journal}, e.g. {[}1{]}.
+\item References\emph{ specific to this document} and not necessarily contained
+in the manuscript. To avoid confusion, these references are quoted
+using an author-year citation style, e.g. \cite{kotyczka2017discrete}.
+\end{itemize}
+\clearpage{}
+
+
+\section{Reply to reviewer \#1}
+
+
+We thank the reviewer for his/her comments. We have addressed each one below. In the revised manuscript, the corresponding revisions are \revOne{highlighted in blue}. 
+
+\begin{remark}
+To answer the comments of \revOne{reviewer 1} the same mathematical notation of the unrevised version of the paper is adopted. This is in contrast with the answers to \revTwo{reviewer 2}, where a new notation, highlighting the actual degree and the orientation (inner or outer) of the differential forms, is employed.
+\end{remark}
+
+\begin{quotebox}{Reviewer No.1 -- Comment 1 (Section 1 page 2)}
+You write about "trimmed" polynomial spaces. What is meant by  "trimmed" in that context? I couldn't find an explanation in the paper.
+\end{quotebox}
+In the work Douglas N. Arnold, Richard S. Falk, and Ragnar Winther. "Finite element exterior calculus, homological techniques, and applications", two different families of finite element differential forms are constructed :
+\begin{itemize}
+    \item the complete space of $k$-forms with polynomial coefficients of degree $s$, denoted by $\mathcal{P}_s\Omega^k(\mathcal{T}_h)$;
+    \item the trimmed space of $k$-forms with polynomial coefficients of degree $s$, denoted by $\mathcal{P}_s^-\Omega^k(\mathcal{T}_h)$.
+\end{itemize}
+Given a simplex $T \in \mathcal{T}_h \subset \bbR^n$ the complete polynomial space over the simplex reads
+\begin{equation*}
+    \mathcal{P}_s \Omega^k({T}) := \left\{ \sum_{1 \le l_1 \le \dots \le l_k \le n} p_{l} \, \d x^l \quad \big| \quad  p_l \in \mathcal{P}_s(T)  \right\}
+\end{equation*}
+where $\mathcal{P}_s(T)$ is the space of polynomial of degree $s$ over $T$. The complete space of polynomial can be decomposed as
+\begin{equation*}
+    \mathcal{P}_s\Omega^k(T) = \mathcal{P}_{s-1}\Omega^k(T) \oplus \kappa \mathcal{H}_{s-1}\Omega^{k+1}(T) \oplus \d\mathcal{H}_{s+1}\Omega^{k-1}(T)
+\end{equation*}
+where $\mathcal{H}_{s}\Omega^{k}(T)$ denotes the space of $k$-forms with homogeneous polynomial coefficients of degree $s$. The trimmed polynomial space is obtained from the previous decomposition by dropping the last term
+\begin{equation*}
+    \mathcal{P}_s^- \Omega^k(T) := \mathcal{P}_{s-1}\Omega^k(T) + \kappa \mathcal{H}_{s-1}\Omega^{k+1}(T).
+\end{equation*}
+This space is a trimmed version of the complete one.
+
+\begin{quotebox}{Reviewer No.1 -- Comment 2 (Section 2 page 4-5)}
+\begin{enumerate}
+    \item Before Def. 3: Writing $[1,\dots,n]$ in the index (with commas) might look nicer.
+    \item Def. 3: Shouldn't the $a_i$ be integers, i.e. $a_i \in \mathbb N$?
+    \item Def. 4: $i=0$ below the sum sign?
+    \item Def. 5: The last identity: Can $\partial^k = \partial_{k+1}^T$ be written in general or only if we consider the matrix representations on $\mathbb R^n$?
+    \item p.5: A zero is missing in the first line.
+    \item p.5: Missing comma in the second line $\forall i = 1,\dots,\#\Delta_k(\mathcal{S})$
+\end{enumerate}
+
+\end{quotebox}
+In accordance with the recommendations of \textcolor{colorRev2}{reviewer 2}, Section 2 has been reduced considerably in the revised version. In particular, the algebraic topology section has been completely removed. \\
+
+Here are the answers to the comments : 
+
+\begin{itemize}
+    \item Point 2: the coefficients $a_i$ in the expansion are real. As a consequence the space of chains  has the structure of a real vector space. This would not be the case if the coefficients were natural numbers (that do not constitute a field);
+    \item Point 3: indeed the sum starts from $0$;
+    \item Point 4: the coboundary operator is the dual of the boundary operator. As such it should be denoted by $\partial^k = \partial_{k+1}'$. When a  basis is selected, the algebraic realization of these operators is such that the associated matrices are one the transpose of the other $\bm{\partial}^k = \bm{\partial}_{k+1}^\top$;
+    \item Point 5: indeed a 0 is missing.
+\end{itemize}
+
+
+\begin{quotebox}{Reviewer No.1 -- Comment 3 (Section 3 page 10)}
+Before Eq. (22) you write "flux" instead of "flow" (and at two other places)
+\end{quotebox}
+
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 1 -- Comment No. 3),colframe=colorRevBG1]
+The manuscript has been corrected to replace flux with flow when speaking about flow variables of a port-Hamiltonian system.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Comment 4 (Section 4 page 16)}
+Do I understand correctly that it is a choice how $f^\partial$ and $e^\partial$ are defined? It could be also done on the efforts of the adjoint Stokes-Dirac structure?
+\end{quotebox}
+
+The boundary flows and effort are common to the primal and adjoint system, and can be  expressed using either the primal or the dual variables, i.e.
+\begin{equation*}
+    \begin{aligned}
+    f^\partial &:= \tr e^p, \\
+    e^\partial &:= (-1)^p\tr e^q,
+    \end{aligned} \qquad
+    \text{or equivalently} \qquad 
+    \begin{aligned}
+    f^\partial &:= (-1)^{p(n-p)} \tr \star \dual{e}^p, \\
+    e^\partial &:= (-1)^{p+q(n-q)}\tr \star \dual{e}^q.
+    \end{aligned}
+\end{equation*}
+So they can be defined by using primal or dual effort variables at the continuous level. However if the adjoint system is used to define them at the discrete level, one would need a discrete Hodge to construct the discrete representation of the boundary variables. This is why in the weak formulation and at the discrete level the boundary variables are defined using the primal variables only. 
+
+\begin{quotebox}{Reviewer No.1 -- Comment 5 (Section 5)}
+\begin{enumerate}
+    \item Equations (79) and (80): You could refer to (66) and (67).
+    \item p. 20, after Eq. (86). You refer to the "algebraic Stokes theorem" which is not mentioned before.
+    \item The first sentence of the proof of Prop. 3 is incomplete.
+    \item I wonder if Prop. 4 cannot be easily proven from (84) and using (74), (75) and (43)?
+    \item After Eq. (99) you write that "Prop. 4 will not be preserved...". Can this be avoided by a weak imposition of BCs?
+    \item After Eq. (107): Can you be a bit more precise about the implication of "decoupling" the system representation?
+    \item Can you explain/clarify the structure of the power-conjugate outputs (109), (110), which are composed of corresponding efforts and time derivatives of "the other" effort? A similar structure can be found in Prop. 1 of [KM17], which is commented on in Remark 5 therein. I believe it would complete the picture if you discuss this briefly with a corresponding reference.
+    \item First sentence of 5.3.2: "... written in terms of ..." (delete "the").
+    \item Same sentences: Maybe write "The right hand side of the continuous power balance ..."?
+    \item Section 5.3.2: Can you give an example for non-regular physical coefficients?
+    \item Can you give an interpretation of the output 
+\end{enumerate}
+
+\end{quotebox}
+
+\begin{itemize}
+    \item Point 2: the integration by parts formula
+    \begin{equation*}
+    \dualpr[M]{\d\mu}{\lambda} + (-1)^k \dualpr[M]{\mu}{\d\lambda} = \dualpr[\partial M]{\mu}{\lambda}, \qquad \mu \in \Omega^{k}(M), \quad \lambda \in \Omega^{n-k-1}(M),
+\end{equation*}
+has a discrete counterpart when conforming finite element differential forms are considered 
+\begin{equation*}
+    \dualpr[M]{\d\mu_h}{\lambda_h} + (-1)^k\dualpr[M]{\mu_h}{\d\lambda_h} = \dualpr[\partial M ]{\mu_h}{\lambda_h}, \qquad  \forall \mu_h \in \mathcal{V}_{s,h}^k, \; \lambda_h \in \mathcal{V}_{s,h}^{n-k-1}.
+\end{equation*}
+This is proven considering that the Stokes theorem holds for the each element of the mesh and it extends to the whole mesh as all terms arising on inter-cell boundaries will cancel due to the special continuity properties of discrete differential forms.
+Since the Eq. above is valid $\forall \mu_h, \forall \lambda_h$, the algebraic form of the Stokes theorem is obtained
+\begin{equation*}
+(-1)^{(k+1)(n-k-1)}(\mathbf{G}^{k})^\top + (-1)^k \mathbf{G}^{n-k-1} = (\mathbf{T}^{k})^\top \bm{\Psi}_{s, \partial}^{n-k-1} \mathbf{T}^{n-k-1}.
+\end{equation*}
+\item Point 4: indeed Prop 4. could be proven using (84) and the discrete Hodge Star (74-75) (that is not used in this work), but this would lead to a different discretization in which the dual variables are based on a weak discrete Hodge. Indeed consider a mimetic discretization of the Stokes-Dirac structure only
+\begin{equation}\label{eq:SDSonly_discr}
+     \begin{aligned}
+      \inpr[M]{v^p}{f^p_{h}} = \inpr[M]{v^p}{(-1)^r\d e^q_{h}}, \qquad \forall v^p \in \mathcal{V}_{s, h}^p, \\
+      \inpr[M]{v^q}{f^q_{h}} = \inpr[M]{v^q}{\d e^p_{h}}, 
+    \qquad \forall v^q \in \mathcal{V}_{s, h}^q, \\
+    \end{aligned}
+\end{equation}
+together with the boundary variables definition
+\begin{equation*}
+    \begin{aligned}
+    f_h^\partial &:= \tr e_h^p, \\
+    e_h^\partial &:= (-1)^p \tr e_h^q. \\
+    \end{aligned}
+\end{equation*}
+The two equations \eqref{eq:SDSonly_discr} are strongly satisfied, leading to Proposition 3
+\begin{equation}\label{eq:powbal_disc}
+    \dualpr[M]{e^p_h}{f^p_h} + \dualpr[M]{e^q_h}{f^q_h} + \dualpr[\partial M]{e^\partial_h}{f^\partial_h} = 0.
+\end{equation}
+Having defined the dual variables by push-forward and pull-back as
+\begin{equation*}
+    \begin{aligned}
+    \dual{f}^{p} := \star f^p, \\
+    \dual{e}^p := \star e^p, \\
+    \end{aligned} \qquad 
+    \begin{aligned}
+    \dual{f}^{q} := \star f^q, \\
+    \dual{e}^q := \star e^q, \\
+    \end{aligned}
+\end{equation*}
+ we consider a weak formulation for the dual discrete variables
+\begin{equation*}
+    \begin{aligned}
+    \inpr[M]{\dual{v}^{p}}{\dual{f}_h^{p}} &= (-1)^{p(n-p)}\dualpr[M]{\dual{v}^{p}}{f_h^p} , \\
+    \inpr[M]{{v}^{p}}{\dual{e}_h^{p}} &= (-1)^{p(n-p)}\dualpr[M]{{v}^{p}}{e_h^p} , \\
+    \inpr[M]{\dual{v}^{q}}{\dual{f}_h^{q}} &= (-1)^{q(n-q)}\dualpr[M]{\dual{v}^{q}}{f_h^q}, \\
+    \inpr[M]{{v}^{q}}{\dual{e}_h^{q}} &= (-1)^{q(n-q)}\dualpr[M]{{v}^{q}}{e_h^q}. \\
+    \end{aligned} \qquad
+    \begin{aligned}
+    &\forall \dual{v}^p \in \mathcal{V}_{s, h}^{n-p}, \\
+    &\forall v^p \in \mathcal{V}_{s, h}^p, \\
+    &\forall \dual{v}^q \in \mathcal{V}_{s, h}^{n-q}, \\
+    &\forall v^q \in \mathcal{V}_{s, h}^q, \\
+    \end{aligned}
+\end{equation*}
+
+Now if the test functions are replaced by $\dual{v}^{p}= e_h^p, \; \dual{v}^{q}= e_h^q$   and ${v}^{p}= f_h^p, \; {v}^{q}= f_h^q$ then 
+\begin{equation*}
+    \begin{aligned}
+    \inpr[M]{e^{p}_h}{\dual{f}^{p}_h} &= (-1)^{p(n-p)}\dualpr[M]{e_h^{p}}{f_h^p} , \\
+    \inpr[M]{\dual{e}_h^{p}}{f_h^{p}} &= \dualpr[M]{e_h^{p}}{f_h^p} , \\
+    \inpr[M]{{e}_h^{q}}{\dual{f}_h^{q}} &= (-1)^{q(n-q)}\dualpr[M]{e_h^{q}}{f_h^q}, \\
+    \inpr[M]{\dual{e}_h^{q}}{f_h^{q}} &= \dualpr[M]{e_h^{q}}{f_h^q}, \\
+    \end{aligned}
+\end{equation*}
+where in the second line the symmetry of the inner product and the fact that the duality product is alternating has been used.
+If the second and third line are used in \eqref{eq:powbal_disc}, one obtains
+\begin{equation*}
+    \inpr[M]{\dual{e}_h^{p}}{f_h^{p}} + (-1)^{q(n-q)}\inpr[M]{{e}_h^{q}}{\dual{f}_h^{q}} + \dualpr[\partial M]{e^\partial_h}{f^\partial_h} = 0.
+\end{equation*}
+This correspond to the first equation of Prop. 4. If instead the first and the fourth line are used, it is obtained
+\begin{equation*}
+    (-1)^{p(n-p)}\inpr[M]{e^{p}_h}{\dual{f}^{p}_h} + \inpr[M]{\dual{e}_h^{q}}{f_h^{q}} + \dualpr[\partial M]{e^\partial_h}{f^\partial_h} = 0.
+\end{equation*}
+This correspond to the second equation of Prop. 4. Notice however that with this construction the dual variables do not follow any dynamics and are obtained algebraically by means of a discrete Hodge (given by a rectangular matrix and so not invertible).
+\item Point 5: the answer is no. If the boundary conditions are imposed in a completely weak manner, then the trace of the discrete efforts is not equal to the input variables
+\begin{equation*}
+    \tr e^p_h|_{\Gamma_p} \neq u^p_h, \qquad (-1)^p \tr e_h^q|_{\Gamma_q} \neq u^q_h. 
+\end{equation*}
+The discrete weak formulation in case of weak imposition of the boundary conditions reads: \\
+find $\dual{e}^p_h \in \mathcal{V}^p_{s, h}, \; \dual{e}^q_h \in \mathcal{V}^q_{s, h}, \; {e}^p_h \in \mathcal{V}^{q-1}_{s, h}, \; e^q_h \in \mathcal{V}^{p-1}_{s, h}$ such that 
+\begin{equation}\label{eq:weakbcs_discr_dfPHsys}
+	\begin{aligned}
+		\inpr[M]{v^p}{C^p \partial_t \dual{e}^p_h} &= -\inpr[M]{v^p}{(-1)^r\d e^q_h}, \\
+		\inpr[M]{v^q}{C^q \partial_t \dual{e}^q_h} &= -\inpr[M]{v^q}{\d e^p_h}, \\
+		\inpr[M]{\dual{v}^p}{\dual{C}^p \partial_t e^p_h} &= \inpr[M]{\d\dual{v}^p}{\dual{e}^q_h} + \dualpr[\Gamma_q]{\dual{v}^p}{(-1)^{(p-1)(q-1)}u_h^q} + \dualpr[\Gamma_p]{\dual{v}^p}{(-1)^{p+(p-1)(q-1)} \tr e_h^q}, \\
+		\inpr[M]{\dual{v}^q}{\dual{C}^q \partial_t e^q_h} &= \inpr[M]{\d\dual{v}^q}{(-1)^{r} \dual{e}^p_h} + \dualpr[\Gamma_p]{\dual{v}^q}{(-1)^{p}u^p_h} + \dualpr[\Gamma_q]{\dual{v}^q}{(-1)^{p}\tr e^p_h}, 
+	\end{aligned} 
+\end{equation}
+$\forall v^p \in \mathcal{V}^p_{s, h}, \; \forall v^q \in \mathcal{V}^q_{s, h}, \; \forall \dual{v}^p \in \mathcal{V}^{q-1}_{s, h}, \; \forall \dual{v}^q \in \mathcal{V}^{p-1}_{s, h}$. Notice that System \eqref{eq:weakbcs_discr_dfPHsys} is fully coupled, in contrast to the uncoupled formulation obtained when the boundary conditions are imposed strongly. Now we can applied the same reasoning as in Prop. 4. Taking $v^p = \dual{e}^p, \; \dual{v}^q = e^q$ and summing the first and last equations one obtains
+\begin{equation*}
+	\begin{aligned}
+		\inpr[M]{\dual{e}^p_h}{C^p \partial_t \dual{e}^p_h} + 
+		\inpr[M]{e_h^q}{\dual{C}^q \partial_t e^q_h} &= \dualpr[\Gamma_p]{(-1)^{p} \tr e^q_h}{u^p_h} + \dualpr[\Gamma_q]{(-1)^{p} \tr e_h^q}{\tr e^p_h}, \\
+		&= \dualpr[\Gamma_p]{y^q_h}{u^p_h} + \dualpr[\Gamma_q]{(-1)^{p} \tr e_h^q}{y^p_h}, 
+	\end{aligned} 
+\end{equation*}
+Analogously, taking $v^q = \dual{e}^q, \; \dual{v}^p = e^p$ and summing the second and third equations one obtains
+\begin{equation*}
+	\begin{aligned}
+		\inpr[M]{\dual{e}^q_h}{C^q \partial_t \dual{e}^q_h}  +
+		\inpr[M]{e^p_h}{\dual{C}^p \partial_t e^p_h} &= \dualpr[\Gamma_q]{\tr e^p_h}{(-1)^{(p-1)(q-1)}u_h^q} + \dualpr[\Gamma_p]{\tr e^p_h}{(-1)^{p+(p-1)(q-1)} \tr e_h^q}, \\
+		&=  \dualpr[\Gamma_q]{u_h^q}{y^p_h} + \dualpr[\Gamma_p]{y_h^q}{\tr e^p_h}. \\
+	\end{aligned} 
+\end{equation*}
+However, even if $\tr e^p_h|_{\Gamma_p} \neq u^p_h, \; (-1)^p \tr e_h^q|_{\Gamma_q} \neq u^q_h$, a detailed numerical analysis of this scheme can quantify the difference between the the traces of the inputs and bound it with respect to the spatial and temporal discretization. This means that Proposition 4 is satisfy up to some discretization error that can be precisely characterized. This is out of the scope of the present work.
+\item Point 6: according to the recommendations of  \revTwo{Reviewer 2} the paper has been restructured to make explicit the fact that the proposed discretization method is a primal-dual method where the primal system consist of straight (inner oriented) forms and the dual consist of twisted (i.e. outer oriented) forms.
+\item Point 7: The outputs defined in \cite{kotyczka2017discrete} have a similar structure but they are defined to be consistent to the classical structure of a power conjugated output for ordinary port-Hamiltonian systems without constraints. To highlight the collocated nature of the output in Eqs (109)-(110) of the paper, it is necessary to describe the system as a port-Hamiltonian descriptor system (pHDAE).  \\
+
+To explain what the outputs defined by Eqs. (109-110) represent, consider a classical discretization of a mechanical system in his free dynamics
+\begin{equation*}
+    \mathbf{M}\ddot{\mathbf{q}} + \mathbf{K}\mathbf{q} = \mathbf{0},
+\end{equation*}
+with $\mathbf{M}, \; \mathbf{K}$ symmetric and positive definite. This system can be put in port-Hamiltonian form using the following (non-unique) realization
+\begin{equation*}
+    \begin{bmatrix}
+    \mathbf{K} & \mathbf{0} \\
+    \mathbf{0} & \mathbf{M} \\
+    \end{bmatrix} 
+    \begin{pmatrix}
+    \dot{\mathbf{q}} \\
+    \dot{\mathbf{v}}
+    \end{pmatrix} = 
+    \begin{bmatrix}
+    \mathbf{0} & \mathbf{K} \\
+    -\mathbf{K} & \mathbf{0} \\
+    \end{bmatrix}
+    \begin{pmatrix}
+    \mathbf{q} \\
+    \mathbf{v}
+    \end{pmatrix}
+\end{equation*}
+Consider now a splitting of the velocity degrees of freedom into interior $\mathbf{v}_I$ and boundary $\mathbf{v}_B$ contributions.  This leads to the following mechanical system
+\begin{equation}\label{eq:mechsys_bdspli}
+    \begin{aligned}
+    \begin{bmatrix}
+    \mathbf{K} & \mathbf{0} & \mathbf{0} \\
+    \mathbf{0} & \mathbf{M}_{I}^I & \mathbf{M}_{I}^B \\
+    \mathbf{0} & \mathbf{M}_{B}^I & \mathbf{M}_{B}^B \\
+    \end{bmatrix} 
+    \begin{pmatrix}
+    \dot{\mathbf{q}} \\
+    \dot{\mathbf{v}}_I \\
+    \dot{\mathbf{v}}_B \\
+    \end{pmatrix} &= 
+    \begin{bmatrix}
+    \mathbf{0} & \mathbf{K}^I & \mathbf{K}^B \\
+    -\mathbf{K}_I & \mathbf{0} & \mathbf{0} \\
+    -\mathbf{K}_B & \mathbf{0} & \mathbf{0} \\
+    \end{bmatrix}
+    \begin{pmatrix}
+    \mathbf{q} \\
+    \mathbf{v}_I \\
+    \mathbf{v}_B \\
+    \end{pmatrix}, 
+    \end{aligned}
+\end{equation}
+where the notation $\mathbf{A}_M^N$ indicates that only the $M$ rows and the $N$ columns are kept (with $M = \{m_1, \dots, m_{\# M}\},N = \{n_1, \dots, n_{\# N}\}$ index sets). Suppose now that the velocities at the boundary are actuated, i.e. $\mathbf{v}_B = \mathbf{u}$. To incorporate the boundary conditions in a strong way the constraint has be verified strongly. This means that only the unconstrained variables $\mathbf{q}, \mathbf{v}_I$  will have a dynamics, whereas the constrained variable $\mathbf{v}_B$ follows the prescribed trajectory $\mathbf{u}$:
+\begin{equation}\label{eq:dynsys_dirass}
+    \begin{aligned}
+    \begin{bmatrix}
+    \mathbf{K} & \mathbf{0}\\
+    \mathbf{0} & \mathbf{M}_{I}^I\\
+    \end{bmatrix} 
+    \begin{pmatrix}
+    \dot{\mathbf{q}} \\
+    \dot{\mathbf{v}}_I \\
+    \end{pmatrix} + 
+    \begin{bmatrix}
+    \mathbf{0} \\
+    \mathbf{M}_I^B
+    \end{bmatrix} \dot{\mathbf{u}}
+    = 
+    \begin{bmatrix}
+    \mathbf{0} & \mathbf{K}^I \\
+    -\mathbf{K}_I & \mathbf{0}\\
+    \end{bmatrix}
+    \begin{pmatrix}
+    \mathbf{q} \\
+    \mathbf{v}_I \\
+    \end{pmatrix}
+    + \begin{bmatrix}
+    \mathbf{K}^B \\
+    \mathbf{0}
+    \end{bmatrix}
+    \mathbf{u}
+    \end{aligned}. \\
+\end{equation}
+The time discrete counterpart of System \eqref{eq:dynsys_dirass} is the one used for the actual simulation, via the \texttt{DirichletBC} object in \firedrake. \\
+
+Given the total energy of the system
+\begin{equation*}
+    H = \frac{1}{2} \mathbf{q}^\top \mathbf{K} \mathbf{q} + \frac{1}{2} \mathbf{v}^\top \mathbf{M} \mathbf{v}, 
+\end{equation*}
+with an analogous computation of Proposition 5 in the paper, it can be shown that
+\begin{equation}\label{eq:yhat}
+    \dot{H} = \mathbf{u}^\top \widetilde{\mathbf{y}}, \qquad \widetilde{\mathbf{y}} := \mathbf{M}_B \dot{\mathbf{v}} + \mathbf{K}_B \mathbf{q}.
+\end{equation}
+It can be noticed that the output $\widetilde{\mathbf{y}}$ corresponds to the residual of the third equation in \eqref{eq:mechsys_bdspli}. So $\widetilde{\mathbf{y}}$ corresponds to the force to be applied on the boundary to ensure that the velocities ${\mathbf{v}_B}$ follow the trajectory $\mathbf{u}$. If $\widetilde{\mathbf{y}}=\mathbf{0}$ this means that no forces are applied and the dynamics satisfies the free vibration problem \eqref{eq:mechsys_bdspli}. \\
+
+Variable $\widetilde{\mathbf{y}}$ is indeed the power conjugated output with respect to the input but to see this it is necessary to consider a larger class of port-Hamiltonian systems, i.e. port-Hamiltonian descriptor systems. The strong imposition of the boundary condition is equivalent of the following differential algebraic system where the constraint is enforced by means of a Lagrange multiplier $\bm{\lambda}$
+
+\begin{equation*}
+    \begin{aligned}
+    \begin{bmatrix}
+    \mathbf{K} & \mathbf{0} & \mathbf{0} & \mathbf{0}\\
+    \mathbf{0} & \mathbf{M}_{I}^I & \mathbf{M}_{I}^B & \mathbf{0}\\
+    \mathbf{0} & \mathbf{M}_{B}^I & \mathbf{M}_{B}^B & \mathbf{0} \\
+    \mathbf{0} & \mathbf{0} & \mathbf{0} & \mathbf{0} \\
+    \end{bmatrix} 
+    \begin{pmatrix}
+    \dot{\mathbf{q}} \\
+    \dot{\mathbf{v}}_I \\
+    \dot{\mathbf{v}}_B \\
+    \dot{\bm{\lambda}} \\
+    \end{pmatrix} &= 
+    \begin{bmatrix}
+    \mathbf{0} & \mathbf{K}^I & \mathbf{K}^B & \mathbf{0} \\
+    -\mathbf{K}_I & \mathbf{0} & \mathbf{0} & \mathbf{0} \\
+    -\mathbf{K}_B & \mathbf{0} & \mathbf{0} & \mathbf{I}\\
+    \mathbf{0} & \mathbf{0} & -\mathbf{I} & \mathbf{0} \\
+    \end{bmatrix}
+    \begin{pmatrix}
+    \mathbf{q} \\
+    \mathbf{v}_I \\
+    \mathbf{v}_B \\
+    \bm{\lambda} \\
+    \end{pmatrix} + 
+    \begin{bmatrix}
+    \mathbf{0} \\
+    \mathbf{0} \\
+    \mathbf{0} \\
+    \mathbf{I}
+    \end{bmatrix} \mathbf{u}, \\
+    \widetilde{\mathbf{y}} &= \begin{bmatrix}
+    \mathbf{0} & \mathbf{0} & \mathbf{0} & \mathbf{I}
+    \end{bmatrix} \begin{pmatrix}
+    \mathbf{q} \\
+    \mathbf{v}_I \\
+    \mathbf{v}_B \\
+    \bm{\lambda} \\
+    \end{pmatrix}
+    \end{aligned}
+\end{equation*}
+where $\mathbf{I}$ is the identity matrix. Now the structure is the same as the one would expect for a collocated output. The output is exactly the same as in \eqref{eq:yhat}:
+\begin{equation*}
+    \widetilde{\mathbf{y}} = \bm{\lambda} = \mathbf{M}_B \dot{\mathbf{v}} + \mathbf{K}_B \mathbf{q}.
+\end{equation*}
+
+Analogous examples of this construction can be found in \cite[Remark 3.6]{altmann2021poro} and \cite[Section 5.4]{mehrmann2022control}.
+
+
+
+
+
+
+\item Point 10: Consider for example the  propagation of seismic waves in the ground. The soil is not an uniform material and its properties change abruptly when different layers are encountered. Discontinuities in the parameters are typically encountered whenever the domain includes different materials or media.
+\item Point 11: see Point 7.
+
+\begin{comment}
+In this case the coefficients belong to the $L^{\infty}(M)$ space. This space is defined as the space of all measurable functions on $M\subset \bbR^n$ that are bounded almost everywhere on $M$:
+\begin{equation*}
+L^\infty(M) = \{u: M \rightarrow \bbR  \text{ such that } |u(\xi)| < \kappa \quad \text{a.e. on $M$ for some } \kappa \in \bbR \}.
+\end{equation*}
+Function that belong to $L^\infty(M)$ can be also though as 
+\begin{equation*}
+    u \in L^\infty(M) \implies u : M \rightarrow  \mathcal{B}(L^2(M), L^2(M)),
+\end{equation*}
+where $\mathcal{B}(V, W)$ denotes the space of bounded linear operators from $V$ to $W$. This is the construction used the paper when introducing the material tensors $A^k : L^2\Omega^k(M) \rightarrow L^2\Omega^k(M)$.
+\end{comment}
+
+\end{itemize}
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 1 -- Comment No. 5 page 19-25),colframe=colorRevBG1]
+\begin{itemize}
+    \item Point 1: equations (66)-(67) have been referenced at equation (79)-(80). Furthermore the $\mathbf{D}$ and $\mathbf{G}$ matrices are now defined for a generic degree $k$.
+    \item Point 2: the algebraic Stokes theorem has been introduced in the mimetic operators part (Section 5.1). 
+    \item Point 3: The phrase has been rewritten.
+    \item Point 6: The primal and dual systems are introduced before to make explicit the fact the two formulation are decoupled from the start.
+    \item Point 7: an additional remark has been added to explain the construction of the output in Eqs. (109)-(110) and their relation with port-Hamiltonian descriptor systems. The references \cite{altmann2021poro,mehrmann2022control} have been cited to provide additional examples of the same construction.
+    \item Point 8: the "the" has been deleted.
+    \item Point 9: The phrase has been corrected.
+    \item Point 11: see Point 7.
+\end{itemize}
+
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.1 -- Typos}
+\begin{itemize}
+    \item p. 2: "...as dual meshes require(s) ghost points..."
+    \item p. 2: "...based on Whitney forms is detailed in [26]." This should be [43]
+    \item p. 3: "...introduced to discretize the Navier-Stokes EQUATIONS [30]."
+    \item p. 3: "...as the finite elementS used therein..."
+    \item p. 3: "Since each of the two mixed discretizationS..."
+    \item Def. 10: "($L^2$ inner product)";
+    \item p. 9, commas in "$\text{span}(w_1^k, ..., w_{...}^k)$"
+    \item after Def. 17: "Considering THEN...";
+    \item p.13 before Subsection 3.4: Remove one bracket from ((40))
+    \item p.15, 4.3: ((22));
+    \item  p.17, before Eq. (64): It should be "...their duality product over the DOMAIN..."
+    \item p.18, second line: "... for each element(s)..."
+    \item p.18 after Eq. (71): a word is missing after "basis"?
+    \item p.18, 3rd line before Eq. (74): Shouldn't there be a hyphen in "non isomorphic"? (also at other places with "non degenerate" etc.)
+    \item After Eq. (83): "The following proposition..." (lower case)
+    \item Before Eq. (86): "Given the fact that this holdS..."
+    \item Prop. 5: comma between (105) (107)
+    \item Second line before Eq. (99): "... can then BE constructed..."
+    \item After Eq. (114): ":=" in blue
+    \item Proof of Prop. 7, first sentence: "... systems (119) ..." (lower case)
+    \item Second last sentence of p. 27: "Figure 7" instead of "diagram 7".
+    \item After Eq. (133): "... of 4 equationS ...", (same typo after (139), "Each variable is ..."
+    \item Title of 7.2: one "equation" too much
+    \item p. 36, 3rd line: "Differently thaN ..."
+    \item Before (144): "Eq." (upper case)
+    \item After (144). "differentiateD"
+    \item Second line of p. 137: "... will can be used ..."?
+    \item Third line of 9: "Calculus" (upper case). Line 7: "integration by partS"
+\end{itemize}
+\end{quotebox}
+
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 1 -- Typos),colframe=colorRevBG1]
+The typos have been corrected. An hyphen has been added to "non-degenerate", "non-isomorphic"
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.1 -- Last comment}
+Generally: The abbreviations "Thm." and "Prop." seem more adequate than "Th." and "Pr.". Also check a unique writing of "adjoint Stokes-Dirac structure".
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 1 -- Last comment),colframe=colorRevBG1]
+The abbreviations Thm. and Prop. have been employed instead of Th. and Pr.\\
+
+The paper has been checked for a unique writing of "adjoint Stokes-Dirac structure".
+
+\end{tcolorbox}
+
+
+
+\section{Reply to reviewer \#2}
+
+We thank the reviewer for these comments. His/her recommendations have lead to a clearer notation and have improved the paper in many important conceptual aspects. We have addressed each one
+below. In the revised manuscript, the corresponding revisions are
+\textcolor{colorRev2}{highlighted in red}. \\
+
+\paragraph{Preliminary comment:} Concerning the main comment, regarding a need for a different notation, we have borrowed the notation from the seminal paper by van der Schaft and Maschke [3]. We recognize that their notation is misleading, for two main reasons:
+\begin{itemize}
+    \item the $p$ and $q$ exponents relate to the actual degree of the forms only for the state $\alpha$ and flow $f$ variables. Thus, for people that do not come from the port-Hamiltonian community, this notation is confusing as the exponent may not have anything to do with the actual degree of the from;
+    \item straight and twisted forms are not denoted differently. However, this distinction is fundamental as the pairing of straight and twisted form leads to an orientation invariant quantity (like the energy of the energy flux across a boundary).
+    \item flows and effort variables are now distinguished by a numerical subscript $1, 2$
+    \end{itemize}
+We therefore decided to change the notation throughout the paper, making the degree and the nature (inner or outer oriented) of the forms explicit. The $p$ and $q$ degree are kept for the state variables (one could also introduce only one degree $k$, as all the others are fixed once $k$ and the manifold dimension $n$ are fixed) in order not to change completely the framework introduced in [3] that is well known to the port-Hamiltonian community. In the following answers, the new notation will be used to make the exposition clearer. To give an example, the notation Stokes-Dirac structure is the following
+\begin{equation*}
+    \begin{pmatrix}
+        \dual{f}^p_1 \\
+        {f}^q_2
+    \end{pmatrix} = 
+    \underbrace{\begin{bmatrix}
+    0 & (-1)^r \d \\
+    \d & 0 \\
+    \end{bmatrix}}_{J}
+    \begin{pmatrix}
+        {e}^{n-p}_1 \\
+        \dual{e}^{n-q}_2
+    \end{pmatrix}, \qquad 
+    \begin{pmatrix}
+        {f}_\partial^{n-p} \\
+        \dual{e}_\partial^{n-q}
+    \end{pmatrix} = 
+    \begin{bmatrix}
+    \tr & 0 \\
+    0 &  (-1)^p\tr
+    \end{bmatrix}
+    \begin{pmatrix}
+        {e}^{n-p}_1 \\
+        \dual{e}^{n-q}_2
+    \end{pmatrix}.
+\end{equation*}
+
+\subsection{Comments}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 1}
+2.1. Page 2: "However, this framework does not rely on interpolating basis functions but only on mimetic discrete operators that reproduce the behaviour of their continuous counterparts."\\
+
+I propose rewriting this sentence as:\\
+"However, this framework does not explicitly rely on interpolating basis functions but only on. mimetic discrete operators that reproduce the behaviour of their continuous counterparts."
+\end{quotebox}
+
+The fact that interpolation is fundamental is also clearly stated in Hirani's thesis, Page 7 Sec. "Increasing Role of Interpolation".
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 1),colframe=colorRevBG2]
+The sentence has been rephrased according to the recommendation.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 2}
+"In order to construct a minimal bond space, projector matrices parametrized by tunable parameters need to be introduced." \\
+
+I am not familiar with bond spaces. Could the authors clarify this statement? Specifically, could the
+authors make a connection to the structure preserving discretization literature. Coming from this community,
+I find it very useful if the connections and relations can be highlighted. In this way ideas from both worlds
+can be enriched.
+\end{quotebox}
+Bond spaces, introduced by Henry Paynter in the sixties \cite{paynter1961}, are the fundamental ingredient of bond graph modelling. The term bond represents the instantaneous flow of energy (power) and as such encompasses mechanical, electrical, hydraulic and thermodynamic systems. This concept is not related to the structure-preserving discretization community but to the dynamical systems one.\\
+
+To explain the concept of bond, consider a vector space ${F}$ over the field $\mathbb{R}$ and ${E} \equiv {F}'$ its dual, the space of linear operators ${e} : {F} \rightarrow \mathbb{R}$. The elements of $\mathit{F}$ are called flows, whereas the elements of ${E}$ are called efforts. Those are port variables and their combination gives the power flowing inside the system. The space ${B} := {F} \times {E}$ is called the bond space of power variables. The power is defined as  $\inpr[E \times F]{e}{f} = e(f)$, where $\left\langle {e} , {f} \right\rangle$ is the duality product between ${f}$ and ${e}$. \\
+
+The concept of bond space is important because a Dirac structure is a particular subspace of the bond space. 
+\begin{definition}[Dirac Structure (\textit{T. Courant, Dirac Manifolds}, Def. 1.1.1)]\label{def:DiracStructure}
+	Given a vector space ${F}$ and its dual ${E}$ with respect to the duality product $\left\langle \cdot , \cdot \right\rangle_{E \times F} : {F} \times {E} \rightarrow \mathbb{R}$, consider the symmetric bilinear pairing:
+	\begin{equation*}
+	\bilprod{({f}_1, {e}_1)}{({f}_2, {e}_2)} := \inpr[E \times F]{{e}_1}{{f}_2} +  \inpr[E \times F]{{e}_2}{{f}_1}, \where ({f}_i, {e}_i) \in {B}, \; i = 1, 2
+	\end{equation*}
+	
+	A Dirac structure on ${B} := {F} \times {E}$ is a subspace ${D} \subset {B}$, which is maximally isotropic under $\left\langle \left\langle \cdot, \cdot \right\rangle \right\rangle$.	Equivalently, a Dirac structure on ${B} := {F} \times {E}$ is a subspace ${D} \subset {B}$ 	which equals its orthogonal complement with respect to $\left\langle \left\langle \cdot, \cdot \right\rangle \right\rangle: {D} ={D}^\perp$.
+\end{definition}
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 2),colframe=colorRevBG2]
+The reference \cite{vanderschaft2014port} has been added in order to connect bond graph modelling and port-Hamiltonian system theory.
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 3}
+"The resulting discrete is merely a projector for dual finite element spaces and therefore it introduces an
+additional discretization error. However, mixed finite elements do not rely on a discrete Hodge, but rather
+on a weak formulation of the codifferential operator via the integration by parts formula." 
+
+As mentioned above, all Hodge-$\star$ operators introduce a discretizations error: the only discretization
+error. In the same way, mixed finite element methods also rely on a discrete Hodge-$\star$ operator. In this
+case, this operator is implicitly defined, but it is still there. This particular choice of Hodge-$\star$ operator
+is the one that leads to a discrete co-differential that is the adjoint of the exterior derivative. The main
+idea is that topological relations (the ones involving only the exterior derivative) are exactly represented at a
+discrete level (because they are topological), and constitutive relations (the one involving the Hodge-$\star$, or the co-differential) are approximated. As mentioned in [1] you can either define the inner product or the
+Hodge-$\star$ operator, because the choice of one sets the other.
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 3),colframe=colorRevBG2]
+The phrase has been reformulated as "Mixed finite elements do not rely on dual meshes to construct an isomorphic discrete Hodge, but rather on a weak formulation of the codifferential operator via the integration by parts formula."
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 4}
+"This was formalized by the Partitioned Finite Element method [29]."\\
+
+What do the authors mean by formalized? Do they mean within a port-Hamiltonian setting? Mixed
+finite elements and the weak formulation of the co-differential date back to the works by Bossavit, [4],
+Arnold, Falk and Winther, [5, 6], and Bochev and Hyman, [1].
+\end{quotebox}
+Indeed the Partition Finite Element Method is the application of Mixed Finite Elements to port-Hamiltonian systems specifically. It is shown in \cite[Theorem 4.4]{haine2020numerical} that convergence of the Partitioned Finite Element method (that corresponds to a mixed finite element discretization including boundary control) is guaranteed for a large class of finite elements, and not only restricted to the families that form a subcomplex of the de Rham complex. 
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 4),colframe=colorRevBG2]
+The phrase has been reformulated to include additional references and to clarify the fact that the Partitioned Finite Element Method has be introduced in the context of port-Hamiltonian systems specifically. 
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 5}
+"As such, it should be discretized via a unifying discretization method: the Finite Element Exterior calculus
+theory [21] provides all the tools needed to accomplish this task." \\
+
+The works by Arnold, Falk, and Winther are essential references, but Bossavit’s works on electromagnetism that predate them should also be referenced, e.g., the so called “Japanese papers”, of which [4] is one, see here for a complete list https: \texttt{//ci.nii.ac.jp/author?q=BOSSAVIT+Alain.}
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 5),colframe=colorRevBG2]
+The phrase as been reformulated as 
+"As such, it should be discretized via a unifying discretization method: the Finite Element Exterior calculus theory, initiated by the Japanese papers of Alain Bossavit and fully developed by Arnold,  Falk and Whinter [21], provides all the tools needed to accomplish this task."
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 6}
+"This redundant representation does not exhibit synchronisation problems and provides a dual finite
+element representation of the underlying exact solution."\\
+
+I think this statement is too strong. Synchronisation seems to be inherent, in the sense that, for a yet
+unknown reason, the coupled system of equations seems to stay in synch (unless for very unresolved cases). One system of equations dragging the other and keeping the two solutions close to each other. Nevertheless,
+the authors state that:\\
+\textit{Other steps we want to report in the future includes, for example, error analysis, mesh adaptivity based
+on the local difference between $\bm{u}_1^h$ and $\bm{u}_2^h$ ($\bm{u}_1^h$ and $\bm{u}_2^h$) and the extension from periodic boundary conditions
+to general boundary conditions.}\\
+This approach is quite promising, but synchronisation is still not fully guaranteed. This is just the
+remark I would like to make.
+\end{quotebox}
+The two mixed systems obtained from the dual field formulation are completely uncoupled in the linear case. If each of the resulting system converge to the true solution then bounds of the following form can be proven 
+\begin{equation*}
+\begin{aligned}
+    ||u^k_h - u_{\text{ex}}||_X \le C_1 h^s ||u_{\text{ex}}||_Y, \\
+    ||\dual{u}^{n-k}_h - u_{\text{ex}}||_X \le C_2 h^s ||u_{\text{ex}}||_Y,
+    \end{aligned}
+\end{equation*}
+where $X$ and $Y$ are suitable Banach spaces with norms $||\cdot||_X, \; ||\cdot||_Y$, $u_{\text{ex}}$  is the exact field and $u^k_h$ and $\dual{u}^{n-k}_h$ are its is discrete representations in dual finite element bases. Then by the triangle inequality one has
+\begin{equation*}
+\begin{aligned}
+    ||u^k_h - \dual{u}^{n-k}_h||_X \le ||u^k_h - u_{\text{ex}}||_X + ||\dual{u}^{n-k}_h - u_{\text{ex}}||_X \le 2 \max(C_1, C_2) h^s ||u_{\text{ex}}||_Y.
+    \end{aligned}
+\end{equation*}
+This means that the two discrete representation converge to the same field as the mesh size shrinks. \\
+Such a result, that is yet to be proven, would guarantee that the two solutions eventually match. Indeed, the numerical tests performed on the wave and Maxwell equations do not exhibit synchronisation problems.
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 6),colframe=colorRevBG2]
+The phrase as been reformulated as 
+"The numerical tests show that each of two mixed discretizations converge to the exact solution under mesh refinement, without exhibiting synchronisation problems."
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 7}
+"(...) and show the numerical performances of the proposed methodology."\\
+I propose using:
+(...) and show the numerical properties of the proposed methodology.
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 7),colframe=colorRevBG2]
+The phrase as been modified according to the recommendation.
+\end{tcolorbox}
+
+\paragraph{Preliminary comment on section two}
+Section two has been considerably reduced to include a brief discussion on exterior calculus. The algebraic topology and Whitney and higher order forms parts have been completely removed.
+
+\begin{quotebox}{Reviewer No.2 -- Comment 8}
+"(...) denotes its set of simplices of dimension $k$: $\mathcal{S} = \bigcup_{[1...n]} \Delta_k(\mathcal{S}).$"\\
+Why set $k = [1, \dots, n]$? Should you not include also $k = 0$? Otherwise the simplicial complex $\mathcal{S}$ does
+not contain the vertices, the 0-simplices, $\sigma_0$.
+\end{quotebox}
+Indeed there is a typo. 
+
+\begin{quotebox}{Reviewer No.2 -- Comment 9}
+The left hand side of equation (3): $\partial_k \sigma_k$.
+This is a matter of notation, but to be compatible with Figure 1 and to have the nice property $\partial^k = \partial_k^\top $ instead of $\partial^k = \partial_{k+1}^\top $, which is what this equation leads to. Also add\\
+"where $k = 1, \dots, n$, and $\widetilde{\mathbf{q}}_i$, means (...)"\\
+Then in equation 4 ($k-1$) should also be used on both $\partial$ operators.
+\end{quotebox}
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 10}
+"From the last two facts, it follows $\partial_{k-1} \partial_k = 0$."\\
+From Definition 4, it follows that $\partial_{k-1} \partial_k = 0$.
+I prefer using $\partial$ instead of $\partial_k$ (without specifying the space where it acts or to where it maps). The
+reason for this is that you cannot have something compact like: $\partial\partial$ = 0 (or the transpose one, which is
+more relevant). For example, $\d\d\alpha^k=0$ for $k = 0, \dots, n$. So we can write down $\d\d\alpha^{n-1}=0$. In a discrete setting we would like to write the same, but we would then have to write  $\partial_{n} \partial_{n-1}\alpha = 0$, but $\partial^n$ is not
+defined. This is simply a remark since Bochev and Hyman and Desbrun and Hirani, for example, use the subscripts.
+\end{quotebox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 11}
+Following what what was pointed above, equation (5) representing the algebraic-topology equivalent of Stokes’ theorem, should become
+\begin{equation*}
+    \dualpr[C_k]{a^k}{\partial_{k} c_{k+1}} = \dualpr[C_{k+1}]{\partial^k a^k}{c_{k+1}}, \qquad a^k \in C^k, \; c_{k+1} \in C_{k+1}, \quad k=0, \dots, n-1.
+\end{equation*}
+Then, below equation (5) also change the identity to $\partial^k = \partial_k^\top.$
+\end{quotebox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 12}
+"The canonical dual basis is orthornomal [check the typo] to the original one with respect to the duality pairing."\\
+This is a detail, but can we refer to orthogonality between different spaces? I would rephrase as: The
+canonical dual basis leads to $\dualpr{\dual{\sigma}_k^i}{\sigma_k^j}=\delta_j^i$.
+\end{quotebox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 13}
+I have faced similar critiques as the one I am going to make here, so please do take this constructively. I
+understand the relevance of introducing all these concepts since these are not familiar to the average reader of
+JCP. Nevertheless, the question I have been asked before, and I now place here myself, is the following. Is it
+relevant to make such a digression with an introduction to this topic? Will a reader not versed in differential
+geometry be ready to understand the remainder of the manuscript with this very short introduction? Also,
+this introduction (for the sake of brevity, I understand it, because I have been there myself) skips several
+steps. For example, in section 2.2.1 it is assumed that the reader knows what a tangent bundle is in order
+to know what a cotangent bundle is. Then, the reader should also know what a section of the kth exterior
+power is, and this means also knowing what k-exterior-forms are. I do not have a definite answer to this,
+I would just like to leave the question here for both the authors and the editor.
+\end{quotebox}
+Indeed, the introduction was meant to be self consistent and to guide people from the port-Hamiltonian community through the most important concepts in mimetic discretization. \\
+
+We understand the need to clarify the proposed construction and the fact that standard material can be cited by means of the appropriate references. 
+
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 13),colframe=colorRevBG2]
+The introduction has been considerably and Section 3 enlarged to demonstrate how to move from the port-Hamiltonian system and its to adjoint to the primal (all twisted/outer oriented forms)-dual (all straight/inner oriented forms) formulation.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 14}
+"(...) $\Omega^{k+1}(M), k + 1 \le n$."\\
+I would rewrite as; (...) $\Omega^{k+1}(M), k, l \ge 0$ and $k + 1 \le n$.
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 14),colframe=colorRevBG2]
+Correction made.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 15}
+"Differential forms defined on the manifold $M$ (...)."\\
+I would rewrite as; Consider a manifold $M$ of dimension $m$, a manifold $N$ of dimension $n$, and a smooth
+mapping between them, $\Phi : M \rightarrow N$. The pullback operator, $\Phi^*$, is a mapping $\Phi^* : \Lambda^k(N) \rightarrow \Lambda^k(M)$, that
+maps $k$-forms in $N$ to $k$-forms in $M$ , with $k\le m$, and $k \le n$, naturally.
+\end{quotebox}
+
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 15),colframe=colorRevBG2]
+The phrase has been reformulated as recommended, keeping that fact that $M$ has dimension $n$ throughout the manuscript\footnote{Differential forms as sections of the cotangent bundle are denoted here with $\Omega^k(M)$. The reason behind this choice is explained later in this document.}.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 16}
+The trace relates a differential form defined on a manifold $M$ to a differential form defined on the
+boundary $\partial M$. You can use immersion, but more than an immersion the mapping is an inclusion, see
+Arnold, Falk, and Winther [5, 6] for example. After equation (9) add: with M an n-dimensional manifold.
+\end{quotebox}
+The term immersion refers to a differentiable map whose differential is injective. The correct term is indeed an inclusion.
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 16),colframe=colorRevBG2]
+Corrections made.
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 17}
+I am not sure about the duality pairing definition in (10). The reason for that is that it is easy to
+confuse this with Hodge duality (at least I was initially mislead). But you address the Hodge-$\star$ later. I
+would simply introduce equation (1) without the duality pairing, simply expanding the expression with
+the wedges. Because the author are very briefly introducing several concepts and notation and using $\dualpr[]{\cdot}{\cdot}$
+and $\inpr[]{\cdot}{\cdot}$ I think is potentially confusing. Also, the authors miss some remarks on orientation between the
+manifold and its boundary (the orientation of the boundary is induced by the manifold).
+Also, please specify the ranges of $k$, in this case: $k = 0, ..., n$ for equation (10) and $k = 0, ..., n - 1$ for equation (11), similarly for equation (12).
+\end{quotebox}
+The duality product of forms plays a fundamental role in port-Hamiltonian system theory. The power flowing into the boundary of a system is indeed given by the duality product of forms. It is never defined in papers on mimetic discretization, but it is the starting point in the definition of Stokes-Dirac structure in [3] (that is based on the duality between flows and efforts, just like in the finite dimensional case). In the dual field construction no duality product in the domain is used for the discretization (only inner products and boundary duality products), but the scheme is such to preserve discrete power balance defined by means of duality products. Since the duality product on the boundary appears many times in the weak and discrete formulation, it needs to be defined via a succinct notation. The same notation is indeed used in reference [3].
+
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 17),colframe=colorRevBG2]
+The notation for the inner product has been changed to $(\cdot,\cdot)_M$ for sake of readability. A comment has been added concerning the induced orientation from a manifold to its boundary.
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 18}
+"As shown in [37] (Flanders), properly speaking, the Hodge operator maps forms to pseudo-forms for
+which the orientation is lost, and vice versa." \\
+I must assume I particularly do not like Flanders as a differential geometry book, so I am biased. $k-$forms are inner oriented forms and the duals (after applying the Hodge-$\star$ operator) are outer oriented. Outer
+orientation is an orientation but a special one: it is an equivalence class of orientations. So I disagree that
+they loose orientation as Flanders states. See for example the manuscript by Bossavit [7].
+\end{quotebox}
+The inner/outer orientation of forms is indeed fundamental. Therefore, we decided to explicitly denote the nature with an hat (that in the unrevised version was used to define the dual variables). Orientation independent quantities (like mass, energy, etc) always combine a straight an a twisted form via the duality product (or two forms of the same kind via the inner product).
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 18),colframe=colorRevBG2]
+The phrase has been modified to underline the importance of the inner/outer orientation of forms and the fact that the Hodge convert one into another one. The reference \cite{kreeft2011mimetic}, that contains a precise discussion about this topic, has been added.
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 19}
+This whole page is quite confusing to me, since I do not understand where the authors intend to go with
+these definitions. For example, why introduce a weak exterior derivative $\d\omega$ by means of the co-differential? I suppose this is for the numerics discussed later on. Nevertheless, whenever an exterior derivative is applied to a differentiable form within a system of equations, this means that if that form exists then the exact (strong) exterior derivative can be computed. Only when a co-differential is applied to a differentiable form, then we may need to use integration by parts to transform the co-differential into an exterior derivative. I do not see the relevance of the other way around, which is what is introduced here. I understand this
+formulation within a vector calculus notation. There, there is only one gradient, one curl, and one divergence.
+This means that it is relevant to distinguish between a strong differential operator and its weak form. In
+differentiable geometry the exterior derivative must be always expressed strongly and the co-differential may
+be expressed weakly. For this reason I do not understand why introduce a weak exterior derivative, then
+Sobolev spaces only with weak derivative, then Sobolev spaces with the co-differential. Also, Figure 2 is
+confusing to me. Why depart from the standard dual de Rham complex with exterior derivatives? What is
+the relevance of using the co-differential in the bottom (dual) complex? I am sure the authors must have a
+reason, but to me this is not clear. Could the author clarify why this is used?
+\end{quotebox}
+The definition of weak exterior derivative is taken from the book on FEEC by Douglas Arnold [36] (Page 75). This is in order to extend the domain of the exterior derivative from the space of smooth forms to the Sobolev spaces introduced just after. Using the distributional derivative to define the weak derivative is a well known construction in vector calculus. The same construction applies in exterior calculus where the weak exterior derivative is taken as the adjoint of the codifferential (and the domain of the latter is the space of smooth function with compact support $C^\infty_0(M)$). Take for example the definition of weak divergence of vector calculus for $M \subset \bbR^3$.
+\begin{definition}[Weak divergence in vector calculus]
+    If  for a vector field $w \in L^2(M; \bbR^3)$ there exists a function $\rho \in L^2(M)$ such that the distributional divergence can be represented in the form
+    \begin{equation*}
+    -\int_M w \cdot \nabla \psi \, \d{x} = \int_M \rho \psi \, \d x, \qquad \forall \psi \in C^\infty_0(M),
+    \end{equation*}
+    then the  function $\rho$ is  called  the  weak  divergence  of $w$,  abbreviated  as $\rho:= \nabla \cdot w$.  
+\end{definition}
+The same definition is used in the $L^2$ theory of differential forms to define the weak exterior derivative 
+\begin{definition}[Weak divergence in exterior calculus]
+    If  for a 2-form $w^2 \in L^2\Omega^2(M)$ there exists a 3-form $\rho^3 \in L^2\Omega^3(M)$ such that the distributional exterior derivative can be represented in the form
+    \begin{equation*}
+    \int_M w^2 \wedge \star\, \d^* \psi^3\, \d{x} = \int_M \rho^3 \wedge \star \psi^3 \, \d x, \qquad \forall \psi^3 \in C^\infty_0\Omega^3(M),  
+    \end{equation*}
+    then the  three form $\rho^3$ is  called  the  weak  exterior derivative  of $w^2$,  abbreviated  as $\rho^3:= \d w^2$.  
+\end{definition}
+
+The same construction is used for the $L^2$ theory of the codifferential. \\
+
+Conforming finite elements $\mathcal{V}^k_{s, h} \subset H\Omega^k(M)$ are constructed in such a way that their weak exterior derivative is well defined (for example in the case $\mathcal{V}^2_{s, h} \subset H\Omega^2(M)\equiv H^{\div}(M)$ the normal component must be continuous across inter-element boundaries \cite[Lemma 4.11]{volker2017review}). \\
+
+This definition has indeed no use for the scheme presented in the paper, as the exterior derivative is always computed strongly, both on Sobolev and finite element spaces. Similarly the adjoint complex containing the codifferential is here introduced for sake of completeness only, and has no use later in the paper. Using the integration by parts formula and the weak representation of the codifferential (and the traces of the efforts), all quantities in the adjoint system live in the canonical de-Rham complex. 
+
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 19),colframe=colorRevBG2]
+The definition of weak exterior derivative, the adjoint Sobolev space and the adjoint complex have been removed. 
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 20}
+Expression on the dimension of the polynomial space, just below the sentence (...) the mesh is given by
+the following expression. Is this expression correct? I think there is at least a plus sign that should be a
+minus.
+Also, I again bring the topic of introducing several results and notation from the literature. I understand
+the desire to make the manuscript self sustained. But for example, is it relevant to this work to explicitly
+introduce the Whitney basis functions (equation (19)) and all the properties of the Whitney interpolation
+operator (the reconstruction operator in other works)?
+Why not take all these results as existing in the literature and make all the almost seven pages up to
+section 3, excluding the introduction, into 2 or 3 pages? In there the authors can introduce notation, state
+the continuous and discrete function spaces used. In my opinion, there is no need to define the Whitney
+interpolation for example. Also the de Rham map for the set of basis functions used is only adequate for
+the lowest order spaces. For example, for RT space of polynomial degree larger than one, the de Rham map
+does not correspond to the degrees of freedom of the expansion of a function in these basis functions. This
+is one of the differences between this type of basis functions and the mimetic spectral element basis, [8], for
+example.
+Without trying to impose, I give as example [9] for an example of a briefer introduction. Of course,
+in that work the authors decided to use a vector calculus formulation instead of differential geometry.
+Nevertheless, it may give some ideas on how to shorten the preliminaries. Especially because, by shortening
+the preliminaries, more focus is drawn into the interesting novel contribution the authors provide.
+\end{quotebox}
+
+The expression for the dimension of the trimmed polynomial space is correct (cf. page 86 in [36]). Indeed the introduction retrieves well known concepts to the mimetic discretization community. This was done to provide a self-consistent introduction. However, the material presented therein can be found in many references. For this reason, in the revised version of the paper, the introduction has been considerably reduced.
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 20),colframe=colorRevBG2]
+We decided to considerably shorten the introduction and expand the novel contribution. 
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 21}
+"(...) the flux variables $f^p \in \Omega^p(M), f^q \in \Omega^q (M).$"\\
+
+Here lies my big ignorance regarding port-Hamiltonian systems. What do the authors mean by flux
+variables? What characterises a flux variable? I ask this because it seems that $p$ can take any value. For
+me, when I read flux variable I immediately think of a ($n - 1$)-form. Is this the case? Or is there more to
+it? Could the authors add a few lines clarifying?
+Also, what does the notation $f^\partial$ mean? Was this notation introduced before? I could not find it. Is
+equation (22) a general equation or the particular case for wave propagation? If the case of wave propagation
+is the exterior derivative a space-time exterior derivative and the manifold also a space-time manifold?
+I am unable to understand the connection between equation (22) and equation (23), maybe it is due to
+the superscript $\partial$ notation. Could the authors clarify?
+\end{quotebox}
+As indicated by \revOne{reviewer 1}, the correct term is flow variables. The term is take from the bond graph terminology \cite{paynter1961} as the flow and effort variables of the Stokes-Dirac structure represent energy conjugated variables. \\
+
+The exponent $p$ can take values from $1$ to $n$. The variables $f^\partial, \; e^\partial$ correspond to the boundary variables, defined to be the trace of the efforts $e^{n-p}_1 \in \Omega^{n-p}(M)$ and $e^{n-q}_2 \in \dual{\Omega}^{n-q}(M)$ ($\dual{\Omega}^{n-q}(M)$ indicates the space of outer oriented forms). This notation simply indicates that this variables belong to the boundary manifold $\partial M$. This notation is well known in the port-Hamiltonian community (cf. for example [3] or [26]). It is important to underline that the boundary variables that belong to Stokes-Dirac structure do not correspond to the boundary conditions. They simply describe all admissible boundary flow for energy preservation. \\
+
+Equation (22) represent a Stokes-Dirac structure. It is a particular case of Dirac structure (cf. Def.~\ref{def:DiracStructure}). The authors decided to introduce the term Stokes-Dirac in relation to the Stokes theorem. This geometrical structure does not introduce time and the exterior derivative $\d$ is the exterior derivative associated to the spatial manifold only. It represents the spatial operators that appears in wave propagation problems but also in the heat equations \cite{kotyczka2019numerical}, encompassing both the case of hyperbolic and parabolic systems. If a flow variable is associated to a dynamics, $f^k = -\partial_t \alpha^k$ then it underlies a conservation law. But flow variables may be also associated to a resistive (i.e dissipative) relation, leading to a dissipative system. The hyperbolic case is obtained when both flows have an associated dynamics. The parabolic case is obtained when one flow is associated to a dynamics and the other one is purely algebraic and associated to resistive relation \cite{reis2021pH}. In the case of wave propagation problems the exterior derivative is only a space derivative and the manifold a spatial manifold. To go from Eq. (22) to Eq. (23) consider the Stokes-Dirac structure with a novel notation (also adopted in the revised version of the paper), that indicates the degree of the forms and if they are inner or outer oriented forms (keep in mind that $p+q=n+1$) 
+
+\begin{equation}\label{eq:StDir}
+\begin{aligned}
+        \dual{f}^p_1 &= (-1)^r \d \dual{e}^{n-q}_2, \\
+        {f}^q_2 &= \d {e}^{n-p}_2,
+\end{aligned} \qquad
+\begin{aligned}
+    {f}_\partial^{n-p} &= \tr {e}^{n-p}_1, \\
+    \dual{e}_\partial^{n-q} &= (-1)^p \tr \dual{e}^{n-q}_2
+\end{aligned}
+\end{equation}
+Consider the duality product between efforts and flows
+\begin{equation}\label{eq:powbal}
+\begin{aligned}
+    \dualpr[M]{e^{n-p}_1}{\dual{f}^p_1} + \dualpr[M]{\dual{e}^{n-q}_2}{{f}^q_2} &= \dualpr[M]{e^{n-p}_1}{(-1)^r \d \dual{e}^{n-q}_2} + \dualpr[M]{\dual{e}^{n-q}_2}{\d {e}^{n-p}_1}, \\
+    &= - \dualpr[M]{(-1)^p \tr \dual{e}^{n-q}_2}{\tr {e}^{n-p}_1}, \\
+    &= - \dualpr[M]{\dual{e}_\partial^{n-q}}{{f}_\partial^{n-p}},
+\end{aligned}
+\end{equation}
+where the Leibniz rule and the Stokes theorem has been used from the first to the second line and the definition of boundary flows has been used at the end. So the Stokes-Dirac structure \eqref{eq:StDir} encodes the power balance in Eq. \eqref{eq:powbal}. \\
+
+The operator $J$ is indeed skew-dual (see \cite{reis2021pH} for the the mathematical framework in Banach spaces). It can be converted to a skew adjoint operator by means of the Hodge star. This is the strategy used in the paper, to obtain two mixed discretization in which all forms are either inner oriented or outer oriented (exception made for the boundary duality arising from the integration by parts, that couples an inner and an outer oriented form).
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 21), colframe=colorRevBG2]
+To clarify the concepts of Stokes-Dirac structure and their connection to wave propagation phenomena an introductory example consisting of the scalar wave equation. Furthermore a remark has been added for additional information. 
+\end{tcolorbox}
+
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 22}
+Is there a particular reason for using $\alpha^p$ and $\alpha^q$ ? If not, why not use $\alpha^p$ and $\beta^q$, to more clearly distinguish the two fields?
+\end{quotebox}
+The notation is retrieved from [3]. Especially in the case when $p=q$ it can become quite confusing. For this reason the two field are now indicated by different letters $\dual{\alpha}^p \in \dual{\Omega}^p(M), \; \beta^q \in \Omega^q(M)$.
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 22), colframe=colorRevBG2]
+The notation has been changed to follow the reccomandation.
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 23}
+Why use
+\begin{equation*}
+    \left.\diff{}{\varepsilon}\right|_{\varepsilon = 0} H({\alpha}^p + \varepsilon \delta {\alpha}^p, \beta^{q}) = \dualpr[M]{\delta_{p} H}{\delta \dual{\alpha}^p}
+\end{equation*}
+instead of
+\begin{equation*}
+    \left.\diff{}{\varepsilon}\right|_{\varepsilon = 0} H({\alpha}^p + \varepsilon \omega^p, \beta^{q}) = \inpr[M]{\delta_{\alpha} H^{p}}{\omega^p}, \qquad \forall \omega^p \in \Omega^p(M)
+\end{equation*}
+Could the authors provide an explanation or a reference? I thought it was an inner product and not
+the duality pairing introduced. The two expressions are very similar, the difference being a Hodge-$\star$? in the
+definition of $\delta_\alpha H$. I also find the notation $\delta_p$ instead of $\delta_\alpha$ confusing.
+Note after reading page 11: is this because you wish to have the Stokes-Dirac structure with the exterior
+derivatives in $J$ and have the effort variables contain the Hodge-$\star$? Why is this relevant? I am referring to equation (31) where you show the variational derivatives for a specific case.
+This essentially means that $\alpha^p \in \Omega^p(M)$ (with $\Omega^p(M)$ the space of inner oriented $p$-forms) and $\alpha^q \in \Omega^q(M)$ (with $\Omega^q(M)$ the space of outer oriented $q$-forms), is this correct? The two variables belong to
+different de Rham complexes. If that is the case, why not make this explicit in the notation? Introduce
+outer oriented forms $\tilde{\alpha}^k \in \tilde{\Omega}^q(M)$. By clearly distinguishing the two dual sets of sequences of function
+spaces (inner and outer oriented) and by explicitly showing that the different fields belong to these different types of spaces would make the ideas more clear. Unless the authors wish to highlight something, but then
+I propose that that is made explicit.
+\end{quotebox}
+
+The definition of variational derivative can be found in References [2,3]. The variational derivative of the Hamiltonian with respect to a $k$-form is a $(n-k)$-form. As a consequence the power flow does not require metric information.  \\
+
+To illustrate this, consider $\mathcal{X}$ a finite-dimensional manifold and $H: \mathcal{X} \rightarrow \bbR$  the Hamiltonian function. The state of the energy is an element $x$ of the manifold $\mathcal{X}$. The flow variable is given by the rate of change of the state variable $\dot{x} \in T_x\mathcal{X}$, while the effort variable is given by the partial derivative of $H$
+with respect to the state $x$, denoted by $\partial_x H(x) \in T_x^{*} \mathcal{X}$. The effort
+variable $\partial_x H(x)$ is usually called the co-energy variable. The rate of change of
+the energy  is given by
+\begin{equation*}
+    \dot{H} = \dualpr[T_x \mathcal{X}]{\partial_x H(x)}{\dot{x}}
+\end{equation*}
+where $\dualpr[T_x \mathcal{X}]{\cdot}{\cdot}$ denotes the duality pairing between the effort $\partial_x H(x) \in T^{*}_x \mathcal{X}$ and the flow $\dot{x} \in T_x X$. In the special case where $\mathcal{X} = \bbR^n$, one has that $T_x X \cong T_x^{*} \mathcal{X} \cong \bbR^n$ and the energy balance  can be written as
+\begin{equation*}
+    \dot{H} = \dualpr[\bbR^n]{\partial_x H(x)}{\dot{x}} = \partial_x H(x)^\top \dot{x},
+\end{equation*}
+where $\partial_x H(x)$ is a column vector of partial derivatives of $H$. This construction can be found in \cite[Chapter 3]{vanderschaft2014port}.\\
+
+The same is also valid in infinite dimension when considering Banach spaces \cite{reis2021pH}. Let $X, Y$ be Banach spaces.
+Then given a G\^{a}teaux differentiable function $f : X \rightarrow Y$, its Gateaux differential is given by
+\begin{equation*}
+    Df(x) = \left(\psi \rightarrow \lim_{t \rightarrow 0} \frac{f(x + t\psi) - f(x)}{t} \right) \in \mathcal{L}(X, Y)
+\end{equation*}
+where $x, \psi \in X$ and $\mathcal{L}(X, Y)$ denotes the space of linear bounded operators from $X$ to $Y$. Consider now the Hamiltonian $H: X \rightarrow \bbR$. The G\^{a}teaux derivative of the Hamiltonian is a mapping to the dual of~$X$, i.e., $DH : X \rightarrow X'$. Given the state $x(t) : [0, T_{\mathrm{end}}] \rightarrow X$, the power flow is the time derivative of the mapping $H \circ x : [0, T_{\mathrm{end}}] \rightarrow \bbR$
+\begin{equation*}
+    \dot{H}(x(t)) = \dualpr[X]{DH(x)}{\dot{x}}
+\end{equation*}
+where $\dualpr[X]{\cdot}{\cdot}$ denotes the duality pairing between $X'$ and $X$.\\
+
+The construction presented in the paper is analogous. Since spaces of differential forms are considered, the duality is given by the Hodge. A more detailed explanation can be found in \cite[Chaper 14]{vanderschaft2014port}. \\
+
+Indeed the effort variables contain the Hodge. This is relevant because topological and metrical operations are clearly and systematically separated in the port-Hamiltonian framework. The separation of metrical and topological properties is central also in the mimetic discretization community (cf. for instance \cite{bauer2018str} and [34]). \\
+
+The first variable $\dual{\alpha}^p \in \dual{\Omega}^p(M)$ belongs to the space of outer oriented forms, whereas the second variable $\beta^q \in \Omega^q(M)$ belongs to the space of inner forms.
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 23), colframe=colorRevBG2]
+Space of outer oriented forms is denoted as $\dual{\Omega}^k(M)$ in the revised version of the paper. 
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 24}
+Could the authors clarify what the notation $\alpha^\bullet$ means? This notation does not seem to be used below, is it a typo or there is a meaning? How does it relate to equation (26)?
+\end{quotebox}
+The bullet $\bullet$ indicates either $p$ or $q$, i.e. $\bullet= \{p, q\}$. Since in the revised version two different field $\dual{\alpha}^p, \; \beta^q$, the bullet has been removed.
+
+\begin{quotebox}{Reviewer No.2 -- Comment 25}
+"These tensors are related to physical properties of space like electric permittivity, density or Young modulus."
+
+These material properties, establishing what are known as constitutive relations (as opposed to topological relations involving the exterior derivative), are encoded in the Hodge-$\star$ operator. For example, in
+Electromagnetics, we have the relation $\star_\epsilon e^1 = d^2$ , the $\epsilon$ index highlights that the Hodge-$\star$. contains the material properties for the permittivity, see for example [4], or section 14.1c of Frankel, [10]. In equation (34)
+these coefficients appear next to the Hodge-$\star$, as I think is better, for clarity. But I am a strong supporter of going one step further and placing them inside the Hodge-$\star$.
+\end{quotebox}
+The possibility of using  the material Hodge operators to define adjoint system  is discussed in Section~8. However, the inclusion of the material properties lead to a discrete system in which the matrix $\mathbf{J}$ is skew-symmetric with respect to a weighted inner product including the material coefficients. Furthermore this means that the adjoint Stokes-Dirac structure depends not only on the considered Stokes-Dirac structure but also on the actual Hamiltonian. In the non-linear case this construction may lead to additional difficulties due to non linear transformations to be applied to differential operators.\\
+
+If the tensors are kept separated from the Hodge, the adjoint Stokes-Dirac structure does not depend on the Hamiltonian. Furthermore, non linear constitutive equations can be treated using a Legendre transformation \cite{egger2019strucutre,liljegren2020port}. For these reasons the material tensors are kept separated from the Hodge in this paper. This is also very common in papers dealing with mixed finite element discretization. 
+
+\begin{quotebox}{Reviewer No.2 -- Comment 26}
+Here the authors introduce $u^p$ and $u^q$, could the authors make clear the spaces to which these forms
+belong to? I would say $u^p \in \Omega^k(\Gamma_p)$ and $u^q \in \tilde{\Omega}^k (\Gamma_q$) (using the inner and outer orientation notation
+I mentioned above). Something else relevant is a note specifying that these are trace spaces (fractional
+function spaces) and the implications these may have in the coupling between two systems, for example.
+\end{quotebox}
+
+The input belong to $u^{n-p}_1 \in \Omega^{n-p}(M)$ and $u^{n-q}_2(\Gamma_p) \in \dual{\Omega}^{n-q}(\Gamma_q)$ as they correspond to the trace of the effort variables.  \\
+
+Concerning the associated Sobolev space, from Theorem 6.3. of [36] the trace map on $H^1 \Omega^k(M)$ extends to a bounded linear operator
+$\tr : H\Omega^k(M) \rightarrow H^{-1/2} \Omega^k (\partial M)$. So the inputs belong to
+\begin{equation*}
+    \begin{aligned}
+    u^{n-p}_1 \in H^{-1/2} \Omega^{n-p} (\Gamma_1), \\
+    u^{n-q}_2 \in H^{-1/2} \Omega^{n-q} (\Gamma_2). \\
+    \end{aligned}
+\end{equation*}
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 26), colframe=colorRevBG2]
+The notation has been changed. In the weak formulation appropriate Sobolev spaces for the boundary variables have been introduced.
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 27}
+"The outputs are defined in a complementary manner as follows" \\
+I could not find any other mention to outputs and formal difference between inputs and outputs. I
+believe this is terminology from the field of the authors. Are these two concepts related to inflow and
+outflow boundary conditions? Could this be made more clear? Also, the following part is not clear to me. \\
+
+"The actual boundary conditions for a problem at hand are then accounted for by considering the causally
+dual (input-output) behavior of the system."\\
+
+Could this be made more clear? Which duality is this?
+In Equation (34), it seems that $y^q = f^q$ and $u^p = e^p$ on $\Gamma_p$, or is it the other way around (since the order
+flips in the second term), or not at all? Here I think it would also help the understanding if inner and outer
+oriented fields were explicitly identified. Also, more clarification would be helpful.
+\end{quotebox}
+Infinite dimensional port-Hamiltonian systems are boundary controlled systems. This means that the boundary conditions coincide with control inputs, that describe the interaction with the environment. The term output and input do not relate to inflow or outflow boundary conditions but come from the system and control theory community. While the input coincide with the boundary conditions, the output is simply  the power conjugated variable to the input. This is a specificity of port-Hamiltonian systems. For a port-Hamiltonian system the power balance always reads
+\begin{equation}\label{eq:uy}
+\dot{H} \le \dualpr[U' \times U]{y}{u},
+\end{equation}
+where $u\in U$ is the input and $y \in U'$ (the prime denotes the dual space of $U$) is the output. The equality holds in the case of a lossless system. Inequality \eqref{eq:uy} represents an example of dissipation inequality \cite{willems1972part1}. Systems that verify it are called passive, that means dissipative with respect to the supply rate $\sigma(u, y) = \dualpr[U' \times U]{y}{u}$. \\
+
+Inputs and outputs are traces of the efforts variables $e^{n-p}_1, \; \dual{e}^{n-q}_2$. They are not connected to the flow variables. Input and outputs are related by duality since if $u^{k} \in \Omega^{k}(\partial M)$ is a $k$-form, its conjugated output $\dual{y}^{n-k-1} \in \Omega^{n-k-1}(\partial M)$ is a $n-k-1$ form. So the output is a dual form to the input on the boundary $\partial M$.
+
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 27), colframe=colorRevBG2]
+To explain the input output behaviour of port-Hamiltonian system an additional section describing the example of the wave equation has been added. Furthermore, the inner and outer orientation of inputs and outputs has been specified.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 28}
+This whole section, especially page 12, is not at all clear to me. Several different ways of looking into
+the fields is at play here and they are combined by the authors. Since this plays an important role in the
+remainder of the work, I would kindly ask the authors to rewrite this part in more detail, or with more
+references to the literature. Also, and this probably is my ignorance, could you not show (42) in a shorter
+way? Instead of using the duality product you could have used inner products? And in the definition of the
+variational derivatives you could have used the inner product (as I asked above)?
+After reading up to here this is my understanding of the formulation, with a slightly different notation
+to make some aspects more explicit (for my own understanding). \\
+
+Consider $\dual{f}^p \in \dual{\Lambda}^p(M), f^q_2 \in \Lambda^q(M)$, and $e^{n-p}_1 \in \Lambda^{n-p}(M), \; \dual{e}_2^{n-q} \in \Lambda^{n-q}(M)$  and the usual relations
+\begin{equation}\label{eq:eq2_rev2}
+f^p_1 = \star f_1^{n-p} \in \Lambda^{n-p}(M), \qquad
+\star e_1^{n-p} = \dual{e}_1^p \in \dual{\Lambda}^p(M), 
+\end{equation}
+and
+\begin{equation}\label{eq:eq3_rev2}
+\star f^p_2 = \dual{f}_2^{n-q} \in \Lambda^{n-q}(M), \qquad
+\dual{e}_2^{n-q} = \star {e}_2^q \in \dual{\Lambda}^q(M), 
+\end{equation}
+
+where $\dual{\cdot}$ indicates that these are $k$-forms on a dual de Rham complex. We can then rewrite Equation (22) of the manuscript as (I do not show the boundary terms, but they follow directly from this)
+\begin{equation}\label{eq:eq4_rev2}
+    \begin{pmatrix}
+        \dual{f}^p_1 \\
+        {f}^q_2
+    \end{pmatrix} = 
+    \begin{bmatrix}
+    0 & (-1)^r \d \\
+    \d & 0 \\
+    \end{bmatrix}
+    \begin{pmatrix}
+        {e}^{n-p}_1 \\
+        \dual{e}^{n-q}_2
+    \end{pmatrix}.
+\end{equation}
+Note that here it is made explicit that this equation mixes quantities from different complexes. This is in
+agreement, in my view, with the duality pairing products introduced by the author. These, as the name
+states and the rank of the forms $k$ and $n - k$
+indicate, involve elements from dual spaces. For this reason, these seem to be inner products, i.e., translating the authors’ notation, $\dualpr[M]{e^p}{f^p}$, into my own notation
+would be
+\begin{equation*}
+\dualpr[M]{e_1^{n-p}}{\dual{f}^p_1} = \inpr[M]{\star e_1^{n-p}}{\dual{f}^p_1} = \inpr[M]{\dual{e}_1^p}{\dual{f}^p_1}    
+\end{equation*}
+and
+\begin{equation*}
+\dualpr[M]{\dual{e}_2^{n-q}}{f^q_2} = \inpr[M]{\star \dual{e}_2^{n-q}}{{f}^q_2} = (-1)^{q(n-q)}\inpr[M]{e_2^q}{f_2^q}
+\end{equation*}
+My question is, why not obtain Equation (40) and Equation (42) directly with the following steps. Using
+\eqref{eq:eq2_rev2} and \eqref{eq:eq3_rev2} directly into \eqref{eq:eq4_rev2} we get
+\begin{equation*}
+    \begin{pmatrix}
+        \dual{f}^p_1 \\
+        {f}^q_2
+    \end{pmatrix} = 
+    \begin{bmatrix}
+    0 & (-1)^r \d \\
+    \d & 0 \\
+    \end{bmatrix}
+    \begin{pmatrix}
+        \star (-1)^{p(n-p)}\dual{e}^{p}_1 \\
+        \star {e}^{q}_2
+    \end{pmatrix}.
+\end{equation*}
+and then applying a Hodge-$\star$ on both sides of the equation we get
+\begin{equation*}
+    \begin{pmatrix}
+        \star \dual{f}^p_1 \\
+        \star {f}^q_2
+    \end{pmatrix} = 
+    \begin{bmatrix}
+    0 & (-1)^r \star \d \\
+    \star \d & 0 \\
+    \end{bmatrix}
+    \begin{pmatrix}
+        \star (-1)^{p(n-p)}\dual{e}^{p}_1 \\
+        \star {e}^{q}_2
+    \end{pmatrix}.
+\end{equation*}
+We can again use \eqref{eq:eq2_rev2} and \eqref{eq:eq3_rev2} to get the same Equation (40) in the manuscript (with a different notation,
+especially for the meaning of the $\dual{\cdot}$ sign)
+\begin{equation*}
+    \begin{pmatrix}
+        {f}^{n-p}_1 \\
+        \dual{f}^{n-q}_2
+    \end{pmatrix} = 
+    \begin{bmatrix}
+    0 & (-1)^{r+p(n-p)} \star \d \star \\
+    (-1)^{p(n-p)}\star \d \star & 0 \\
+    \end{bmatrix}
+    \begin{pmatrix}
+        \dual{e}^{p}_1 \\
+        {e}^{q}_2
+    \end{pmatrix}.
+\end{equation*}
+using the definition of the co-differential $\d^* \alpha^k := (-1)^{n(k+1)+1}$ yields
+\begin{equation*}
+    \begin{pmatrix}
+        {f}^{n-p}_1 \\
+        \dual{f}^{n-q}_2
+    \end{pmatrix} = 
+    \begin{bmatrix}
+    0 & (-1)^{r+p(n-p) + n(q+1)+1} \star \d \\
+    (-1)^{p(n-p)+n(p+1)+1}\star \d \star & 0 \\
+    \end{bmatrix}
+    \begin{pmatrix}
+        \dual{e}^{p}_1 \\
+        {e}^{q}_2
+    \end{pmatrix}.
+\end{equation*}
+I get an expression for $a_0$ that is different from the one the authors got. Maybe I have an error in my
+derivation, but could the authors double check their result? Equation (23) in the manuscript can be rewritten (just change of notation) as (the terms with $e^\partial$ and $f^\partial$ I am not sure how to write them because I cannot understand the authors’ notation)
+\begin{equation*}
+\inpr[M]{\star {e}_1^{n-p}}{\dual{f}^p_1} + \inpr[M]{\star \dual{e}_2^{n-q}}{{f}^q_2} + \inpr[\partial M]{\star \dual{e}^\partial}{f^\partial}
+\end{equation*}
+This equation leads directly to the alternate form of expression (12)
+\begin{equation*}
+\inpr[M]{\star\star {e}_1^{n-p}}{\star \dual{f}^p_1} + \inpr[M]{\star \star \dual{e}_2^{n-q}}{\star {f}^q_2} + \inpr[\partial M]{\star\star \dual{e}^\partial}{\star f^\partial}
+\end{equation*}
+due to the well known identity $\inpr[M]{\alpha^k}{\beta^k} = \inpr[M]{\star \alpha^k}{\star \beta^k}$. In turn, using $\star\star\alpha^k= (-1)^{k(n-k)}\alpha^k$ and \eqref{eq:eq2_rev2} and \eqref{eq:eq3_rev2}, becomes
+\begin{equation*}
+\inpr[M]{\star \dual{e}_1^{p}}{\dual{f}^{n-p}_1} + \inpr[M]{\star \dual{e}_2^{q}}{\dual{f}^{n-q}_2} + \inpr[\partial M]{\star {e}^\partial}{\dual{f}^\partial}
+\end{equation*}
+which is the power balance equation associated to the adjoint Stokes-Dirac structure (10).
+I have one additional question, probably very naive, given the structure I see, why not express the
+Stokes-Dirac structure (4) as
+\begin{equation*}
+    \begin{pmatrix}
+        {f}^{n-p}_1 \\
+        {f}^{q}_2
+    \end{pmatrix} = 
+    \begin{bmatrix}
+    0 & (-1)^{r+p(n-p) + n(q+1)+1} \d^*\\
+    \d & 0 \\
+    \end{bmatrix}
+    \begin{pmatrix}
+        {e}^{n-p}_1 \\
+        {e}^{q}_2
+    \end{pmatrix}.
+\end{equation*}
+On a single de Rham complex? My question lies in the fact that it seems that there exists a primal-dual structure in the equations,
+but the notation does not make it clear. Could the authors clarify the benefit of the notation used in the
+manuscript?
+\end{quotebox}
+
+The nature of the forms deduced by the \revTwo{reviewer} is correct, and in the revised version of the manuscript the Stokes-Dirac structure is written in the same way as in Eq. \eqref{eq:eq4_rev2}. \\
+
+
+The flows and effort may be transformed as suggested by the reviewer, but it is different from what is done in the paper. This is the reason for the which the $a_0$ is different (the computations have been rechecked and are correct). \\
+
+The construction used in the paper is such to preserve the duality products in the adjoint Stokes-Dirac structure. This is the same procedure used in \cite{vankerschaver2010} and in reference [14]. This has the advantage that once the states are transformed by means of a generic diffeomorphism, the associated push-forward and pull-back are consequently deduced. In this way the transformation of flow and effort variables is systematically obtained. Furthermore, the transformed system is such to verify the same power balance of the initial system. \\
+
+In the revised version of the paper, a slightly different diffeomorphism is employed. This is to be consistent with respect to the nature of the forms. This adjoint structure is defined on the dual state space $\dual{X} = \Omega^{n-p}(M) \times \dual{\Omega}^{n-q}(M)$ related to $X = \dual{\Omega}^{p}(M) \times {\Omega}^{q}(M)$ by the diffeomorphism
+\begin{equation*}
+	\Phi:
+	X \rightarrow \dual{X} ; \qquad
+	\begin{pmatrix}
+	\dual{\alpha}^p \\    
+	\beta^{q}
+	\end{pmatrix}
+	\mapsto 
+	\begin{pmatrix}
+	{\alpha}^{n-p} \\    
+	\dual{\beta}^{n-q}
+	\end{pmatrix} :=
+	\begin{pmatrix}
+	\star^{-1}\dual{\alpha}^p \\    
+	\star \beta^{q}
+	\end{pmatrix}, \qquad \Phi = 
+	\begin{bmatrix}
+        \star^{-1} & 0 \\
+        0 & \star 
+    \end{bmatrix}.
+\end{equation*}
+The definition of the flow and effort variables is then deduced from the push-forward and pullback of the map $\Phi$. \\
+
+
+The power balance expressed by means of the duality product can be converted into one with inner products in which the Hodge operators appears. The two are indeed equivalent at the continuous level. However, the boundary term requires additional care since to convert the boundary duality product into a boundary inner product, the Hodge operator over the boundary is required (this can be done by pulling back the metric to the boundary manifold). This is the reason why in the paper the boundary flow is always written by means of the duality product. \\
+
+Concerning the final question, this is indeed the core idea of the dual field. This method is based one a primal-dual formulation (each described by a skew adjoint differential operator). In the unrevised version of the paper the term primal was used as synonymous as the canonical Stokes-Dirac structure (that contains only the $\d$ operator). In the revised version of the manuscript, the primal system contained only inner oriented forms, whereas the dual systems contains only outer oriented forms. For sake of concreteness, consider the example of the wave equation. One mixed discretization corresponds to a $\mathrm{grad}-\mathrm{grad}$ formulation, the second mixed discretization corresponds to a $\mathrm{div}-\mathrm{div}$ formulation. One will have the Neumann boundary conditions as a natural one (it appears explicitly through the integration by parts). The second will have the Dirichlet boundary condition as a natural one. 
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 28), colframe=colorRevBG2]
+The diffeomorphism $\Phi$ has been redefined to account for the orientation of the forms. An additional remark has been added to better explain the reason behind the push-forward and pull-back transformations. \\
+
+The terminology primal-dual system is now used for two (uncoupled) mixed discretization arising from the dual-field representation. 
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 29}
+In equation (53) it is stated that $H_T({\alpha}^p, \beta^{q}, \dual{\alpha}^p, \dual{\alpha}^q) = H({\alpha}^p, \beta^{q}) + \dual{H}(\dual{\alpha}^p, \dual{\alpha}^q)$. But in the unnumbered
+equation just below we have that $\mathcal{H}_T
+(\dual{\alpha}^p, \beta^{q},\dual{\alpha}^p, \dual{\alpha}^q) = A^p \dual{\alpha}^p \wedge \dual{\alpha}^p + A^q \beta^{q} \wedge \dual{\alpha}^q$. How can these two expression reconciled?
+Another note on the notation. There are now two implicit conversions from $k$ to $n - k$. One between $f$
+and $e$ and now another between $\cdot$ and $\dual{\cdot}$. I understand the authors wish to minimise the use of $(n- k)$ but I find this notation confusing.
+\end{quotebox}
+
+The two expression are equivalent at the continuous level by definition of the variables in the adjoint system. This is redundant, as one could equivalently use the inner on product on the two initial variables (denoted by $\dual{\alpha}^p$ and $\beta^q$ in the revised version of the paper). However, this expression rewrites the total Hamiltonian $\mathcal{H}_T$ without the Hodge. In this way, the constitutive equations do not rely on the Hodge but only on the dual-field representation of the variables. This is advantageous as the discrete representation does not need a Hodge star.\\
+
+Concerning the notation, the $\widehat{\cdot}$ is now used for outer oriented variables. The degree of the forms is explicitly used as an exponent.
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 29), colframe=colorRevBG2]
+A commentary has been added on the two equivalent expressions of the total Hamiltonian stating that the dependence on the Hodge star of the energy has been remove by means of the dual field formulation. 
+\end{tcolorbox}
+
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 30}
+Why add now a weak formulation? These expression can be expressed strongly, or not? The same for
+Remark 2 and Section 4.3.
+\end{quotebox}
+The material tensors (indicated by $\widehat{A}^p, \; B^q$ in the revised paper) are supposed to be in $L^2\Omega^k(M) \rightarrow L^2\Omega^k(M)$ (analogously to what is done in Section 7.3 of [21]). This means that the material tensors belong are allowed to be discontinuous, which is important for applications. Therefore the constitutive equations need to be treated weakly.  
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 30), colframe=colorRevBG2]
+The section has been modified to explain the necessity of a weak formulation for the constitutive equations. The section on the constitutive equations has been removed and incorporated into the section dealing with the weak port-Hamiltonian system.
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 31}
+Could the authors also add here $\forall v^p \in H\Omega^p(M)$?
+\end{quotebox}
+
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 31), colframe=colorRevBG2]
+The test functions spaces have been added.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 32}
+Could the authors rewrite and re-arrange this set of equations? Especially the boundary terms seem
+quite odd where they are placed now.
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 32), colframe=colorRevBG2]
+The whole has been modified and replaced with 2 sections describing the primal and dual Stokes-Dirac structure.
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 33}
+How can the boundary conditions be purely enforced strongly? This depends on the system being solved
+or not? Could this be made more clear?
+\end{quotebox}
+Indeed, the boundary conditions are not uniquely enforced strongly and the section is not really clear. From the dual field methodology two mixed discretization are obtained, a primal one, based on outer oriented forms, and a dual one, based on inner oriented forms. The boundary conditions imposition in each system is done by the strong assignment of the boundary degrees of freedom of the \textit{essential} boundary condition whereas the natural boundary condition is imposed via the integration by parts. In this way the primal and dual system are completely decoupled from each other. \\
+
+Indeed the essential boundary condition of the primal system corresponds to the natural one of the dual and vice-versa. This means that by combining the two formulation via a time staggered integration (analogously to what is done in [33] for the vorticity variable in the rotational term) the boundary conditions can be imposed in a completely weak manner by exchanging information between the primal and dual system. This is an interesting development that is not pursued in the paper. This comment can bring some confusion and has therefore been removed. This possibility is mentioned in the conclusion only in the revised version of the paper.
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 33), colframe=colorRevBG2]
+The section has been rewritten to explain that the essential boundary condition of each mixed discretization is imposed strongly via direct assignment of the degrees of freedom. 
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 34}
+Could the authors make this section more clear? For example, the last equation in (56) is not clear $\dual{e}^p$
+belong to which space? Is it the same as $\d \dual{v}^q$? This is not clear from the notation. For this reason Equation
+(60) is not clear to me. Also, I think it would help to write the strong equations using the matrix notation
+used before, and then switch to the weak form. In the process highlight what is relevant.
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 34), colframe=colorRevBG2]
+The section has been rewritten. First the strong formulation of the two port-Hamiltonian system is presented followed by the corresponding weak formulation. 
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 35}
+I would completely remove Appendix A. If necessary use a reference (AFW, [5, 6], for example) and
+state the relevant properties (commuting properties, for example) and this could be done when the spaces
+are first introduced. My point is that this manuscript is long but more lines should be spent in sections 3
+and 4 (which contain the novel parts) and less on standard (for me of course) FEEC. I understand that for
+the authors probably the opposite is the case, therefore for them it is more interesting to discuss FEEC and
+spend less time on what for them is “trivial”. In my opinion (as a sample point from the FEEC community)
+I am particularly interested in the port Hamiltonian part and much less on the other parts.
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 35), colframe=colorRevBG2]
+The introductory part of FEEC as well as Appendix A have been completely removed. 
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 36}
+I would choose a notation and stick to it. Either always use $\alpha^k$ for a $k$-form (my preference), or never
+use the superscript. In (64) (and subsequent equations) the superscript was dropped.
+\end{quotebox}
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 36), colframe=colorRevBG2]
+In the revised version of the manuscript all forms have a superscript that denotes their degree (except for few cases in which the space does not allow for that). 
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 37}
+I do not agree with the statement that $L$ is skew-symmetric. In this setting of finite elements, with a single grid and two (not fully) dual complexes, this matrix is not square. For example if $k = 2$ and we
+are using lowest order basis functions $s = 1$, we then have that $N_{k,1}$ is the number of faces of the mesh,
+and $N_{(n-k),1}$ is the number of edges of the mesh. These two are not the same. This is only a square
+(skew-symmetric) matrix if a dual-grid is used, which is not the case for FEEC. This means that Equation
+(65) does not hold. Similar point goes for equation (71).
+\end{quotebox}
+Indeed, the matrix $\mathbf{L}_s^k$ is rectangular and cannot be skew symmetric. The term skew-symmetric was erroneously used for the wedge product. The correct terminology is alternating. Therefore the matrix $\mathbf{L}^k_s$ (that combines in the duality product with a $k$-forms on the right and a $n-k$ form on the left) relates to the matrix $\mathbf{L}^{n-k}_s$ (that combines in the duality product with a $n-k$-forms on the right and a $k$ form on the left). To see this consider the alternating property of the wedge applied on discrete differential forms $\lambda_h^{n-k} \in \mathcal{V}_{s, h}^{n-k}, \; \mu_h^k \in \mathcal{V}_{s, h}^{k}$ (where the same notation as the paper has been used)
+\begin{equation*}
+    \int_M \lambda^{n-k}_h \wedge \mu^k_h = (-1)^{k(n-k)} \int_M \mu^k_h \wedge \lambda^{n-k}_h, \qquad \forall\; \lambda_h^{n-k} \in \mathcal{V}_{s, h}^{n-k}, \quad \forall \; \mu_h^k \in \mathcal{V}_{s, h}^{k}.
+\end{equation*}
+
+The corresponding vector matrix representation of the expression above is
+\begin{equation*}
+    (\bm{\lambda}^{n-k})^\top \mathbf{L}^k_s \bm{\mu}^k = (-1)^{k(n-k)} (\bm{\mu}^k)^\top \mathbf{L}^{n-k}_s \bm{\lambda}^{n-k}, \qquad \forall \; \bm{\lambda}^{n-k} \in \bbR^{N_{n-k, s}}, \quad \forall \; \bm{\lambda}^{k} \in \bbR^{N_{k, s}}.
+\end{equation*}
+where $\mathbf{L}^{n-k}_s \in \bbR^{N_{k, s} \times N_{n-k, s}}$. This is an equation between scalars, so each side is equal to its transpose. Taking the transpose of the right-hand side gives
+\begin{equation*}
+    (\bm{\lambda}^{n-k})^\top \mathbf{L}^k_s \bm{\mu}^k = (-1)^{k(n-k)} (\bm{\lambda}^{n-k})^\top (\mathbf{L}^{n-k}_s)^\top \bm{\mu}^k, \qquad \forall \; \bm{\lambda}^{n-k} \in \bbR^{N_{n-k, s}}, \quad \forall \; \bm{\lambda}^{k} \in \bbR^{N_{k, s}}.
+\end{equation*}
+Since this equation is valid $\forall \; \bm{\lambda}^{n-k} \in \bbR^{N_{n-k, s}}, \; \forall \; \bm{\mu}^{k} \in \bbR^{N_{k, s}}$ it holds
+\begin{equation*}
+   \mathbf{L}^k_s= (-1)^{k(n-k)} (\mathbf{L}^{n-k}_s)^\top.
+\end{equation*}
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 37), colframe=colorRevBG2]
+The term skew-symmetric used for the wedge product and been replaced with alternating. Furthermore the definition of the matrix $\mathbf{L}^{n-k}_s$ has been added.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 38}
+Equation (67) should be avoided at all costs, especially in the way it seems the authors are using it. As
+mentioned above, this implies projecting (without and inverse) from one space to another one. Where is
+this used in the discrete formulation?
+\end{quotebox}
+Equation (64) and (67) are never used in the discretization, that is completely based on inner product for the domain terms of the weak formulation. \\
+
+One equation in the primal system and one in the dual contains the exterior derivative. The equations are written as follows in the revised notation of the paper
+
+\begin{equation*}
+\begin{aligned}
+    \dual{C}^p \partial_t \dual{e}_1^p &= (-1)^p\d \dual{e}_2^{p-1}, \\
+    E^q \partial_t e_2^q &= -\d e_1^{q-1}
+\end{aligned}
+\end{equation*}
+
+For the discretization, the inner product is taken to  account for possible discontinuities in the material coefficients
+\begin{equation*}
+\begin{aligned}
+    \inpr[M]{\dual{v}^p_h}{\dual{C}^p \partial_t \dual{e}_{1, h}^p} &= \inpr[M]{\dual{v}^p_h}{(-1)^p\d \dual{e}_{2, h}^{p-1}}, \\
+    \inpr[M]{v^q_h}{E^q \partial_t e_{2, h}^q} &= -\inpr[M]{v^q_h}{\d e_{1, h}^{q-1}}
+\end{aligned}\qquad
+\begin{aligned}
+\forall \dual{v}^p_h \in \dual{\mathcal{V}}_{s, h}^{p}, \\
+\forall v^q_h \in {\mathcal{V}}_{s, h}^{q}.
+\end{aligned}
+\end{equation*}
+If the material coefficients are sufficiently regular, i.e. $\dual{C}^p : H\dual{\Omega}^p(M) \rightarrow H\dual{\Omega}^p(M)$ and  $\dual{E}^p : H{\Omega}^p(M) \rightarrow H{\Omega}^p(M)$, then the two equations imply discrete conservation laws that mimetically reproduce the infinite-dimensional strong form (analogously to what happens in Eq. 14 in Reference~[33] for the vorticity definition)
+\begin{equation*}
+\begin{aligned}
+    \dual{C}^p \partial_t \dual{e}_{1, h}^p &= (-1)^p\d \dual{e}_{2, h}^{p-1}, \\
+    E^q \partial_t e_{2, h}^q &= -\d e_{1, h}^{q-1}
+\end{aligned}
+\end{equation*}
+These equations are obtained by taking the inner-product in the numerical scheme. Now, the duality product can be taken to show an additional property of the numerical scheme (this is not used by the numerical scheme but still preserved by it)
+\begin{equation*}
+\begin{aligned}
+    \dualpr[M]{v^{q-1}_h}{\dual{C}^p \partial_t \dual{e}_{1, h}^p} &= \dualpr[M]{v^{q-1}_h}{(-1)^p\d \dual{e}_{2, h}^{p-1}}, \\
+    \dualpr[M]{\dual{v}^{p-1}_h}{E^q \partial_t e_{2, h}^q} &= \dualpr[M]{\dual{v}^{p-1}_h}{-\d e_{1, h}^{q-1}}
+\end{aligned} \qquad
+\begin{aligned}
+\forall {v}^{q-1}_h \in {\mathcal{V}}_{s, h}^{q-1}, \\
+\forall \dual{v}^{p-1}_h \in \dual{\mathcal{V}}_{s, h}^{p-1}.
+\end{aligned}
+\end{equation*}
+Taking ${v}^{q-1}_h = e_{1, h}^{q-1}$ and $\dual{v}^{p-1}_h = \dual{e}_{2, h}^{p-1}$ and using the discrete version of the Stokes theorem (cf. answer to Comment 41) results in Proposition 6 of the unrevised paper.
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 38), colframe=colorRevBG2]
+A remark has been added explaining that the duality product over the domain is not used by the numerical scheme but preserved by it nevertheless.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 39}
+"However, this approach result in mesh entities located outside the physical domain, making it cum-
+bersome to implement boundary interconnections of different systems, which is a fundamental feature of
+port-Hamiltonian systems that we aim to preserve at the discrete level."
+
+I do not agree with this statement. In some discrete formulations this is the case, in others not.
+\end{quotebox}
+
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 39), colframe=colorRevBG2]
+The phrase has been reformulated as "However,  in some discrete formulations this approach result in mesh entities located outside the physical domain"
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 40}
+What is a coincidence matrix? Is it related to the incidence matrix (the topological discrete representation of the exterior derivative)? Also, I think that even for the co-differential, the incidence matrix also explicitly appears in the inner product. The issue lies in the fact that two different mass matrices appear on both sides. Once again the issue of notation. In Equation (81), $\dual{v}^q$ is now using the same notation as $e^q$ (meaning it is
+ba ($n-q$)-form or, due to the relation between $p$ and $q$, a ($p-1$)-form), which I think is very confusing. Also the notation for the function spaces is confusing in my opinion. The authors could formally differentiate
+elements of the dual and primal spaces such that expressions like $\inpr[M]{\phi_{s, i}^{n-k}}{\dual{C}^k \phi_{s, i}^{n-k}}$ would be written as $\inpr[M]{\dual{\phi}_{s, i}^{n-k}}{\dual{C}^k \dual{\phi}_{s, i}^{n-k}}$, which I think is more consistent. Note that this distinction is purely formal (notational even) since the basis functions are the same. But this makes the reading of expressions easier and faster, avoiding to have to constantly stop and think if now it is $k$ or $(n-k)$ and if it is a primal or a dual quantity, etc.
+\end{quotebox}
+
+The nomenclature used in \cite{kotyczka2019numerical} has been employed: the coincidence matrix is the discrete representation of the exterior derivative, whereas the incidence matrix is instead the discrete representation of the boundary operator. This is in contrast to the nomenclature mornally adopted by the mimetic discretization community, see e.g. [28,39]. For this reason, the discrete representation of the exterior derivative is called incidence matrix in the revised version of the manuscript. \\
+
+Indeed the incidence matrix also appear in the codifferential, with mass matrices of different degree on the left and on the right. \\
+
+Concerning the second comment, the notation has been modified throughout the all manuscript.
+
+
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 40), colframe=colorRevBG2]
+The discrete representation of exterior derivatice is now called incidence matrix. 
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 41}
+The last use of Stokes theorem is not guaranteed at the discrete level. I think this duality products
+involving the exterior derivative are essentially an integration by parts and the the power balance is only
+valid because of the dual set of equations and not because of Stokes theorem, which I seriously doubt is
+valid in the discrete sense, I may be wrong, of course. I typically see this type of power balance equations
+are only valid if primal and dual variables are mixed, which does not seem to be the case here. I think the
+power balance must be a mixed power balance, involving inner product and not the dual product. I think
+that what is expressed in equation (86) is essentially what I am stating. Equation (86) is a discrete Stokes
+law, involving integration by parts (if I am not mistaken). So I think the authors need to show (86) and
+then use that to proved the power law is satisfied. Could the authors show that Stokes it valid in a discrete setting? Actually I think Proposition 4 is the way to prove (for both primal and dual equations). The
+argument (very simplistic) is that the equations solved involve inner products and not dual products. This
+means that, in the discrete setting the authors are presenting, only those algebraic relations are valid. All others are speculation since it is not guaranteed, a priori, that they will hold within this discrete setting. The mixed products, I think, can be expressed for both cases and using both sets of equations the power balance can be proven, as you do in Proposition 4.
+The proof of Proposition 4 a too big step from Equation (90) to Equation (91). This should be expanded.
+The exterior derivative becomes a co-differential first since you are doing integration by parts, then some
+other steps are needed. The authors need to be sure that all steps are valid at the discrete level, not just
+at the continuous level, that is the difficulty, otherwise all numerical discretisations would have the same properties.
+\end{quotebox}
+The proof of the discrete power balance indeed combines information from the primal and dual system as it combines inner and outer oriented forms. The key point is that both the primal and dual system contain one discrete conservation law each. For the primal system, it holds
+
+\begin{equation*}
+    \inpr[M]{\dual{v}^p_h}{\dual{f}^p_{1, h}}= \inpr[M]{\dual{v}^p_h}{(-1)^r\d \dual{e}^{p-1}_{2, h}},\qquad
+    \forall \dual{v}^{p}_h \in \dual{\mathcal{V}}_{s, h}^p.
+\end{equation*}
+For the dual system it holds
+\begin{equation*}
+        \inpr[M]{v^q_h}{f^q_{2, h}} = \inpr[M]{v^q_h}{\d e^{q-1}_{1, h}}, \qquad \forall v^q_h \in \mathcal{V}_{s, h}^q. 
+\end{equation*}
+Since the trimmed polynomial family forms a subcomplex of the de Rham complex it holds $\d \dual{e}_{2, h}^{p-1} \in \mathcal{V}_{s, h}^p$ and $\d e^{q-1}_{1, h} \in \mathcal{V}_{s, h}^q$. By bilinearity of the inner product, it holds
+\begin{equation*}
+\begin{aligned}
+    \inpr[M]{\dual{v}^p_h}{\dual{f}^p_{1, h} - (-1)^r\d \dual{e}^{p-1}_{2, h}} &= 0, \\
+    \inpr[M]{v^q_h}{f^q_{2, h} - \d e^{q-1}_{1, h}} &= 0,
+\end{aligned} \qquad
+    \begin{aligned}
+    \forall \dual{v}^p_h \in \dual{\mathcal{V}}_{s, h}^p, \\
+    \forall v^q_h \in \mathcal{V}_{s, h}^q. \\
+    \end{aligned}
+\end{equation*}
+Since the inner product is non-degenerate, one has 
+\begin{equation*}
+    \dual{f}^p_{1, h} = (-1)^r \d \dual{e}^{p-1}_{2, h}, \qquad f^q_{2, h} = \d e^{q-1}_{1, h}.
+\end{equation*}
+These two equations are indeed topological. Taking the duality product with $e^{q-1}_{1, h}$ and $\dual{e}^{p-1}_{2, h}$ and summed the contribution of the each cell in the computational domain $T \in \mathcal{T}_h$, one obtains
+    \begin{equation}\label{eq:int_dualpr}
+        \sum_{T \in \mathcal{T}_h} \dualpr[T]{e^{q-1}_{1, h}}{\dual{f}^p_{1, h}} + \dualpr[T]{\dual{e}^{p-1}_{2, h}}{f^q_{2, h}} = \sum_{T \in \mathcal{T}_h}  \dualpr[T]{e^{q-1}_{1, h}}{(-1)^r \d \dual{e}^{p-1}_{2, h}} + \dualpr[T]{\dual{e}^{p-1}_{2, h}}{\d e^{q-1}_{1, h}}.
+    \end{equation}
+
+To arrive at the \textbf{final statement} of the proposition, a \textbf{discrete Stokes theorem is indeed needed}. This is a tricky point and, to the best of our knowledge, a discrete integration by formula for finite elements in exterior calculus has not been presented in the literature. The following integration by parts formula for a domain $M$ with Lipschitz boundary holds (cf. [36, Theorem 6.3])
+\begin{equation}\label{eq:int_byparts_d_H}
+    \dualpr[M]{\d{\mu}}{\lambda} + (-1)^k \dualpr[M]{\mu}{\d{\lambda}} = \dualpr[\partial M]{\mu}{\lambda}, \qquad \mu \in H^1\Omega^{k}(M), \quad \lambda \in H \Omega^{n-k-1}(M),
+\end{equation}
+where $H^1\Omega^{k}(M)$ is the space of $k$-forms with coefficients in $H^1(M)$. Conforming finite element $\mathcal{V}_{s,h}^k \subset H\Omega^k(M)$ do not possess the $H^1\Omega^{k}(M)$ regularity (except for the case $k=0$). However, the integration by parts holds at the discrete level when conforming finite element spaces are used
+\begin{equation}\label{eq:int_byparts_d_disc}
+    \dualpr[M]{\d\mu_h}{\lambda_h} + (-1)^k\dualpr[M]{\mu_h}{\d\lambda_h} = \dualpr[\partial M ]{\mu_h}{\lambda_h}, \qquad  \forall \mu_h \in \mathcal{V}_{s,h}^k, \; \forall\lambda_h \in \mathcal{V}_{s,h}^{n-k-1}.
+\end{equation}
+
+This is proven considering that the Stokes theorem holds for the each element of the mesh and it extends to the whole mesh as all terms arising on inter-cell boundaries will cancel due to the special continuity properties of discrete differential forms. Consider for example the wave equation in a 3 dimensional domain $M \subset \bbR^3$, corresponding to the case $k=0$. Using a vector calculus notation (but keeping the actual form degree as exponent) the formula reads
+
+\begin{equation*}
+    \int_M \{  \grad \mu^0 \cdot \bm{\lambda}^2 + \mu^0 \div \bm{\lambda}^2 \} \; \d M = \int_{\partial M} \mu^0 (\bm{\lambda}^2 \cdot \bm{n}) \d{\Gamma}, \qquad \mu^0 \in H^1(M), \quad \bm{\lambda}^2 \in H^{\div}(M),
+\end{equation*}
+where $\d\Gamma$ denotes the measure at the boundary $\partial M$. For this example, the discrete counterpart based on the trimmed polynomial family is immediately verified for conforming elements $\mathcal{V}_{s, h}^k \subset H\Omega^k(M)$ since the first variable is in $H^1(M) = H\Omega^0(M)$. Using Continuous Galerkin elements $\mathrm{CG}_s(\mathcal{T}_h) \subset H^1(M)$  for $\mu^0_h$  and Raviart Thomas $\mathrm{RT}_s(\mathcal{T}_h) \in H^{\div}(M)$ for $\bm{\lambda}_h^2$ (where $s$ is the polynomial degree for the finite elements) leads to the following integration by parts when the contribution of each cell of the mesh $T \in \mathcal{T}_h$ is summed up
+\begin{equation*}
+    \sum_{T \in \mathcal{T}_h}\int_T \{\grad \mu^0_h \cdot \bm{\lambda}^2_h + \mu^0_h \div \bm{\lambda}^2_h\} \;  \d\bm{x} = \sum_{T \in \mathcal{T}_h} \int_{\partial T} \mu^0_h (\bm{\lambda}^2_h \cdot \bm{n}) \d\bm{s}, \qquad \mu^0_h \in \mathrm{CG}_s(\mathcal{T}_h), \quad \bm{\lambda}^2_h \in \mathrm{RT}_s(\mathcal{T}_h).
+\end{equation*}
+From the finite elements properties $\mu^0_h$ and the normal components of $\bm{\lambda}^2_h$ are continuous across cells. Therefore, the inter-cell terms of the last integral vanishes, leading to
+\begin{equation}\label{eq:discr_intbyparts_wave}
+    \int_M\{\grad \mu^0_h \cdot \bm{\lambda}^2_h + \mu^0_h \div \bm{\lambda}^2_h\} \;  \d{M} =\int_{\partial M} \mu^0_h (\bm{\lambda}^2_h \cdot \bm{n}) \d\Gamma.
+\end{equation}
+The second case of interest for the paper is the one of the Maxwell equations in 3 dimensional domains $M \subset \bbR^3$, corresponding to the case $k=1$. The integration by parts \eqref{eq:int_byparts_d_H} for this case reads
+\begin{equation*}
+    \int_M \{  \curl\bm{\mu}^1 \cdot \bm{\lambda}^1 - \bm{\mu}^1 \cdot\, \curl \bm{\lambda}^1 \} \; \d{M} = \int_{\partial M} \bm{\mu}^1 \cdot (\bm{\lambda}^1 \times \bm{n}) \d\Gamma, \qquad \bm{\mu}^1 \in H^1(M, \bbR^3), \; \bm{\lambda}^1 \in H^{\curl}(M),
+\end{equation*}
+where $H^1(M; \bbR^3) := [H^1(M)]^3$ is the $H^1$ space for vector fields. The same formula can be written using the tangential trace and the twisted tangential trace as follows \cite[Eq. 27]{buffa2002} 
+\begin{equation*}
+\int_M \{  \curl \bm{\mu}^1 \cdot \, \bm{\lambda}^1 - \bm{\mu}^1 \cdot \, \curl \bm{\lambda}^1 \} \; \d M = \int_{\partial M}  \{\bm{n} \times (\bm{\mu}^1 \times \bm{n})\} \cdot (\bm{\lambda}^1 \times \bm{n}) \d\Gamma, \qquad \bm{\mu}^1 \in  H^1(M, \bbR^3), \quad \bm{\lambda}^1 \in H^{\curl}(M).
+\end{equation*}
+The discrete counterpart based on the trimmed polynomial family then uses Nédélec elements of the first kind NED$_s^1(\mathcal{T}_h) \subset H^{\curl}(M)$ for both $\bm{\mu}^1_h$ and $\bm{\lambda}^1_h$
+\begin{equation*}
+\sum_{T \in \mathcal{T}_h} \int_T \{  \curl \bm{\mu}^1_h \cdot \bm{\lambda}^1_h - \bm{\mu}^1_h \cdot \curl \bm{\lambda}^1_h \} \; \d\bm{x} = \sum_{T \in \mathcal{T}_h} \int_{\partial T}  \{\bm{n} \times (\bm{\mu}^1_h \times \bm{n})\} \cdot (\bm{\lambda}_h^1 \times \bm{n}) \d\bm{s}, \qquad \bm{\mu}^1_h, \; \bm{\lambda}^1_h \in \mathrm{NED}_s^1(\mathcal{T}_h).
+\end{equation*}
+Nédélec elements are not $H^1(M,\bbR^3)$ conforming, i.e. $\mathrm{NED}_s^1 \not\subset H^1(M, \bbR^3)$. However, their tangential component is continuous across cells. Therefore, the inter-cell terms of the last integral vanishes, leading to
+\begin{equation}\label{eq:discr_intbyparts_maxwell}
+\int_M \{  \curl \bm{\mu}^1_h \cdot \bm{\lambda}^1_h - \bm{\mu}^1_h \cdot \curl \bm{\lambda}^1_h \} \; \d M = \int_{\partial M}  \{\bm{n} \times (\bm{\mu}^1_h \times \bm{n})\} \cdot (\bm{\lambda}_h^1 \times \bm{n}) \d\Gamma, \qquad \bm{\mu}^1_h, \; \bm{\lambda}^1_h \in \mathrm{NED}_s^1(\mathcal{T}_h).
+\end{equation}
+Formulas \eqref{eq:discr_intbyparts_wave} and \eqref{eq:discr_intbyparts_maxwell} demonstrates \eqref{eq:int_byparts_d_disc} for the cases of interest. Since Eq. \eqref{eq:int_byparts_d_disc} is valid $\forall \mu_h, \forall \lambda_h$, the algebraic form of the Stokes theorem is obtained
+\begin{equation}\label{eq:alg_StokesTh}
+(-1)^{(k+1)(n-k-1)}(\mathbf{G}^{k})^\top + (-1)^k \mathbf{G}^{n-k-1} = (\mathbf{T}^{k})^\top \bm{\Psi}_{s, \partial}^{n-k-1} \mathbf{T}^{n-k-1},
+\end{equation}
+where the alternating property of the duality product has been used for the first term. The discrete Stokes theorem reported in Eq. \eqref{eq:int_byparts_d_disc} once applied to Eq. \eqref{eq:int_dualpr} gives
+\begin{equation*}
+    \dualpr[M]{e^{q-1}_{1, h}}{(-1)^r \d \dual{e}^{p-1}_{2, h}} + \dualpr[M]{\dual{e}^{p-1}_{2, h}}{\d e^{q-1}_{1, h}} = - \dualpr[\partial M]{\dual{e}_{\partial, h}^{p-1}}{f_{\partial, h}^{q-1}},
+\end{equation*}
+thus proving the statement of the Proposition. A formal proof of the integration by parts formula in an exterior calculus setting is out of the scope of this paper.
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 41), colframe=colorRevBG2]
+A proof for the cases of interest of the discrete integration by parts formula has been added to the appendix. In Sec. 5 the formula \eqref{eq:int_byparts_d_H} is cited and it is explained that conforming finite elements are not into $H^1\Omega^k(M)$ but they satisfy the discrete integration by parts because of the special continuity of discrete differential forms.
+\end{tcolorbox}
+
+
+\begin{quotebox}{Reviewer No.2 -- Comment 42}
+On the dual set of equations, I think the incidence matrices should be transposed.
+\end{quotebox}
+The matrix $\mathbf{d}_k$, that represent the discrete boundary operator and verifies $\mathbf{d}_k = (\mathbf{d}^k)^\top$, is introduced for that equation. This is confusing so the transposed incidence matrix is introduced in the corrected version.
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 42), colframe=colorRevBG2]
+Corrections made.
+\end{tcolorbox}
+
+\begin{quotebox}{Reviewer No.2 -- Comment 43}
+As I mentioned before, I think this decoupling should have been done at the continuous level. This seems
+to be very close to what I proposed above. To me, this is the “natural” form to express these equations. If
+this is done at the continuous level, then all the rest follows much smoother and cleanly, I think. All discrete
+expressions follow directly instead of the several manipulations the authors do.
+\end{quotebox}
+The structure of the paper has been modified to introduce the decoupling from the start, both at the level of the Stokes-Dirac structures and associated port-Hamiltonian systems.
+\begin{tcolorbox}[title=Revision (Reviewer No. 2 -- Comment No. 43), colframe=colorRevBG2]
+The decoupling is now presented in strong form for the port-Hamiltonian system in Section 4.4. The same decoupling is also valid at the level of the Stokes-Dirac structure in Sec. 4.2.
+\end{tcolorbox}
+
+\subsection{Notation}
+
+\begin{quotebox}{Reviewer No.2 -- Notation}
+While reading the manuscript I came across notation that, in my opinion, would be improved if it followed
+the more standard references. Of course, as all notation, this is a recommendation.
+3.1. Spaces of differential forms
+The authors use $\Omega^k$ to denote the space of k-differential forms on the manifold M . I propose using
+the more standard notation $\Lambda^k(M)$, which is used in the works of Arnold, Falke, and Winther, [5, 6], the
+review work by Bochev and Hyman, [1], and the more classical monographs by Burke, [11], and Spivak,
+[12]. I find the specific choice $\Omega^k(M)$ to be confusing since, in the literature, $\Omega^k$ is commonly used to refer to the
+domain.
+\end{quotebox}
+The notation used in the paper is the same as the one used in \cite{kanso2007}, \cite{arnold2021topological} and in several other references. In particular, in \cite{angoshtari2015differential} the symbol $\Lambda^k T^* M$ denotes the space of  anti-symmetric $(0, k)$ tensors, whereas $\Omega^k(M)$ denotes the spaces of sections of the $\Lambda^k T^* M$ bundle, i.e. $\Omega^k(M) := \Gamma(\Lambda^k T^* M)$. The same notation is also used in the other papers from the same funding project [14,15,16]. \\
+
+For these reasons, the notation has not been changed in the revised version.
+
+\subsection{Typos}
+
+\begin{quotebox}{Reviewer No.2 -- Typo 1}
+The resulting discrete operator is merely a projector for dual finite element spaces and therefore it
+introduces an additional discretization error.
+\end{quotebox}
+The sentence has been removed from the revised version.
+
+\begin{quotebox}{Reviewer No.2 -- Typo 2}
+discretization of constitutive equations remains problematic as those require a discrete Hodge star.
+\end{quotebox}
+Corrected.
+
+\begin{quotebox}{Reviewer No.2 -- Typo 3}
+ competitive with state of the art methods.
+\end{quotebox}
+Corrected.
+\begin{quotebox}{Reviewer No.2 -- Typo 4}
+requires the integration by parts formula to obtain.
+\end{quotebox}
+Corrected.
+
+\begin{quotebox}{Reviewer No.2 -- Typo 5}
+since each of the two mixed discretisations converges to the exact
+\end{quotebox}
+Removed from the revised manuscript.
+\begin{quotebox}{Reviewer No.2 -- Typo 6}
+I am not the best person to highlight this, since I am not a native english speaker and I also struggle
+with this, but a general harmonisation (and probably following the JCP’s guidelines) between using s and
+z in words e.g., I have seen discretized above and discretisation here.
+\end{quotebox}
+The spelling has been checked throughout the manuscript for the version "discretization".
+\begin{quotebox}{Reviewer No.2 -- Typo 7}
+A k-simplex $\sigma^k$
+\end{quotebox}
+Removed from the manuscript.
+\begin{quotebox}{Reviewer No.2 -- Typo 8}
+it follows that $\partial^{k+1}\partial^k = 0$, for $k = 0, . . . , n-2$
+\end{quotebox}
+Removed from the manuscript.
+\begin{quotebox}{Reviewer No.2 -- Typo 9}
+Using as basis for (...) simplices (...).\\
+Please check for other occurrences.
+\end{quotebox}
+All occurrences have been corrected.
+
+\begin{quotebox}{Reviewer No.2 -- Typo 10}
+ in terms of coefficient vectors by means 
+\end{quotebox}
+Removed from the manuscript.
+
+\begin{quotebox}{Reviewer No.2 -- Typo 11}
+exterior derivative acting on a k-form
+\end{quotebox}
+Corrected.
+
+\begin{quotebox}{Reviewer No.2 -- Typo 12}
+their duality pairing is expressed as\\
+I think the boundary is a typo.
+\end{quotebox}
+The typo has been corrected.
+
+
+\clearpage{}
+
+\bibliographystyle{alpha}
+\bibliography{biblio_response}
+
+\end{document}
