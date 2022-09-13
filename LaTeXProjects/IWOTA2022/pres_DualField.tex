@@ -172,22 +172,25 @@
 
 \section{The geometric structure of port-Hamiltonian systems}
 
+\begin{comment}
 \begin{frame}{A unified language for multiphysics in engineering}
-	The port-Hamiltonian (pH) paradigm provides a language to understand multiphysics:
-	\vspace{.3cm}
+The port-Hamiltonian (pH) paradigm provides a language to understand multiphysics:
+\vspace{.3cm}
 
-			\begin{itemize}
-				\item \textbf{Physics} is at the core: port-Hamiltonian systems are \textbf{passive} with respect to the \textbf{energy storage function}.
-				\item The \textbf{topological} and \textbf{metrical} structure of the equation is clearly separated (mimetic discretization).
-				\item PH systems are \textbf{closed under interconnection}. 
-			\end{itemize}
+\begin{itemize}
+\item \textbf{Physics} is at the core: port-Hamiltonian systems are \textbf{passive} with respect to the \textbf{energy storage function}.
+\item The \textbf{topological} and \textbf{metrical} structure of the equation is clearly separated (mimetic discretization).
+\item PH systems are \textbf{closed under interconnection}. 
+\end{itemize}
 
-	\begin{block}{A quest for duality}
-		The concept of \textbf{interconnection} and the \textbf{port behavior} of pH systems is mathematically formalized as \textbf{duality pairing}. How exactly is that defined?
-	\end{block}
-	
-	
+\begin{block}{A quest for duality}
+The concept of \textbf{interconnection} and the \textbf{port behavior} of pH systems is mathematically formalized as \textbf{duality pairing}. How exactly is that defined?
+\end{block}
+
+
 \end{frame}
+
+\end{comment}
 
 
 
@@ -360,14 +363,13 @@ where the variational derivative is defined by
 		\left.\diff{}{\varepsilon}\right|_{\varepsilon = 0} H({\mu}^k + \varepsilon \delta {\mu}^k) = \dualpr[\Omega]{\delta_{\mu} H^{n-p}}{\delta {\mu}^k},
 	\end{aligned}
 \end{equation*}
-Considering the following \textbf{port behavior}:
 \begin{itemize}
 	\item
-	the \textbf{storage ports} $$({f}_1^p,\, f_2^q,\, e_1^{n-p}, \, e_2^{n-q}) := (-\partial_t \alpha^p,\,  -\partial_t \beta^q, \,  \delta_{\alpha} H^{n-p}, \,  \delta_{\beta} H^{n-q}),$$
+	the \textbf{flows} $({f}_1^p,\, f_2^q,\, {f}_{\partial}^{n-p}) := (-\partial_t \alpha^p,\,  -\partial_t \beta^q, \, {y}^{n-p}),$
 	\item
-	the \textbf{interconnection ports} $$({f}_{\partial}^{n-p}, {e}_{\partial}^{n-q}) := ({y}^{n-p}, {u}^{n-q} ).$$
+	the \textbf{efforts} $(e_1^{n-p}, \, e_2^{n-q}, \, {e}_{\partial}^{n-q}) := ( \delta_{\alpha} H^{n-p}, \,  \delta_{\beta} H^{n-q}, {u}^{n-q}).$
 \end{itemize}
-Then the dynamical system defines a Dirac structure.
+The dynamical system defines a Dirac structure.
 
 \end{frame}
 
@@ -427,7 +429,7 @@ However, the \textbf{Stokes formula} has only been proven when \textbf{more regu
 	\begin{equation*}
 		\int_\Omega \d{\mu} \wedge \lambda + (-1)^k \int_\Omega \mu \wedge \d{\lambda} = \int_{\partial \Omega}\tr {\mu} \wedge \tr{\lambda}, \qquad \mu \in H^1\Lambda^{k}(\Omega), \quad \lambda \in H \Lambda^{n-k-1}(\Omega),
 	\end{equation*}
-	where $H^1\Lambda^k(\Omega)$ is the space of $k$-forms with coefficient in $H^1(\Omega)$.
+	where $H^1\Lambda^k(\Omega)$ is the space of $k$-forms with coefficients in $H^1(\Omega)$.
 \end{theorem}
 
 Nevertheless, using conforming finite elements for $H\Lambda^k$, one can obtained a discrete version of the power balance (integration by parts).
@@ -443,7 +445,7 @@ Nevertheless, using conforming finite elements for $H\Lambda^k$, one can obtaine
 	\end{equation*}
 	In a finite element context one relies on a weak formulation\footfullcite{hiptmair2001}
 	\begin{equation*}
-			\inpr[\Omega]{v^k_h}{\lambda^k_h} = (-1)^{k(n-k)}\dualpr[\Omega]{v^k_h}{\mu^{n-k}_h}
+			\inpr[\Omega]{\psi^k_h}{\lambda^k_h} = (-1)^{k(n-k)}\dualpr[\Omega]{\psi^k_h}{\mu^{n-k}_h}, \qquad  \forall \psi^k_h
 	\end{equation*}
 	To construct an \textbf{isomorphic Hodge star} \textbf{dual meshes} are needed. Difficulties:
 	\begin{itemize}
@@ -548,19 +550,19 @@ The finite elements in the figure form a subcomplex of the de Rham complex:
 Input-output behavior (the boundary conditions data coincide with the inputs):
 \begin{equation*}
 	\begin{aligned}
-		p^0|_{\Gamma_1} &= u^0_1, \\
-	-\bm{v}^2\cdot \bm{n}|_{\Gamma_2}  &= u^{2}_2, \\
+		p^0|_{\Gamma_1} &= \textcolor{red}{u^0_1}, \\
+	-\bm{v}^2\cdot \bm{n}|_{\Gamma_2}  &= \textcolor{blue}{u^{2}_2}, \\
 	\end{aligned}	\qquad
 	\begin{aligned}
-		y^2_2 &= -\bm{v}^2\cdot \bm{n}|_{\Gamma_1}, \\
-		y^{0}_1 &= p^0|_{\Gamma_2}.
+		\textcolor{red}{y^2_2} &= -\bm{v}^2\cdot \bm{n}|_{\Gamma_1}, \\
+		\textcolor{blue}{y^{0}_1} &= p^0|_{\Gamma_2}.
 	\end{aligned}
 \end{equation*}
 
 \begin{figure}
 \centering
 \includegraphics[width=.5\textwidth]{bound_part.eps}
-\caption*{Wave equation with mixed \textcolor{blue}{Dirichlet} and \textcolor{red}{Neumann} boundary conditions}
+\caption*{Wave equation with mixed \textcolor{red}{Dirichlet} and \textcolor{blue}{Neumann} boundary conditions}
 \end{figure}
 
 \end{frame}	
@@ -619,10 +621,10 @@ Introducing Sobolev spaces with boundary conditions
 
 
 \begin{tcolorbox}[nobeforeafter, colframe=theme,title=Primal weak formulation]%%
-Find $p^0 \in H^1(\Omega), \; \bm{v}^1 \in H^{\curl}(\Omega)$ such that $p^0|_{\Gamma_1} = u^0_1$ and
+Find $p^0 \in H^1(\Omega), \; \bm{v}^1 \in H^{\curl}(\Omega)$ such that $p^0|_{\Gamma_1} = \textcolor{red}{u^0_1}$ and
 \begin{equation*}
 	\begin{aligned}
-		\inpr[\Omega]{\psi^0}{\partial_t p^0} &= +\inpr[\Omega]{\grad \psi^0}{\bm{v}^1} + \dualpr[\Gamma_2]{\psi^0}{u^2_2}, \\
+		\inpr[\Omega]{\psi^0}{\partial_t p^0} &= +\inpr[\Omega]{\grad \psi^0}{\bm{v}^1} + \dualpr[\Gamma_2]{\psi^0}{\textcolor{blue}{u^2_2}}, \\
 		\inpr[\Omega]{\bm{\psi}^1}{\partial_t \bm{v}^1} &= -\inpr[\Omega]{\bm{\psi}^1}{\grad {p}^0},
 	\end{aligned} \qquad
 	\begin{aligned}
@@ -633,11 +635,11 @@ Find $p^0 \in H^1(\Omega), \; \bm{v}^1 \in H^{\curl}(\Omega)$ such that $p^0|_{\
 \end{tcolorbox} 
 
 \begin{tcolorbox}[nobeforeafter, colframe=theme,title=Dual weak formulation]%%
-find $p^3 \in L^2(\Omega), \; \bm{v}^2 \in H^{\div}(\Omega)$ such that $\bm{v}^2 \cdot \bm{n}|_{\Gamma_2} = u^2_2$ and
+find $p^3 \in L^2(\Omega), \; \bm{v}^2 \in H^{\div}(\Omega)$ such that $\bm{v}^2 \cdot \bm{n}|_{\Gamma_2} = \textcolor{blue}{u^2_2}$ and
 \begin{equation*}
 	\begin{aligned}
 		\inpr[\Omega]{\psi^3}{\partial_t p^3} &= -\inpr[\Omega]{\psi^3}{\div\bm{v}^2}, \\
-		\inpr[\Omega]{\bm{\psi}^2}{\partial_t \bm{v}^2} &= +\inpr[\Omega]{\div \bm{\psi}^2}{p^3} - \dualpr[\Gamma_1]{\bm{\psi}^2 \cdot \bm{n}}{u^0_1},
+		\inpr[\Omega]{\bm{\psi}^2}{\partial_t \bm{v}^2} &= +\inpr[\Omega]{\div \bm{\psi}^2}{p^3} - \dualpr[\Gamma_1]{\bm{\psi}^2 \cdot \bm{n}}{\textcolor{red}{u^0_1}},
 	\end{aligned} \qquad
 	\begin{aligned}
 		&\forall \psi^3 \in L^2(\Omega), \\
@@ -660,10 +662,10 @@ The two formulations are uncoupled.
 		
 		
 		\begin{tcolorbox}[nobeforeafter, colframe=theme,title=Primal weak formulation]%%
-		Find $p^0_h \in \mathrm{CG}_{s}(\Omega), \; \bm{v}^1_h \in \mathrm{NED}^1_s(\Omega)$ such that $p^0_h|_{\Gamma_1} = u^0_{1, h}$ and
+		Find $p^0_h \in \mathrm{CG}_{s}(\Omega), \; \bm{v}^1_h \in \mathrm{NED}^1_s(\Omega)$ such that $p^0_h|_{\Gamma_1} = \textcolor{red}{u^0_{1, h}}$ and
 		\begin{equation*}
 			\begin{aligned}
-				\inpr[\Omega]{\psi^0_h}{\partial_t p^0_h} &= +\inpr[\Omega]{\grad \psi^0_h}{\bm{v}^1_h} + \dualpr[\Gamma_2]{\psi^0_h}{u^2_{2, h}}, \\
+				\inpr[\Omega]{\psi^0_h}{\partial_t p^0_h} &= +\inpr[\Omega]{\grad \psi^0_h}{\bm{v}^1_h} + \dualpr[\Gamma_2]{\psi^0_h}{\textcolor{blue}{u^2_{2, h}}}, \\
 				\inpr[\Omega]{\bm{\psi}^1_h}{\partial_t \bm{v}^1_h} &= -\inpr[\Omega]{\bm{\psi}^1_h}{\grad {p}^0_h},
 			\end{aligned} \qquad
 			\begin{aligned}
@@ -676,11 +678,11 @@ The two formulations are uncoupled.
 	
 		
 	\begin{tcolorbox}[nobeforeafter, colframe=theme,title=Dual weak formulation]%%
-		find $p^3_h \in \mathrm{DG}_{s-1}(\Omega), \; \bm{v}^2_h \in \mathrm{RT}_{s}(\Omega)$ such that $\bm{v}^2_h \cdot \bm{n}|_{\Gamma_2} = u^2_{2, h}$ and
+		find $p^3_h \in \mathrm{DG}_{s-1}(\Omega), \; \bm{v}^2_h \in \mathrm{RT}_{s}(\Omega)$ such that $\bm{v}^2_h \cdot \bm{n}|_{\Gamma_2} = \textcolor{blue}{u^2_{2, h}}$ and
 		\begin{equation*}
 			\begin{aligned}
 				\inpr[\Omega]{\psi^3_h}{\partial_t p^3_h} &= -\inpr[\Omega]{\psi^3_h}{\div\bm{v}^2_h}, \\
-				\inpr[\Omega]{\bm{\psi}^2_h}{\partial_t \bm{v}^2_h} &= +\inpr[\Omega]{\div \bm{\psi}^2_h}{{p}^3_h} - \dualpr[\Gamma_1]{\bm{\psi}^2_h \cdot \bm{n}}{u^0_{1, h}},
+				\inpr[\Omega]{\bm{\psi}^2_h}{\partial_t \bm{v}^2_h} &= +\inpr[\Omega]{\div \bm{\psi}^2_h}{{p}^3_h} - \dualpr[\Gamma_1]{\bm{\psi}^2_h \cdot \bm{n}}{\textcolor{red}{u^0_{1, h}}},
 			\end{aligned} \qquad
 			\begin{aligned}
 				&\forall \psi^3_h \in \mathrm{DG}_{s-1}(\Omega), \\
@@ -1002,7 +1004,7 @@ The exact solution provides the appropriate inputs to be fed into the system
 \end{frame}
 
 \begin{frame}{Conclusion}
-	The open character of pH systems has the \textbf{potential to improve the status quo} of multiphysics simulation.  \\
+	
 	\vspace{.3cm}
 	\begin{tcolorbox}[nobeforeafter, colframe=theme,title=Analytical developments]%%
 	\begin{itemize}
