@@ -18,7 +18,7 @@ L_z = 1
 
 deg = 1
 
-quad = input("quad mesh? ")
+quad = False # input("quad mesh? ")
 
 if quad:
     mesh_quad = RectangleMesh(1, 1, L_x, L_y, quadrilateral=quad)
@@ -44,8 +44,10 @@ if quad:
     P_3 = FiniteElement("DG", hexahedron, deg - 1)
 
 else:
-    mesh = BoxMesh(n_el, n_el, n_el, L_x, L_y, L_z)
-
+    # mesh = BoxMesh(n_el, n_el, n_el, L_x, L_y, L_z)
+    mesh = UnitTetrahedronMesh()
+    triplot(mesh)
+    plt.show()
     # * 1: plane x == 0
     # * 2: plane x == 1
     # * 3: plane y == 0
@@ -53,10 +55,11 @@ else:
     # * 5: plane z == 0
     # * 6: plane z == 1
 
-    P_0 = FiniteElement("CG", triangle, deg)
-    P_1 = FiniteElement("N1curl", triangle, deg)
-    P_2 = FiniteElement("RT", triangle, deg)
-    P_3 = FiniteElement("DG", triangle, deg - 1)
+    P_0 = FiniteElement("CG", tetrahedron, deg)
+    P_1 = FiniteElement("N1curl", tetrahedron, deg)
+    P_2 = FiniteElement("RT", tetrahedron, deg)
+    P_3 = FiniteElement("DG", tetrahedron, deg - 1)
+
 
 n_ver = FacetNormal(mesh)
 
@@ -143,8 +146,8 @@ print(B_R.shape, B_L.shape)
 #     ax.set_xlabel('x')
 #     ax.set_ylabel('y')
 #     quiver(f_1, axes=ax)
-#
-#
+
+
 
 # n_1til = V_1til.dim()
 # for i in range(n_1til):

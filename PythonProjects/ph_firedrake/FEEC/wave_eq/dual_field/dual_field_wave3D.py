@@ -60,7 +60,9 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
         return b_form
 
-    L = 1/2
+    L = 1 / 2
+
+
     mesh = BoxMesh(n_el, n_el, n_el, 1, 1/2, 1/2)
     n_ver = FacetNormal(mesh)
 
@@ -71,6 +73,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     # Integral evaluation on Raviart-Thomas and NED for deg=3 completely freezes interpolation
     # P_2 = FiniteElement("RT", tetrahedron, deg, variant='integral')
     P_3 = FiniteElement("DG", tetrahedron, deg - 1)
+
 
     V_3 = FunctionSpace(mesh, P_3)
     V_1 = FunctionSpace(mesh, P_1)
@@ -593,15 +596,16 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 bd_cond = input("Enter bc: ")
 
 n_elem = 4
-pol_deg = 3
+pol_deg = 1
 
-n_time = 200
+n_time = 5
 t_fin = 5
 
 dt = t_fin / n_time
 
 results = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bd_cond)
 
-dictres_file = open("results_wave.pkl", "wb")
-pickle.dump(results, dictres_file)
-dictres_file.close()
+#
+# dictres_file = open("results_wave.pkl", "wb")
+# pickle.dump(results, dictres_file)
+# dictres_file.close()
