@@ -20,7 +20,7 @@ def create_reference_triangle(h, comm=COMM_WORLD, name="ReferenceTriangle", \
 
     plex.createLabel(dmcommon.FACE_SETS_LABEL)
     plex.markBoundaryFaces("boundary_faces")
-    coords = plex.getCoordinates()
+    # coords = plex.getCoordinates()
     # print(coords)
     # coord_sec = plex.getCoordinateSection()
     boundary_faces = plex.getStratumIS("boundary_faces", 1).getIndices()

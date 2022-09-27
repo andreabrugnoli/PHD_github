@@ -24,11 +24,11 @@ def rot2D(u_vec):
 
 h = 1
 mesh = create_reference_triangle(h)
-triplot(mesh)
-plt.show()
+# triplot(mesh)
+# plt.show()
 P_0 = FiniteElement("CG", triangle, deg)
-P_1 = FiniteElement("N1curl", triangle, deg)
-P_1til = FiniteElement("RT", triangle, deg)
+P_1 = FiniteElement("N1curl", triangle, deg, variant='integral')
+P_1til = FiniteElement("RT", triangle, deg, variant='integral')
 P_2 = FiniteElement("DG", triangle, deg - 1)
 
 V_0 = FunctionSpace(mesh, P_0)

@@ -62,7 +62,6 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     L = 1 / 2
 
-
     mesh = BoxMesh(n_el, n_el, n_el, 1, 1/2, 1/2)
     n_ver = FacetNormal(mesh)
 
