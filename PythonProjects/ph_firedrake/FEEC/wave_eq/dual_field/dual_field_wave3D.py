@@ -165,6 +165,12 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         bc_N = None
         bc_N_nat = [DirichletBC(V_32.sub(1), u_ex_1, "on_boundary")]
 
+        # print('bc_D nodes')
+        # print(bc_D[0].nodes)
+        #
+        # print('bc_N nat nodes')
+        # print(bc_N_nat[0].nodes)
+
     elif bd_cond == "N":
         bc_N = [DirichletBC(V_32.sub(1), u_ex_1, "on_boundary")]
         bc_N_nat = None
@@ -533,14 +539,16 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         # print(r"Final: ", H_10_vec[-1])
         # print(r"Delta: ", H_10_vec[-1] - H_10_vec[0])
         #
-        # plt.figure()
-        # plt.plot(t_vec, p_3P, 'r-', label=r'$p_3$')
-        # plt.plot(t_vec, p_0P, 'b-', label=r'$p_0$')
-        # plt.plot(t_vec, om_t * np.sin(om_x * Ppoint[0] + phi_x) * np.sin(om_y * Ppoint[1] + phi_y) \
-        #          * np.cos(om_t * t_vec + phi_t), 'g-', label=r'exact $p$')
-        # plt.xlabel(r'Time [s]')
-        # plt.title(r'$p$ at ' + str(Ppoint))
-        # plt.legend()
+    plt.figure()
+    plt.plot(t_vec, p_3P, 'r-', label=r'$p_3$')
+    plt.plot(t_vec, p_0P, 'b-', label=r'$p_0$')
+    plt.plot(t_vec, om_t * np.cos(om_x * Ppoint[0] + phi_x) * np.sin(om_y * Ppoint[1] + phi_y) \
+             * np.sin(om_z * Ppoint[2] + phi_z) * (2 * np.cos(om_t * t_vec + phi_t) - 3 * np.sin(om_t * t_vec + phi_t)),\
+             'g-', label=r'exact $p$')
+    plt.xlabel(r'Time [s]')
+    plt.title(r'$p$ at ' + str(Ppoint))
+    plt.legend()
+    plt.show()
 
         # err_p_3 = np.sqrt(np.sum(float(dt) * np.power(err_p_3_vec, 2)))
         # err_u_1 = np.sqrt(np.sum(float(dt) * np.power(err_u_1_vec, 2)))
@@ -595,10 +603,10 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 bd_cond = input("Enter bc: ")
 
 n_elem = 4
-pol_deg = 1
+pol_deg = 3
 
-n_time = 5
-t_fin = 5
+n_time = 50
+t_fin = 1
 
 dt = t_fin / n_time
 

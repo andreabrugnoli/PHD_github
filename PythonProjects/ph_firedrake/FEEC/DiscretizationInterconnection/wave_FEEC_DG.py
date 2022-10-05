@@ -25,11 +25,39 @@ def curl2D(u):
 def rot2D(u_vec):
     return u_vec[1].dx(0) - u_vec[0].dx(1)
 
+
+def j_p_32(v3, p3, v2, u2):
+    j_p_32 = dot(v3, div(u2)) * dx - dot(div(v2), p3) * dx
+
+    return j_p_32
+
+def j_d_10(v1, u1, v0, p0):
+    j_d_10 = dot(v1, grad(p0)) * dx - dot(grad(v0), u1) * dx
+
+    return j_d_10
+
+def j_int(v2_b, p0_b, v0_b, u2_b):
+    j_int_20 = (dot(v2_b('+'), n_ver('+')) * p0_b('-') + dot(v2_b('-'), n_ver('-')) * p0_b('+'))*dS
+    j_int_02 = - (v0_b('+') * dot(u2_b('-'), n_ver('-')) + v0_b('-') * dot(u2_b('+'), n_ver('+')))*dS
+
+    return j_int_20 + j_int_02
+
+def j_int_p(v2_b, p0_b, v0_b, u2_b):
+    j_int_p = (dot(v2_b('+'), n_ver('+')) * p0_b('-') - v0_b('-') * dot(u2_b('+'), n_ver('+'))) * dS
+
+    return j_int_p
+
+
+def j_int_d(v2_b, p0_b, v0_b, u2_b):
+    j_int_d = (-v0_b('+') * dot(u2_b('-'), n_ver('-')) + dot(v2_b('-'), n_ver('-')) * p0_b('+')) * dS
+
+    return j_int_d
+
 mesh = RectangleMesh(1, 1, L_x, L_y)
 n_ver = FacetNormal(mesh)
 
-triplot(mesh)
-plt.show()
+# triplot(mesh)
+# plt.show()
 P0 = FiniteElement("CG", triangle, deg)
 P1 = FiniteElement("N1curl", triangle, deg)
 P1til = FiniteElement("RT", triangle, deg)
@@ -45,55 +73,96 @@ P2_b = BrokenElement(P2)
 
 V0_b = FunctionSpace(mesh, P0_b)
 V1_b = FunctionSpace(mesh, P1_b)
-V1til_b = FunctionSpace(mesh, P1til_b)
-V2_b = FunctionSpace(mesh, P2_b)
+V2_b = FunctionSpace(mesh, P1til_b)
+V3_b = FunctionSpace(mesh, P2_b)
 
-V_1til_0_b = V1til_b * V0_b
+V_b = V0_b * V1_b * V3_b * V2_b
 
 dx = Measure('dx')
 ds = Measure('ds')
 dS = Measure('dS')
 
-v_1til_0_b = TestFunction(V_1til_0_b)
-v1til_b, v0_b = split(v_1til_0_b)
+v_b = TestFunction(V_b)
+v0_b, v1_b, v3_b, v2_b = split(v_b)
 
-u_1til_0_b = TrialFunction(V_1til_0_b)
-u1til_b, u0_b = split(u_1til_0_b)
+e_b = TrialFunction(V_b)
+e0_b, e1_b, e3_b, e2_b = split(e_b)
 
-# v0_b = TestFunction(V0_b)
-# u0_b = TrialFunction(V0_b)
+f_b = Function(V_b)
+f0_b, f1_b, f3_b, f2_b = split(f_b)
+
+jform_p_32 = j_p_32(v3_b, e3_b, v2_b, e2_b)
+jform_d_10 = j_d_10(v1_b, e1_b, v0_b, e0_b)
+jform_int_20 = j_int(v2_b, e0_b, v0_b, e2_b)
+
+jform_int_p_20 = j_int_p(v2_b, e0_b, v0_b, e2_b)
+jform_int_d_20 = j_int_d(v2_b, e0_b, v0_b, e2_b)
+
+j_pd = jform_p_32 + jform_d_10
+j_pd_int = jform_p_32 + jform_d_10 + jform_int_20
+
+j_pd_int_p = jform_p_32 + jform_d_10 + jform_int_p_20
+j_pd_int_d = jform_p_32 + jform_d_10 + jform_int_d_20
+
+J_pd_petsc = assemble(j_pd, mat_type='aij').M.handle
+J_pd = np.array(J_pd_petsc.convert("dense").getDenseArray())
+
+print(np.linalg.norm(J_pd + np.transpose(J_pd)))
+
+J_pd_int_petsc = assemble(j_pd_int, mat_type='aij').M.handle
+J_pd_int = np.array(J_pd_int_petsc.convert("dense").getDenseArray())
+
+print(np.linalg.norm(J_pd_int + np.transpose(J_pd_int)))
+
+J_pd_int_p_petsc = assemble(j_pd_int_p, mat_type='aij').M.handle
+J_pd_int_p = np.array(J_pd_int_p_petsc.convert("dense").getDenseArray())
+
+print(np.linalg.norm(J_pd_int_p + np.transpose(J_pd_int_p)))
+
+J_pd_int_d_petsc = assemble(j_pd_int_d, mat_type='aij').M.handle
+J_pd_int_d = np.array(J_pd_int_d_petsc.convert("dense").getDenseArray())
+
+print(np.linalg.norm(J_pd_int_d + np.transpose(J_pd_int_d)))
+
+# print(J_pd_int[-6:-3, 3:6])
+J_pd[abs(J_pd) < tol] = 0.0
+J_pd_int_p[abs(J_pd_int_p) < tol] = 0.0
+J_pd_int_d[abs(J_pd_int_d) < tol] = 0.0
+J_pd_int[abs(J_pd_int) < tol] = 0.0
+
+plt.figure()
+plt.spy(J_pd)
+plt.title('No coupling')
+
+plt.figure()
+plt.spy(J_pd_int_p)
+plt.title('Primal coupling')
+
+plt.figure()
+plt.spy(J_pd_int_d)
+plt.title('Dual coupling')
+
+plt.figure()
+plt.spy(J_pd_int)
+plt.title('All coupling')
+
+plt.show()
+
+
+# J_int_petsc = assemble(int_form_10 + int_form_01, mat_type='aij').M.handle
+# J_int = np.array(J_int_petsc.convert("dense").getDenseArray())
+
+# print(np.linalg.norm(J_int + np.transpose(J_int)))
 #
-# v1_b = TestFunction(V1_b)
-# u1_b = TrialFunction(V1_b)
+# int_form_primal = (dot(v1til_b('+'), n_ver('+')) * u0_b('-') - v0_b('-') * dot(u1til_b('+'), n_ver('+')))*dS
+# int_form_dual = (-v0_b('+') * dot(u1til_b('-'), n_ver('-')) + dot(v1til_b('-'), n_ver('-')) * u0_b('+'))*dS
 #
-# v1til_b = TestFunction(V1til_b)
-# u1til_b = TrialFunction(V1til_b)
+# J_int_p_petsc = assemble(int_form_primal, mat_type='aij').M.handle
+# J_int_p = np.array(J_int_p_petsc.convert("dense").getDenseArray())
 #
-# v2_b = TestFunction(V2_b)
-# u2_b = TrialFunction(V2_b)
+# print(np.linalg.norm(J_int_p + np.transpose(J_int_p)))
 #
-# f0_b = Function(V0_b)
-# f1_b = Function(V1_b)
-# f1til_b = Function(V1til_b)
-# f2_b = Function(V2_b)
-
-int_form_10 = (dot(v1til_b('+'), n_ver('+')) * u0_b('-') + dot(v1til_b('-'), n_ver('-')) * u0_b('+'))*dS
-int_form_01 = - (v0_b('+') * dot(u1til_b('-'), n_ver('-')) + v0_b('-') * dot(u1til_b('+'), n_ver('+')))*dS
-
-J_int_petsc = assemble(int_form_10 + int_form_01, mat_type='aij').M.handle
-J_int = np.array(J_int_petsc.convert("dense").getDenseArray())
-
-print(np.linalg.norm(J_int + np.transpose(J_int)))
-
-int_form_primal = (dot(v1til_b('+'), n_ver('+')) * u0_b('-') - v0_b('-') * dot(u1til_b('+'), n_ver('+')))*dS
-int_form_dual = (-v0_b('+') * dot(u1til_b('-'), n_ver('-')) + dot(v1til_b('-'), n_ver('-')) * u0_b('+'))*dS
-
-J_int_p_petsc = assemble(int_form_primal, mat_type='aij').M.handle
-J_int_p = np.array(J_int_p_petsc.convert("dense").getDenseArray())
-
-print(np.linalg.norm(J_int_p + np.transpose(J_int_p)))
-
-J_int_d_petsc = assemble(int_form_dual, mat_type='aij').M.handle
-J_int_d = np.array(J_int_d_petsc.convert("dense").getDenseArray())
-
-print(np.linalg.norm(J_int_d + np.transpose(J_int_d)))
+# J_int_d_petsc = assemble(int_form_dual, mat_type='aij').M.handle
+# J_int_d = np.array(J_int_d_petsc.convert("dense").getDenseArray())
+#
+# print(np.linalg.norm(J_int_d + np.transpose(J_int_d)))
