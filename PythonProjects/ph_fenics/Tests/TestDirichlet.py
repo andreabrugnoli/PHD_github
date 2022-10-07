@@ -1,6 +1,5 @@
 
 from fenics import *
-import matplotlib.pyplot as plt
 import numpy as np
 
 # Create mesh and define function space

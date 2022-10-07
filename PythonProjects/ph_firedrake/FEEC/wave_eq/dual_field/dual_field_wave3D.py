@@ -603,7 +603,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 bd_cond = input("Enter bc: ")
 
 n_elem = 4
-pol_deg = 3
+pol_deg = 2
 
 n_time = 50
 t_fin = 1
