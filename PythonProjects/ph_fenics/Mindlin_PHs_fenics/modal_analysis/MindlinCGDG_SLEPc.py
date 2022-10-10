@@ -91,10 +91,6 @@ def gradSym(u):
     return 0.5 * (nabla_grad(u) + nabla_grad(u).T)
     # return sym(nabla_grad(u))
 
-def bending_moment(kappa):
-    momenta = D * ((1-nu) * kappa + nu * Identity(d) * tr(kappa))
-    return momenta
-
 def bending_curv(momenta):
     kappa = fl_rot * ((1+nu)*momenta - nu * Identity(d) * tr(momenta))
     return kappa

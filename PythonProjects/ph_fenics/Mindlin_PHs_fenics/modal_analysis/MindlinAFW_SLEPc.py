@@ -4,21 +4,21 @@
 from fenics import *
 import numpy as np
 np.set_printoptions(threshold=np.inf)
-import mshr
-import matplotlib.pyplot as plt
+# import mshr
+# import matplotlib.pyplot as plt
+#
+# import scipy.linalg as la
+#
+# import matplotlib
+# import matplotlib.pyplot as plt
+# from mpl_toolkits.mplot3d import Axes3D
+# from matplotlib.ticker import LinearLocator, FormatStrFormatter
+# from matplotlib import cm
 
-import scipy.linalg as la
+# matplotlib.rcParams['text.usetex'] = True
 
-import matplotlib
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
-from matplotlib import cm
-
-matplotlib.rcParams['text.usetex'] = True
-
-n = 5 #int(input("Number of elements for side: "))
-deg = 1 #int(input('Degree for FE: '))
+n = 10 #int(input("Number of elements for side: "))
+deg = 2 #int(input('Degree for FE: '))
 nreq = 10
 
 E = 1e12
@@ -73,10 +73,6 @@ d = mesh.geometry().dim()
 def gradSym(u):
     return 0.5 * (nabla_grad(u) + nabla_grad(u).T)
     # return sym(nabla_grad(u))
-
-def bending_moment(kappa):
-    momenta = D * ((1-nu) * kappa + nu * Identity(d) * tr(kappa))
-    return momenta
 
 def bending_curv(momenta):
     kappa = fl_rot * ((1+nu)*momenta - nu * Identity(d) * tr(momenta))
@@ -213,7 +209,7 @@ solver.parameters["problem_type"] = "gen_non_hermitian"
 solver.parameters["spectrum"] = "target imaginary"
 solver.parameters["spectral_transform"] = "shift-and-invert"
 solver.parameters["spectral_shift"] = shift
-neigs = 10
+neigs = 20
 solver.solve(neigs)
 
 nconv = solver.get_number_converged()
@@ -222,12 +218,36 @@ if nconv==0:
 
 computed_real_eigenvalues = []
 computed_imag_eigenvalues = []
-for i in range(min(neigs, nconv)):
-    r, c = solver.get_eigenvalue(i) # ignore the imaginary part
-    computed_real_eigenvalues.append(r)
-    computed_imag_eigenvalues.append(c)
 
-print(np.sort(np.array(computed_imag_eigenvalues)))
+eigvec_w_real = []
+eigvec_w_imag = []
+n_eig_stocked = 0
+
+tol = 1e-3
+
+for i in range(min(neigs, nconv)):
+    r, c, rx, cx = solver.get_eigenpair(i)  # ignore the imaginary part
+
+    #    print(i , r, c)
+
+    if c > tol:
+        computed_real_eigenvalues.append(r)
+        computed_imag_eigenvalues.append(c)
+        #
+        # eigvec_w_real.append(rx[dofs_Vpw])
+        # eigvec_w_imag.append(cx[dofs_Vpw])
+
+        n_eig_stocked += 1
+
+# print(np.sort(np.array(computed_imag_eigenvalues)))
+
+omega_til_imag = np.array(computed_imag_eigenvalues)*L*((2*(1+nu)*rho)/E)**0.5
+omega_til_real = np.array(computed_real_eigenvalues)*L*((2*(1+nu)*rho)/E)**0.5
+
+print('Imaginary part tilde')
+for i in range(n_eig_stocked):
+    print('Eig n ' + str(i) + ': ' + str(np.sort(np.array(omega_til_imag))[i]))
+
 
 
 #for i in range(nreq):
