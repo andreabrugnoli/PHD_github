@@ -66,7 +66,7 @@ def construct_system(Elasticity2DConfig):
     AFW_elem = MixedElement([Pvel, Psig1, Psig2, Pskw])
     Vstate = FunctionSpace(msh, AFW_elem)
 
-    Pcntr = VectorElement('CG', triangle, Elasticity2DConfig.deg_FE+1)
+    Pcntr = VectorElement('CG', triangle, Elasticity2DConfig.deg_FE)
     Vcntr = FunctionSpace(msh, Pcntr)
 
     v_state = TestFunction(Vstate)
@@ -142,6 +142,19 @@ def construct_system(Elasticity2DConfig):
     # Non zero rows and columns
     rows_B, cols_B = csr_matrix.nonzero(Bscipy_cols)
 
+    tol = 1e-6
+    indtol_vec = []
+    # Remove nonzeros rows and columns below a given tolerance
+    for kk in range(len(rows_B)):
+        ind_row = rows_B[kk]
+        ind_col = cols_B[kk]
+
+        if abs(Bscipy_cols[ind_row, ind_col]) < tol:
+            indtol_vec.append(kk)
+
+    rows_B = np.delete(rows_B, indtol_vec)
+    cols_B = np.delete(cols_B, indtol_vec)
+
     # Indexes of non zero columns
     set_cols = np.array(list(set(cols_B)))
     # Number of non zero columns (i.e. number of inputs)
@@ -163,6 +176,7 @@ instance_El2D = Elasticity2DConfig()
 
 M, J, B = construct_system(instance_El2D)
 
-print(B)
+print(B.shape)
+print(np.linalg.matrix_rank(B.todense()))
 
 

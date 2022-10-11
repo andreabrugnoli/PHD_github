@@ -6,11 +6,11 @@ import pickle
 
 save_plots = input("Save plots? ")
 
-path_fig = "/home/andrea/Pictures/PythonPlots/Gyrator_Wave3D/"
-bc_case = "_DN"
-geo_case = "_3D"
+path_fig = "/home/andrea/Pictures/PythonPlots/Gyrator_Wave2D/"
+bc_case = "_N"
+geo_case = "_2D"
 
-res_file = open("results_wave.pkl", "rb")
+res_file = open("results_wave" + geo_case + bc_case + ".pkl", "rb")
 results = pickle.load(res_file)
 
 t_vec = results["t_span"]
@@ -54,6 +54,10 @@ plt.plot(t_vec, bdflow_ex_vec, '+', label=r"Flow ex")
 plt.xlabel(r'Time $[\mathrm{s}]$')
 plt.ylabel(r'WTF')
 plt.legend()
+
+if save_plots:
+    plt.savefig(path_fig + "test_bdflow" + geo_case + bc_case + ".pdf", format="pdf")
+
 
 # plt.title(r'Conservation law $\dot{H}^{3\widehat{1}}_h-P^{3\widehat{1}}_h$')
 

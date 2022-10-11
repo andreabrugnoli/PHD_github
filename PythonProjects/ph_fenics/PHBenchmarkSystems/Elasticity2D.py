@@ -110,7 +110,7 @@ def construct_system(Elasticity2DConfig):
     AFW_elem = MixedElement([Pvel, Psig1, Psig2, Pskw])
     Vstate = FunctionSpace(msh, AFW_elem)
 
-    Pcntr = VectorElement('CG', triangle, Elasticity2DConfig.deg_FE+1)
+    Pcntr = VectorElement('CG', triangle, Elasticity2DConfig.deg_FE)
     Vcntr = FunctionSpace(msh, Pcntr)
 
     v_state = TestFunction(Vstate)
@@ -221,5 +221,6 @@ instance_El2D = Elasticity2DConfig()
 M, J, B = construct_system(instance_El2D)
 
 print(B.shape)
-print(B)
+print(np.linalg.matrix_rank(B.todense()))
+
 

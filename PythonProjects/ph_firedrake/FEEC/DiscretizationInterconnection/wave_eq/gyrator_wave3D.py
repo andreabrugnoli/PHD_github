@@ -93,7 +93,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     mesh = BoxMesh(n_el, n_el, n_el, 1, 1/2, 1/2)
     n_ver = FacetNormal(mesh)
 
-    P0 = FiniteElement("CG", tetrahedron, deg)
+    P0 = FiniteElement("CR", tetrahedron, deg)
     P1 = FiniteElement("N1curl", tetrahedron, deg)
     # P1 = FiniteElement("N1curl", tetrahedron, deg)
     P2 = FiniteElement("RT", tetrahedron, deg)
@@ -214,57 +214,57 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
                     DirichletBC(V0132_b.sub(3), u_ex_1, 5)]
 
     bcs = bc_D + bc_N
-    #
-    ## This functionalities are broken for 
-    # print(DirichletBC(V0132_b.sub(0), p_ex_1, "on_boundary").nodes)
-    #
-    # dofsV0_D = []
-    # dofsV2_D = []
-    #
-    # if bc_D is not None:
-    #     for ii in range(len(bc_D)):
-    #         nodesV0_D = bc_D[ii].nodes
-    #         nodesV2_D = V0_b.dim() + V1_b.dim() + V3_b.dim() + bc_N_nat[ii].nodes
-    #
-    #         dofsV0_D = dofsV0_D + list(nodesV0_D)
-    #         dofsV2_D = dofsV2_D + list(nodesV2_D)
-    #
-    # dofsV0_D = list(set(dofsV0_D))
-    # dofsV2_D = list(set(dofsV2_D))
-    #
-    # print("dofs on Gamma_D for V0")
-    # print(dofsV0_D)
-    # print("dofs on Gamma_D for V2")
-    # print(dofsV2_D)
-    #
-    # dofsV0_N = []
-    # dofsV2_N = []
-    #
-    # if bc_N is not None:
-    #     for ii in range(len(bc_N)):
-    #         nodesV2_N = V0_b.dim() + V1_b.dim() + V3_b.dim() + bc_N[ii].nodes
-    #         nodesV0_N = bc_D_nat[ii].nodes
-    #
-    #         dofsV2_N = dofsV2_N + list(nodesV2_N)
-    #         dofsV0_N = dofsV0_N + list(nodesV0_N)
-    #
-    # dofsV2_N = list(set(dofsV2_N))
-    # dofsV0_N = list(set(dofsV0_N))
-    #
-    # for element in dofsV0_D:
-    #     if element in dofsV0_N:
-    #         dofsV0_N.remove(element)
-    #
-    # for element in dofsV2_N:
-    #     if element in dofsV2_D:
-    #         dofsV2_D.remove(element)
-    #
-    # print("dofs on Gamma_N for V0")
-    # print(dofsV0_N)
-    # print("dofs on Gamma_N for V2")
-    # print(dofsV2_N)
 
-    Ppoint = (L/5, L/5, L/5)
+    # Nodes does not work for broken spaces
+    print(DirichletBC(V0132_b.sub(0), p_ex_1, "on_boundary").nodes)
+
+    dofsV0_D = []
+    dofsV2_D = []
+
+    if bc_D is not None:
+        for ii in range(len(bc_D)):
+            nodesV0_D = bc_D[ii].nodes
+            nodesV2_D = V0_b.dim() + V1_b.dim() + V3_b.dim() + bc_N_nat[ii].nodes
+
+            dofsV0_D = dofsV0_D + list(nodesV0_D)
+            dofsV2_D = dofsV2_D + list(nodesV2_D)
+
+    dofsV0_D = list(set(dofsV0_D))
+    dofsV2_D = list(set(dofsV2_D))
+
+    print("dofs on Gamma_D for V0")
+    print(dofsV0_D)
+    print("dofs on Gamma_D for V2")
+    print(dofsV2_D)
+
+    dofsV0_N = []
+    dofsV2_N = []
+
+    if bc_N is not None:
+        for ii in range(len(bc_N)):
+            nodesV2_N = V0_b.dim() + V1_b.dim() + V3_b.dim() + bc_N[ii].nodes
+            nodesV0_N = bc_D_nat[ii].nodes
+
+            dofsV2_N = dofsV2_N + list(nodesV2_N)
+            dofsV0_N = dofsV0_N + list(nodesV0_N)
+
+    dofsV2_N = list(set(dofsV2_N))
+    dofsV0_N = list(set(dofsV0_N))
+
+    for element in dofsV0_D:
+        if element in dofsV0_N:
+            dofsV0_N.remove(element)
+
+    for element in dofsV2_N:
+        if element in dofsV2_D:
+            dofsV2_D.remove(element)
+
+    print("dofs on Gamma_N for V0")
+    print(dofsV0_N)
+    print("dofs on Gamma_N for V2")
+    print(dofsV2_N)
+
+    Ppoint = (L/7, L/4, L/8)
 
     p_0P = np.zeros((1+n_t,))
     p_0P[0] = project(p_ex, V0_b).at(Ppoint)
@@ -598,11 +598,11 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
 bd_cond = input("Enter bc: ")
 
-n_elem = 2
+n_elem = 10
 pol_deg = 1
 
-n_time = 2
-t_fin = 1
+n_time = 50
+t_fin = 5
 
 dt = t_fin / n_time
 

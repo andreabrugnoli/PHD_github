@@ -5,7 +5,7 @@ np.set_printoptions(threshold=np.inf)
 import os
 os.environ["OMP_NUM_THREADS"] = "1"
 
-from FEEC.DiscretizationInterconnection.triangle_mesh import create_reference_triangle
+from FEEC.DiscretizationInterconnection.tests_DG.triangle_mesh import create_reference_triangle
 from matplotlib import pyplot as plt
 
 L_x = 1

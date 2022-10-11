@@ -14,8 +14,7 @@ from matplotlib.ticker import FormatStrFormatter
 import pickle
 
 
-bc_case = "_DN"
-geo_case = "_3D"
+
 
 
 def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
@@ -90,13 +89,12 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     L = 1/2
 
-    mesh = BoxMesh(n_el, n_el, n_el, 1, 1/2, 1/2)
+    mesh = RectangleMesh(n_el, n_el, 1, 1/2)
     n_ver = FacetNormal(mesh)
 
     P0 = FiniteElement("CG", tetrahedron, deg)
-    P1 = FiniteElement("N1curl", tetrahedron, deg)
-    # P1 = FiniteElement("N1curl", tetrahedron, deg)
-    P2 = FiniteElement("RT", tetrahedron, deg)
+    P1 = FiniteElement("N1curl", tetrahedron, deg, variant="integral")
+    P2 = FiniteElement("RT", tetrahedron, deg, variant="integral")
     # Integral evaluation on Raviart-Thomas and NED for deg=3 completely freezes interpolation
     # P2 = FiniteElement("RT", tetrahedron, deg, variant='integral')
     P3 = FiniteElement("DG", tetrahedron, deg - 1)
@@ -128,16 +126,14 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     ds = Measure('ds')
     dS = Measure('dS')
 
-    x, y, z = SpatialCoordinate(mesh)
+    x, y = SpatialCoordinate(mesh)
 
     om_x = 1
     om_y = 1
-    om_z = 1
 
-    om_t = np.sqrt(om_x ** 2 + om_y ** 2 + om_z ** 2)
+    om_t = np.sqrt(om_x ** 2 + om_y ** 2)
     phi_x = 0
     phi_y = 0
-    phi_z = 0
     phi_t = 0
 
     dt = Constant(t_fin / n_t)
@@ -158,15 +154,13 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     ft_1 = 2 * sin(om_t * t_1 + phi_t) + 3 * cos(om_t * t_1 + phi_t)
     dft_1 = om_t * (2 * cos(om_t * t_1 + phi_t) - 3 * sin(om_t * t_1 + phi_t))  # diff(dft_t, t)
 
-    gxyz = cos(om_x * x + phi_x) * sin(om_y * y + phi_y) * sin(om_z * z + phi_z)
+    gxyz = cos(om_x * x + phi_x) * sin(om_y * y + phi_y)
 
-    dgxyz_x = - om_x * sin(om_x * x + phi_x) * sin(om_y * y + phi_y) * sin(om_z * z + phi_z)
-    dgxyz_y = om_y * cos(om_x * x + phi_x) * cos(om_y * y + phi_y) * sin(om_z * z + phi_z)
-    dgxyz_z = om_z * cos(om_x * x + phi_x) * sin(om_y * y + phi_y) * cos(om_z * z + phi_z)
+    dgxyz_x = - om_x * sin(om_x * x + phi_x) * sin(om_y * y + phi_y)
+    dgxyz_y = om_y * cos(om_x * x + phi_x) * cos(om_y * y + phi_y)
 
     grad_gxyz = as_vector([dgxyz_x,
-                           dgxyz_y,
-                           dgxyz_z]) # grad(gxyz)
+                           dgxyz_y]) # grad(gxyz)
 
     p_ex = gxyz * dft
     u_ex = grad_gxyz * ft
@@ -182,71 +176,81 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     u0_1_b = project(u_ex, V1_b)
     p0_0_b = project(p_ex, V0_b)
 
-
+    tol = 1e-10
     if bd_cond == "D":
         bc_D = [DirichletBC(V0132_b.sub(0), p_ex_1, "on_boundary")]
-        bc_D_nat = []
+
+        bformV0_D = v0_b * Constant(1) * ds
+        bvecV0_D = assemble(bformV0_D).vector().get_local()
+        bvecV0_D[abs(bvecV0_D) < tol] = 0
+        dofsV0_D = bvecV0_D.nonzero()[0]
+
+        bformV2_D = dot(v2_b, n_ver) * Constant(1) * ds
+        bvecV2_D = assemble(bformV2_D).vector().get_local()
+        bvecV2_D[abs(bvecV2_D) < tol] = 0
+        dofsV2_D = bvecV2_D.nonzero()[0]
+
+        dofsV0_D = list(set(dofsV0_D))
+        dofsV2_D = list(set(dofsV2_D))
 
         bc_N = []
-        bc_N_nat = [DirichletBC(V0132_b.sub(3), u_ex_1, "on_boundary")]
+        dofsV0_N = []
+        dofsV2_N = []
 
     elif bd_cond == "N":
         bc_N = [DirichletBC(V0132_b.sub(3), u_ex_1, "on_boundary")]
-        bc_N_nat = []
+
+        bformV2_N = dot(v2_b, n_ver) * Constant(1) * ds
+        bvecV2_N = assemble(bformV2_N).vector().get_local()
+        bvecV2_N[abs(bvecV2_N) < tol] = 0
+        dofsV2_N = bvecV2_N.nonzero()[0]
+
+        bformV0_N = v0_b * Constant(1) * ds
+        bvecV0_N = assemble(bformV0_N).vector().get_local()
+        bvecV0_N[abs(bvecV0_N) < tol] = 0
+        dofsV0_N = bvecV0_N.nonzero()[0]
+
+        dofsV2_N = list(set(dofsV2_N))
+        dofsV0_N = list(set(dofsV0_N))
 
         bc_D = []
-        bc_D_nat = [DirichletBC(V0132_b.sub(0), p_ex_1, "on_boundary")]
+        dofsV0_D = []
+        dofsV2_D = []
+
     else:
         bc_D = [DirichletBC(V0132_b.sub(0), p_ex_1, 1), \
-                DirichletBC(V0132_b.sub(0), p_ex_1, 3),
-                DirichletBC(V0132_b.sub(0), p_ex_1, 5)]
+                DirichletBC(V0132_b.sub(0), p_ex_1, 4)]
 
-        bc_D_nat = [DirichletBC(V0132_b.sub(0), p_ex_1, 2), \
-                    DirichletBC(V0132_b.sub(0), p_ex_1, 4), \
-                    DirichletBC(V0132_b.sub(0), p_ex_1, 6)]
+        bformV0_D = v0_b * Constant(1) * ds(1) + v0_b * Constant(1) * ds(4)
+        bvecV0_D = assemble(bformV0_D).vector().get_local()
+        bvecV0_D[abs(bvecV0_D) < tol] = 0
+        dofsV0_D = bvecV0_D.nonzero()[0]
+
+        bformV2_D = dot(v2_b, n_ver) * Constant(1) * ds(1) + dot(v2_b, n_ver) * Constant(1) * ds(4)
+        bvecV2_D = assemble(bformV2_D).vector().get_local()
+        bvecV2_D[abs(bvecV2_D) < tol] = 0
+        dofsV2_D = bvecV2_D.nonzero()[0]
+
+        dofsV0_D = list(set(dofsV0_D))
+        dofsV2_D = list(set(dofsV2_D))
 
         bc_N = [DirichletBC(V0132_b.sub(3), u_ex_1, 2), \
-                DirichletBC(V0132_b.sub(3), u_ex_1, 4),
-                DirichletBC(V0132_b.sub(3), u_ex_1, 6)]
+                DirichletBC(V0132_b.sub(3), u_ex_1, 3)]
 
-        bc_N_nat = [DirichletBC(V0132_b.sub(3), u_ex_1, 1), \
-                    DirichletBC(V0132_b.sub(3), u_ex_1, 3), \
-                    DirichletBC(V0132_b.sub(3), u_ex_1, 5)]
+        bformV2_N = dot(v2_b, n_ver) * Constant(1) * ds(1) + dot(v2_b, n_ver) * Constant(1) * ds(4)
+        bvecV2_N = assemble(bformV2_N).vector().get_local()
+        bvecV2_N[abs(bvecV2_N) < tol] = 0
+        dofsV2_N = bvecV2_N.nonzero()[0]
+
+        bformV0_N = v0_b * Constant(1) * ds(1) + v0_b * Constant(1) * ds(4)
+        bvecV0_N = assemble(bformV0_N).vector().get_local()
+        bvecV0_N[abs(bvecV0_N) < tol] = 0
+        dofsV0_N = bvecV0_N.nonzero()[0]
+
+        dofsV2_N = list(set(dofsV2_N))
+        dofsV0_N = list(set(dofsV0_N))
 
     bcs = bc_D + bc_N
-
-    dofsV0_D = []
-    dofsV2_D = []
-
-    if bc_D is not None:
-        for ii in range(len(bc_D)):
-            nodesV0_D = bc_D[ii].nodes
-            nodesV2_D = V0_b.dim() + V1_b.dim() + V3_b.dim() + bc_N_nat[ii].nodes
-
-            dofsV0_D = dofsV0_D + list(nodesV0_D)
-            dofsV2_D = dofsV2_D + list(nodesV2_D)
-
-    dofsV0_D = list(set(dofsV0_D))
-    dofsV2_D = list(set(dofsV2_D))
-
-    # print("dofs on Gamma_D for 10")
-    # print(dofs10_D)
-    # print("dofs on Gamma_D for 32")
-    # print(dofs32_D)
-
-    dofsV0_N = []
-    dofsV2_N = []
-
-    if bc_N is not None:
-        for ii in range(len(bc_N)):
-            nodesV2_N = V0_b.dim() + V1_b.dim() + V3_b.dim() + bc_N[ii].nodes
-            nodesV0_N = bc_D_nat[ii].nodes
-
-            dofsV2_N = dofsV2_N + list(nodesV2_N)
-            dofsV0_N = dofsV0_N + list(nodesV0_N)
-
-    dofsV2_N = list(set(dofsV2_N))
-    dofsV0_N = list(set(dofsV0_N))
 
     for element in dofsV0_D:
         if element in dofsV0_N:
@@ -256,12 +260,17 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         if element in dofsV2_D:
             dofsV2_D.remove(element)
 
-    # print("dofs on Gamma_N for 10")
-    # print(dofs10_N)
-    # print("dofs on Gamma_N for 32")
-    # print(dofs32_N)
+    # print("dofs on Gamma_D for V0")
+    # print(dofsV0_D)
+    # print("dofs on Gamma_D for V2")
+    # print(dofsV2_D)
+    #
+    # print("dofs on Gamma_N for V0")
+    # print(dofsV0_N)
+    # print("dofs on Gamma_N for V2")
+    # print(dofsV2_N)
 
-    Ppoint = (L/5, L/5, L/5)
+    Ppoint = (L/5, L/5)
 
     p_0P = np.zeros((1+n_t,))
     p_0P[0] = project(p_ex, V0_b).at(Ppoint)
@@ -530,16 +539,20 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         # print(r"Final: ", H_10_vec[-1])
         # print(r"Delta: ", H_10_vec[-1] - H_10_vec[0])
         #
-    plt.figure()
-    plt.plot(t_vec, p_3P, 'r-', label=r'$p_3$')
-    plt.plot(t_vec, p_0P, 'b-', label=r'$p_0$')
-    plt.plot(t_vec, om_t * np.cos(om_x * Ppoint[0] + phi_x) * np.sin(om_y * Ppoint[1] + phi_y) \
-             * np.sin(om_z * Ppoint[2] + phi_z) * (2 * np.cos(om_t * t_vec + phi_t) - 3 * np.sin(om_t * t_vec + phi_t)), \
-             'g-', label=r'exact $p$')
-    plt.xlabel(r'Time [s]')
-    plt.title(r'$p$ at ' + str(Ppoint))
-    plt.legend()
-    plt.show()
+
+
+    # plt.figure()
+    # plt.plot(t_vec, p_3P, 'r-', label=r'$p_3$')
+    # plt.plot(t_vec, p_0P, 'b-', label=r'$p_0$')
+    # plt.plot(t_vec, om_t * np.cos(om_x * Ppoint[0] + phi_x) * np.sin(om_y * Ppoint[1] + phi_y) \
+    #          * (2 * np.cos(om_t * t_vec + phi_t) - 3 * np.sin(om_t * t_vec + phi_t)), \
+    #          'g-', label=r'exact $p$')
+    # plt.xlabel(r'Time [s]')
+    # plt.title(r'$p$ at ' + str(Ppoint))
+    # plt.legend()
+    # plt.show()
+
+
         # err_p_3 = np.sqrt(np.sum(float(dt) * np.power(err_p_3_vec, 2)))
         # err_u_1 = np.sqrt(np.sum(float(dt) * np.power(err_u_1_vec, 2)))
         # err_p_0 = np.sqrt(np.sum(float(dt) * np.power(err_p_0_vec, 2)))
@@ -588,21 +601,21 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
                 "err_u12": err_u12, "err_H": [errH_3210, errH_10, errH_32]}
 
     return dict_res
-
-
-bd_cond = input("Enter bc: ")
-
-n_elem = 4
-pol_deg = 2
-
-n_time = 50
-t_fin = 5
-
-dt = t_fin / n_time
-
-results = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bd_cond)
-
-
-dictres_file = open("results_wave.pkl", "wb")
-pickle.dump(results, dictres_file)
-dictres_file.close()
+#
+#
+# bd_cond = input("Enter bc: ")
+#
+# n_elem = 10
+# pol_deg = 2
+#
+# n_time = 50
+# t_fin = 5
+#
+# dt = t_fin / n_time
+#
+# results = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bd_cond)
+# geo_case = "_2D"
+#
+# dictres_file = open("results_wave" + geo_case + "_" + bd_cond + ".pkl", "wb")
+# pickle.dump(results, dictres_file)
+# dictres_file.close()

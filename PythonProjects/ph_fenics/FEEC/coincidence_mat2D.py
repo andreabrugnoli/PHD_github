@@ -14,9 +14,9 @@ L = 1
 n_el = 1
 deg = 1
 
-# mesh = RectangleMesh(Point(0, 0), Point(L, L), n_el, n_el)
-domain = mshr.Rectangle(Point(0,0,0), Point(L,L,L))
-mesh = mshr.generate_mesh(domain, n_el)
+mesh = RectangleMesh(Point(0, 0), Point(L, L), n_el, n_el)
+# domain = mshr.Rectangle(Point(0,0,0), Point(L,L,L))
+# mesh = mshr.generate_mesh(domain, n_el)
 
 plot(mesh)
 plt.show()
