@@ -8,9 +8,14 @@ if geo_case=="2D":
 else:
     from FEEC.DiscretizationInterconnection.wave_eq.gyrator_wave3D import compute_err
 import numpy as np
+import os
+save_res = True # input("Save results: ")
 
-save_res = False # input("Save results: ")
-path_res = "results_wave" + "_" + geo_case + "_" + bc_input + "/"
+# path_project = "~/GitProjects/PHD_github/PythonProjects/ph_firedrake/FEEC/DiscretizationInterconnection/wave_eq/"
+path_res = "results_wave/"
+# path_res = os.path.join(path_project, folder_res)
+# os.mkdir(path_res)
+
 n_test_deg1 = 5
 
 

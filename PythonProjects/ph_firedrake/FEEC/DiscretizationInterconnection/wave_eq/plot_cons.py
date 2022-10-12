@@ -20,18 +20,15 @@ Hdot_vec = results["power"]
 bdflow_vec = results["flow"]
 bdflow_mid = results["flow_mid"]
 
-bdflow10_mid = results["flow10_mid"]
-bdflow32_mid = results["flow32_mid"]
+bdflowV0_mid = results["flowV0_mid"]
+bdflowV2_mid = results["flowV2_mid"]
 int_bdflow = results["int_flow"]
 
 H_df = results["energy_df"]
 H_3210 = results["energy_3210"]
 
-H_32 = results["energy_32"]
-H_01 = results["energy_01"]
+H_T = results["energy_T"]
 
-H_31 = results["energy_31"]
-H_02 = results["energy_02"]
 
 H_ex = results["energy_ex"]
 bdflow_ex_vec = results["flow_ex"]
@@ -41,54 +38,51 @@ errL2_u1, errHcurl_u1 = results["err_u1"]
 errL2_p0, errH1_p0 = results["err_p0"]
 errL2_u2, errHdiv_u2 = results["err_u2"]
 
-err_Hs, err_H10, err_H32 = results["err_H"]
+err_Hs, err_HT = results["err_H"]
 
 dt = t_vec[-1] / (len(t_vec)-1)
 
-plt.figure()
-plt.plot(t_vec[1:]-dt/2, bdflow32_mid, '--.', label=r"Flow 2")
-plt.plot(t_vec[1:]-dt/2, bdflow10_mid, '-.', label=r"Flow 0")
-plt.plot(t_vec[1:]-dt/2, bdflow_mid, '*', label=r"Flow mid")
-plt.plot(t_vec, bdflow_vec, 'o', label=r"Flow n")
-plt.plot(t_vec, bdflow_ex_vec, '+', label=r"Flow ex")
-plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.ylabel(r'WTF')
-plt.legend()
 
-if save_plots:
-    plt.savefig(path_fig + "test_bdflow" + geo_case + bc_case + ".pdf", format="pdf")
+
+# plt.figure()
+# plt.plot(t_vec[1:]-dt/2, bdflowV2_mid, '--.', label=r"Flow 2")
+# plt.plot(t_vec[1:]-dt/2, bdflowV0_mid, '-.', label=r"Flow 0")
+# plt.plot(t_vec[1:]-dt/2, bdflow_mid, '*', label=r"Flow mid")
+# plt.plot(t_vec, bdflow_vec, 'o', label=r"Flow n")
+# plt.plot(t_vec, bdflow_ex_vec, '+', label=r"Flow ex")
+# plt.xlabel(r'Time $[\mathrm{s}]$')
+# plt.ylabel(r'WTF')
+# plt.legend()
+#
+# if save_plots:
+#     plt.savefig(path_fig + "test_bdflow" + geo_case + bc_case + ".pdf", format="pdf")
 
 
 # plt.title(r'Conservation law $\dot{H}^{3\widehat{1}}_h-P^{3\widehat{1}}_h$')
 
-#
-# plt.figure()
-# plt.plot(t_vec[1:]-dt/2, Hdot_vec - bdflow_mid, 'r-.')
-# plt.xlabel(r'Time $[\mathrm{s}]$')
-# plt.ylabel(r'$P_h -<e^\partial_{h}, f^\partial_{h}>_{\partial M}$')
-# plt.title(r'Power balance conservation')
-#
-# if save_plots:
-#     plt.savefig(path_fig + "pow_bal" + geo_case + bc_case + ".pdf", format="pdf")
-#
-# plt.figure()
-# plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt - bdflow10_mid, 'r-.')
-# plt.xlabel(r'Time $[\mathrm{s}]$')
-# plt.ylabel(r'$\dot{H}^{3\widehat{1}}_h-P^{3\widehat{1}}_h$')
-# # plt.title(r'Conservation law $\dot{H}^{3\widehat{1}}_h-P^{3\widehat{1}}_h$')
-#
-# if save_plots:
-#     plt.savefig(path_fig + "pow_bal10" + geo_case + bc_case + ".pdf", format="pdf")
-#
-# plt.figure()
-# plt.plot(t_vec[1:]-dt/2, np.diff(H_32)/dt - bdflow32_mid, 'r-.')
-# plt.xlabel(r'Time $[\mathrm{s}]$')
-# plt.ylabel(r'$\dot{H}^{\widehat{3}1}_h-P^{\widehat{3}1}_h$')
-# # plt.title(r'Conservation law $\dot{H}^{\widehat{3}1}_h-P^{\widehat{3}1}_h$')
-#
-# if save_plots:
-#     plt.savefig(path_fig + "pow_bal32" + geo_case + bc_case + ".pdf", format="pdf")
-#
+plt.figure()
+plt.plot(t_vec[1:]-dt/2, 0.5*np.diff(H_T)/dt - bdflowV0_mid - bdflowV2_mid, 'r-.')
+plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.ylabel(r'$\dot{H}^T_h-P^T_h$')
+
+if save_plots:
+    plt.savefig(path_fig + "HT_conservation" + geo_case + bc_case + ".pdf", format="pdf")
+
+plt.figure()
+plt.plot(t_vec[1:]-dt/2, 0.5*np.diff(H_T)/dt, '-v', label=r"$\dot{H}_{h}^{T}$")
+plt.plot(t_vec[1:]-dt/2, bdflowV0_mid, '-.+', label=r"Flow V0")
+plt.plot(t_vec[1:]-dt/2, bdflowV2_mid, '--*', label=r"Flow V2")
+plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.ylabel(r'$\dot{H}^{3\widehat{1}}_h-P^{3\widehat{1}}_h$')
+plt.title(r'Conservation law $\dot{H}^{T}_h-P^{T}_h$')
+
+if save_plots:
+    plt.savefig(path_fig + "test" + geo_case + bc_case + ".pdf", format="pdf")
+
+plt.legend()
+
+
+
 # plt.figure()
 # ax = plt.gca()
 # plt.plot(t_vec, bdflow_vec - bdflow_ex_vec, 'r-.')
@@ -112,6 +106,17 @@ if save_plots:
 #
 # if save_plots:
 #     plt.savefig(path_fig + "dHdt" + geo_case + bc_case + ".pdf", format="pdf")
+# #
+#
+# plt.figure()
+# plt.plot(t_vec[1:]-dt/2, Hdot_vec - bdflow_mid, 'r-.')
+# plt.xlabel(r'Time $[\mathrm{s}]$')
+# plt.ylabel(r'$P_h -<e^\partial_{h}, f^\partial_{h}>_{\partial M}$')
+# plt.title(r'Power balance conservation')
+#
+# if save_plots:
+#     plt.savefig(path_fig + "pow_bal" + geo_case + bc_case + ".pdf", format="pdf")
+#
 #
 # plt.figure()
 # plt.plot(t_vec, np.abs((H_01 - H_01[0]) - (H_ex-H_ex[0])), '-v', label=r'$\Delta H_{h}^{3\widehat{1}}$')

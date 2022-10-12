@@ -213,6 +213,9 @@ def construct_system(Elasticity2DConfig):
         # Convert to csr format
         Bscipy.tocsr()
 
+    coord_Vcntr = Vcntr.tabulate_dof_coordinates()
+    coord_cols_B = coord_Vcntr[set_cols]
+
     return Mscipy, Jscipy, Bscipy
 
 

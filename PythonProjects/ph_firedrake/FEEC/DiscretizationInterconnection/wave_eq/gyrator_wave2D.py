@@ -14,9 +14,6 @@ from matplotlib.ticker import FormatStrFormatter
 import pickle
 
 
-
-
-
 def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     """Compute the numerical solution of the wave equation with a DG method based on interconnection
 
@@ -92,12 +89,12 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     mesh = RectangleMesh(n_el, n_el, 1, 1/2)
     n_ver = FacetNormal(mesh)
 
-    P0 = FiniteElement("CG", tetrahedron, deg)
-    P1 = FiniteElement("N1curl", tetrahedron, deg, variant="integral")
-    P2 = FiniteElement("RT", tetrahedron, deg, variant="integral")
+    P0 = FiniteElement("CG", triangle, deg)
+    P1 = FiniteElement("N1curl", triangle, deg, variant="integral")
+    P2 = FiniteElement("RT", triangle, deg, variant="integral")
     # Integral evaluation on Raviart-Thomas and NED for deg=3 completely freezes interpolation
     # P2 = FiniteElement("RT", tetrahedron, deg, variant='integral')
-    P3 = FiniteElement("DG", tetrahedron, deg - 1)
+    P3 = FiniteElement("DG", triangle, deg - 1)
 
     P0_b = BrokenElement(P0)
     P1_b = BrokenElement(P1)
@@ -180,12 +177,12 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     if bd_cond == "D":
         bc_D = [DirichletBC(V0132_b.sub(0), p_ex_1, "on_boundary")]
 
-        bformV0_D = v0_b * Constant(1) * ds
+        bformV0_D = v0_b * ds
         bvecV0_D = assemble(bformV0_D).vector().get_local()
         bvecV0_D[abs(bvecV0_D) < tol] = 0
         dofsV0_D = bvecV0_D.nonzero()[0]
 
-        bformV2_D = dot(v2_b, n_ver) * Constant(1) * ds
+        bformV2_D = dot(v2_b, n_ver) * ds
         bvecV2_D = assemble(bformV2_D).vector().get_local()
         bvecV2_D[abs(bvecV2_D) < tol] = 0
         dofsV2_D = bvecV2_D.nonzero()[0]
@@ -200,12 +197,12 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     elif bd_cond == "N":
         bc_N = [DirichletBC(V0132_b.sub(3), u_ex_1, "on_boundary")]
 
-        bformV2_N = dot(v2_b, n_ver) * Constant(1) * ds
+        bformV2_N = dot(v2_b, n_ver) * ds
         bvecV2_N = assemble(bformV2_N).vector().get_local()
         bvecV2_N[abs(bvecV2_N) < tol] = 0
         dofsV2_N = bvecV2_N.nonzero()[0]
 
-        bformV0_N = v0_b * Constant(1) * ds
+        bformV0_N = v0_b * ds
         bvecV0_N = assemble(bformV0_N).vector().get_local()
         bvecV0_N[abs(bvecV0_N) < tol] = 0
         dofsV0_N = bvecV0_N.nonzero()[0]
@@ -218,15 +215,14 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         dofsV2_D = []
 
     else:
-        bc_D = [DirichletBC(V0132_b.sub(0), p_ex_1, 1), \
-                DirichletBC(V0132_b.sub(0), p_ex_1, 4)]
+        bc_D = [DirichletBC(V0132_b.sub(0), p_ex_1, 1), DirichletBC(V0132_b.sub(0), p_ex_1, 4)]
 
-        bformV0_D = v0_b * Constant(1) * ds(1) + v0_b * Constant(1) * ds(4)
+        bformV0_D = v0_b * ds(1) + v0_b * ds(4)
         bvecV0_D = assemble(bformV0_D).vector().get_local()
         bvecV0_D[abs(bvecV0_D) < tol] = 0
         dofsV0_D = bvecV0_D.nonzero()[0]
 
-        bformV2_D = dot(v2_b, n_ver) * Constant(1) * ds(1) + dot(v2_b, n_ver) * Constant(1) * ds(4)
+        bformV2_D = dot(v2_b, n_ver) * ds(1) + dot(v2_b, n_ver) * ds(4)
         bvecV2_D = assemble(bformV2_D).vector().get_local()
         bvecV2_D[abs(bvecV2_D) < tol] = 0
         dofsV2_D = bvecV2_D.nonzero()[0]
@@ -234,15 +230,14 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         dofsV0_D = list(set(dofsV0_D))
         dofsV2_D = list(set(dofsV2_D))
 
-        bc_N = [DirichletBC(V0132_b.sub(3), u_ex_1, 2), \
-                DirichletBC(V0132_b.sub(3), u_ex_1, 3)]
+        bc_N = [DirichletBC(V0132_b.sub(3), u_ex_1, 2), DirichletBC(V0132_b.sub(3), u_ex_1, 3)]
 
-        bformV2_N = dot(v2_b, n_ver) * Constant(1) * ds(1) + dot(v2_b, n_ver) * Constant(1) * ds(4)
+        bformV2_N = dot(v2_b, n_ver) * ds(2) + dot(v2_b, n_ver) * ds(3)
         bvecV2_N = assemble(bformV2_N).vector().get_local()
         bvecV2_N[abs(bvecV2_N) < tol] = 0
         dofsV2_N = bvecV2_N.nonzero()[0]
 
-        bformV0_N = v0_b * Constant(1) * ds(1) + v0_b * Constant(1) * ds(4)
+        bformV0_N = v0_b * ds(2) + v0_b * ds(3)
         bvecV0_N = assemble(bformV0_N).vector().get_local()
         bvecV0_N[abs(bvecV0_N) < tol] = 0
         dofsV0_N = bvecV0_N.nonzero()[0]
@@ -269,6 +264,12 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     # print(dofsV0_N)
     # print("dofs on Gamma_N for V2")
     # print(dofsV2_N)
+    #
+    # print("dofs  V0")
+    # print(dofsV0_D + dofsV0_N)
+    # print("dofs on Gamma_D for V2")
+    # print(dofsV2_D + dofsV2_N)
+
 
     Ppoint = (L/5, L/5)
 
@@ -296,11 +297,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     pnmid_0_b, unmid_1_b, pnmid_3_b, unmid_2_b = enmid_0132_b.split()
     pn1_0_b, un1_1_b, pn1_3_b, un1_2_b = en1_0132_b.split()
 
-    Hn_32 = 0.5 * (inner(pn_3_b, pn_3_b) * dx + inner(un_2_b, un_2_b) * dx)
-    Hn_10 = 0.5 * (inner(pn_0_b, pn_0_b) * dx + inner(un_1_b, un_1_b) * dx)
-
-    Hn_31 = 0.5 * (inner(pn_3_b, pn_3_b) * dx + inner(un_1_b, un_1_b) * dx)
-    Hn_02 = 0.5 * (inner(pn_0_b, pn_0_b) * dx + inner(un_2_b, un_2_b) * dx)
+    Hn_T = 0.5 * (inner(pn_0_b, pn_0_b) * dx + inner(un_1_b, un_1_b) * dx) + \
+           0.5 * (inner(pn_3_b, pn_3_b) * dx + inner(un_2_b, un_2_b) * dx)
 
     Hn_3210 = 0.5 * (dot(pn_0_b, pn_3_b) * dx + dot(un_2_b, un_1_b) * dx)
 
@@ -320,11 +318,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     bdflow_n = pn_0_b * dot(un_2_b, n_ver) * ds(domain=mesh)
     bdflow_ex_n = p_ex * dot(u_ex, n_ver) * ds(domain=mesh)
 
-    H_32_vec = np.zeros((1 + n_t,))
-    H_10_vec = np.zeros((1 + n_t,))
-
-    H_31_vec = np.zeros((1 + n_t,))
-    H_02_vec = np.zeros((1 + n_t,))
+    H_T_vec = np.zeros((1 + n_t,))
 
     H_3210_vec = np.zeros((1 + n_t,))
 
@@ -336,8 +330,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     bdflowV2_mid_vec = np.zeros((n_t,))
 
     bdflow_vec = np.zeros((1 + n_t,))
-    bdflow_ex_vec = np.zeros((1 + n_t,))
 
+    bdflow_ex_vec = np.zeros((1 + n_t,))
     H_ex_vec = np.zeros((1 + n_t,))
 
     errL2_p_3_vec = np.zeros((1 + n_t,))
@@ -353,22 +347,16 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     err_p30_vec = np.zeros((1 + n_t,))
     err_u12_vec = np.zeros((1 + n_t,))
 
-    errH_32_vec = np.zeros((1 + n_t,))
-    errH_10_vec = np.zeros((1 + n_t,))
+    errH_T_vec = np.zeros((1 + n_t,))
     errH_3210_vec = np.zeros((1 + n_t,))
 
-    H_32_vec[0] = assemble(Hn_32)
-    H_10_vec[0] = assemble(Hn_10)
-
-    H_31_vec[0] = assemble(Hn_31)
-    H_02_vec[0] = assemble(Hn_02)
+    H_T_vec[0] = assemble(Hn_T)
 
     H_3210_vec[0] = assemble(Hn_3210)
 
     H_ex_vec[0] = assemble(Hn_ex)
 
-    errH_32_vec[0] = np.abs(H_32_vec[0] - H_ex_vec[0])
-    errH_10_vec[0] = np.abs(H_10_vec[0] - H_ex_vec[0])
+    errH_T_vec[0] = np.abs(0.5*H_T_vec[0] - H_ex_vec[0])
     errH_3210_vec[0] = np.abs(H_3210_vec[0] - H_ex_vec[0])
 
     Hdot_vec[0] = assemble(Hdot_n)
@@ -428,6 +416,11 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         bdflowV0_ess = np.dot(yhat_V0, u_midn_V0)
         bdflowV0_mid_vec[ii] = bdflowV0_nat + bdflowV0_ess
 
+        print('V0 flow nat')
+        print(bdflowV0_nat)
+        print('V0 flow ess')
+        print(bdflowV0_ess)
+
         yhat_V2 = assemble(y_nmid_ess).vector().get_local()[dofsV2_N]
         u_midn_V2 = enmid_0132_b.vector().get_local()[dofsV2_N]
 
@@ -438,6 +431,11 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         bdflowV2_ess = np.dot(yhat_V2, u_midn_V2)
         bdflowV2_mid_vec[ii] = bdflowV2_nat + bdflowV2_ess
 
+        print('V2 flow nat')
+        print(bdflowV2_nat)
+        print('V2 flow ess')
+        print(bdflowV2_ess)
+
         # New assign
 
         en_0132_b.assign(en1_0132_b)
@@ -446,11 +444,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
         bdflow_vec[ii+1] = assemble(bdflow_n)
 
-        H_32_vec[ii+1] = assemble(Hn_32)
-        H_10_vec[ii+1] = assemble(Hn_10)
-
-        H_31_vec[ii+1] = assemble(Hn_31)
-        H_02_vec[ii+1] = assemble(Hn_02)
+        H_T_vec[ii+1] = assemble(Hn_T)
 
         H_3210_vec[ii+1] = assemble(Hn_3210)
 
@@ -465,8 +459,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         bdflow_ex_vec[ii + 1] = assemble(bdflow_ex_n)
 
         # print(bdflow_ex_vec[ii+1])
-        errH_32_vec[ii + 1] = np.abs(H_32_vec[ii + 1] - H_ex_vec[ii + 1])
-        errH_10_vec[ii + 1] = np.abs(H_10_vec[ii + 1] - H_ex_vec[ii + 1])
+        errH_T_vec[ii + 1] = np.abs(0.5*H_T_vec[ii + 1] - H_ex_vec[ii + 1])
         errH_3210_vec[ii + 1] = np.abs(H_3210_vec[ii + 1] - H_ex_vec[ii + 1])
 
         errL2_p_3_vec[ii + 1] = errornorm(p_ex, pn_3_b, norm_type="L2")
@@ -481,26 +474,6 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         err_p30_vec[ii + 1] = np.sqrt(assemble(inner(pn_3_b - pn_0_b, pn_3_b - pn_0_b) * dx))
         err_u12_vec[ii + 1] = np.sqrt(assemble(inner(un_2_b - un_1_b, un_2_b - un_1_b) * dx))
 
-        #     p_3P[ii + 1] = pn_3.at(Ppoint)
-        #     p_0P[ii + 1] = pn_0.at(Ppoint)
-        #
-        # err_p3.assign(pn_3 - interpolate(p_ex, V_3))
-        # err_p0.assign(pn_0 - interpolate(p_ex, V_0))
-        #
-        # fig = plt.figure()
-        # axes = fig.add_subplot(111, projection='3d')
-        # contours = trisurf(err_p3, axes=axes, cmap="inferno")
-        # axes.set_aspect("auto")
-        # axes.set_title("Error $p_3$")
-        # fig.colorbar(contours)
-        #
-        # fig = plt.figure()
-        # axes = fig.add_subplot(111, projection='3d')
-        # contours = trisurf(err_p0, axes=axes, cmap="inferno")
-        # axes.set_aspect("auto")
-        # axes.set_title("Error $p_0$")
-        # fig.colorbar(contours)
-        #
     # fig = plt.figure()
     # axes = fig.add_subplot(111, projection='3d')
     # contours = trisurf(project(p_ex, V3_b), axes=axes, cmap="inferno")
@@ -510,7 +483,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     #
     # fig = plt.figure()
     # axes = fig.add_subplot(111, projection='3d')
-    # contours = trisurf(interpolate(p_ex, V0_b), axes=axes, cmap="inferno")
+    # contours = trisurf(project(p_ex, V0_b), axes=axes, cmap="inferno")
     # axes.set_aspect("auto")
     # axes.set_title("$p_0$ Exact")
     # fig.colorbar(contours)
@@ -557,33 +530,43 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         # err_u_1 = np.sqrt(np.sum(float(dt) * np.power(err_u_1_vec, 2)))
         # err_p_0 = np.sqrt(np.sum(float(dt) * np.power(err_p_0_vec, 2)))
         # err_u_2 = np.sqrt(np.sum(float(dt) * np.power(err_u_2_vec, 2)))
-        #
-        # err_p_3 = max(err_p_3_vec)
-        # err_u_1 = max(err_u_1_vec)
-        #
-        # err_p_0 = max(err_p_0_vec)
-        # err_u_2 = max(err_u_2_vec)
-        #
-        # err_p30 = max(err_p30_vec)
-        # err_u12 = max(err_u12_vec)
 
-    errL2_p_3 = errL2_p_3_vec[-1]
-    errL2_u_1 = errL2_u_1_vec[-1]
+    ## Linf in time error
+    errL2_p_3 = max(errL2_p_3_vec)
+    errL2_u_1 = max(errL2_u_1_vec)
 
-    errL2_p_0 = errL2_p_0_vec[-1]
-    errL2_u_2 = errL2_u_2_vec[-1]
+    errL2_p_0 = max(errL2_p_0_vec)
+    errL2_u_2 = max(errL2_u_2_vec)
 
-    errHcurl_u_1 = errHcurl_u_1_vec[-1]
+    errHcurl_u_1 = max(errHcurl_u_1_vec)
 
-    errH1_p_0 = errH1_p_0_vec[-1]
-    errHdiv_u_2 = errHdiv_u_2_vec[-1]
+    errH1_p_0 = max(errH1_p_0_vec)
+    errHdiv_u_2 = max(errHdiv_u_2_vec)
 
-    err_p30 = err_p30_vec[-1]
-    err_u12 = err_u12_vec[-1]
+    err_p30 = max(err_p30_vec)
+    err_u12 = max(err_u12_vec)
 
-    errH_3210 = errH_3210_vec[-1]
-    errH_10 = errH_10_vec[-1]
-    errH_32 = errH_32_vec[-1]
+    errH_3210 = max(errH_3210_vec)
+    errH_T = max(errH_T_vec)
+
+    # # Error at the last simluation instant
+    # errL2_p_3 = errL2_p_3_vec[-1]
+    # errL2_u_1 = errL2_u_1_vec[-1]
+    #
+    # errL2_p_0 = errL2_p_0_vec[-1]
+    # errL2_u_2 = errL2_u_2_vec[-1]
+    #
+    # errHcurl_u_1 = errHcurl_u_1_vec[-1]
+    #
+    # errH1_p_0 = errH1_p_0_vec[-1]
+    # errHdiv_u_2 = errHdiv_u_2_vec[-1]
+    #
+    # err_p30 = err_p30_vec[-1]
+    # err_u12 = err_u12_vec[-1]
+
+    # errH_3210 = errH_3210_vec[-1]
+    # errH_10 = errH_10_vec[-1]
+    # errH_32 = errH_32_vec[-1]
 
     int_bd_flow = np.zeros((1 + n_t,))
 
@@ -593,29 +576,28 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     H_df_vec = H_3210_vec[0] + int_bd_flow
 
     dict_res = {"t_span": t_vec, "energy_ex": H_ex_vec, "energy_df": H_df_vec, "energy_3210": H_3210_vec,\
-                "energy_32": H_32_vec, "energy_01": H_10_vec, "energy_31": H_31_vec, "energy_02": H_02_vec, \
-                "power": Hdot_vec, "flow": bdflow_vec, "flow_ex": bdflow_ex_vec, "int_flow": int_bd_flow, \
-                "flow_mid": bdflow_mid_vec, "flow10_mid": bdflowV0_mid_vec, "flow32_mid": bdflowV2_mid_vec,\
+                "energy_T": H_T_vec, "power": Hdot_vec, "flow": bdflow_vec, "flow_ex": bdflow_ex_vec, "int_flow": int_bd_flow, \
+                "flow_mid": bdflow_mid_vec, "flowV0_mid": bdflowV0_mid_vec, "flowV2_mid": bdflowV2_mid_vec,\
                 "err_p3": errL2_p_3, "err_u1": [errL2_u_1, errHcurl_u_1], \
                 "err_p0": [errL2_p_0, errH1_p_0], "err_u2": [errL2_u_2, errHdiv_u_2], "err_p30": err_p30, \
-                "err_u12": err_u12, "err_H": [errH_3210, errH_10, errH_32]}
+                "err_u12": err_u12, "err_H": [errH_3210, errH_T]}
 
     return dict_res
-#
-#
-# bd_cond = input("Enter bc: ")
-#
-# n_elem = 10
-# pol_deg = 2
-#
-# n_time = 50
-# t_fin = 5
-#
-# dt = t_fin / n_time
-#
-# results = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bd_cond)
-# geo_case = "_2D"
-#
+
+
+bd_cond = input("Enter bc: ")
+
+n_elem = 20
+pol_deg = 1
+
+n_time = 5
+t_fin = 1
+
+dt = t_fin / n_time
+
+results = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bd_cond)
+geo_case = "_2D"
+
 # dictres_file = open("results_wave" + geo_case + "_" + bd_cond + ".pkl", "wb")
 # pickle.dump(results, dictres_file)
 # dictres_file.close()

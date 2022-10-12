@@ -2,7 +2,7 @@
 # with weak symmetry
 from ufl import indices
 from fenics import *
-from scipy.sparse import csc_matrix, csr_matrix, lil_matrix
+from scipy.sparse import csr_matrix, lil_matrix
 import numpy as np
 
 
@@ -157,26 +157,29 @@ def construct_system(Elasticity2DConfig):
 
     # Indexes of non zero columns
     set_cols = np.array(list(set(cols_B)))
+    # print(set_cols)
     # Number of non zero columns (i.e. number of inputs)
-    n_u = len(set(cols_B))
+    n_u = len(set_cols)
     # Initialization of the final matrix in lil folmat for efficient incremental construction.
     Bscipy = lil_matrix((Vstate.dim(), n_u))
     for r, c in zip(rows_B, cols_B):
         # Column index in the final matrix
         ind_col = np.where(set_cols == c)[0]
+
         # Fill the matrix with the values
         Bscipy[r, ind_col] = Bscipy_cols[r, c]
         # Convert to csr format
         Bscipy.tocsr()
 
-    return Mscipy, Jscipy, Bscipy
+    coord_Vcntr = Vcntr.tabulate_dof_coordinates()
+    coord_cols_B = coord_Vcntr[set_cols]
+
+    return Mscipy, Jscipy, Bscipy, coord_cols_B
 
 
-instance_El2D = Elasticity2DConfig()
+instance_El2D = Elasticity2DConfig(n_el=1)
 
-M, J, B = construct_system(instance_El2D)
+M, J, B, coord_colsB = construct_system(instance_El2D)
 
-print(B.shape)
-print(np.linalg.matrix_rank(B.todense()))
 
 

@@ -1,20 +1,21 @@
-DEG=2
+DEG = 2
 
 geo_case = "2D"
-bc_input = "DN"
 
 if geo_case=="2D":
     from FEEC.DiscretizationInterconnection.wave_eq.gyrator_wave2D import compute_err
 else:
     from FEEC.DiscretizationInterconnection.wave_eq.gyrator_wave3D import compute_err
+
+save_res = True # input("Save results: ")
 import numpy as np
-import os
+
 save_res = True # input("Save results: ")
 path_res = "results_wave/"
 bc_input = "DN"
-n_test_deg2 = 2
+n_test_deg2 = 4
 
-n_vec_deg2 = np.array([2 ** (i+1) for i in range(n_test_deg2)])
+n_vec_deg2 = np.array([2 ** (i+2) for i in range(n_test_deg2)])
 h_vec_deg2 = 1./n_vec_deg2
 
 p3_err_deg2 = np.zeros((n_test_deg2,))
