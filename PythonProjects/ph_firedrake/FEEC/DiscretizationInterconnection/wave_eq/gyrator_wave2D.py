@@ -89,6 +89,9 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     mesh = RectangleMesh(n_el, n_el, 1, 1/2)
     n_ver = FacetNormal(mesh)
 
+    # triplot(mesh)
+    # plt.show()
+
     P0 = FiniteElement("CG", triangle, deg)
     P1 = FiniteElement("N1curl", triangle, deg, variant="integral")
     P2 = FiniteElement("RT", triangle, deg, variant="integral")
@@ -255,19 +258,19 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         if element in dofsV2_D:
             dofsV2_D.remove(element)
 
-    # print("dofs on Gamma_D for V0")
-    # print(dofsV0_D)
-    # print("dofs on Gamma_D for V2")
-    # print(dofsV2_D)
-    #
-    # print("dofs on Gamma_N for V0")
-    # print(dofsV0_N)
-    # print("dofs on Gamma_N for V2")
-    # print(dofsV2_N)
-    #
+    print("dofs on Gamma_D for V0")
+    print(len(dofsV0_D))
+    print("dofs on Gamma_D for V2")
+    print(len(dofsV2_D))
+
+    print("dofs on Gamma_N for V0")
+    print(len(dofsV0_N))
+    print("dofs on Gamma_N for V2")
+    print(len(dofsV2_N))
+
     # print("dofs  V0")
     # print(dofsV0_D + dofsV0_N)
-    # print("dofs on Gamma_D for V2")
+    # print("dofs V2")
     # print(dofsV2_D + dofsV2_N)
 
 
@@ -390,7 +393,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
         ## Integration of the coupled system
 
-        A_mat = assemble(a_form, bcs=bcs, mat_type='aij')
+        # A_mat = assemble(a_form, bcs=bcs, mat_type='aij')
+        A_mat = assemble(a_form, mat_type='aij')
 
         b_form = m_form(v0_b, pn_0_b, v1_b, un_1_b, v3_b, pn_3_b, v2_b, un_2_b) \
                    + dt*(0.5*j_form(v0_b, pn_0_b, v1_b, un_1_b, v3_b, pn_3_b, v2_b, un_2_b) + bdflow(v2_b, input_0, v0_b, input_2))
@@ -401,6 +405,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         # Computation of energy rate and fluxes
 
         enmid_0132_b.assign(0.5 * (en_0132_b + en1_0132_b))
+        pnmid_0_b, unmid_1_b, pnmid_3_b, unmid_2_b = enmid_0132_b.split()
 
         Hdot_vec[ii] = assemble(Hdot_n)
 
@@ -409,32 +414,34 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         yhat_V0 = assemble(y_nmid_ess).vector().get_local()[dofsV0_D]
         u_midn_V0 = enmid_0132_b.vector().get_local()[dofsV0_D]
 
-        uhat_V0 = assemble(u_nmid_nat0).vector().get_local()[dofsV0_N]
-        y_midn_V0 = enmid_0132_b.vector().get_local()[dofsV0_N]
+        uhat_V0 = assemble(u_nmid_nat0).vector().get_local()
+        y_midn_V0 = enmid_0132_b.vector().get_local()
 
-        bdflowV0_nat = np.dot(uhat_V0, y_midn_V0)
-        bdflowV0_ess = np.dot(yhat_V0, u_midn_V0)
+        bdflowV0_nat = 0*np.dot(uhat_V0, y_midn_V0)
+        bdflowV0_ess = 0*np.dot(yhat_V0, u_midn_V0)
         bdflowV0_mid_vec[ii] = bdflowV0_nat + bdflowV0_ess
 
-        print('V0 flow nat')
-        print(bdflowV0_nat)
-        print('V0 flow ess')
-        print(bdflowV0_ess)
+        # print('V0 flow nat')
+        # print(bdflowV0_nat)
+        # print('V0 flow ess')
+        # print(bdflowV0_ess)
 
         yhat_V2 = assemble(y_nmid_ess).vector().get_local()[dofsV2_N]
         u_midn_V2 = enmid_0132_b.vector().get_local()[dofsV2_N]
 
-        uhat_V2 = assemble(u_nmid_nat2).vector().get_local()[dofsV2_D]
-        y_midn_V2 = enmid_0132_b.vector().get_local()[dofsV2_D]
+        uhat_V2 = assemble(u_nmid_nat2).vector().get_local()
+        y_midn_V2 = enmid_0132_b.vector().get_local()
 
-        bdflowV2_nat = np.dot(uhat_V2, y_midn_V2)
-        bdflowV2_ess = np.dot(yhat_V2, u_midn_V2)
-        bdflowV2_mid_vec[ii] = bdflowV2_nat + bdflowV2_ess
+        bdflowV2_nat = 0*np.dot(uhat_V2, y_midn_V2)
+        bdflowV2_ess = 0*np.dot(yhat_V2, u_midn_V2)
+        # bdflowV2_mid_vec[ii] = bdflowV2_nat + bdflowV2_ess
 
-        print('V2 flow nat')
-        print(bdflowV2_nat)
-        print('V2 flow ess')
-        print(bdflowV2_ess)
+        bdflowV2_mid_vec[ii] = assemble(bdflow(unmid_2_b, input_0, pnmid_0_b, input_2))
+
+        # print('V2 flow nat')
+        # print(bdflowV2_nat)
+        # print('V2 flow ess')
+        # print(bdflowV2_ess)
 
         # New assign
 
@@ -587,10 +594,10 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
 bd_cond = input("Enter bc: ")
 
-n_elem = 20
+n_elem = 10
 pol_deg = 1
 
-n_time = 5
+n_time = 10
 t_fin = 1
 
 dt = t_fin / n_time
@@ -598,6 +605,6 @@ dt = t_fin / n_time
 results = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bd_cond)
 geo_case = "_2D"
 
-# dictres_file = open("results_wave" + geo_case + "_" + bd_cond + ".pkl", "wb")
-# pickle.dump(results, dictres_file)
-# dictres_file.close()
+dictres_file = open("results_wave" + geo_case + "_" + bd_cond + ".pkl", "wb")
+pickle.dump(results, dictres_file)
+dictres_file.close()

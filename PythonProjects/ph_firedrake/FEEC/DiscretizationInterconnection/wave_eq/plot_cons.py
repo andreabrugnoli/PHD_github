@@ -44,24 +44,24 @@ dt = t_vec[-1] / (len(t_vec)-1)
 
 
 
-# plt.figure()
-# plt.plot(t_vec[1:]-dt/2, bdflowV2_mid, '--.', label=r"Flow 2")
-# plt.plot(t_vec[1:]-dt/2, bdflowV0_mid, '-.', label=r"Flow 0")
-# plt.plot(t_vec[1:]-dt/2, bdflow_mid, '*', label=r"Flow mid")
-# plt.plot(t_vec, bdflow_vec, 'o', label=r"Flow n")
-# plt.plot(t_vec, bdflow_ex_vec, '+', label=r"Flow ex")
-# plt.xlabel(r'Time $[\mathrm{s}]$')
-# plt.ylabel(r'WTF')
-# plt.legend()
-#
-# if save_plots:
-#     plt.savefig(path_fig + "test_bdflow" + geo_case + bc_case + ".pdf", format="pdf")
+plt.figure()
+plt.plot(t_vec[1:]-dt/2, bdflowV2_mid, '--.', label=r"Flow 2")
+plt.plot(t_vec[1:]-dt/2, bdflowV0_mid, '-.', label=r"Flow 0")
+plt.plot(t_vec[1:]-dt/2, bdflow_mid, '*', label=r"Flow mid")
+plt.plot(t_vec, bdflow_vec, 'o', label=r"Flow n")
+plt.plot(t_vec, bdflow_ex_vec, '+', label=r"Flow ex")
+plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.ylabel(r'WTF')
+plt.legend()
+
+if save_plots:
+    plt.savefig(path_fig + "test_bdflow" + geo_case + bc_case + ".pdf", format="pdf")
 
 
 # plt.title(r'Conservation law $\dot{H}^{3\widehat{1}}_h-P^{3\widehat{1}}_h$')
 
 plt.figure()
-plt.plot(t_vec[1:]-dt/2, 0.5*np.diff(H_T)/dt - bdflowV0_mid - bdflowV2_mid, 'r-.')
+plt.plot(t_vec[1:]-dt/2, np.diff(H_T)/dt - bdflowV2_mid - bdflowV0_mid, 'r-.')
 plt.xlabel(r'Time $[\mathrm{s}]$')
 plt.ylabel(r'$\dot{H}^T_h-P^T_h$')
 
@@ -69,7 +69,7 @@ if save_plots:
     plt.savefig(path_fig + "HT_conservation" + geo_case + bc_case + ".pdf", format="pdf")
 
 plt.figure()
-plt.plot(t_vec[1:]-dt/2, 0.5*np.diff(H_T)/dt, '-v', label=r"$\dot{H}_{h}^{T}$")
+plt.plot(t_vec[1:]-dt/2, np.diff(H_T)/dt, '-v', label=r"$\dot{H}_{h}^{T}$")
 plt.plot(t_vec[1:]-dt/2, bdflowV0_mid, '-.+', label=r"Flow V0")
 plt.plot(t_vec[1:]-dt/2, bdflowV2_mid, '--*', label=r"Flow V2")
 plt.xlabel(r'Time $[\mathrm{s}]$')
