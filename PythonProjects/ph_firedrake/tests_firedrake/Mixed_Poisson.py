@@ -106,8 +106,7 @@ tau, v = TestFunctions(W)
 # with our chosen right hand side function value. ::
 
 x, y = SpatialCoordinate(mesh)
-f = Function(DG).interpolate(
-    10*exp(-(pow(x - 0.5, 2) + pow(y - 0.5, 2)) / 0.02))
+f = Function(DG).interpolate(10*exp(-(pow(x - 0.5, 2) + pow(y - 0.5, 2)) / 0.02))
 
 # After dropping the vanishing boundary term on the right hand side, the
 # bilinear and linear forms of the variational problem are defined as: ::
@@ -130,20 +129,22 @@ bc1 = DirichletBC(W.sub(0), as_vector([0.0, sin(5*y)]), 2)
 # Now we're ready to solve the variational problem. We define `w` to be a function
 # to hold the solution on the mixed space. ::
 
-w = Function(W)
+wh = Function(W)
 
 # Then we solve the linear variational problem ``a == L`` for ``w`` under the
 # given boundary conditions ``bc0`` and ``bc1``. Afterwards we extract the
 # components ``sigma`` and ``u`` on each of the subspaces with ``split``. ::
 
-solve(a == L, w, bcs=[bc0, bc1])
-sigma, u = w.split()
+solve(a == L, wh, bcs=[bc0, bc1])
+# solve(a == L, wh)
+
+sigmah, uh = wh.split()
 
 # Lastly we write the component of the solution corresponding to the primal
 # variable on the DG space to a file in VTK format for later inspection with a
 # visualisation tool such as `ParaView <http://www.paraview.org/>`__ ::
 
-File("poisson_mixed.pvd").write(u)
+# File("poisson_mixed.pvd").write(uh)
 
 # We could use the built in plot function of firedrake by calling
 # :func:`plot <firedrake.plot.plot>` to plot a surface graph. Before that,
@@ -155,7 +156,7 @@ except:
   warning("Matplotlib not imported")
 
 try:
-  plot(u)
+  trisurf(uh)
 except Exception as e:
   warning("Cannot plot figure. Error msg '%s'" % e)
 
