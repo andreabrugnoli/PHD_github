@@ -4,18 +4,18 @@
 from fenics import *
 import numpy as np
 np.set_printoptions(threshold=np.inf)
-import mshr
-import matplotlib.pyplot as plt
-
 import scipy.linalg as la
 
-import matplotlib
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
-from matplotlib import cm
-
-matplotlib.rcParams['text.usetex'] = True
+# import mshr
+# import matplotlib.pyplot as plt
+#
+#
+# import matplotlib
+# import matplotlib.pyplot as plt
+# from mpl_toolkits.mplot3d import Axes3D
+# from matplotlib.ticker import LinearLocator, FormatStrFormatter
+# from matplotlib import cm
+# matplotlib.rcParams['text.usetex'] = True
 
 n = 7 #int(input("Number of elements for side: "))
 deg = 1 #int(input('Degree for FE: '))
@@ -236,45 +236,45 @@ eigvec_w_imag = np.imag(eigvec_w)
 
 n_fig = nreq
 
-if plot_eigenvector == 'y':
-
-    for i in range(n_fig):
-        z_real = eigvec_w_real[:, i]
-        z_imag = eigvec_w_imag[:, i]
-
-        tol = 1e-6
-        fntsize = 20
-
-        if np.linalg.norm(z_real) > np.linalg.norm(z_imag):
-            z = z_real
-        else:
-            z = z_imag
-
-        minZ = min(z)
-        maxZ = max(z)
-
-        if minZ != maxZ:
-
-            fig = plt.figure()
-
-            ax = fig.add_subplot(111, projection='3d')
-
-            ax.set_xbound(min(x) - tol, max(x) + tol)
-            ax.set_xlabel('$x$', fontsize=fntsize)
-
-            ax.set_ybound(min(y) - tol, max(y) + tol)
-            ax.set_ylabel('$y$', fontsize=fntsize)
-
-            ax.set_title('$v_{e_{p,w}}$', fontsize=fntsize)
-
-            ax.set_zlim3d(minZ - 0.01*abs(minZ), maxZ + 0.01*abs(maxZ))
-            ax.w_zaxis.set_major_locator(LinearLocator(10))
-            ax.w_zaxis.set_major_formatter(FormatStrFormatter('%.2g'))
-
-            ax.plot_trisurf(x, y, z, cmap=cm.jet, linewidth=0, antialiased=False)
-
-            # path_out = "/home/a.brugnoli/PycharmProjects/Mindlin_Phs_fenics/Figures_Eig_Min/RealEig/"
-            # plt.savefig(path_out1 + "Case" + case_study + "_el" + str(n) + "_deg" + str(deg) + "_thick_" + \
-            #             str(thick) + "_eig_" + str(i+1) + ".eps", format="eps")
-
-plt.show()
+# if plot_eigenvector == 'y':
+#
+#     for i in range(n_fig):
+#         z_real = eigvec_w_real[:, i]
+#         z_imag = eigvec_w_imag[:, i]
+#
+#         tol = 1e-6
+#         fntsize = 20
+#
+#         if np.linalg.norm(z_real) > np.linalg.norm(z_imag):
+#             z = z_real
+#         else:
+#             z = z_imag
+#
+#         minZ = min(z)
+#         maxZ = max(z)
+#
+#         if minZ != maxZ:
+#
+#             fig = plt.figure()
+#
+#             ax = fig.add_subplot(111, projection='3d')
+#
+#             ax.set_xbound(min(x) - tol, max(x) + tol)
+#             ax.set_xlabel('$x$', fontsize=fntsize)
+#
+#             ax.set_ybound(min(y) - tol, max(y) + tol)
+#             ax.set_ylabel('$y$', fontsize=fntsize)
+#
+#             ax.set_title('$v_{e_{p,w}}$', fontsize=fntsize)
+#
+#             ax.set_zlim3d(minZ - 0.01*abs(minZ), maxZ + 0.01*abs(maxZ))
+#             ax.w_zaxis.set_major_locator(LinearLocator(10))
+#             ax.w_zaxis.set_major_formatter(FormatStrFormatter('%.2g'))
+#
+#             ax.plot_trisurf(x, y, z, cmap=cm.jet, linewidth=0, antialiased=False)
+#
+#             # path_out = "/home/a.brugnoli/PycharmProjects/Mindlin_Phs_fenics/Figures_Eig_Min/RealEig/"
+#             # plt.savefig(path_out1 + "Case" + case_study + "_el" + str(n) + "_deg" + str(deg) + "_thick_" + \
+#             #             str(thick) + "_eig_" + str(i+1) + ".eps", format="eps")
+#
+# plt.show()

@@ -1,7 +1,7 @@
 # Mindlin plate written with the port Hamiltonian approach
 # with weak symmetry
 from ufl import indices
-from fenics import *
+from firedrake import *
 from scipy.sparse import csr_matrix, lil_matrix
 from scipy.sparse.linalg import spsolve
 from scipy.io import savemat
@@ -53,10 +53,14 @@ def construct_system(Elasticity2DConfig):
         return 1/(2*Elasticity2DConfig.mu) * \
                (sigma - Elasticity2DConfig.lamda/(2*(Elasticity2DConfig.lamda + Elasticity2DConfig.mu)) * Identity(2) * tr(sigma))
 
-    msh = RectangleMesh(Point(0, 0), Point(Elasticity2DConfig.Lx, Elasticity2DConfig.Ly), \
-                         Elasticity2DConfig.n_el, Elasticity2DConfig.n_el)
+    msh = RectangleMesh(Elasticity2DConfig.n_el, Elasticity2DConfig.n_el, \
+                        Elasticity2DConfig.Lx, Elasticity2DConfig.Ly )
 
     n_ver = FacetNormal(msh)
+
+    x, y = SpatialCoordinate(msh)
+    location_f = conditional(And(And(gt(x, Elasticity2DConfig.Lx/4), lt(x, 3 * Elasticity2DConfig.Lx/4)), \
+                                 And(gt(y, Elasticity2DConfig.Ly/4), lt(y, 3 * Elasticity2DConfig.Ly/4))), 1, 0)
 
     # Finite element definition: we use the AFW with weak symmetry
 
@@ -123,66 +127,36 @@ def construct_system(Elasticity2DConfig):
         """
         return dot(v_vel, div(e_sig)) * dx - dot(div(v_sig), e_vel) * dx
 
-    def cntr_form(v_sig, u):
-        i, j = indices(2)
-        return v_sig[i, j]*n_ver[j]*u[i] * ds
+    def cntr_form_x(v_vel):
+        return v_vel[0] * location_f * ds
 
-    Jpetsc = PETScMatrix()
-    Mpetsc = PETScMatrix()
-    Bpetsc = PETScMatrix()
+    def cntr_form_y(v_vel):
+        return v_vel[1] * location_f * ds
 
     m_form = mass_form(v_vel, e_vel, v_sig, e_sig, v_skw, e_skw)
     j_form = int_form(v_vel, e_vel, v_sig, e_sig)
-    b_form = cntr_form(v_sig, u_cntr)
 
-    assemble(m_form, Mpetsc)
-    assemble(j_form, Jpetsc)
-    assemble(b_form, Bpetsc)
+    b_form_x = cntr_form_x(v_vel)
+    b_form_y = cntr_form_y(v_vel)
+
+    Mpetsc = assemble(m_form, mat_type='aij').M.handle  # Petsc format of the matrix
+    Jpetsc = assemble(j_form, mat_type='aij').M.handle  # Petsc format of the matrix
+
 
     # Conversion to CSR scipy format
-    Jscipy = csr_matrix(Jpetsc.mat().getValuesCSR()[::-1])
-    Mscipy = csr_matrix(Mpetsc.mat().getValuesCSR()[::-1])
-    Bscipy_cols = csr_matrix(Bpetsc.mat().getValuesCSR()[::-1])
-    # Non zero rows and columns
-    rows_B, cols_B = csr_matrix.nonzero(Bscipy_cols)
+    Jscipy = csr_matrix(Jpetsc.getValuesCSR()[::-1])
+    Mscipy = csr_matrix(Mpetsc.getValuesCSR()[::-1])
 
-    tol = 1e-6
-    indtol_vec = []
-    # Remove nonzeros rows and columns below a given tolerance
-    for kk in range(len(rows_B)):
-        ind_row = rows_B[kk]
-        ind_col = cols_B[kk]
+    Bscipy_x = assemble(b_form_x).vector().get_local()
+    Bscipy_y = assemble(b_form_y).vector().get_local()
 
-        if abs(Bscipy_cols[ind_row, ind_col]) < tol:
-            indtol_vec.append(kk)
-
-    rows_B = np.delete(rows_B, indtol_vec)
-    cols_B = np.delete(cols_B, indtol_vec)
-
-    # Indexes of non zero columns
-    set_cols = np.array(list(set(cols_B)))
-    # print(set_cols)
-    # Number of non zero columns (i.e. number of inputs)
-    n_u = len(set_cols)
-    # Initialization of the final matrix in lil folmat for efficient incremental construction.
-    Bscipy = lil_matrix((Vstate.dim(), n_u))
-    for r, c in zip(rows_B, cols_B):
-        # Column index in the final matrix
-        ind_col = np.where(set_cols == c)[0]
-
-        # Fill the matrix with the values
-        Bscipy[r, ind_col] = Bscipy_cols[r, c]
-        # Convert to csr format
-        Bscipy.tocsr()
-
-    coord_Vcntr = Vcntr.tabulate_dof_coordinates()
-    coord_cols_B = coord_Vcntr[set_cols]
-
-    return Mscipy, Jscipy, Bscipy, coord_cols_B
+    Bscipy = np.hstack((Bscipy_x.reshape((-1, 1)), Bscipy_y.reshape((-1, 1))))
+    return Mscipy, Jscipy, Bscipy
 
 
-instance_El2D_case1 = Elasticity2DConfig(n_el=5, deg_FE=2)
-E_1, J_1, B_1, coord_colsB_1 = construct_system(instance_El2D_case1)
+# instance_El2D_case1 = Elasticity2DConfig(n_el=5, deg_FE=1)
+# E_1, J_1, B_1 = construct_system(instance_El2D_case1)
+
 
 # n1 = E_1.shape[0]
 # dic_case1 = {"E": E_1, "J": J_1, "B": B_1, "x_u": coord_colsB_1}
