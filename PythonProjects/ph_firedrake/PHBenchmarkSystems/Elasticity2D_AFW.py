@@ -6,7 +6,7 @@ from scipy.sparse import csr_matrix, lil_matrix
 from scipy.sparse.linalg import spsolve
 from scipy.io import savemat
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 class Elasticity2DConfig:
     def __init__(self, n_el=1, deg_FE=1, Lx=1, Ly=1, rho=1, lamda=20, mu=4):
@@ -59,14 +59,17 @@ def construct_system(Elasticity2DConfig):
     n_ver = FacetNormal(msh)
 
     x, y = SpatialCoordinate(msh)
-    location_f = conditional(And(And(gt(x, Elasticity2DConfig.Lx/4), lt(x, 3 * Elasticity2DConfig.Lx/4)), \
-                                 And(gt(y, Elasticity2DConfig.Ly/4), lt(y, 3 * Elasticity2DConfig.Ly/4))), 1, 0)
+    # location_f = conditional(And(And(gt(x, Elasticity2DConfig.Lx/4), lt(x, 3 * Elasticity2DConfig.Lx/4)), \
+    #                              And(gt(y, Elasticity2DConfig.Ly/4), lt(y, 3 * Elasticity2DConfig.Ly/4))), 1, 0)
+    location_f = exp(-0.5*(100*(x-Elasticity2DConfig.Lx/2)**2 + 100*(y-Elasticity2DConfig.Ly/2)**2))
+    # trisurf(interpolate(location_f, FunctionSpace(msh, "CG", 2)))
+    # plt.show()
 
     # Finite element definition: we use the AFW with weak symmetry
 
     Pvel = VectorElement('DG', triangle, Elasticity2DConfig.deg_FE - 1)
-    Psig1 = FiniteElement('BDM', triangle, Elasticity2DConfig.deg_FE)
-    Psig2 = FiniteElement('BDM', triangle, Elasticity2DConfig.deg_FE)
+    Psig1 = FiniteElement('BDM', triangle, Elasticity2DConfig.deg_FE, variant="integral")
+    Psig2 = FiniteElement('BDM', triangle, Elasticity2DConfig.deg_FE, variant="integral")
     Pskw = FiniteElement('DG', triangle, Elasticity2DConfig.deg_FE - 1)
 
     AFW_elem = MixedElement([Pvel, Psig1, Psig2, Pskw])
@@ -154,33 +157,31 @@ def construct_system(Elasticity2DConfig):
     return Mscipy, Jscipy, Bscipy
 
 
-# instance_El2D_case1 = Elasticity2DConfig(n_el=5, deg_FE=1)
+# instance_El2D_case1 = Elasticity2DConfig(n_el=5, deg_FE=2)
 # E_1, J_1, B_1 = construct_system(instance_El2D_case1)
-
-
-# n1 = E_1.shape[0]
-# dic_case1 = {"E": E_1, "J": J_1, "B": B_1, "x_u": coord_colsB_1}
-# savemat("/home/andrea/Data/PH_Benchmark/el2Dafw-n" + str(n1) + ".mat", dic_case1)
 #
+# n1 = E_1.shape[0]
+# dic_case1 = {"E": E_1.todense(), "J": J_1.todense(), "B": B_1}
+# savemat("/home/andrea/Data/PH_Benchmark/el2Dafw-n" + str(n1) + ".mat", dic_case1)
+
 # instance_El2D_case2 = Elasticity2DConfig(n_el=10, deg_FE=1)
-# E_2, J_2, B_2, coord_colsB_2 = construct_system(instance_El2D_case2)
+# E_2, J_2, B_2 = construct_system(instance_El2D_case2)
 #
 # # A_2 = spsolve(E_2.tocsc(), J_2.tocsc())
 #
 # n2 = E_2.shape[0]
 #
-# dic_case2 = {"E": E_2, "J": J_2, "B": B_2, "x_u": coord_colsB_2}
+# dic_case2 = {"E": E_2, "J": J_2, "B": B_2}
 #
 # savemat("/home/andrea/Data/PH_Benchmark/el2Dafw-n" + str(n2) + ".mat", dic_case2)
 #
 # instance_El2D_case3 = Elasticity2DConfig(n_el=10, deg_FE=2)
-# E_3, J_3, B_3, coord_colsB_3 = construct_system(instance_El2D_case3)
+# E_3, J_3, B_3 = construct_system(instance_El2D_case3)
 #
 # n3 = E_3.shape[0]
 #
-# dic_case3 = {"E": E_3, "J": J_3, "B": B_3, "x_u": coord_colsB_3}
+# dic_case3 = {"E": E_3, "J": J_3, "B": B_3}
 #
 # savemat("/home/andrea/Data/PH_Benchmark/el2Dafw-n" + str(n3) + ".mat", dic_case3)
 #
-#
-#
+
