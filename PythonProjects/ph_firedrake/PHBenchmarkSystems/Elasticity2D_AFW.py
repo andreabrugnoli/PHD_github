@@ -157,31 +157,31 @@ def construct_system(Elasticity2DConfig):
     return Mscipy, Jscipy, Bscipy
 
 
-# instance_El2D_case1 = Elasticity2DConfig(n_el=5, deg_FE=2)
-# E_1, J_1, B_1 = construct_system(instance_El2D_case1)
-#
-# n1 = E_1.shape[0]
-# dic_case1 = {"E": E_1.todense(), "J": J_1.todense(), "B": B_1}
-# savemat("/home/andrea/Data/PH_Benchmark/el2Dafw-n" + str(n1) + ".mat", dic_case1)
+instance_El2D_case1 = Elasticity2DConfig(n_el=5, deg_FE=2)
+E_1, J_1, B_1 = construct_system(instance_El2D_case1)
 
-# instance_El2D_case2 = Elasticity2DConfig(n_el=10, deg_FE=1)
-# E_2, J_2, B_2 = construct_system(instance_El2D_case2)
-#
-# # A_2 = spsolve(E_2.tocsc(), J_2.tocsc())
-#
-# n2 = E_2.shape[0]
-#
-# dic_case2 = {"E": E_2, "J": J_2, "B": B_2}
-#
-# savemat("/home/andrea/Data/PH_Benchmark/el2Dafw-n" + str(n2) + ".mat", dic_case2)
-#
-# instance_El2D_case3 = Elasticity2DConfig(n_el=10, deg_FE=2)
-# E_3, J_3, B_3 = construct_system(instance_El2D_case3)
-#
-# n3 = E_3.shape[0]
-#
-# dic_case3 = {"E": E_3, "J": J_3, "B": B_3}
-#
-# savemat("/home/andrea/Data/PH_Benchmark/el2Dafw-n" + str(n3) + ".mat", dic_case3)
+n1 = E_1.shape[0]
+dic_case1 = {"E": E_1, "J": J_1, "B": B_1}
+savemat("/home/andrea/Data/PH_Benchmark/el2Dafw-n" + str(n1) + ".mat", dic_case1)
+
+instance_El2D_case2 = Elasticity2DConfig(n_el=10, deg_FE=1)
+E_2, J_2, B_2 = construct_system(instance_El2D_case2)
+
+# A_2 = spsolve(E_2.tocsc(), J_2.tocsc())
+
+n2 = E_2.shape[0]
+
+dic_case2 = {"E": E_2, "J": J_2, "B": B_2}
+
+savemat("/home/andrea/Data/PH_Benchmark/el2Dafw-n" + str(n2) + ".mat", dic_case2)
+
+instance_El2D_case3 = Elasticity2DConfig(n_el=10, deg_FE=2)
+E_3, J_3, B_3 = construct_system(instance_El2D_case3)
+
+n3 = E_3.shape[0]
+
+dic_case3 = {"E": E_3, "J": J_3, "B": B_3}
+
+savemat("/home/andrea/Data/PH_Benchmark/el2Dafw-n" + str(n3) + ".mat", dic_case3)
 #
 
