@@ -8,7 +8,6 @@ os.environ["OMP_NUM_THREADS"] = "1"
 from scipy.sparse import csr_matrix, csc_matrix, lil_matrix
 from scipy.sparse.linalg import spsolve
 
-from FEEC.DiscretizationInterconnection.triangle_mesh import create_reference_triangle
 from matplotlib import pyplot as plt
 
 L_x = 1
@@ -25,7 +24,8 @@ def curl2D(u):
 def rot2D(u_vec):
     return u_vec[1].dx(0) - u_vec[0].dx(1)
 
-mesh = RectangleMesh(1, 1, L_x, L_y)
+n_el = 1
+mesh = RectangleMesh(n_el, n_el, L_x, L_y)
 x, y = SpatialCoordinate(mesh)
 
 n_ver = FacetNormal(mesh)
@@ -83,26 +83,41 @@ f0_b.project(x*y**2)
 # * 3: plane y == 0
 # * 4: plane y == Ly
 
-# b_L = v0_b * dot(u1til_b, n_ver) * ds(1)
-# petsc_BL = assemble(b_L, mat_type='aij').M.handle
-# B_L = np.array(petsc_BL.convert("dense").getDenseArray())
-# B_L[abs(B_L) < tol] = 0.0
-# dofs2_L = np.where(B_L.any(axis=0))[0]
+b_0in = v0_b * u0_b * ds
+petsc_B0in = assemble(b_0in, mat_type='aij').M.handle
+B_0in = np.array(petsc_B0in.convert("dense").getDenseArray())
+B_0in[abs(B_0in) < tol] = 0.0
+dofs_bd_0in = np.where(B_0in.any(axis=0))[0]
+
+print("Boundary matrix 1til")
+B_0in = B_0in[:, dofs_bd_0in]
+print(B_0in)
+
+print(B_0in.shape, np.linalg.matrix_rank(B_0in))
+
+# b_1til = v0_b * dot(u1til_b, n_ver) * ds
+# petsc_B1til = assemble(b_1til, mat_type='aij').M.handle
+# B_1til = np.array(petsc_B1til.convert("dense").getDenseArray())
+# B_1til[abs(B_1til) < tol] = 0.0
+# dofs_bd_1til = np.where(B_1til.any(axis=0))[0]
 #
-# print("Left boundary matrix")
-# B_L = B_L[:, dofs2_L]
-# print(B_L)
+# print("Boundary matrix 1til")
+# B_1til = B_1til[:, dofs_bd_1til]
+# # print(B_1til)
 #
-# b_R = v0_b * dot(u1til_b, n_ver) * ds(2)
-# petsc_BR = assemble(b_R, mat_type='aij').M.handle
-# B_R = np.array(petsc_BR.convert("dense").getDenseArray())
-# B_R[abs(B_R) < tol] = 0.0
-# dofs2_R = np.where(B_R.any(axis=0))[0]
+# print(B_1til.shape, np.linalg.matrix_rank(B_1til))
+
+# b_0 = dot(v1til_b, n_ver) * u0_b * ds
+# petsc_B0 = assemble(b_0, mat_type='aij').M.handle
+# B_0 = np.array(petsc_B0.convert("dense").getDenseArray())
+# B_0[abs(B_0) < tol] = 0.0
+# dofs_bd_0 = np.where(B_0.any(axis=0))[0]
 #
-# print("Right boundary matrix")
-# B_R = B_R[:, dofs2_R]
-# print(B_R)
+# print("Boundary matrix 0")
+# B_0 = B_0[:, dofs_bd_0]
+# # print(B_0)
 #
+# print(B_0.shape, np.linalg.matrix_rank(B_0))
 #
 #
 # n0_b = V0_b.dim()
