@@ -24,7 +24,7 @@ def curl2D(u):
 def rot2D(u_vec):
     return u_vec[1].dx(0) - u_vec[0].dx(1)
 
-n_el = 1
+n_el = 2
 mesh = RectangleMesh(n_el, n_el, L_x, L_y)
 x, y = SpatialCoordinate(mesh)
 
@@ -33,10 +33,10 @@ n_ver = FacetNormal(mesh)
 # triplot(mesh)
 # plt.show()
 P0 = FiniteElement("CG", triangle, deg)
-P1 = FiniteElement("N1curl", triangle, deg)
-P1til = FiniteElement("RT", triangle, deg)
-# P1 = FiniteElement("N1curl", triangle, deg, variant='integral')
-# P1til = FiniteElement("RT", triangle, deg, variant='integral')
+# P1 = FiniteElement("N1curl", triangle, deg)
+# P1til = FiniteElement("RT", triangle, deg)
+P1 = FiniteElement("N1curl", triangle, deg, variant='integral')
+P1til = FiniteElement("RT", triangle, deg, variant='integral')
 P2 = FiniteElement("DG", triangle, deg - 1)
 
 
@@ -91,34 +91,34 @@ dofs_bd_0in = np.where(B_0in.any(axis=0))[0]
 
 print("Boundary matrix 1til")
 B_0in = B_0in[:, dofs_bd_0in]
-print(B_0in)
+# print(B_0in)
 
 print(B_0in.shape, np.linalg.matrix_rank(B_0in))
 
-# b_1til = v0_b * dot(u1til_b, n_ver) * ds
-# petsc_B1til = assemble(b_1til, mat_type='aij').M.handle
-# B_1til = np.array(petsc_B1til.convert("dense").getDenseArray())
-# B_1til[abs(B_1til) < tol] = 0.0
-# dofs_bd_1til = np.where(B_1til.any(axis=0))[0]
-#
-# print("Boundary matrix 1til")
-# B_1til = B_1til[:, dofs_bd_1til]
-# # print(B_1til)
-#
-# print(B_1til.shape, np.linalg.matrix_rank(B_1til))
+b_1til = v0_b * dot(u1til_b, n_ver) * ds
+petsc_B1til = assemble(b_1til, mat_type='aij').M.handle
+B_1til = np.array(petsc_B1til.convert("dense").getDenseArray())
+B_1til[abs(B_1til) < tol] = 0.0
+dofs_bd_1til = np.where(B_1til.any(axis=0))[0]
 
-# b_0 = dot(v1til_b, n_ver) * u0_b * ds
-# petsc_B0 = assemble(b_0, mat_type='aij').M.handle
-# B_0 = np.array(petsc_B0.convert("dense").getDenseArray())
-# B_0[abs(B_0) < tol] = 0.0
-# dofs_bd_0 = np.where(B_0.any(axis=0))[0]
-#
-# print("Boundary matrix 0")
-# B_0 = B_0[:, dofs_bd_0]
-# # print(B_0)
-#
-# print(B_0.shape, np.linalg.matrix_rank(B_0))
-#
+print("Boundary matrix 1til")
+B_1til = B_1til[:, dofs_bd_1til]
+# print(B_1til)
+
+print(B_1til.shape, np.linalg.matrix_rank(B_1til))
+
+b_0 = dot(v1til_b, n_ver) * u0_b * ds
+petsc_B0 = assemble(b_0, mat_type='aij').M.handle
+B_0 = np.array(petsc_B0.convert("dense").getDenseArray())
+B_0[abs(B_0) < tol] = 0.0
+dofs_bd_0 = np.where(B_0.any(axis=0))[0]
+
+print("Boundary matrix 0")
+B_0 = B_0[:, dofs_bd_0]
+# print(B_0)
+
+print(B_0.shape, np.linalg.matrix_rank(B_0))
+
 #
 # n0_b = V0_b.dim()
 # n1_b = V1_b.dim()
