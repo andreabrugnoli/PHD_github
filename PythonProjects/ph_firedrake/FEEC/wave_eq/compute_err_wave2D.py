@@ -32,8 +32,10 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     n_ver = FacetNormal(mesh)
 
     P_0 = FiniteElement("CG", triangle, deg)
-    P_1 = FiniteElement("N1curl", triangle, deg, variant='integral')
-    # P_2 = FiniteElement("RT", triangle, deg)
+    # P_1 = FiniteElement("N1curl", triangle, deg, variant='integral')
+
+    P_1 = BrokenElement(FiniteElement("N1curl", triangle, deg, variant='integral'))
+
     # Integral evaluation on Raviart-Thomas for deg=3 completely freezes interpolation
     P_2 = FiniteElement("RT", triangle, deg, variant='integral')
     P_3 = FiniteElement("DG", triangle, deg - 1)
@@ -87,9 +89,15 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
                       dgxy_y * ft])  # grad(gxy)
 
     p0_3 = interpolate(p_ex, V_3)
-    u0_1 = interpolate(u_ex, V_1)
+
+    try:
+        u0_1 = interpolate(u_ex, V_1)
+    except NotImplementedError:
+        u0_1 = project(u_ex, V_1)
+
     p0_0 = interpolate(p_ex, V_0)
     u0_2 = interpolate(u_ex, V_2)
+
 
     e0_3102 = Function(V_3102)
     e0_3102.sub(0).assign(p0_3)
@@ -240,7 +248,12 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         Hdot_ex_vec2[ii + 1] = dHn_t_ex2
 
         pn_3_i = interpolate(pn_3, V_3)
-        un_1_i = interpolate(un_1, V_1)
+
+        try:
+            un_1_i = interpolate(un_1, V_1)
+        except NotImplementedError:
+            un_1_i = project(un_1, V_1)
+
         pn_0_i = interpolate(pn_0, V_0)
         un_2_i = interpolate(un_2, V_2)
 
@@ -343,35 +356,40 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         # err_p30 = max(err_p30_vec)
         # err_u12 = max(err_u12_vec)
 
-        errL2_p_3 = errL2_p_3_vec[-1]
-        errL2_u_1 = errL2_u_1_vec[-1]
+    quiver(un_1_i)
+    quiver(u_ex)
 
-        errL2_p_0 = errL2_p_0_vec[-1]
-        errL2_u_2 = errL2_u_2_vec[-1]
+    plt.show()
 
-        errHcurl_u_1 = errHcurl_u_1_vec[-1]
+    errL2_p_3 = errL2_p_3_vec[-1]
+    errL2_u_1 = errL2_u_1_vec[-1]
 
-        errH1_p_0 = errH1_p_0_vec[-1]
-        errHdiv_u_2 = errHdiv_u_2_vec[-1]
+    errL2_p_0 = errL2_p_0_vec[-1]
+    errL2_u_2 = errL2_u_2_vec[-1]
 
-        err_p30 = err_p30_vec[-1]
-        err_u12 = err_u12_vec[-1]
+    errHcurl_u_1 = errHcurl_u_1_vec[-1]
 
-        dict_res = {"t_span": t_vec, "energy_32": H_32_vec, "energy_ex1": H_ex_vec1, "energy_ex2": H_ex_vec2, \
-                    "energy_s": Hs_vec, "energy_10": H_10_vec, "power": Hdot_vec, \
-                    "power_ex": Hdot_ex_vec2, "flow": bdflow_vec, "flow_ex": bdflow_ex_vec, "err_p3": errL2_p_3, \
-                    "err_u1": [errL2_u_1, errHcurl_u_1], "err_p0": [errL2_p_0, errH1_p_0], \
-                    "err_u2": [errL2_u_2, errHdiv_u_2], "err_p30": err_p30, "err_u12": err_u12}
+    errH1_p_0 = errH1_p_0_vec[-1]
+    errHdiv_u_2 = errHdiv_u_2_vec[-1]
+
+    err_p30 = err_p30_vec[-1]
+    err_u12 = err_u12_vec[-1]
+
+    dict_res = {"t_span": t_vec, "energy_32": H_32_vec, "energy_ex1": H_ex_vec1, "energy_ex2": H_ex_vec2, \
+                "energy_s": Hs_vec, "energy_10": H_10_vec, "power": Hdot_vec, \
+                "power_ex": Hdot_ex_vec2, "flow": bdflow_vec, "flow_ex": bdflow_ex_vec, "err_p3": errL2_p_3, \
+                "err_u1": [errL2_u_1, errHcurl_u_1], "err_p0": [errL2_p_0, errH1_p_0], \
+                "err_u2": [errL2_u_2, errHdiv_u_2], "err_p30": err_p30, "err_u12": err_u12}
 
     return dict_res
 
-# n_elem = 5
-# pol_deg = 1
-#
-# n_time = 100
-# t_fin = 1
-#
-# results = compute_err(n_elem, n_time, pol_deg, t_fin)
+n_elem = 1
+pol_deg = 2
+
+n_time = 100
+t_fin = 3
+
+results = compute_err(n_elem, n_time, pol_deg, t_fin)
 #
 # t_vec = results["t_span"]
 # Hdot_vec = results["power"]

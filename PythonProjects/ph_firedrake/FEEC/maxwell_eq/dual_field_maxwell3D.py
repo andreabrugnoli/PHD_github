@@ -77,9 +77,13 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="H"):
     n_ver = FacetNormal(mesh)
 
     PE_2 = FiniteElement("RT", tetrahedron, deg)
+    # PE_2 = BrokenElement(FiniteElement("RT", tetrahedron, deg))
+
     PE_1 = FiniteElement("N1curl", tetrahedron, deg)
 
     PH_2 = FiniteElement("RT", tetrahedron, deg)
+    # PH_2 = BrokenElement(FiniteElement("RT", tetrahedron, deg))
+
     PH_1 = FiniteElement("N1curl", tetrahedron, deg)
 
     VE_2 = FunctionSpace(mesh, PE_2)
@@ -90,10 +94,6 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="H"):
 
     V_E2_H1 = VE_2 * VH_1
     V_H2_E1 = VH_2 * VE_1
-
-    print("Space dimensions: ")
-    print(VE_2.dim())
-    print(VH_1.dim())
 
     v_E2_H1 = TestFunction(V_E2_H1)
     v_E2, v_H1 = split(v_E2_H1)
@@ -166,10 +166,18 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="H"):
     E_ex_mid = 0.5 * (E_ex + E_ex_1)
     H_ex_mid = 0.5 * (H_ex + H_ex_1)
 
-    E0_2 = interpolate(E_ex, VE_2)
+    try:
+        E0_2 = interpolate(E_ex, VE_2)
+    except NotImplementedError:
+        E0_2 = project(E_ex, VE_2)
+
     E0_1 = interpolate(E_ex, VE_1)
 
-    H0_2 = interpolate(H_ex, VH_2)
+    try:
+        H0_2 = interpolate(H_ex, VH_2)
+    except NotImplementedError:
+        H0_2 = project(H_ex, VH_2)
+
     H0_1 = interpolate(H_ex, VH_1)
 
     if bd_cond == "H":

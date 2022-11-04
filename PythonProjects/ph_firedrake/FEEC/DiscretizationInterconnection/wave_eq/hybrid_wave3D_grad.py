@@ -9,6 +9,7 @@ from firedrake import *
 import matplotlib.pyplot as plt
 from tools_plotting import setup
 from tqdm import tqdm
+from FEEC.DiscretizationInterconnection.wave_eq.exact_eigensolution import exact_sol_wave3D
 # from time import sleep
 from matplotlib.ticker import FormatStrFormatter
 import pickle
@@ -101,6 +102,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     # P2 = FiniteElement("RT", tetrahedron, deg, variant='integral')
     P3 = FiniteElement("DG", tetrahedron, deg - 1)
 
+    PO_f = FiniteElement('CG', mesh.ufl_cell(), deg)['facet']
+
     P0_b = BrokenElement(P0)
     P1_b = BrokenElement(P1)
     P2_b = BrokenElement(P2)
@@ -128,18 +131,6 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     ds = Measure('ds')
     dS = Measure('dS')
 
-    x, y, z = SpatialCoordinate(mesh)
-
-    om_x = 1
-    om_y = 1
-    om_z = 1
-
-    om_t = np.sqrt(om_x ** 2 + om_y ** 2 + om_z ** 2)
-    phi_x = 0
-    phi_y = 0
-    phi_z = 0
-    phi_t = 0
-
     dt = Constant(t_fin / n_t)
 
     params = {"mat_type": "aij",
@@ -152,27 +143,9 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     t = Constant(0.0)
     t_1 = Constant(dt)
 
-    ft = 2 * sin(om_t * t + phi_t) + 3 * cos(om_t * t + phi_t)
-    dft = om_t * (2 * cos(om_t * t + phi_t) - 3 * sin(om_t * t + phi_t))  # diff(dft_t, t)
+    x, y, z = SpatialCoordinate(mesh)
 
-    ft_1 = 2 * sin(om_t * t_1 + phi_t) + 3 * cos(om_t * t_1 + phi_t)
-    dft_1 = om_t * (2 * cos(om_t * t_1 + phi_t) - 3 * sin(om_t * t_1 + phi_t))  # diff(dft_t, t)
-
-    gxyz = cos(om_x * x + phi_x) * sin(om_y * y + phi_y) * sin(om_z * z + phi_z)
-
-    dgxyz_x = - om_x * sin(om_x * x + phi_x) * sin(om_y * y + phi_y) * sin(om_z * z + phi_z)
-    dgxyz_y = om_y * cos(om_x * x + phi_x) * cos(om_y * y + phi_y) * sin(om_z * z + phi_z)
-    dgxyz_z = om_z * cos(om_x * x + phi_x) * sin(om_y * y + phi_y) * cos(om_z * z + phi_z)
-
-    grad_gxyz = as_vector([dgxyz_x,
-                           dgxyz_y,
-                           dgxyz_z]) # grad(gxyz)
-
-    p_ex = gxyz * dft
-    u_ex = grad_gxyz * ft
-
-    p_ex_1 = gxyz * dft_1
-    u_ex_1 = grad_gxyz * ft_1
+    p_ex, u_ex, p_ex_1, u_ex_1 = exact_sol_wave3D(x, y, z, t, t_1)
 
     u_ex_mid = 0.5 * (u_ex + u_ex_1)
     p_ex_mid = 0.5 * (p_ex + p_ex_1)

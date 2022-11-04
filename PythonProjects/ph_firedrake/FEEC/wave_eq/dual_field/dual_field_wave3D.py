@@ -66,8 +66,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     n_ver = FacetNormal(mesh)
 
     P_0 = FiniteElement("CG", tetrahedron, deg)
+    # P_1 = BrokenElement(FiniteElement("N1curl", tetrahedron, deg))
     P_1 = FiniteElement("N1curl", tetrahedron, deg)
-    # P_1 = FiniteElement("N1curl", tetrahedron, deg)
     P_2 = FiniteElement("RT", tetrahedron, deg)
     # Integral evaluation on Raviart-Thomas and NED for deg=3 completely freezes interpolation
     # P_2 = FiniteElement("RT", tetrahedron, deg, variant='integral')
@@ -155,7 +155,12 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     p0_3 = interpolate(p_ex, V_3)
     u0_2 = interpolate(u_ex, V_2)
-    u0_1 = interpolate(u_ex, V_1)
+
+    try:
+        u0_1 = interpolate(u_ex, V_1)
+    except NotImplementedError:
+        u0_1 = project(u_ex, V_1)
+
     p0_0 = interpolate(p_ex, V_0)
 
     if bd_cond == "D":
@@ -603,16 +608,16 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 bd_cond = input("Enter bc: ")
 
 n_elem = 4
-pol_deg = 2
+pol_deg = 3
 
-n_time = 50
-t_fin = 1
+n_time = 200
+t_fin = 5
 
 dt = t_fin / n_time
 
 results = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bd_cond)
 
-#
-# dictres_file = open("results_wave.pkl", "wb")
-# pickle.dump(results, dictres_file)
-# dictres_file.close()
+
+dictres_file = open("results_wave.pkl", "wb")
+pickle.dump(results, dictres_file)
+dictres_file.close()
