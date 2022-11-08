@@ -264,7 +264,6 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     e0_10.sub(0).assign(u0_1)
     e0_10.sub(1).assign(p0_0)
 
-
     en_32 = Function(V_32, name="e_32 n")
     en_32.assign(e0_32)
 

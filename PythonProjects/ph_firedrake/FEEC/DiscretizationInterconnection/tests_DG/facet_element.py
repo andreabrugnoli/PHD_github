@@ -14,6 +14,7 @@ V0_nor = FunctionSpace(mesh, P0_f_b)
 
 V0 = FunctionSpace(mesh, P0)
 
+
 print(V0_tan.dim(), V0_nor.dim(), V0.dim())
 
 print(V0_tan.boundary_nodes("on_boundary"))
