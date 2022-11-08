@@ -75,6 +75,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     W1 = FunctionSpace(mesh, P1_b)
 
     W0_nor = FunctionSpace(mesh, P0f_b)
+
     V0_tan = FunctionSpace(mesh, P0f)
 
     W_loc = W0 * W1 * W0_nor
@@ -92,7 +93,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     v0, v1, v0_nor, v0_tan = split(v_grad)
 
     e_grad = TrialFunction(V_grad)
-    p0, u1, p0_nor, p0_tan = split(e_grad)
+    p0, u1, lam0_nor, p0_tan = split(e_grad)
 
     dx = Measure('dx')
     ds = Measure('ds')
@@ -163,11 +164,10 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     en_grad.sub(2).assign(Constant(0))
     en_grad.sub(3).assign(interpolate(p_ex, V0_tan))
 
-    pn_0, un_1, pn_0_nor, pn_0_tan = en_grad.split()
+    pn_0, un_1, lamn_0_nor, pn_0_tan = en_grad.split()
 
     enmid_grad = Function(V_grad, name="e n+1/2")
-
-    en1_grad = Function(V_grad, name="e n+1")
+    en1_grad = Function(V_grad, name="e n+1/2")
 
     Hn_01 = 0.5 * (inner(pn_0, pn_0) * dx(domain=mesh) + inner(un_1, un_1) * dx(domain=mesh))
 
@@ -202,8 +202,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     ## Settings of intermediate variables and matrices for the 2 linear systems
 
-    a_form10 = m_form10(v1, u1, v0, p0) - 0.5 * dt * j_form10(v1, u1, v0, p0) \
-               - dt * constr_loc(v0, p0, v0_nor, p0_nor) - dt * constr_global(v0_nor, p0_nor, v0_tan, p0_tan)
+    a_form10 = 1/dt*m_form10(v1, u1, v0, p0) - 0.5 * j_form10(v1, u1, v0, p0) \
+               - constr_loc(v0, p0, v0_nor, lam0_nor) - constr_global(v0_nor, lam0_nor, v0_tan, p0_tan)
 
     print("Computation of the solution with n elem " + str(n_el) + " n time " + str(n_t) + " deg " + str(deg))
     print("==============")
@@ -212,8 +212,12 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
         ## Integration of 10 system (Neumann natural)
 
-        b_form10 = m_form10(v1, un_1, v0, pn_0) + 0.5 * dt * j_form10(v1, un_1, v0, pn_0) \
-                   + dt * neumann_flow0(v0_tan, dot(u_ex_mid, n_ver))
+        b_form10 = 1/dt*m_form10(v1, un_1, v0, pn_0) + 0.5 * j_form10(v1, un_1, v0, pn_0) \
+                   + neumann_flow0(v0_tan, dot(u_ex_mid, n_ver))
+
+        # b_form10 = 1/dt*m_form10(v1, un_1, v0, pn_0) + 0.5 * j_form10(v1, un_1, v0, pn_0) \
+        #            - constr_loc(v0, pn_0, v0_nor, lamn_0_nor) - constr_global(v0_nor, lamn_0_nor, v0_tan, pn_0_tan)\
+        #            + neumann_flow0(v0_tan, dot(u_ex_mid, n_ver))
 
         # A_10 = assemble(a_form10, bcs=bcs, mat_type='aij')
         # b_vec10 = assemble(b_form10)
@@ -221,14 +225,14 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         # solve(A_10, en1_grad, b_vec10, solver_parameters=params)
 
         # en1_grad = solve_hybrid(a_form10, b_form10, bcs, V0_tan, W_loc)
-        #
-        # pn1_0, un1_1, pn1_0_nor, pn1_0_tan = en1_grad.split()
+        # #
+        # pn1_0, un1_1, lamnmid_0_nor, pn1_0_tan = en1_grad.split()
 
-        pn1_0, un1_1, pnmid_0_nor, pn1_0_tan = solve_hybrid_2constr(a_form10, b_form10, bcs, W0, W1, W0_nor, V0_tan)
+        pn1_0, un1_1, lamnmid_0_nor, pn1_0_tan = solve_hybrid_2constr(a_form10, b_form10, bcs, W0, W1, W0_nor, V0_tan)
 
         en1_grad.sub(0).assign(pn1_0)
         en1_grad.sub(1).assign(un1_1)
-        en1_grad.sub(2).assign(pnmid_0_nor)
+        en1_grad.sub(2).assign(lamnmid_0_nor)
         en1_grad.sub(3).assign(pn1_0_tan)
 
 
@@ -249,12 +253,13 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
             bd_flow_dirichlet = 0
             print("Flow D 0")
         else:
-            # y_nmid_D = v0_tan * pnmid_0_nor * ds(domain=mesh)
+            # y_nmid_D = v0_tan * lamnmid_0_nor * ds(domain=mesh)
             # yess_D = assemble(y_nmid_D).vector().get_local()[dofsV0_tan_D]
             # uess_D = assemble(enmid_grad).vector().get_local()[dofsV0_tan_D]
             # bd_flow_dirichlet = np.dot(yess_D, uess_D)
 
-            bd_flow_dirichlet = assemble(pnmid_0_tan * pnmid_0_nor * ds)
+            # bd_flow_dirichlet = assemble(pnmid_0_tan * lamnmid_0_nor * ds)
+            bd_flow_dirichlet = assemble(pnmid_0_tan * dot(unmid_1, n_ver) * ds)
 
         # bd_flow_dirichlet = assemble(0.5*(pn1_0_tan + pn_0_tan)*pn1_0_nor*ds)
 
@@ -265,7 +270,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         # New assign
 
         en_grad.assign(en1_grad)
-        pn_0, un_1, pn_0_nor, pn_0_tan = en_grad.split()
+        pn_0, un_1, lamn_0_nor, pn_0_tan = en_grad.split()
 
         H_01_vec[ii + 1] = assemble(Hn_01)
 
@@ -284,6 +289,14 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         errHcurl_u_1_vec[ii + 1] = errornorm(u_ex, un_1, norm_type="Hcurl")
         errH1_p_0_vec[ii + 1] = errornorm(p_ex, pn_0, norm_type="H1")
 
+    fig = plt.figure()
+    axes = fig.add_subplot(111, projection='3d')
+    contours = trisurf(lamn_0_nor, axes=axes, cmap="inferno")
+    axes.set_aspect("auto")
+    axes.set_title("lambda nor")
+    fig.colorbar(contours)
+
+
     # fig = plt.figure()
     # axes = fig.add_subplot(111, projection='3d')
     # contours = trisurf(project(p_ex, W0), axes=axes, cmap="inferno")
@@ -295,6 +308,13 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     # contours = trisurf(pn_0, axes=axes, cmap="inferno")
     # axes.set_aspect("auto")
     # axes.set_title("p0 h")
+    # fig.colorbar(contours)
+    #
+    # fig = plt.figure()
+    # axes = fig.add_subplot(111, projection='3d')
+    # contours = trisurf(pn_0_tan, axes=axes, cmap="inferno")
+    # axes.set_aspect("auto")
+    # axes.set_title("p0 tan h")
     # fig.colorbar(contours)
 
     # err_p_0 = np.sqrt(np.sum(float(dt) * np.power(err_p_0_vec, 2)))
@@ -329,8 +349,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
 bd_cond = 'D' #input("Enter bc: ")
 
-n_elem = 10
-pol_deg = 2
+n_elem = 20
+pol_deg = 1
 
 n_time = 10
 t_fin = 1
@@ -353,6 +373,10 @@ errL2_p0, errH1_p0 = results["err_p0"]
 
 err_H01 = results["err_H"]
 
+plt.figure()
+plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt-bdflow10_mid, 'r-.', label="Power bal")
+plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.legend()
 
 plt.figure()
 plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt, 'r-.', label="DHdt")
@@ -360,11 +384,17 @@ plt.plot(t_vec[1:]-dt/2, bdflow10_mid, 'b-.', label="flow")
 plt.xlabel(r'Time $[\mathrm{s}]$')
 plt.legend()
 
-plt.figure()
-plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt-bdflow10_mid, 'r-.', label="power bal")
-plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.title(r'Power balance conservation')
-plt.legend()
+# plt.figure()
+# plt.plot(t_vec[1:]-dt/2, bdflow10_mid, 'r-.', label="power flow 10")
+# plt.plot(t_vec[1:]-dt/2, bdflow_ex_nmid, 'b-.', label="power flow ex")
+# plt.xlabel(r'Time $[\mathrm{s}]$')
+# plt.legend()
+#
+# plt.figure()
+# plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt, 'r-.', label="DHdt")
+# plt.plot(t_vec[1:]-dt/2, bdflow_ex_nmid, 'b-.', label="flow exact")
+# plt.xlabel(r'Time $[\mathrm{s}]$')
+# plt.legend()
 
 #
 # plt.figure()

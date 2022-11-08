@@ -92,9 +92,21 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     else:
         bc_D = [DirichletBC(V_grad.sub(0), p_ex_1, 1), \
-                DirichletBC(V_grad.sub(0), p_ex_1, 3)]
+                DirichletBC(V_grad.sub(0), p_ex_1, 4)]
 
     bcs = bc_D
+
+    dofs10_D = []
+
+    if bc_D is not None:
+        for ii in range(len(bc_D)):
+            nodes10_D = bc_D[ii].nodes
+            dofs10_D = dofs10_D + list(nodes10_D)
+
+    dofs10_D = list(set(dofs10_D))
+
+    dofs10_N = list(set(V0.boundary_nodes("on_boundary")).difference(set(dofs10_D)))
+
 
     p0_0 = project(p_ex, V0)
     u0_1 = project(u_ex, V1)
@@ -104,13 +116,16 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     en_grad = Function(V_grad, name="e n")
     en_grad.sub(0).assign(p0_0)
     en_grad.sub(1).assign(u0_1)
-    pn_0, un_1 = en_grad.split()
 
     enmid_grad = Function(V_grad, name="e n+1/2")
-    pnmid_0, unmid_1 = enmid_grad.split()
+
 
     en1_grad = Function(V_grad, name="e n+1")
+
+    pn_0, un_1 = en_grad.split()
+    pnmid_0, unmid_1 = enmid_grad.split()
     pn1_0, un1_1 = en1_grad.split()
+
 
     Hn_01 = 0.5 * (inner(pn_0, pn_0) * dx + inner(un_1, un_1) * dx)
 
@@ -157,7 +172,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         A_10 = assemble(a_form10, bcs=bc_D, mat_type='aij')
 
         b_form10 = m_form10(v1, un_1, v0, pn_0) + 0.5 * dt * j_form10(v1, un_1, v0, pn_0) \
-                   + dt *  neumann_flow0(v0, dot(u_ex_mid, n_ver))
+                   + dt * neumann_flow0(v0, dot(u_ex_mid, n_ver))
 
         b_vec10 = assemble(b_form10)
 
@@ -167,7 +182,31 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
         enmid_grad.assign(0.5 * (en_grad + en1_grad))
 
+        yess_D = 1 / dt * m_form10(v1, un1_1 - un_1, v0, pn1_0 - pn_0) \
+                 - j_form10(v1, unmid_1, v0, pnmid_0)
+
         bdflow_ex_mid_vec[ii] = assemble(bdflow_ex_nmid)
+
+        if np.size(dofs10_N) == 0:
+            bdflow_neumann = 0
+            print("Flow N 0")
+
+        else:
+            ynat_D = assemble(neumann_flow0(v0, dot(u_ex_mid, n_ver))).vector().get_local()[dofs10_N]
+            unat_D = enmid_grad.vector().get_local()[dofs10_N]
+            bdflow_neumann = np.dot(ynat_D, unat_D)
+
+        if np.size(dofs10_D) == 0:
+            bdflow_dirichlet = 0
+            print("Flow D 0")
+        else:
+            yess_D = assemble(yess_D).vector().get_local()[dofs10_D]
+
+            print(np.linalg.norm(yess_D))
+            uess_D = enmid_grad.vector().get_local()[dofs10_D]
+            bdflow_dirichlet = np.dot(yess_D, uess_D)
+
+        bdflow10_mid_vec[ii] = bdflow_neumann + bdflow_dirichlet
 
         # New assign
 
@@ -229,7 +268,7 @@ bd_cond = 'DN' #input("Enter bc: ")
 n_elem = 10
 pol_deg = 2
 
-n_time = 5
+n_time = 10
 t_fin = 1
 
 dt = t_fin / n_time
@@ -252,11 +291,31 @@ err_H01 = results["err_H"]
 
 dt = t_vec[-1] / (len(t_vec)-1)
 
+plt.figure()
+plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt-bdflow10_mid, 'r-.', label="pow bal")
+plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.legend()
 
 plt.figure()
-plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt - bdflow_ex_nmid, 'r-.')
+plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt, 'r-.', label="DHdt")
+plt.plot(t_vec[1:]-dt/2, bdflow_ex_nmid, 'b-.', label="flow exact")
+plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.legend()
+
+plt.figure()
+plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt, 'r-.', label="DHdt")
+plt.plot(t_vec[1:]-dt/2, bdflow10_mid, 'b-.', label="flow")
+plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.legend()
+
+plt.figure()
+plt.plot(t_vec[1:]-dt/2, bdflow10_mid, 'r-.', label="power flow 10")
+plt.plot(t_vec[1:]-dt/2, bdflow_ex_nmid, 'b-.', label="power flow ex")
+
 plt.xlabel(r'Time $[\mathrm{s}]$')
 plt.title(r'Power balance conservation')
+plt.legend()
+
 
 plt.show()
 # dictres_file = open("results_wave.pkl", "wb")

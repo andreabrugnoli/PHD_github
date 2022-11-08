@@ -66,7 +66,7 @@ def solve_hybrid_2constr(a_form, b_form, bcs, W0, W1, W0_nor, V0_tan):
     # Intermediate expressions
     Lam_gl = AssembledVector(lam_gl_h)  # Local coefficient vector for Λ
     # Local solve expressions
-    lam_loc_sys = Aloc_mul.solve(F[2] -Bpar.T * Adyn.inv * F[:n_dyn] - Rgam * Lam_gl)
+    lam_loc_sys = Aloc_mul.solve(F[2] -Bpar.T * Adyn.inv * F[:n_dyn] - Rgam * Lam_gl, decomposition="PartialPivLU")
     assemble(lam_loc_sys, lam_loc_h)
 
     # Local state variable
@@ -74,7 +74,7 @@ def solve_hybrid_2constr(a_form, b_form, bcs, W0, W1, W0_nor, V0_tan):
     # Intermediate expressions
     Lam_loc = AssembledVector(lam_loc_h)  # Local coefficient vector for Λ
     # Local solve expressions
-    x_loc_sys = Adyn.solve(F[:n_dyn] + Bpar * Lam_loc)
+    x_loc_sys = Adyn.solve(F[:n_dyn] + Bpar * Lam_loc, decomposition="PartialPivLU")
 
     assemble(x_loc_sys, x_h)
 
