@@ -228,18 +228,18 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         errHcurl_u_1_vec[ii + 1] = errornorm(u_ex, un_1, norm_type="Hcurl")
         errH1_p_0_vec[ii + 1] = errornorm(p_ex, pn_0, norm_type="H1")
 
-        # fig = plt.figure()
-        # axes = fig.add_subplot(111, projection='3d')
-        # contours = trisurf(interpolate(p_ex, V0), axes=axes, cmap="inferno")
-        # axes.set_aspect("auto")
-        # axes.set_title("p0 ex")
-        # fig.colorbar(contours)
-        # fig = plt.figure()
-        # axes = fig.add_subplot(111, projection='3d')
-        # contours = trisurf(pn_0, axes=axes, cmap="inferno")
-        # axes.set_aspect("auto")
-        # axes.set_title("p0 h")
-        # fig.colorbar(contours)
+    fig = plt.figure()
+    axes = fig.add_subplot(111, projection='3d')
+    contours = trisurf(interpolate(p_ex, V0), axes=axes, cmap="inferno")
+    axes.set_aspect("auto")
+    axes.set_title("p0 ex")
+    fig.colorbar(contours)
+    fig = plt.figure()
+    axes = fig.add_subplot(111, projection='3d')
+    contours = trisurf(pn_0, axes=axes, cmap="inferno")
+    axes.set_aspect("auto")
+    axes.set_title("p0 h")
+    fig.colorbar(contours)
 
     # err_p_0 = np.sqrt(np.sum(float(dt) * np.power(err_p_0_vec, 2)))
     # err_u_1 = np.sqrt(np.sum(float(dt) * np.power(err_u_1_vec, 2)))
@@ -263,7 +263,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     return dict_res
 
 
-bd_cond = 'DN' #input("Enter bc: ")
+bd_cond = 'D' #input("Enter bc: ")
 
 n_elem = 10
 pol_deg = 2

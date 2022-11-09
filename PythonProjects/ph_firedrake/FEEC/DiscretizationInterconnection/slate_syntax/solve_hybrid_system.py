@@ -35,10 +35,16 @@ def solve_hybrid(a_form, b_form, bcs, V_gl, V_loc):
 
 
 
-def solve_hybrid_2constr(a_form, b_form, bcs, W0, W1, W0_nor, V0_tan):
+def solve_hybrid_2constr(a_form, b_form, bd_cond, Wstate, W0_nor, V0_tan):
     """Specific function for the hybridization
            """
-    n_dyn = 2
+    try:
+        n_dyn = Wstate.num_sub_spaces()
+    except AttributeError:
+        n_dyn=1
+
+    print(n_dyn)
+
     _A = Tensor(a_form)
     _F = Tensor(b_form)
     # Extracting blocks for Slate expression of the reduced system
@@ -47,15 +53,15 @@ def solve_hybrid_2constr(a_form, b_form, bcs, W0, W1, W0_nor, V0_tan):
 
     Adyn = A[:n_dyn, :n_dyn]
     Bpar = - A[:n_dyn, n_dyn]
-    Rgam = A[n_dyn, 3]
+    Rgam = A[n_dyn, n_dyn+1]
 
     Aloc_mul = Bpar.T * Adyn.inv * Bpar
     Agl_mul = Rgam.T * Aloc_mul.inv * Rgam
-    Fgl_mul = F[3] - Rgam.T * Aloc_mul.inv * Bpar.T * Adyn.inv * F[:n_dyn]   \
-              + Rgam.T * Aloc_mul.inv * F[2] # Should not be present
+    Fgl_mul = F[n_dyn+1] - Rgam.T * Aloc_mul.inv * Bpar.T * Adyn.inv * F[:n_dyn]   \
+              + Rgam.T * Aloc_mul.inv * F[n_dyn] # Should not be present
 
     # Assemble and solve for the global multiplier
-    Amat_gl = assemble(Agl_mul, bcs=bcs)
+    Amat_gl = assemble(Agl_mul, bcs=bd_cond)
     Fvec_gl = assemble(Fgl_mul)
     lam_gl_h = Function(V0_tan)
     solve(Amat_gl, lam_gl_h, Fvec_gl, solver_parameters={"ksp_type": "preonly"})
@@ -66,11 +72,11 @@ def solve_hybrid_2constr(a_form, b_form, bcs, W0, W1, W0_nor, V0_tan):
     # Intermediate expressions
     Lam_gl = AssembledVector(lam_gl_h)  # Local coefficient vector for Λ
     # Local solve expressions
-    lam_loc_sys = Aloc_mul.solve(F[2] -Bpar.T * Adyn.inv * F[:n_dyn] - Rgam * Lam_gl, decomposition="PartialPivLU")
+    lam_loc_sys = Aloc_mul.solve(F[n_dyn] - Bpar.T * Adyn.inv * F[:n_dyn] - Rgam * Lam_gl, decomposition="PartialPivLU")
     assemble(lam_loc_sys, lam_loc_h)
 
     # Local state variable
-    x_h = Function(W0*W1)
+    x_h = Function(Wstate)
     # Intermediate expressions
     Lam_loc = AssembledVector(lam_loc_h)  # Local coefficient vector for Λ
     # Local solve expressions
@@ -78,6 +84,4 @@ def solve_hybrid_2constr(a_form, b_form, bcs, W0, W1, W0_nor, V0_tan):
 
     assemble(x_loc_sys, x_h)
 
-    p_h, u_h = x_h.split()
-
-    return p_h, u_h, lam_loc_h, lam_gl_h
+    return x_h, lam_loc_h, lam_gl_h
