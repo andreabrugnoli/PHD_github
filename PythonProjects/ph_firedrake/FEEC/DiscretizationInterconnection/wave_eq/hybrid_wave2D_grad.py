@@ -154,12 +154,25 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     u0_1 = project(interpolate(u_ex, V1), W1)
 
     # The Lagrange multiplier is computed at half steps
-
     en_grad = Function(V_grad, name="e n")
     en_grad.sub(0).assign(p0_0)
     en_grad.sub(1).assign(u0_1)
-    en_grad.sub(2).assign(Constant(0))
     en_grad.sub(3).assign(interpolate(p_ex, V0_tan))
+
+    # For lambda nor the resolution of a linear system is required
+    P_un_ex = Function(W0_nor)
+    wtan = TestFunction(W0_nor)
+    P_un = TrialFunction(W0_nor)
+
+    A_Pgradn_uex = (wtan('+') * P_un('+') + wtan('-') * P_un('-')) * dS + wtan * P_un * ds
+
+    b_Pgradn_uex = (wtan('+') * dot(u_ex('+'), n_ver('+')) \
+                    + wtan('-') * dot(u_ex('-'), n_ver('-'))) * dS \
+                    + wtan * dot(u_ex, n_ver) * ds
+
+    solve(A_Pgradn_uex == b_Pgradn_uex, P_un_ex)
+
+    en_grad.sub(2).assign(P_un_ex)
 
     pn_0, un_1, lamn_0_nor, pn_0_tan = en_grad.split()
 
@@ -199,8 +212,11 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     ## Settings of intermediate variables and matrices for the 2 linear systems
 
-    a_form10 = 1/dt*m_form10(v1, u1, v0, p0) - 0.5 * j_form10(v1, u1, v0, p0) \
-               - constr_loc(v0, p0, v0_nor, lam0_nor) - constr_global(v0_nor, lam0_nor, v0_tan, p0_tan)
+    a_form10 = m_form10(v1, u1, v0, p0) - 0.5 * dt * j_form10(v1, u1, v0, p0) \
+               - dt * constr_loc(v0, p0, v0_nor, lam0_nor) - dt * constr_global(v0_nor, lam0_nor, v0_tan, p0_tan)
+
+    # a_form10 = 1 / dt * m_form10(v1, u1, v0, p0) - 0.5 * j_form10(v1, u1, v0, p0) \
+    #            - 0.5*constr_loc(v0, p0, v0_nor, lam0_nor) - 0.5*constr_global(v0_nor, lam0_nor, v0_tan, p0_tan)
 
     print("Computation of the solution with n elem " + str(n_el) + " n time " + str(n_t) + " deg " + str(deg))
     print("==============")
@@ -209,11 +225,12 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
         ## Integration of 10 system (Neumann natural)
 
-        b_form10 = 1/dt*m_form10(v1, un_1, v0, pn_0) + 0.5 * j_form10(v1, un_1, v0, pn_0) \
-                   + neumann_flow0(v0_tan, dot(u_ex_mid, n_ver))
+        b_form10 = m_form10(v1, un_1, v0, pn_0) + 0.5 * dt * j_form10(v1, un_1, v0, pn_0) \
+                   + dt * neumann_flow0(v0_tan, dot(u_ex_mid, n_ver))
 
         # b_form10 = 1/dt*m_form10(v1, un_1, v0, pn_0) + 0.5 * j_form10(v1, un_1, v0, pn_0) \
-        #            - constr_loc(v0, pn_0, v0_nor, lamn_0_nor) - constr_global(v0_nor, lamn_0_nor, v0_tan, pn_0_tan)\
+        #            + 0.5*constr_loc(v0, pn_0, v0_nor, lamn_0_nor) \
+        #            + 0.5*constr_global(v0_nor, lamn_0_nor, v0_tan, pn_0_tan)\
         #            + neumann_flow0(v0_tan, dot(u_ex_mid, n_ver))
 
         # A_10 = assemble(a_form10, bcs=bcs, mat_type='aij')
@@ -223,6 +240,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
         en1_grad = solve_hybrid(a_form10, b_form10, bcs, V0_tan, W_loc)
         pn1_0, un1_1, lamnmid_0_nor, pn1_0_tan = en1_grad.split()
+        # pn1_0, un1_1, lamn1_0_nor, pn1_0_tan = en1_grad.split()
 
         # xn1, lamnmid_0_nor, pn1_0_tan = solve_hybrid_2constr(a_form10, b_form10, bcs, W0*W1, W0_nor, V0_tan)
         # pn1_0, un1_1 = xn1.split()
@@ -234,6 +252,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
         enmid_grad.assign(0.5 * (en_grad + en1_grad))
         pnmid_0, unmid_1, _, pnmid_0_tan = enmid_grad.split()
+        # pnmid_0, unmid_1, lamnmid_0_nor, pnmid_0_tan = enmid_grad.split()
 
         if np.size(dofsV0_tan_N) == 0:
             bdflow_neumann = 0
@@ -254,7 +273,11 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
             # uess_D = assemble(enmid_grad).vector().get_local()[dofsV0_tan_D]
             # bd_flow_dirichlet = np.dot(yess_D, uess_D)
 
-            bd_flow_dirichlet = assemble(pnmid_0_tan * lamnmid_0_nor * ds)
+            bd_flow_dirichlet = assemble((lamnmid_0_nor('+')*pnmid_0('+') + lamnmid_0_nor('-')*pnmid_0('-')) * dS \
+                                         + lamnmid_0_nor * pnmid_0 * ds)
+            # bd_flow_dirichlet = assemble(lamnmid_0_nor * pnmid_0 * ds)
+
+            # bd_flow_dirichlet = assemble(pnmid_0_tan * lamnmid_0_nor * ds)
             # bd_flow_dirichlet = assemble(pnmid_0_tan * dot(unmid_1, n_ver) * ds)
 
         # bd_flow_dirichlet = assemble(0.5*(pn1_0_tan + pn_0_tan)*pn1_0_nor*ds)
@@ -286,25 +309,54 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         errH1_p_0_vec[ii + 1] = errornorm(p_ex, pn_0, norm_type="H1")
 
     # fig = plt.figure()
-    # axes = fig.add_subplot(111, projection='3d')
-    # contours = trisurf(lamn_0_nor, axes=axes, cmap="inferno")
+    # axes = fig.add_subplot(111)
+    # contours = tricontourf(lamnmid_0_nor, axes=axes, cmap="inferno")
     # axes.set_aspect("auto")
     # axes.set_title("lambda nor")
     # fig.colorbar(contours)
+    #
+    # P_un_ex = Function(W0_nor)
+    # wtan = TestFunction(W0_nor)
+    # P_un = TrialFunction(W0_nor)
+    #
+    # t.assign(float(t) - float(dt))
+    # A_Pgradn_uex = (wtan('+') * P_un('+') + wtan('-') * P_un('-')) * dS + wtan * P_un * ds
+    #
+    # b_Pgradn_uex = (wtan('+') * dot(u_ex('+'), n_ver('+')) \
+    #                 + wtan('-') * dot(u_ex('-'), n_ver('-'))) * dS \
+    #                + wtan * dot(u_ex, n_ver) * ds
+    #
+    # solve(A_Pgradn_uex == b_Pgradn_uex, P_un_ex)
+    #
+    # fig = plt.figure()
+    # axes = fig.add_subplot(111)
+    # contours = tricontourf(P_un_ex, axes=axes, cmap="inferno")
+    # axes.set_aspect("auto")
+    # axes.set_title("uex nor")
+    # fig.colorbar(contours)
+    #
+    # err_lam_nor = Function(W0_nor)
+    # err_lam_nor.assign(lamnmid_0_nor-P_un_ex)
+    #
+    # fig = plt.figure()
+    # axes = fig.add_subplot(111)
+    # contours = tricontourf(err_lam_nor, axes=axes, cmap="inferno")
+    # axes.set_aspect("auto")
+    # axes.set_title("err lam nor")
+    # fig.colorbar(contours)
 
-
-    fig = plt.figure()
-    axes = fig.add_subplot(111, projection='3d')
-    contours = trisurf(project(p_ex, W0), axes=axes, cmap="inferno")
-    axes.set_aspect("auto")
-    axes.set_title("p0 ex")
-    fig.colorbar(contours)
-    fig = plt.figure()
-    axes = fig.add_subplot(111, projection='3d')
-    contours = trisurf(pn_0, axes=axes, cmap="inferno")
-    axes.set_aspect("auto")
-    axes.set_title("p0 h")
-    fig.colorbar(contours)
+    # fig = plt.figure()
+    # axes = fig.add_subplot(111, projection='3d')
+    # contours = trisurf(project(p_ex, W0), axes=axes, cmap="inferno")
+    # axes.set_aspect("auto")
+    # axes.set_title("p0 ex")
+    # fig.colorbar(contours)
+    # fig = plt.figure()
+    # axes = fig.add_subplot(111, projection='3d')
+    # contours = trisurf(pn_0, axes=axes, cmap="inferno")
+    # axes.set_aspect("auto")
+    # axes.set_title("p0 h")
+    # fig.colorbar(contours)
     #
     # fig = plt.figure()
     # axes = fig.add_subplot(111)
@@ -358,8 +410,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
 bd_cond = 'D' #input("Enter bc: ")
 
-n_elem = 5
-pol_deg = 3
+n_elem = 10
+pol_deg = 2
 
 n_time = 10
 t_fin = 1

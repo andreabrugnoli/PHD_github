@@ -1,9 +1,9 @@
 from firedrake import *
 
 
-def solve_hybrid(a_form, b_form, bcs, V_gl, V_loc):
+def solve_hybrid(a_form, b_form, bcs, V_gl, W_loc):
 
-    n_block_loc = V_loc.num_sub_spaces()
+    n_block_loc = W_loc.num_sub_spaces()
     _A = Tensor(a_form)
     _F = Tensor(b_form)
     # Extracting blocks for Slate expression of the reduced system
@@ -18,7 +18,7 @@ def solve_hybrid(a_form, b_form, bcs, V_gl, V_loc):
     lambda_h = Function(V_gl)
     solve(Smat, lambda_h, Evec, solver_parameters={"ksp_type": "preonly", "pc_type": "lu"})
 
-    x_h = Function(V_loc)  # Function to store the result: x_loc
+    x_h = Function(W_loc)  # Function to store the result: x_loc
 
     # Intermediate expressions
     Lambda = AssembledVector(lambda_h)  # Local coefficient vector for Λ
@@ -26,7 +26,7 @@ def solve_hybrid(a_form, b_form, bcs, V_gl, V_loc):
     x_sys = A[:n_block_loc, :n_block_loc].solve(F[:n_block_loc] - A[:n_block_loc, n_block_loc] * Lambda, decomposition="PartialPivLU")
     assemble(x_sys, x_h)
 
-    sol = Function(V_loc * V_gl)
+    sol = Function(W_loc * V_gl)
     for ii in range(n_block_loc):
         sol.sub(ii).assign(x_h.sub(ii))
     sol.sub(n_block_loc).assign(lambda_h)
