@@ -3,9 +3,9 @@ DEG = 2
 geo_case = "2D"
 
 if geo_case=="2D":
-    from FEEC.DiscretizationInterconnection.wave_eq.gyrator_wave2D import compute_err
+    from FEEC.DiscretizationInterconnection.wave_eq.Gyrator_DG.gyrator_wave2D import compute_err
 else:
-    from FEEC.DiscretizationInterconnection.wave_eq.gyrator_wave3D import compute_err
+    from FEEC.DiscretizationInterconnection.wave_eq.Gyrator_DG.gyrator_wave3D import compute_err
 
 save_res = True # input("Save results: ")
 import numpy as np

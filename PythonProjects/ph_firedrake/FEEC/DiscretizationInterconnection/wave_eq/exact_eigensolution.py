@@ -1,6 +1,7 @@
 from firedrake import *
 
-def exact_sol_wave3D(x, y, z, t, t_1):
+def exact_sol_wave3D(mesh, t, t_1):
+    x, y, z = SpatialCoordinate(mesh)
 
     om_x = 1
     om_y = 1
@@ -37,7 +38,8 @@ def exact_sol_wave3D(x, y, z, t, t_1):
     return p_ex, u_ex, p_ex_1, u_ex_1
 
 
-def exact_sol_wave2D(x, y, t, t_1):
+def exact_sol_wave2D(mesh, t, t_1):
+    x, y = SpatialCoordinate(mesh)
 
     om_x = 1
     om_y = 1
@@ -71,7 +73,7 @@ def exact_sol_wave2D(x, y, t, t_1):
 
 
 def exact_homosol_wave2D(x, y, t, t_1):
-
+    x, y = SpatialCoordinate(mesh)
     om_x = pi
     om_y = 2*pi
 

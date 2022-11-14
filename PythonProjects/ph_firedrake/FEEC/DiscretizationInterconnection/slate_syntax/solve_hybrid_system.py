@@ -12,19 +12,29 @@ def solve_hybrid(a_form, b_form, bcs, V_gl, W_loc):
     S = A[n_block_loc, n_block_loc] - A[n_block_loc, :n_block_loc] * A[:n_block_loc, :n_block_loc].inv * A[:n_block_loc, n_block_loc]
     E = F[n_block_loc] - A[n_block_loc, :n_block_loc] * A[:n_block_loc, :n_block_loc].inv * F[:n_block_loc]
 
+    params = {
+        'ksp_type': 'preonly',
+        'pc_type': 'lu',
+        'pc_factor_mat_solver_type': 'mumps'
+    }
+
     # Assemble and solve: SΛ = E
     Smat = assemble(S, bcs=bcs)
     Evec = assemble(E)
     lambda_h = Function(V_gl)
-    solve(Smat, lambda_h, Evec, solver_parameters={"ksp_type": "preonly", "pc_type": "lu"})
+    solve(Smat, lambda_h, Evec, solver_parameters=params)
 
-    x_h = Function(W_loc)  # Function to store the result: x_loc
 
     # Intermediate expressions
     Lambda = AssembledVector(lambda_h)  # Local coefficient vector for Λ
     # Local solve expressions
-    x_sys = A[:n_block_loc, :n_block_loc].solve(F[:n_block_loc] - A[:n_block_loc, n_block_loc] * Lambda, decomposition="PartialPivLU")
-    assemble(x_sys, x_h)
+    x_h = assemble(A[:n_block_loc, :n_block_loc].inv *
+                       (F[:n_block_loc] - A[:n_block_loc, n_block_loc] * Lambda))
+
+    # x_sys = A[:n_block_loc, :n_block_loc].solve(F[:n_block_loc] - A[:n_block_loc, n_block_loc] * Lambda,\
+    #                                             decomposition="PartialPivLU")
+    #    x_h = Function(W_loc)  # Function to store the result: x_loc
+    # assemble(x_sys, x_h)
 
     sol = Function(W_loc * V_gl)
     for ii in range(n_block_loc):
@@ -43,7 +53,6 @@ def solve_hybrid_2constr(a_form, b_form, bd_cond, Wstate, W0_nor, V0_tan):
     except AttributeError:
         n_dyn=1
 
-    print(n_dyn)
 
     _A = Tensor(a_form)
     _F = Tensor(b_form)
@@ -64,8 +73,14 @@ def solve_hybrid_2constr(a_form, b_form, bd_cond, Wstate, W0_nor, V0_tan):
     Amat_gl = assemble(Agl_mul, bcs=bd_cond)
     Fvec_gl = assemble(Fgl_mul)
     lam_gl_h = Function(V0_tan)
-    solve(Amat_gl, lam_gl_h, Fvec_gl, solver_parameters={"ksp_type": "preonly"})
 
+    params = {
+        'ksp_type': 'preonly',
+        'pc_type': 'lu',
+        'pc_factor_mat_solver_type': 'mumps'
+    }
+
+    solve(Amat_gl, lam_gl_h, Fvec_gl, solver_parameters=params)
 
     # Local lagrange multiplier
     lam_loc_h = Function(W0_nor)

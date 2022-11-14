@@ -4,11 +4,11 @@ geo_case = "2D"
 bc_input = "DN"
 
 if geo_case=="2D":
-    from FEEC.DiscretizationInterconnection.wave_eq.gyrator_wave2D import compute_err
+    from FEEC.DiscretizationInterconnection.wave_eq.Gyrator_DG.gyrator_wave2D import compute_err
 else:
-    from FEEC.DiscretizationInterconnection.wave_eq.gyrator_wave3D import compute_err
+    from FEEC.DiscretizationInterconnection.wave_eq.Gyrator_DG.gyrator_wave3D import compute_err
 import numpy as np
-import os
+
 save_res = True # input("Save results: ")
 
 # path_project = "~/GitProjects/PHD_github/PythonProjects/ph_firedrake/FEEC/DiscretizationInterconnection/wave_eq/"
