@@ -81,9 +81,11 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     P0f = FacetElement(P0)
 
     P1 = FiniteElement("N1curl", triangle, deg, variant="integral")
+    P1til = FiniteElement("RT", triangle, deg, variant="integral")
 
     V0 = FunctionSpace(mesh, P0)
     V1 = FunctionSpace(mesh, P1)
+    V1til = FunctionSpace(mesh, P1til)
 
     P0_b = BrokenElement(P0)
     P1_b = BrokenElement(P1)
@@ -233,6 +235,11 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
                    + 0.5 * dt * constr_global(v0_nor, lamn_0_nor, v0_tan, pn_0_tan)\
                    + dt * neumann_flow0(v0_tan, dot(u_ex_mid, n_ver))
 
+        # b_form10 = m_form10(v1, un_1, v0, pn_0) + 0.5 * dt * j_form10(v1, un_1, v0, pn_0) \
+        #            + 0.5 * dt * constr_loc(v0, pn_0, v0_nor, lamn_0_nor) \
+        #            + 0.5 * dt * constr_global(v0_nor, lamn_0_nor, v0_tan, pn_0_tan) \
+        #            + dt * neumann_flow0(v0_tan, dot(interpolate(u_ex_mid, V1til), n_ver))
+
         en1_grad = solve_hybrid(a_form10, b_form10, bc_D, V0_tan, W_loc)
 
         enmid_grad.assign(0.5 * (en_grad + en1_grad))
@@ -243,6 +250,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         else:
             y_neumann = enmid_grad.vector().get_local()[dofsV0_tan_N]
             u_neumann = assemble(neumann_flow0(v0_tan, dot(u_ex_mid, n_ver))).vector().get_local()[dofsV0_tan_N]
+            # u_neumann = assemble(neumann_flow0(v0_tan, dot(interpolate(u_ex_mid, V1til), n_ver))).vector().get_local()[dofsV0_tan_N]
             bdflow_neumann = np.dot(y_neumann, u_neumann)
 
         if np.size(dofsV0_tan_D) == 0:
@@ -398,44 +406,44 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     return dict_res
 
 
-# bd_cond = 'D' #input("Enter bc: ")
-#
-# n_elem = 10
-# pol_deg = 3
-#
-# n_time = 10
-# t_fin = 1
-#
-# dt = t_fin / n_time
-#
-# results = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bd_cond)
-#
-# t_vec = results["t_span"]
-#
-# bdflow10_mid = results["flow10_mid"]
-#
-# H_01 = results["energy_01"]
-# H_ex = results["energy_ex"]
-#
-# bdflow_ex_nmid = results["flow_ex_mid"]
-#
-# errL2_u1, errHcurl_u1 = results["err_u1"]
-# errL2_p0, errH1_p0 = results["err_p0"]
-#
-# err_H01 = results["err_H"]
-#
-# plt.figure()
-# plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt-bdflow10_mid, 'r-.', label="Power bal")
-# plt.xlabel(r'Time $[\mathrm{s}]$')
-# plt.legend()
-#
-# plt.figure()
-# plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt, 'r-.', label="DHdt")
-# plt.plot(t_vec[1:]-dt/2, bdflow10_mid, 'b-.', label="flow")
-# plt.xlabel(r'Time $[\mathrm{s}]$')
-# plt.legend()
-#
-# plt.show()
+bd_cond = 'N' #input("Enter bc: ")
+
+n_elem = 10
+pol_deg = 1
+
+n_time = 10
+t_fin = 1
+
+dt = t_fin / n_time
+
+results = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bd_cond)
+
+t_vec = results["t_span"]
+
+bdflow10_mid = results["flow10_mid"]
+
+H_01 = results["energy_01"]
+H_ex = results["energy_ex"]
+
+bdflow_ex_nmid = results["flow_ex_mid"]
+
+errL2_u1, errHcurl_u1 = results["err_u1"]
+errL2_p0, errH1_p0 = results["err_p0"]
+
+err_H01 = results["err_H"]
+
+plt.figure()
+plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt-bdflow10_mid, 'r-.', label="Power bal")
+plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.legend()
+
+plt.figure()
+plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt, 'r-.', label="DHdt")
+plt.plot(t_vec[1:]-dt/2, bdflow10_mid, 'b-.', label="flow")
+plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.legend()
+
+plt.show()
 
 
 # plt.figure()
