@@ -1,6 +1,6 @@
 DEG=1
 
-geo_case = "3D"
+geo_case = "2D"
 bc_input = "DN"
 
 if geo_case=="2D":
@@ -16,7 +16,7 @@ path_res = "results_hybrid/"
 # path_res = os.path.join(path_project, folder_res)
 # os.mkdir(path_res)
 
-n_test_deg1 = 3
+n_test_deg1 = 5
 
 n_vec_deg1 = np.array([2 ** (i) for i in range(n_test_deg1)])
 h_vec_deg1 = 1./n_vec_deg1
