@@ -1,12 +1,12 @@
 DEG=1
 
-geo_case = "2D"
+geo_case = "3D"
 bc_input = "DN"
 
 if geo_case=="2D":
     from FEEC.DiscretizationInterconnection.wave_eq.dynamic_hybridization.hybrid_wave2D_grad import compute_err
 else:
-    from FEEC.DiscretizationInterconnection.wave_eq.dynamic_hybridization.hybrid_wave3D_grad import compute_err
+    from FEEC.DiscretizationInterconnection.wave_eq.dynamic_hybridization.hybrid_wave3D import compute_err
 import numpy as np
 
 save_res = True # input("Save results: ")
@@ -16,7 +16,7 @@ path_res = "results_hybrid/"
 # path_res = os.path.join(path_project, folder_res)
 # os.mkdir(path_res)
 
-n_test_deg1 = 5
+n_test_deg1 = 2
 
 n_vec_deg1 = np.array([2 ** (i) for i in range(n_test_deg1)])
 h_vec_deg1 = 1./n_vec_deg1

@@ -6,7 +6,7 @@ bc_input = "DN"
 if geo_case=="2D":
     from FEEC.DiscretizationInterconnection.wave_eq.dynamic_hybridization.hybrid_wave2D_grad import compute_err
 else:
-    from FEEC.DiscretizationInterconnection.wave_eq.dynamic_hybridization.hybrid_wave3D_grad import compute_err
+    from FEEC.DiscretizationInterconnection.wave_eq.dynamic_hybridization.hybrid_wave3D import compute_err
 import numpy as np
 
 save_res = True # input("Save results: ")
