@@ -17,7 +17,7 @@ from FEEC.DiscretizationInterconnection.wave_eq.exact_eigensolution import exact
 from FEEC.DiscretizationInterconnection.slate_syntax.solve_hybrid_system import solve_hybrid
 
 
-# For some reasons it does not work at all
+# Unstable
 def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     """Compute the numerical solution of the wave equation with a DG method based on interconnection
 

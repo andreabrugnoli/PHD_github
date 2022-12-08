@@ -123,9 +123,7 @@ def j_form32(v_3, p_3, v_2, u_2):
     return j_form
 
 
-def constr_loc32(v_2, u_2, v_2_nor, p_2_nor):
-    mesh = u_2.function_space().mesh()
-    n_ver = FacetNormal(mesh)
+def constr_loc32(v_2, u_2, v_2_nor, p_2_nor, n_ver):
 
     form_W2_Wnor = inner(v_2, n_ver) * inner(p_2_nor, n_ver)
     form_Wnor_W2 = inner(v_2_nor, n_ver) * inner(u_2, n_ver)
@@ -136,9 +134,7 @@ def constr_loc32(v_2, u_2, v_2_nor, p_2_nor):
     return form
 
 
-def constr_global32(v_2_nor, p_2_nor, v_2_tan, u_2_tan):
-    mesh = u_2_tan.function_spaces().mesh()
-    n_ver = FacetNormal(mesh)
+def constr_global32(v_2_nor, p_2_nor, v_2_tan, u_2_tan, n_ver):
 
     form_Wnor_Vtan = inner(v_2_nor, n_ver) * inner(u_2_tan, n_ver)
     form_Vtan_Wnor = inner(v_2_tan, n_ver) * inner(p_2_nor, n_ver)
@@ -147,9 +143,8 @@ def constr_global32(v_2_nor, p_2_nor, v_2_tan, u_2_tan):
            - ((form_Vtan_Wnor('+') + form_Vtan_Wnor('-')) * dS + form_Vtan_Wnor * ds)
     return form
 
-def dirichlet_flow2(v_2_tan, dirichlet_bc):
-    mesh = v_2_tan.function_spaces().mesh()
-    n_ver = FacetNormal(mesh)
+def dirichlet_flow2(v_2_tan, dirichlet_bc, n_ver):
+
     return dot(v_2_tan, n_ver) * dirichlet_bc * ds
 
 def project_uex_W0nor(u_ex, W0_nor):
