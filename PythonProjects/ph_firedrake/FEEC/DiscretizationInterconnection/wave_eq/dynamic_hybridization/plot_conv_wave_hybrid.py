@@ -12,36 +12,58 @@ deg_vec = np.arange(1, 4)
 
 h_dict = {}
 
+# 01
 err_p0_dict = {}
 err_u1_dict = {}
 err_u0nor_dict = {}
 err_p0tan_dict = {}
-
+# 32
 err_p3_dict = {}
 err_u2_dict = {}
 err_u2tan_dict = {}
 err_p2nor_dict = {}
 
+# Postprocessing
+err_p0_pp_dict = {}
+err_u1_pp_dict = {}
+err_p3_pp_dict = {}
+err_u2_pp_dict = {}
+
+# Dual Field
 err_p30_dict = {}
 err_u12_dict = {}
 
+err_p30_pp_dict = {}
+err_u12_pp_dict = {}
+
+# Orders
+# 01
 ord_p0_dict = {}
 ord_u1_dict = {}
 ord_u0nor_dict = {}
 ord_p0tan_dict = {}
-
+# 32
 ord_p3_dict = {}
 ord_u2_dict = {}
 ord_u2tan_dict = {}
 ord_p2nor_dict = {}
+# Orders post-processed
+ord_p0_pp_dict = {}
+ord_u1_pp_dict = {}
+ord_p3_pp_dict = {}
+ord_u2_pp_dict = {}
 
+# Dual field
 ord_p30_dict = {}
 ord_u12_dict = {}
+ord_p30_pp_dict = {}
+ord_u12_pp_dict = {}
 
 for ii in deg_vec:
     h_deg_ii = np.load(path_res + "h_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
     h_dict[ii] = h_deg_ii
 
+    # 01
     err_p0_deg_ii = np.load(path_res + "p0_err_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
     err_p0_dict[ii] = err_p0_deg_ii
 
@@ -54,6 +76,7 @@ for ii in deg_vec:
     err_p0tan_deg_ii = np.load(path_res + "p0tan_err_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
     err_p0tan_dict[ii] = err_p0tan_deg_ii
 
+    # 32
     err_p3_deg_ii = np.load(path_res + "p3_err_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
     err_p3_dict[ii] = err_p3_deg_ii
 
@@ -66,12 +89,35 @@ for ii in deg_vec:
     err_u2tan_deg_ii = np.load(path_res + "u2tan_err_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
     err_u2tan_dict[ii] = err_u2tan_deg_ii
 
-    # err_p30_deg_ii = np.load(path_res + "p30_err_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
-    # err_p30_dict[ii] = err_p30_deg_ii
-    #
-    # err_u12_deg_ii = np.load(path_res + "u12_err_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
-    # err_u12_dict[ii] = err_u12_deg_ii
+    # Post-processed
+    err_p0_pp_deg_ii = np.load(path_res + "p0_pp_err_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    err_p0_pp_dict[ii] = err_p0_pp_deg_ii
 
+    err_u1_pp_deg_ii = np.load(path_res + "u1_pp_err_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    err_u1_pp_dict[ii] = err_u1_pp_deg_ii
+
+    err_p3_pp_deg_ii = np.load(path_res + "p3_pp_err_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    err_p3_pp_dict[ii] = err_p3_pp_deg_ii
+
+    err_u2_pp_deg_ii = np.load(path_res + "u2_pp_err_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    err_u2_pp_dict[ii] = err_u2_pp_deg_ii
+
+    # Dual field
+    err_p30_deg_ii = np.load(path_res + "p30_err_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    err_p30_dict[ii] = err_p30_deg_ii
+
+    err_u12_deg_ii = np.load(path_res + "u12_err_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    err_u12_dict[ii] = err_u12_deg_ii
+
+    err_p30_pp_deg_ii = np.load(path_res + "p30_pp_err_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    err_p30_pp_dict[ii] = err_p30_deg_ii
+
+    err_u12_pp_deg_ii = np.load(path_res + "u12_pp_err_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    err_u12_pp_dict[ii] = err_u12_pp_deg_ii
+
+
+    # Orders
+    # 01
     ord_p0_deg_ii = np.load(path_res + "order_p0_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
     ord_p0_dict[ii] = ord_p0_deg_ii
 
@@ -83,7 +129,7 @@ for ii in deg_vec:
 
     ord_p0tan_deg_ii = np.load(path_res + "order_p0tan_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
     ord_p0tan_dict[ii] = ord_p0tan_deg_ii
-
+    # 32
     ord_p3_deg_ii = np.load(path_res + "order_p3_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
     ord_p3_dict[ii] = ord_p3_deg_ii
 
@@ -96,13 +142,34 @@ for ii in deg_vec:
     ord_u2tan_deg_ii = np.load(path_res + "order_u2tan_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
     ord_u2tan_dict[ii] = ord_u2tan_deg_ii
 
-    # ord_p30_deg_ii = np.load(path_res + "order_p30_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
-    # ord_p30_dict[ii] = ord_p30_deg_ii
-    #
-    # ord_u12_deg_ii = np.load(path_res + "order_u12_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
-    # ord_u12_dict[ii] = ord_u12_deg_ii
+    # Postprocessing
+    ord_p0_pp_deg_ii = np.load(path_res + "order_p0_pp_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    ord_p0_pp_dict[ii] = ord_p0_pp_deg_ii
+
+    ord_u1_pp_deg_ii = np.load(path_res + "order_u1_pp_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    ord_u1_pp_dict[ii] = ord_u1_pp_deg_ii
+
+    ord_p3_pp_deg_ii = np.load(path_res + "order_p3_pp_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    ord_p3_pp_dict[ii] = ord_p3_pp_deg_ii
+
+    ord_u2_pp_deg_ii = np.load(path_res + "order_u2_pp_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    ord_u2_pp_dict[ii] = ord_u2_pp_deg_ii
+
+    # Dual Field
+    ord_p30_deg_ii = np.load(path_res + "order_p30_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    ord_p30_dict[ii] = ord_p30_deg_ii
+
+    ord_u12_deg_ii = np.load(path_res + "order_u12_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    ord_u12_dict[ii] = ord_u12_deg_ii
+
+    ord_p30_pp_deg_ii = np.load(path_res + "order_p30_pp_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    ord_p30_pp_dict[ii] = ord_p30_pp_deg_ii
+
+    ord_u12_pp_deg_ii = np.load(path_res + "order_u12_pp_deg" + str(ii) + bc_case + str(geo_case) + ".npy")
+    ord_u12_pp_dict[ii] = ord_u12_pp_deg_ii
 
 
+# 01 system
 
 plt.figure()
 for ii in deg_vec:
@@ -143,7 +210,7 @@ for ii in deg_vec:
 
 plt.xlabel(r'$\log(h)$')
 plt.ylabel(r'$\log||u^1_h - u^1_{\mathrm{ex}}||_{L^2}$')
-plt.title(r'Error $q^1_h$')
+plt.title(r'Error $u^1_h$')
 
 plt.legend()
 
@@ -161,6 +228,8 @@ if save_plots:
 # plt.xlabel(r'$h$')
 # plt.title(r'$||u_1||_{H(\mathrm{curl})}$')
 # plt.legend()
+
+
 
 plt.figure()
 for ii in deg_vec:
@@ -197,7 +266,7 @@ plt.legend()
 if save_plots:
     plt.savefig(path_fig + "p_0tan" + geo_case + bc_case + ".pdf", format="pdf")
 
-
+# 32 system
 plt.figure()
 for ii in deg_vec:
     h = h_dict[ii]
@@ -274,7 +343,6 @@ plt.legend()
 if save_plots:
     plt.savefig(path_fig + "u_2tan" + geo_case + bc_case + ".pdf", format="pdf")
 
-
 # plt.figure()
 # for ii in deg_vec:
 #     h = h_dict[ii]
@@ -286,6 +354,98 @@ if save_plots:
 # plt.xlabel(r'$h$')
 # plt.title(r'$||u_2||_{H(\mathrm{div})}$')
 # plt.legend()
+
+# Post-processing
+
+plt.figure()
+for ii in deg_vec:
+    h = h_dict[ii]
+    errL2_p0_pp = err_p0_pp_dict[ii][:, 0]
+    plt.plot(np.log(h), np.log(errL2_p0_pp), '-.+', label=r'CG$_' + str(ii)+ '$')
+    plt.plot(np.log(h), np.log(h**ii) + \
+             + 1.1*(np.log(errL2_p0_pp)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+
+plt.xlabel(r'$\log(h)$')
+plt.ylabel(r'$\log||p^{*0}_h - p^0_{\mathrm{ex}}||_{L^2}$')
+plt.title(r'Error $p^{*0}_h$')
+
+plt.legend()
+
+if save_plots:
+    plt.savefig(path_fig + "p_0_pp" + geo_case + bc_case + ".pdf", format="pdf")
+
+
+
+plt.figure()
+for ii in deg_vec:
+    h = h_dict[ii]
+    errH1_p0_pp = err_p0_pp_dict[ii][:, 1]
+    plt.plot(np.log(h), np.log(errH1_p0_pp), '-.+', label=r'CG$_' + str(ii)+ '$')
+    plt.plot(np.log(h), np.log(h**ii) + \
+             + 1.1*(np.log(errH1_p0_pp)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+
+plt.xlabel(r'$\log(h)$')
+plt.ylabel(r'$\log||\mathrm{d}(p^{*0}_h - p^0_{\mathrm{ex}})||_{L^2}$')
+plt.title(r'Error $\mathrm{d}p^{*0}_h$')
+
+plt.legend()
+
+if save_plots:
+    plt.savefig(path_fig + "grad_p_0_pp" + geo_case + bc_case + ".pdf", format="pdf")
+
+
+plt.figure()
+for ii in deg_vec:
+    h = h_dict[ii]
+    errL2_p3_pp = err_p3_pp_dict[ii][:]
+    plt.plot(np.log(h), np.log(errL2_p3_pp), '-.+', label=r'DG$_' + str(ii)+ '$')
+    plt.plot(np.log(h), np.log(h**ii) + \
+             + 1.1*(np.log(errL2_p3_pp)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+
+plt.xlabel(r'$\log(h)$')
+plt.ylabel(r'$\log||p^{*3}_h - p^3_{\mathrm{ex}}||_{L^2}$')
+plt.title(r'Error $p^{*3}_h$')
+
+plt.legend()
+
+if save_plots:
+    plt.savefig(path_fig + "p_3_pp" + geo_case + bc_case + ".pdf", format="pdf")
+
+
+plt.figure()
+for ii in deg_vec:
+    h = h_dict[ii]
+    errL2_u1_pp = err_u1_pp_dict[ii][:, 0]
+    plt.plot(np.log(h), np.log(errL2_u1_pp), '-.+', label=r'NED$^1_' + str(ii) + '$')
+    plt.plot(np.log(h), np.log(h**ii) + \
+             + 1.1*(np.log(errL2_u1_pp)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+
+plt.xlabel(r'$\log(h)$')
+plt.ylabel(r'$\log||u^{*1}_h - u^1_{\mathrm{ex}}||_{L^2}$')
+plt.title(r'Error $u^1_h$')
+
+plt.legend()
+
+if save_plots:
+    plt.savefig(path_fig + "u_1_pp" + geo_case + bc_case + ".pdf", format="pdf")
+
+
+plt.figure()
+for ii in deg_vec:
+    h = h_dict[ii]
+    errHcurl_u1_pp = err_u1_pp_dict[ii][:, 1]
+    plt.plot(np.log(h), np.log(errHcurl_u1_pp), '-.+', label=r'NED$^1_' + str(ii) + '$')
+    plt.plot(np.log(h), np.log(h**ii) + \
+             + 1.1*(np.log(errHcurl_u1_pp)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+
+plt.xlabel(r'$\log(h)$')
+plt.ylabel(r'$\log||\mathrm{d}(u^{*1}_h - u^1_{\mathrm{ex}})||_{L^2}$')
+plt.title(r'Error $\mathrm{d} u^{*1}_h$')
+
+plt.legend()
+
+if save_plots:
+    plt.savefig(path_fig + "curl_u_1_pp" + geo_case + bc_case + ".pdf", format="pdf")
 
 
 
