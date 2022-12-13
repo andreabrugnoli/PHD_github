@@ -7,19 +7,20 @@ if geo_case=="2D":
     # from FEEC.wave_eq.compute_err_wave2D import compute_err
     from FEEC.wave_eq.staggering_wave2D import compute_err
 else:
-    from FEEC.wave_eq.dual_field.dual_field_wave3D import compute_err
+    # from FEEC.wave_eq.dual_field.dual_field_wave3D import compute_err
+    from FEEC.wave_eq.dual_field.dual_field_wave3D_L2 import compute_err
     # from FEEC.wave_eq.compute_err_wave3D import compute_err
     # from FEEC.wave_eq.staggering_wave3D import compute_err
 
 import numpy as np
 
-save_res = False # input("Save results: ")
+save_res = True # input("Save results: ")
 path_res = "results_wave/"
 bc_input = "DN"
 n_test_deg1 = 3
 
 
-n_vec_deg1 = np.array([2 ** (i+1) for i in range(n_test_deg1)])
+n_vec_deg1 = np.array([2 ** (i) for i in range(n_test_deg1)])
 h_vec_deg1 = 1./n_vec_deg1
 
 p3_err_deg1 = np.zeros((n_test_deg1, ))

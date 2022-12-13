@@ -7,13 +7,21 @@ os.environ["OMP_NUM_THREADS"] = "1"
 from firedrake import *
 from tqdm import tqdm
 # from time import sleep
+import matplotlib.pyplot as plt
+from tools_plotting import setup
+
 
 from FEEC.DiscretizationInterconnection.wave_eq.exact_eigensolution import exact_sol_wave3D
 from FEEC.DiscretizationInterconnection.slate_syntax.solve_hybrid_system import solve_hybrid
 
-from spaces_forms_hybridwave import spaces01, spaces32, m_form01, m_form32, j_form01, j_form32, constr_loc01, constr_loc32, \
-    constr_global01, constr_global32, assign_exact01, assign_exact32, neumann_flow0, dirichlet_flow2, \
+from spaces_forms_hybridwave import spaces01, spaces32, \
+    m_form01, m_form32, j_form01, j_form32, constr_loc01, constr_loc32, constr_global01, constr_global32, \
+    assign_exact01, assign_exact32, \
+    neumann_flow0, dirichlet_flow2,  \
     project_uex_W0nor, project_pex_W2nor
+
+from spaces_forms_postprocessingwave import spaces_postprocessing01, spaces_postprocessing32,\
+    assign_exact01_pp, assign_exact32_pp, neumann_flow0_pp, dirichlet_flow2_pp
 
 from FEEC.DiscretizationInterconnection.dofs_bd_hybrid import dofs_ess_nat
 
@@ -42,20 +50,38 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     e_grad = TrialFunction(V_grad)
     p0, u1, u0_nor, p0_tan = split(e_grad)
 
-    print("Local space 01 dim: " + str(V01.sub(0).dim()+W01_loc.sub(1).dim()))
-    print("Global space 01 dim: " + str(V0_tan.dim()))
+    print("Conforming Galerkin 01 dim: " + str(V01.dim()))
+    print("Conforming Galerkin 01 (1 broken) dim: " + str(V01.sub(0).dim()+W01_loc.sub(1).dim()))
+    print("Hybrid 01 dim: " + str(V0_tan.dim()))
 
     W32_loc, V2_tan, V32 = spaces32(mesh, deg)
     V_div = W32_loc * V2_tan
 
-    print("Local space 32 dim: " + str(W32_loc.sub(0).dim() + V32.sub(1).dim()))
-    print("Global space 32 dim: " + str(V2_tan.dim()))
+    print("Conforming Galerkin 32 dim: " + str(V32.dim()))
+    print("Hybrid 32 dim: " + str(V2_tan.dim()))
 
     v_div = TestFunction(V_div)
     v3, v2, v2_nor, v2_tan = split(v_div)
 
     e_div = TrialFunction(V_div)
     p3, u2, p2_nor, u2_tan = split(e_div)
+
+    # Post-processing variables
+    W01_pp = spaces_postprocessing01(mesh, deg+1)
+
+    v_grad_pp = TestFunction(W01_pp)
+    v0_pp, v1_pp = split(v_grad_pp)
+
+    e_grad_pp = TrialFunction(W01_pp)
+    p0_pp, u1_pp = split(e_grad_pp)
+
+    W32_pp = spaces_postprocessing32(mesh, deg+1)
+
+    v_div_pp = TestFunction(W32_pp)
+    v3_pp, v2_pp = split(v_div_pp)
+
+    e_div_pp = TrialFunction(W32_pp)
+    p3_pp, u2_pp = split(e_div_pp)
 
     dx = Measure('dx')
     ds = Measure('ds')
@@ -112,6 +138,15 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     enmid_div = Function(V_div, name="e n+1/2")
     pnmid_3, unmid_2, pnmid_2_nor, unmid_2_tan = enmid_div.split()
 
+    # Initial conditions post-processing
+    en_grad_pp = Function(W01_pp, name="e n")
+    assign_exact01_pp(p_ex, u_ex, en_grad_pp, W01_pp, V01)
+    pn_0_pp, un_1_pp = en_grad_pp.split()
+
+    en_div_pp = Function(W32_pp, name="e n")
+    assign_exact32_pp(p_ex, u_ex, en_div_pp, W32_pp, V32)
+    pn_3_pp, un_2_pp = en_div_pp.split()
+
     # Exact quantities
     Hn_ex = 0.5 * (inner(p_ex, p_ex) * dx(domain=mesh) + inner(u_ex, u_ex) * dx(domain=mesh))
     bdflow_ex_nmid = p_ex_mid * dot(u_ex_mid, n_ver) * ds(domain=mesh)
@@ -131,11 +166,16 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     Hn_01 = 0.5 * (inner(pn_0, pn_0) * dx(domain=mesh) + inner(un_1, un_1) * dx(domain=mesh))
     H_01_vec = np.zeros((1 + n_t,))
     errH_01_vec = np.zeros((1 + n_t,))
+
     errL2_p_0_vec = np.zeros((1 + n_t,))
     errL2_u_1_vec = np.zeros((1 + n_t,))
     errH1_p_0_vec = np.zeros((1 + n_t,))
     errHcurl_u_1_vec = np.zeros((1 + n_t,))
     errL2_p_0tan_vec = np.zeros((1 + n_t,))
+
+    errL2_p_3_pp_vec = np.zeros((1 + n_t,))
+    errL2_u_2_pp_vec = np.zeros((1 + n_t,))
+    errHdiv_u_2_pp_vec = np.zeros((1 + n_t,))
 
     bdflow_01_mid_vec = np.zeros((n_t,))
     errL2_u_0nor_vec = np.zeros((n_t,))
@@ -150,14 +190,24 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     err_p_0tan = h_cell * (p_ex - pn_0_tan) ** 2
     errL2_p_0tan_vec[0] = sqrt(assemble((err_p_0tan('+') + err_p_0tan('-')) * dS + err_p_0tan * ds))
 
+    errL2_p_3_pp_vec[0] = norm(p_ex - pn_3_pp)
+    errL2_u_2_pp_vec[0] = norm(u_ex-un_2_pp)
+    errHdiv_u_2_pp_vec[0] = norm(div(u_ex-un_2_pp))
+
     # Results 32
     Hn_32 = 0.5 * (inner(pn_3, pn_3) * dx(domain=mesh) + inner(un_2, un_2) * dx(domain=mesh))
     H_32_vec = np.zeros((1 + n_t,))
     errH_32_vec = np.zeros((1 + n_t,))
+
     errL2_p_3_vec = np.zeros((1 + n_t,))
     errL2_u_2_vec = np.zeros((1 + n_t,))
     errHdiv_u_2_vec = np.zeros((1 + n_t,))
     errL2_u_2tan_vec = np.zeros((1 + n_t,))
+
+    errL2_p_0_pp_vec = np.zeros((1 + n_t,))
+    errL2_u_1_pp_vec = np.zeros((1 + n_t,))
+    errH1_p_0_pp_vec = np.zeros((1 + n_t,))
+    errHcurl_u_1_pp_vec = np.zeros((1 + n_t,))
 
     bdflow_32_mid_vec = np.zeros((n_t,))
     errL2_p_2nor_vec = np.zeros((n_t,))
@@ -171,12 +221,27 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     err_u_2tan = h_cell * (u_ex - un_2_tan) ** 2
     errL2_u_2tan_vec[0] = sqrt(assemble((err_u_2tan('+') + err_u_2tan('-')) * dS + err_u_2tan * ds))
 
+    errL2_p_0_pp_vec[0] = norm(p_ex - pn_0_pp)
+    errH1_p_0_pp_vec[0] = norm(grad(p_ex-pn_0_pp))
+    errL2_u_1_pp_vec[0] = norm(u_ex - un_1_pp)
+    errHcurl_u_1_pp_vec[0] = norm(curl(u_ex-un_1_pp))
+
     # Dual Field representation
     err_p30_vec = np.zeros((1 + n_t,))
     err_u12_vec = np.zeros((1 + n_t,))
+
+    err_p30_pp_vec = np.zeros((1 + n_t,))
+    err_u12_pp_vec = np.zeros((1 + n_t,))
+
+    err_p30_vec[0] = norm(pn_0 - pn_3)
+    err_u12_vec[0] = norm(un_1 - un_2)
+
+    err_p30_pp_vec[0] = norm(pn_0_pp - pn_3_pp)
+    err_u12_pp_vec[0] = norm(un_1_pp - un_2_pp)
+
     ## Settings of intermediate variables and matrices for the 2 linear systems
     # Bilinear form 01
-    a_form01 = m_form01(v1, u1, v0, p0) - 0.5 * dt * j_form01(v1, u1, v0, p0) \
+    a_form01 = m_form01(v0, p0, v1, u1) - 0.5 * dt * j_form01(v0, p0, v1, u1) \
                - 0.5 * dt * constr_loc01(v0, p0, v0_nor, u0_nor) \
                - 0.5 * dt * constr_global01(v0_nor, u0_nor, v0_tan, p0_tan)
 
@@ -185,17 +250,29 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
                - 0.5 * dt * constr_loc32(v2, u2, v2_nor, p2_nor, n_ver) \
                - 0.5 * dt * constr_global32(v2_nor, p2_nor, v2_tan, u2_tan, n_ver)
 
+    # Post-processed solution
+    a_form01_pp = m_form01(v0_pp, p0_pp, v1_pp, u1_pp) - 0.5 * dt * j_form01(v0_pp, p0_pp, v1_pp, u1_pp)
+    A01_pp = Tensor(a_form01_pp).blocks
+
+    # Bilinear form 32
+    a_form32_pp = m_form32(v3_pp, p3_pp, v2_pp, u2_pp) - 0.5 * dt * j_form32(v3_pp, p3_pp, v2_pp, u2_pp)
+    A32_pp = Tensor(a_form32_pp).blocks
+
+
     print("Computation of the solution with n elem " + str(n_el) + " n time " + str(n_t) + " deg " + str(deg))
     print("==============")
 
     for ii in tqdm(range(n_t)):
 
+        input_u = interpolate(u_ex_mid, V32.sub(1))
+        input_p = interpolate(p_ex_mid, V01.sub(0))
+
         ## Integration of 10 system (Neumann natural)
 
-        b_form01 = m_form01(v1, un_1, v0, pn_0) + 0.5 * dt * j_form01(v1, un_1, v0, pn_0) \
+        b_form01 = m_form01(v0, pn_0, v1, un_1) + 0.5 * dt * j_form01(v0, pn_0, v1, un_1) \
                    + 0.5 * dt * constr_loc01(v0, pn_0, v0_nor, un_0_nor) \
                    + 0.5 * dt * constr_global01(v0_nor, un_0_nor, v0_tan, pn_0_tan)\
-                   + dt * neumann_flow0(v0_tan, dot(u_ex_mid, n_ver))
+                   + dt * neumann_flow0(v0_tan, input_u, n_ver)
 
         en1_grad = solve_hybrid(a_form01, b_form01, bc_D, V0_tan, W01_loc)
         pn1_0, un1_1, un1_0_nor, pn1_0_tan = en1_grad.split()
@@ -203,10 +280,12 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         enmid_grad.assign(0.5 * (en_grad + en1_grad))
         pnmid_0, unmid_1, unmid_0_nor, pnmid_0_tan = enmid_grad.split()
 
+        ## Integration of 32 system (Dirichlet natural)
+
         b_form32 = m_form32(v3, pn_3, v2, un_2) + 0.5 * dt * j_form32(v3, pn_3, v2, un_2) \
                    + 0.5 * dt * constr_loc32(v2, un_2, v2_nor, pn_2_nor, n_ver) \
                    + 0.5 * dt * constr_global32(v2_nor, pn_2_nor, v2_tan, un_2_tan, n_ver) \
-                   + dt * dirichlet_flow2(v2_tan, p_ex_mid, n_ver)
+                   + dt * dirichlet_flow2(v2_tan, input_p, n_ver)
 
         en1_div = solve_hybrid(a_form32, b_form32, bc_N, V2_tan, W32_loc)
         pn1_3, un1_2, pn1_2_nor, un1_2_tan = en1_div.split()
@@ -214,12 +293,29 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         enmid_div.assign(0.5 * (en_div + en1_div))
         pnmid_3, unmid_2, pnmid_2_nor, unmid_2_tan = enmid_div.split()
 
+        # Post-processed solution
+
+        # 01 system
+        b_form01_pp = m_form01(v0_pp, pn_0_pp, v1_pp, un_1_pp) + 0.5 * dt * j_form01(v0_pp, pn_0_pp, v1_pp, un_1_pp) \
+                   + dt * neumann_flow0_pp(v0_pp, unmid_2_tan, n_ver)
+        b01_pp = Tensor(b_form01_pp).blocks
+
+        en1_grad_pp = assemble(A01_pp[:, :].inv * b01_pp[:])
+
+        # 32 system
+        b_form32_pp = m_form32(v3_pp, pn_3_pp, v2_pp, un_2_pp) + 0.5 * dt * j_form32(v3_pp, pn_3_pp, v2_pp, un_2_pp) \
+                   + dt * dirichlet_flow2_pp(v2_pp, pnmid_0_tan, n_ver)
+
+        b32_pp = Tensor(b_form32_pp).blocks
+
+        en1_div_pp = assemble(A32_pp[:, :].inv * b32_pp[:])
+
         if len(bc_N) == 0:
             bdflow_nat01 = 0
             bdflow_ess32 = 0
         else:
             y_nat01 = enmid_grad.vector().get_local()[dofsV0_tan_N]
-            u_nat01 = assemble(neumann_flow0(v0_tan, dot(u_ex_mid, n_ver))).vector().get_local()[dofsV0_tan_N]
+            u_nat01 = assemble(neumann_flow0(v0_tan, input_u, n_ver)).vector().get_local()[dofsV0_tan_N]
             bdflow_nat01 = np.dot(y_nat01, u_nat01)
 
             form_tn_32 = inner(v2_tan, n_ver) * inner(pnmid_2_nor, n_ver)
@@ -234,7 +330,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
         else:
             y_nat32 = enmid_div.vector().get_local()[dofsV2_tan_D]
-            u_nat32 = assemble(dirichlet_flow2(v2_tan, p_ex_mid, n_ver)).vector().get_local()[dofsV2_tan_D]
+            u_nat32 = assemble(dirichlet_flow2(v2_tan, input_p, n_ver)).vector().get_local()[dofsV2_tan_D]
             bdflow_nat32 = np.dot(y_nat32, u_nat32)
 
             form_tn_01 = v0_tan * unmid_0_nor
@@ -254,13 +350,20 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
         bdflow_ex_mid_vec[ii] = assemble(bdflow_ex_nmid)
         bdflow_num_mid_vec[ii] = assemble(bdflow_num_nmid)
-        # New assign
 
+        # New assign
         en_grad.assign(en1_grad)
         pn_0, un_1, un_0_nor, pn_0_tan = en_grad.split()
 
         en_div.assign(en1_div)
         pn_3, un_2, pn_2_nor, un_2_tan = en_div.split()
+
+        # New assign post-processing
+        en_grad_pp.assign(en1_grad_pp)
+        pn_0_pp, un_1_pp = en_grad_pp.split()
+
+        en_div_pp.assign(en1_div_pp)
+        pn_3_pp, un_2_pp = en_div_pp.split()
 
         H_01_vec[ii + 1] = assemble(Hn_01)
         H_32_vec[ii + 1] = assemble(Hn_32)
@@ -296,9 +399,25 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         err_p_2nor = h_cell * inner(pex_nor_p - pn_2_nor, n_ver) ** 2
         errL2_p_2nor_vec[ii] = sqrt(assemble((err_p_2nor('+') + err_p_2nor('-')) * dS + err_p_2nor * ds))
 
+        ## Post-processed error
+        errL2_p_0_pp_vec[ii + 1] = norm(p_ex - pn_0_pp)
+        errH1_p_0_pp_vec[ii + 1] = norm(grad(p_ex-pn_0_pp))
+
+        errL2_u_1_pp_vec[ii + 1] = norm(u_ex - un_1_pp)
+        errHcurl_u_1_pp_vec[ii + 1] = norm(curl(u_ex-un_1_pp))
+
+        errL2_p_3_pp_vec[ii + 1] = norm(p_ex - pn_3_pp)
+
+        errL2_u_2_pp_vec[ii + 1] = norm(u_ex - un_2_pp)
+        errHdiv_u_2_pp_vec[ii + 1] = norm(div(u_ex - un_2_pp))
+
         # Dual Field
-        err_p30_vec[ii + 1] = np.sqrt(assemble(inner(pn_3 - pn_0, pn_3 - pn_0) * dx))
-        err_u12_vec[ii + 1] = np.sqrt(assemble(inner(un_2 - un_1, un_2 - un_1) * dx))
+        err_p30_vec[ii + 1] = norm(pn_3 - pn_0)
+        err_u12_vec[ii + 1] = norm(un_2 - un_1)
+
+        err_p30_pp_vec[ii + 1] = norm(pn_3_pp - pn_0_pp)
+        err_u12_pp_vec[ii + 1] = norm(un_2_pp - un_1_pp)
+
 
     # Error 01
     errH_01 = errH_01_vec[-1]
@@ -312,6 +431,9 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     errL2_u_0nor = errL2_u_0nor_vec[-1]
     errL2_p_0tan = errL2_p_0tan_vec[-1]
 
+    errL2_p_3_pp = errL2_p_3_pp_vec[-1]
+    errL2_u_2_pp = errL2_u_2_pp_vec[-1]
+    errHdiv_u_2_pp = errHdiv_u_2_pp_vec[-1]
 
     # Error 32
     errH_32 = errH_01_vec[-1]
@@ -324,8 +446,17 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     errL2_p_2nor = errL2_p_2nor_vec[-1]
     errL2_u_2tan = errL2_u_2tan_vec[-1]
 
+    errL2_p_0_pp = errL2_p_0_pp_vec[-1]
+    errL2_u_1_pp = errL2_u_1_pp_vec[-1]
+    errH1_p_0_pp = errH1_p_0_pp_vec[-1]
+    errHcurl_u_1_pp = errHcurl_u_1_pp_vec[-1]
+
+    # Dual field representation error
     err_p30 = err_p30_vec[-1]
     err_u12 = err_u12_vec[-1]
+
+    err_p30_pp = err_p30_pp_vec[-1]
+    err_u12_pp = err_u12_pp_vec[-1]
 
     # errL2_p_0 = max(errL2_p_0_vec)
     # errL2_u_1 = max(errL2_u_1_vec)
@@ -354,14 +485,18 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
                 "err_p0tan": errL2_p_0tan, "err_u0nor": errL2_u_0nor, \
                 "flow32_mid": bdflow_32_mid_vec, "err_u2": [errL2_u_2, errHdiv_u_2], \
                 "err_p3": errL2_p_3, "err_u2tan": errL2_u_2tan, "err_p2nor": errL2_p_2nor, \
-                "err_p30": err_p30, "err_u12": err_u12, "err_H": [errH_01, errH_32]}
+                "err_p0_pp": [errL2_p_0_pp, errH1_p_0_pp], "err_u1_pp": [errL2_u_1_pp, errHcurl_u_1_pp], \
+                "err_p3_pp": errL2_p_3_pp, "err_u2_pp": [errL2_u_2_pp, errHdiv_u_2_pp], \
+                "err_p30": err_p30, "err_u12": err_u12, "err_p30_pp": err_p30_pp, "err_u12_pp": err_u12_pp,
+                "err_H": [errH_01, errH_32]
+                }
 
     return dict_res
 
-
+#
 # bd_cond = 'DN' #input("Enter bc: ")
 #
-# n_elem = 5
+# n_elem = 1
 # pol_deg = 2
 #
 # n_time = 10

@@ -171,7 +171,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     ## Settings of intermediate variables and matrices for the 2 linear systems
     # Bilinear form 01
-    a_form01 = m_form01(v1, u1, v0, p0) - 0.5 * dt * j_form01(v1, u1, v0, p0) \
+    a_form01 = m_form01(v0, p0, v1, u1) - 0.5 * dt * j_form01(v0, p0, v1, u1) \
                - 0.5 * dt * constr_loc01(v0, p0, v0_nor, u0_nor) \
                - 0.5 * dt * constr_global01(v0_nor, u0_nor, v0_tan, p0_tan)
 
@@ -187,7 +187,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
         ## Integration of 10 system (Neumann natural)
 
-        b_form01 = m_form01(v1, un_1, v0, pn_0) + 0.5 * dt * j_form01(v1, un_1, v0, pn_0) \
+        b_form01 = m_form01(v0, pn_0, v1, un_1) + 0.5 * dt * j_form01(v0, pn_0, v1, un_1) \
                    + 0.5 * dt * constr_loc01(v0, pn_0, v0_nor, un_0_nor) \
                    + 0.5 * dt * constr_global01(v0_nor, un_0_nor, v0_tan, pn_0_tan)\
                    + dt * neumann_flow0(v0_tan, dot(u_ex_mid, n_ver))

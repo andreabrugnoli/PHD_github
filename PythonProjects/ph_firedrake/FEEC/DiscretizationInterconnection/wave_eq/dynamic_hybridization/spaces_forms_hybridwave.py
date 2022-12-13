@@ -26,7 +26,6 @@ def spaces01(mesh, deg):
 
     return W01_loc, V0_tan, V01
 
-
 def spaces32(mesh, deg):
     P3 = FiniteElement("DG", mesh.ufl_cell(), deg-1)
     # Careful with freezing of simulation for variant integral
@@ -76,14 +75,13 @@ def assign_exact32(p_ex, u_ex, state32, W32_loc, V32_gl, V32):
     state32.sub(2).assign(p_ex_Pnor)
     state32.sub(3).assign(interpolate(u_ex, V32_gl))
 
-
-def m_form01(v_1, u_1, v_0, p_0):
+def m_form01(v_0, p_0, v_1, u_1):
     m_form = inner(v_1, u_1) * dx + inner(v_0, p_0) * dx
 
     return m_form
 
 
-def j_form01(v_1, u_1, v_0, p_0):
+def j_form01(v_0, p_0, v_1, u_1):
     j_form = dot(v_1, grad(p_0)) * dx - dot(grad(v_0), u_1) * dx
 
     return j_form
@@ -107,9 +105,8 @@ def constr_global01(v_0_nor, u_0_nor, v_0_tan, p_0_tan):
     return form
 
 
-def neumann_flow0(v_0_tan, neumann_bc):
-    return v_0_tan * neumann_bc * ds
-
+def neumann_flow0(v_0_tan, neumann_bc, n_ver):
+    return v_0_tan * dot(neumann_bc, n_ver) * ds
 
 def m_form32(v_3, p_3, v_2, u_2):
     m_form = inner(v_3, p_3) * dx + inner(v_2, u_2) * dx
