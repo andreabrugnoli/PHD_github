@@ -67,7 +67,7 @@ if save_plots:
 plt.figure()
 plt.plot(t_vec[1:]-dt/2, np.diff(H_32)/dt - bdflow32_mid, 'r-.')
 plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.ylabel(r'$\dot{H}^{\widehat{3}1}_h-P^{\widehat{3}1}_h$')
+plt.ylabel(r'$\dot{H}^{}_h-P^{\widehat{3}1}_h$')
 # plt.title(r'Conservation law $\dot{H}^{\widehat{3}1}_h-P^{\widehat{3}1}_h$')
 
 if save_plots:

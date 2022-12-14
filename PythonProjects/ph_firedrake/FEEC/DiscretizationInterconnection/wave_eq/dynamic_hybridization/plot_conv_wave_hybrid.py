@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tools_plotting import setup
 save_plots = input("Save plots? ")
-path_fig = "/home/andrea/Pictures/PythonPlots/Hybridization_wave3D/"
+path_fig = "/home/andrea/Pictures/PythonPlots/Hybridization_wave/"
 path_res = "results_hybrid/"
 bc_case = "_DN"
 geo_case = "_3D"
@@ -301,15 +301,25 @@ plt.title(r'Error $u^2_h$')
 plt.legend()
 
 if save_plots:
-    plt.savefig(path_fig + "q_2" + geo_case + bc_case + ".pdf", format="pdf")
+    plt.savefig(path_fig + "u_2" + geo_case + bc_case + ".pdf", format="pdf")
 
-
+# plt.figure()
+# for ii in deg_vec:
+#     h = h_dict[ii]
+#     errHdiv_u2 = err_u2_dict[ii][:, 1]
+#     plt.plot(np.log(h), np.log(errHdiv_u2), '-.+', label=r'RT$_' + str(ii) + '$')
+#     plt.plot(np.log(h), np.log(h**ii) + \
+#              + 1.1*(np.log(errHdiv_u2)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+#
+# plt.xlabel(r'$h$')
+# plt.title(r'$||u_2||_{H(\mathrm{div})}$')
+# plt.legend()
 
 plt.figure()
 for ii in deg_vec:
     h = h_dict[ii]
     errL2_p2nor = err_p2nor_dict[ii][:]
-    plt.plot(np.log(h), np.log(errL2_p2nor), '-.+', label=r'CG$_' + str(ii) + '$')
+    plt.plot(np.log(h), np.log(errL2_p2nor), '-.+', label=r'RT$_' + str(ii) + '$')
     if ii==1:
         pass
     else:
@@ -330,7 +340,7 @@ plt.figure()
 for ii in deg_vec:
     h = h_dict[ii]
     errL2_u2tan = err_u2tan_dict[ii][:]
-    plt.plot(np.log(h), np.log(errL2_u2tan), '-.+', label=r'CG$_' + str(ii) + '$')
+    plt.plot(np.log(h), np.log(errL2_u2tan), '-.+', label=r'RT$_' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
              + 1.1*(np.log(errL2_u2tan)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
@@ -342,147 +352,211 @@ plt.legend()
 
 if save_plots:
     plt.savefig(path_fig + "u_2tan" + geo_case + bc_case + ".pdf", format="pdf")
-
-# plt.figure()
-# for ii in deg_vec:
-#     h = h_dict[ii]
-#     errHdiv_u2 = err_u1_dict[ii][:, 1]
-#     plt.plot(np.log(h), np.log(errHdiv_u2), '-.+', label=r'RT$_' + str(ii) + '$')
-#     plt.plot(np.log(h), np.log(h**ii) + \
-#              + 1.1*(np.log(errHdiv_u2)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 #
-# plt.xlabel(r'$h$')
-# plt.title(r'$||u_2||_{H(\mathrm{div})}$')
-# plt.legend()
-
-# Post-processing
-
-plt.figure()
-for ii in deg_vec:
-    h = h_dict[ii]
-    errL2_p0_pp = err_p0_pp_dict[ii][:, 0]
-    plt.plot(np.log(h), np.log(errL2_p0_pp), '-.+', label=r'CG$_' + str(ii)+ '$')
-    plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.1*(np.log(errL2_p0_pp)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
-
-plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||p^{*0}_h - p^0_{\mathrm{ex}}||_{L^2}$')
-plt.title(r'Error $p^{*0}_h$')
-
-plt.legend()
-
-if save_plots:
-    plt.savefig(path_fig + "p_0_pp" + geo_case + bc_case + ".pdf", format="pdf")
-
-
-
-plt.figure()
-for ii in deg_vec:
-    h = h_dict[ii]
-    errH1_p0_pp = err_p0_pp_dict[ii][:, 1]
-    plt.plot(np.log(h), np.log(errH1_p0_pp), '-.+', label=r'CG$_' + str(ii)+ '$')
-    plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.1*(np.log(errH1_p0_pp)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
-
-plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||\mathrm{d}(p^{*0}_h - p^0_{\mathrm{ex}})||_{L^2}$')
-plt.title(r'Error $\mathrm{d}p^{*0}_h$')
-
-plt.legend()
-
-if save_plots:
-    plt.savefig(path_fig + "grad_p_0_pp" + geo_case + bc_case + ".pdf", format="pdf")
-
-
-plt.figure()
-for ii in deg_vec:
-    h = h_dict[ii]
-    errL2_p3_pp = err_p3_pp_dict[ii][:]
-    plt.plot(np.log(h), np.log(errL2_p3_pp), '-.+', label=r'DG$_' + str(ii)+ '$')
-    plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.1*(np.log(errL2_p3_pp)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
-
-plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||p^{*3}_h - p^3_{\mathrm{ex}}||_{L^2}$')
-plt.title(r'Error $p^{*3}_h$')
-
-plt.legend()
-
-if save_plots:
-    plt.savefig(path_fig + "p_3_pp" + geo_case + bc_case + ".pdf", format="pdf")
-
-
-plt.figure()
-for ii in deg_vec:
-    h = h_dict[ii]
-    errL2_u1_pp = err_u1_pp_dict[ii][:, 0]
-    plt.plot(np.log(h), np.log(errL2_u1_pp), '-.+', label=r'NED$^1_' + str(ii) + '$')
-    plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.1*(np.log(errL2_u1_pp)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
-
-plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||u^{*1}_h - u^1_{\mathrm{ex}}||_{L^2}$')
-plt.title(r'Error $u^1_h$')
-
-plt.legend()
-
-if save_plots:
-    plt.savefig(path_fig + "u_1_pp" + geo_case + bc_case + ".pdf", format="pdf")
-
-
-plt.figure()
-for ii in deg_vec:
-    h = h_dict[ii]
-    errHcurl_u1_pp = err_u1_pp_dict[ii][:, 1]
-    plt.plot(np.log(h), np.log(errHcurl_u1_pp), '-.+', label=r'NED$^1_' + str(ii) + '$')
-    plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.1*(np.log(errHcurl_u1_pp)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
-
-plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||\mathrm{d}(u^{*1}_h - u^1_{\mathrm{ex}})||_{L^2}$')
-plt.title(r'Error $\mathrm{d} u^{*1}_h$')
-
-plt.legend()
-
-if save_plots:
-    plt.savefig(path_fig + "curl_u_1_pp" + geo_case + bc_case + ".pdf", format="pdf")
-
-
-
+# # Post-processing
+#
 # plt.figure()
 # for ii in deg_vec:
 #     h = h_dict[ii]
-#     errL2_u12 = err_u12_dict[ii]
-#     plt.plot(np.log(h), np.log(errL2_u12), '-.+', label=r'$s=' + str(ii) + '$')
+#     errL2_p0_pp = err_p0_pp_dict[ii][:, 0]
+#     plt.plot(np.log(h), np.log(errL2_p0_pp), '-.+', label=r'CG$_' + str(ii)+ '$')
 #     plt.plot(np.log(h), np.log(h**ii) + \
-#              + 1.15*(np.log(errL2_u12)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+#              + 1.1*(np.log(errL2_p0_pp)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 #
 # plt.xlabel(r'$\log(h)$')
-# plt.ylabel(r'$\log||q^1_h - q^2_h||_{L^2}$')
-# plt.title(r'Error between $q^1_h$ and $q^2_h$')
+# plt.ylabel(r'$\log||p^{*0}_h - p^0_{\mathrm{ex}}||_{L^2}$')
+# plt.title(r'Error $p^{*0}_h$')
 #
 # plt.legend()
 #
 # if save_plots:
-#     plt.savefig(path_fig + "q_12" + geo_case + bc_case + ".pdf", format="pdf")
+#     plt.savefig(path_fig + "p_0_pp" + geo_case + bc_case + ".pdf", format="pdf")
+#
+#
 #
 # plt.figure()
 # for ii in deg_vec:
 #     h = h_dict[ii]
-#     errL2_p30 = err_p30_dict[ii]
-#     plt.plot(np.log(h), np.log(errL2_p30), '-.+', label=r'$s=' + str(ii) + '$')
-#     plt.plot(np.log(h), np.log(h**ii) + \
-#              + 1.1*(np.log(errL2_p30)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+#     errH1_p0_pp = err_p0_pp_dict[ii][:, 1]
+#     plt.plot(np.log(h), np.log(errH1_p0_pp), '-.+', label=r'CG$_' + str(ii)+ '$')
+#     plt.plot(np.log(h), np.log(h**(ii-1)) + \
+#          + 1.1*(np.log(errH1_p0_pp)[-1] - np.log(h**(ii-1))[-1]), '-v', label=r'$h^' + str(ii-1) + '$')
 #
 # plt.xlabel(r'$\log(h)$')
-# plt.ylabel(r'$\log||p^3_h - p^0_h||_{L^2}$')
-# plt.title(r'Error between $p^3$ and $p^0$')
+# plt.ylabel(r'$\log||\mathrm{d}(p^{*0}_h - p^0_{\mathrm{ex}})||_{L^2}$')
+# plt.title(r'Error $\mathrm{d}p^{*0}_h$')
 #
 # plt.legend()
 #
 # if save_plots:
-#     plt.savefig(path_fig + "p_30" + geo_case + bc_case + ".pdf", format="pdf")
+#     plt.savefig(path_fig + "grad_p_0_pp" + geo_case + bc_case + ".pdf", format="pdf")
 #
+#
+# plt.figure()
+# for ii in deg_vec:
+#     h = h_dict[ii]
+#     errL2_p3_pp = err_p3_pp_dict[ii][:]
+#     plt.plot(np.log(h), np.log(errL2_p3_pp), '-.+', label=r'DG$_' + str(ii)+ '$')
+#     plt.plot(np.log(h), np.log(h**ii) + \
+#              + 1.1*(np.log(errL2_p3_pp)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+#
+# plt.xlabel(r'$\log(h)$')
+# plt.ylabel(r'$\log||p^{*3}_h - p^3_{\mathrm{ex}}||_{L^2}$')
+# plt.title(r'Error $p^{*3}_h$')
+#
+# plt.legend()
+#
+# if save_plots:
+#     plt.savefig(path_fig + "p_3_pp" + geo_case + bc_case + ".pdf", format="pdf")
+#
+#
+# plt.figure()
+# for ii in deg_vec:
+#     h = h_dict[ii]
+#     errL2_u1_pp = err_u1_pp_dict[ii][:, 0]
+#     plt.plot(np.log(h), np.log(errL2_u1_pp), '-.+', label=r'NED$^1_' + str(ii) + '$')
+#     plt.plot(np.log(h), np.log(h**ii) + \
+#              + 1.1*(np.log(errL2_u1_pp)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+#
+# plt.xlabel(r'$\log(h)$')
+# plt.ylabel(r'$\log||u^{*1}_h - u^1_{\mathrm{ex}}||_{L^2}$')
+# plt.title(r'Error $u^{*1}_h$')
+#
+# plt.legend()
+#
+# if save_plots:
+#     plt.savefig(path_fig + "u_1_pp" + geo_case + bc_case + ".pdf", format="pdf")
+#
+#
+# plt.figure()
+# for ii in deg_vec:
+#     h = h_dict[ii]
+#     errHcurl_u1_pp = err_u1_pp_dict[ii][:, 1]
+#     plt.plot(np.log(h), np.log(errHcurl_u1_pp), '-.+', label=r'NED$^1_' + str(ii) + '$')
+#     if ii>1:
+#         plt.plot(np.log(h), np.log(h**(ii-1)) + \
+#              + 1.1*(np.log(errHcurl_u1_pp)[-1] - np.log(h**(ii-1))[-1]), '-v', label=r'$h^' + str(ii-1) + '$')
+#
+# plt.xlabel(r'$\log(h)$')
+# plt.ylabel(r'$\log||\mathrm{d}(u^{*1}_h - u^1_{\mathrm{ex}})||_{L^2}$')
+# plt.title(r'Error $\mathrm{d} u^{*1}_h$')
+#
+# plt.legend()
+#
+# if save_plots:
+#     plt.savefig(path_fig + "curl_u_1_pp" + geo_case + bc_case + ".pdf", format="pdf")
+#
+#
+#
+#
+# plt.figure()
+# for ii in deg_vec:
+#     h = h_dict[ii]
+#     errL2_u2_pp = err_u2_pp_dict[ii][:, 0]
+#     plt.plot(np.log(h), np.log(errL2_u2_pp), '-.+', label=r'RT$^1_' + str(ii) + '$')
+#     plt.plot(np.log(h), np.log(h**ii) + \
+#              + 1.1*(np.log(errL2_u2_pp)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+#
+# plt.xlabel(r'$\log(h)$')
+# plt.ylabel(r'$\log||u^{*2}_h - u^2_{\mathrm{ex}}||_{L^2}$')
+# plt.title(r'Error $u^{*2}_h$')
+#
+# plt.legend()
+#
+# if save_plots:
+#     plt.savefig(path_fig + "u_2_pp" + geo_case + bc_case + ".pdf", format="pdf")
+#
+#
+# plt.figure()
+# for ii in deg_vec:
+#     h = h_dict[ii]
+#     errHdiv_u2_pp = err_u2_pp_dict[ii][:, 1]
+#     plt.plot(np.log(h), np.log(errHdiv_u2_pp), '-.+', label=r'RT$^1_' + str(ii) + '$')
+#     plt.plot(np.log(h), np.log(h**(ii-1)) + \
+#          + 1.1*(np.log(errHdiv_u2_pp)[-1] - np.log(h**(ii-1))[-1]), '-v', label=r'$h^' + str((ii-1)) + '$')
+#
+# plt.xlabel(r'$\log(h)$')
+# plt.ylabel(r'$\log||\mathrm{d}(u^{*2}_h - u^2_{\mathrm{ex}})||_{L^2}$')
+# plt.title(r'Error $\mathrm{d} u^{*2}_h$')
+#
+# plt.legend()
+#
+# if save_plots:
+#     plt.savefig(path_fig + "div_u_2_pp" + geo_case + bc_case + ".pdf", format="pdf")
+
+
+# Dual Field
+#
+
+plt.figure()
+for ii in deg_vec:
+    h = h_dict[ii]
+    errL2_p30 = err_p30_dict[ii]
+    plt.plot(np.log(h), np.log(errL2_p30), '-.+', label=r'$s=' + str(ii) + '$')
+    plt.plot(np.log(h), np.log(h**ii) + \
+             + 1.1*(np.log(errL2_p30)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+
+plt.xlabel(r'$\log(h)$')
+plt.ylabel(r'$\log||p^3_h - p^0_h||_{L^2}$')
+plt.title(r'Error between $p^3$ and $p^0$')
+
+plt.legend()
+
+if save_plots:
+    plt.savefig(path_fig + "p_30" + geo_case + bc_case + ".pdf", format="pdf")
+
+plt.figure()
+for ii in deg_vec:
+    h = h_dict[ii]
+    errL2_u12 = err_u12_dict[ii]
+    plt.plot(np.log(h), np.log(errL2_u12), '-.+', label=r'$s=' + str(ii) + '$')
+    plt.plot(np.log(h), np.log(h**ii) + \
+             + 1.15*(np.log(errL2_u12)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+
+plt.xlabel(r'$\log(h)$')
+plt.ylabel(r'$\log||u^1_h - u^2_h||_{L^2}$')
+plt.title(r'Error between $u^1_h$ and $u^2_h$')
+
+plt.legend()
+
+if save_plots:
+    plt.savefig(path_fig + "u_12" + geo_case + bc_case + ".pdf", format="pdf")
+
+
+# plt.figure()
+# for ii in deg_vec:
+#     h = h_dict[ii]
+#     errL2_p30_pp = err_p30_pp_dict[ii]
+#     plt.plot(np.log(h), np.log(errL2_p30_pp), '-.+', label=r'$s=' + str(ii) + '$')
+#     plt.plot(np.log(h), np.log(h**ii) + \
+#              + 1.1*(np.log(errL2_p30_pp)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+#
+# plt.xlabel(r'$\log(h)$')
+# plt.ylabel(r'$\log||p^{*3}_h - p^{*0}_h||_{L^2}$')
+# plt.title(r'Error between $p^{*3}$ and $p^{*0}$')
+#
+# plt.legend()
+#
+# if save_plots:
+#     plt.savefig(path_fig + "p_30_pp" + geo_case + bc_case + ".pdf", format="pdf")
+#
+#
+# plt.figure()
+# for ii in deg_vec:
+#     h = h_dict[ii]
+#     errL2_u12_pp = err_u12_pp_dict[ii]
+#     plt.plot(np.log(h), np.log(errL2_u12_pp), '-.+', label=r'$s=' + str(ii) + '$')
+#     plt.plot(np.log(h), np.log(h**ii) + \
+#              + 1.15*(np.log(errL2_u12_pp)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+#
+# plt.xlabel(r'$\log(h)$')
+# plt.ylabel(r'$\log||u^{*1}_h - u^{*2}_h||_{L^2}$')
+# plt.title(r'Error between $u^{*1}_h$ and $u^{*2}_h$')
+#
+# plt.legend()
+#
+# if save_plots:
+#     plt.savefig(path_fig + "u_12_pp" + geo_case + bc_case + ".pdf", format="pdf")
 
 plt.show()
 

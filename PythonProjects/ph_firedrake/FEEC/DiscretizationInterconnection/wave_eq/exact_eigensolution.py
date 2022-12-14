@@ -1,4 +1,5 @@
 from firedrake import *
+import numpy as np
 
 def exact_sol_wave3D(mesh, t, t_1):
     x, y, z = SpatialCoordinate(mesh)

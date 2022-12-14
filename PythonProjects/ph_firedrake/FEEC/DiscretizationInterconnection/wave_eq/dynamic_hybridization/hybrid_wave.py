@@ -1,6 +1,4 @@
-## This is a first test to solve the wave equation in 3d domains using the dual field method
-## A staggering method is used for the time discretization
-
+import numpy as np
 import os
 os.environ["OMP_NUM_THREADS"] = "1"
 
@@ -11,7 +9,7 @@ import matplotlib.pyplot as plt
 from tools_plotting import setup
 
 
-from FEEC.DiscretizationInterconnection.wave_eq.exact_eigensolution import exact_sol_wave3D
+from FEEC.DiscretizationInterconnection.wave_eq.exact_eigensolution import exact_sol_wave3D, exact_sol_wave2D
 from FEEC.DiscretizationInterconnection.slate_syntax.solve_hybrid_system import solve_hybrid
 
 from spaces_forms_hybridwave import spaces01, spaces32, \
@@ -26,7 +24,7 @@ from spaces_forms_postprocessingwave import spaces_postprocessing01, spaces_post
 from FEEC.DiscretizationInterconnection.dofs_bd_hybrid import dofs_ess_nat
 
 
-def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
+def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D", dim="2D"):
     """Compute the numerical solution of the wave equation with a DG method based on interconnection
 
         Parameters:
@@ -37,7 +35,10 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         some plots
        """
 
-    mesh = BoxMesh(n_el, n_el, n_el, 1, 1/2, 1/2)
+    if dim=="2D":
+        mesh = RectangleMesh(n_el, n_el, 1, 1 / 2)
+    else:
+        mesh = BoxMesh(n_el, n_el, n_el, 1, 1 / 2, 1 / 2)
     n_ver = FacetNormal(mesh)
     h_cell = CellDiameter(mesh)
 
@@ -67,7 +68,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     p3, u2, p2_nor, u2_tan = split(e_div)
 
     # Post-processing variables
-    W01_pp = spaces_postprocessing01(mesh, deg+1)
+    W01_pp = spaces_postprocessing01(mesh, deg)
 
     v_grad_pp = TestFunction(W01_pp)
     v0_pp, v1_pp = split(v_grad_pp)
@@ -75,7 +76,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     e_grad_pp = TrialFunction(W01_pp)
     p0_pp, u1_pp = split(e_grad_pp)
 
-    W32_pp = spaces_postprocessing32(mesh, deg+1)
+    W32_pp = spaces_postprocessing32(mesh, deg)
 
     v_div_pp = TestFunction(W32_pp)
     v3_pp, v2_pp = split(v_div_pp)
@@ -94,8 +95,10 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     t = Constant(0.0)
     t_1 = Constant(dt)
 
-    p_ex, u_ex, p_ex_1, u_ex_1 = exact_sol_wave3D(mesh, t, t_1)
-
+    if dim=="2D":
+        p_ex, u_ex, p_ex_1, u_ex_1 = exact_sol_wave2D(mesh, t, t_1)
+    else:
+        p_ex, u_ex, p_ex_1, u_ex_1 = exact_sol_wave3D(mesh, t, t_1)
     u_ex_mid = 0.5 * (u_ex + u_ex_1)
     p_ex_mid = 0.5 * (p_ex + p_ex_1)
 
@@ -110,14 +113,20 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     else:
         # bc_D = [DirichletBC(V_grad.sub(3), p_ex_1, 1), \
         #         DirichletBC(V_grad.sub(3), p_ex_1, 3)]
+        if dim=="2D":
+            bc_D = [DirichletBC(V0_tan, p_ex_1, 1),
+                    DirichletBC(V0_tan, p_ex_1, 3)]
 
-        bc_D = [DirichletBC(V0_tan, p_ex_1, 1),
-                DirichletBC(V0_tan, p_ex_1, 3),
-                DirichletBC(V0_tan, p_ex_1, 5)]
+            bc_N = [DirichletBC(V2_tan, u_ex_1, 2), \
+                    DirichletBC(V2_tan, u_ex_1, 4)]
+        else:
+            bc_D = [DirichletBC(V0_tan, p_ex_1, 1),
+                    DirichletBC(V0_tan, p_ex_1, 3),
+                    DirichletBC(V0_tan, p_ex_1, 5)]
 
-        bc_N = [DirichletBC(V2_tan, u_ex_1, 2), \
-                DirichletBC(V2_tan, u_ex_1, 4),
-                DirichletBC(V2_tan, u_ex_1, 6)]
+            bc_N = [DirichletBC(V2_tan, u_ex_1, 2), \
+                    DirichletBC(V2_tan, u_ex_1, 4),
+                    DirichletBC(V2_tan, u_ex_1, 6)]
 
 
     dofsV0_tan_D, dofsV0_tan_N = dofs_ess_nat(bc_D, W01_loc, V0_tan)
@@ -191,7 +200,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
     errL2_p_0tan_vec[0] = sqrt(assemble((err_p_0tan('+') + err_p_0tan('-')) * dS + err_p_0tan * ds))
 
     errL2_p_3_pp_vec[0] = norm(p_ex - pn_3_pp)
-    errL2_u_2_pp_vec[0] = norm(u_ex-un_2_pp)
+    errL2_u_2_pp_vec[0] = norm(u_ex - un_2_pp)
     errHdiv_u_2_pp_vec[0] = norm(div(u_ex-un_2_pp))
 
     # Results 32
@@ -250,13 +259,13 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
                - 0.5 * dt * constr_loc32(v2, u2, v2_nor, p2_nor, n_ver) \
                - 0.5 * dt * constr_global32(v2_nor, p2_nor, v2_tan, u2_tan, n_ver)
 
-    # Post-processed solution
-    a_form01_pp = m_form01(v0_pp, p0_pp, v1_pp, u1_pp) - 0.5 * dt * j_form01(v0_pp, p0_pp, v1_pp, u1_pp)
-    A01_pp = Tensor(a_form01_pp).blocks
-
-    # Bilinear form 32
-    a_form32_pp = m_form32(v3_pp, p3_pp, v2_pp, u2_pp) - 0.5 * dt * j_form32(v3_pp, p3_pp, v2_pp, u2_pp)
-    A32_pp = Tensor(a_form32_pp).blocks
+    # # Post-processed solution
+    # a_form01_pp = m_form01(v0_pp, p0_pp, v1_pp, u1_pp) - 0.5 * dt * j_form01(v0_pp, p0_pp, v1_pp, u1_pp)
+    # A01_pp = Tensor(a_form01_pp).blocks
+    #
+    # # Bilinear form 32
+    # a_form32_pp = m_form32(v3_pp, p3_pp, v2_pp, u2_pp) - 0.5 * dt * j_form32(v3_pp, p3_pp, v2_pp, u2_pp)
+    # A32_pp = Tensor(a_form32_pp).blocks
 
 
     print("Computation of the solution with n elem " + str(n_el) + " n time " + str(n_t) + " deg " + str(deg))
@@ -293,22 +302,22 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         enmid_div.assign(0.5 * (en_div + en1_div))
         pnmid_3, unmid_2, pnmid_2_nor, unmid_2_tan = enmid_div.split()
 
-        # Post-processed solution
-
-        # 01 system
-        b_form01_pp = m_form01(v0_pp, pn_0_pp, v1_pp, un_1_pp) + 0.5 * dt * j_form01(v0_pp, pn_0_pp, v1_pp, un_1_pp) \
-                   + dt * neumann_flow0_pp(v0_pp, unmid_2_tan, n_ver)
-        b01_pp = Tensor(b_form01_pp).blocks
-
-        en1_grad_pp = assemble(A01_pp[:, :].inv * b01_pp[:])
-
-        # 32 system
-        b_form32_pp = m_form32(v3_pp, pn_3_pp, v2_pp, un_2_pp) + 0.5 * dt * j_form32(v3_pp, pn_3_pp, v2_pp, un_2_pp) \
-                   + dt * dirichlet_flow2_pp(v2_pp, pnmid_0_tan, n_ver)
-
-        b32_pp = Tensor(b_form32_pp).blocks
-
-        en1_div_pp = assemble(A32_pp[:, :].inv * b32_pp[:])
+        # # Post-processed solution
+        #
+        # # 01 system
+        # b_form01_pp = m_form01(v0_pp, pn_0_pp, v1_pp, un_1_pp) + 0.5 * dt * j_form01(v0_pp, pn_0_pp, v1_pp, un_1_pp) \
+        #            + dt * neumann_flow0_pp(v0_pp, unmid_2_tan, n_ver)
+        # b01_pp = Tensor(b_form01_pp).blocks
+        #
+        # en1_grad_pp = assemble(A01_pp[:, :].inv * b01_pp[:])
+        #
+        # # 32 system
+        # b_form32_pp = m_form32(v3_pp, pn_3_pp, v2_pp, un_2_pp) + 0.5 * dt * j_form32(v3_pp, pn_3_pp, v2_pp, un_2_pp) \
+        #            + dt * dirichlet_flow2_pp(v2_pp, pnmid_0_tan, n_ver)
+        #
+        # b32_pp = Tensor(b_form32_pp).blocks
+        #
+        # en1_div_pp = assemble(A32_pp[:, :].inv * b32_pp[:])
 
         if len(bc_N) == 0:
             bdflow_nat01 = 0
@@ -358,12 +367,12 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         en_div.assign(en1_div)
         pn_3, un_2, pn_2_nor, un_2_tan = en_div.split()
 
-        # New assign post-processing
-        en_grad_pp.assign(en1_grad_pp)
-        pn_0_pp, un_1_pp = en_grad_pp.split()
-
-        en_div_pp.assign(en1_div_pp)
-        pn_3_pp, un_2_pp = en_div_pp.split()
+        # # New assign post-processing
+        # en_grad_pp.assign(en1_grad_pp)
+        # pn_0_pp, un_1_pp = en_grad_pp.split()
+        #
+        # en_div_pp.assign(en1_div_pp)
+        # pn_3_pp, un_2_pp = en_div_pp.split()
 
         H_01_vec[ii + 1] = assemble(Hn_01)
         H_32_vec[ii + 1] = assemble(Hn_32)
@@ -399,25 +408,69 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
         err_p_2nor = h_cell * inner(pex_nor_p - pn_2_nor, n_ver) ** 2
         errL2_p_2nor_vec[ii] = sqrt(assemble((err_p_2nor('+') + err_p_2nor('-')) * dS + err_p_2nor * ds))
 
-        ## Post-processed error
-        errL2_p_0_pp_vec[ii + 1] = norm(p_ex - pn_0_pp)
-        errH1_p_0_pp_vec[ii + 1] = norm(grad(p_ex-pn_0_pp))
-
-        errL2_u_1_pp_vec[ii + 1] = norm(u_ex - un_1_pp)
-        errHcurl_u_1_pp_vec[ii + 1] = norm(curl(u_ex-un_1_pp))
-
-        errL2_p_3_pp_vec[ii + 1] = norm(p_ex - pn_3_pp)
-
-        errL2_u_2_pp_vec[ii + 1] = norm(u_ex - un_2_pp)
-        errHdiv_u_2_pp_vec[ii + 1] = norm(div(u_ex - un_2_pp))
+        # ## Post-processed error
+        # errL2_p_0_pp_vec[ii + 1] = norm(p_ex - pn_0_pp)
+        # errH1_p_0_pp_vec[ii + 1] = norm(grad(p_ex-pn_0_pp))
+        #
+        # errL2_u_1_pp_vec[ii + 1] = norm(u_ex - un_1_pp)
+        # errHcurl_u_1_pp_vec[ii + 1] = norm(curl(u_ex-un_1_pp))
+        #
+        # errL2_p_3_pp_vec[ii + 1] = norm(p_ex - pn_3_pp)
+        #
+        # errL2_u_2_pp_vec[ii + 1] = norm(u_ex - un_2_pp)
+        # errHdiv_u_2_pp_vec[ii + 1] = norm(div(u_ex - un_2_pp))
 
         # Dual Field
         err_p30_vec[ii + 1] = norm(pn_3 - pn_0)
         err_u12_vec[ii + 1] = norm(un_2 - un_1)
 
-        err_p30_pp_vec[ii + 1] = norm(pn_3_pp - pn_0_pp)
-        err_u12_pp_vec[ii + 1] = norm(un_2_pp - un_1_pp)
+        # err_p30_pp_vec[ii + 1] = norm(pn_3_pp - pn_0_pp)
+        # err_u12_pp_vec[ii + 1] = norm(un_2_pp - un_1_pp)
 
+    if dim==2:
+        fig = plt.figure()
+        axes = fig.add_subplot(111, projection='3d')
+        contours = trisurf(interpolate(p_ex, V01.sub(0)), axes=axes, cmap="inferno")
+        axes.set_aspect("auto")
+        axes.set_title("p0 ex")
+        fig.colorbar(contours)
+
+        fig = plt.figure()
+        axes = fig.add_subplot(111, projection='3d')
+        contours = trisurf(pn_0_pp, axes=axes, cmap="inferno")
+        axes.set_aspect("auto")
+        axes.set_title("p0_pp h")
+        fig.colorbar(contours)
+
+        fig = plt.figure()
+        axes = fig.add_subplot(111, projection='3d')
+        contours = trisurf(pn_3_pp, axes=axes, cmap="inferno")
+        axes.set_aspect("auto")
+        axes.set_title("p3_pp h")
+        fig.colorbar(contours)
+
+        fig = plt.figure()
+        axes = fig.add_subplot(111)
+        contours = quiver(u_ex, axes=axes, cmap="inferno")
+        axes.set_aspect("auto")
+        axes.set_title("u1 ex")
+        fig.colorbar(contours)
+
+        fig = plt.figure()
+        axes = fig.add_subplot(111)
+        contours = quiver(un_1_pp, axes=axes, cmap="inferno")
+        axes.set_aspect("auto")
+        axes.set_title("u1_pp h")
+        fig.colorbar(contours)
+
+        fig = plt.figure()
+        axes = fig.add_subplot(111)
+        contours = quiver(un_2_pp, axes=axes, cmap="inferno")
+        axes.set_aspect("auto")
+        axes.set_title("u2_pp h")
+        fig.colorbar(contours)
+
+        plt.show()
 
     # Error 01
     errH_01 = errH_01_vec[-1]
@@ -493,7 +546,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 
     return dict_res
 
-#
+
 # bd_cond = 'DN' #input("Enter bc: ")
 #
 # n_elem = 1
@@ -504,8 +557,8 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D"):
 #
 # dt = t_fin / n_time
 #
-# results = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bd_cond)
-#
+# results = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bd_cond, dim=3)
+
 # t_vec = results["t_span"]
 #
 # bdflow10_mid = results["flow10_mid"]

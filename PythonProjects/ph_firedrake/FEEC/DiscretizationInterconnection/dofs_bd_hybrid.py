@@ -1,4 +1,5 @@
 from firedrake import *
+import numpy as np
 
 def dofs_ess_nat(bcs_ess, W_loc, V_gl):
     dofs_ess = []

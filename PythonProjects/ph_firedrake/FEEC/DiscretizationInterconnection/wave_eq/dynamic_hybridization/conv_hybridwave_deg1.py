@@ -1,12 +1,10 @@
+from FEEC.DiscretizationInterconnection.wave_eq.dynamic_hybridization.hybrid_wave import compute_err
+
 DEG=1
 
-geo_case = "3D"
+geo_case = "2D"
 bc_input = "DN"
 
-if geo_case=="3D":
-    from FEEC.DiscretizationInterconnection.wave_eq.dynamic_hybridization.hybrid_wave3D import compute_err
-else:
-    from FEEC.DiscretizationInterconnection.wave_eq.dynamic_hybridization.hybrid_wave2D import compute_err
 import numpy as np
 
 save_res = True # input("Save results: ")
@@ -16,7 +14,7 @@ path_res = "results_hybrid/"
 # path_res = os.path.join(path_project, folder_res)
 # os.mkdir(path_res)
 
-n_test_deg1 = 3
+n_test_deg1 = 5
 
 n_vec_deg1 = np.array([2 ** (i) for i in range(n_test_deg1)])
 h_vec_deg1 = 1./n_vec_deg1
@@ -79,7 +77,7 @@ order_u12_pp_deg1 = np.zeros((n_test_deg1 - 1,))
 
 
 for i in range(n_test_deg1):
-    res_deg1 = compute_err(n_vec_deg1[i], 100, deg=DEG, bd_cond=bc_input)
+    res_deg1 = compute_err(n_vec_deg1[i], 100, deg=DEG, bd_cond=bc_input, dim=geo_case)
     # 01 system
     u1_err_deg1[i, :] = res_deg1["err_u1"]
     p0_err_deg1[i, :] = res_deg1["err_p0"]
