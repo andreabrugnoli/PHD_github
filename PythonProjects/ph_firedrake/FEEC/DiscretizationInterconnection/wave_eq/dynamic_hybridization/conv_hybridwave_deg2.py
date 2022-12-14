@@ -3,7 +3,7 @@ import numpy as np
 
 DEG=2
 
-geo_case = "2D"
+geo_case = "3D"
 bc_input = "DN"
 
 save_res = True # input("Save results: ")

@@ -2,7 +2,7 @@ from FEEC.DiscretizationInterconnection.wave_eq.dynamic_hybridization.hybrid_wav
 
 DEG=1
 
-geo_case = "2D"
+geo_case = "3D"
 bc_input = "DN"
 
 import numpy as np
@@ -188,7 +188,7 @@ print("Estimated L2 order of convergence for p_2nor: " + str(order_p2nor_deg1))
 print("Estimated L2 order of convergence for u_2tan: " + str(order_u2tan_deg1))
 
 print("Estimated order of convergence for H_32: " + str(order_H32_deg1))
-
+#
 # Post-processing
 print("Estimated L2, Hcurl order of convergence for u_1_pp: " + str(order_u1_pp_deg1))
 print("Estimated L2, H1 order of convergence for p_0_pp: " + str(order_p0_pp_deg1))

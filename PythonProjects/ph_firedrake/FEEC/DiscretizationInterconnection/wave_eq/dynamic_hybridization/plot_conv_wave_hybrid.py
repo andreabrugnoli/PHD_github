@@ -353,7 +353,7 @@ plt.legend()
 if save_plots:
     plt.savefig(path_fig + "u_2tan" + geo_case + bc_case + ".pdf", format="pdf")
 #
-# # Post-processing
+# Post-processing
 #
 # plt.figure()
 # for ii in deg_vec:
