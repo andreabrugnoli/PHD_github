@@ -36,9 +36,9 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D", dim="2D"):
        """
 
     if dim=="2D":
-        mesh = RectangleMesh(n_el, n_el, 1, 1 / 2)
+        mesh = RectangleMesh(n_el, n_el, 1, 1)
     else:
-        mesh = BoxMesh(n_el, n_el, n_el, 1, 1 / 2, 1 / 2)
+        mesh = BoxMesh(n_el, n_el, n_el, 1, 1, 1)
     n_ver = FacetNormal(mesh)
     h_cell = CellDiameter(mesh)
 

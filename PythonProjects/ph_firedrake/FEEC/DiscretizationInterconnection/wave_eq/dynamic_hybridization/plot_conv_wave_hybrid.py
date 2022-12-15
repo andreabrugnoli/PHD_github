@@ -176,8 +176,8 @@ for ii in deg_vec:
     h = h_dict[ii]
     errL2_p0 = err_p0_dict[ii][:, 0]
     plt.plot(np.log(h), np.log(errL2_p0), '-.+', label=r'CG$_' + str(ii)+ '$')
-    plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.1*(np.log(errL2_p0)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+    plt.plot(np.log(h), np.log(h**(ii)) + \
+             + 1.1*(np.log(errL2_p0)[-1] - np.log(h**(ii))[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
 plt.ylabel(r'$\log||p^0_h - p^0_{\mathrm{ex}}||_{L^2}$')
@@ -206,7 +206,7 @@ for ii in deg_vec:
     errL2_u1 = err_u1_dict[ii][:, 0]
     plt.plot(np.log(h), np.log(errL2_u1), '-.+', label=r'NED$^1_' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.1*(np.log(errL2_u1)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.5*(np.log(errL2_u1)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
 plt.ylabel(r'$\log||u^1_h - u^1_{\mathrm{ex}}||_{L^2}$')
@@ -236,11 +236,15 @@ for ii in deg_vec:
     h = h_dict[ii]
     errL2_u0nor = err_u0nor_dict[ii][:]
     plt.plot(np.log(h), np.log(errL2_u0nor), '-.+', label=r'CG$_' + str(ii) + '$')
-    plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.1*(np.log(errL2_u0nor)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+    if ii==1 or ii==2:
+        plt.plot(np.log(h), np.log(h ** ii) + \
+                 + 1.2 * (np.log(errL2_u0nor)[-1] - 0.9*np.log(h ** ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+    else:
+        plt.plot(np.log(h), np.log(h**ii) + \
+             + 1.2*(np.log(errL2_u0nor)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||u^{0, \bm{n}}_h - P_h^{\bm{n}}u^{0,\bm{n}}_{\mathrm{ex}}||_{L^2}$')
+plt.ylabel(r'$\log|||u^{0, \bm{n}}_h - P_h u^{0,\bm{n}}_{\mathrm{ex}}|||_{\mathcal{T}_h}$')
 plt.title(r'Error $u^{0, \bm{n}}_h$')
 
 plt.legend()
@@ -255,10 +259,10 @@ for ii in deg_vec:
     errL2_p0tan = err_p0tan_dict[ii][:]
     plt.plot(np.log(h), np.log(errL2_p0tan), '-.+', label=r'CG$_' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.1*(np.log(errL2_p0tan)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.5*(np.log(errL2_p0tan)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||p^{0, \bm{t}}_h - p^{0, \bm{t}}_{\mathrm{ex}}||_{L^2}$')
+plt.ylabel(r'$\log|||p^{0, \bm{t}}_h - p^{0, \bm{t}}_{\mathrm{ex}}|||_{\mathcal{T}_h}$')
 plt.title(r'Error $p^{0, \bm{t}}_h$')
 
 plt.legend()
@@ -273,11 +277,11 @@ for ii in deg_vec:
     errL2_p3 = err_p3_dict[ii]
     plt.plot(np.log(h), np.log(errL2_p3), '-.+', label=r'DG$_' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.1*(np.log(errL2_p3)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.5*(np.log(errL2_p3)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||p^3_h - p^3_{\mathrm{ex}}||_{L^2}$')
-plt.title(r'Error $p^3_h$')
+plt.ylabel(r'$\log||\widehat{p}^3_h - \widehat{p}^3_{\mathrm{ex}}||_{L^2}$')
+plt.title(r'Error $\widehat{p}^3_h$')
 
 plt.legend()
 
@@ -292,10 +296,10 @@ for ii in deg_vec:
     errL2_u2 = err_u2_dict[ii][:, 0]
     plt.plot(np.log(h), np.log(errL2_u2), '-.+', label=r'RT$_' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.1*(np.log(errL2_u2)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.2*(np.log(errL2_u2)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||u^2_h - u^2_{\mathrm{ex}}||_{L^2}$')
+plt.ylabel(r'$\log||\widehat{u}^2_h - \widehat{u}^2_{\mathrm{ex}}||_{L^2}$')
 plt.title(r'Error $u^2_h$')
 
 plt.legend()
@@ -321,14 +325,17 @@ for ii in deg_vec:
     errL2_p2nor = err_p2nor_dict[ii][:]
     plt.plot(np.log(h), np.log(errL2_p2nor), '-.+', label=r'RT$_' + str(ii) + '$')
     if ii==1:
+        plt.plot(np.log(h), np.log(h ** (ii+1)) + \
+                 + 2 * (np.log(errL2_p2nor)[-1] - np.log(h ** (ii+1))[-1]), '-v', label=r'$h^' + str(ii+1) + '$')
+    elif ii==2:
         pass
     else:
-        plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.1*(np.log(errL2_p2nor)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+        plt.plot(np.log(h), np.log(h**(ii)) + \
+             + 1.5*(np.log(errL2_p2nor)[-1] - np.log(h**(ii))[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||p^{2, \bm{n}}_h - P_h^{\bm{n}}p^{2, \bm{n}}_{\mathrm{ex}}||_{L^2}$')
-plt.title(r'Error $p^{2, \bm{n}}_h$')
+plt.ylabel(r'$\log|||\widehat{p}^{2, \bm{n}}_h - P_h \widehat{p}^{2, \bm{n}}_{\mathrm{ex}}|||_{\mathcal{T}_h}$')
+plt.title(r'Error $\widehat{p}^{2, \bm{n}}_h$')
 
 plt.legend()
 
@@ -342,11 +349,11 @@ for ii in deg_vec:
     errL2_u2tan = err_u2tan_dict[ii][:]
     plt.plot(np.log(h), np.log(errL2_u2tan), '-.+', label=r'RT$_' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.1*(np.log(errL2_u2tan)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.5*(np.log(errL2_u2tan)[-1] - 0.9*np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||u^{2, \bm{t}}_h - u^{2, \bm{t}}_{\mathrm{ex}}||_{L^2}$')
-plt.title(r'Error $u^{2, \bm{t}}_h$')
+plt.ylabel(r'$\log|||\widehat{u}^{2, \bm{t}}_h - \widehat{u}^{2, \bm{t}}_{\mathrm{ex}}|||_{\mathcal{T}_h}$')
+plt.title(r'Error $\widehat{u}^{2, \bm{t}}_h$')
 
 plt.legend()
 
@@ -494,11 +501,11 @@ for ii in deg_vec:
     errL2_p30 = err_p30_dict[ii]
     plt.plot(np.log(h), np.log(errL2_p30), '-.+', label=r'$s=' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.1*(np.log(errL2_p30)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.5*(np.log(errL2_p30)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||p^3_h - p^0_h||_{L^2}$')
-plt.title(r'Error between $p^3$ and $p^0$')
+plt.ylabel(r'$\log||\widehat{p}^3_h - p^0_h||_{L^2}$')
+plt.title(r'Error between $\widehat{p}^3$ and $p^0$')
 
 plt.legend()
 
@@ -511,11 +518,11 @@ for ii in deg_vec:
     errL2_u12 = err_u12_dict[ii]
     plt.plot(np.log(h), np.log(errL2_u12), '-.+', label=r'$s=' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.15*(np.log(errL2_u12)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.5*(np.log(errL2_u12)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
-plt.ylabel(r'$\log||u^1_h - u^2_h||_{L^2}$')
-plt.title(r'Error between $u^1_h$ and $u^2_h$')
+plt.ylabel(r'$\log||u^1_h - \widehat{u}^2_h||_{L^2}$')
+plt.title(r'Error between $u^1_h$ and $\widehat{u}^2_h$')
 
 plt.legend()
 
