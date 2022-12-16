@@ -1,6 +1,6 @@
 from firedrake import *
 
-from spaces_forms_hybridwave import spaces01, spaces32
+from FEEC.DiscretizationInterconnection.wave_eq.dynamic_hybridization.spaces_forms_hybridwave import spaces01, spaces32
 
 n_test_deg1 = 5
 n_test_deg2 = 4
@@ -13,6 +13,27 @@ n_vec_deg3 = np.array([2 ** (i) for i in range(n_test_deg3)])
 n_dict = {1: n_vec_deg1, 2: n_vec_deg2, 3: n_vec_deg3}
 
 kk=1
+
+print('01 Spaces')
+
+for n_deg in n_dict.values():
+
+    for n_el in n_deg:
+
+        mesh = BoxMesh(n_el, n_el, n_el, 1, 1, 1)
+
+        W32_loc, V2_tan, V32 = spaces32(mesh, kk)
+
+        print("Conforming Galerkin 32 dim for n_el " + str(n_el) + " and degree " + str(kk) + ": " + str(V32.dim()))
+        print("Hybrid 32 dim for n_el " + str(n_el) + " and degree " + str(kk) + ": " + str(V2_tan.dim()))
+
+        print("Ratio hybrid continous " + str(n_el) + " and degree " + str(kk) + ": " + str(V2_tan.dim()/V32.dim()))
+    kk = kk+1
+
+print('01 Spaces')
+
+kk=1
+
 for n_deg in n_dict.values():
 
     for n_el in n_deg:
@@ -27,9 +48,7 @@ for n_deg in n_dict.values():
               + str(V01.sub(0).dim() + W01_loc.sub(1).dim()))
         print("Hybrid 01 dim for n_el " + str(n_el) + " and degree " + str(kk) + ": " + str(V0_tan.dim()))
 
-        W32_loc, V2_tan, V32 = spaces32(mesh, kk)
-
-        print("Conforming Galerkin 32 dim for n_el " + str(n_el) + " and degree " + str(kk) + ": " + str(V32.dim()))
-        print("Hybrid 32 dim for n_el " + str(n_el) + " and degree " + str(kk) + ": " + str(V2_tan.dim()))
+        print("Ratio hybrid continous " + str(n_el) + " and degree " + str(kk) + ": " \
+              + str(V0_tan.dim()/(V01.sub(0).dim() + W01_loc.sub(1).dim())))
 
     kk = kk+1
