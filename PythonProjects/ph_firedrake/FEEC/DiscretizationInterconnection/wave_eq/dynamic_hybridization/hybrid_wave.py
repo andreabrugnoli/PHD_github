@@ -7,6 +7,7 @@ from tqdm import tqdm
 # from time import sleep
 import matplotlib.pyplot as plt
 from tools_plotting import setup
+import pickle
 
 
 from FEEC.DiscretizationInterconnection.wave_eq.exact_eigensolution import exact_sol_wave3D, exact_sol_wave2D
@@ -547,17 +548,21 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D", dim="2D"):
     return dict_res
 
 
-# bd_cond = 'DN' #input("Enter bc: ")
-#
-# n_elem = 1
-# pol_deg = 2
-#
-# n_time = 10
-# t_fin = 1
-#
-# dt = t_fin / n_time
-#
-# results = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bd_cond, dim=3)
+bd_cond = 'DN' #input("Enter bc: ")
+
+n_elem = 4
+pol_deg = 3
+
+n_time = 100
+t_fin = 1
+
+dt = t_fin / n_time
+
+results = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bd_cond, dim=3)
+
+dictres_file = open("results_hybridwave.pkl", "wb")
+pickle.dump(results, dictres_file)
+dictres_file.close()
 
 # t_vec = results["t_span"]
 #
