@@ -1,7 +1,7 @@
 from firedrake import *
 
 
-def spaces12(mesh, deg):
+def spacesE1H2(mesh, deg):
     P1 = FiniteElement("N1curl", mesh.ufl_cell(), deg)
     P1f = FacetElement(P1)
     P1_b = BrokenElement(P1)
@@ -26,7 +26,7 @@ def spaces12(mesh, deg):
 
     return W12_loc, V1_tan, V12
 
-def spaces21(mesh, deg):
+def spacesE2H1(mesh, deg):
     P2 = FiniteElement("RT", mesh.ufl_cell(), deg)
     P2_b = BrokenElement(P2)
 
@@ -50,7 +50,7 @@ def spaces21(mesh, deg):
 
     return W21_loc, V1_tan, V21
 
-def assign_exact12(E_ex, H_ex, state12, W12_loc, V12_gl, V12):
+def assign_exactE1H2(E_ex, H_ex, state12, W12_loc, V12_gl, V12):
     Eex_1 = project(interpolate(E_ex, V12.sub(0)), W12_loc.sub(0))
     Hex_2 = project(interpolate(H_ex, V12.sub(1)), W12_loc.sub(1))
     H_ex_Pnor = project_ex_W1nor(H_ex, W12_loc.sub(2))
@@ -63,7 +63,7 @@ def assign_exact12(E_ex, H_ex, state12, W12_loc, V12_gl, V12):
     state12.sub(3).assign(interpolate(E_ex, V12_gl))
 
 
-def assign_exact21(E_ex, H_ex, state21, W21_loc, V21_gl, V21):
+def assign_exactE2H1(E_ex, H_ex, state21, W21_loc, V21_gl, V21):
     Eex_2 = project(interpolate(E_ex, V21.sub(0)), W21_loc.sub(0))
     Hex_1 = project(interpolate(H_ex, V21.sub(1)), W21_loc.sub(1))
     E_ex_Pnor = project_ex_W1nor(E_ex, W21_loc.sub(2))
@@ -75,19 +75,19 @@ def assign_exact21(E_ex, H_ex, state21, W21_loc, V21_gl, V21):
     state21.sub(2).assign(E_ex_Pnor)
     state21.sub(3).assign(interpolate(H_ex, V21_gl))
 
-def m_form12(v_1, E_1, v_2, H_2):
+def m_formE1H2(v_1, E_1, v_2, H_2):
     m_form = inner(v_1, E_1) * dx + inner(v_2, H_2) * dx
 
     return m_form
 
 
-def j_form12(v_1, E_1, v_2, H_2):
+def j_formE1H2(v_1, E_1, v_2, H_2):
     j_form = dot(curl(v_1), H_2) * dx - dot(v_2, curl(E_1)) * dx
 
     return j_form
 
 
-def constr_loc12(v_1, E_1, v_1_nor, H_1_nor, n_ver):
+def constr_locE1H2(v_1, E_1, v_1_nor, H_1_nor, n_ver):
     form_W1_Wnor = -inner(cross(v_1, n_ver), cross(H_1_nor, n_ver))
     form_Wnor_W1 = -inner(cross(v_1_nor, n_ver), cross(E_1, n_ver))
 
@@ -96,7 +96,7 @@ def constr_loc12(v_1, E_1, v_1_nor, H_1_nor, n_ver):
     return form
 
 
-def constr_global01(v_1_nor, H_1_nor, v_1_tan, E_1_tan, n_ver):
+def constr_globalE1H2(v_1_nor, H_1_nor, v_1_tan, E_1_tan, n_ver):
     form_Wnor_Vtan = -inner(cross(v_1_nor, n_ver), cross(E_1_tan, n_ver))
     form_Vtan_Wnor = -inner(cross(v_1_tan, n_ver), cross(H_1_nor, n_ver))
 
@@ -105,44 +105,44 @@ def constr_global01(v_1_nor, H_1_nor, v_1_tan, E_1_tan, n_ver):
     return form
 
 
-def neumann_flow0(v_0_tan, neumann_bc, n_ver):
-    return v_0_tan * dot(neumann_bc, n_ver) * ds
+def bdflowE1H2(v_1_tan, H_1, n_ver):
+    return -dot(cross(v_1_tan, H_1), n_ver) * ds
 
-def m_form32(v_3, p_3, v_2, u_2):
-    m_form = inner(v_3, p_3) * dx + inner(v_2, u_2) * dx
+
+def m_formE2H1(v_2, E_2, v_1, H_1):
+    m_form = inner(v_2, E_2) * dx + inner(v_1, H_1) * dx
 
     return m_form
 
 
-def j_form32(v_3, p_3, v_2, u_2):
-    j_form = dot(v_3, div(u_2)) * dx - dot(div(v_2), p_3) * dx
+def j_formE2H1(v_2, E_2, v_1, H_1):
+    j_form = dot(v_2, curl(H_1)) * dx - dot(curl(v_1), E_2) * dx
 
     return j_form
 
 
-def constr_loc32(v_2, u_2, v_2_nor, p_2_nor, n_ver):
+def constr_locE2H1(v_1, H_1, v_1_nor, E_1_nor, n_ver):
+    form_W1_Wnor = inner(cross(v_1, n_ver), cross(E_1_nor, n_ver))
+    form_Wnor_W1 = inner(cross(v_1_nor, n_ver), cross(H_1, n_ver))
 
-    form_W2_Wnor = inner(v_2, n_ver) * inner(p_2_nor, n_ver)
-    form_Wnor_W2 = inner(v_2_nor, n_ver) * inner(u_2, n_ver)
-
-
-    form = (form_W2_Wnor('+') + form_W2_Wnor('-')) * dS + form_W2_Wnor * ds \
-           - ((form_Wnor_W2('+') + form_Wnor_W2('-')) * dS + form_Wnor_W2 * ds)
+    form = (form_W1_Wnor('+') + form_W1_Wnor('-')) * dS + form_W1_Wnor * ds \
+           - ((form_Wnor_W1('+') + form_Wnor_W1('-')) * dS + form_Wnor_W1 * ds)
     return form
 
 
-def constr_global32(v_2_nor, p_2_nor, v_2_tan, u_2_tan, n_ver):
-
-    form_Wnor_Vtan = inner(v_2_nor, n_ver) * inner(u_2_tan, n_ver)
-    form_Vtan_Wnor = inner(v_2_tan, n_ver) * inner(p_2_nor, n_ver)
+def constr_globalE2H1(v_1_nor, E_1_nor, v_1_tan, H_1_tan, n_ver):
+    form_Wnor_Vtan = inner(cross(v_1_nor, n_ver), cross(H_1_tan, n_ver))
+    form_Vtan_Wnor = inner(cross(v_1_tan, n_ver), cross(E_1_nor, n_ver))
 
     form = (form_Wnor_Vtan('+') + form_Wnor_Vtan('-')) * dS + form_Wnor_Vtan * ds \
            - ((form_Vtan_Wnor('+') + form_Vtan_Wnor('-')) * dS + form_Vtan_Wnor * ds)
     return form
 
-def dirichlet_flow2(v_2_tan, dirichlet_bc, n_ver):
 
-    return dot(v_2_tan, n_ver) * dirichlet_bc * ds
+def bdflowE2H1(v_1, E_1, n_ver):
+    b_form = dot(cross(v_1, E_1), n_ver) * ds
+
+    return b_form
 
 
 def project_ex_W1nor(var_ex, W1_nor):

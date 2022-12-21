@@ -548,22 +548,22 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D", dim="2D"):
     return dict_res
 
 
-bd_cond = 'DN' #input("Enter bc: ")
-
-n_elem = 4
-pol_deg = 3
-
-n_time = 100
-t_fin = 1
-
-dt = t_fin / n_time
-
-results = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bd_cond, dim=3)
-
-dictres_file = open("results_hybridwave.pkl", "wb")
-pickle.dump(results, dictres_file)
-dictres_file.close()
-
+# bd_cond = 'DN' #input("Enter bc: ")
+#
+# n_elem = 4
+# pol_deg = 3
+#
+# n_time = 100
+# t_fin = 1
+#
+# dt = t_fin / n_time
+#
+# results = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bd_cond, dim=3)
+#
+# # dictres_file = open("results_hybridwave.pkl", "wb")
+# # pickle.dump(results, dictres_file)
+# # dictres_file.close()
+#
 # t_vec = results["t_span"]
 #
 # bdflow10_mid = results["flow10_mid"]
@@ -583,28 +583,28 @@ dictres_file.close()
 #
 # err_H01 = results["err_H"]
 #
-# plt.figure()
-# plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt-bdflow10_mid, 'r-.', label="Power bal 10")
-# plt.xlabel(r'Time $[\mathrm{s}]$')
-# plt.legend()
-#
-# plt.figure()
-# plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt, 'r-.', label="DHdt 10")
-# plt.plot(t_vec[1:]-dt/2, bdflow10_mid, 'b-.', label="flow 10")
-# plt.xlabel(r'Time $[\mathrm{s}]$')
-# plt.legend()
-#
-# plt.figure()
-# plt.plot(t_vec[1:]-dt/2, np.diff(H_32)/dt-bdflow32_mid, 'r-.', label="Power bal 32")
-# plt.xlabel(r'Time $[\mathrm{s}]$')
-# plt.legend()
-#
-# plt.figure()
-# plt.plot(t_vec[1:]-dt/2, np.diff(H_32)/dt, 'r-.', label="DHdt 32")
-# plt.plot(t_vec[1:]-dt/2, bdflow32_mid, 'b-.', label="flow 32")
-# plt.xlabel(r'Time $[\mathrm{s}]$')
-# plt.legend()
-#
+# # plt.figure()
+# # plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt-bdflow10_mid, 'r-.', label="Power bal 10")
+# # plt.xlabel(r'Time $[\mathrm{s}]$')
+# # plt.legend()
+# #
+# # plt.figure()
+# # plt.plot(t_vec[1:]-dt/2, np.diff(H_01)/dt, 'r-.', label="DHdt 10")
+# # plt.plot(t_vec[1:]-dt/2, bdflow10_mid, 'b-.', label="flow 10")
+# # plt.xlabel(r'Time $[\mathrm{s}]$')
+# # plt.legend()
+# #
+# # plt.figure()
+# # plt.plot(t_vec[1:]-dt/2, np.diff(H_32)/dt-bdflow32_mid, 'r-.', label="Power bal 32")
+# # plt.xlabel(r'Time $[\mathrm{s}]$')
+# # plt.legend()
+# #
+# # plt.figure()
+# # plt.plot(t_vec[1:]-dt/2, np.diff(H_32)/dt, 'r-.', label="DHdt 32")
+# # plt.plot(t_vec[1:]-dt/2, bdflow32_mid, 'b-.', label="flow 32")
+# # plt.xlabel(r'Time $[\mathrm{s}]$')
+# # plt.legend()
+# #
 # plt.figure()
 # plt.plot(t_vec[1:]-dt/2, Hdot_num_nmid-bdflow_num_nmid, 'r-.', label="Discrete Power flow")
 # plt.xlabel(r'Time $[\mathrm{s}]$')
