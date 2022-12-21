@@ -9,12 +9,12 @@ import numpy as np
 
 save_res = True # input("Save results: ")
 
-# path_project = "~/GitProjects/PHD_github/PythonProjects/ph_firedrake/FEEC/DiscretizationInterconnection/wave_eq/"
+# path_project = "~/GitProjects/PHD_github/PythonProjects/ph_firedrake/FEEC/DiscretizationInterconnection/maxwell_eq/"
 path_res = "results_hybrid/"
 # path_res = os.path.join(path_project, folder_res)
 # os.mkdir(path_res)
 
-n_test_deg1 = 3
+n_test_deg1 = 5
 
 n_vec_deg1 = np.array([2 ** (i) for i in range(n_test_deg1)])
 h_vec_deg1 = 1./n_vec_deg1
@@ -127,7 +127,7 @@ for i in range(n_test_deg1):
 
 # E1H2 variables order
 print("Estimated L2, Hcurl order of convergence for E_1: " + str(order_E1_deg1))
-print("Estimated L2, Hdiv order of convergence for u_2: " + str(order_H2_deg1))
+print("Estimated L2, Hdiv order of convergence for H_2: " + str(order_H2_deg1))
 
 print("Estimated L2 order of convergence for H_1nor: " + str(order_H1nor_deg1))
 print("Estimated L2 order of convergence for E_1tan: " + str(order_E1tan_deg1))
@@ -150,36 +150,36 @@ print("Estimated L2 order of convergence for H_1 - H_2: " + str(order_H12_deg1))
 
 if save_res:
     np.save(path_res + "h_deg1_" + bc_input + "_" + geo_case, h_vec_deg1)
-    # Results to save 01
-    np.save(path_res + "u1_err_deg1_" + bc_input + "_" + geo_case, u1_err_deg1)
-    np.save(path_res + "p0_err_deg1_" + bc_input + "_" + geo_case, p0_err_deg1)
-    np.save(path_res + "p0tan_err_deg1_" + bc_input + "_" + geo_case, p0tan_err_deg1)
-    np.save(path_res + "u0nor_err_deg1_" + bc_input + "_" + geo_case, u0nor_err_deg1)
+    # Results to save E1H2
+    np.save(path_res + "E1_err_deg1_" + bc_input + "_" + geo_case, E1_err_deg1)
+    np.save(path_res + "H2_err_deg1_" + bc_input + "_" + geo_case, H2_err_deg1)
+    np.save(path_res + "E1tan_err_deg1_" + bc_input + "_" + geo_case, E1tan_err_deg1)
+    np.save(path_res + "H1nor_err_deg1_" + bc_input + "_" + geo_case, H1nor_err_deg1)
 
-    np.save(path_res + "H01_err_deg1_" + bc_input + "_" + geo_case, H01_err_deg1)
+    np.save(path_res + "H_E1H2_err_deg1_" + bc_input + "_" + geo_case, H_E1H2_err_deg1)
 
-    np.save(path_res + "order_u1_deg1_" + bc_input + "_" + geo_case, order_u1_deg1)
-    np.save(path_res + "order_p0_deg1_" + bc_input + "_" + geo_case, order_p0_deg1)
-    np.save(path_res + "order_p0tan_deg1_" + bc_input + "_" + geo_case, order_p0tan_deg1)
-    np.save(path_res + "order_u0nor_deg1_" + bc_input + "_" + geo_case, order_u0nor_deg1)
+    np.save(path_res + "order_E1_deg1_" + bc_input + "_" + geo_case, order_E1_deg1)
+    np.save(path_res + "order_H2_deg1_" + bc_input + "_" + geo_case, order_H2_deg1)
+    np.save(path_res + "order_E1tan_deg1_" + bc_input + "_" + geo_case, order_E1tan_deg1)
+    np.save(path_res + "order_H1nor_deg1_" + bc_input + "_" + geo_case, order_H1nor_deg1)
 
-    np.save(path_res + "order_H01_deg1_" + bc_input + "_" + geo_case, order_H01_deg1)
+    np.save(path_res + "order_H_E1E2_deg1_" + bc_input + "_" + geo_case, order_H_E1H2_deg1)
 
-    # Results to save 32
-    np.save(path_res + "u2_err_deg1_" + bc_input + "_" + geo_case, u2_err_deg1)
-    np.save(path_res + "p3_err_deg1_" + bc_input + "_" + geo_case, p3_err_deg1)
-    np.save(path_res + "u2tan_err_deg1_" + bc_input + "_" + geo_case, u2tan_err_deg1)
-    np.save(path_res + "p2nor_err_deg1_" + bc_input + "_" + geo_case, p2nor_err_deg1)
+    # Results to save E2H1
+    np.save(path_res + "E2_err_deg1_" + bc_input + "_" + geo_case, E2_err_deg1)
+    np.save(path_res + "H1_err_deg1_" + bc_input + "_" + geo_case, H1_err_deg1)
+    np.save(path_res + "H1tan_err_deg1_" + bc_input + "_" + geo_case, H1tan_err_deg1)
+    np.save(path_res + "E1nor_err_deg1_" + bc_input + "_" + geo_case, E1nor_err_deg1)
 
-    np.save(path_res + "H32_err_deg1_" + bc_input + "_" + geo_case, H32_err_deg1)
+    np.save(path_res + "H_E2H1_err_deg1_" + bc_input + "_" + geo_case, H_E2H1_err_deg1)
 
-    np.save(path_res + "order_u2_deg1_" + bc_input + "_" + geo_case, order_u2_deg1)
-    np.save(path_res + "order_p3_deg1_" + bc_input + "_" + geo_case, order_p3_deg1)
-    np.save(path_res + "order_u2tan_deg1_" + bc_input + "_" + geo_case, order_u2tan_deg1)
-    np.save(path_res + "order_p2nor_deg1_" + bc_input + "_" + geo_case, order_p2nor_deg1)
+    np.save(path_res + "order_E2_deg1_" + bc_input + "_" + geo_case, order_E2_deg1)
+    np.save(path_res + "order_H1_deg1_" + bc_input + "_" + geo_case, order_H1_deg1)
+    np.save(path_res + "order_H1tan_deg1_" + bc_input + "_" + geo_case, order_H1tan_deg1)
+    np.save(path_res + "order_E1nor_deg1_" + bc_input + "_" + geo_case, order_E1nor_deg1)
 
-    np.save(path_res + "order_H32_deg1_" + bc_input + "_" + geo_case, order_H32_deg1)
+    np.save(path_res + "order_H_E2H1_deg1_" + bc_input + "_" + geo_case, order_H_E2H1_deg1)
 
     # Dual representation
-    np.save(path_res + "p30_err_deg1_" + bc_input + "_" + geo_case, p30_err_deg1)
-    np.save(path_res + "u12_err_deg1_" + bc_input + "_" + geo_case, u12_err_deg1)
+    np.save(path_res + "E12_err_deg1_" + bc_input + "_" + geo_case, E12_err_deg1)
+    np.save(path_res + "H12_err_deg1_" + bc_input + "_" + geo_case, H12_err_deg1)

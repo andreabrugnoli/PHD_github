@@ -25,7 +25,7 @@ from FEEC.DiscretizationInterconnection.dofs_bd_hybrid import dofs_ess_nat
 
 
 def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="EH"):
-    """Compute the numerical solution of the wave equation with a DG method based on interconnection
+    """Compute the numerical solution of the maxwell equation with a Hybridization method
 
         Parameters:
         n_el: number of elements for the discretization
@@ -100,7 +100,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="EH"):
     dofsVE1_tan_E, dofsVE1_tan_H = dofs_ess_nat(bc_E, WE1H2_loc, VE1_tan)
     dofsVH1_tan_H, dofsVH1_tan_E = dofs_ess_nat(bc_H, WE2H1_loc, VH1_tan)
 
-    # Initial condition 01 and 32
+    # Initial condition
     en_E1H2 = Function(V_E1H2, name="e_E1H2 n")
     assign_exactE1H2(E_ex, H_ex, en_E1H2, WE1H2_loc, VE1_tan, V12)
     En_1, Hn_2, Hn_1_nor, En_1_tan = en_E1H2.split()
@@ -303,7 +303,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="EH"):
 
         # Error E2H1
         errL2_E_2_vec[ii + 1] = norm(E_ex - En_2)
-        errHdiv_H_2_vec[ii + 1] = errornorm(E_ex, En_2, norm_type="Hdiv")
+        errHdiv_E_2_vec[ii + 1] = errornorm(E_ex, En_2, norm_type="Hdiv")
         errL2_H_1_vec[ii + 1] = norm(H_ex - Hn_1)
         errHcurl_H_1_vec[ii + 1] = errornorm(H_ex, Hn_1, norm_type="Hcurl")
         err_H_1tan = h_cell * cross(H_ex - Hn_1_tan, n_ver) ** 2
@@ -312,7 +312,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="EH"):
         # First project normal trace of u_e onto Vnor
         Eex_nor_p = project_ex_W1nor(E_ex, WE2H1_loc.sub(2))
         err_E_1nor = h_cell * cross(Eex_nor_p - En_1_nor, n_ver) ** 2
-        errL2_H_1nor_vec[ii] = sqrt(assemble((err_E_1nor('+') + err_E_1nor('-')) * dS + err_E_1nor * ds))
+        errL2_E_1nor_vec[ii] = sqrt(assemble((err_E_1nor('+') + err_E_1nor('-')) * dS + err_E_1nor * ds))
 
         # Dual Field
         err_E12_vec[ii + 1] = norm(En_2 - En_1)
@@ -359,72 +359,72 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="EH"):
     return dict_res
 
 
-bd_cond = 'EH' #input("Enter bc: ")
-
-n_elem = 1
-pol_deg = 1
-
-n_time = 10
-t_fin = 1
-
-dt = t_fin / n_time
-
-results = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bd_cond)
-
-# # dictres_file = open("results_hybridwave.pkl", "wb")
-# # pickle.dump(results, dictres_file)
-# # dictres_file.close()
-
-t_vec = results["t_span"]
-
-bdflow12_mid = results["flow12_mid"]
-bdflow21_mid = results["flow21_mid"]
-
-H_12 = results["energy_12"]
-H_21 = results["energy_21"]
-
-H_ex = results["energy_ex"]
-
-bdflow_ex_nmid = results["flow_ex_mid"]
-bdflow_num_nmid = results["flow_num_mid"]
-Hdot_num_nmid = results["Hdot_num_mid"]
-
-err_H12, err_H21 = results["err_H"]
-
-plt.figure()
-plt.plot(t_vec[1:]-dt/2, np.diff(H_12)/dt-bdflow12_mid, 'r-.', label="Power bal 12")
-plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.legend()
-
-plt.figure()
-plt.plot(t_vec[1:]-dt/2, np.diff(H_12)/dt, 'r-.', label="DHdt 12")
-plt.plot(t_vec[1:]-dt/2, bdflow12_mid, 'b-.', label="flow 12")
-plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.legend()
-
-plt.figure()
-plt.plot(t_vec[1:]-dt/2, np.diff(H_21)/dt-bdflow21_mid, 'r-.', label="Power bal 21")
-plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.legend()
-
-plt.figure()
-plt.plot(t_vec[1:]-dt/2, np.diff(H_21)/dt, 'r-.', label="DHdt 21")
-plt.plot(t_vec[1:]-dt/2, bdflow21_mid, 'b-.', label="flow 21")
-plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.legend()
-
-plt.figure()
-plt.plot(t_vec[1:]-dt/2, Hdot_num_nmid-bdflow_num_nmid, 'r-.', label="Discrete Power flow")
-plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.legend()
-
-plt.figure()
-plt.plot(t_vec[1:]-dt/2, bdflow_ex_nmid-bdflow_num_nmid, 'r-.', label="Err power bal")
-plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.legend()
-
-
-plt.show()
+# bd_cond = 'EH' #input("Enter bc: ")
+#
+# n_elem = 4
+# pol_deg = 3
+#
+# n_time = 100
+# t_fin = 1
+#
+# dt = t_fin / n_time
+#
+# results = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bd_cond)
+#
+# dictres_file = open("results_hybridmaxwell.pkl", "wb")
+# pickle.dump(results, dictres_file)
+# dictres_file.close()
+#
+# t_vec = results["t_span"]
+#
+# bdflow12_mid = results["flow12_mid"]
+# bdflow21_mid = results["flow21_mid"]
+#
+# H_12 = results["energy_12"]
+# H_21 = results["energy_21"]
+#
+# H_ex = results["energy_ex"]
+#
+# bdflow_ex_nmid = results["flow_ex_mid"]
+# bdflow_num_nmid = results["flow_num_mid"]
+# Hdot_num_nmid = results["Hdot_num_mid"]
+#
+# err_H12, err_H21 = results["err_H"]
+#
+# plt.figure()
+# plt.plot(t_vec[1:]-dt/2, np.diff(H_12)/dt-bdflow12_mid, 'r-.', label="Power bal 12")
+# plt.xlabel(r'Time $[\mathrm{s}]$')
+# plt.legend()
+#
+# plt.figure()
+# plt.plot(t_vec[1:]-dt/2, np.diff(H_12)/dt, 'r-.', label="DHdt 12")
+# plt.plot(t_vec[1:]-dt/2, bdflow12_mid, 'b-.', label="flow 12")
+# plt.xlabel(r'Time $[\mathrm{s}]$')
+# plt.legend()
+#
+# plt.figure()
+# plt.plot(t_vec[1:]-dt/2, np.diff(H_21)/dt-bdflow21_mid, 'r-.', label="Power bal 21")
+# plt.xlabel(r'Time $[\mathrm{s}]$')
+# plt.legend()
+#
+# plt.figure()
+# plt.plot(t_vec[1:]-dt/2, np.diff(H_21)/dt, 'r-.', label="DHdt 21")
+# plt.plot(t_vec[1:]-dt/2, bdflow21_mid, 'b-.', label="flow 21")
+# plt.xlabel(r'Time $[\mathrm{s}]$')
+# plt.legend()
+#
+# plt.figure()
+# plt.plot(t_vec[1:]-dt/2, Hdot_num_nmid-bdflow_num_nmid, 'r-.', label="Discrete Power flow")
+# plt.xlabel(r'Time $[\mathrm{s}]$')
+# plt.legend()
+#
+# plt.figure()
+# plt.plot(t_vec[1:]-dt/2, bdflow_ex_nmid-bdflow_num_nmid, 'r-.', label="Err power bal")
+# plt.xlabel(r'Time $[\mathrm{s}]$')
+# plt.legend()
+#
+#
+# plt.show()
 
 # dictres_file = open("results_wave.pkl", "wb")
 # pickle.dump(results, dictres_file)
