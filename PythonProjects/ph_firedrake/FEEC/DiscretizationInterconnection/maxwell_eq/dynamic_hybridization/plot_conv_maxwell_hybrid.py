@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tools_plotting import setup
 
-## TO DO
 save_plots = input("Save plots? ")
 path_fig = "/home/andrea/Pictures/PythonPlots/Hybridization_maxwell/"
 path_res = "results_hybrid/"
@@ -145,7 +144,7 @@ for ii in deg_vec:
     errL2_H2 = err_H2_dict[ii][:, 0]
     plt.plot(np.log(h), np.log(errL2_H2), '-.+', label=r'RT$^1_' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.5*(np.log(errL2_H2)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.1*(np.log(errL2_H2)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
 plt.ylabel(r'$\log||H^2_h - H^2_{\mathrm{ex}}||_{L^2}$')
@@ -163,7 +162,7 @@ for ii in deg_vec:
     plt.plot(np.log(h), np.log(errL2_H1nor), '-.+', label=r'NED$^1_' + str(ii) + '$')
 
     plt.plot(np.log(h), np.log(h**ii) + \
-        + 1.2*(np.log(errL2_H1nor)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+        + 1.1*(np.log(errL2_H1nor)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
 plt.ylabel(r'$\log|||H^{1, \bm{n}}_h - P_h H^{1,\bm{n}}_{\mathrm{ex}}|||_{\mathcal{T}_h}$')
@@ -181,7 +180,7 @@ for ii in deg_vec:
     errL2_E1tan = err_E1tan_dict[ii][:]
     plt.plot(np.log(h), np.log(errL2_E1tan), '-.+', label=r'NED$^1_' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.5*(np.log(errL2_E1tan)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.1*(np.log(errL2_E1tan)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
 plt.ylabel(r'$\log|||E^{1, \bm{t}}_h - E^{1, \bm{t}}_{\mathrm{ex}}|||_{\mathcal{T}_h}$')
@@ -196,10 +195,10 @@ if save_plots:
 plt.figure()
 for ii in deg_vec:
     h = h_dict[ii]
-    errL2_E2 = err_E2_dict[ii]
+    errL2_E2 = err_E2_dict[ii][:, 0]
     plt.plot(np.log(h), np.log(errL2_E2), '-.+', label=r'RT$_' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.5*(np.log(errL2_E2)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.1*(np.log(errL2_E2)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
 plt.ylabel(r'$\log||\widehat{E}^2_h - \widehat{E}^2_{\mathrm{ex}}||_{L^2}$')
@@ -216,7 +215,7 @@ for ii in deg_vec:
     errL2_H1 = err_H1_dict[ii][:, 0]
     plt.plot(np.log(h), np.log(errL2_H1), '-.+', label=r'NED$^1_' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.2*(np.log(errL2_H1)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.1*(np.log(errL2_H1)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
 plt.ylabel(r'$\log||\widehat{H}^1_h - \widehat{H}^1_{\mathrm{ex}}||_{L^2}$')
@@ -233,7 +232,7 @@ for ii in deg_vec:
     errL2_E1nor = err_E1nor_dict[ii][:]
     plt.plot(np.log(h), np.log(errL2_E1nor), '-.+', label=r'NED$^1_' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**(ii)) + \
-             + 1.5*(np.log(errL2_E1nor)[-1] - np.log(h**(ii))[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.1*(np.log(errL2_E1nor)[-1] - np.log(h**(ii))[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
 plt.ylabel(r'$\log|||\widehat{E}^{1, \bm{n}}_h - P_h \widehat{E}^{1, \bm{n}}_{\mathrm{ex}}|||_{\mathcal{T}_h}$')
@@ -251,7 +250,7 @@ for ii in deg_vec:
     errL2_H1tan = err_H1tan_dict[ii][:]
     plt.plot(np.log(h), np.log(errL2_H1tan), '-.+', label=r'NED$^1_' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.5*(np.log(errL2_H1tan)[-1] - 0.9*np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.1*(np.log(errL2_H1tan)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
 plt.ylabel(r'$\log|||\widehat{H}^{1, \bm{t}}_h - \widehat{H}^{1, \bm{t}}_{\mathrm{ex}}|||_{\mathcal{T}_h}$')
@@ -289,7 +288,7 @@ for ii in deg_vec:
     errL2_H12 = err_H12_dict[ii]
     plt.plot(np.log(h), np.log(errL2_H12), '-.+', label=r'$s=' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.5*(np.log(errL2_H12)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.1*(np.log(errL2_H12)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
 plt.ylabel(r'$\log||H^2_h - \widehat{H}^1_h||_{L^2}$')

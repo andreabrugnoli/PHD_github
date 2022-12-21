@@ -183,3 +183,6 @@ if save_res:
     # Dual representation
     np.save(path_res + "E12_err_deg1_" + bc_input + "_" + geo_case, E12_err_deg1)
     np.save(path_res + "H12_err_deg1_" + bc_input + "_" + geo_case, H12_err_deg1)
+
+    np.save(path_res + "order_E12_deg1_" + bc_input + "_" + geo_case, order_E12_deg1)
+    np.save(path_res + "order_H12_deg1_" + bc_input + "_" + geo_case, order_H12_deg1)
