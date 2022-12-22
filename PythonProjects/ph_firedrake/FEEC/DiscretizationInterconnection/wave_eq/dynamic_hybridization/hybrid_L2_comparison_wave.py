@@ -283,14 +283,14 @@ plt.savefig(path_fig + "diff_u1_conthyb" + geo_case + bc_case + ".pdf", format="
 plt.figure()
 plt.plot(t_vec[1:], err_p3, 'r-.')
 plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.title("$||p^3_{\mathrm{cont}} - p^3_{\mathrm{hyb}}||_{L^2}$")
+plt.title("$||\widehat{p}^3_{\mathrm{cont}} - \widehat{p}^3_{\mathrm{hyb}}||_{L^2}$")
 plt.savefig(path_fig + "diff_p3_conthyb" + geo_case + bc_case + ".pdf", format="pdf")
 
 
 plt.figure()
 plt.plot(t_vec[1:], err_u2, 'r-.')
 plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.title("$||u^2_{\mathrm{cont}} - u^2_{\mathrm{hyb}}||_{L^2}$")
+plt.title("$||\widehat{u}^2_{\mathrm{cont}} - \widehat{u}^2_{\mathrm{hyb}}||_{L^2}$")
 plt.savefig(path_fig + "diff_u2_conthyb" + geo_case + bc_case + ".pdf", format="pdf")
 
 

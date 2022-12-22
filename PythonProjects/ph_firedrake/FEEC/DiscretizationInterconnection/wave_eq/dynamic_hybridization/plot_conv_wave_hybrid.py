@@ -300,7 +300,7 @@ for ii in deg_vec:
 
 plt.xlabel(r'$\log(h)$')
 plt.ylabel(r'$\log||\widehat{u}^2_h - \widehat{u}^2_{\mathrm{ex}}||_{L^2}$')
-plt.title(r'Error $u^2_h$')
+plt.title(r'Error $\widehat{u}^2_h$')
 
 plt.legend()
 

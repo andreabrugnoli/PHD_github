@@ -29,6 +29,7 @@ for n_deg in n_dict.values():
         print("Conforming Galerkin E1H2  dim for n_el " + str(n_el) + " and degree " + str(kk) + ": " + str(V12.dim()))
         print("Conforming Galerkin E1H2 (2 broken) dim for n_el " + str(n_el) + \
               " and degree " + str(kk) + ": " + str(V12.sub(0).dim() + WE1H2_loc.sub(1).dim()))
+
         print("Hybrid E1H2 dim for n_el " + str(n_el) + " and degree " + str(kk) + ": " + str(VE1_tan.dim()))
 
         print("Ratio hybrid continous " + str(n_el) + " and degree " + str(kk) + ": " + \
@@ -50,7 +51,7 @@ for n_deg in n_dict.values():
         print("Conforming Galerkin E2H1  dim for n_el " + str(n_el) + " and degree " + str(kk) + ": " + str(V21.dim()))
         print("Conforming Galerkin E2H1 (2 broken) dim for n_el " + str(n_el) + \
               " and degree " + str(kk) + ": " + str(WE2H1_loc.sub(0).dim()+V21.sub(1).dim()))
-        print("Hybrid E2H1 dim for n_el " + str(n_el) + " and degree " + str(kk) + ": " + str(VE1_tan.dim()))
+        print("Hybrid E2H1 dim for n_el " + str(n_el) + " and degree " + str(kk) + ": " + str(VH1_tan.dim()))
 
         print("Ratio hybrid continous " + str(n_el) + " and degree " + str(kk) + ": " + \
               str(VH1_tan.dim() / (WE2H1_loc.sub(0).dim()+V21.sub(1).dim())))
