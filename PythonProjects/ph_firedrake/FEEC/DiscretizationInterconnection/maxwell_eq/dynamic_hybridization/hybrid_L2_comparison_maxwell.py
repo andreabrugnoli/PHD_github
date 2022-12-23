@@ -160,6 +160,12 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D", dim="2D"):
     err_H1 = np.zeros((n_t,))
     err_H2 = np.zeros((n_t,))
 
+    err_divE2 = np.zeros((n_t+1,))
+    err_divH2 = np.zeros((n_t+1,))
+
+    err_divE2[0] = norm(div(En_2))
+    err_divH2[0] = norm(div(Hn_2))
+
     # Bilinear form E1H2
     a_formE1H2_hyb = m_formE1H2(vE1_hyb, E1_hyb, vH2_hyb, H2_hyb) - 0.5 * dt * j_formE1H2(vE1_hyb, E1_hyb, vH2_hyb, H2_hyb) \
                  - 0.5 * dt * constr_locE1H2(vE1_hyb, E1_hyb, vH1_nor, H1_nor, n_ver) \
@@ -245,8 +251,11 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D", dim="2D"):
         err_H1[ii] = norm(Hn_1_hyb - Hn_1)
         err_H2[ii] = norm(Hn_2_hyb - Hn_2)
 
+        err_divE2[ii+1] = norm(div(En_2))
+        err_divH2[ii+1] = norm(div(Hn_2))
 
-    return t_vec, err_E1, err_E2, err_H1, err_H2
+
+    return t_vec, err_E1, err_E2, err_H1, err_H2, err_divE2, err_divH2
 
 
 bc_case = 'EH' #input("Enter bc: ")
@@ -259,32 +268,45 @@ t_fin = 1
 
 dt = t_fin / n_time
 
-t_vec, err_E1, err_E2, err_H1, err_H2 = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bc_case)
+t_vec, err_E1, err_E2, err_H1, err_H2, divE2, divH2 = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bc_case)
 
 path_fig = "/home/andrea/Pictures/PythonPlots/Hybridization_maxwell/"
 
+# plt.figure()
+# plt.plot(t_vec[1:], err_E1, 'r-.')
+# plt.xlabel(r'Time $[\mathrm{s}]$')
+# plt.title("$||E^1_{\mathrm{cont}} - E^1_{\mathrm{hyb}}||_{L^2}$")
+# plt.savefig(path_fig + "diff_E1_conthyb" + geo_case + bc_case + ".pdf", format="pdf")
+#
+# plt.figure()
+# plt.plot(t_vec[1:], err_H2, 'r-.')
+# plt.xlabel(r'Time $[\mathrm{s}]$')
+# plt.title("$||H^2_{\mathrm{cont}} - H^2_{\mathrm{hyb}}||_{L^2}$")
+# plt.savefig(path_fig + "diff_H2_conthyb" + geo_case + bc_case + ".pdf", format="pdf")
+#
+# plt.figure()
+# plt.plot(t_vec[1:], err_E2, 'r-.')
+# plt.title("$||\widehat{E}^2_{\mathrm{cont}} - \widehat{E}^2_{\mathrm{hyb}}||_{L^2}$")
+# plt.savefig(path_fig + "diff_E2_conthyb" + geo_case + bc_case + ".pdf", format="pdf")
+#
+# plt.figure()
+# plt.plot(t_vec[1:], err_H1, 'r-.')
+# plt.xlabel(r'Time $[\mathrm{s}]$')
+# plt.title("$||\widehat{H}^1_{\mathrm{cont}} - \widehat{H}^1_{\mathrm{hyb}}||_{L^2}$")
+# plt.savefig(path_fig + "diff_H1_conthyb" + geo_case + bc_case + ".pdf", format="pdf")
+
 plt.figure()
-plt.plot(t_vec[1:], err_E1, 'r-.')
+plt.plot(t_vec, divE2, 'r-.') # , label=r"\mathrm{d}^2(E^2_h)")
 plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.title("$||E^1_{\mathrm{cont}} - E^1_{\mathrm{hyb}}||_{L^2}$")
-plt.savefig(path_fig + "diff_E1_conthyb" + geo_case + bc_case + ".pdf", format="pdf")
+plt.ylabel(r'$||\mathrm{d}^2 E^2_h||_{L^2}$')
+
+plt.savefig(path_fig + "div_E2" + geo_case + bc_case + ".pdf", format="pdf")
 
 plt.figure()
-plt.plot(t_vec[1:], err_H2, 'r-.')
+plt.plot(t_vec, divH2, 'b-.') #, label=r"\mathrm{d}^2(H^2_h)")
 plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.title("$||H^2_{\mathrm{cont}} - H^2_{\mathrm{hyb}}||_{L^2}$")
-plt.savefig(path_fig + "diff_H2_conthyb" + geo_case + bc_case + ".pdf", format="pdf")
+plt.ylabel(r'$||\mathrm{d}^2 H^2_h||_{L^2}$')
 
-plt.figure()
-plt.plot(t_vec[1:], err_E2, 'r-.')
-plt.title("$||\widehat{E}^2_{\mathrm{cont}} - \widehat{E}^2_{\mathrm{hyb}}||_{L^2}$")
-plt.savefig(path_fig + "diff_E2_conthyb" + geo_case + bc_case + ".pdf", format="pdf")
-
-plt.figure()
-plt.plot(t_vec[1:], err_H1, 'r-.')
-plt.xlabel(r'Time $[\mathrm{s}]$')
-plt.title("$||\widehat{H}^1_{\mathrm{cont}} - \widehat{H}^1_{\mathrm{hyb}}||_{L^2}$")
-plt.savefig(path_fig + "diff_H1_conthyb" + geo_case + bc_case + ".pdf", format="pdf")
-
+plt.savefig(path_fig + "div_H2" + geo_case + bc_case + ".pdf", format="pdf")
 
 plt.show()

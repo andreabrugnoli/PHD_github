@@ -40,20 +40,20 @@ print('E2H1 Spaces')
 
 kk=1
 
-for n_deg in n_dict.values():
-
-    for n_el in n_deg:
-
-        mesh = BoxMesh(n_el, n_el, n_el, 1, 1, 1)
-
-        WE2H1_loc, VH1_tan, V21 = spacesE2H1(mesh, kk)
-
-        print("Conforming Galerkin E2H1  dim for n_el " + str(n_el) + " and degree " + str(kk) + ": " + str(V21.dim()))
-        print("Conforming Galerkin E2H1 (2 broken) dim for n_el " + str(n_el) + \
-              " and degree " + str(kk) + ": " + str(WE2H1_loc.sub(0).dim()+V21.sub(1).dim()))
-        print("Hybrid E2H1 dim for n_el " + str(n_el) + " and degree " + str(kk) + ": " + str(VH1_tan.dim()))
-
-        print("Ratio hybrid continous " + str(n_el) + " and degree " + str(kk) + ": " + \
-              str(VH1_tan.dim() / (WE2H1_loc.sub(0).dim()+V21.sub(1).dim())))
-
-    kk = kk+1
+# for n_deg in n_dict.values():
+#
+#     for n_el in n_deg:
+#
+#         mesh = BoxMesh(n_el, n_el, n_el, 1, 1, 1)
+#
+#         WE2H1_loc, VH1_tan, V21 = spacesE2H1(mesh, kk)
+#
+#         print("Conforming Galerkin E2H1  dim for n_el " + str(n_el) + " and degree " + str(kk) + ": " + str(V21.dim()))
+#         print("Conforming Galerkin E2H1 (2 broken) dim for n_el " + str(n_el) + \
+#               " and degree " + str(kk) + ": " + str(WE2H1_loc.sub(0).dim()+V21.sub(1).dim()))
+#         print("Hybrid E2H1 dim for n_el " + str(n_el) + " and degree " + str(kk) + ": " + str(VH1_tan.dim()))
+#
+#         print("Ratio hybrid continous " + str(n_el) + " and degree " + str(kk) + ": " + \
+#               str(VH1_tan.dim() / (WE2H1_loc.sub(0).dim()+V21.sub(1).dim())))
+#
+#     kk = kk+1

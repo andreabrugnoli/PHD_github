@@ -225,7 +225,7 @@ for ii in deg_vec:
 
 plt.xlabel(r'$\log(h)$')
 plt.ylabel(r'$\log||\widehat{H}^1_h - \widehat{H}^1_{\mathrm{ex}}||_{L^2}$')
-plt.title(r'Error $H^1_h$')
+plt.title(r'Error $\widehat{H}^1_h$')
 
 plt.legend()
 
