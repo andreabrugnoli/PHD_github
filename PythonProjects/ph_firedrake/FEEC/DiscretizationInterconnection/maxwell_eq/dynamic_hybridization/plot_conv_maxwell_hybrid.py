@@ -126,7 +126,7 @@ for ii in deg_vec:
     errL2_E1 = err_E1_dict[ii][:, 0]
     plt.plot(np.log(h), np.log(errL2_E1), '-.+', label=r'NED$^1_' + str(ii)+ '$')
     plt.plot(np.log(h), np.log(h**(ii)) + \
-             + 1.1*(np.log(errL2_E1)[-1] - np.log(h**(ii))[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.1*(np.log(errL2_E1)[0] - np.log(h**(ii))[0]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
 plt.ylabel(r'$\log||E^1_h - E^1_{\mathrm{ex}}||_{L^2}$')
@@ -180,7 +180,7 @@ for ii in deg_vec:
     errL2_E1tan = err_E1tan_dict[ii][:]
     plt.plot(np.log(h), np.log(errL2_E1tan), '-.+', label=r'NED$^1_' + str(ii) + '$')
     plt.plot(np.log(h), np.log(h**ii) + \
-             + 1.3*(np.log(errL2_E1tan)[-1] - np.log(h**ii)[-1]), '-v', label=r'$h^' + str(ii) + '$')
+             + 1.3*(np.log(errL2_E1tan)[0] - np.log(h**ii)[0]), '-v', label=r'$h^' + str(ii) + '$')
 
 plt.xlabel(r'$\log(h)$')
 plt.ylabel(r'$\log|||E^{1, \bm{t}}_h - E^{1, \bm{t}}_{\mathrm{ex}}|||_{\mathcal{T}_h}$')
