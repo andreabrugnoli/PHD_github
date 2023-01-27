@@ -271,25 +271,26 @@ path_fig = "/home/andrea/Pictures/PythonPlots/Hybridization_wave/"
 
 plt.figure()
 plt.plot(t_vec[1:], err_p0, 'r-.')
-plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.xlabel(r'Time')
 plt.title("$||p^0_{\mathrm{cont}} - p^0_{\mathrm{hyb}}||_{L^2}$")
 plt.savefig(path_fig + "diff_p0_conthyb" + geo_case + bc_case + ".pdf", format="pdf")
 
 plt.figure()
 plt.plot(t_vec[1:], err_u1, 'r-.')
+plt.xlabel(r'Time')
 plt.title("$||u^1_{\mathrm{cont}} - u^1_{\mathrm{hyb}}||_{L^2}$")
 plt.savefig(path_fig + "diff_u1_conthyb" + geo_case + bc_case + ".pdf", format="pdf")
 
 plt.figure()
 plt.plot(t_vec[1:], err_p3, 'r-.')
-plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.xlabel(r'Time')
 plt.title("$||\widehat{p}^3_{\mathrm{cont}} - \widehat{p}^3_{\mathrm{hyb}}||_{L^2}$")
 plt.savefig(path_fig + "diff_p3_conthyb" + geo_case + bc_case + ".pdf", format="pdf")
 
 
 plt.figure()
 plt.plot(t_vec[1:], err_u2, 'r-.')
-plt.xlabel(r'Time $[\mathrm{s}]$')
+plt.xlabel(r'Time')
 plt.title("$||\widehat{u}^2_{\mathrm{cont}} - \widehat{u}^2_{\mathrm{hyb}}||_{L^2}$")
 plt.savefig(path_fig + "diff_u2_conthyb" + geo_case + bc_case + ".pdf", format="pdf")
 

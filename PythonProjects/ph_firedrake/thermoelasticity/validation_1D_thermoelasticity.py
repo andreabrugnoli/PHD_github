@@ -29,17 +29,22 @@ def compute_analytical(delta, xi):
                       ((gam1(s)**2-s**2)*mpmath.exp(-gam1(s)*xi) - (gam2(s)**2-s**2)*mpmath.exp(-gam2(s)*xi))
 
     disp_s = lambda s: -phi(s)/(gam1(s)**2-gam2(s)**2)*(gam1(s)*mpmath.exp(-gam1(s)*xi) - gam2(s)*mpmath.exp(-gam2(s)*xi))
+    vel_s = lambda s: -s*phi(s) / (gam1(s) ** 2 - gam2(s) ** 2) * (
+                gam1(s) * mpmath.exp(-gam1(s) * xi) - gam2(s) * mpmath.exp(-gam2(s) * xi))
     stress_s = lambda s: s**2*phi(s)/(gam1(s)**2-gam2(s)**2)*(mpmath.exp(-gam1(s)*xi) - mpmath.exp(-gam2(s)*xi))
 
     theta_t = np.empty((n_t, ))
     disp_t = np.empty((n_t, ))
+    vel_t = np.empty((n_t, ))
+
     stress_t = np.empty((n_t, ))
     for i in range(n_t):
         theta_t[i] = mpmath.invertlaplace(theta_s, t_vec[i], method='dehoog')
         disp_t[i] = mpmath.invertlaplace(disp_s, t_vec[i], method='dehoog')
+        vel_t[i] = mpmath.invertlaplace(vel_s, t_vec[i], method='dehoog')
         stress_t[i] = mpmath.invertlaplace(stress_s, t_vec[i], method='dehoog')
 
-    return t_vec, theta_t, disp_t, stress_t
+    return t_vec, theta_t, disp_t, stress_t, vel_t
 
 
 def compute_sol(n, r, delta):
@@ -142,12 +147,12 @@ def compute_sol(n, r, delta):
 
     epel_n, eqel_n, ept_n, eqt_n = e_n.split()
 
-    v_n.assign(Constant(0.0))
+    # v_n.assign(Constant(0.0))
 
     n_t = int(floor(t_fin/dt) + 1)
 
     u_atP = np.zeros((n_t,))
-    v_atP = np.zeros((n_t,))
+    vel_atP = np.zeros((n_t,))
     theta_atP = np.zeros((n_t,))
 
     x_hat = 1
@@ -184,22 +189,23 @@ def compute_sol(n, r, delta):
         u_atP[i] = u_atP[i-1] + dt/2*(v_n.at(Ppoint) + v_n1.at(Ppoint))
         v_n.assign(v_n1)
         theta_atP[i] = ept_n1.at(Ppoint)
+        vel_atP[i] = v_n1.at(Ppoint)
         print(i)
 
     t_vec = np.linspace(0, t_fin, num=n_t)
 
-    return t_vec, theta_atP, u_atP
+    return t_vec, theta_atP, u_atP, vel_atP
 
-n = 100
-r = 2
+n = 200
+r = 1
 
-t1, th1, u1 = compute_sol(n, r, 0)
-t2, th2, u2 = compute_sol(n, r, 1)
+t1, th1, u1, vel1 = compute_sol(n, r, 0)
+t2, th2, u2, vel2 = compute_sol(n, r, 1)
 
-t_an1, th_an1, disp_an1, stress_an1 = compute_analytical(0, 1)
-t_an2, th_an2, disp_an2, stress_an2 = compute_analytical(1, 1)
+t_an1, th_an1, disp_an1, stress_an1, vel_an1 = compute_analytical(0, 1)
+t_an2, th_an2, disp_an2, stress_an2, vel_an2 = compute_analytical(1, 1)
 
-path_fig = "/home/a.brugnoli/Plots/Python/Plots/Thermoelasticity/"
+path_fig = "/home/andrea/Pictures/PythonPlots/Thermoelasticity/"
 save_fig = True
 plt.figure()
 
@@ -216,11 +222,23 @@ plt.figure()
 
 plt.plot(t1, u1, '-.', label=r'approx $u_x$ $\delta=0$')
 plt.plot(t2, u2, '-.', label=r'approx $u_x$ $\delta=1$')
-plt.plot(t_an1, disp_an1, '-', label=r'exact $\theta$ $\delta=0$')
-plt.plot(t_an2, disp_an2, ':', label=r'exact $\theta$ $\delta=1$')
+plt.plot(t_an1, disp_an1, '-', label=r'exact $u_x$ $\delta=0$')
+plt.plot(t_an2, disp_an2, ':', label=r'exact $u_x$ $\delta=1$')
 plt.xlabel(r'Dimensionless Time')
 plt.title(r'Dimensionless Displacement at ' + str(1))
 plt.legend()
 
 plt.savefig(path_fig + "disp_at1", format="eps")
+
+plt.figure()
+
+plt.plot(t1, vel1, '-.', label=r'approx $v_x$ $\delta=0$')
+plt.plot(t2, vel2, '-.', label=r'approx $v_x$ $\delta=1$')
+plt.plot(t_an1, vel_an1, '-', label=r'exact $v_x$ $\delta=0$')
+plt.plot(t_an2, vel_an2, ':', label=r'exact $v_x$ $\delta=1$')
+plt.xlabel(r'Dimensionless Time')
+plt.title(r'Dimensionless Velocity at ' + str(1))
+plt.legend()
+
+plt.savefig(path_fig + "vel_at1", format="eps")
 plt.show()
