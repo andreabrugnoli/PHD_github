@@ -144,6 +144,12 @@ def compute_sol(n, r, delta):
     v_n1 = Function(V_pel)
     v_n = Function(V_pel)
 
+    init_f = Function(V)
+    init_f.assign(Constant(0))
+
+    # Assign compatible initial conditions
+    solve(A, e_n, init_f)
+
 
     epel_n, eqel_n, ept_n, eqt_n = e_n.split()
 
@@ -196,8 +202,8 @@ def compute_sol(n, r, delta):
 
     return t_vec, theta_atP, u_atP, vel_atP
 
-n = 200
-r = 1
+n = 100
+r = 3
 
 t1, th1, u1, vel1 = compute_sol(n, r, 0)
 t2, th2, u2, vel2 = compute_sol(n, r, 1)
