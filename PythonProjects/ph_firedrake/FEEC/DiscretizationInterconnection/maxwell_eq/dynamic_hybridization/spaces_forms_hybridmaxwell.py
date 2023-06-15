@@ -3,7 +3,7 @@ from firedrake import *
 
 def spacesE1H2(mesh, deg):
     P1 = FiniteElement("N1curl", mesh.ufl_cell(), deg)
-    P1f = FacetElement(P1)
+    P1f = P1[facet]
     P1_b = BrokenElement(P1)
     P1f_b = BrokenElement(P1f)
 
@@ -32,7 +32,7 @@ def spacesE2H1(mesh, deg):
 
     # Careful with freezing of simulation for variant integral
     P1 = FiniteElement("N1curl", mesh.ufl_cell(), deg)
-    P1f = FacetElement(P1)
+    P1f = P1[facet]
     P1_b = BrokenElement(P1)
     P1f_b = BrokenElement(P1f)
 
