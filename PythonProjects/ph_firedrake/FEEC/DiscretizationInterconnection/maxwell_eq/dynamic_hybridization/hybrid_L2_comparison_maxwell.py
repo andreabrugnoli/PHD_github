@@ -212,10 +212,10 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D", dim="2D"):
         ## Integration of E2H1 system (E natural)
 
         b_formE2H1_hyb = m_formE2H1(vE2_hyb, En_2_hyb, vH1_hyb, Hn_1_hyb)\
-                         + 0.5 * dt * j_formE2H1(vE2_hyb, En_2_hyb, vH1_hyb, Hn_1_hyb) \
-                     + 0.5 * dt * constr_locE2H1(vH1_hyb, Hn_1_hyb, vE1_nor, En_1_nor, n_ver) \
-                     + 0.5 * dt * constr_globalE2H1(vE1_nor, En_1_nor, vH1_tan, Hn_1_tan, n_ver) \
-                     + dt * bdflowE2H1(vH1_tan, input_E, n_ver)
+                    + 0.5 * dt * j_formE2H1(vE2_hyb, En_2_hyb, vH1_hyb, Hn_1_hyb) \
+                    + 0.5 * dt * constr_locE2H1(vH1_hyb, Hn_1_hyb, vE1_nor, En_1_nor, n_ver) \
+                    + 0.5 * dt * constr_globalE2H1(vE1_nor, En_1_nor, vH1_tan, Hn_1_tan, n_ver) \
+                    + dt * bdflowE2H1(vH1_tan, input_E, n_ver)
 
         en1_E2H1_hyb = solve_hybrid(a_formE2H1_hyb, b_formE2H1_hyb, bc_H_hyb, VH1_tan, WE2H1_loc)
 
@@ -270,7 +270,13 @@ dt = t_fin / n_time
 
 t_vec, err_E1, err_E2, err_H1, err_H2, divE2, divH2 = compute_err(n_elem, n_time, pol_deg, t_fin, bd_cond=bc_case)
 
+home_dir =os.environ['HOME']
+
 path_fig = "/home/andrea/Pictures/PythonPlots/Hybridization_maxwell/"
+
+if not os.path.exists(path_fig):
+    # If it doesn't exist, create it
+    os.makedirs(path_fig)
 
 plt.figure()
 plt.plot(t_vec[1:], err_E1, 'r-.')
