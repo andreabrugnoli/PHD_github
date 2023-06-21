@@ -28,7 +28,7 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D", dim="2D"):
     mesh = BoxMesh(n_el, n_el, n_el, 1, 1 / 2, 1 / 2)
     n_ver = FacetNormal(mesh)
 
-    WE1H2_loc, VE1_tan, V12 = spacesE1H2(mesh, deg)
+    WE1H2_loc, VE1_tan, V12, V1W2 = spacesE1H2(mesh, deg)
     V_E1H2_hyb = WE1H2_loc * VE1_tan
 
     v_E1H2_hyb = TestFunction(V_E1H2_hyb)
@@ -37,17 +37,17 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D", dim="2D"):
     e_E1H2_hyb = TrialFunction(V_E1H2_hyb)
     E1_hyb, H2_hyb, H1_nor, E1_tan = split(e_E1H2_hyb)
 
-    v_E1H2 = TestFunction(V12)
+    v_E1H2 = TestFunction(V1W2)
     vE1, vH2 = split(v_E1H2)
 
-    e_E1H2 = TrialFunction(V12)
+    e_E1H2 = TrialFunction(V1W2)
     E1, H2 = split(e_E1H2)
 
     print("Conforming Galerkin 12 dim: " + str(V12.dim()))
     print("Conforming Galerkin 12 (2 broken) dim: " + str(V12.sub(0).dim() + WE1H2_loc.sub(1).dim()))
     print("Hybrid 12 dim: " + str(VE1_tan.dim()))
 
-    WE2H1_loc, VH1_tan, V21 = spacesE2H1(mesh, deg)
+    WE2H1_loc, VH1_tan, V21, W2V1 = spacesE2H1(mesh, deg)
     V_E2H1_hyb = WE2H1_loc * VH1_tan
 
     print("Conforming Galerkin 21 dim: " + str(V21.dim()))
@@ -60,10 +60,10 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D", dim="2D"):
     e_E2H1_hyb = TrialFunction(V_E2H1_hyb)
     E2_hyb, H1_hyb, E1_nor, H1_tan = split(e_E2H1_hyb)
 
-    v_E2H1 = TestFunction(V21)
+    v_E2H1 = TestFunction(W2V1)
     vE2, vH1 = split(v_E2H1)
 
-    e_E2H1 = TrialFunction(V21)
+    e_E2H1 = TrialFunction(W2V1)
     E2, H1 = split(e_E2H1)
 
     dt = Constant(t_fin / n_t)
@@ -81,14 +81,14 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D", dim="2D"):
         bc_H_hyb = [DirichletBC(VH1_tan, H_ex_1, "on_boundary")]
         bc_E_hyb = []
 
-        bc_H = [DirichletBC(V21.sub(1), H_ex_1, "on_boundary")]
+        bc_H = [DirichletBC(W2V1.sub(1), H_ex_1, "on_boundary")]
         bc_E = []
 
     elif bd_cond == "E":
         bc_E_hyb = [DirichletBC(VE1_tan, E_ex_1, "on_boundary")]
         bc_H_hyb = []
 
-        bc_E = [DirichletBC(V12.sub(0), E_ex_1, "on_boundary")]
+        bc_E = [DirichletBC(V1W2.sub(0), E_ex_1, "on_boundary")]
         bc_H = []
     else:
         bc_H_hyb = [DirichletBC(VH1_tan, H_ex_1, 1), \
@@ -99,13 +99,13 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D", dim="2D"):
                     DirichletBC(VE1_tan, E_ex_1, 4),
                     DirichletBC(VE1_tan, E_ex_1, 6)]
 
-        bc_H = [DirichletBC(V21.sub(1), H_ex_1, 1), \
-                DirichletBC(V21.sub(1), H_ex_1, 3),
-                DirichletBC(V21.sub(1), H_ex_1, 5)]
+        bc_H = [DirichletBC(W2V1.sub(1), H_ex_1, 1), \
+                DirichletBC(W2V1.sub(1), H_ex_1, 3),
+                DirichletBC(W2V1.sub(1), H_ex_1, 5)]
 
-        bc_E = [DirichletBC(V12.sub(0), E_ex_1, 2), \
-                DirichletBC(V12.sub(0), E_ex_1, 4),
-                DirichletBC(V12.sub(0), E_ex_1, 6)]
+        bc_E = [DirichletBC(V1W2.sub(0), E_ex_1, 2), \
+                DirichletBC(V1W2.sub(0), E_ex_1, 4),
+                DirichletBC(V1W2.sub(0), E_ex_1, 6)]
 
     # Initial condition 01 and 32 hybrid
 
@@ -120,39 +120,39 @@ def compute_err(n_el, n_t, deg=1, t_fin=1, bd_cond="D", dim="2D"):
     # Initial condition for continuos
 
     try:
-        E0_1 = interpolate(E_ex, V12.sub(0))
+        E0_1 = interpolate(E_ex, V1W2.sub(0))
     except NotImplementedError:
-        E0_1 = project(E_ex, V12.sub(0))
+        E0_1 = project(E_ex, V1W2.sub(0))
 
     try:
-        H0_2 = interpolate(H_ex, V12.sub(1))
+        H0_2 = interpolate(H_ex, V1W2.sub(1))
     except NotImplementedError:
-        H0_2 = project(H_ex, V12.sub(1))
+        H0_2 = project(H_ex, V1W2.sub(1))
 
 
-    en_E1H2 = Function(V12, name="e_E1H2 n")
+    en_E1H2 = Function(V1W2, name="e_E1H2 n")
     en_E1H2.sub(0).assign(E0_1)
     en_E1H2.sub(1).assign(H0_2)
 
     En_1, Hn_2 = en_E1H2.split()
-    en1_E1H2 = Function(V12, name="e_E1H2 n+1")
+    en1_E1H2 = Function(V1W2, name="e_E1H2 n+1")
 
     try:
-        E0_2 = interpolate(E_ex, V21.sub(0))
+        E0_2 = interpolate(E_ex, W2V1.sub(0))
     except NotImplementedError:
-        E0_2 = project(E_ex, V21.sub(0))
+        E0_2 = project(E_ex, W2V1.sub(0))
 
     try:
-        H0_1 = interpolate(H_ex, V21.sub(1))
+        H0_1 = interpolate(H_ex, W2V1.sub(1))
     except NotImplementedError:
-        H0_1 = project(H_ex, V21.sub(1))
+        H0_1 = project(H_ex, W2V1.sub(1))
 
-    en_E2H1 = Function(V21, name="e_E2H1 n")
+    en_E2H1 = Function(W2V1, name="e_E2H1 n")
     en_E2H1.sub(0).assign(E0_2)
     en_E2H1.sub(1).assign(H0_1)
 
     En_2, Hn_1 = en_E2H1.split()
-    en1_E2H1 = Function(V21, name="e_E2H1 n+1")
+    en1_E2H1 = Function(W2V1, name="e_E2H1 n+1")
 
     # Error variables
     err_E1 = np.zeros((n_t,))
@@ -263,7 +263,7 @@ geo_case = '3D'
 n_elem = 4
 pol_deg = 3
 
-n_time = 100
+n_time = 3
 t_fin = 1
 
 dt = t_fin / n_time

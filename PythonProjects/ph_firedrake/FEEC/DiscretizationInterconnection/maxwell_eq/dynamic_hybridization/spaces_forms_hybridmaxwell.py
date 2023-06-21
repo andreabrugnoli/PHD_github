@@ -3,7 +3,7 @@ from firedrake import *
 
 def spacesE1H2(mesh, deg):
     P1 = FiniteElement("N1curl", mesh.ufl_cell(), deg)
-    P1f = FacetElement(P1)
+    P1f = P1[facet]
     P1_b = BrokenElement(P1)
     P1f_b = BrokenElement(P1f)
 
@@ -24,7 +24,9 @@ def spacesE1H2(mesh, deg):
     V1_tan = FunctionSpace(mesh, P1f)
     V12 = V1 * V2
 
-    return W12_loc, V1_tan, V12
+    V1W2 = V1 * W2
+
+    return W12_loc, V1_tan, V12, V1W2
 
 def spacesE2H1(mesh, deg):
     P2 = FiniteElement("RT", mesh.ufl_cell(), deg)
@@ -32,7 +34,7 @@ def spacesE2H1(mesh, deg):
 
     # Careful with freezing of simulation for variant integral
     P1 = FiniteElement("N1curl", mesh.ufl_cell(), deg)
-    P1f = FacetElement(P1)
+    P1f = P1[facet]
     P1_b = BrokenElement(P1)
     P1f_b = BrokenElement(P1f)
 
@@ -48,7 +50,10 @@ def spacesE2H1(mesh, deg):
     V1_tan = FunctionSpace(mesh, P1f)
     V21 = V2 * V1
 
-    return W21_loc, V1_tan, V21
+    W2V1 = W2 * V1
+
+
+    return W21_loc, V1_tan, V21, W2V1
 
 def assign_exactE1H2(E_ex, H_ex, state12, W12_loc, V12_gl, V12):
     Eex_1 = project(interpolate(E_ex, V12.sub(0)), W12_loc.sub(0))
